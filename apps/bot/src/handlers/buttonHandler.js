@@ -173,7 +173,7 @@ async function handlePartyButtons(interaction) {
                 rolesWithMembers[joinIndex].userId = userId;
 
                 const roleName = rolesWithMembers[joinIndex].role;
-                db.run('INSERT INTO party_members (party_id, user_id, role, status) SELECT id, ?, ?, "joined" FROM parties WHERE message_id = ?', [userId, roleName, message.id]).catch(e => console.error(e));
+                db.run('INSERT INTO party_members (party_id, user_id, role, status) SELECT id, ?, ?, \'joined\' FROM parties WHERE message_id = ?', [userId, roleName, message.id]).catch(e => console.error(e));
             } else if (joinIndex !== -1 && rolesWithMembers[joinIndex].userId) {
                 return await interaction.reply({ content: `❌ ${t('common.error', lang)}`, flags: [MessageFlags.Ephemeral] });
             }

@@ -392,7 +392,7 @@ async function handleJoinRoleSelect(interaction) {
             const slotIdx = rolesWithMembers.findIndex(r => r.userId === uId);
             if (slotIdx !== -1) {
                 const roleName = rolesWithMembers[slotIdx].role;
-                db.run('INSERT INTO party_members (party_id, user_id, role, status) SELECT id, ?, ?, "joined" FROM parties WHERE message_id = ?', [uId, roleName, message.id]).catch(console.error);
+                db.run('INSERT INTO party_members (party_id, user_id, role, status) SELECT id, ?, ?, \'joined\' FROM parties WHERE message_id = ?', [uId, roleName, message.id]).catch(console.error);
             }
         }
 
@@ -417,7 +417,7 @@ async function handleJoinRoleSelect(interaction) {
 
     // DB update
     const roleName = rolesWithMembers[selectedIndex].role;
-    db.run('INSERT INTO party_members (party_id, user_id, role, status) SELECT id, ?, ?, "joined" FROM parties WHERE message_id = ?',
+    db.run('INSERT INTO party_members (party_id, user_id, role, status) SELECT id, ?, ?, \'joined\' FROM parties WHERE message_id = ?',
         [userId, roleName, message.id]).catch(e => console.error(e));
 
     // Regenerate select menu components with updated member state

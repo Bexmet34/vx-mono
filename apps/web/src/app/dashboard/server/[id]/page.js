@@ -62,9 +62,9 @@ export default function ServerSettings() {
 
   const fetchSettings = async () => {
     try {
-      const res = await fetch(`/api/guilds/${guildId}/settings`);
+      const res = await fetch(`/api/guild-settings/${guildId}`);
       const data = await res.json();
-      if (res.ok) {
+      if (res.ok && data) {
         setSettings({
           language: data.language || "tr",
           auto_role_sync: data.auto_role_sync || false,
@@ -72,6 +72,7 @@ export default function ServerSettings() {
           whitelist: data.whitelist || [],
           party_templates: data.party_templates || [],
         });
+        if (data.embed_thumbnail_url) checkImage(data.embed_thumbnail_url);
       }
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
@@ -79,7 +80,7 @@ export default function ServerSettings() {
 
   const fetchDiscordData = async () => {
     try {
-      const res = await fetch(`/api/guilds/${guildId}/discord-info`);
+      const res = await fetch(`/api/discord/guilds/${guildId}/roles`);
       const data = await res.json();
       if (res.ok) {
         setDiscordRoles(data.roles || []);
