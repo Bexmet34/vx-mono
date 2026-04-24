@@ -75,7 +75,7 @@ async function handlePartyButtons(interaction) {
             .setTitle(`${oldEmbed.title || 'Party'} [${t('common.closed', lang)}]`)
             .setColor('#808080')
             .setFields(newFields)
-            .setThumbnail(guildConfig?.embed_thumbnail_url || `attachment://${LOGO_NAME}`)
+            .setThumbnail(guildConfig?.embed_thumbnail_url || null)
             .setFooter(null)
             .setTimestamp(null);
 
@@ -87,8 +87,7 @@ async function handlePartyButtons(interaction) {
 
         const response = await interaction.update({ 
             embeds: [closedEmbed], 
-            components: [closedRow],
-            files: [new AttachmentBuilder(LOGO_PATH, { name: LOGO_NAME })]
+            components: [closedRow]
         });
 
         return response;
@@ -191,8 +190,7 @@ async function handlePartyButtons(interaction) {
 
         await interaction.update({ 
             embeds: [newEmbed], 
-            components: newComponents,
-            files: [new AttachmentBuilder(LOGO_PATH, { name: LOGO_NAME })]
+            components: newComponents
         });
         return; // Interaction zaten cevaplandı, settings bloklarına düşmesin
     }

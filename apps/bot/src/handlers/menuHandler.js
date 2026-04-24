@@ -54,7 +54,7 @@ async function handleCloseOption(interaction, ownerId, lang) {
         .setTitle(`${oldEmbed.title || 'Party'} [${t('common.closed', lang)}]`)
         .setColor('#808080')
         .setFields(newFields)
-        .setThumbnail(guildConfig?.embed_thumbnail_url || `attachment://${LOGO_NAME}`)
+        .setThumbnail(guildConfig?.embed_thumbnail_url || null)
         .setFooter(null)
         .setTimestamp(null);
 
@@ -65,15 +65,13 @@ async function handleCloseOption(interaction, ownerId, lang) {
     if (interaction.customId.startsWith('settings_close_')) {
         await message.edit({ 
             embeds: [closedEmbed], 
-            components: [closedRow],
-            files: [new AttachmentBuilder(LOGO_PATH, { name: LOGO_NAME })]
+            components: [closedRow]
         });
         await interaction.update({ content: `✅ ${t('common.party_closed_label', lang)}`, embeds: [], components: [] });
     } else {
         await interaction.update({ 
             embeds: [closedEmbed], 
-            components: [closedRow],
-            files: [new AttachmentBuilder(LOGO_PATH, { name: LOGO_NAME })]
+            components: [closedRow]
         });
     }
 }
@@ -216,8 +214,7 @@ async function handleEditModal(interaction) {
 
     await message.edit({ 
         embeds: [newEmbed], 
-        components: newComponents,
-        files: [new AttachmentBuilder(LOGO_PATH, { name: LOGO_NAME })]
+        components: newComponents
     });
     await interaction.reply({ content: lang === 'tr' ? '✅ Parti başarıyla güncellendi.' : '✅ Party updated successfully.', flags: [MessageFlags.Ephemeral] });
 }
@@ -246,8 +243,7 @@ async function handleKickMember(interaction) {
 
     await message.edit({ 
         embeds: [allocationResult.newEmbed], 
-        components: allocationResult.newComponents,
-        files: [new AttachmentBuilder(LOGO_PATH, { name: LOGO_NAME })]
+        components: allocationResult.newComponents
     });
     await interaction.update({ content: lang === 'tr' ? '✅ Kullanıcı çıkarıldı.' : '✅ Member removed.', components: [], flags: [MessageFlags.Ephemeral] });
 }
@@ -405,8 +401,7 @@ async function handleJoinRoleSelect(interaction) {
         const allocationResult = await finalizeRoleUpdate(message, rolesWithMembers, multiRoleWaitlist, data, lang, guildName);
         return await interaction.update({ 
             embeds: [allocationResult.newEmbed], 
-            components: allocationResult.newComponents,
-            files: [new AttachmentBuilder(LOGO_PATH, { name: LOGO_NAME })]
+            components: allocationResult.newComponents
         });
     }
 
@@ -431,8 +426,7 @@ async function handleJoinRoleSelect(interaction) {
     const allocationResult = await finalizeRoleUpdate(message, rolesWithMembers, multiRoleWaitlist, data, lang, guildName);
     await interaction.update({ 
         embeds: [allocationResult.newEmbed], 
-        components: allocationResult.newComponents,
-        files: [new AttachmentBuilder(LOGO_PATH, { name: LOGO_NAME })]
+        components: allocationResult.newComponents
     });
 }
 
@@ -466,8 +460,7 @@ async function handleJoinMultiRoleSelect(interaction) {
 
     await message.edit({ 
         embeds: [allocationResult.newEmbed], 
-        components: allocationResult.newComponents,
-        files: [new AttachmentBuilder(LOGO_PATH, { name: LOGO_NAME })]
+        components: allocationResult.newComponents
     });
     await interaction.update({ content: lang === 'tr' ? '✅ Yedek rolleriniz başarıyla kaydedildi.' : '✅ Swap roles successfully saved.', embeds: [], components: [] });
 }
@@ -533,8 +526,7 @@ async function handleAddMemberUserSelect(interaction) {
 
     await message.edit({ 
         embeds: [allocationResult.newEmbed], 
-        components: allocationResult.newComponents,
-        files: [new AttachmentBuilder(LOGO_PATH, { name: LOGO_NAME })]
+        components: allocationResult.newComponents
     });
     await interaction.update({ content: `✅ ${t('manage.member_added', lang)}`, components: [], flags: [MessageFlags.Ephemeral] });
 }

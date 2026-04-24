@@ -344,24 +344,67 @@ export default function ServerSettings() {
                       </p>
 
                       <div className="embed-tab-layout">
-                        <div className="input-group" style={{flex: 1}}>
                           <label>
                             {lang === "en" ? "Thumbnail Image" : "Küçük Resim (Thumbnail)"}
                           </label>
+                          
+                          {/* URL Input */}
+                          <div className="url-input-group" style={{marginBottom: "1rem"}}>
+                            <input
+                              type="text"
+                              className="role-selector"
+                              placeholder={lang === "en" ? "Paste image URL (PNG, SVG, JPG)..." : "Resim linki yapıştırın (PNG, SVG, JPG)..."}
+                              value={settings.embed_thumbnail_url}
+                              onChange={(e) => {
+                                setSettings({ ...settings, embed_thumbnail_url: e.target.value });
+                                checkImage(e.target.value);
+                              }}
+                            />
+                          </div>
+
                           <div className="file-upload-wrapper">
                             <input
                               type="file"
                               accept="image/*"
                               id="thumbUpload"
                               className="file-input-hidden"
-                              onChange={handleFileSelect}
+                              onChange={(e) => {
+                                const file = e.target.files[0];
+                                if (!file) return;
+                                
+                                // SVG handling (no crop)
+                                if (file.type === 'image/svg+xml') {
+                                  const reader = new FileReader();
+                                  reader.onload = async () => {
+                                    setUploadingThumb(true);
+                                    try {
+                                      const fileName = `${guildId}-thumbnail-${Date.now()}.svg`;
+                                      const { data, error } = await supabase.storage
+                                        .from('guild-embeds')
+                                        .upload(fileName, file, { upsert: true, contentType: 'image/svg+xml' });
+                                      if (error) throw error;
+                                      const { data: { publicUrl } } = supabase.storage.from('guild-embeds').getPublicUrl(fileName);
+                                      setSettings(prev => ({ ...prev, embed_thumbnail_url: publicUrl }));
+                                      checkImage(publicUrl);
+                                      showToast(lang === 'en' ? 'SVG uploaded!' : 'SVG başarıyla yüklendi!', 'success');
+                                    } catch (err) {
+                                      showToast('SVG error: ' + err.message, 'error');
+                                    } finally {
+                                      setUploadingThumb(false);
+                                    }
+                                  };
+                                  reader.readAsDataURL(file);
+                                } else {
+                                  handleFileSelect(e);
+                                }
+                              }}
                               disabled={uploadingThumb}
                             />
                             <label htmlFor="thumbUpload" className="file-upload-btn">
                               {uploadingThumb ? <Loader2 size={16} className="spin" /> : <ImageIcon size={16} />}
                               {uploadingThumb 
                                 ? (lang === "en" ? "Uploading..." : "Yükleniyor...") 
-                                : (lang === "en" ? "Choose Thumbnail File" : "Küçük Resim Seç")}
+                                : (lang === "en" ? "Upload PNG/SVG/JPG" : "PNG/SVG/JPG Yükle")}
                             </label>
                             {settings.embed_thumbnail_url && !uploadingThumb && (
                               <button type="button" className="btn-remove" onClick={() => { setSettings({...settings, embed_thumbnail_url: ""}); setThumbError(null); }}>
@@ -371,9 +414,10 @@ export default function ServerSettings() {
                           </div>
                           {renderStatus(thumbError)}
                           <p className="hint">
-                            {lang === "en" ? "You can crop the image directly exactly to 1:1 format." : "Resmi seçtikten sonra istediğiniz gibi kare bir şekilde (1:1 oranıyla) kırpabilirsiniz."}
+                            {lang === "en" 
+                              ? "Note: This logo will ONLY appear in /createparty messages. Other notifications will remain clean." 
+                              : "Not: Bu logo SADECE /createparty mesajlarında görünür. Diğer bildirimler sade kalacaktır."}
                           </p>
-                        </div>
 
                         {/* Inline Preview */}
                         <div className="preview-container">

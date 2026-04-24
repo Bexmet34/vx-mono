@@ -147,6 +147,8 @@ function createEmbed(title, details, content, roles, isClosed = false, guild = n
         .setTitle(`🛡️ ${guildName} | ${cleanTitle}${isClosed ? ` [${t('common.closed', lang)}]` : ''}`)
         .setDescription(description)
         .setColor(isClosed ? '#808080' : '#F1C40F');
+    
+    if (thumbnailUrl) embed.setThumbnail(thumbnailUrl);
 
     embed.addFields(
             { name: `👥 **${t('common.party_roster', lang)}**`, value: '\u200b', inline: false },
@@ -198,6 +200,8 @@ function createPartikurEmbed(header, rolesList, description = '', content = '', 
     const embed = new EmbedBuilder()
         .setTitle(sanitizedHeader)
         .setColor(12770100); // Default Gold Color
+
+    if (thumbnailUrl) embed.setThumbnail(thumbnailUrl);
 
     const leaderText = ownerId ? `<@${ownerId}>` : t('common.not_set', lang);
     const descText = description || t('common.not_set', lang);
