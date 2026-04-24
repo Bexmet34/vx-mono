@@ -273,9 +273,33 @@ export default function AdminPage() {
                             </td>
                             <td>
                               <div style={{ display: "flex", gap: "0.6rem", justifyContent: "flex-end" }}>
-                                <button className="admin-action-btn" title="Süre Ekle" onClick={() => { setShowDayModal(s.guild_id); setDaysToAdd(30); }}><Clock size={18} /></button>
-                                <button className={`admin-action-btn ${s.is_unlimited ? 'active' : ''}`} title="Sınırsız Yap" onClick={() => handleServerAction(s.guild_id, 'toggle_unlimited', !s.is_unlimited)}><Infinity size={18} /></button>
-                                <button className={`admin-action-btn ${!s.is_active ? 'danger' : ''}`} title={s.is_active ? "Devre Dışı Bırak" : "Etkinleştir"} onClick={() => handleServerAction(s.guild_id, 'toggle_active', !s.is_active)}><Power size={18} /></button>
+                                <button 
+                                  className="admin-action-btn" 
+                                  title="Süre Ekle" 
+                                  onClick={() => { setShowDayModal(s.guild_id); setDaysToAdd(30); }}
+                                >
+                                  <Clock size={18} />
+                                </button>
+                                
+                                <button 
+                                  className={`admin-action-btn ${s.is_unlimited ? 'active' : ''}`} 
+                                  title={!s.is_active ? "Önce aktif etmelisiniz" : "Sınırsız Yap"} 
+                                  disabled={!s.is_active || savingId === s.guild_id}
+                                  style={{ opacity: !s.is_active ? 0.3 : 1, cursor: !s.is_active ? 'not-allowed' : 'pointer' }}
+                                  onClick={() => handleServerAction(s.guild_id, 'toggle_unlimited', !s.is_unlimited)}
+                                >
+                                  <Infinity size={18} />
+                                </button>
+                                
+                                <button 
+                                  className={`admin-action-btn ${!s.is_active ? 'danger' : ''}`} 
+                                  title={s.is_unlimited ? "Süresiz sunucu devre dışı bırakılamaz" : (s.is_active ? "Devre Dışı Bırak" : "Etkinleştir")} 
+                                  disabled={s.is_unlimited || savingId === s.guild_id}
+                                  style={{ opacity: s.is_unlimited ? 0.3 : 1, cursor: s.is_unlimited ? 'not-allowed' : 'pointer' }}
+                                  onClick={() => handleServerAction(s.guild_id, 'toggle_active', !s.is_active)}
+                                >
+                                  <Power size={18} />
+                                </button>
                               </div>
                             </td>
                           </tr>

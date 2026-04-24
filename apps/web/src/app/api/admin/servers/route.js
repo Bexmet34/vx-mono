@@ -70,12 +70,20 @@ export async function PATCH(req) {
     templateId = value ? 'sub_extended' : 'sub_suspended';
   } else if (action === 'add_days') {
     const currentExpires = new Date(currentSub.expires_at);
-    const baseDate = currentExpires < new Date() ? new Date() : currentExpires;
-    baseDate.setDate(baseDate.getDate() + parseInt(value));
-    updateData.expires_at = baseDate.toISOString();
+    const now = new Date();
+    // Eğer süresi dolmuşsa bugünden, dolmamışsa mevcut tarihten başla (Referans hatasını önlemek için new Date() kullan)
+    const startDate = currentExpires < now ? new Date(now) : new Date(currentExpires);
+    
+    startDate.setDate(startDate.getDate() + parseInt(value));
+    updateData.expires_at = startDate.toISOString();
     updateData.one_day_notified = false;
     templateId = 'sub_extended';
-    placeholders.tarih = baseDate.toLocaleDateString('tr-TR');
+    
+    // Tarih formatını garantiye alalım (DD.MM.YYYY)
+    const dd = String(startDate.getDate()).padStart(2, '0');
+    const mm = String(startDate.getMonth() + 1).padStart(2, '0');
+    const yyyy = startDate.getFullYear();
+    placeholders.tarih = `${dd}.${mm}.${yyyy}`;
   }
 
   // 2. Update Subscription
