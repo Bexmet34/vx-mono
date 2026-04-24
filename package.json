@@ -5,7 +5,11 @@
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",
-    "lint": "turbo lint"
+    "lint": "turbo lint",
+    "start": "pm2 start apps/bot/src/index.js --name partikur && pm2 start apps/support/index.js --name vxdestek",
+    "stop": "pm2 stop partikur vxdestek",
+    "restart": "pm2 restart partikur vxdestek",
+    "logs": "pm2 logs"
   },
   "devDependencies": {
     "turbo": "latest"
