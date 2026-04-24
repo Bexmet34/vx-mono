@@ -86,7 +86,6 @@ async function handleClosePartyCommand(interaction) {
                                 .setTitle(`${oldEmbed.title || 'Party'} [${t('common.closed', lang)}]`)
                                 .setColor('#808080')
                                 .setFields(newFields)
-                                .setThumbnail(`attachment://${LOGO_NAME}`)
                                 .setFooter(null)
                                 .setTimestamp(null);
 
@@ -95,8 +94,7 @@ async function handleClosePartyCommand(interaction) {
                             const { LOGO_PATH } = require('../constants/constants');
                             await message.edit({ 
                                 embeds: [closedEmbed], 
-                                components: [closedRow],
-                                files: [new AttachmentBuilder(LOGO_PATH, { name: LOGO_NAME })]
+                                components: [closedRow]
                             }).catch(() => { });
                             totalClosed++;
                         }
@@ -537,7 +535,6 @@ async function handleVoteCommand(interaction) {
         .setTitle(t('vote.title', lang))
         .setDescription(t('vote.description', lang))
         .setColor('#5865F2')
-        .setThumbnail(`attachment://${LOGO_NAME}`)
         .setTimestamp();
 
     const row = new ActionRowBuilder().addComponents(
@@ -554,7 +551,6 @@ async function handleVoteCommand(interaction) {
     return await safeReply(interaction, {
         embeds: [embed],
         components: [row],
-        files: [logo],
         flags: [MessageFlags.Ephemeral]
     });
 }

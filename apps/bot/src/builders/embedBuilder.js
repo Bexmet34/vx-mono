@@ -146,8 +146,7 @@ function createEmbed(title, details, content, roles, isClosed = false, guild = n
     const embed = new EmbedBuilder()
         .setTitle(`🛡️ ${guildName} | ${cleanTitle}${isClosed ? ` [${t('common.closed', lang)}]` : ''}`)
         .setDescription(description)
-        .setColor(isClosed ? '#808080' : '#F1C40F')
-        .setThumbnail(thumbnailUrl || `attachment://${LOGO_NAME}`);
+        .setColor(isClosed ? '#808080' : '#F1C40F');
 
     embed.addFields(
             { name: `👥 **${t('common.party_roster', lang)}**`, value: '\u200b', inline: false },
@@ -198,8 +197,7 @@ function createPartikurEmbed(header, rolesList, description = '', content = '', 
 
     const embed = new EmbedBuilder()
         .setTitle(sanitizedHeader)
-        .setColor(12770100) // Default Gold Color
-        .setThumbnail(thumbnailUrl || `attachment://${LOGO_NAME}`);
+        .setColor(12770100); // Default Gold Color
 
     const leaderText = ownerId ? `<@${ownerId}>` : t('common.not_set', lang);
     const descText = description || t('common.not_set', lang);
@@ -239,7 +237,6 @@ function createHelpEmbed(page = 0, guild = null, lang = 'tr', thumbnailUrl = nul
         new EmbedBuilder()
             .setTitle(t('help.title_page_0', lang))
             .setColor(15844367) // #F1C40F
-            .setThumbnail(thumbnailUrl || `attachment://${LOGO_NAME}`)
             .setDescription(t('help.desc_page_0', lang))
             .addFields(
                 { name: t('help.field_features_title', lang), value: t('help.field_features_value', lang), inline: false },
@@ -252,7 +249,6 @@ function createHelpEmbed(page = 0, guild = null, lang = 'tr', thumbnailUrl = nul
         new EmbedBuilder()
             .setTitle(t('help.title_page_1', lang))
             .setColor(3447003) // #3498DB
-            .setThumbnail(thumbnailUrl || `attachment://${LOGO_NAME}`)
             .setDescription(t('help.desc_page_1', lang))
             .addFields(
                 { name: '🚀 /createparty', value: t('help.cmd_createparty', lang), inline: false },
@@ -278,8 +274,7 @@ function createDonateEmbed(lang = 'tr', guild = null, thumbnailUrl = null) {
     const embed = new EmbedBuilder()
         .setTitle(t('help.donate_title', lang))
         .setDescription(t('help.donate_description', lang))
-        .setColor('#E91E63')
-        .setThumbnail(thumbnailUrl || `attachment://${LOGO_NAME}`);
+        .setColor('#E91E63');
 
     embed.addFields(
             { name: '\u200b', value: t('help.donate_bank_info', lang) }

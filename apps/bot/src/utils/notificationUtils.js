@@ -36,13 +36,10 @@ async function sendSubscriptionNotification(client, guildId, type, days = 0) {
                     .setURL(LINKS.SUPPORT_SERVER)
             );
 
-            const logo = new AttachmentBuilder(LOGO_PATH, { name: LOGO_NAME });
-
             await owner.send({
                 embeds: notification.embeds,
                 content: notification.content,
-                components: [row],
-                files: [logo]
+                components: [row]
             }).catch(err => console.error(`[NotificationUtils] Could not send DM to owner of ${guild.name}: ${err.message}`));
         }
 

@@ -117,8 +117,7 @@ async function handleSetupRewardCommand(interaction) {
             'Botumuzu kullandığınız bir sunucunuza **30 günlük ücretsiz süre** tanımlamak için aşağıdaki butona tıklayın.\n\n' +
             '**Not:** Bu ödül her kullanıcı için sadece **bir kez** alınabilir.'
         )
-        .setColor('#2ECC71')
-        .setThumbnail(interaction.client.user.displayAvatarURL());
+        .setColor('#2ECC71');
 
     const row = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
