@@ -7,7 +7,7 @@ import {
   Save, Bell, Loader2, AlertCircle, CheckCircle, Info, 
   LayoutDashboard, Server, MessageSquare, Settings, 
   Users, BarChart3, ShieldAlert, ChevronRight, Search,
-  Clock, Infinity, Power, ExternalLink, Calendar
+  Clock, Infinity, Power, Calendar
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { useLanguage } from "@/context/LanguageContext";
@@ -30,7 +30,7 @@ export default function AdminPage() {
   const [savingId, setSavingId] = useState(null);
   
   // Modal States
-  const [showDayModal, setShowDayModal] = useState(null); // stores guildId
+  const [showDayModal, setShowDayModal] = useState(null);
   const [daysToAdd, setDaysToAdd] = useState(30);
 
   // Auth Check
@@ -98,8 +98,8 @@ export default function AdminPage() {
         body: JSON.stringify({ guildId, action, value }),
       });
       if (res.ok) {
-        setMessage({ type: "success", text: "İşlem başarıyla tamamlandı!" });
-        fetchServers(); // Refresh list
+        setMessage({ type: "success", text: "İşlem başarılı!" });
+        fetchServers();
         setShowDayModal(null);
         setTimeout(() => setMessage(null), 3000);
       }
@@ -110,6 +110,10 @@ export default function AdminPage() {
     }
   };
 
+  const handleInputChange = (id, field, value) => {
+    setTemplates(prev => prev.map(t => t.id === id ? { ...t, [field]: value } : t));
+  };
+
   const filteredServers = servers.filter(s => 
     s.guild_name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
     s.guild_id?.includes(searchTerm) ||
@@ -117,14 +121,12 @@ export default function AdminPage() {
   );
 
   const menuItems = [
-    { id: "overview", label: "Genel Bakış", icon: <LayoutDashboard size={20} /> },
-    { id: "notifications", label: "Bildirim Şablonları", icon: <Bell size={20} /> },
-    { id: "servers", label: "Sunucu Listesi", icon: <Server size={20} /> },
-    { id: "broadcast", label: "Duyuru Gönder", icon: <MessageSquare size={20} /> },
-    { id: "users", label: "Global Kullanıcılar", icon: <Users size={20} /> },
-    { id: "stats", label: "İstatistikler", icon: <BarChart3 size={20} /> },
-    { id: "settings", label: "Sistem Ayarları", icon: <Settings size={20} /> },
-    { id: "security", label: "Güvenlik & Loglar", icon: <ShieldAlert size={20} /> },
+    { id: "overview", label: "Genel Bakış", icon: <LayoutDashboard size={18} /> },
+    { id: "notifications", label: "Bildirimler", icon: <Bell size={18} /> },
+    { id: "servers", label: "Sunucu Listesi", icon: <Server size={18} /> },
+    { id: "broadcast", label: "Duyuru", icon: <MessageSquare size={18} /> },
+    { id: "stats", label: "İstatistik", icon: <BarChart3 size={18} /> },
+    { id: "settings", label: "Ayarlar", icon: <Settings size={18} /> },
   ];
 
   if (status === "loading") {
@@ -143,91 +145,83 @@ export default function AdminPage() {
         
         {/* SIDEBAR */}
         <aside style={{ 
-          width: "280px", 
-          borderRight: "1px solid var(--border-color)", 
-          background: "rgba(255,255,255,0.02)",
-          display: "flex",
-          flexDirection: "column",
-          padding: "1.5rem",
-          flexShrink: 0
+          width: "250px", borderRight: "1px solid rgba(255,255,255,0.05)", background: "rgba(11, 12, 16, 0.5)",
+          display: "flex", flexDirection: "column", padding: "1.5rem", flexShrink: 0
         }}>
-          <nav style={{ display: "flex", flexDirection: "column", gap: "0.5rem", flex: 1 }}>
+          <nav style={{ display: "flex", flexDirection: "column", gap: "0.25rem", flex: 1 }}>
             {menuItems.map(item => (
               <button 
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
                 style={{
-                  display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.8rem 1rem", borderRadius: "10px", border: "none",
-                  background: activeTab === item.id ? "rgba(252, 163, 17, 0.15)" : "transparent",
+                  display: "flex", alignItems: "center", gap: "0.8rem", padding: "0.75rem 1rem", borderRadius: "10px", border: "none",
+                  background: activeTab === item.id ? "rgba(252, 163, 17, 0.08)" : "transparent",
                   color: activeTab === item.id ? "var(--accent-color)" : "var(--text-muted)",
-                  cursor: "pointer", transition: "0.2s", textAlign: "left", fontSize: "0.95rem", fontWeight: activeTab === item.id ? "600" : "400"
+                  cursor: "pointer", transition: "0.2s", textAlign: "left", fontSize: "0.9rem", fontWeight: activeTab === item.id ? "600" : "400"
                 }}
+                className="admin-nav-item"
               >
                 {item.icon}
                 <span style={{ flex: 1 }}>{item.label}</span>
-                {activeTab === item.id && <ChevronRight size={16} />}
               </button>
             ))}
           </nav>
-          <div style={{ marginTop: "auto", paddingTop: "1rem", borderTop: "1px solid var(--border-color)" }}>
+          <div style={{ marginTop: "auto", paddingTop: "1rem", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.5rem" }}>
-              {session?.user?.image && <img src={session.user.image} width={32} height={32} style={{ borderRadius: "50%" }} />}
-              <div style={{ flex: 1, overflow: "hidden" }}>
-                <div style={{ fontSize: "0.85rem", fontWeight: "600", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{session?.user?.name}</div>
-                <div style={{ fontSize: "0.7rem", color: "var(--text-muted)" }}>Bot Sahibi</div>
+              {session?.user?.image && <img src={session.user.image} width={28} height={28} style={{ borderRadius: "50%" }} />}
+              <div style={{ overflow: "hidden" }}>
+                <div style={{ fontSize: "0.8rem", fontWeight: "600", color: "white" }}>{session?.user?.name}</div>
+                <div style={{ fontSize: "0.65rem", color: "var(--text-muted)" }}>Administrator</div>
               </div>
             </div>
           </div>
         </aside>
 
         {/* CONTENT */}
-        <section style={{ flex: 1, overflowY: "auto", padding: "2.5rem" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2.5rem" }}>
+        <section style={{ flex: 1, overflowY: "auto", padding: "2rem 3rem", background: "rgba(0,0,0,0.2)" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "3rem" }}>
             <div>
-              <h1 style={{ fontSize: "2rem", fontWeight: "800" }}>{menuItems.find(i => i.id === activeTab)?.label}</h1>
-              <p style={{ color: "var(--text-muted)", marginTop: "0.25rem" }}>Sistem yönetim merkezi.</p>
+              <h1 style={{ fontSize: "1.75rem", fontWeight: "800", letterSpacing: "-0.5px" }}>{menuItems.find(i => i.id === activeTab)?.label}</h1>
+              <p style={{ color: "var(--text-muted)", fontSize: "0.9rem", marginTop: "0.25rem" }}>Sistem kaynaklarını ve yapılandırmalarını yönetin.</p>
             </div>
             {message && (
-              <div className="glass-panel" style={{ padding: "0.75rem 1.25rem", display: "flex", alignItems: "center", gap: "0.75rem", borderColor: message.type === "success" ? "#2ecc71" : "#e74c3c", background: "rgba(0,0,0,0.5)" }}>
-                {message.type === "success" ? <CheckCircle size={18} color="#2ecc71" /> : <AlertCircle size={18} color="#e74c3c" />}
-                <span style={{ fontSize: "0.9rem" }}>{message.text}</span>
+              <div className="glass-panel animate-fade-in" style={{ padding: "0.6rem 1rem", display: "flex", alignItems: "center", gap: "0.6rem", borderColor: message.type === "success" ? "rgba(46, 204, 113, 0.4)" : "rgba(231, 76, 60, 0.4)", background: "rgba(0,0,0,0.6)" }}>
+                {message.type === "success" ? <CheckCircle size={16} color="#2ecc71" /> : <AlertCircle size={16} color="#e74c3c" />}
+                <span style={{ fontSize: "0.85rem" }}>{message.text}</span>
               </div>
             )}
           </div>
 
           {loading ? (
-            <div style={{ display: "flex", justifyContent: "center", padding: "4rem" }}><Loader2 className="spin" size={32} /></div>
+            <div style={{ display: "flex", justifyContent: "center", padding: "10rem" }}><Loader2 className="spin" size={32} color="var(--accent-color)" /></div>
           ) : (
             <>
-              {/* NOTIFICATIONS TAB */}
+              {/* NOTIFICATIONS */}
               {activeTab === "notifications" && (
-                <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
                   {templates.map(tpl => (
-                    <div key={tpl.id} className="glass-panel" style={{ padding: "2rem" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                          <div style={{ background: "var(--accent-color)", padding: "0.5rem", borderRadius: "8px" }}><Bell size={24} color="black" /></div>
-                          <div>
-                            <h2 style={{ fontSize: "1.1rem", fontWeight: "700" }}>{tpl.id.toUpperCase().replace('_', ' ')}</h2>
-                            <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>ID: {tpl.id}</span>
-                          </div>
+                    <div key={tpl.id} className="glass-panel" style={{ padding: "1.5rem", background: "rgba(255,255,255,0.01)" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                          <div style={{ background: "rgba(252, 163, 17, 0.1)", padding: "0.5rem", borderRadius: "8px" }}><Bell size={20} color="var(--accent-color)" /></div>
+                          <h2 style={{ fontSize: "1rem", fontWeight: "700" }}>{tpl.id.toUpperCase().replace('_', ' ')}</h2>
                         </div>
-                        <button className="btn-primary" disabled={savingId === tpl.id} onClick={() => handleUpdateTemplate(tpl)} style={{ padding: "0.5rem 1.25rem" }}>
-                          {savingId === tpl.id ? <Loader2 className="spin" size={16} /> : <Save size={16} />} Güncelle
+                        <button className="btn-primary" disabled={savingId === tpl.id} onClick={() => handleUpdateTemplate(tpl)} style={{ padding: "0.4rem 1rem", fontSize: "0.85rem" }}>
+                          {savingId === tpl.id ? <Loader2 className="spin" size={14} /> : <Save size={14} />} Kaydet
                         </button>
                       </div>
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }}>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
                         <div>
                           <label style={labelStyle}>🇹🇷 TR Başlık</label>
-                          <input className="admin-input" type="text" value={tpl.title_tr} onChange={(e) => handleInputChange(tpl.id, 'title_tr', e.target.value)} />
+                          <input className="admin-input" value={tpl.title_tr} onChange={(e) => handleInputChange(tpl.id, 'title_tr', e.target.value)} />
                           <label style={{...labelStyle, marginTop: "1rem"}}>🇹🇷 TR İçerik</label>
-                          <textarea className="admin-input" rows={4} value={tpl.content_tr} onChange={(e) => handleInputChange(tpl.id, 'content_tr', e.target.value)} />
+                          <textarea className="admin-input" rows={3} value={tpl.content_tr} onChange={(e) => handleInputChange(tpl.id, 'content_tr', e.target.value)} />
                         </div>
                         <div>
                           <label style={labelStyle}>🇺🇸 EN Title</label>
-                          <input className="admin-input" type="text" value={tpl.title_en} onChange={(e) => handleInputChange(tpl.id, 'title_en', e.target.value)} />
+                          <input className="admin-input" value={tpl.title_en} onChange={(e) => handleInputChange(tpl.id, 'title_en', e.target.value)} />
                           <label style={{...labelStyle, marginTop: "1rem"}}>🇺🇸 EN Content</label>
-                          <textarea className="admin-input" rows={4} value={tpl.content_en} onChange={(e) => handleInputChange(tpl.id, 'content_en', e.target.value)} />
+                          <textarea className="admin-input" rows={3} value={tpl.content_en} onChange={(e) => handleInputChange(tpl.id, 'content_en', e.target.value)} />
                         </div>
                       </div>
                     </div>
@@ -235,83 +229,76 @@ export default function AdminPage() {
                 </div>
               )}
 
-              {/* SERVERS TAB */}
+              {/* SERVERS */}
               {activeTab === "servers" && (
-                <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-                  <div style={{ position: "relative" }}>
-                    <Search style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} size={20} />
+                <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+                  <div style={{ position: "relative", maxWidth: "400px" }}>
+                    <Search style={{ position: "absolute", left: "0.8rem", top: "50%", transform: "translateY(-50%)", color: "rgba(255,255,255,0.3)" }} size={16} />
                     <input 
                       className="admin-input" 
-                      placeholder="Sunucu adı, ID veya sahip ID ile ara..." 
-                      style={{ paddingLeft: "3rem" }}
+                      placeholder="Sunucu veya Sahip Ara..." 
+                      style={{ paddingLeft: "2.5rem", fontSize: "0.85rem", borderRadius: "12px" }}
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                     />
                   </div>
 
-                  <div className="glass-panel" style={{ overflow: "hidden" }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+                  <div className="glass-panel" style={{ background: "rgba(255,255,255,0.01)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse" }}>
                       <thead>
-                        <tr style={{ background: "rgba(255,255,255,0.03)", borderBottom: "1px solid var(--border-color)" }}>
-                          <th style={thStyle}>Sunucu Bilgisi</th>
+                        <tr style={{ textAlign: "left", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                          <th style={thStyle}>Sunucu</th>
                           <th style={thStyle}>Sahip ID</th>
                           <th style={thStyle}>Durum</th>
                           <th style={thStyle}>Bitiş Tarihi</th>
-                          <th style={thStyle}>İşlemler</th>
+                          <th style={{...thStyle, textAlign: "right"}}>İşlemler</th>
                         </tr>
                       </thead>
                       <tbody>
                         {filteredServers.map(s => {
                           const isExpired = !s.is_unlimited && new Date(s.expires_at) < new Date();
+                          const isPassive = !s.is_active;
+                          
                           return (
-                            <tr key={s.id} style={{ borderBottom: "1px solid rgba(255,255,255,0.05)", transition: "0.2s" }} className="table-row-hover">
+                            <tr key={s.id} style={{ borderBottom: "1px solid rgba(255,255,255,0.02)", opacity: isPassive ? 0.6 : 1 }} className="row-hover">
                               <td style={tdStyle}>
-                                <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
                                   <div style={{ 
-                                    width: "40px", height: "40px", borderRadius: "10px", background: "rgba(252, 163, 17, 0.2)", 
-                                    display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "800", color: "var(--accent-color)" 
+                                    width: "36px", height: "36px", borderRadius: "8px", 
+                                    background: "linear-gradient(135deg, rgba(252, 163, 17, 0.2) 0%, rgba(252, 163, 17, 0.05) 100%)",
+                                    border: "1px solid rgba(252, 163, 17, 0.2)",
+                                    display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "700", color: "var(--accent-color)", fontSize: "0.9rem"
                                   }}>
                                     {s.guild_name?.charAt(0).toUpperCase()}
                                   </div>
                                   <div>
-                                    <div style={{ fontWeight: "600", fontSize: "0.95rem" }}>{s.guild_name}</div>
-                                    <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>{s.guild_id}</div>
+                                    <div style={{ fontWeight: "600", fontSize: "0.9rem" }}>{s.guild_name}</div>
+                                    <div style={{ fontSize: "0.7rem", color: "var(--text-muted)", fontFamily: "monospace" }}>{s.guild_id}</div>
                                   </div>
                                 </div>
                               </td>
-                              <td style={tdStyle}><code style={{ fontSize: "0.85rem", opacity: 0.8 }}>{s.owner_id}</code></td>
+                              <td style={tdStyle}><code style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>{s.owner_id}</code></td>
                               <td style={tdStyle}>
-                                {s.is_unlimited ? (
+                                {isPassive ? (
+                                  <span className="badge badge-passive">Pasif</span>
+                                ) : s.is_unlimited ? (
                                   <span className="badge badge-unlimited">Sınırsız</span>
                                 ) : isExpired ? (
                                   <span className="badge badge-expired">Süresi Dolmuş</span>
                                 ) : (
                                   <span className="badge badge-active">Aktif</span>
                                 )}
-                                {!s.is_active && <span className="badge" style={{ marginLeft: "0.5rem", background: "gray" }}>Pasif</span>}
                               </td>
                               <td style={tdStyle}>
-                                <div style={{ fontSize: "0.9rem" }}>
-                                  {s.is_unlimited ? "♾️ Sınırsız" : format(new Date(s.expires_at), "dd MMM yyyy HH:mm", { locale: tr })}
+                                <div style={{ fontSize: "0.85rem", color: isExpired && !s.is_unlimited ? "#e74c3c" : "inherit" }}>
+                                  {s.is_unlimited ? "Süresiz" : format(new Date(s.expires_at), "dd MMM yyyy HH:mm", { locale: tr })}
                                 </div>
                               </td>
-                              <td style={tdStyle}>
-                                <div style={{ display: "flex", gap: "0.5rem" }}>
-                                  <button className="icon-btn" title="Süre Yönetimi" onClick={() => setShowDayModal(s.guild_id)}><Clock size={18} /></button>
-                                  <button 
-                                    className={`icon-btn ${s.is_unlimited ? 'active' : ''}`} 
-                                    title="Sınırsız Mod" 
-                                    onClick={() => handleServerAction(s.guild_id, 'toggle_unlimited', !s.is_unlimited)}
-                                  >
-                                    <Infinity size={18} />
-                                  </button>
-                                  <button 
-                                    className={`icon-btn ${!s.is_active ? 'danger' : ''}`} 
-                                    title={s.is_active ? "Devre Dışı Bırak" : "Aktif Et"} 
-                                    onClick={() => handleServerAction(s.guild_id, 'toggle_active', !s.is_active)}
-                                  >
-                                    <Power size={18} />
-                                  </button>
+                              <td style={{...tdStyle, textAlign: "right"}}>
+                                <div style={{ display: "flex", gap: "0.4rem", justifyContent: "flex-end" }}>
+                                  <button className="minimal-btn" title="Süre" onClick={() => setShowDayModal(s.guild_id)}><Clock size={16} /></button>
+                                  <button className={`minimal-btn ${s.is_unlimited ? 'active' : ''}`} title="Sınırsız" onClick={() => handleServerAction(s.guild_id, 'toggle_unlimited', !s.is_unlimited)}><Infinity size={16} /></button>
+                                  <button className={`minimal-btn ${!s.is_active ? 'danger' : ''}`} title="Durum" onClick={() => handleServerAction(s.guild_id, 'toggle_active', !s.is_active)}><Power size={16} /></button>
                                 </div>
                               </td>
                             </tr>
@@ -324,53 +311,38 @@ export default function AdminPage() {
               )}
             </>
           )}
-
-          {/* OTHER TABS */}
-          {activeTab !== "notifications" && activeTab !== "servers" && (
-            <div className="glass-panel" style={{ padding: "4rem", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: "1rem" }}>
-              <div style={{ background: "rgba(255,255,255,0.05)", padding: "2rem", borderRadius: "50%" }}>{menuItems.find(i => i.id === activeTab)?.icon}</div>
-              <h2 style={{ fontSize: "1.5rem" }}>{menuItems.find(i => i.id === activeTab)?.label} Yakında</h2>
-            </div>
-          )}
         </section>
       </div>
 
-      {/* DAY MODAL */}
+      {/* MODAL */}
       {showDayModal && (
-        <div className="modal-overlay">
-          <div className="glass-panel animate-fade-in" style={{ width: "400px", padding: "2rem" }}>
-            <h2 style={{ marginBottom: "1.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}><Calendar size={24} color="var(--accent-color)" /> Süre Ekle</h2>
-            <p style={{ color: "var(--text-muted)", fontSize: "0.9rem", marginBottom: "1.5rem" }}>Sunucuya eklenecek gün sayısını girin.</p>
-            <input 
-              className="admin-input" 
-              type="number" 
-              value={daysToAdd} 
-              onChange={(e) => setDaysToAdd(e.target.value)}
-              style={{ marginBottom: "1.5rem", fontSize: "1.2rem", textAlign: "center" }}
-            />
-            <div style={{ display: "flex", gap: "1rem" }}>
-              <button className="signout-btn" style={{ flex: 1 }} onClick={() => setShowDayModal(null)}>İptal</button>
-              <button className="btn-primary" style={{ flex: 1, justifyContent: "center" }} onClick={() => handleServerAction(showDayModal, 'add_days', daysToAdd)}>
-                Onayla
-              </button>
+        <div className="modal-overlay" onClick={() => setShowDayModal(null)}>
+          <div className="glass-panel animate-fade-in" style={{ width: "350px", padding: "1.5rem", background: "#0b0c10" }} onClick={e => e.stopPropagation()}>
+            <h2 style={{ fontSize: "1.1rem", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "0.5rem" }}><Calendar size={20} color="var(--accent-color)" /> Süre Ekle</h2>
+            <input className="admin-input" type="number" value={daysToAdd} onChange={(e) => setDaysToAdd(e.target.value)} style={{ marginBottom: "1.5rem", textAlign: "center", fontSize: "1.1rem" }} />
+            <div style={{ display: "flex", gap: "0.75rem" }}>
+              <button className="signout-btn" style={{ flex: 1, padding: "0.6rem" }} onClick={() => setShowDayModal(null)}>İptal</button>
+              <button className="btn-primary" style={{ flex: 1, padding: "0.6rem", justifyContent: "center" }} onClick={() => handleServerAction(showDayModal, 'add_days', daysToAdd)}>Onayla</button>
             </div>
           </div>
         </div>
       )}
       
       <style jsx>{`
-        .admin-input { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 0.8rem; border-radius: 10px; width: 100%; transition: 0.2s; outline: none; }
-        .admin-input:focus { border-color: var(--accent-color); background: rgba(0,0,0,0.4); }
-        .table-row-hover:hover { background: rgba(255,255,255,0.02); }
-        .badge { padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; }
-        .badge-active { background: rgba(46, 204, 113, 0.2); color: #2ecc71; }
-        .badge-expired { background: rgba(231, 76, 60, 0.2); color: #e74c3c; }
-        .badge-unlimited { background: rgba(155, 89, 182, 0.2); color: #9b59b6; border: 1px solid rgba(155, 89, 182, 0.3); }
-        .icon-btn { background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.1); padding: 0.5rem; border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .icon-btn:hover { background: rgba(252, 163, 17, 0.1); color: var(--accent-color); border-color: var(--accent-color); }
-        .icon-btn.active { background: rgba(155, 89, 182, 0.2); color: #9b59b6; border-color: #9b59b6; }
-        .icon-btn.danger:hover { background: rgba(231, 76, 60, 0.1); color: #e74c3c; border-color: #e74c3c; }
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .admin-nav-item:hover { color: white !important; background: rgba(255,255,255,0.03) !important; }
+        .admin-input { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); color: white; padding: 0.6rem 0.8rem; border-radius: 8px; width: 100%; transition: 0.2s; outline: none; font-size: 0.9rem; }
+        .admin-input:focus { border-color: var(--accent-color); background: rgba(0,0,0,0.3); }
+        .row-hover:hover { background: rgba(255,255,255,0.015); }
+        .badge { padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .badge-active { background: rgba(46, 204, 113, 0.1); color: #2ecc71; border: 1px solid rgba(46, 204, 113, 0.2); }
+        .badge-expired { background: rgba(231, 76, 60, 0.1); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.2); }
+        .badge-unlimited { background: rgba(155, 89, 182, 0.1); color: #9b59b6; border: 1px solid rgba(155, 89, 182, 0.2); }
+        .badge-passive { background: rgba(255, 255, 255, 0.05); color: #888; border: 1px solid rgba(255, 255, 255, 0.1); }
+        .minimal-btn { background: rgba(255,255,255,0.03); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.05); padding: 0.4rem; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .minimal-btn:hover { background: rgba(252, 163, 17, 0.1); color: var(--accent-color); border-color: var(--accent-color); }
+        .minimal-btn.active { background: rgba(155, 89, 182, 0.1); color: #9b59b6; border-color: #9b59b6; }
+        .minimal-btn.danger:hover { background: rgba(231, 76, 60, 0.1); color: #e74c3c; border-color: #e74c3c; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; }
         .spin { animation: spin 1s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
       `}</style>
@@ -378,6 +350,6 @@ export default function AdminPage() {
   );
 }
 
-const thStyle = { padding: "1.25rem 1.5rem", fontSize: "0.85rem", fontWeight: "600", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.5px" };
-const tdStyle = { padding: "1.25rem 1.5rem", verticalAlign: "middle" };
-const labelStyle = { display: "block", marginBottom: "0.5rem", fontSize: "0.8rem", fontWeight: "600", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.5px" };
+const thStyle = { padding: "1rem 1.25rem", fontSize: "0.75rem", fontWeight: "700", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "1px" };
+const tdStyle = { padding: "1rem 1.25rem", verticalAlign: "middle" };
+const labelStyle = { display: "block", marginBottom: "0.4rem", fontSize: "0.75rem", fontWeight: "700", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.5px" };
