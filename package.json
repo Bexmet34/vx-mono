@@ -6,9 +6,10 @@
     "dev": "turbo dev",
     "build": "turbo build",
     "lint": "turbo lint",
-    "start": "pm2 start apps/bot/src/index.js --name partikur && pm2 start apps/support/index.js --name vxdestek",
-    "stop": "pm2 stop partikur vxdestek",
-    "restart": "pm2 restart partikur vxdestek",
+    "start": "pm2 start ecosystem.config.js",
+    "stop": "pm2 stop ecosystem.config.js",
+    "restart": "pm2 restart ecosystem.config.js",
+    "delete": "pm2 delete ecosystem.config.js",
     "logs": "pm2 logs"
   },
   "devDependencies": {
