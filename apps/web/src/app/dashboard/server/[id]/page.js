@@ -55,6 +55,8 @@ export default function ServerSettings() {
 
   useEffect(() => {
     if (status === "authenticated" && guildId) {
+      setDiscordRoles([]);
+      setDiscordMembers([]);
       fetchSettings();
       fetchDiscordData();
     }
@@ -92,7 +94,7 @@ export default function ServerSettings() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const res = await fetch(`/api/guilds/${guildId}/settings`, {
+      const res = await fetch(`/api/guild-settings/${guildId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(settings),
