@@ -10,6 +10,7 @@ import { useToast, ToastContainer } from "@/components/Toast";
 import Cropper from "react-easy-crop";
 import getCroppedImg from "@/utils/cropImage";
 import { createClient } from "@supabase/supabase-js";
+import "./server-dashboard.css";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
