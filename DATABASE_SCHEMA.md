@@ -38,7 +38,15 @@ Botun kullanıcılara göndereceği bildirimlerin kuyruğudur. `broadcastService
 - `error_message` (text): Eğer gönderim başarısız olursa hata detayı.
 - `subscription_id` (uuid): İlgili abonelik kaydına referans.
 
-### 5. `users`
+### 5. `notification_templates`
+Botun gönderdiği sistem mesajlarının (hoş geldin, süre bitimi vb.) şablonlarını saklar.
+- `id` (text): Şablon kodu (`welcome_trial`, `sub_expired`, `sub_extended`).
+- `title_tr / title_en` (text): Mesaj başlıkları.
+- `content_tr / content_en` (text): Mesaj içerikleri (Placeholder destekli).
+- `is_embed` (boolean): Embed mi yoksa düz metin mi?
+- `color` (text): Embed renk kodu.
+
+### 6. `users`
 Kullanıcı bazlı verileri ve global premium durumlarını saklar.
 - `discord_id` (text): Kullanıcının global Discord ID'si.
 - `premium_until` (timestamp): Kullanıcı bazlı premium bitiş tarihi.

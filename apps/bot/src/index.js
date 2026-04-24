@@ -137,6 +137,8 @@ client.once('clientReady', async (c) => {
 });
 
 // Guild join event
+const { getNotification } = require('./services/notificationService');
+
 client.on('guildCreate', async (guild) => {
     try {
         console.log(`[GuildCreate] Joined new server: ${guild.name} (${guild.id})`);
@@ -147,30 +149,29 @@ client.on('guildCreate', async (guild) => {
 
         const owner = await guild.members.fetch(guild.ownerId).catch(() => null);
         if (owner) {
-            const welcomeEmbed = new EmbedBuilder()
-                .setTitle('🎉 Deneme Sürümü Başladı! | Trial Period Started!')
-                .setDescription(
-                    `🇹🇷 **Türkçe:**\nBotumuz sunucunuza başarıyla eklendi! **3 günlük ücretsiz deneme** süreniz tanımlanmıştır.\nBu süre boyunca tüm özellikleri (/createparty vb.) sınırsız kullanabilirsiniz.\n\n` +
-                    `🇺🇸 **English:**\nOur bot has been successfully added to your server! A **3-day free trial** has been assigned.\nDuring this period, you can use all features (/createparty etc.) without limits.`
-                )
-                .addFields(
-                    { name: 'Bitiş Tarihi | Expiration Date', value: new Date(sub.expires_at).toLocaleString('tr-TR'), inline: false }
-                )
-                .setColor('#2ECC71')
-                .setFooter({ text: 'Veyronix Party Master' });
+            const notification = await getNotification('welcome_trial', 'tr', {
+                sunucu: guild.name,
+                tarih: new Date(sub.expires_at).toLocaleString('tr-TR')
+            });
 
-            const row = new ActionRowBuilder().addComponents(
-                new ButtonBuilder()
-                    .setLabel('Destek Sunucusu | Support Server')
-                    .setURL(LINKS.SUPPORT_SERVER)
-                    .setStyle(ButtonStyle.Link),
-                new ButtonBuilder()
-                    .setLabel('Web Sitesi | Website')
-                    .setURL(LINKS.WEBSITE)
-                    .setStyle(ButtonStyle.Link)
-            );
+            if (notification) {
+                const row = new ActionRowBuilder().addComponents(
+                    new ButtonBuilder()
+                        .setLabel('Destek Sunucusu | Support Server')
+                        .setURL(LINKS.SUPPORT_SERVER)
+                        .setStyle(ButtonStyle.Link),
+                    new ButtonBuilder()
+                        .setLabel('Web Sitesi | Website')
+                        .setURL(LINKS.WEBSITE)
+                        .setStyle(ButtonStyle.Link)
+                );
 
-            await owner.send({ embeds: [welcomeEmbed], components: [row] }).catch(() => { });
+                await owner.send({ 
+                    embeds: notification.embeds, 
+                    content: notification.content,
+                    components: [row] 
+                }).catch(() => { });
+            }
         }
     } catch (err) {
         console.error('[GuildCreate] Error:', err.message);

@@ -42,23 +42,26 @@ function startCronService(client) {
                         const guildSettings = await getGuildConfig(sub.guild_id);
                         const lang = guildSettings?.language || 'tr';
 
-                        const embed = new EmbedBuilder()
-                            .setTitle(t('subscription.one_day_warning_title', lang))
-                            .setDescription(t('subscription.one_day_warning_desc', lang).replace('{guildName}', sub.guild_name))
-                            .addFields(
-                                { name: t('subscription.expires_at', lang), value: new Date(sub.expires_at).toLocaleString(lang === 'tr' ? 'tr-TR' : 'en-US'), inline: true }
-                            )
-                            .setColor('#E67E22')
-                            .setFooter({ text: 'Veyronix Party Master • Subscription System' });
+                        const { getNotification } = require('./notificationService');
+                        const notification = await getNotification('sub_expired', lang, {
+                            sunucu: sub.guild_name,
+                            tarih: new Date(sub.expires_at).toLocaleString(lang === 'tr' ? 'tr-TR' : 'en-US')
+                        });
 
-                        const row = new ActionRowBuilder().addComponents(
-                            new ButtonBuilder()
-                                .setLabel(t('subscription.join_support', lang))
-                                .setURL(LINKS.SUPPORT_SERVER)
-                                .setStyle(ButtonStyle.Link)
-                        );
+                        if (notification) {
+                            const row = new ActionRowBuilder().addComponents(
+                                new ButtonBuilder()
+                                    .setLabel(t('subscription.join_support', lang))
+                                    .setURL(LINKS.SUPPORT_SERVER)
+                                    .setStyle(ButtonStyle.Link)
+                            );
 
-                        await user.send({ embeds: [embed], components: [row] });
+                            await user.send({ 
+                                embeds: notification.embeds, 
+                                content: notification.content,
+                                components: [row] 
+                            });
+                        }
                         
                         // Mark as notified in DB
                         await supabase
