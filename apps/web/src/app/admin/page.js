@@ -99,8 +99,16 @@ export default function AdminPage() {
         body: JSON.stringify({ guildId, action, value }),
       });
       if (res.ok) {
+        const result = await res.json();
         showToast("İşlem başarıyla gerçekleşti!", "success");
-        fetchServers();
+        
+        // Update local state instead of full re-fetch
+        if (result.updatedData) {
+          setServers(prev => prev.map(s => s.guild_id === guildId ? { ...s, ...result.updatedData } : s));
+        } else {
+          fetchServers(); // Fallback if data not returned
+        }
+        
         setShowDayModal(null);
       }
     } catch (err) {
@@ -288,7 +296,7 @@ export default function AdminPage() {
                                   style={{ opacity: !s.is_active ? 0.3 : 1, cursor: !s.is_active ? 'not-allowed' : 'pointer' }}
                                   onClick={() => handleServerAction(s.guild_id, 'toggle_unlimited', !s.is_unlimited)}
                                 >
-                                  <Infinity size={18} />
+                                  {savingId === s.guild_id ? <Loader2 size={18} className="spin" /> : <Infinity size={18} />}
                                 </button>
                                 
                                 <button 
@@ -298,7 +306,7 @@ export default function AdminPage() {
                                   style={{ opacity: s.is_unlimited ? 0.3 : 1, cursor: s.is_unlimited ? 'not-allowed' : 'pointer' }}
                                   onClick={() => handleServerAction(s.guild_id, 'toggle_active', !s.is_active)}
                                 >
-                                  <Power size={18} />
+                                  {savingId === s.guild_id ? <Loader2 size={18} className="spin" /> : <Power size={18} />}
                                 </button>
                               </div>
                             </td>

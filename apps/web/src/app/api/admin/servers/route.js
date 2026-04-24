@@ -69,21 +69,33 @@ export async function PATCH(req) {
     updateData.is_active = value;
     templateId = value ? 'sub_extended' : 'sub_suspended';
   } else if (action === 'add_days') {
-    const currentExpires = new Date(currentSub.expires_at);
+    const currentExpires = currentSub.expires_at ? new Date(currentSub.expires_at) : new Date();
     const now = new Date();
-    // Eğer süresi dolmuşsa bugünden, dolmamışsa mevcut tarihten başla (Referans hatasını önlemek için new Date() kullan)
-    const startDate = currentExpires < now ? new Date(now) : new Date(currentExpires);
     
-    startDate.setDate(startDate.getDate() + parseInt(value));
-    updateData.expires_at = startDate.toISOString();
+    // Geçerli bir tarih değilse 'now' kullan
+    let baseDate = isNaN(currentExpires.getTime()) ? now : currentExpires;
+    
+    // Eğer süresi çoktan dolmuşsa (bugünden daha eski), bugünü baz al
+    if (baseDate < now) {
+      baseDate = now;
+    }
+    
+    const newExpiry = new Date(baseDate);
+    newExpiry.setDate(newExpiry.getDate() + parseInt(value));
+    
+    updateData.expires_at = newExpiry.toISOString();
     updateData.one_day_notified = false;
     templateId = 'sub_extended';
     
     // Tarih formatını garantiye alalım (DD.MM.YYYY)
-    const dd = String(startDate.getDate()).padStart(2, '0');
-    const mm = String(startDate.getMonth() + 1).padStart(2, '0');
-    const yyyy = startDate.getFullYear();
+    const dd = String(newExpiry.getDate()).padStart(2, '0');
+    const mm = String(newExpiry.getMonth() + 1).padStart(2, '0');
+    const yyyy = newExpiry.getFullYear();
+    const hh = String(newExpiry.getHours()).padStart(2, '0');
+    const min = String(newExpiry.getMinutes()).padStart(2, '0');
+    
     placeholders.tarih = `${dd}.${mm}.${yyyy}`;
+    placeholders.saat = `${hh}:${min}`;
   }
 
   // 2. Update Subscription
@@ -101,7 +113,7 @@ export async function PATCH(req) {
           embeds: [{
             title: parsed.title,
             description: parsed.content,
-            color: parseInt(parsed.color.replace('#', ''), 16),
+            color: parsed.color ? parseInt(parsed.color.replace('#', ''), 16) : 0x5865f2,
             timestamp: new Date().toISOString()
           }]
         }),
@@ -110,5 +122,5 @@ export async function PATCH(req) {
     }
   }
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ success: true, updatedData: updateData });
 }
