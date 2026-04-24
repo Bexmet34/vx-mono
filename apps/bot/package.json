@@ -1,0 +1,31 @@
+{
+  "name": "albiondcbot",
+  "version": "1.0.0",
+  "description": "Albion Online Discord botu - PVE içerik başvuru ve parti kurma botu",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "discord",
+    "bot",
+    "albion-online",
+    "pve",
+    "gaming"
+  ],
+  "author": "Antigravity",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.101.1",
+    "@top-gg/sdk": "^3.1.6",
+    "@veyronix/database": "workspace:*",
+    "better-sqlite3": "^12.9.0",
+    "discord.js": "^14.16.3",
+    "dotenv": "^17.2.3",
+    "node-cron": "^4.2.1",
+    "topgg-autoposter": "^2.0.2"
+  }
+}
