@@ -93,10 +93,10 @@ export default function AdminPage() {
   }
 
   return (
-    <main style={{ background: "var(--bg-color)", minHeight: "100vh", color: "white" }}>
+    <main style={{ background: "var(--bg-color)", height: "100vh", color: "white", overflow: "hidden" }}>
       <Navbar />
       
-      <div style={{ display: "flex", paddingTop: "var(--nav-height)", height: "100vh", overflow: "hidden" }}>
+      <div style={{ display: "flex", height: "calc(100vh - var(--nav-height))", overflow: "hidden" }}>
         
         {/* SIDEBAR */}
         <aside style={{ 
