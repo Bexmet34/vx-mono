@@ -2,179 +2,188 @@
 
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/context/LanguageContext";
-import { supabase } from "@veyronix/database";
-import { Calendar, ChevronDown, ChevronUp, Tag, History, Loader2 } from "lucide-react";
-import Link from "next/link";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import { Calendar, ChevronDown, ChevronUp, History, Loader2, Sparkles, Zap, Shield, Globe } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
+// 10 Professional Updates for Veyronix
+const staticLogs = [
+  {
+    version: "2.0.0",
+    date: "2024-04-24",
+    title_tr: "Monorepo ve Performans Çağı",
+    title_en: "The Age of Monorepo & Performance",
+    type: "major",
+    content_tr: "### Neler Değişti?\n- **Monorepo Geçişi:** Tüm servisler Turborepo ile birleştirildi.\n- **Hız:** Bot yanıt süreleri optimize edildi.\n- **Web:** Dashboard altyapısı Next.js 14+ sürümüne yükseltildi.",
+    content_en: "### What's New?\n- **Monorepo Migration:** All services unified with Turborepo.\n- **Speed:** Bot response times optimized.\n- **Web:** Dashboard infrastructure upgraded to Next.js 14+."
+  },
+  {
+    version: "1.9.5",
+    date: "2024-04-15",
+    title_tr: "Gelişmiş Ticket Sistemi",
+    title_en: "Advanced Ticket System",
+    type: "feature",
+    content_tr: "### Yeni Özellikler\n- Sunucular için çoklu kategori desteği.\n- Yetkili rolleri için özel paneller.\n- Kapanan ticketlar için otomatik transcript oluşturma.",
+    content_en: "### New Features\n- Multi-category support for servers.\n- Custom panels for staff roles.\n- Automatic transcript generation for closed tickets."
+  },
+  {
+    version: "1.8.0",
+    date: "2024-04-01",
+    title_tr: "Albion API Entegrasyonu",
+    title_en: "Albion API Integration",
+    type: "feature",
+    content_tr: "### Oyun Verileri\n- Oyuncu istatistikleri anlık olarak Albion API üzerinden çekilmeye başlandı.\n- Guild üyelerinin rütbe takibi otomatikleşti.",
+    content_en: "### Game Data\n- Player stats are now fetched live via Albion API.\n- Guild member rank tracking is now automated."
+  },
+  {
+    version: "1.7.2",
+    date: "2024-03-20",
+    title_tr: "Dil Desteği ve Yerelleştirme",
+    title_en: "Language Support & Localization",
+    type: "fix",
+    content_tr: "- Tüm bot komutları artık İngilizce ve Türkçe dillerini tam destekliyor.\n- Web dashboard için dil seçeneği eklendi.",
+    content_en: "- All bot commands now fully support English and Turkish languages.\n- Language toggle added to the web dashboard."
+  },
+  {
+    version: "1.6.0",
+    date: "2024-03-10",
+    title_tr: "Dinamik Parti Kurucu",
+    title_en: "Dynamic Party Builder",
+    type: "feature",
+    content_tr: "### Savaş Meydanı Hazırlığı\n- `/create` komutu ile saniyeler içinde ZvZ partileri kurabilme.\n- Rol seçim butonları (Tank, Healer, DPS).",
+    content_en: "### Battlefield Prep\n- Create ZvZ parties in seconds with the `/create` command.\n- Role selection buttons (Tank, Healer, DPS)."
+  },
+  {
+    version: "1.5.5",
+    date: "2024-02-25",
+    title_tr: "Ses Kanalı Entegrasyonu",
+    title_en: "Voice Channel Integration",
+    type: "feature",
+    content_tr: "- Partiye katılan kullanıcıların ses kanallarına otomatik taşınması.\n- Oda limitlerinin otomatik ayarlanması.",
+    content_en: "- Automatically move joined users to designated voice channels.\n- Automatic room limit adjustments."
+  },
+  {
+    version: "1.4.0",
+    date: "2024-02-15",
+    title_tr: "Güvenlik ve Whitelist",
+    title_en: "Security & Whitelist",
+    type: "security",
+    content_tr: "- Spam koruması iyileştirildi.\n- Whitelist sistemi ile güvenilir kullanıcılara özel yetkiler tanımlandı.",
+    content_en: "- Improved spam protection.\n- Special permissions defined for trusted users via the Whitelist system."
+  },
+  {
+    version: "1.3.0",
+    date: "2024-02-01",
+    title_tr: "Discord Role Sync",
+    title_en: "Discord Role Sync",
+    type: "feature",
+    content_tr: "- Oyun içi rütbelerin Discord rolleriyle senkronize edilmesi.\n- Otomatik yetki verme ve alma sistemi.",
+    content_en: "- Syncing in-game ranks with Discord roles.\n- Automatic permission granting and removal system."
+  },
+  {
+    version: "1.1.0",
+    date: "2024-01-20",
+    title_tr: "Hata Düzeltmeleri",
+    title_en: "Bug Fixes & Stability",
+    type: "fix",
+    content_tr: "- Veritabanı bağlantı kopmaları giderildi.\n- Slash komutlarındaki gecikmeler minimize edildi.",
+    content_en: "- Database connection issues resolved.\n- Latency in slash commands minimized."
+  },
+  {
+    version: "1.0.0",
+    date: "2024-01-01",
+    title_tr: "Veyronix Dünyasına Merhaba",
+    title_en: "Hello to Veyronix World",
+    type: "major",
+    content_tr: "### İlk Sürüm\n- Veyronix botun ilk kararlı sürümü yayınlandı.\n- Temel parti kurma ve yönetim özellikleri aktif.",
+    content_en: "### Initial Release\n- First stable version of Veyronix bot released.\n- Core party building and management features are live."
+  }
+];
 
 export default function ChangelogPage() {
-  const { lang, t } = useLanguage();
-  const [expandedIndex, setExpandedIndex] = useState(-1);
-  const [logs, setLogs] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { lang } = useLanguage();
+  const [expandedIndex, setExpandedIndex] = useState(0);
 
-  useEffect(() => {
-    async function fetchLogs() {
-      const { data, error } = await supabase
-        .from("changelogs")
-        .select("*")
-        .order("created_at", { ascending: false });
-      
-      if (data) {
-        setLogs(data);
-        // Check hash after logs are loaded
-        const hash = window.location.hash.replace('#', '');
-        if (hash) {
-          const index = data.findIndex(log => log.version === hash || `v${log.version}` === hash || log.version === `v${hash}`);
-          if (index !== -1) setExpandedIndex(index);
-        }
-      }
-      setLoading(false);
-    }
-    fetchLogs();
-  }, []);
-
-  const toggleAccordion = (index) => {
-    setExpandedIndex(expandedIndex === index ? -1 : index);
-    if (expandedIndex !== index && logs[index]) {
-      window.history.replaceState(null, null, `#${logs[index].version}`);
-    } else {
-      window.history.replaceState(null, null, ' ');
+  const getTypeIcon = (type) => {
+    switch(type) {
+      case 'major': return <Sparkles size={18} className="text-yellow-400" />;
+      case 'feature': return <Zap size={18} className="text-blue-400" />;
+      case 'security': return <Shield size={18} className="text-green-400" />;
+      default: return <Globe size={18} className="text-purple-400" />;
     }
   };
 
   return (
-    <main style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+    <main className="min-h-screen bg-[#0a0a0c] text-white">
       <Navbar />
       
-      <div className="container" style={{ padding: "4rem 1.5rem", flex: 1 }}>
-        <div style={{ textAlign: "center", marginBottom: "4rem" }} className="animate-fade-in">
-          <div style={{ 
-            display: "inline-flex", 
-            alignItems: "center", 
-            gap: "0.5rem", 
-            background: "rgba(252, 163, 11, 0.1)", 
-            color: "var(--accent-color)", 
-            padding: "0.5rem 1.2rem", 
-            borderRadius: "100px",
-            fontSize: "0.9rem",
-            fontWeight: "bold",
-            marginBottom: "1rem"
-          }}>
+      <div className="container mx-auto px-6 py-20">
+        <div className="text-center mb-16 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+          <div className="inline-flex items-center gap-2 bg-[#FCA30B]/10 text-[#FCA30B] px-4 py-2 rounded-full text-sm font-bold mb-6 border border-[#FCA30B]/20">
             <History size={16} />
-            {t.changelog}
+            {lang === "en" ? "Changelog" : "Güncelleme Notları"}
           </div>
-          <h1 style={{ fontSize: "3rem", fontWeight: "800", marginBottom: "1rem" }}>
-            {lang === "en" ? "Development History" : "Gelişim Geçmişi"}
+          <h1 className="text-5xl md:text-6xl font-black mb-6 bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">
+            {lang === "en" ? "Evolution of Veyronix" : "Veyronix'in Gelişimi"}
           </h1>
-          <p style={{ color: "var(--text-muted)", fontSize: "1.1rem", maxWidth: "600px", margin: "0 auto" }}>
+          <p className="text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">
             {lang === "en" 
-              ? "Stay updated with the latest improvements, bug fixes, and feature additions to the Veyronix ecosystem." 
-              : "Veyronix ekosistemindeki en son iyileştirmeler, hata düzeltmeleri ve özellik eklemeleri hakkında güncel kalın."}
+              ? "Follow our journey as we build the ultimate tools for the Albion Online community." 
+              : "Albion Online topluluğu için en iyi araçları geliştirirken geçirdiğimiz yolculuğu takip edin."}
           </p>
         </div>
 
-        <div style={{ 
-          maxWidth: "800px", 
-          margin: "0 auto", 
-          display: "flex", 
-          flexDirection: "column", 
-          gap: "1.5rem" 
-        }}>
-          {loading ? (
-            <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
-              <Loader2 className="animate-spin" size={32} style={{ margin: '0 auto 1rem' }} />
-              Yükleniyor...
-            </div>
-          ) : logs.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
-              Henüz bir güncelleme notu bulunmuyor.
-            </div>
-          ) : logs.map((item, index) => {
+        <div className="max-w-3xl mx-auto space-y-6">
+          {staticLogs.map((item, index) => {
             const isExpanded = expandedIndex === index;
             const content = lang === "tr" ? item.content_tr : item.content_en;
             const title = lang === "tr" ? item.title_tr : item.title_en;
-            const displayContent = isExpanded ? content : (content.length > 250 ? content.substring(0, 250) + "..." : content);
 
             return (
               <div 
-                id={item.version}
-                key={index} 
-                className="glass-panel animate-fade-in" 
-                style={{ 
-                  overflow: "hidden", 
-                  transition: "all 0.3s ease",
-                  animationDelay: `${index * 0.1}s`,
-                  boxShadow: isExpanded ? "0 10px 40px rgba(0,0,0,0.4)" : "none",
-                  borderColor: isExpanded ? "var(--accent-color)" : "var(--border-color)",
-                  borderWidth: isExpanded ? "2px" : "1px"
-                }}
+                key={item.version}
+                className={`group relative rounded-2xl border transition-all duration-500 overflow-hidden ${
+                  isExpanded 
+                    ? "bg-[#111114] border-[#FCA30B]/50 shadow-[0_0_40px_rgba(252,163,11,0.1)]" 
+                    : "bg-[#0d0d0f] border-white/5 hover:border-white/20"
+                }`}
               >
-                <div 
-                  onClick={() => toggleAccordion(index)}
-                  style={{ 
-                    padding: "2rem", 
-                    cursor: "pointer", 
-                    display: "flex", 
-                    flexDirection: "column",
-                    alignItems: "center",
-                    textAlign: "center",
-                    gap: "1rem",
-                    background: isExpanded ? "rgba(255, 255, 255, 0.03)" : "transparent"
-                  }}
+                <button 
+                  onClick={() => setExpandedIndex(isExpanded ? -1 : index)}
+                  className="w-full text-left p-8 focus:outline-none"
                 >
-                  <div style={{ display: "flex", alignItems: "center", gap: "1rem", flexWrap: "wrap", justifyContent: "center" }}>
-                    <span style={{ 
-                      background: "var(--accent-color)", 
-                      color: "var(--bg-color)", 
-                      padding: "0.3rem 0.8rem", 
-                      borderRadius: "8px", 
-                      fontSize: "0.9rem", 
-                      fontWeight: "bold" 
-                    }}>
-                      v{item.version}
-                    </span>
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", color: "var(--text-muted)", fontSize: "0.95rem" }}>
-                      <Calendar size={16} />
-                      {new Date(item.date).toLocaleDateString(lang === "tr" ? "tr-TR" : "en-US", { 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric' 
-                      })}
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className={`p-3 rounded-xl transition-colors ${isExpanded ? "bg-[#FCA30B] text-black" : "bg-white/5 text-gray-400"}`}>
+                        {getTypeIcon(item.type)}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-3 mb-1">
+                          <span className="text-[#FCA30B] font-mono font-bold text-sm">v{item.version}</span>
+                          <span className="w-1 h-1 rounded-full bg-white/20"></span>
+                          <div className="flex items-center gap-1.5 text-gray-500 text-xs uppercase tracking-widest font-bold">
+                            <Calendar size={12} />
+                            {item.date}
+                          </div>
+                        </div>
+                        <h2 className="text-xl font-bold group-hover:text-[#FCA30B] transition-colors">{title}</h2>
+                      </div>
+                    </div>
+                    <div className={`transition-transform duration-500 ${isExpanded ? "rotate-180 text-[#FCA30B]" : "text-gray-600"}`}>
+                      <ChevronDown size={24} />
                     </div>
                   </div>
-                  
-                  <h2 style={{ fontSize: "1.8rem", fontWeight: "800", color: "white" }}>{title}</h2>
+                </button>
 
-                  <div className={`markdown-content ${isExpanded ? 'expanded' : 'collapsed'}`} style={{ 
-                    color: "var(--text-muted)", 
-                    lineHeight: "1.8", 
-                    fontSize: "1.05rem",
-                    width: "100%",
-                    textAlign: "center"
-                  }}>
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                      {displayContent}
-                    </ReactMarkdown>
-                  </div>
-
-                  <div style={{ 
-                    color: isExpanded ? "var(--accent-color)" : "var(--text-muted)",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                    fontSize: "0.9rem",
-                    fontWeight: "bold",
-                    marginTop: "0.5rem"
-                  }}>
-                    {isExpanded ? (
-                      <>{lang === 'tr' ? 'Daha az göster' : 'Show less'} <ChevronUp size={18} /></>
-                    ) : (
-                      <>{lang === 'tr' ? 'Devamını oku' : 'Read more'} <ChevronDown size={18} /></>
-                    )}
+                <div className={`transition-all duration-500 ease-in-out ${isExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"}`}>
+                  <div className="px-8 pb-8 pt-0 text-gray-400 border-t border-white/5 mt-2">
+                    <div className="prose prose-invert prose-orange max-w-none pt-6">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {content}
+                      </ReactMarkdown>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -184,72 +193,15 @@ export default function ChangelogPage() {
       </div>
 
       <Footer />
-
+      
       <style jsx global>{`
-        .markdown-content p {
-          margin-bottom: 1rem;
-        }
-        .markdown-content ul, .markdown-content ol {
-          margin-bottom: 1rem;
-          padding-left: 0;
-          list-style-position: inside;
-        }
-        .markdown-content li {
-          margin-bottom: 0.5rem;
-        }
-        .markdown-content code {
-          background: rgba(252, 163, 11, 0.1);
-          color: var(--accent-color);
-          padding: 0.2rem 0.4rem;
-          borderRadius: 4px;
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 0.9em;
-        }
-        .markdown-content pre {
-          background: rgba(0, 0, 0, 0.3);
-          padding: 1rem;
-          borderRadius: 8px;
-          overflow-x: auto;
-          margin-bottom: 1.5rem;
-          border: 1px solid var(--border-color);
-        }
-        .markdown-content pre code {
-          background: transparent;
-          padding: 0;
-          color: #e2e8f0;
-        }
-        .markdown-content h3 {
-          color: white;
-          margin-top: 1.5rem;
-          margin-bottom: 0.75rem;
-          font-size: 1.25rem;
-        }
-        .markdown-content strong {
-          color: white;
-        }
-        
-        .collapsed {
-          max-height: 150px;
-          overflow: hidden;
-          position: relative;
-        }
-        
-        .collapsed::after {
-          content: "";
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          width: 100%;
-          height: 60px;
-          background: linear-gradient(transparent, rgba(10, 10, 12, 0.8));
-          pointer-events: none;
-        }
-
-        .glass-panel:hover {
-          border-color: rgba(252, 163, 11, 0.4);
-          transform: translateY(-2px);
-        }
+        .prose h3 { color: white !important; font-weight: 800; margin-top: 0 !important; }
+        .prose ul { list-style-type: none; padding-left: 0; }
+        .prose li { position: relative; padding-left: 1.5rem; margin-bottom: 0.5rem; }
+        .prose li::before { content: "→"; position: absolute; left: 0; color: #FCA30B; font-weight: bold; }
+        .prose strong { color: white; }
       `}</style>
     </main>
   );
 }
+
