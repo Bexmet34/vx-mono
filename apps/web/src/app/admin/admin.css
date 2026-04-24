@@ -303,3 +303,60 @@
 .animate-slide-up {
   animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
+
+/* New Components */
+.stat-mini-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--admin-border);
+  padding: 0.75rem 1.25rem;
+  border-radius: 14px;
+  min-width: 110px;
+  text-align: center;
+  transition: all 0.3s;
+}
+
+.stat-mini-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-3px);
+}
+
+.stat-mini-card .label {
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--admin-text-muted);
+  letter-spacing: 1px;
+  margin-bottom: 0.2rem;
+}
+
+.stat-mini-card .value {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: white;
+}
+
+.filter-btn {
+  padding: 0.5rem 1.2rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--admin-border);
+  color: var(--admin-text-muted);
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: white;
+}
+
+.filter-btn.active {
+  background: var(--admin-accent);
+  color: var(--admin-bg);
+  border-color: var(--admin-accent);
+  font-weight: 700;
+  box-shadow: 0 4px 15px rgba(252, 163, 17, 0.3);
+}

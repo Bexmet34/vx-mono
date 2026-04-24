@@ -34,6 +34,7 @@ export default function AdminPage() {
   // Modal States
   const [showDayModal, setShowDayModal] = useState(null);
   const [daysToAdd, setDaysToAdd] = useState(30);
+  const [statusFilter, setStatusFilter] = useState("all"); // all, active, unlimited, passive
 
   const isAdmin = session?.user?.id === ADMIN_ID || session?.user?.id === "407234961582587916";
 
@@ -127,11 +128,19 @@ export default function AdminPage() {
     setTemplates(prev => prev.map(t => t.id === id ? { ...t, [field]: value } : t));
   };
 
-  const filteredServers = servers.filter(s => 
-    s.guild_name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    s.guild_id?.includes(searchTerm) ||
-    s.owner_id?.includes(searchTerm)
-  );
+  const filteredServers = servers.filter(s => {
+    const matchesSearch = s.guild_name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                         s.guild_id?.includes(searchTerm) ||
+                         s.owner_id?.includes(searchTerm);
+    
+    if (!matchesSearch) return false;
+    
+    if (statusFilter === 'active') return s.is_active && !s.is_unlimited;
+    if (statusFilter === 'unlimited') return s.is_unlimited;
+    if (statusFilter === 'passive') return !s.is_active;
+    
+    return true;
+  });
 
   const menuItems = [
     { id: "overview", label: "Genel Bakış", icon: <LayoutDashboard size={20} /> },
@@ -213,14 +222,52 @@ export default function AdminPage() {
             {/* SERVER MANAGEMENT TAB */}
             {activeTab === "servers" && (
               <>
-                <div className="admin-search-container">
-                  <Search style={{ position: "absolute", left: "1.2rem", top: "50%", transform: "translateY(-50%)", color: "var(--admin-text-muted)" }} size={18} />
-                  <input 
-                    className="admin-search-input" 
-                    placeholder="Sunucu ismi, ID veya Sahip ID ile ara..." 
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
+                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '2rem', marginBottom: '2.5rem'}}>
+                   <div style={{flex: 1}}>
+                      <div className="admin-search-container" style={{marginBottom: 0}}>
+                        <Search style={{ position: "absolute", left: "1.2rem", top: "50%", transform: "translateY(-50%)", color: "var(--admin-text-muted)" }} size={18} />
+                        <input 
+                          className="admin-search-input" 
+                          placeholder="Sunucu ismi, ID veya Sahip ID ile ara..." 
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                      </div>
+                   </div>
+                   
+                   <div style={{display: 'flex', gap: '1rem'}}>
+                      <div className="stat-mini-card">
+                         <div className="label">Toplam</div>
+                         <div className="value">{servers.length}</div>
+                      </div>
+                      <div className="stat-mini-card">
+                         <div className="label" style={{color: 'var(--admin-success)'}}>Aktif</div>
+                         <div className="value">{servers.filter(s => s.is_active && !s.is_unlimited).length}</div>
+                      </div>
+                      <div className="stat-mini-card">
+                         <div className="label" style={{color: '#fca311'}}>Sınırsız</div>
+                         <div className="value">{servers.filter(s => s.is_unlimited).length}</div>
+                      </div>
+                      <div className="stat-mini-card">
+                         <div className="label" style={{color: 'var(--admin-error)'}}>Pasif</div>
+                         <div className="value">{servers.filter(s => !s.is_active).length}</div>
+                      </div>
+                   </div>
+                </div>
+
+                <div style={{display: 'flex', gap: '0.8rem', marginBottom: '1.5rem'}}>
+                   {['all', 'active', 'unlimited', 'passive'].map(f => (
+                     <button 
+                       key={f}
+                       onClick={() => setStatusFilter(f)}
+                       className={`filter-btn ${statusFilter === f ? 'active' : ''}`}
+                     >
+                       {f === 'all' && 'Hepsi'}
+                       {f === 'active' && 'Sadece Aktif'}
+                       {f === 'unlimited' && 'Sadece Sınırsız'}
+                       {f === 'passive' && 'Sadece Pasif'}
+                     </button>
+                   ))}
                 </div>
 
                 <div className="admin-card">
@@ -283,8 +330,8 @@ export default function AdminPage() {
                               <div style={{ display: "flex", gap: "0.6rem", justifyContent: "flex-end" }}>
                                 <button 
                                   className="admin-action-btn" 
-                                  title="Süre Ekle" 
-                                  onClick={() => { setShowDayModal(s.guild_id); setDaysToAdd(30); }}
+                                  title="Süre Yönetimi" 
+                                  onClick={() => { setShowDayModal({ guildId: s.guild_id, mode: 'add' }); setDaysToAdd(30); }}
                                 >
                                   <Clock size={18} />
                                 </button>
@@ -385,11 +432,22 @@ export default function AdminPage() {
         <div className="admin-modal-overlay" onClick={() => setShowDayModal(null)}>
           <div className="admin-modal animate-slide-up" onClick={e => e.stopPropagation()}>
             <div style={{textAlign: 'center', marginBottom: '2rem'}}>
-               <div style={{background: 'var(--admin-accent-muted)', width: '64px', height: '64px', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem'}}>
-                  <Calendar size={32} color="var(--admin-accent)" />
+               <div style={{background: showDayModal.mode === 'add' ? 'var(--admin-accent-muted)' : 'rgba(231, 76, 60, 0.1)', width: '64px', height: '64px', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem'}}>
+                  <Calendar size={32} color={showDayModal.mode === 'add' ? 'var(--admin-accent)' : 'var(--admin-error)'} />
                </div>
-               <h2 style={{ fontSize: "1.5rem", fontWeight: "800" }}>Süre Ekle</h2>
-               <p style={{color: 'var(--admin-text-muted)', fontSize: '0.9rem'}}>Sunucuya eklenecek gün sayısını girin.</p>
+               <h2 style={{ fontSize: "1.5rem", fontWeight: "800" }}>{showDayModal.mode === 'add' ? 'Süre Ekle' : 'Süre Çıkar'}</h2>
+               <p style={{color: 'var(--admin-text-muted)', fontSize: '0.9rem'}}>Sunucuya uygulanacak gün sayısını girin.</p>
+            </div>
+
+            <div style={{display: 'flex', gap: '0.5rem', background: 'rgba(0,0,0,0.2)', padding: '0.4rem', borderRadius: '12px', marginBottom: '1.5rem'}}>
+               <button 
+                 onClick={() => setShowDayModal({...showDayModal, mode: 'add'})}
+                 style={{flex: 1, padding: '0.6rem', borderRadius: '8px', border: 'none', background: showDayModal.mode === 'add' ? 'var(--admin-accent)' : 'transparent', color: showDayModal.mode === 'add' ? 'var(--admin-bg)' : 'white', fontWeight: '700', transition: '0.2s'}}
+               >Ekle</button>
+               <button 
+                 onClick={() => setShowDayModal({...showDayModal, mode: 'remove'})}
+                 style={{flex: 1, padding: '0.6rem', borderRadius: '8px', border: 'none', background: showDayModal.mode === 'remove' ? 'var(--admin-error)' : 'transparent', color: 'white', fontWeight: '700', transition: '0.2s'}}
+               >Çıkar</button>
             </div>
             
             <input 
@@ -402,8 +460,12 @@ export default function AdminPage() {
 
             <div className="admin-btn-group">
               <button className="admin-btn-secondary" onClick={() => setShowDayModal(null)}>İptal</button>
-              <button className="admin-btn-primary" onClick={() => handleServerAction(showDayModal, 'add_days', daysToAdd)}>
-                {savingId === showDayModal ? <Loader2 className="spin" size={18} /> : "Süreyi Güncelle"}
+              <button 
+                className={showDayModal.mode === 'add' ? 'admin-btn-primary' : 'admin-btn-primary danger'} 
+                style={showDayModal.mode === 'remove' ? {background: 'var(--admin-error)'} : {}}
+                onClick={() => handleServerAction(showDayModal.guildId, showDayModal.mode === 'add' ? 'add_days' : 'remove_days', daysToAdd)}
+              >
+                {savingId === showDayModal.guildId ? <Loader2 size={18} className="spin" /> : (showDayModal.mode === 'add' ? 'Süreyi Uzat' : 'Süreyi Kısalt')}
               </button>
             </div>
           </div>

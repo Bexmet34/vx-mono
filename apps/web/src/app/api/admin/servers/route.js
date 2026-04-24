@@ -53,10 +53,14 @@ export async function PATCH(req) {
 
   const body = await req.json();
   const { guildId, action, value } = body;
+  console.log(`[AdminAPI] Action: ${action}, Guild: ${guildId}, Value: ${value}`);
 
   // 1. Fetch current sub
-  const { data: currentSub } = await supabase.from('subscriptions').select('*').eq('guild_id', guildId).single();
-  if (!currentSub) return NextResponse.json({ error: "Server not found" }, { status: 404 });
+  const { data: currentSub, error: fetchError } = await supabase.from('subscriptions').select('*').eq('guild_id', guildId).single();
+  if (fetchError || !currentSub) {
+    console.error(`[AdminAPI] Fetch Error: ${fetchError?.message}`);
+    return NextResponse.json({ error: "Server not found" }, { status: 404 });
+  }
 
   let updateData = { updated_at: new Date().toISOString() };
   let templateId = '';
@@ -68,45 +72,64 @@ export async function PATCH(req) {
   } else if (action === 'toggle_active') {
     updateData.is_active = value;
     templateId = value ? 'sub_extended' : 'sub_suspended';
-  } else if (action === 'add_days') {
+  } else if (action === 'add_days' || action === 'remove_days') {
+    console.log(`[AdminAPI] Current Expiry from DB: ${currentSub.expires_at}`);
+    
     const currentExpires = currentSub.expires_at ? new Date(currentSub.expires_at) : new Date();
     const now = new Date();
     
-    // Geçerli bir tarih değilse 'now' kullan
     let baseDate = isNaN(currentExpires.getTime()) ? now : currentExpires;
+    console.log(`[AdminAPI] Initial BaseDate: ${baseDate.toISOString()}`);
     
-    // Eğer süresi çoktan dolmuşsa (bugünden daha eski), bugünü baz al
-    if (baseDate < now) {
+    if (action === 'add_days' && baseDate < now) {
+      console.log(`[AdminAPI] Subscription expired, starting from NOW`);
       baseDate = now;
     }
     
-    const newExpiry = new Date(baseDate);
-    newExpiry.setDate(newExpiry.getDate() + parseInt(value));
+    const dayDelta = parseInt(value) || 0;
+    const newExpiry = new Date(baseDate.getTime()); // Use getTime to avoid reference issues
+    
+    if (action === 'add_days') {
+      newExpiry.setDate(newExpiry.getDate() + dayDelta);
+      templateId = 'sub_extended';
+    } else {
+      newExpiry.setDate(newExpiry.getDate() - dayDelta);
+      templateId = 'sub_reduced';
+    }
+    
+    console.log(`[AdminAPI] Calculated New Expiry: ${newExpiry.toISOString()}`);
     
     updateData.expires_at = newExpiry.toISOString();
     updateData.one_day_notified = false;
-    templateId = 'sub_extended';
     
-    // Tarih formatını garantiye alalım (DD.MM.YYYY)
-    const dd = String(newExpiry.getDate()).padStart(2, '0');
-    const mm = String(newExpiry.getMonth() + 1).padStart(2, '0');
-    const yyyy = newExpiry.getFullYear();
-    const hh = String(newExpiry.getHours()).padStart(2, '0');
-    const min = String(newExpiry.getMinutes()).padStart(2, '0');
+    // Format for notification (TR Timezone - assuming bot user is in TR)
+    // Offset by +3 for TR
+    const trTime = new Date(newExpiry.getTime() + (3 * 60 * 60 * 1000));
+    const dd = String(trTime.getUTCDate()).padStart(2, '0');
+    const mm = String(trTime.getUTCMonth() + 1).padStart(2, '0');
+    const yyyy = trTime.getUTCFullYear();
+    const hh = String(trTime.getUTCHours()).padStart(2, '0');
+    const min = String(trTime.getUTCMinutes()).padStart(2, '0');
     
     placeholders.tarih = `${dd}.${mm}.${yyyy}`;
     placeholders.saat = `${hh}:${min}`;
+    placeholders.gun = dayDelta;
+    
+    console.log(`[AdminAPI] Final Placeholders:`, placeholders);
   }
 
   // 2. Update Subscription
   const { error: updateError } = await supabase.from('subscriptions').update(updateData).eq('guild_id', guildId);
-  if (updateError) return NextResponse.json({ error: updateError.message }, { status: 500 });
+  if (updateError) {
+    console.error(`[AdminAPI] Update Error: ${updateError.message}`);
+    return NextResponse.json({ error: updateError.message }, { status: 500 });
+  }
 
   // 3. Queue Notification
   if (templateId) {
     const parsed = await getParsedTemplate(templateId, placeholders);
     if (parsed) {
-      await supabase.from('message_queue').insert({
+      const { error: queueError } = await supabase.from('message_queue').insert({
         guild_id: guildId,
         owner_id: currentSub.owner_id,
         message_content: JSON.stringify({
@@ -119,6 +142,7 @@ export async function PATCH(req) {
         }),
         status: 'pending'
       });
+      if (queueError) console.error(`[AdminAPI] Queue Error: ${queueError.message}`);
     }
   }
 
