@@ -20,13 +20,15 @@ export default function AdminPage() {
   const [message, setMessage] = useState(null);
 
   useEffect(() => {
-    if (status === "unauthenticated" || (status === "authenticated" && session.user.id !== ADMIN_ID)) {
+    const isAdmin = session?.user?.id === ADMIN_ID || session?.user?.id === "407234961582587916";
+    if (status === "unauthenticated" || (status === "authenticated" && !isAdmin)) {
       router.push("/");
     }
   }, [status, session, router]);
 
   useEffect(() => {
-    if (status === "authenticated" && session.user.id === ADMIN_ID) {
+    const isAdmin = session?.user?.id === ADMIN_ID || session?.user?.id === "407234961582587916";
+    if (status === "authenticated" && isAdmin) {
       fetchTemplates();
     }
   }, [status, session]);

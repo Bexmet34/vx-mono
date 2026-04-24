@@ -39,7 +39,7 @@ export default function Navbar() {
                 <LayoutDashboard size={18} />
                 {t.dashboard}
               </Link>
-              {session.user?.id === process.env.NEXT_PUBLIC_ADMIN_ID && (
+              {session.user?.id && (session.user.id === process.env.NEXT_PUBLIC_ADMIN_ID || session.user.id === "407234961582587916") && (
                 <Link href="/admin" className="signout-btn" style={{ background: 'rgba(252, 163, 17, 0.1)', color: 'var(--accent-color)', borderColor: 'var(--accent-color)' }}>
                   Admin
                 </Link>
