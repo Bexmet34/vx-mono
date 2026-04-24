@@ -138,6 +138,7 @@ export default function AdminPage() {
     if (statusFilter === 'active') return s.is_active && !s.is_unlimited;
     if (statusFilter === 'unlimited') return s.is_unlimited;
     if (statusFilter === 'passive') return !s.is_active;
+    if (statusFilter === 'expired') return !s.is_unlimited && new Date(s.expires_at) < new Date();
     
     return true;
   });
@@ -235,7 +236,7 @@ export default function AdminPage() {
                       </div>
                    </div>
                    
-                   <div style={{display: 'flex', gap: '1rem'}}>
+                   <div style={{display: 'flex', gap: '1rem', alignItems: 'center'}}>
                       <div className="stat-mini-card">
                          <div className="label">Toplam</div>
                          <div className="value">{servers.length}</div>
@@ -252,20 +253,28 @@ export default function AdminPage() {
                          <div className="label" style={{color: 'var(--admin-error)'}}>Pasif</div>
                          <div className="value">{servers.filter(s => !s.is_active).length}</div>
                       </div>
+                      
+                      {/* Küçük Süresi Dolmuş Kartı */}
+                      <div className="stat-mini-card" style={{padding: '0.5rem 0.8rem', minWidth: '90px', borderStyle: 'dashed'}}>
+                         <div className="label" style={{fontSize: '0.6rem', color: '#ff4757'}}>S. Dolmuş</div>
+                         <div className="value" style={{fontSize: '1rem'}}>{servers.filter(s => !s.is_unlimited && new Date(s.expires_at) < new Date()).length}</div>
+                      </div>
                    </div>
                 </div>
 
                 <div style={{display: 'flex', gap: '0.8rem', marginBottom: '1.5rem'}}>
-                   {['all', 'active', 'unlimited', 'passive'].map(f => (
+                   {['all', 'active', 'unlimited', 'passive', 'expired'].map(f => (
                      <button 
                        key={f}
                        onClick={() => setStatusFilter(f)}
                        className={`filter-btn ${statusFilter === f ? 'active' : ''}`}
+                       style={f === 'expired' ? {borderColor: '#ff4757', color: statusFilter === 'expired' ? 'white' : '#ff4757'} : {}}
                      >
                        {f === 'all' && 'Hepsi'}
                        {f === 'active' && 'Sadece Aktif'}
                        {f === 'unlimited' && 'Sadece Sınırsız'}
                        {f === 'passive' && 'Sadece Pasif'}
+                       {f === 'expired' && 'Süresi Dolmuş'}
                      </button>
                    ))}
                 </div>
@@ -320,7 +329,7 @@ export default function AdminPage() {
                             </td>
                             <td>
                               <div style={{ fontSize: "0.9rem", fontWeight: "600", color: isExpired && !s.is_unlimited ? "var(--admin-error)" : "inherit" }}>
-                                {s.is_unlimited ? "Süresiz" : format(new Date(s.expires_at), "dd MMM yyyy", { locale: lang === 'tr' ? tr : enUS })}
+                                {s.is_unlimited ? "Süresiz" : format(new Date(s.expires_at), "dd MMM yyyy", { locale: tr })}
                               </div>
                               <div style={{fontSize: '0.75rem', color: 'var(--admin-text-muted)'}}>
                                 {s.is_unlimited ? "∞" : format(new Date(s.expires_at), "HH:mm")}
