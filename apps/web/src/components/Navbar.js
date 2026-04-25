@@ -12,111 +12,198 @@ export default function Navbar() {
   const { lang, toggleLanguage, t } = useLanguage();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  return (
-    <nav className="navbar" style={{ padding: '0 1.5rem', height: 'var(--nav-height)', borderBottom: '1px solid var(--border-color)' }}>
-      <div className="navbar-content">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-          <Link href="/" className="navbar-brand text-logo">
-            Veyronix
-          </Link>
-          <a href="https://docs.veyronix.com.tr/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-muted)', fontWeight: '600', transition: '0.2s' }} className="nav-link desktop-only">
-            Wiki
-          </a>
-          <Link href="/changelog" style={{ color: 'var(--text-muted)', fontWeight: '600', transition: '0.2s' }} className="nav-link desktop-only">
-            {t.changelog}
-          </Link>
-        </div>
-        
-        {/* Desktop Menu */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }} className="desktop-only">
-          <button onClick={toggleLanguage} className="signout-btn" style={{ padding: '0.4rem 0.8rem', display: 'flex', gap: '0.5rem', alignItems: 'center', borderRadius: '8px' }}>
-            <Globe size={18} />
-            {lang === 'en' ? 'TR' : 'EN'}
-          </button>
-          {session ? (
-            <div className="auth-user">
-              <Link href="/dashboard" className="btn-primary" style={{ padding: "0.5rem 1rem" }}>
-                <LayoutDashboard size={18} />
-                {t.dashboard}
-              </Link>
-              {session.user?.id && (session.user.id === process.env.NEXT_PUBLIC_ADMIN_ID || session.user.id === "407234961582587916") && (
-                <Link href="/admin" className="signout-btn" style={{ background: 'rgba(252, 163, 17, 0.1)', color: 'var(--accent-color)', borderColor: 'var(--accent-color)' }}>
-                  Admin
-                </Link>
-              )}
-              <button onClick={() => signOut()} className="signout-btn">
-                <LogOut size={16} />
-                {t.logout}
-              </button>
-              {session.user?.image && (
-                <img src={session.user.image} alt="Avatar" className="avatar" />
-              )}
-            </div>
-          ) : (
-            <button onClick={() => signIn("discord")} className="btn-primary">
-              <LogIn size={18} />
-              {t.login}
-            </button>
-          )}
-        </div>
+  const isAdmin = session?.user?.id && (session.user.id === process.env.NEXT_PUBLIC_ADMIN_ID || session.user.id === "407234961582587916");
 
-        {/* Mobile Toggle */}
-        <button className="mobile-only" onClick={() => setIsMenuOpen(!isMenuOpen)} style={{ background: 'transparent', color: 'var(--text-main)', padding: '0.5rem' }}>
-          {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
-        </button>
+  return (
+    <nav className="navbar">
+      <div className="container">
+        <div className="navbar-content">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+            <Link href="/" className="navbar-brand text-logo">
+              Veyronix
+            </Link>
+            <div className="desktop-links">
+              <a href="https://docs.veyronix.com.tr/" target="_blank" rel="noopener noreferrer" className="nav-link">
+                Wiki
+              </a>
+              <Link href="/changelog" className="nav-link">
+                {t.changelog}
+              </Link>
+            </div>
+          </div>
+          
+          {/* Desktop Menu */}
+          <div className="desktop-menu">
+            <button onClick={toggleLanguage} className="lang-toggle">
+              <Globe size={18} />
+              {lang === 'en' ? 'TR' : 'EN'}
+            </button>
+
+            {session ? (
+              <div className="auth-user">
+                {isAdmin && (
+                  <Link href="/admin" className="admin-pill">
+                    Admin
+                  </Link>
+                )}
+                <Link href="/dashboard" className="btn-primary" style={{ padding: "0.6rem 1.2rem", fontSize: '0.9rem' }}>
+                  <LayoutDashboard size={18} />
+                  {t.dashboard}
+                </Link>
+                <button onClick={() => signOut()} className="icon-btn" title={t.logout}>
+                  <LogOut size={20} />
+                </button>
+                {session.user?.image && (
+                  <img src={session.user.image} alt="Avatar" className="avatar" />
+                )}
+              </div>
+            ) : (
+              <button onClick={() => signIn("discord")} className="btn-primary">
+                <LogIn size={18} />
+                {t.login}
+              </button>
+            )}
+          </div>
+
+          {/* Mobile Toggle */}
+          <button className="mobile-toggle" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu Overlay */}
-      {isMenuOpen && (
-        <div className="mobile-menu" style={{ 
-          position: 'fixed', 
-          top: 'var(--nav-height)', 
-          left: 0, 
-          right: 0, 
-          background: 'var(--bg-color)', 
-          padding: '2rem',
-          borderBottom: '1px solid var(--border-color)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '1.5rem',
-          zIndex: 100,
-          animation: 'fadeIn 0.3s ease'
-        }}>
-          <a href="https://docs.veyronix.com.tr/" target="_blank" rel="noopener noreferrer" onClick={() => setIsMenuOpen(false)} style={{ fontSize: '1.2rem', fontWeight: '600' }}>{t.wiki}</a>
-          <Link href="/changelog" onClick={() => setIsMenuOpen(false)} style={{ fontSize: '1.2rem', fontWeight: '600' }}>{t.changelog}</Link>
-          <div style={{ height: '1px', background: 'var(--border-color)' }}></div>
-          {session ? (
-            <>
-              <Link href="/dashboard" onClick={() => setIsMenuOpen(false)} className="btn-primary" style={{ justifyContent: 'center' }}>
-                <LayoutDashboard size={18} />
-                {t.dashboard}
-              </Link>
-              <button onClick={() => signOut()} className="signout-btn" style={{ width: '100%', justifyContent: 'center', display: 'flex', gap: '0.5rem' }}>
-                <LogOut size={16} />
+      <div className={`mobile-overlay ${isMenuOpen ? 'open' : ''}`}>
+        <div className="mobile-menu-content">
+          <div className="mobile-links">
+            <Link href="/" onClick={() => setIsMenuOpen(false)}>{lang === 'tr' ? 'Ana Sayfa' : 'Home'}</Link>
+            <Link href="/dashboard" onClick={() => setIsMenuOpen(false)}>{t.dashboard}</Link>
+            <a href="https://docs.veyronix.com.tr/" target="_blank" rel="noopener noreferrer" onClick={() => setIsMenuOpen(false)}>{t.wiki}</a>
+            <Link href="/changelog" onClick={() => setIsMenuOpen(false)}>{t.changelog}</Link>
+            {isAdmin && (
+              <Link href="/admin" onClick={() => setIsMenuOpen(false)} style={{ color: 'var(--accent-color)' }}>Admin Panel</Link>
+            )}
+          </div>
+
+          <div className="mobile-footer">
+            <button onClick={toggleLanguage} className="signout-btn" style={{ width: '100%', justifyContent: 'center' }}>
+              <Globe size={18} />
+              {lang === 'en' ? 'Türkçe\'ye Geç' : 'Switch to English'}
+            </button>
+            
+            {session ? (
+              <button onClick={() => signOut()} className="signout-btn" style={{ width: '100%', justifyContent: 'center', background: 'rgba(231, 76, 60, 0.1)', color: '#ff4d4f', borderColor: 'rgba(231, 76, 60, 0.2)' }}>
+                <LogOut size={18} />
                 {t.logout}
               </button>
-            </>
-          ) : (
-            <button onClick={() => signIn("discord")} className="btn-primary" style={{ justifyContent: 'center' }}>
-              <LogIn size={18} />
-              {t.login}
-            </button>
-          )}
-          <button onClick={() => { toggleLanguage(); setIsMenuOpen(false); }} className="signout-btn" style={{ width: '100%', justifyContent: 'center', display: 'flex', gap: '0.5rem' }}>
-            <Globe size={18} />
-            {lang === 'en' ? 'Bahasa TR' : 'Language EN'}
-          </button>
+            ) : (
+              <button onClick={() => signIn("discord")} className="btn-primary" style={{ width: '100%' }}>
+                <LogIn size={20} />
+                {t.login}
+              </button>
+            )}
+          </div>
         </div>
-      )}
+      </div>
 
       <style jsx>{`
-        .desktop-only { display: flex; }
-        .mobile-only { display: none; }
-        @media (max-width: 768px) {
-          .desktop-only { display: none; }
-          .mobile-only { display: flex; }
+        .desktop-links {
+          display: flex;
+          gap: 1.5rem;
+        }
+        .nav-link {
+          color: var(--text-muted);
+          font-weight: 600;
+          font-size: 0.95rem;
+        }
+        .nav-link:hover {
+          color: var(--text-main);
+        }
+        .desktop-menu {
+          display: flex;
+          align-items: center;
+          gap: 1.25rem;
+        }
+        .lang-toggle {
+          background: transparent;
+          color: var(--text-muted);
+          font-weight: 700;
+          padding: 0.5rem;
+          border: 1px solid transparent;
+        }
+        .lang-toggle:hover {
+          color: var(--accent-color);
+        }
+        .admin-pill {
+          background: var(--accent-color);
+          color: var(--bg-color);
+          padding: 0.3rem 0.8rem;
+          border-radius: 50px;
+          font-size: 0.75rem;
+          font-weight: 800;
+          text-transform: uppercase;
+        }
+        .icon-btn {
+          background: transparent;
+          color: var(--text-muted);
+          padding: 0.5rem;
+        }
+        .icon-btn:hover {
+          color: #ff4d4f;
+        }
+        .mobile-toggle {
+          display: none;
+          background: transparent;
+          color: var(--text-main);
+          padding: 0.5rem;
+        }
+        
+        .mobile-overlay {
+          position: fixed;
+          top: var(--nav-height);
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: var(--bg-color);
+          z-index: 999;
+          transform: translateX(100%);
+          transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          display: flex;
+          flex-direction: column;
+          padding: 2rem;
+        }
+        .mobile-overlay.open {
+          transform: translateX(0);
+        }
+        .mobile-menu-content {
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+          justify-content: space-between;
+        }
+        .mobile-links {
+          display: flex;
+          flex-direction: column;
+          gap: 2rem;
+        }
+        .mobile-links a {
+          font-size: 1.75rem;
+          font-weight: 800;
+          color: var(--text-main);
+        }
+        .mobile-footer {
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+          padding-bottom: 2rem;
+        }
+
+        @media (max-width: 960px) {
+          .desktop-links, .desktop-menu { display: none; }
+          .mobile-toggle { display: flex; }
         }
       `}</style>
     </nav>
   );
 }
+

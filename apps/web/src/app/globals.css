@@ -12,12 +12,18 @@
   --nav-height: 80px;
 }
 
+@media (max-width: 1024px) {
+  :root {
+    --nav-height: 70px;
+  }
+}
+
 @media (max-width: 768px) {
   :root {
-    --nav-height: 60px;
+    --nav-height: 64px;
   }
   html, body {
-    font-size: 14px; /* Base font size reduction for mobile */
+    font-size: 14px;
   }
 }
 
@@ -31,94 +37,101 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
   font-family: 'Outfit', sans-serif;
   background-color: var(--bg-color);
   color: var(--text-main);
-  background-image: radial-gradient(circle at top right, rgba(252, 163, 17, 0.15) 0%, transparent 40%),
-                    radial-gradient(circle at bottom left, rgba(252, 163, 17, 0.1) 0%, transparent 40%);
+  background-image: radial-gradient(circle at top right, rgba(252, 163, 17, 0.12) 0%, transparent 40%),
+                    radial-gradient(circle at bottom left, rgba(252, 163, 17, 0.08) 0%, transparent 40%);
   background-attachment: fixed;
   min-height: 100vh;
   overflow-x: hidden;
+  line-height: 1.5;
 }
 
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1.5rem;
+  width: 100%;
 }
 
 @media (max-width: 768px) {
   .container {
-    padding: 0 1rem;
+    padding: 0 1.25rem;
   }
 }
 
 a {
   color: inherit;
   text-decoration: none;
+  transition: color 0.2s ease;
 }
 
 button {
   font-family: inherit;
   cursor: pointer;
   border: none;
-  border-radius: 8px;
-  transition: all 0.2s ease;
+  border-radius: 10px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 .btn-primary {
   background-color: var(--accent-color);
   color: var(--bg-color);
-  font-weight: 600;
-  padding: 0.75rem 1.5rem;
+  font-weight: 700;
+  padding: 0.85rem 1.75rem;
   font-size: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  box-shadow: 0 4px 15px rgba(252, 163, 17, 0.2);
 }
 
 .btn-primary:hover {
   background-color: var(--accent-hover);
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(252, 163, 17, 0.3);
+  box-shadow: 0 6px 20px rgba(252, 163, 17, 0.35);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
 }
 
 .glass-panel {
   background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--border-color);
-  border-radius: 12px;
+  border-radius: 16px;
+  padding: 2rem;
 }
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
+  from { opacity: 0; transform: translateY(15px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.8s ease forwards;
+  animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 /* Navbar */
 .navbar {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
   position: sticky;
   top: 0;
-  z-index: 50;
-  background: rgba(11, 12, 16, 0.8);
-  backdrop-filter: blur(10px);
-}
-
-.nav-link:hover {
-  color: var(--accent-color) !important;
+  z-index: 1000;
+  background: rgba(11, 12, 16, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all 0.3s ease;
 }
 
 .navbar-content {
@@ -131,15 +144,13 @@ button {
 }
 
 .navbar-brand {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+  font-family: 'Outfit', sans-serif;
   text-decoration: none;
-  flex-shrink: 0;
+  z-index: 1001;
 }
 
 .text-logo {
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 800;
   background: linear-gradient(135deg, #fca311 0%, #ff5e00 100%);
   -webkit-background-clip: text;
@@ -147,33 +158,35 @@ button {
   -webkit-text-fill-color: transparent;
   letter-spacing: -1px;
   text-transform: uppercase;
-  text-shadow: 0 4px 15px rgba(252, 163, 17, 0.3);
 }
 
 .auth-user {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .avatar {
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   border: 2px solid var(--accent-color);
+  object-fit: cover;
 }
 
 .signout-btn {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.05);
   color: var(--text-muted);
   font-weight: 600;
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 1.1rem;
   border: 1px solid var(--border-color);
+  font-size: 0.9rem;
 }
 
 .signout-btn:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.1);
   color: var(--text-main);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 /* top.gg Vote Button */
@@ -181,51 +194,42 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 1rem 2rem;
-  font-size: 1.1rem;
+  padding: 0.85rem 1.75rem;
+  font-size: 1rem;
   font-weight: 700;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #ff3c3c 0%, #e53935 100%);
+  border-radius: 10px;
+  background: linear-gradient(135deg, #5865F2 0%, #4752C4 100%);
   color: #fff;
   text-decoration: none;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 15px rgba(229, 57, 53, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 15px rgba(88, 101, 242, 0.2);
 }
+
 .btn-topgg:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(229, 57, 53, 0.5);
-  background: linear-gradient(135deg, #ff4f4f 0%, #ef5350 100%);
+  box-shadow: 0 6px 20px rgba(88, 101, 242, 0.35);
+  filter: brightness(1.1);
+}
+
+@media (max-width: 1024px) {
+  .container { padding: 0 2rem; }
 }
 
 @media (max-width: 768px) {
-  .navbar {
-    padding: 0 1rem;
-  }
-  .navbar-brand {
-    font-size: 1.5rem !important;
-  }
-  .auth-user {
-    gap: 0.5rem;
-  }
-  .avatar {
-    width: 32px;
-    height: 32px;
-  }
+  .container { padding: 0 1.25rem; }
+  .navbar { height: 64px; }
+  .text-logo { font-size: 1.5rem; }
+  .glass-panel { padding: 1.5rem; }
   
-  /* Global Layout Fixes */
-  .glass-panel {
-    padding: 1.5rem !important; /* Force smaller padding on mobile for all glass panels */
-  }
-  
-  h1 { font-size: 2.2rem !important; }
-  h2 { font-size: 1.8rem !important; }
-  h3 { font-size: 1.4rem !important; }
+  h1 { font-size: 2.25rem; line-height: 1.2; }
+  h2 { font-size: 1.75rem; line-height: 1.3; }
+  h3 { font-size: 1.35rem; }
 }
 
 @media (max-width: 480px) {
   .btn-primary, .btn-topgg {
     width: 100%;
-    justify-content: center;
+    padding: 0.9rem;
   }
 }
+

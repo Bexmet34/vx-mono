@@ -99,33 +99,23 @@ export default function ChangelogPage() {
     <main style={{ backgroundColor: "var(--bg-color)", minHeight: "100vh", color: "white" }}>
       <Navbar />
       
-      <div className="container" style={{ padding: "6rem 1rem" }}>
-        <div style={{ textAlign: "center", marginBottom: "5rem" }}>
-          <div style={{ 
-            display: "inline-flex", 
-            alignItems: "center", 
-            gap: "0.5rem", 
-            color: "var(--accent-color)", 
-            fontSize: "0.85rem",
-            fontWeight: "800",
-            letterSpacing: "2px",
-            textTransform: "uppercase",
-            marginBottom: "1rem"
-          }}>
+      <div className="container" style={{ padding: "4rem 1rem" }}>
+        <div style={{ textAlign: "center", marginBottom: "4rem" }}>
+          <div className="changelog-badge">
             <History size={16} />
             {lang === "en" ? "Changelog" : "Güncelleme Notları"}
           </div>
-          <h1 style={{ fontSize: "clamp(2rem, 8vw, 3.5rem)", fontWeight: "800", marginBottom: "1.5rem", letterSpacing: "-1px" }}>
+          <h1 className="changelog-title">
             {lang === "en" ? "System Updates" : "Sistem Güncellemeleri"}
           </h1>
-          <p style={{ color: "var(--text-muted)", fontSize: "1.1rem", maxWidth: "600px", margin: "0 auto", opacity: 0.8 }}>
+          <p className="changelog-desc">
             {lang === "en" 
               ? "A chronological log of all changes and improvements to the Veyronix ecosystem." 
               : "Veyronix ekosisteminde yapılan tüm değişikliklerin ve iyileştirmelerin kronolojik kaydı."}
           </p>
         </div>
 
-        <div style={{ maxWidth: "700px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "1rem" }}>
+        <div className="changelog-list">
           {staticLogs.map((item, index) => {
             const isExpanded = expandedIndex === index;
             const content = lang === "tr" ? item.content_tr : item.content_en;
@@ -134,56 +124,27 @@ export default function ChangelogPage() {
             return (
               <div 
                 key={item.version}
-                className="glass-panel"
-                style={{ 
-                  borderColor: isExpanded ? "var(--accent-color)" : "rgba(255,255,255,0.05)",
-                  background: isExpanded ? "rgba(255,255,255,0.03)" : "var(--glass-bg)",
-                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                  borderRadius: "16px"
-                }}
+                className={`glass-panel changelog-item ${isExpanded ? 'active' : ''}`}
+                onClick={() => setExpandedIndex(isExpanded ? -1 : index)}
               >
-                <div 
-                  onClick={() => setExpandedIndex(isExpanded ? -1 : index)}
-                  style={{ padding: "1.5rem 2rem", cursor: "pointer" }}
-                >
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                    <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "1rem" }}>
-                      <span style={{ 
-                        color: isExpanded ? "var(--accent-color)" : "white", 
-                        fontWeight: "800", 
-                        fontSize: "1.1rem",
-                        fontFamily: "monospace"
-                      }}>
-                        v{item.version}
-                      </span>
-                      <h2 style={{ fontSize: "1.1rem", fontWeight: "600", color: isExpanded ? "white" : "var(--text-muted)", transition: "color 0.3s" }}>
-                        {title}
-                      </h2>
-                    </div>
-                    <div style={{ 
-                      color: isExpanded ? "var(--accent-color)" : "rgba(255,255,255,0.2)",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "0.5rem"
-                    }}>
-                      <span style={{ fontSize: "0.8rem", fontWeight: "600", display: "flex", alignItems: "center", gap: "0.3rem" }}>
-                        <Calendar size={12} /> {item.date}
-                      </span>
-                      <div style={{ transform: isExpanded ? "rotate(180deg)" : "none", transition: "transform 0.3s" }}>
-                        <ChevronDown size={20} />
-                      </div>
+                <div className="changelog-header">
+                  <div className="header-main">
+                    <span className="version-pill">v{item.version}</span>
+                    <h2 className="item-title">{title}</h2>
+                  </div>
+                  <div className="header-meta">
+                    <span className="date-tag">
+                      <Calendar size={12} /> {item.date}
+                    </span>
+                    <div className={`chevron ${isExpanded ? 'up' : ''}`}>
+                      <ChevronDown size={20} />
                     </div>
                   </div>
                 </div>
 
-                <div style={{ 
-                  maxHeight: isExpanded ? "1000px" : "0", 
-                  opacity: isExpanded ? 1 : 0,
-                  overflow: "hidden",
-                  transition: "all 0.4s ease-in-out"
-                }}>
-                  <div style={{ padding: "0 2rem 2rem 2rem", color: "var(--text-muted)", borderTop: "1px solid rgba(255,255,255,0.03)", paddingTop: "1.5rem" }}>
-                    <div className="markdown-body" style={{ fontSize: "0.95rem", lineHeight: "1.6" }}>
+                <div className={`changelog-content ${isExpanded ? 'show' : ''}`}>
+                  <div className="content-inner">
+                    <div className="markdown-body">
                       <ReactMarkdown remarkPlugins={[remarkGfm]}>
                         {content}
                       </ReactMarkdown>
@@ -198,17 +159,143 @@ export default function ChangelogPage() {
 
       <Footer />
       
+      <style jsx>{`
+        .changelog-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          color: var(--accent-color);
+          font-size: 0.8rem;
+          font-weight: 800;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          margin-bottom: 1rem;
+        }
+        .changelog-title {
+          font-size: clamp(2rem, 8vw, 3rem);
+          font-weight: 800;
+          margin-bottom: 1.5rem;
+          letter-spacing: -1px;
+        }
+        .changelog-desc {
+          color: var(--text-muted);
+          font-size: 1.1rem;
+          max-width: 600px;
+          margin: 0 auto;
+          opacity: 0.8;
+        }
+        .changelog-list {
+          max-width: 800px;
+          margin: 0 auto;
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+        }
+        .changelog-item {
+          cursor: pointer;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          padding: 0 !important;
+        }
+        .changelog-item.active {
+          border-color: var(--accent-color);
+          background: rgba(255, 255, 255, 0.03);
+        }
+        .changelog-header {
+          padding: 1.5rem 2rem;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 1rem;
+        }
+        .header-main {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          flex: 1;
+        }
+        .version-pill {
+          color: var(--accent-color);
+          font-weight: 800;
+          font-size: 1rem;
+          font-family: monospace;
+          background: rgba(252, 163, 17, 0.1);
+          padding: 0.2rem 0.6rem;
+          border-radius: 6px;
+        }
+        .item-title {
+          font-size: 1.1rem;
+          font-weight: 600;
+          color: var(--text-muted);
+        }
+        .changelog-item.active .item-title {
+          color: white;
+        }
+        .header-meta {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          color: var(--text-muted);
+        }
+        .date-tag {
+          font-size: 0.8rem;
+          font-weight: 600;
+          display: flex;
+          align-items: center;
+          gap: 0.3rem;
+          white-space: nowrap;
+        }
+        .chevron {
+          transition: transform 0.3s;
+        }
+        .chevron.up {
+          transform: rotate(180deg);
+          color: var(--accent-color);
+        }
+        .changelog-content {
+          max-height: 0;
+          opacity: 0;
+          overflow: hidden;
+          transition: all 0.4s ease-in-out;
+        }
+        .changelog-content.show {
+          max-height: 1000px;
+          opacity: 1;
+        }
+        .content-inner {
+          padding: 0 2rem 2rem 2rem;
+          border-top: 1px solid rgba(255, 255, 255, 0.03);
+          padding-top: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+          .changelog-header {
+            padding: 1.25rem 1rem;
+            flex-direction: column;
+            align-items: flex-start;
+          }
+          .header-main {
+            width: 100%;
+          }
+          .header-meta {
+            width: 100%;
+            justify-content: space-between;
+          }
+          .content-inner {
+            padding: 1.25rem 1rem;
+          }
+        }
+      `}</style>
       <style jsx global>{`
         .markdown-body h3 { color: white !important; margin-bottom: 1rem; font-size: 1rem; font-weight: 700; }
         .markdown-body ul { padding-left: 0; list-style: none; }
         .markdown-body li { position: relative; padding-left: 1.2rem; margin-bottom: 0.6rem; }
         .markdown-body li::before { content: "•"; color: var(--accent-color); position: absolute; left: 0; font-weight: bold; }
         .markdown-body strong { color: white; }
-        .glass-panel:hover { border-color: rgba(252, 163, 17, 0.3); }
       `}</style>
     </main>
   );
 }
+
 
 
 

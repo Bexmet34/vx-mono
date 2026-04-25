@@ -91,21 +91,32 @@
 }
 @media (max-width: 768px) {
   .container {
-    padding: 1rem;
+    padding: 1.25rem 1rem;
+  }
+  .header {
+    margin-bottom: 1.5rem;
   }
   .welcomeText {
     font-size: 1.5rem;
+    line-height: 1.2;
   }
   .serverItem {
     flex-direction: column;
     align-items: flex-start;
-    gap: 1.5rem;
+    gap: 1.25rem;
+    padding: 1.25rem;
   }
   .serverInfo {
     width: 100%;
   }
+  .serverAvatar {
+    width: 40px;
+    height: 40px;
+    font-size: 0.85rem;
+  }
   .serverItem .btn-primary, .serverItem button {
     width: 100%;
     justify-content: center;
+    padding: 0.8rem;
   }
 }
