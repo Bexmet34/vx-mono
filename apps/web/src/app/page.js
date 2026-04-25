@@ -92,7 +92,82 @@ export default function Home() {
           </div>
         </div>
 
-        <div className={`${styles.features} animate-fade-in`} style={{ animationDelay: '0.2s' }}>
+        <div className={`${styles.pricingSection} animate-fade-in`} style={{ animationDelay: '0.3s' }}>
+          <div className={styles.pricingHeader}>
+            <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>{t.pricingTitle}</h2>
+            <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>{t.pricingSubtitle}</p>
+          </div>
+
+          <div className={styles.pricingGrid}>
+            {/* 7 Days */}
+            <div className={`${styles.pricingCard} glass-panel`}>
+              <h3 className={styles.priceTitle}>{t.sevenDays}</h3>
+              <div className={styles.priceValue}>29 <span>TL</span></div>
+              <ul className={styles.featureList}>
+                <li className={styles.featureItem}><Sword size={18} className={styles.checkIcon} /> {t.featParty}</li>
+                <li className={styles.featureItem}><Command size={18} className={styles.checkIcon} /> {t.featLimit}</li>
+                <li className={styles.featureItem}><Users size={18} className={styles.checkIcon} /> {t.featDash}</li>
+                <li className={styles.featureItem}><Shield size={18} className={styles.checkIcon} /> {t.featSupport}</li>
+              </ul>
+              <div className={styles.pendingLabel}>{t.paybePending}</div>
+              <button className="btn-primary" style={{ width: '100%', opacity: 0.5, cursor: 'not-allowed' }} disabled>
+                {t.buyNow}
+              </button>
+            </div>
+
+            {/* 1 Month */}
+            <div className={`${styles.pricingCard} glass-panel`}>
+              <h3 className={styles.priceTitle}>{t.oneMonth}</h3>
+              <div className={styles.priceValue}>89 <span>TL</span></div>
+              <ul className={styles.featureList}>
+                <li className={styles.featureItem}><Sword size={18} className={styles.checkIcon} /> {t.featParty}</li>
+                <li className={styles.featureItem}><Command size={18} className={styles.checkIcon} /> {t.featLimit}</li>
+                <li className={styles.featureItem}><Users size={18} className={styles.checkIcon} /> {t.featDash}</li>
+                <li className={styles.featureItem}><Shield size={18} className={styles.checkIcon} /> {t.featSupport}</li>
+              </ul>
+              <div className={styles.pendingLabel}>{t.paybePending}</div>
+              <button className="btn-primary" style={{ width: '100%', opacity: 0.5, cursor: 'not-allowed' }} disabled>
+                {t.buyNow}
+              </button>
+            </div>
+
+            {/* 3 Months - BEST SELLER */}
+            <div className={`${styles.pricingCard} ${styles.featured} glass-panel`}>
+              <div className={styles.bestSellerBadge}>{t.bestSeller}</div>
+              <h3 className={styles.priceTitle}>{t.threeMonths}</h3>
+              <div className={styles.priceValue}>229 <span>TL</span></div>
+              <ul className={styles.featureList}>
+                <li className={styles.featureItem}><Sword size={18} className={styles.checkIcon} /> {t.featParty}</li>
+                <li className={styles.featureItem}><Command size={18} className={styles.checkIcon} /> {t.featLimit}</li>
+                <li className={styles.featureItem}><Users size={18} className={styles.checkIcon} /> {t.featDash}</li>
+                <li className={styles.featureItem}><Shield size={18} className={styles.checkIcon} /> {t.featSupport}</li>
+              </ul>
+              <div className={styles.pendingLabel}>{t.paybePending}</div>
+              <button className="btn-primary" style={{ width: '100%', opacity: 0.5, cursor: 'not-allowed' }} disabled>
+                {t.buyNow}
+              </button>
+            </div>
+
+            {/* 1 Year */}
+            <div className={`${styles.pricingCard} glass-panel`}>
+              <h3 className={styles.priceTitle}>{t.oneYear}</h3>
+              <div className={styles.priceValue}>749 <span>TL</span></div>
+              <ul className={styles.featureList}>
+                <li className={styles.featureItem}><Sword size={18} className={styles.checkIcon} /> {t.featParty}</li>
+                <li className={styles.featureItem}><Command size={18} className={styles.checkIcon} /> {t.featLimit}</li>
+                <li className={styles.featureItem}><Users size={18} className={styles.checkIcon} /> {t.featDash}</li>
+                <li className={styles.featureItem}><Shield size={18} className={styles.checkIcon} /> {t.featSupport}</li>
+              </ul>
+              <div className={styles.pendingLabel}>{t.paybePending}</div>
+              <button className="btn-primary" style={{ width: '100%', opacity: 0.5, cursor: 'not-allowed' }} disabled>
+                {t.buyNow}
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <div className={`${styles.features} animate-fade-in`} style={{ animationDelay: '0.4s' }}>
           <div className={`${styles.featureCard} glass-panel`}>
             <Users className={styles.featureIcon} size={32} />
             <h3 className={styles.featureTitle}>{t.feat1Title}</h3>
@@ -109,6 +184,7 @@ export default function Home() {
             <p className={styles.featureDesc}>{t.feat3Desc}</p>
           </div>
         </div>
+
 
         <div className={`${styles.commandsSection} animate-fade-in`} style={{ animationDelay: '0.4s' }}>
           <div className={styles.commandsHeader}>

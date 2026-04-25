@@ -81,6 +81,20 @@ const en = {
   phone: "Phone",
   email: "Email",
   support: "Support",
+  pricingTitle: "Premium Plans",
+  pricingSubtitle: "Unlock the full potential of your Discord server",
+  sevenDays: "7 Days",
+  oneMonth: "1 Month",
+  threeMonths: "3 Months",
+  oneYear: "1 Year",
+  bestSeller: "Best Seller",
+  buyNow: "Buy Now",
+  paybePending: "Payment unavailable (Waiting for Paybe approval)",
+  allFeatures: "All Features Included",
+  featParty: "Advanced Party System",
+  featLimit: "Unlimited Party Creation",
+  featDash: "Full Web Dashboard Access",
+  featSupport: "Priority Discord Support",
 };
 
 const tr = {
@@ -157,6 +171,20 @@ const tr = {
   phone: "Telefon",
   email: "E-posta",
   support: "Destek",
+  pricingTitle: "Premium Paketler",
+  pricingSubtitle: "Discord sunucunuzun tüm potansiyelini açığa çıkarın",
+  sevenDays: "7 Günlük",
+  oneMonth: "1 Aylık",
+  threeMonths: "3 Aylık",
+  oneYear: "1 Yıllık",
+  bestSeller: "En Çok Satılan",
+  buyNow: "Şimdi Al",
+  paybePending: "Ödeme şu an kapalı (Paybe onayı beklenmektedir)",
+  allFeatures: "Tüm Özellikler Dahil",
+  featParty: "Gelişmiş Parti Sistemi",
+  featLimit: "Sınırsız Parti Kurma",
+  featDash: "Tam Web Paneli Erişimi",
+  featSupport: "Öncelikli Discord Desteği",
 };
 
 const LanguageContext = createContext();
