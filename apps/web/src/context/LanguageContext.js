@@ -70,6 +70,9 @@ const en = {
   terms: "Terms of Service",
   allRights: "All rights reserved.",
   changelog: "Changelog",
+  error404Title: "404 - Page Not Found",
+  error404Desc: "The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.",
+  backToHome: "Back to Home",
 };
 
 const tr = {
@@ -135,6 +138,9 @@ const tr = {
   terms: "Kullanım Koşulları",
   allRights: "Tüm hakları saklıdır.",
   changelog: "Güncelleme Notları",
+  error404Title: "404 - Sayfa Bulunamadı",
+  error404Desc: "Aradığınız sayfa silinmiş, ismi değiştirilmiş veya geçici olarak kullanım dışı olabilir.",
+  backToHome: "Ana Sayfaya Dön",
 };
 
 const LanguageContext = createContext();

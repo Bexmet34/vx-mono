@@ -20,29 +20,30 @@ export default function TermsPage() {
         <div className="glass-panel" style={{ padding: '3rem', lineHeight: '1.8', color: 'var(--text-muted)' }}>
           <section style={{ marginBottom: '2.5rem' }}>
             <h2 style={{ color: 'var(--text-main)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <CheckCircle size={24} /> Acceptable Use
+              <CheckCircle size={24} /> Kullanım Şartları
             </h2>
-            <p>You agree to use Veyronix only for its intended purpose: managing Albion Online parties. Any attempt to exploit or misuse the bot's features is prohibited.</p>
+            <p>Veyronix hizmetlerini kullanarak, bu şartları kabul etmiş sayılırsınız. Botun sunduğu özellikleri kötüye kullanmak, tersine mühendislik yapmak veya servisleri aksatacak faaliyetlerde bulunmak yasaktır.</p>
           </section>
 
           <section style={{ marginBottom: '2.5rem' }}>
             <h2 style={{ color: 'var(--text-main)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <AlertCircle size={24} /> Service Modifications
+              <AlertCircle size={24} /> Hizmet Değişiklikleri
             </h2>
-            <p>We reserve the right to modify or discontinue any part of the service at any time. Subscription terms are subject to change with prior notice.</p>
+            <p>Veyronix, sunduğu hizmetlerin kapsamını, özelliklerini ve abonelik paketlerini önceden bildirim yaparak değiştirme hakkını saklı tutar. Teknik güncellemeler veya zorunlu hallerde geçici kesintiler yaşanabilir.</p>
           </section>
 
           <section style={{ marginBottom: '2.5rem' }}>
             <h2 style={{ color: 'var(--text-main)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Info size={24} /> Liability
+              <Info size={24} /> Sorumluluk Sınırları
             </h2>
-            <p>Veyronix is provided "as is". While we strive for 100% uptime, we are not responsible for any impact caused by service interruptions or Albion Online API changes.</p>
+            <p>Veyronix "olduğu gibi" sunulmaktadır. Discord veya Albion Online API kaynaklı teknik sorunlardan veya kesintilerden dolayı oluşabilecek aksaklıklardan Veyronix sorumlu tutulamaz.</p>
           </section>
           
           <p style={{ marginTop: '3rem', fontStyle: 'italic', borderTop: '1px solid var(--border-color)', paddingTop: '2rem' }}>
-            Violation of these terms may result in your server being restricted from using Veyronix services.
+            Bu şartların ihlali durumunda, ilgili sunucunun Veyronix servislerine erişimi kalıcı veya geçici olarak kısıtlanabilir.
           </p>
         </div>
+
       </main>
     </>
   );

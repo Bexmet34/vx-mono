@@ -262,18 +262,51 @@
 
 /* Responsive */
 @media (max-width: 1024px) {
-  .dash-sidebar { width: 80px; }
+  .dash-sidebar { 
+    width: 70px; 
+    padding: 1.5rem 0.5rem;
+    align-items: center;
+  }
+  .sidebar-item {
+    justify-content: center;
+    padding: 0.85rem;
+  }
   .sidebar-item span { display: none; }
-  .dash-main { padding: 2rem 1.5rem; }
+  .dash-main { padding: 1.5rem; }
 }
 
 @media (max-width: 768px) {
-  .server-dash-container { flex-direction: column; }
+  .server-dash-container { 
+    flex-direction: column; 
+  }
   .dash-sidebar { 
     width: 100%; 
     height: auto; 
     flex-direction: row; 
     overflow-x: auto;
-    position: static;
+    position: sticky;
+    top: var(--nav-height);
+    z-index: 90;
+    padding: 0.5rem;
+    background: var(--dash-sidebar);
+    border-right: none;
+    border-bottom: 1px solid var(--dash-border);
+  }
+  .sidebar-item {
+    width: auto;
+    white-space: nowrap;
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+  }
+  .dash-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+  .dash-section-card {
+    padding: 1.5rem 1rem;
+  }
+  .whitelist-grid, .tpl-grid {
+    grid-template-columns: 1fr;
   }
 }

@@ -14,7 +14,16 @@
 
 @media (max-width: 768px) {
   :root {
-    --nav-height: 70px;
+    --nav-height: 60px;
+  }
+  html, body {
+    font-size: 14px; /* Base font size reduction for mobile */
+  }
+}
+
+@media (max-width: 480px) {
+  html, body {
+    font-size: 13px;
   }
 }
 
@@ -189,14 +198,34 @@ button {
   background: linear-gradient(135deg, #ff4f4f 0%, #ef5350 100%);
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .navbar {
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1rem;
+    padding: 0 1rem;
+  }
+  .navbar-brand {
+    font-size: 1.5rem !important;
   }
   .auth-user {
-    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .avatar {
+    width: 32px;
+    height: 32px;
+  }
+  
+  /* Global Layout Fixes */
+  .glass-panel {
+    padding: 1.5rem !important; /* Force smaller padding on mobile for all glass panels */
+  }
+  
+  h1 { font-size: 2.2rem !important; }
+  h2 { font-size: 1.8rem !important; }
+  h3 { font-size: 1.4rem !important; }
+}
+
+@media (max-width: 480px) {
+  .btn-primary, .btn-topgg {
+    width: 100%;
     justify-content: center;
   }
 }

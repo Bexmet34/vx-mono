@@ -20,29 +20,38 @@ export default function PrivacyPage() {
         <div className="glass-panel" style={{ padding: '3rem', lineHeight: '1.8', color: 'var(--text-muted)' }}>
           <section style={{ marginBottom: '2.5rem' }}>
             <h2 style={{ color: 'var(--text-main)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Eye size={24} /> Information Collection
+              <Eye size={24} /> Veri Toplama ve KVKK
             </h2>
-            <p>Veyronix collects minimal data required for functionality. This includes your Discord user ID, server IDs where the bot is present, and basic settings you configure.</p>
+            <p>
+              Veyronix, 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) uyarınca, kullanıcılarının verilerini korumayı taahhüt eder. 
+              Sadece hizmetin işleyişi için gerekli olan Discord ID, sunucu ID ve temel ayar verileri toplanır.
+            </p>
           </section>
 
           <section style={{ marginBottom: '2.5rem' }}>
             <h2 style={{ color: 'var(--text-main)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Lock size={24} /> Data Usage
+              <Lock size={24} /> Veri Kullanımı
             </h2>
-            <p>Your data is used solely to provide party management services and synchronize your Albion Online guild settings with Discord. We never sell or share your data with third parties.</p>
+            <p>
+              Toplanan veriler sadece botun sunduğu party yönetim sistemi ve Albion Online entegrasyonu gibi hizmetlerin sağlanması amacıyla kullanılır. 
+              Verileriniz kesinlikle üçüncü taraflarla paylaşılmaz veya satılmaz.
+            </p>
           </section>
 
           <section style={{ marginBottom: '2.5rem' }}>
             <h2 style={{ color: 'var(--text-main)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <FileText size={24} /> Security
+              <FileText size={24} /> Güvenlik
             </h2>
-            <p>We implement industry-standard security measures to protect your information. Database access is restricted and encrypted.</p>
+            <p>
+              Verileriniz güvenli sunucularda saklanmakta olup, yetkisiz erişime karşı endüstri standardı güvenlik önlemleri uygulanmaktadır.
+            </p>
           </section>
           
           <p style={{ marginTop: '3rem', fontStyle: 'italic', borderTop: '1px solid var(--border-color)', paddingTop: '2rem' }}>
-            By using Veyronix, you agree to these practices. If you have questions, please contact us via our support server.
+            Veyronix hizmetlerini kullanarak bu politikaları kabul etmiş sayılırsınız. KVKK kapsamındaki haklarınız ve diğer sorularınız için hakkibsknn@gmail.com adresinden bizimle iletişime geçebilirsiniz.
           </p>
         </div>
+
       </main>
     </>
   );
