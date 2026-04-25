@@ -73,6 +73,14 @@ const en = {
   error404Title: "404 - Page Not Found",
   error404Desc: "The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.",
   backToHome: "Back to Home",
+  mesafeliSatis: "Distance Sales Agreement",
+  iptalIade: "Cancellation & Refund Policy",
+  hakkimizda: "About Us & Contact",
+  contact: "Contact",
+  address: "Address",
+  phone: "Phone",
+  email: "Email",
+  support: "Support",
 };
 
 const tr = {
@@ -141,6 +149,14 @@ const tr = {
   error404Title: "404 - Sayfa Bulunamadı",
   error404Desc: "Aradığınız sayfa silinmiş, ismi değiştirilmiş veya geçici olarak kullanım dışı olabilir.",
   backToHome: "Ana Sayfaya Dön",
+  mesafeliSatis: "Mesafeli Satış Sözleşmesi",
+  iptalIade: "İptal ve İade Koşulları",
+  hakkimizda: "Hakkımızda ve İletişim",
+  contact: "İletişim",
+  address: "Adres",
+  phone: "Telefon",
+  email: "E-posta",
+  support: "Destek",
 };
 
 const LanguageContext = createContext();

@@ -69,12 +69,12 @@ export default function Footer() {
             </li>
             <li>
               <Link href="/mesafeli-satis-sozlesmesi" style={{ color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.5rem' }} className="hover-accent">
-                <FileText size={18} /> Mesafeli Satış Sözleşmesi
+                <FileText size={18} /> {t.mesafeliSatis}
               </Link>
             </li>
             <li>
               <Link href="/iptal-ve-iade-kosullari" style={{ color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.5rem' }} className="hover-accent">
-                <History size={18} /> İptal ve İade Koşulları
+                <History size={18} /> {t.iptalIade}
               </Link>
             </li>
           </ul>
@@ -82,21 +82,22 @@ export default function Footer() {
 
         {/* Contact Section */}
         <div>
-          <h4 style={{ color: 'var(--text-main)', marginBottom: '1.5rem', fontSize: '1.2rem', fontWeight: '800' }}>İletişim</h4>
+          <h4 style={{ color: 'var(--text-main)', marginBottom: '1.5rem', fontSize: '1.2rem', fontWeight: '800' }}>{t.contact}</h4>
           <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
             <li>
               <Link href="/hakkimizda" style={{ color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.5rem' }} className="hover-accent">
-                Hakkımızda & İletişim
+                {t.hakkimizda}
               </Link>
             </li>
             <li style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-              Tel: 0551 078 82 61
+              {t.phone}: 0551 078 82 61
             </li>
             <li style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-              E-posta: hakkibsknn@gmail.com
+              {t.email}: hakkibsknn@gmail.com
             </li>
           </ul>
         </div>
+
 
 
       </div>
