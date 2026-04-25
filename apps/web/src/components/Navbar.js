@@ -19,9 +19,9 @@ export default function Navbar() {
           <Link href="/" className="navbar-brand text-logo">
             Veyronix
           </Link>
-          <Link href="/wiki" style={{ color: 'var(--text-muted)', fontWeight: '600', transition: '0.2s' }} className="nav-link desktop-only">
+          <a href="https://docs.veyronix.com.tr/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-muted)', fontWeight: '600', transition: '0.2s' }} className="nav-link desktop-only">
             Wiki
-          </Link>
+          </a>
           <Link href="/changelog" style={{ color: 'var(--text-muted)', fontWeight: '600', transition: '0.2s' }} className="nav-link desktop-only">
             {t.changelog}
           </Link>
@@ -82,7 +82,7 @@ export default function Navbar() {
           zIndex: 100,
           animation: 'fadeIn 0.3s ease'
         }}>
-          <Link href="/wiki" onClick={() => setIsMenuOpen(false)} style={{ fontSize: '1.2rem', fontWeight: '600' }}>{t.wiki}</Link>
+          <a href="https://docs.veyronix.com.tr/" target="_blank" rel="noopener noreferrer" onClick={() => setIsMenuOpen(false)} style={{ fontSize: '1.2rem', fontWeight: '600' }}>{t.wiki}</a>
           <Link href="/changelog" onClick={() => setIsMenuOpen(false)} style={{ fontSize: '1.2rem', fontWeight: '600' }}>{t.changelog}</Link>
           <div style={{ height: '1px', background: 'var(--border-color)' }}></div>
           {session ? (
