@@ -72,29 +72,34 @@ export async function PATCH(req) {
   } else if (action === 'toggle_active') {
     updateData.is_active = value;
     templateId = value ? 'sub_extended' : 'sub_suspended';
-  } else if (action === 'add_days' || action === 'remove_days') {
+  } else if (action === 'add_days' || action === 'remove_days' || action === 'set_expiry') {
     console.log(`[AdminAPI] Current Expiry from DB: ${currentSub.expires_at}`);
     
     const currentExpires = currentSub.expires_at ? new Date(currentSub.expires_at) : new Date();
     const now = new Date();
     
     let baseDate = isNaN(currentExpires.getTime()) ? now : currentExpires;
-    console.log(`[AdminAPI] Initial BaseDate: ${baseDate.toISOString()}`);
-    
-    if (action === 'add_days' && baseDate < now) {
-      console.log(`[AdminAPI] Subscription expired, starting from NOW`);
-      baseDate = now;
-    }
-    
-    const dayDelta = parseInt(value) || 0;
-    const newExpiry = new Date(baseDate.getTime()); // Use getTime to avoid reference issues
-    
-    if (action === 'add_days') {
-      newExpiry.setDate(newExpiry.getDate() + dayDelta);
+    let newExpiry;
+    let dayDelta = 0;
+
+    if (action === 'set_expiry') {
+      newExpiry = new Date(value);
+      if (isNaN(newExpiry.getTime())) return NextResponse.json({ error: "Invalid date" }, { status: 400 });
+      dayDelta = Math.round((newExpiry - baseDate) / (1000 * 60 * 60 * 24));
       templateId = 'sub_extended';
     } else {
-      newExpiry.setDate(newExpiry.getDate() - dayDelta);
-      templateId = 'sub_reduced';
+      const days = parseInt(value) || 0;
+      dayDelta = days;
+      if (action === 'add_days' && baseDate < now) baseDate = now;
+      
+      newExpiry = new Date(baseDate.getTime());
+      if (action === 'add_days') {
+        newExpiry.setDate(newExpiry.getDate() + days);
+        templateId = 'sub_extended';
+      } else {
+        newExpiry.setDate(newExpiry.getDate() - days);
+        templateId = 'sub_reduced';
+      }
     }
     
     console.log(`[AdminAPI] Calculated New Expiry: ${newExpiry.toISOString()}`);
@@ -103,7 +108,6 @@ export async function PATCH(req) {
     updateData.one_day_notified = false;
     
     // Format for notification (TR Timezone - assuming bot user is in TR)
-    // Offset by +3 for TR
     const trTime = new Date(newExpiry.getTime() + (3 * 60 * 60 * 1000));
     const dd = String(trTime.getUTCDate()).padStart(2, '0');
     const mm = String(trTime.getUTCMonth() + 1).padStart(2, '0');
@@ -113,7 +117,7 @@ export async function PATCH(req) {
     
     placeholders.tarih = `${dd}.${mm}.${yyyy}`;
     placeholders.saat = `${hh}:${min}`;
-    placeholders.gun = dayDelta;
+    placeholders.gun = Math.abs(dayDelta);
     
     console.log(`[AdminAPI] Final Placeholders:`, placeholders);
   }

@@ -34,6 +34,7 @@ export default function AdminPage() {
   // Modal States
   const [showDayModal, setShowDayModal] = useState(null);
   const [daysToAdd, setDaysToAdd] = useState(30);
+  const [expiryDate, setExpiryDate] = useState("");
   const [statusFilter, setStatusFilter] = useState("all"); // all, active, unlimited, passive
 
   const isAdmin = session?.user?.id === ADMIN_ID || session?.user?.id === "407234961582587916";
@@ -340,7 +341,12 @@ export default function AdminPage() {
                                 <button 
                                   className="admin-action-btn" 
                                   title="Süre Yönetimi" 
-                                  onClick={() => { setShowDayModal({ guildId: s.guild_id, mode: 'add' }); setDaysToAdd(30); }}
+                                  onClick={() => { 
+                                    const currentExpiry = s.expires_at ? format(new Date(s.expires_at), "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd");
+                                    setShowDayModal({ guildId: s.guild_id, mode: 'add' }); 
+                                    setDaysToAdd(30);
+                                    setExpiryDate(currentExpiry);
+                                  }}
                                 >
                                   <Clock size={18} />
                                 </button>
@@ -441,40 +447,63 @@ export default function AdminPage() {
         <div className="admin-modal-overlay" onClick={() => setShowDayModal(null)}>
           <div className="admin-modal animate-slide-up" onClick={e => e.stopPropagation()}>
             <div style={{textAlign: 'center', marginBottom: '2rem'}}>
-               <div style={{background: showDayModal.mode === 'add' ? 'var(--admin-accent-muted)' : 'rgba(231, 76, 60, 0.1)', width: '64px', height: '64px', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem'}}>
-                  <Calendar size={32} color={showDayModal.mode === 'add' ? 'var(--admin-accent)' : 'var(--admin-error)'} />
+               <div style={{background: showDayModal.mode === 'remove' ? 'rgba(231, 76, 60, 0.1)' : 'var(--admin-accent-muted)', width: '64px', height: '64px', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem'}}>
+                  <Calendar size={32} color={showDayModal.mode === 'remove' ? 'var(--admin-error)' : 'var(--admin-accent)'} />
                </div>
-               <h2 style={{ fontSize: "1.5rem", fontWeight: "800" }}>{showDayModal.mode === 'add' ? 'Süre Ekle' : 'Süre Çıkar'}</h2>
-               <p style={{color: 'var(--admin-text-muted)', fontSize: '0.9rem'}}>Sunucuya uygulanacak gün sayısını girin.</p>
+               <h2 style={{ fontSize: "1.5rem", fontWeight: "800" }}>
+                 {showDayModal.mode === 'add' && 'Süre Ekle'}
+                 {showDayModal.mode === 'remove' && 'Süre Çıkar'}
+                 {showDayModal.mode === 'set_date' && 'Tarih Belirle'}
+               </h2>
+               <p style={{color: 'var(--admin-text-muted)', fontSize: '0.9rem'}}>
+                 {showDayModal.mode === 'set_date' ? 'Yeni bitiş tarihini seçin.' : 'Uygulanacak gün sayısını girin.'}
+               </p>
             </div>
 
             <div style={{display: 'flex', gap: '0.5rem', background: 'rgba(0,0,0,0.2)', padding: '0.4rem', borderRadius: '12px', marginBottom: '1.5rem'}}>
                <button 
                  onClick={() => setShowDayModal({...showDayModal, mode: 'add'})}
-                 style={{flex: 1, padding: '0.6rem', borderRadius: '8px', border: 'none', background: showDayModal.mode === 'add' ? 'var(--admin-accent)' : 'transparent', color: showDayModal.mode === 'add' ? 'var(--admin-bg)' : 'white', fontWeight: '700', transition: '0.2s'}}
+                 style={{flex: 1, padding: '0.6rem', borderRadius: '8px', border: 'none', background: showDayModal.mode === 'add' ? 'var(--admin-accent)' : 'transparent', color: showDayModal.mode === 'add' ? 'var(--admin-bg)' : 'white', fontWeight: '700', transition: '0.2s', fontSize: '0.85rem'}}
                >Ekle</button>
                <button 
                  onClick={() => setShowDayModal({...showDayModal, mode: 'remove'})}
-                 style={{flex: 1, padding: '0.6rem', borderRadius: '8px', border: 'none', background: showDayModal.mode === 'remove' ? 'var(--admin-error)' : 'transparent', color: 'white', fontWeight: '700', transition: '0.2s'}}
+                 style={{flex: 1, padding: '0.6rem', borderRadius: '8px', border: 'none', background: showDayModal.mode === 'remove' ? 'var(--admin-error)' : 'transparent', color: 'white', fontWeight: '700', transition: '0.2s', fontSize: '0.85rem'}}
                >Çıkar</button>
+               <button 
+                 onClick={() => setShowDayModal({...showDayModal, mode: 'set_date'})}
+                 style={{flex: 1, padding: '0.6rem', borderRadius: '8px', border: 'none', background: showDayModal.mode === 'set_date' ? 'var(--admin-accent)' : 'transparent', color: showDayModal.mode === 'set_date' ? 'var(--admin-bg)' : 'white', fontWeight: '700', transition: '0.2s', fontSize: '0.85rem'}}
+               >Tarih</button>
             </div>
             
-            <input 
-              className="admin-input-field" 
-              type="number" 
-              autoFocus
-              value={daysToAdd} 
-              onChange={(e) => setDaysToAdd(e.target.value)} 
-            />
+            {showDayModal.mode === 'set_date' ? (
+              <input 
+                className="admin-input-field" 
+                type="date" 
+                value={expiryDate} 
+                onChange={(e) => setExpiryDate(e.target.value)} 
+              />
+            ) : (
+              <input 
+                className="admin-input-field" 
+                type="number" 
+                autoFocus
+                value={daysToAdd} 
+                onChange={(e) => setDaysToAdd(e.target.value)} 
+              />
+            )}
 
             <div className="admin-btn-group">
               <button className="admin-btn-secondary" onClick={() => setShowDayModal(null)}>İptal</button>
               <button 
-                className={showDayModal.mode === 'add' ? 'admin-btn-primary' : 'admin-btn-primary danger'} 
+                className={(showDayModal.mode === 'add' || showDayModal.mode === 'set_date') ? 'admin-btn-primary' : 'admin-btn-primary danger'} 
                 style={showDayModal.mode === 'remove' ? {background: 'var(--admin-error)'} : {}}
-                onClick={() => handleServerAction(showDayModal.guildId, showDayModal.mode === 'add' ? 'add_days' : 'remove_days', daysToAdd)}
+                onClick={() => {
+                  const val = showDayModal.mode === 'set_date' ? expiryDate : daysToAdd;
+                  const action = showDayModal.mode === 'set_date' ? 'set_expiry' : (showDayModal.mode === 'add' ? 'add_days' : 'remove_days');
+                  handleServerAction(showDayModal.guildId, action, val);
+                }}
               >
-                {savingId === showDayModal.guildId ? <Loader2 size={18} className="spin" /> : (showDayModal.mode === 'add' ? 'Süreyi Uzat' : 'Süreyi Kısalt')}
+                {savingId === showDayModal.guildId ? <Loader2 size={18} className="spin" /> : 'Güncelle'}
               </button>
             </div>
           </div>
