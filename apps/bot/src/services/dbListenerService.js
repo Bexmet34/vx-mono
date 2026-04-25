@@ -55,7 +55,7 @@ async function checkUpdates(client, initial = false) {
                         const diffInDays = Math.round(diffInMs / (1000 * 60 * 60 * 24));
                         
                         if (diffInDays > 0) {
-                            await sendSubscriptionNotification(client, guildId, 'extended', diffInDays);
+                            await sendSubscriptionNotification(client, guildId, 'extended', diffInDays, sub.expires_at);
                         }
                     }
                 }

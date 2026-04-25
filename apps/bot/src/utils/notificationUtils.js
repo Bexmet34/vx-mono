@@ -9,8 +9,9 @@ const { t } = require('../services/i18n');
  * @param {string} guildId 
  * @param {string} type 'extended' | 'unlimited' | 'disabled'
  * @param {number} [days] 
+ * @param {string|Date} [expiryDate]
  */
-async function sendSubscriptionNotification(client, guildId, type, days = 0) {
+async function sendSubscriptionNotification(client, guildId, type, days = 0, expiryDate = null) {
     try {
         const guild = await client.guilds.fetch(guildId).catch(() => null);
         if (!guild) return;
@@ -18,10 +19,24 @@ async function sendSubscriptionNotification(client, guildId, type, days = 0) {
         const owner = await guild.fetchOwner().catch(() => null);
         if (!owner) return;
 
+        // Format Date
+        let formattedDate = 'Belirtilmedi';
+        if (expiryDate) {
+            const dateObj = new Date(expiryDate);
+            // TR Timezone adjustment (UTC+3)
+            const trDate = new Date(dateObj.getTime() + (3 * 60 * 60 * 1000));
+            const dd = String(trDate.getUTCDate()).padStart(2, '0');
+            const mm = String(trDate.getUTCMonth() + 1).padStart(2, '0');
+            const yyyy = trDate.getUTCFullYear();
+            formattedDate = `${dd}.${mm}.${yyyy}`;
+        } else {
+            formattedDate = new Date().toLocaleDateString('tr-TR');
+        }
+
         const { getNotification } = require('../services/notificationService');
         const notification = await getNotification(type === 'disabled' ? 'sub_expired' : 'sub_extended', 'tr', {
             sunucu: guild.name,
-            tarih: new Date().toLocaleDateString('tr-TR') // Not ideal but placeholder for now
+            tarih: formattedDate
         });
 
         if (notification) {
