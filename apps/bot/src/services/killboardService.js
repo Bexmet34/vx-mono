@@ -57,7 +57,11 @@ async function processKillBoards(client) {
 
     for (const guildCfg of guilds) {
         // If we already sent today's summary, skip
-        if (guildCfg.last_killboard_date === todayStr) continue;
+        let isSentToday = false;
+        if (guildCfg.last_killboard_date) {
+            isSentToday = guildCfg.last_killboard_date.startsWith(todayStr);
+        }
+        if (isSentToday) continue;
 
         const [targetHour, targetMinute] = (guildCfg.killboard_time || '06:00').split(':').map(Number);
         const currentHour = now.getUTCHours();
@@ -129,23 +133,25 @@ async function sendKillBoardSummary(client, guildCfg) {
         const killerMap = {};
         for (const ev of killEvents) {
             const name = ev.Killer?.Name;
+            const id = ev.Killer?.Id;
             if (!name) continue;
-            if (!killerMap[name]) killerMap[name] = { Name: name, Kills: 0, KillFame: 0 };
+            if (!killerMap[name]) killerMap[name] = { Name: name, Id: id, Kills: 0, KillFame: 0 };
             killerMap[name].Kills++;
             killerMap[name].KillFame += ev.TotalVictimKillFame || 0;
         }
-        const topKillers = Object.values(killerMap).sort((a, b) => b.KillFame - a.KillFame).slice(0, 3);
+        const topKillers = Object.values(killerMap).sort((a, b) => b.KillFame - a.KillFame).slice(0, 10);
 
         // --- Build death stats ---
         const deathMap = {};
         for (const ev of deathEvents) {
             const name = ev.Victim?.Name;
+            const id = ev.Victim?.Id;
             if (!name) continue;
-            if (!deathMap[name]) deathMap[name] = { Name: name, Deaths: 0, DeathFame: 0 };
+            if (!deathMap[name]) deathMap[name] = { Name: name, Id: id, Deaths: 0, DeathFame: 0 };
             deathMap[name].Deaths++;
             deathMap[name].DeathFame += ev.TotalVictimKillFame || 0;
         }
-        const topDeaths = Object.values(deathMap).sort((a, b) => b.Deaths - a.Deaths).slice(0, 3);
+        const topDeaths = Object.values(deathMap).sort((a, b) => b.Deaths - a.Deaths).slice(0, 10);
 
         // --- Top single fame kill ---
         const topFameKill = [...killEvents].sort(
@@ -167,9 +173,9 @@ async function sendKillBoardSummary(client, guildCfg) {
 
         // Top killers list
         if (topKillers.length > 0) {
-            const medals = ['🥇', '🥈', '🥉'];
+            const medals = ['🥇', '🥈', '🥉', '🏅', '🏅', '🏅', '🏅', '🏅', '🏅', '🏅'];
             const killerText = topKillers
-                .map((k, i) => `${medals[i]} **${k.Name}** — \`${k.Kills}\` kill | \`${(k.KillFame / 1000000).toFixed(2)}M\` fame`)
+                .map((k, i) => `${medals[i]} [**${k.Name}**](https://albiononline.com/en/killboard/player/${k.Id}) — \`${k.Kills}\` kill | \`${(k.KillFame / 1000000).toFixed(2)}M\` fame`)
                 .join('\n');
             embed.addFields({
                 name: '⚔️ En Çok Kill Alanlar',
@@ -187,9 +193,9 @@ async function sendKillBoardSummary(client, guildCfg) {
                 'Bugün de bedava eşya dağıtarak hayır işledi.',
                 'Ekranı gri görmekten gözleri bozuldu.'
             ];
-            const medals = ['🥇', '🥈', '🥉'];
+            const medals = ['🥇', '🥈', '🥉', '🏅', '🏅', '🏅', '🏅', '🏅', '🏅', '🏅'];
             const deathText = topDeaths
-                .map((d, i) => `${medals[i]} **${d.Name}** — \`${d.Deaths}\` ölüm | \`${(d.DeathFame / 1000000).toFixed(2)}M\` kayıp fame`)
+                .map((d, i) => `${medals[i]} [**${d.Name}**](https://albiononline.com/en/killboard/player/${d.Id}) — \`${d.Deaths}\` ölüm | \`${(d.DeathFame / 1000000).toFixed(2)}M\` kayıp fame`)
                 .join('\n');
             const randomJoke = jokes[Math.floor(Math.random() * jokes.length)];
             embed.addFields({
@@ -203,7 +209,7 @@ async function sendKillBoardSummary(client, guildCfg) {
         if (topFameKill) {
             embed.addFields({
                 name: '💰 Günün Vurgunu',
-                value: `**${topFameKill.Killer?.Name || '?'}** → **${topFameKill.Victim?.Name || '?'}**\n\`${(topFameKill.TotalVictimKillFame || 0).toLocaleString('tr-TR')}\` Fame`,
+                value: `[**${topFameKill.Killer?.Name || '?'}**](https://albiononline.com/en/killboard/player/${topFameKill.Killer?.Id}) 🗡️ [**${topFameKill.Victim?.Name || '?'}**](https://albiononline.com/en/killboard/player/${topFameKill.Victim?.Id})\n\`${(topFameKill.TotalVictimKillFame || 0).toLocaleString('tr-TR')}\` Fame`,
                 inline: false
             });
         }

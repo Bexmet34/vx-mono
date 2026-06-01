@@ -154,7 +154,9 @@ export default function KillBoardTab({
               {killboardPreview.topKillers && killboardPreview.topKillers.length > 0 ? (
                 killboardPreview.topKillers.map((k, i) => (
                   <div key={k.name} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                    <span style={{ color: '#ccc' }}>{['🥇', '🥈', '🥉'][i] || '🏅'} {k.name}</span>
+                    <span style={{ color: '#ccc' }}>
+                      {['🥇', '🥈', '🥉'][i] || '🏅'} <a href={`https://albiononline.com/en/killboard/player/${k.id}`} target="_blank" rel="noopener noreferrer" style={{ color: '#ccc', textDecoration: 'none' }} onMouseOver={e => e.target.style.color = '#fff'} onMouseOut={e => e.target.style.color = '#ccc'}>{k.name}</a>
+                    </span>
                     <span style={{ fontWeight: 'bold', color: '#22c55e' }}>{k.kills} Kills</span>
                   </div>
                 ))
@@ -168,7 +170,9 @@ export default function KillBoardTab({
               {killboardPreview.topDeaths && killboardPreview.topDeaths.length > 0 ? (
                 killboardPreview.topDeaths.map((d, i) => (
                   <div key={d.name} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                    <span style={{ color: '#ccc' }}>{['🥇', '🥈', '🥉'][i] || '🏅'} {d.name}</span>
+                    <span style={{ color: '#ccc' }}>
+                      {['🥇', '🥈', '🥉'][i] || '🏅'} <a href={`https://albiononline.com/en/killboard/player/${d.id}`} target="_blank" rel="noopener noreferrer" style={{ color: '#ccc', textDecoration: 'none' }} onMouseOver={e => e.target.style.color = '#fff'} onMouseOut={e => e.target.style.color = '#ccc'}>{d.name}</a>
+                    </span>
                     <span style={{ fontWeight: 'bold', color: '#ef4444' }}>{d.deaths} Deaths</span>
                   </div>
                 ))

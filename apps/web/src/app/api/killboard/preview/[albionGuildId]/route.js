@@ -58,24 +58,26 @@ export async function GET(req, { params }) {
         let totalKillFame = 0;
         for (const ev of killEvents) {
             const name = ev.Killer?.Name;
+            const id = ev.Killer?.Id;
             if (!name) continue;
             totalKillFame += ev.TotalVictimKillFame || 0;
-            if (!killerMap[name]) killerMap[name] = { name, kills: 0, killFame: 0 };
+            if (!killerMap[name]) killerMap[name] = { name, id, kills: 0, killFame: 0 };
             killerMap[name].kills++;
             killerMap[name].killFame += ev.TotalVictimKillFame || 0;
         }
-        const topKillers = Object.values(killerMap).sort((a, b) => b.killFame - a.killFame).slice(0, 5);
+        const topKillers = Object.values(killerMap).sort((a, b) => b.killFame - a.killFame).slice(0, 10);
 
         // Top deaths: aggregate by victim name
         const deathMap = {};
         for (const ev of deathEvents) {
             const name = ev.Victim?.Name;
+            const id = ev.Victim?.Id;
             if (!name) continue;
-            if (!deathMap[name]) deathMap[name] = { name, deaths: 0, deathFame: 0 };
+            if (!deathMap[name]) deathMap[name] = { name, id, deaths: 0, deathFame: 0 };
             deathMap[name].deaths++;
             deathMap[name].deathFame += ev.TotalVictimKillFame || 0;
         }
-        const topDeaths = Object.values(deathMap).sort((a, b) => b.deaths - a.deaths).slice(0, 5);
+        const topDeaths = Object.values(deathMap).sort((a, b) => b.deaths - a.deaths).slice(0, 10);
 
         // Highest single kill by fame
         const topFameKill = [...killEvents].sort(
