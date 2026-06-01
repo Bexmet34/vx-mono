@@ -41,7 +41,7 @@ export async function POST(req) {
         guild_id: guildId,
         amount: plan.amount,
         currency: 'USDT',
-        duration_days: plan.days,
+        duration_days: plan.duration_days,
         status: 'pending'
       });
 
