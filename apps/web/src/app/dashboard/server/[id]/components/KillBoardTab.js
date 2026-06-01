@@ -45,6 +45,9 @@ export default function KillBoardTab({
                <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff' }}>
                  {guildDetail.AllianceTag ? `[${guildDetail.AllianceTag}] ` : ''}{guildDetail.Name}
                </div>
+               <div style={{ fontSize: '0.85rem', color: '#888', marginTop: '0.25rem' }}>
+                 Leader: <span style={{color: '#fff'}}>{guildDetail.FounderName || 'Unknown'}</span> &bull; Members: <span style={{color: '#fff'}}>{guildDetail.MemberCount || 0}</span>
+               </div>
              </div>
              <button className="dockItem" style={{ color: '#ef4444', padding: '0.5rem 1rem' }} onClick={() => {
                 setSettings({ ...settings, albion_guild_id: "", albion_guild_name: "" });
@@ -133,15 +136,15 @@ export default function KillBoardTab({
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
              <div style={{ background: '#000', padding: '1.5rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
                <div style={{ color: '#888', fontSize: '0.85rem', marginBottom: '0.5rem' }}>Total Kills</div>
-               <div style={{ fontSize: '2rem', fontWeight: 900, color: '#22c55e' }}>{killboardPreview.total_kills}</div>
+               <div style={{ fontSize: '2rem', fontWeight: 900, color: '#22c55e' }}>{killboardPreview.totalKills || 0}</div>
              </div>
              <div style={{ background: '#000', padding: '1.5rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
                <div style={{ color: '#888', fontSize: '0.85rem', marginBottom: '0.5rem' }}>Total Deaths</div>
-               <div style={{ fontSize: '2rem', fontWeight: 900, color: '#ef4444' }}>{killboardPreview.total_deaths}</div>
+               <div style={{ fontSize: '2rem', fontWeight: 900, color: '#ef4444' }}>{killboardPreview.totalDeaths || 0}</div>
              </div>
              <div style={{ background: '#000', padding: '1.5rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
                <div style={{ color: '#888', fontSize: '0.85rem', marginBottom: '0.5rem' }}>Kill Fame</div>
-               <div style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--accent-color)' }}>{killboardPreview.total_kill_fame.toLocaleString()}</div>
+               <div style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--accent-color)' }}>{(killboardPreview.totalKillFame || 0).toLocaleString()}</div>
              </div>
           </div>
           

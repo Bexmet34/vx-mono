@@ -45,9 +45,11 @@ export async function GET(req, { params }) {
 
         // Top killers: aggregate by killer name
         const killerMap = {};
+        let totalKillFame = 0;
         for (const ev of killEvents) {
             const name = ev.Killer?.Name;
             if (!name) continue;
+            totalKillFame += ev.TotalVictimKillFame || 0;
             if (!killerMap[name]) killerMap[name] = { name, kills: 0, killFame: 0 };
             killerMap[name].kills++;
             killerMap[name].killFame += ev.TotalVictimKillFame || 0;
@@ -73,6 +75,7 @@ export async function GET(req, { params }) {
         return NextResponse.json({
             totalKills: killEvents.length,
             totalDeaths: deathEvents.length,
+            totalKillFame: totalKillFame,
             topKillers,
             topDeaths,
             topFameKill: topFameKill ? {
