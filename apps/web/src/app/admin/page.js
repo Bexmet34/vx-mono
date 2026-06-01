@@ -304,7 +304,7 @@ export default function AdminPage() {
   const menuItems = [
     { id: "overview", label: "Genel Bakış", icon: <LayoutDashboard size={20} /> },
     { id: "servers", label: "Sunucu Yönetimi", icon: <Server size={20} /> },
-    { id: "plans", label: "Paket Yönetimi", icon: <DollarSign size={20} /> },
+    { id: "plans", label: "Paket Yönetimi", icon: <DollarSign size={20} /> }, 
     { id: "campaigns", label: "Kampanya & Hediye", icon: <Gift size={20} /> },
     { id: "notifications", label: "Bildirim Şablonları", icon: <Bell size={20} /> },
     { id: "broadcast", label: "Duyuru Merkezi", icon: <MessageSquare size={20} /> },
