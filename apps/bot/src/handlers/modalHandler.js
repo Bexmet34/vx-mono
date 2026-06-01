@@ -190,9 +190,11 @@ async function handleRegisterModal(interaction) {
         
         let realName = '';
         let ign = '';
+        let age = '';
         try {
             realName = interaction.fields.getTextInputValue('real_name');
             ign = interaction.fields.getTextInputValue('ingame_name');
+            age = interaction.fields.getTextInputValue('age');
         } catch (e) {
             // Fallback for older modal versions if they existed
             ign = interaction.fields.getTextInputValue('register_ign');
@@ -247,6 +249,12 @@ async function handleRegisterModal(interaction) {
             const embed = createPlayerCardEmbed(playerData, lang);
             if (realName) {
                 embed.addFields({ name: '📝 Gerçek İsim', value: realName, inline: true });
+            }
+            if (ign) {
+                embed.addFields({ name: '🎮 Oyun İçi Nick', value: ign, inline: true });
+            }
+            if (age) {
+                embed.addFields({ name: '📅 Yaş', value: age, inline: true });
             }
 
             const row = new ActionRowBuilder().addComponents(

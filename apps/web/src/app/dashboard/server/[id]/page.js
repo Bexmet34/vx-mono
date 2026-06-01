@@ -45,6 +45,7 @@ export default function ServerSettings() {
     registration_enabled: false,
     registration_channel_id: "",
     registration_staff_role_ids: "",
+    registration_given_role_id: "",
     registration_category_id: "",
     registration_welcome_message: "",
   });

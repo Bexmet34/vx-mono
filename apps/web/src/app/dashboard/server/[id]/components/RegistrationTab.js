@@ -112,6 +112,22 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
             ))}
           </select>
         </div>
+
+        <div className="inputGroup">
+          <label className="label">
+            {lang === 'en' ? 'Given Role (Role assigned upon approval)' : 'Verilecek Rol (Kayıt onaylandığında verilecek)'}
+          </label>
+          <select
+            className="select"
+            value={settings.registration_given_role_id || ""}
+            onChange={(e) => setSettings({ ...settings, registration_given_role_id: e.target.value })}
+          >
+            <option value="">{lang === 'en' ? 'Select Role' : 'Rol Seçin'}</option>
+            {(discordRoles || []).map(r => (
+              <option key={r.id} value={r.id}>@{r.name}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* Message Setup Section */}

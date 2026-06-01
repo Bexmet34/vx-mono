@@ -79,12 +79,98 @@ async function handlePartyButtons(interaction) {
             .setMinLength(3)
             .setMaxLength(30);
 
+        const ageInput = new TextInputBuilder()
+            .setCustomId('age')
+            .setLabel(lang === 'en' ? 'Your Age' : 'Yaşınız')
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true)
+            .setMinLength(1)
+            .setMaxLength(2);
+
         modal.addComponents(
             new ActionRowBuilder().addComponents(realNameInput),
-            new ActionRowBuilder().addComponents(inGameNameInput)
+            new ActionRowBuilder().addComponents(inGameNameInput),
+            new ActionRowBuilder().addComponents(ageInput)
         );
 
         return await interaction.showModal(modal);
+    }
+
+    // Registration System: Approve/Reject Actions
+    if (customId.startsWith('reg_approve_') || customId.startsWith('reg_reject_')) {
+        const action = customId.startsWith('reg_approve_') ? 'approve' : 'reject';
+        const targetUserId = customId.split('_')[2];
+
+        // 1. Fetch the ticket's embed to get details
+        const embed = message.embeds[0];
+        if (!embed) return interaction.reply({ content: '❌ Hata: Kayıt bilgileri bulunamadı.', flags: [MessageFlags.Ephemeral] });
+
+        let realName = '';
+        let ign = '';
+        let age = '';
+        let guildName = '';
+
+        // Extract from embed fields
+        embed.fields.forEach(field => {
+            if (field.name.includes('Gerçek İsim')) realName = field.value;
+            if (field.name.includes('Yaş')) age = field.value;
+            if (field.name.includes('Guild')) guildName = field.value !== 'None' ? field.value : '';
+        });
+
+        // IGN is usually in the author name or description, but we can also extract it from embed description or we will rely on albionService.
+        // The modalHandler currently doesn't put IGN explicitly in a field, it puts it in the author or title. We'll update modalHandler to add an 'Oyun İçi Nick' field.
+        embed.fields.forEach(field => {
+            if (field.name.includes('Oyun İçi Nick')) ign = field.value;
+        });
+
+        if (action === 'reject') {
+            await interaction.reply({ content: `✅ Kayıt reddedildi ve kanal siliniyor...` });
+            setTimeout(() => interaction.channel.delete().catch(() => {}), 3000);
+            return;
+        }
+
+        if (action === 'approve') {
+            await interaction.deferReply();
+            
+            try {
+                const targetMember = await interaction.guild.members.fetch(targetUserId);
+
+                // Format Nickname: [TURQ]Ign - RealName Age
+                let prefix = '';
+                if (guildName && guildName.length > 0) {
+                    prefix = `[${guildName.substring(0, 4).toUpperCase()}]`;
+                }
+                
+                // Fallback for IGN if not in field (old tickets)
+                if (!ign && embed.author?.name) ign = embed.author.name;
+
+                const newNickname = `${prefix}${ign} - ${realName} ${age}`.trim();
+
+                // Assign role if configured
+                const givenRoleId = guildConfig?.registration_given_role_id;
+                if (givenRoleId) {
+                    await targetMember.roles.add(givenRoleId).catch(e => console.error('Role add error:', e));
+                }
+
+                // Change nickname
+                if (interaction.guild.ownerId !== targetUserId) {
+                    await targetMember.setNickname(newNickname).catch(e => console.error('Nickname error:', e));
+                }
+
+                await interaction.editReply({ content: `✅ <@${targetUserId}> adlı kullanıcının kaydı onaylandı!\n**Yeni İsim:** ${newNickname}` });
+                
+                // Remove the buttons so it can't be clicked again
+                const disabledRow = new ActionRowBuilder().addComponents(
+                    new ButtonBuilder().setCustomId('approved_btn').setLabel('Onaylandı').setStyle(ButtonStyle.Success).setDisabled(true)
+                );
+                await message.edit({ components: [disabledRow] }).catch(() => {});
+
+            } catch (err) {
+                console.error('[RegApprove Error]', err);
+                await interaction.editReply({ content: `❌ Bir hata oluştu: ${err.message}` });
+            }
+        }
+        return;
     }
 
     if (customId.startsWith('close_party_')) {
