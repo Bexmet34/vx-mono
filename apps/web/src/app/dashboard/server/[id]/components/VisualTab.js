@@ -1,55 +1,82 @@
-import React from 'react';
-import { Image as ImageIcon, Loader2, Crop, AlertTriangle } from "lucide-react";
-import SaveButton from './SaveButton';
+"use client";
 
-export default function VisualTab({ t, settings, setSettings, uploadingThumb, checkImage, handleFileSelect, thumbError, renderStatus, handleSave, saving }) {
+import { Image as ImageIcon, Upload, Link as LinkIcon, Trash } from "lucide-react";
+
+export default function VisualTab({ t, settings, setSettings, uploadingThumb, checkImage, handleFileSelect, thumbError, renderStatus }) {
   return (
-    <div className="dash-section-card animate-fade-in">
-      <h2 className="section-title"><ImageIcon size={22}/> <span suppressHydrationWarning>{t.dVisual || "Visuals"}</span></h2>
-      <p className="dash-hint" style={{marginBottom: '2rem'}}>
-         Parti mesajlarında görünecek sunucu logonuzu yükleyin veya linkini girin. Sadece /createparty embed'lerinde görünür.
-      </p>
-
-      <div className="dash-grid-2" style={{marginTop: '2rem'}}>
-        <div className="visuals-form">
-          <div className="dash-input-group">
-            <label className="dash-label">Logo Linki (Doğrudan URL)</label>
-            <input type="text" className="dash-input" placeholder="https://i.imgur.com/..." value={settings.embed_thumbnail_url || ""} onChange={(e) => { setSettings({ ...settings, embed_thumbnail_url: e.target.value }); checkImage(e.target.value); }} />
-          </div>
-
-          <div style={{margin: '2rem 0', height: '1px', background: 'var(--dash-border)', position: 'relative', textAlign: 'center'}}>
-             <span suppressHydrationWarning style={{position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: '#0f111a', padding: '0 1rem', color: 'var(--dash-text-muted)', fontSize: '0.75rem', fontWeight: '800', letterSpacing: '1px'}}>{t.dOrUpload || "OR UPLOAD FILE"}</span>
-          </div>
- 
-          <div className="upload-zone">
-            <input type="file" accept="image/*" id="thumbUpload" style={{display: 'none'}} onChange={handleFileSelect} />
-            <label htmlFor="thumbUpload" className="dash-select" style={{cursor: 'pointer', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', border: '2px dashed var(--dash-border)', padding: '2.5rem', borderRadius: '16px', transition: 'all 0.3s'}}>
-              {uploadingThumb ? <Loader2 size={24} className="spin" color="var(--dash-accent)" /> : <ImageIcon size={28} color="var(--dash-accent)" />}
-              <div style={{textAlign: 'left'}}>
-                 <div suppressHydrationWarning style={{fontWeight: '700', fontSize: '1.1rem'}}>{uploadingThumb ? t.dSaving : (t.dSelectImage || "Select Image")}</div>
-                 <p className="dash-hint" style={{margin: 0}}>PNG, JPG or SVG</p>
+    <div className="bentoGrid">
+      <div className="bentoBox span12">
+        <h2 className="bentoTitle"><ImageIcon /> Branding & Visuals</h2>
+        
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2.5rem' }}>
+          <div>
+            <div className="inputGroup">
+              <label className="label">Thumbnail Image URL</label>
+              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                <LinkIcon size={18} color="#888" />
+                <input
+                  type="text"
+                  className="input"
+                  placeholder="https://..."
+                  value={settings.embed_thumbnail_url || ""}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setSettings({ ...settings, embed_thumbnail_url: val });
+                    if (val) checkImage(val);
+                  }}
+                />
               </div>
-            </label>
-          </div>
-          {renderStatus(thumbError)}
-        </div>
+              {renderStatus(thumbError)}
+              <p className="hint">This image will appear on the top right of your Discord party embeds.</p>
+            </div>
 
-        <div className="preview-side">
-          <label className="dash-label" style={{textAlign: 'center', display: 'block', marginBottom: '1rem', color: 'var(--dash-accent)'}}>Canlı Discord Önizlemesi</label>
-          <div className="discord-mockup" style={{background: '#2b2d31', borderRadius: '14px', padding: '1.5rem', border: '1px solid rgba(255,255,255,0.05)', boxShadow: '0 10px 30px rgba(0,0,0,0.3)'}}>
-             <div style={{borderLeft: '4px solid var(--dash-accent)', paddingLeft: '1.25rem', display: 'flex', justifyContent: 'space-between', gap: '1rem'}}>
-                <div style={{flex: 1}}>
-                   <div style={{fontWeight: '700', fontSize: '1rem', marginBottom: '0.4rem', color: 'white'}}>🛡️ Veyronix | PARTİ KURULDU</div>
-                   <div style={{fontSize: '0.85rem', color: '#dbdee1', lineHeight: '1.5'}}>Bu alan sunucunuza özel logo ile şık bir görünüme kavuşur. Kullanıcılarınız bu logoyu gördüğünde sunucunuzun kurumsallığını fark edecektir.</div>
+            <div className="inputGroup" style={{ marginTop: '2rem' }}>
+              <label className="label">Or Upload a Logo</label>
+              <div style={{ position: 'relative' }}>
+                <input
+                  type="file"
+                  accept="image/png, image/jpeg, image/gif"
+                  onChange={handleFileSelect}
+                  style={{ opacity: 0, position: 'absolute', inset: 0, cursor: 'pointer' }}
+                />
+                <div style={{ border: '1px dashed rgba(255,255,255,0.2)', padding: '1.5rem', textAlign: 'center', borderRadius: '8px', cursor: 'pointer', background: 'rgba(255,255,255,0.02)' }}>
+                   <Upload size={24} color="#888" style={{ margin: '0 auto 0.5rem' }} />
+                   <div style={{ color: '#fff', fontWeight: 600 }}>Click to Browse</div>
+                   <div style={{ color: '#666', fontSize: '0.85rem' }}>PNG, JPG up to 2MB</div>
                 </div>
-                {settings.embed_thumbnail_url && (
-                   <img src={settings.embed_thumbnail_url} alt="Logo" style={{width: '80px', height: '80px', borderRadius: '12px', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.1)'}} />
-                )}
+              </div>
+            </div>
+          </div>
+
+          <div>
+             <label className="label">Live Preview</label>
+             <div style={{ background: '#2b2d31', borderRadius: '8px', padding: '1rem', border: '1px solid #1e1f22', minHeight: '200px' }}>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                   <div style={{ flex: 1 }}>
+                     <div style={{ background: '#1e1f22', height: '14px', width: '60%', borderRadius: '4px', marginBottom: '8px' }}></div>
+                     <div style={{ background: '#1e1f22', height: '10px', width: '40%', borderRadius: '4px', marginBottom: '8px' }}></div>
+                     <div style={{ background: '#1e1f22', height: '10px', width: '80%', borderRadius: '4px', marginBottom: '8px' }}></div>
+                   </div>
+                   {(settings.embed_thumbnail_url && !thumbError) ? (
+                     <div style={{ width: '60px', height: '60px', borderRadius: '8px', overflow: 'hidden' }}>
+                       <img src={settings.embed_thumbnail_url} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                     </div>
+                   ) : (
+                     <div style={{ width: '60px', height: '60px', borderRadius: '8px', background: '#1e1f22', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <ImageIcon color="#555" size={24} />
+                     </div>
+                   )}
+                </div>
              </div>
+             
+             {settings.embed_thumbnail_url && !thumbError && (
+               <button className="dockItem" style={{ marginTop: '1rem', color: '#ef4444' }} onClick={() => setSettings({ ...settings, embed_thumbnail_url: '' })}>
+                 <Trash size={16} /> Remove Logo
+               </button>
+             )}
           </div>
         </div>
       </div>
-      <SaveButton onClick={handleSave} saving={saving} t={t} />
     </div>
   );
 }

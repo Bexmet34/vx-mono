@@ -1,95 +1,103 @@
-import React from 'react';
-import { Copy, Plus, List, ChevronRight, Trash2 } from "lucide-react";
-import SaveButton from './SaveButton';
+"use client";
 
-export default function TemplateTab({ t, lang, settings, setSettings, selectedTemplateId, setSelectedTemplateId, handleSave, saving }) {
+import { Copy, Plus, Trash2 } from "lucide-react";
+
+export default function TemplateTab({ t, lang, settings, setSettings, selectedTemplateId, setSelectedTemplateId }) {
+  const selectedTemplate = settings.party_templates?.find(tpl => tpl.id === selectedTemplateId) || null;
+
+  const handleCreateTemplate = () => {
+    const newTemplate = { id: `tpl_${Date.now()}`, name: "New Template", required_roles: [], optional_roles: [] };
+    setSettings({ ...settings, party_templates: [...(settings.party_templates || []), newTemplate] });
+    setSelectedTemplateId(newTemplate.id);
+  };
+
+  const handleUpdateTemplate = (updates) => {
+    if (!selectedTemplateId) return;
+    setSettings(prev => ({
+      ...prev,
+      party_templates: prev.party_templates.map(tpl => tpl.id === selectedTemplateId ? { ...tpl, ...updates } : tpl)
+    }));
+  };
+
+  const handleDeleteTemplate = (id) => {
+    setSettings(prev => ({
+      ...prev,
+      party_templates: prev.party_templates.filter(tpl => tpl.id !== id)
+    }));
+    if (selectedTemplateId === id) setSelectedTemplateId(null);
+  };
+
   return (
-    <div className="templates-container animate-fade-in">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-        <div>
-          <h2 className="section-title" style={{ margin: 0 }}><Copy size={22} /> {t.dTemplates}</h2>
-          <p className="dash-hint">Sunucunuzda hızlıca parti kurmak için hazır şablonlar oluşturun.</p>
+    <div className="bentoGrid">
+      <div className="bentoBox span4" style={{ padding: 0 }}>
+        <div style={{ padding: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h2 className="bentoTitle" style={{ margin: 0 }}><Copy /> Templates</h2>
+          <button className="dockItem" style={{ padding: '0.4rem', borderRadius: '8px' }} onClick={handleCreateTemplate}>
+             <Plus size={18} />
+          </button>
         </div>
-        <button type="button" className="btn-primary" onClick={() => {
-          const newId = Date.now().toString();
-          const newTpl = { id: newId, name: "Yeni Şablon", title: "", description: "", roles: "Tank\nHeal\nDPS" };
-          setSettings({ ...settings, party_templates: [...settings.party_templates, newTpl] });
-          setSelectedTemplateId(newId);
-        }} style={{ borderRadius: '14px', padding: '0.8rem 1.5rem' }}>
-          <Plus size={20} /> {lang === 'en' ? 'New Template' : 'Yeni Şablon'}
-        </button>
-      </div>
-
-      <div className="template-management-layout">
-        {/* Sidebar List */}
-        <div className="template-sidebar">
-          <div className="template-list">
-            {settings.party_templates.length === 0 ? (
-              <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--dash-text-muted)', fontSize: '0.85rem' }}>Henüz şablon yok.</div>
-            ) : settings.party_templates.map(t_item => (
-              <button
-                key={t_item.id}
-                className={`template-list-item ${selectedTemplateId === t_item.id ? 'active' : ''}`}
-                onClick={() => setSelectedTemplateId(t_item.id)}
+        
+        <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
+          {(!settings.party_templates || settings.party_templates.length === 0) ? (
+            <div style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>No templates yet.</div>
+          ) : (
+            settings.party_templates.map(tpl => (
+              <div 
+                key={tpl.id} 
+                className={`listItem ${selectedTemplateId === tpl.id ? 'active' : ''}`}
+                style={{ margin: 0, borderRadius: 0, border: 'none', borderBottom: '1px solid rgba(255,255,255,0.05)', cursor: 'pointer', background: selectedTemplateId === tpl.id ? 'rgba(252,163,17,0.1)' : 'transparent' }}
+                onClick={() => setSelectedTemplateId(tpl.id)}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', overflow: 'hidden' }}>
-                  <List size={16} />
-                  <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t_item.name}</span>
-                </div>
-                <ChevronRight size={14} opacity={selectedTemplateId === t_item.id ? 1 : 0.3} />
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Editor Area */}
-        <div className="template-editor">
-          {selectedTemplateId ? (() => {
-            const tplIndex = settings.party_templates.findIndex(t_item => t_item.id === selectedTemplateId);
-            const tpl = settings.party_templates[tplIndex];
-            if (!tpl) return null;
-            return (
-              <div className="animate-fade-in">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
-                  <h3 style={{ fontSize: '1.4rem', fontWeight: '800' }}>{tpl.name}</h3>
-                  <button type="button" onClick={() => {
-                    setSettings({ ...settings, party_templates: settings.party_templates.filter(t_item => t_item.id !== tpl.id) });
-                    setSelectedTemplateId(null);
-                  }} className="btn-secondary" style={{ color: '#ff4d4f', border: '1px solid rgba(255, 77, 79, 0.2)', background: 'rgba(255, 77, 79, 0.05)' }}>
-                    <Trash2 size={18} /> {lang === 'en' ? 'Delete' : 'Sil'}
-                  </button>
-                </div>
-
-                <div className="dash-input-group">
-                  <label className="dash-label">Şablon İsmi</label>
-                  <input type="text" className="dash-input" value={tpl.name} onChange={(e) => { const nt = [...settings.party_templates]; nt[tplIndex].name = e.target.value; setSettings({ ...settings, party_templates: nt }); }} />
-                </div>
-                <div className="dash-input-group">
-                  <label className="dash-label">Varsayılan Başlık</label>
-                  <input type="text" className="dash-input" value={tpl.title} onChange={(e) => { const nt = [...settings.party_templates]; nt[tplIndex].title = e.target.value; setSettings({ ...settings, party_templates: nt }); }} />
-                </div>
-                <div className="dash-input-group">
-                  <label className="dash-label">Rol Listesi</label>
-                  <textarea className="dash-textarea" rows={8} value={tpl.roles} onChange={(e) => { const nt = [...settings.party_templates]; nt[tplIndex].roles = e.target.value; setSettings({ ...settings, party_templates: nt }); }} style={{ fontSize: '0.95rem', background: 'rgba(0,0,0,0.3)', lineHeight: '1.6' }} placeholder="Tank&#10;Healer&#10;DPS" />
-                  <p className="dash-hint">Her satıra bir rol gelecek şekilde yazın.</p>
-                </div>
-
-                {/* Save button immediately under the editor */}
-                <div style={{ marginTop: '2rem' }}>
-                   <SaveButton onClick={handleSave} saving={saving} t={t} />
-                </div>
+                <div style={{ fontWeight: 600, color: selectedTemplateId === tpl.id ? 'var(--accent-color)' : '#fff' }}>{tpl.name}</div>
+                <button className="btnIcon" onClick={(e) => { e.stopPropagation(); handleDeleteTemplate(tpl.id); }}>
+                  <Trash2 size={16} />
+                </button>
               </div>
-            );
-          })() : (
-            <div className="empty-editor-state">
-              <div style={{ background: 'var(--dash-accent-muted)', padding: '2rem', borderRadius: '50%', color: 'var(--dash-accent)' }}><Copy size={48} /></div>
-              <div>
-                <h3 style={{ fontSize: '1.25rem', color: 'white', marginBottom: '0.5rem' }}>{lang === 'en' ? 'Select a Template' : 'Bir Şablon Seçin'}</h3>
-                <p>Düzenlemeye başlamak için listeden bir şablon seçin veya yeni bir tane oluşturun.</p>
-              </div>
-            </div>
+            ))
           )}
         </div>
+      </div>
+
+      <div className="bentoBox span8">
+        {!selectedTemplate ? (
+          <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666' }}>
+            Select or create a template to edit.
+          </div>
+        ) : (
+          <div>
+            <h3 className="bentoTitle" style={{ fontSize: '1.25rem' }}>Edit Template</h3>
+            <div className="inputGroup">
+              <label className="label">Template Name</label>
+              <input 
+                type="text" 
+                className="input" 
+                value={selectedTemplate.name} 
+                onChange={(e) => handleUpdateTemplate({ name: e.target.value })} 
+              />
+            </div>
+            
+            <div className="inputGroup">
+              <label className="label">Required Roles (comma separated)</label>
+              <input 
+                type="text" 
+                className="input" 
+                value={(selectedTemplate.required_roles || []).join(", ")} 
+                onChange={(e) => handleUpdateTemplate({ required_roles: e.target.value.split(",").map(r => r.trim()).filter(Boolean) })} 
+              />
+              <p className="hint">E.g. Tank, Healer, DPS</p>
+            </div>
+
+            <div className="inputGroup">
+              <label className="label">Optional Roles (comma separated)</label>
+              <input 
+                type="text" 
+                className="input" 
+                value={(selectedTemplate.optional_roles || []).join(", ")} 
+                onChange={(e) => handleUpdateTemplate({ optional_roles: e.target.value.split(",").map(r => r.trim()).filter(Boolean) })} 
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

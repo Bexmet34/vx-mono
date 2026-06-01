@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
-import { ArrowLeft, Loader2, Image as ImageIcon, Layout, Shield, X, Crop, Users, Copy, Lock, Home, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Loader2, Image as ImageIcon, Layout, Shield, X, Crop, Users, Copy, Lock, Home, Save } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 import { useToast, ToastContainer } from "@/components/Toast";
@@ -12,7 +12,7 @@ import getCroppedImg from "@/utils/cropImage";
 import { supabase } from "@/utils/supabase";
 import "./server-dashboard.css";
 
-// Modular Components
+// Modular Components (These will be refactored to use new Bento grid classes)
 import OverviewTab from "./components/OverviewTab";
 import GeneralTab from "./components/GeneralTab";
 import VisualTab from "./components/VisualTab";
@@ -20,9 +20,6 @@ import WhitelistTab from "./components/WhitelistTab";
 import TemplateTab from "./components/TemplateTab";
 import KillBoardTab from "./components/KillBoardTab";
 import RegistrationTab from "./components/RegistrationTab";
-import SaveButton from "./components/SaveButton";
-
-// Supabase is imported from @/utils/supabase
 
 export default function ServerSettings() {
   const { data: session, status } = useSession();
@@ -63,7 +60,7 @@ export default function ServerSettings() {
   const [guildDetail, setGuildDetail] = useState(null);
   
   const [whitelistSearch, setWhitelistSearch] = useState("");
-  const [whitelistAddTab, setWhitelistAddTab] = useState("roles"); // "roles" | "users"
+  const [whitelistAddTab, setWhitelistAddTab] = useState("roles");
   const [thumbError, setThumbError] = useState(null);
   const [uploadingThumb, setUploadingThumb] = useState(false);
   const [discordRoles, setDiscordRoles] = useState([]);
@@ -151,8 +148,6 @@ export default function ServerSettings() {
     }
   }, [status, guildId, fetchSettings, fetchDiscordData]);
 
-
-  // Auto-fetch Albion guild details (founder, member count, alliance) when guild is selected
   useEffect(() => {
     if (!settings.albion_guild_id) { 
       setTimeout(() => setGuildDetail(null), 0);
@@ -253,7 +248,6 @@ export default function ServerSettings() {
       setSettings(newSettings);
       setImageToCrop(null);
       
-      // Auto-save after upload to ensure it's persisted
       const saveRes = await fetch(`/api/guild-settings/${guildId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -279,7 +273,7 @@ export default function ServerSettings() {
   const renderStatus = (err) => {
     if (!err) return null;
     return (
-      <div className="status-msg error" style={{marginTop: '1rem'}}>
+      <div className="statusMsg">
         <AlertTriangle size={18} />
         <span>{err === "invalid" ? (lang === "en" ? "Invalid image URL" : "Geçersiz görsel bağlantısı") : err}</span>
       </div>
@@ -289,125 +283,112 @@ export default function ServerSettings() {
   if (!mounted) return null;
 
   if (loading) return (
-    <div className="server-dash-container" style={{justifyContent: 'center', alignItems: 'center'}}>
-       <div style={{textAlign: 'center'}}>
-          <Loader2 size={48} className="spin" color="var(--dash-accent)" />
-          <p style={{marginTop: '1.5rem', color: 'var(--dash-text-muted)', fontWeight: '600'}}>Loading...</p>
-       </div>
+    <div className="appWrapper" style={{justifyContent: 'center', alignItems: 'center'}}>
+       <Loader2 size={40} className="spin" color="#fff" />
     </div>
   );
 
   return (
-    <div className="server-dash-container" suppressHydrationWarning>
+    <div className="appWrapper" suppressHydrationWarning>
       <ToastContainer toasts={toasts} />
       
-      <aside className="dash-sidebar">
-        <div className="sidebar-group">
-          <button className={`sidebar-item ${activeTab === 'overview' ? 'active' : ''}`} onClick={() => setActiveTab('overview')}>
-            <Home size={20} /> <span>{t.dOverview}</span>
+      {/* Floating Dock Navigation */}
+      <div className="topDockWrapper">
+        <nav className="topDock">
+          <Link href="/dashboard" className="dockItem" style={{marginRight: '1rem'}}>
+             <ArrowLeft size={18} />
+          </Link>
+          <button className={`dockItem ${activeTab === 'overview' ? 'active' : ''}`} onClick={() => setActiveTab('overview')}>
+            <Home size={18} /> Overview
           </button>
-          <button className={`sidebar-item ${activeTab === 'general' ? 'active' : ''}`} onClick={() => setActiveTab('general')}>
-            <Layout size={20} /> <span>{t.dGeneral}</span>
+          <button className={`dockItem ${activeTab === 'general' ? 'active' : ''}`} onClick={() => setActiveTab('general')}>
+            <Layout size={18} /> General
           </button>
-          <button className={`sidebar-item ${activeTab === 'embed' ? 'active' : ''}`} onClick={() => setActiveTab('embed')}>
-            <ImageIcon size={20} /> <span>{t.dVisual}</span>
+          <button className={`dockItem ${activeTab === 'embed' ? 'active' : ''}`} onClick={() => setActiveTab('embed')}>
+            <ImageIcon size={18} /> Branding
           </button>
-          <button className={`sidebar-item ${activeTab === 'whitelist' ? 'active' : ''}`} onClick={() => setActiveTab('whitelist')}>
-            <Users size={20} /> <span>{t.dAccess}</span>
+          <button className={`dockItem ${activeTab === 'whitelist' ? 'active' : ''}`} onClick={() => setActiveTab('whitelist')}>
+            <Users size={18} /> Access
           </button>
-          <button className={`sidebar-item ${activeTab === 'templates' ? 'active' : ''}`} onClick={() => setActiveTab('templates')}>
-            <Copy size={20} /> <span>{t.dTemplates}</span>
+          <button className={`dockItem ${activeTab === 'templates' ? 'active' : ''}`} onClick={() => setActiveTab('templates')}>
+            <Copy size={18} /> Templates
           </button>
-          <button className={`sidebar-item premium`} disabled title="Premium Feature">
-            <Lock size={18} color="var(--dash-accent)" /> <span>KillBoard</span>
-            <div className="premium-badge">PRO</div>
+          <button className="dockItem premium" disabled title="Premium Feature">
+            <Lock size={16} /> KillBoard <span className="proBadge">PRO</span>
           </button>
-          <button className={`sidebar-item premium`} disabled title="Premium Feature">
-            <Lock size={18} color="var(--dash-accent)" /> <span>{t.dRegistration}</span>
-            <div className="premium-badge">PRO</div>
+          <button className="dockItem premium" disabled title="Premium Feature">
+            <Lock size={16} /> Reg <span className="proBadge">PRO</span>
           </button>
-        </div>
+        </nav>
+      </div>
 
-        <div style={{marginTop: 'auto', padding: '1rem', borderTop: '1px solid var(--dash-border)'}}>
-           <Link href="/dashboard" className="sidebar-item" style={{justifyContent: 'center', background: 'rgba(255,255,255,0.03)'}}>
-              <ArrowLeft size={18} /> <span>{lang === "en" ? "Dashboard" : "Geri Dön"}</span>
-           </Link>
-        </div>
-      </aside>
-
-      <main className="dash-main">
-        <header className="dash-header">
-          <div style={{display: 'flex', alignItems: 'center', gap: '1.5rem'}}>
-            <div style={{width: '50px', height: '50px', background: 'var(--dash-accent-muted)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--dash-accent)', fontWeight: '800', fontSize: '1.2rem', border: '1px solid var(--dash-accent)'}}>
+      <main className="appMain">
+        <header className="heroHeader">
+          <div className="heroInfo">
+            <div className="heroAvatar">
               {guildDetail?.Name?.charAt(0) || guildId.charAt(0).toUpperCase()}
             </div>
-            <div>
-              <h1 style={{fontSize: '1.5rem', fontWeight: '800', margin: 0}}>{guildDetail?.Name || 'Server Settings'}</h1>
-              <div style={{fontSize: '0.85rem', color: 'var(--dash-text-muted)', display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.2rem'}}>
-                 <Shield size={14} color="var(--dash-accent)" /> Administrator Access
+            <div className="heroText">
+              <h1>{guildDetail?.Name || 'Server Settings'}</h1>
+              <div className="heroBadge">
+                 <Shield size={16} /> Administrator Access
               </div>
             </div>
           </div>
-          
-          <SaveButton onClick={handleSave} saving={saving} t={t} variant="header" />
         </header>
 
-        <div className="dash-content">
-          {activeTab === 'overview' && <OverviewTab t={t} subscription={subscription} setActiveTab={setActiveTab} showToast={showToast} />}
-          
-          {activeTab === 'general' && (
-            <GeneralTab t={t} settings={settings} setSettings={setSettings} discordChannels={discordChannels} handleSave={handleSave} saving={saving} />
-          )}
+        {/* Tab Content Rendering with Bento Grids */}
+        {activeTab === 'overview' && <OverviewTab t={t} subscription={subscription} setActiveTab={setActiveTab} showToast={showToast} />}
+        
+        {activeTab === 'general' && (
+          <GeneralTab t={t} settings={settings} setSettings={setSettings} discordChannels={discordChannels} handleSave={handleSave} saving={saving} />
+        )}
 
-          {activeTab === 'embed' && (
-            <VisualTab t={t} settings={settings} setSettings={setSettings} uploadingThumb={uploadingThumb} checkImage={checkImage} handleFileSelect={handleFileSelect} thumbError={thumbError} renderStatus={renderStatus} handleSave={handleSave} saving={saving} />
-          )}
+        {activeTab === 'embed' && (
+          <VisualTab t={t} settings={settings} setSettings={setSettings} uploadingThumb={uploadingThumb} checkImage={checkImage} handleFileSelect={handleFileSelect} thumbError={thumbError} renderStatus={renderStatus} handleSave={handleSave} saving={saving} />
+        )}
 
-          {activeTab === 'whitelist' && (
-            <WhitelistTab t={t} settings={settings} setSettings={setSettings} whitelistAddTab={whitelistAddTab} setWhitelistAddTab={setWhitelistAddTab} searchQuery={whitelistSearch} setSearchQuery={setWhitelistSearch} discordRoles={discordRoles} discordMembers={discordMembers} removeWhitelistId={removeWhitelistId} handleSave={handleSave} saving={saving} />
-          )}
+        {activeTab === 'whitelist' && (
+          <WhitelistTab t={t} settings={settings} setSettings={setSettings} whitelistAddTab={whitelistAddTab} setWhitelistAddTab={setWhitelistAddTab} searchQuery={whitelistSearch} setSearchQuery={setWhitelistSearch} discordRoles={discordRoles} discordMembers={discordMembers} removeWhitelistId={removeWhitelistId} handleSave={handleSave} saving={saving} />
+        )}
 
-          {activeTab === 'templates' && (
-            <TemplateTab t={t} lang={lang} settings={settings} setSettings={setSettings} selectedTemplateId={selectedTemplateId} setSelectedTemplateId={setSelectedTemplateId} handleSave={handleSave} saving={saving} />
-          )}
+        {activeTab === 'templates' && (
+          <TemplateTab t={t} lang={lang} settings={settings} setSettings={setSettings} selectedTemplateId={selectedTemplateId} setSelectedTemplateId={setSelectedTemplateId} handleSave={handleSave} saving={saving} />
+        )}
 
-          {activeTab === 'killboard' && (
-            <KillBoardTab t={t} lang={lang} settings={settings} setSettings={setSettings} discordChannels={discordChannels} guildSearchQuery={guildSearchQuery} setGuildSearchQuery={setGuildSearchQuery} searchGuilds={searchGuilds} searchingGuild={searchingGuild} guildSearchResults={guildSearchResults} guildDetail={guildDetail} setGuildDetail={setGuildDetail} killboardPreview={killboardPreview} loadingPreview={loadingPreview} handlePreviewKillBoard={handlePreviewKillBoard} handleTriggerKillBoard={handleTriggerKillBoard} triggeringKillBoard={triggeringKillBoard} handleSave={handleSave} saving={saving} />
-          )}
+        {activeTab === 'killboard' && (
+          <KillBoardTab t={t} lang={lang} settings={settings} setSettings={setSettings} discordChannels={discordChannels} guildSearchQuery={guildSearchQuery} setGuildSearchQuery={setGuildSearchQuery} searchGuilds={searchGuilds} searchingGuild={searchingGuild} guildSearchResults={guildSearchResults} guildDetail={guildDetail} setGuildDetail={setGuildDetail} killboardPreview={killboardPreview} loadingPreview={loadingPreview} handlePreviewKillBoard={handlePreviewKillBoard} handleTriggerKillBoard={handleTriggerKillBoard} triggeringKillBoard={triggeringKillBoard} handleSave={handleSave} saving={saving} />
+        )}
 
-          {activeTab === 'registration' && (
-            <RegistrationTab t={t} lang={lang} settings={settings} setSettings={setSettings} discordChannels={discordChannels} discordRoles={discordRoles} handleSave={handleSave} saving={saving} />
-          )}
-        </div>
+        {activeTab === 'registration' && (
+          <RegistrationTab t={t} lang={lang} settings={settings} setSettings={setSettings} discordChannels={discordChannels} discordRoles={discordRoles} handleSave={handleSave} saving={saving} />
+        )}
+
       </main>
+
+      {/* Floating Action Button for Saving (Replaces the SaveButton component) */}
+      <button className="floatingSave" onClick={handleSave} disabled={saving}>
+        {saving ? <Loader2 className="spin" size={20} /> : <Save size={20} />}
+        {saving ? "Saving..." : "Save Changes"}
+      </button>
 
       {imageToCrop && (
         <div style={{position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem'}}>
-           <div className="dash-section-card" style={{maxWidth: '600px', width: '100%', padding: '2rem'}}>
-              <h2 className="section-title"><Crop size={22}/> {lang === 'en' ? 'Crop Logo' : 'Logoyu Kırp'}</h2>
+           <div className="bentoBox span6" style={{maxWidth: '600px', width: '100%', padding: '2rem'}}>
+              <h2 className="bentoTitle"><Crop size={22}/> Crop Logo</h2>
               <div style={{height: '400px', position: 'relative', background: '#000', borderRadius: '12px', overflow: 'hidden', marginBottom: '2rem'}}>
                  <Cropper image={imageToCrop} crop={crop} zoom={zoom} aspect={1} onCropChange={setCrop} onCropComplete={onCropComplete} onZoomChange={setZoom} />
               </div>
               <div style={{display: 'flex', justifyContent: 'flex-end', gap: '1rem'}}>
-                 <button className="sidebar-item" onClick={() => setImageToCrop(null)} style={{width: 'auto', background: 'rgba(255,255,255,0.05)'}}>{lang === 'en' ? 'Cancel' : 'İptal'}</button>
-                 <button className="btn-primary" onClick={uploadCroppedImage} disabled={uploadingThumb}>{lang === 'en' ? 'Apply & Upload' : 'Uygula ve Yükle'}</button>
+                 <button className="dockItem" onClick={() => setImageToCrop(null)} style={{width: 'auto', background: 'rgba(255,255,255,0.05)'}}>Cancel</button>
+                 <button className="floatingSave" style={{position: 'relative', bottom: 'auto', right: 'auto'}} onClick={uploadCroppedImage} disabled={uploadingThumb}>Apply & Upload</button>
               </div>
            </div>
         </div>
       )}
 
       <style jsx global>{`
-        body { background-color: #0b0c10 !important; background-image: none !important; }
-        .sidebar-item { border: none; cursor: pointer; transition: all 0.2s; }
-        .btn-remove-icon { background: transparent; border: none; cursor: pointer; color: var(--dash-text-muted); transition: all 0.2s; }
-        .btn-remove-icon:hover { color: var(--dash-error); transform: scale(1.1); }
-        .btn-save-header {
-  padding: 0.85rem 2rem;
-  border-radius: 12px;
-}
-
-.whitelist-grid::-webkit-scrollbar, .wl-picker-list::-webkit-scrollbar { width: 6px; }
-        .whitelist-grid::-webkit-scrollbar-thumb, .wl-picker-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        body { background-color: #000 !important; background-image: none !important; }
       `}</style>
     </div>
   );
