@@ -66,8 +66,11 @@ async function handleCreatePartyCommand(interaction) {
         });
     }
 
+    const hideGear = interaction.options.getBoolean('esya_gosterme') ?? false;
+    const showGear = !hideGear;
+
     const modal = new ModalBuilder()
-        .setCustomId('parti_modal:genel')
+        .setCustomId(`parti_modal:genel:${showGear ? '1' : '0'}`)
         .setTitle(t('party.create_party_title', lang));
 
     const headerInput = new TextInputBuilder()
@@ -171,6 +174,8 @@ function getTemplateByIndex(templatesStr, indexStr) {
 }
 
     const templateIndex = interaction.options.getString('template');
+    const hideGear = interaction.options.getBoolean('esya_gosterme') ?? false;
+    const showGear = !hideGear;
     const template = getTemplateByIndex(guildConfig?.party_templates, templateIndex);
     
     if (!template) {
@@ -202,7 +207,7 @@ function getTemplateByIndex(templatesStr, indexStr) {
     const rolesWithMembers = rolesList.map(role => ({ role, userId: null }));
     const components = createCustomPartyComponents(rolesList, userId, lang, rolesWithMembers);
     
-    embed.addFields(...buildRolesFields(rolesWithMembers, lang, interaction.guild));
+    embed.addFields(...buildRolesFields(rolesWithMembers, lang, interaction.guild, showGear));
 
     const actualRoles = rolesList.filter(r => !r.startsWith('#HEADER:') && !r.startsWith('#'));
     addFooterFields(embed, 0, actualRoles.length, lang);

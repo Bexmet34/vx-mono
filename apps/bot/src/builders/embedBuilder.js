@@ -364,7 +364,7 @@ function buildRolesValue(rolesWithMembers, lang = 'tr', guildOrClient = null) {
 /**
  * Builds an array of field objects, splitting roles if they exceed 1024 chars
  */
-function buildRolesFields(rolesWithMembers, lang = 'tr', guildOrClient = null) {
+function buildRolesFields(rolesWithMembers, lang = 'tr', guildOrClient = null, showGear = false) {
     const fields = [];
     const hasHeaders = rolesWithMembers.some(r => r.role && (r.role.startsWith('#HEADER:') || r.role.startsWith('#')));
     
@@ -406,10 +406,10 @@ function buildRolesFields(rolesWithMembers, lang = 'tr', guildOrClient = null) {
             emoji = resolveRoleEmoji(displayRole, guildOrClient);
 
             let line = `${emoji} **${displayRole}**: ${mention}`;
-            // Eşyaları (gear) ana embedde göstermemek için aşağıdaki bloğu kaldırdık
-            // if (gearInfo) {
-            //     line += `\n${gearInfo}`;
-            // }
+            
+            if (showGear && gearInfo) {
+                line += `\n${gearInfo}`;
+            }
 
             if (currentLength + line.length + 2 > 1000) {
                 fields.push({

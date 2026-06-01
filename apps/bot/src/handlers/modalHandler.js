@@ -17,7 +17,9 @@ const { parseTimeToMs, getNow } = require('../utils/timeUtils');
 
 async function handlePartiModal(interaction) {
     if (interaction.customId.startsWith('parti_modal:')) {
-        const type = interaction.customId.split(':')[1] || 'genel';
+        const parts = interaction.customId.split(':');
+        const type = parts[1] || 'genel';
+        const showGear = parts[2] === '1';
         const guildConfig = await getGuildConfig(interaction.guildId);
         const lang = guildConfig?.language || 'tr';
         const guildName = guildConfig?.guild_name || 'Albion';
@@ -53,7 +55,7 @@ async function handlePartiModal(interaction) {
         const rolesWithMembers = rolesList.map(role => ({ role, userId: null }));
         const components = createCustomPartyComponents(rolesList, userId, lang, rolesWithMembers);
         
-        embed.addFields(...buildRolesFields(rolesWithMembers, lang, interaction.guild));
+        embed.addFields(...buildRolesFields(rolesWithMembers, lang, interaction.guild, showGear));
 
 
         const actualRoles = rolesList.filter(r => !r.startsWith('#HEADER:') && !r.startsWith('#'));
