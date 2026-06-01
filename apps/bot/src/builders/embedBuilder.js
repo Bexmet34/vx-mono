@@ -510,7 +510,6 @@ function createPlayerCardEmbed(player, lang = 'tr') {
         .setTitle(`🛡️ ${player.Name} [${player.GuildName || 'No Guild'}]`)
         .setURL(`https://albiononline.com/en/killboard/player/${player.Id}`)
         .setColor('#E67E22')
-        .setThumbnail(`https://render.albiononline.com/v1/item/T8_HEAD_PLATE_SET1.png`) // Decorative item icon
         .setDescription(lang === 'tr' ? `👤 **Oyuncu Analizi ve İstatistikleri**` : `👤 **Player Analysis & Statistics**`)
         .addFields(
             { 

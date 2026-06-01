@@ -114,14 +114,24 @@ async function handlePartyButtons(interaction) {
         embed.fields.forEach(field => {
             if (field.name.includes('Gerçek İsim')) realName = field.value;
             if (field.name.includes('Yaş')) age = field.value;
-            if (field.name.includes('Guild')) guildName = field.value !== 'None' ? field.value : '';
+            if (field.name.includes('Oyun İçi Nick')) ign = field.value;
+            
+            // Extract Guild from the "Diğer" / "Others" field
+            if (field.name.includes('Diğer') || field.name.includes('Others')) {
+                const match = field.value.match(/\*\*Guild:\*\* `([^`]+)`/);
+                if (match && match[1] && match[1] !== '-' && match[1] !== 'No Guild') {
+                    guildName = match[1];
+                }
+            }
         });
 
-        // IGN is usually in the author name or description, but we can also extract it from embed description or we will rely on albionService.
-        // The modalHandler currently doesn't put IGN explicitly in a field, it puts it in the author or title. We'll update modalHandler to add an 'Oyun İçi Nick' field.
-        embed.fields.forEach(field => {
-            if (field.name.includes('Oyun İçi Nick')) ign = field.value;
-        });
+        // Fallback for guildName from Title if not found in fields
+        if (!guildName && embed.title) {
+            const titleMatch = embed.title.match(/\[(.*?)\]/);
+            if (titleMatch && titleMatch[1] && titleMatch[1] !== 'No Guild') {
+                guildName = titleMatch[1];
+            }
+        }
 
         if (action === 'reject') {
             await interaction.reply({ content: `✅ Kayıt reddedildi ve kanal siliniyor...` });
@@ -143,21 +153,44 @@ async function handlePartyButtons(interaction) {
                 
                 // Fallback for IGN if not in field (old tickets)
                 if (!ign && embed.author?.name) ign = embed.author.name;
+                if (!ign && embed.title) {
+                    const titleMatch = embed.title.match(/🛡️ (.*?) \[/);
+                    if (titleMatch && titleMatch[1]) ign = titleMatch[1];
+                }
 
-                const newNickname = `${prefix}${ign} - ${realName} ${age}`.trim();
+                // Protect against empty age or realName
+                const safeAge = age ? ` ${age}` : '';
+                const safeRealName = realName ? ` - ${realName}` : '';
+                const newNickname = `${prefix}${ign}${safeRealName}${safeAge}`.trim();
 
                 // Assign role if configured
                 const givenRoleId = guildConfig?.registration_given_role_id;
+                let roleStatus = '';
                 if (givenRoleId) {
-                    await targetMember.roles.add(givenRoleId).catch(e => console.error('Role add error:', e));
+                    try {
+                        await targetMember.roles.add(givenRoleId);
+                        roleStatus = `\n✅ **Rol Verildi:** <@&${givenRoleId}>`;
+                    } catch (e) {
+                        console.error('Role add error:', e);
+                        roleStatus = `\n⚠️ **Rol Verilemedi:** Botun yetkisi bu rolü vermeye yetmiyor olabilir. (Rolü botun rolünün altına taşıyın)`;
+                    }
                 }
 
                 // Change nickname
+                let nickStatus = '';
                 if (interaction.guild.ownerId !== targetUserId) {
-                    await targetMember.setNickname(newNickname).catch(e => console.error('Nickname error:', e));
+                    try {
+                        await targetMember.setNickname(newNickname);
+                        nickStatus = `\n✅ **Yeni İsim:** ${newNickname}`;
+                    } catch (e) {
+                        console.error('Nickname error:', e);
+                        nickStatus = `\n⚠️ **İsim Değiştirilemedi:** Botun yetkisi bu kişinin ismini değiştirmeye yetmiyor. (Kullanıcının rolü botun rolünden yüksek olabilir)`;
+                    }
+                } else {
+                    nickStatus = `\nℹ️ Sunucu sahibinin ismi bot tarafından değiştirilemez.`;
                 }
 
-                await interaction.editReply({ content: `✅ <@${targetUserId}> adlı kullanıcının kaydı onaylandı!\n**Yeni İsim:** ${newNickname}` });
+                await interaction.editReply({ content: `✅ <@${targetUserId}> adlı kullanıcının kaydı onaylandı!${nickStatus}${roleStatus}` });
                 
                 // Remove the buttons so it can't be clicked again
                 const disabledRow = new ActionRowBuilder().addComponents(
