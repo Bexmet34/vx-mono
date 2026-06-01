@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+.pnpm-debug.log*
+
+# Next.js
+.next/
+out/
+
+# Build outputs
+dist/
+build/
+.turbo/
+
+# Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+
+# Debugging & Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+error.log
+error.txt
+.update_success
+
+# OS Metadata
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+
+# Local data (SQLite vb.)
+apps/bot/data/
+*.sqlite
