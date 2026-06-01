@@ -146,7 +146,7 @@ async function handlePartyButtons(interaction) {
                 const targetMember = await interaction.guild.members.fetch(targetUserId);
 
                 // Format Nickname: [TURQ]Ign - RealName Age
-                let prefix = '';
+                let prefix = '[NAN]';
                 if (guildName && guildName.length > 0) {
                     prefix = `[${guildName.substring(0, 4).toUpperCase()}]`;
                 }
