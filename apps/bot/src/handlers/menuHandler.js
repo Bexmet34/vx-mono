@@ -462,31 +462,7 @@ async function handleJoinRoleSelect(interaction) {
                 components: allocationResult.newComponents
             });
 
-            // Eşya bildirimini (gear) gönder
-            let finalRoleName = rolesWithMembers[selectedIndex].role;
-            try {
-                const gearRow = await db.get('SELECT gear_json FROM party_gear WHERE message_id = ?', [message.id]);
-                if (gearRow && gearRow.gear_json) {
-                    const gearArray = JSON.parse(gearRow.gear_json);
-                    if (gearArray[selectedIndex]) {
-                        finalRoleName = gearArray[selectedIndex];
-                    }
-                }
-            } catch (err) {
-                console.error('Gear fetch error:', err);
-            }
 
-            if (finalRoleName && finalRoleName.includes('>')) {
-                const parts = finalRoleName.split('>');
-                const roleOnly = parts[0].trim();
-                const gearInfo = parts.slice(1).join('>').trim();
-                if (gearInfo) {
-                    await interaction.followUp({
-                        content: `✅ **${roleOnly}** rolüne katıldınız!\n🛡️ **Giymeniz gereken eşyalar:**\n${gearInfo}`,
-                        flags: [MessageFlags.Ephemeral]
-                    }).catch(() => {});
-                }
-            }
             return;
         }
 
@@ -514,31 +490,7 @@ async function handleJoinRoleSelect(interaction) {
             components: allocationResult.newComponents
         });
 
-        // Eşya bildirimini (gear) gönder
-        let finalRoleName = rolesWithMembers[selectedIndex].role;
-        try {
-            const gearRow = await db.get('SELECT gear_json FROM party_gear WHERE message_id = ?', [message.id]);
-            if (gearRow && gearRow.gear_json) {
-                const gearArray = JSON.parse(gearRow.gear_json);
-                if (gearArray[selectedIndex]) {
-                    finalRoleName = gearArray[selectedIndex];
-                }
-            }
-        } catch (err) {
-            console.error('Gear fetch error:', err);
-        }
 
-        if (finalRoleName && finalRoleName.includes('>')) {
-            const parts = finalRoleName.split('>');
-            const roleOnly = parts[0].trim();
-            const gearInfo = parts.slice(1).join('>').trim();
-            if (gearInfo) {
-                await interaction.followUp({
-                    content: `✅ **${roleOnly}** rolüne katıldınız!\n🛡️ **Giymeniz gereken eşyalar:**\n${gearInfo}`,
-                    flags: [MessageFlags.Ephemeral]
-                }).catch(() => {});
-            }
-        }
     } catch (e) {
         console.error('Error in handleJoinRoleSelect:', e);
     } finally {
