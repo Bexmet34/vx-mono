@@ -7,11 +7,7 @@ const commands = [
 
     new SlashCommandBuilder()
         .setName('createparty')
-        .setDescription('Create a new Albion Online party.')
-        .addBooleanOption(option =>
-            option.setName('esya_gosterme')
-                .setDescription('Eşya detayları embed içinde GİZLENSİN mi? (Varsayılan: Hayır/Göster)')
-                .setRequired(false)),
+        .setDescription('Create a new Albion Online party.'),
 
     new SlashCommandBuilder()
         .setName('closeparty')
@@ -40,11 +36,7 @@ const commands = [
             option.setName('template')
                 .setDescription('Kullanmak istediğiniz şablonu seçin')
                 .setRequired(true)
-                .setAutocomplete(true))
-        .addBooleanOption(option =>
-            option.setName('esya_gosterme')
-                .setDescription('Eşya detayları embed içinde GİZLENSİN mi? (Varsayılan: Hayır/Göster)')
-                .setRequired(false)),
+                .setAutocomplete(true)),
 
     new SlashCommandBuilder()
         .setName('vote')
