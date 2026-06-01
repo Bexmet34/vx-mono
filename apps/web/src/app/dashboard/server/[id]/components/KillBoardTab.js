@@ -118,11 +118,11 @@ export default function KillBoardTab({
         </div>
 
         <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
-           <button className="dockItem" style={{ flex: 1, justifyContent: 'center', background: 'rgba(255,255,255,0.05)' }} onClick={handlePreviewKillBoard} disabled={!settings.albion_guild_id || loadingPreview}>
+           <button className="dockItem" style={{ flex: 1, justifyContent: 'center', background: 'rgba(255,255,255,0.05)' }} onClick={handlePreviewKillBoard} disabled={!settings.albion_guild_id || loadingPreview || triggeringKillBoard}>
               {loadingPreview ? <Loader2 size={18} className="spin"/> : <Eye size={18}/>} 
               Preview Data
            </button>
-           <button className="dockItem" style={{ flex: 1, justifyContent: 'center', background: 'var(--accent-color)', color: '#000' }} onClick={handleTriggerKillBoard} disabled={!settings.albion_guild_id || !settings.killboard_channel_id || triggeringKillBoard}>
+           <button className="dockItem" style={{ flex: 1, justifyContent: 'center', background: 'var(--accent-color)', color: '#000' }} onClick={handleTriggerKillBoard} disabled={!settings.albion_guild_id || !settings.killboard_channel_id || triggeringKillBoard || loadingPreview}>
               {triggeringKillBoard ? <Loader2 size={18} className="spin"/> : <ShieldAlert size={18}/>} 
               Trigger Now
            </button>
@@ -147,8 +147,50 @@ export default function KillBoardTab({
                <div style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--accent-color)' }}>{(killboardPreview.totalKillFame || 0).toLocaleString()}</div>
              </div>
           </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+            <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px', padding: '1.5rem' }}>
+              <h3 style={{ fontSize: '1.1rem', color: '#fff', marginBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.5rem' }}>⚔️ Top Killers</h3>
+              {killboardPreview.topKillers && killboardPreview.topKillers.length > 0 ? (
+                killboardPreview.topKillers.map((k, i) => (
+                  <div key={k.name} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                    <span style={{ color: '#ccc' }}>{['🥇', '🥈', '🥉'][i] || '🏅'} {k.name}</span>
+                    <span style={{ fontWeight: 'bold', color: '#22c55e' }}>{k.kills} Kills</span>
+                  </div>
+                ))
+              ) : (
+                <div style={{ color: '#666', fontSize: '0.9rem' }}>No kills recorded.</div>
+              )}
+            </div>
+
+            <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px', padding: '1.5rem' }}>
+              <h3 style={{ fontSize: '1.1rem', color: '#fff', marginBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.5rem' }}>💀 Top Deaths</h3>
+              {killboardPreview.topDeaths && killboardPreview.topDeaths.length > 0 ? (
+                killboardPreview.topDeaths.map((d, i) => (
+                  <div key={d.name} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                    <span style={{ color: '#ccc' }}>{['🥇', '🥈', '🥉'][i] || '🏅'} {d.name}</span>
+                    <span style={{ fontWeight: 'bold', color: '#ef4444' }}>{d.deaths} Deaths</span>
+                  </div>
+                ))
+              ) : (
+                <div style={{ color: '#666', fontSize: '0.9rem' }}>No deaths recorded.</div>
+              )}
+            </div>
+          </div>
+
+          {killboardPreview.topFameKill && (
+            <div style={{ background: 'rgba(252, 163, 17, 0.1)', border: '1px solid var(--accent-color)', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem' }}>
+              <h3 style={{ fontSize: '1.1rem', color: 'var(--accent-color)', marginBottom: '0.5rem' }}>💰 Most Valuable Kill</h3>
+              <div style={{ color: '#fff', fontSize: '1.1rem' }}>
+                <span style={{ fontWeight: 'bold', color: '#22c55e' }}>{killboardPreview.topFameKill.killer}</span> killed <span style={{ fontWeight: 'bold', color: '#ef4444' }}>{killboardPreview.topFameKill.victim}</span>
+              </div>
+              <div style={{ color: 'var(--accent-color)', fontWeight: 'bold', marginTop: '0.5rem' }}>
+                +{(killboardPreview.topFameKill.fame || 0).toLocaleString()} Fame
+              </div>
+            </div>
+          )}
           
-          <p className="hint">Note: This is just a numerical preview. The actual Discord post will include an elegant embed with player leaderboards.</p>
+          <p className="hint">Note: This preview mirrors the actual Discord post data.</p>
         </div>
       )}
     </div>
