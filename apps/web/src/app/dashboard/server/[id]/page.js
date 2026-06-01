@@ -312,10 +312,10 @@ export default function ServerSettings() {
             <Copy size={18} /> Templates
           </button>
           <button className={`dockItem ${activeTab === 'killboard' ? 'active' : ''}`} onClick={() => setActiveTab('killboard')}>
-            <Lock size={16} /> KillBoard
+            <Lock size={16} /> KillBoard <span className="proBadge" style={{ background: 'var(--accent-color)', color: '#000' }}>BETA</span>
           </button>
-          <button className="dockItem premium" disabled title="Premium Feature">
-            <Lock size={16} /> Reg <span className="proBadge">PRO</span>
+          <button className={`dockItem ${activeTab === 'registration' ? 'active' : ''}`} onClick={() => setActiveTab('registration')}>
+            <Users size={16} /> Reg <span className="proBadge" style={{ background: 'var(--accent-color)', color: '#000' }}>BETA</span>
           </button>
         </nav>
       </div>
