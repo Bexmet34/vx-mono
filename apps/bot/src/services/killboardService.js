@@ -22,20 +22,11 @@ function fetchAlbionEvents(url) {
 }
 
 /**
- * Fetches kill events for a guild — guild members as killers
+ * Fetches recent events for a guild (both kills and deaths)
  */
-function fetchGuildKills(guildId) {
+function fetchAllGuildEvents(guildId) {
     return fetchAlbionEvents(
-        `https://gameinfo-ams.albiononline.com/api/gameinfo/guilds/${guildId}/kills?offset=0&limit=51`
-    );
-}
-
-/**
- * Fetches death events for a guild — guild members as victims
- */
-function fetchGuildDeaths(guildId) {
-    return fetchAlbionEvents(
-        `https://gameinfo-ams.albiononline.com/api/gameinfo/guilds/${guildId}/deaths?offset=0&limit=51`
+        `https://gameinfo-ams.albiononline.com/api/gameinfo/events?offset=0&limit=51&guildId=${guildId}`
     );
 }
 
@@ -111,11 +102,16 @@ async function sendKillBoardSummary(client, guildCfg) {
 
         console.log(`[KillBoard] Period: ${sinceDate.toISOString()} → ${now.toISOString()}`);
 
-        // Fetch kills and deaths in parallel
-        const [allKills, allDeaths] = await Promise.all([
-            fetchGuildKills(guildCfg.albion_guild_id),
-            fetchGuildDeaths(guildCfg.albion_guild_id)
-        ]);
+        // Fetch all recent events
+        const allEvents = await fetchAllGuildEvents(guildCfg.albion_guild_id);
+        
+        const allKills = [];
+        const allDeaths = [];
+        
+        for (const ev of allEvents) {
+            if (ev.Killer?.GuildId === guildCfg.albion_guild_id) allKills.push(ev);
+            if (ev.Victim?.GuildId === guildCfg.albion_guild_id) allDeaths.push(ev);
+        }
 
         // Filter to only events AFTER sinceDate
         const killEvents = allKills.filter(ev => {
