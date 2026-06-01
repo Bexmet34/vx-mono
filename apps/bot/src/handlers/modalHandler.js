@@ -187,7 +187,16 @@ async function handleRegisterModal(interaction) {
     if (interaction.customId === 'register_modal') {
         const guildConfig = await getGuildConfig(interaction.guildId);
         const lang = guildConfig?.language || 'tr';
-        const ign = interaction.fields.getTextInputValue('register_ign');
+        
+        let realName = '';
+        let ign = '';
+        try {
+            realName = interaction.fields.getTextInputValue('real_name');
+            ign = interaction.fields.getTextInputValue('ingame_name');
+        } catch (e) {
+            // Fallback for older modal versions if they existed
+            ign = interaction.fields.getTextInputValue('register_ign');
+        }
 
         await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
 
@@ -206,17 +215,21 @@ async function handleRegisterModal(interaction) {
             
             const permissionOverwrites = [
                 { id: interaction.guild.id, deny: [PermissionFlagsBits.ViewChannel] },
-                { id: interaction.user.id, allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages] }
+                { id: interaction.user.id, allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages] },
+                { id: interaction.client.user.id, allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages, PermissionFlagsBits.ManageChannels] }
             ];
 
             staffRoles.forEach(roleId => {
                 if (roleId) permissionOverwrites.push({ id: roleId, allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages] });
             });
 
+            // Channel name format: ingamename-realname
+            const channelName = realName ? `${ign.toLowerCase()}-${realName.toLowerCase().replace(/\s+/g, '-')}` : `basvuru-${ign.toLowerCase()}`;
+
             let channel;
             try {
                 channel = await interaction.guild.channels.create({
-                    name: `basvuru-${ign.toLowerCase()}`,
+                    name: channelName,
                     type: ChannelType.GuildText,
                     parent: categoryId || null,
                     permissionOverwrites
@@ -232,13 +245,20 @@ async function handleRegisterModal(interaction) {
 
             // 3. Send Player Card
             const embed = createPlayerCardEmbed(playerData, lang);
+            if (realName) {
+                embed.addFields({ name: '📝 Gerçek İsim', value: realName, inline: true });
+            }
+
             const row = new ActionRowBuilder().addComponents(
                 new ButtonBuilder().setCustomId(`reg_approve_${interaction.user.id}`).setLabel(lang === 'tr' ? 'Onayla' : 'Approve').setStyle(ButtonStyle.Success),
                 new ButtonBuilder().setCustomId(`reg_reject_${interaction.user.id}`).setLabel(lang === 'tr' ? 'Reddet' : 'Reject').setStyle(ButtonStyle.Danger)
             );
 
+            // Ping staff if configured
+            const staffPings = staffRoles.filter(r => r).map(r => `<@&${r}>`).join(' ');
+            
             await channel.send({
-                content: `🔔 **${lang === 'tr' ? 'Yeni Başvuru!' : 'New Application!'}** <@${interaction.user.id}>`,
+                content: `🔔 **${lang === 'tr' ? 'Yeni Kayıt Başvurusu!' : 'New Registration Application!'}** <@${interaction.user.id}> ${staffPings}`,
                 embeds: [embed],
                 components: [row]
             });

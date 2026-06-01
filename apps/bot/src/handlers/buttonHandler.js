@@ -57,6 +57,36 @@ async function handlePartyButtons(interaction) {
 
 
 
+    // Registration System: Open Modal
+    if (customId === 'register_btn') {
+        const modal = new ModalBuilder()
+            .setCustomId('register_modal')
+            .setTitle(lang === 'en' ? 'Registration' : 'Kayıt Sistemi');
+
+        const realNameInput = new TextInputBuilder()
+            .setCustomId('real_name')
+            .setLabel(lang === 'en' ? 'Your Real Name' : 'Gerçek İsminiz')
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true)
+            .setMinLength(2)
+            .setMaxLength(30);
+
+        const inGameNameInput = new TextInputBuilder()
+            .setCustomId('ingame_name')
+            .setLabel(lang === 'en' ? 'Albion In-Game Nickname' : 'Albion Oyun İçi Nickiniz')
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true)
+            .setMinLength(3)
+            .setMaxLength(30);
+
+        modal.addComponents(
+            new ActionRowBuilder().addComponents(realNameInput),
+            new ActionRowBuilder().addComponents(inGameNameInput)
+        );
+
+        return await interaction.showModal(modal);
+    }
+
     if (customId.startsWith('close_party_')) {
         const ownerId = customId.split('_')[2];
 
