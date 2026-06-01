@@ -3,21 +3,29 @@
 import { Users, Plus, Trash2 } from "lucide-react";
 
 export default function WhitelistTab({ t, settings, setSettings, whitelistAddTab, setWhitelistAddTab, searchQuery, setSearchQuery, discordRoles, discordMembers, removeWhitelistId }) {
-  const filteredRoles = discordRoles.filter(r => r.name.toLowerCase().includes(searchQuery.toLowerCase()) && !settings.whitelist.includes(r.id));
-  const filteredMembers = discordMembers.filter(m => m.user.username.toLowerCase().includes(searchQuery.toLowerCase()) && !settings.whitelist.includes(m.user.id));
+  const safeWhitelist = Array.isArray(settings?.whitelist) ? settings.whitelist : [];
+  const safeSearch = (searchQuery || "").toLowerCase();
+
+  const filteredRoles = (discordRoles || []).filter(r => 
+    r?.name?.toLowerCase().includes(safeSearch) && !safeWhitelist.includes(r.id)
+  );
+  
+  const filteredMembers = (discordMembers || []).filter(m => 
+    m?.user?.username?.toLowerCase().includes(safeSearch) && !safeWhitelist.includes(m.user.id)
+  );
 
   const handleAdd = (id) => {
-    if (!settings.whitelist.includes(id)) {
-      setSettings(prev => ({ ...prev, whitelist: [...prev.whitelist, id] }));
+    if (!safeWhitelist.includes(id)) {
+      setSettings(prev => ({ ...prev, whitelist: [...(Array.isArray(prev.whitelist) ? prev.whitelist : []), id] }));
       setSearchQuery("");
     }
   };
 
   const getEntityInfo = (id) => {
-    const r = discordRoles.find(r => r.id === id);
+    const r = (discordRoles || []).find(r => r.id === id);
     if (r) return { name: `@${r.name}`, color: r.color ? `#${r.color.toString(16).padStart(6, '0')}` : '#fff', type: 'role' };
-    const m = discordMembers.find(m => m.user.id === id);
-    if (m) return { name: m.user.username, color: '#fff', type: 'user' };
+    const m = (discordMembers || []).find(m => m.user?.id === id);
+    if (m) return { name: m.user?.username || 'Unknown', color: '#fff', type: 'user' };
     return { name: `ID: ${id}`, color: '#888', type: 'unknown' };
   };
 
@@ -27,13 +35,13 @@ export default function WhitelistTab({ t, settings, setSettings, whitelistAddTab
         <h2 className="bentoTitle"><Users /> Active Whitelist</h2>
         <p className="hint" style={{ marginBottom: '1.5rem' }}>Users or roles listed here can use restricted commands like /createparty.</p>
 
-        {settings.whitelist.length === 0 ? (
+        {safeWhitelist.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '3rem 1rem', background: 'rgba(0,0,0,0.4)', borderRadius: '12px', color: '#666' }}>
             No whitelist entries. Everyone can use commands.
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '400px', overflowY: 'auto' }}>
-            {settings.whitelist.map(id => {
+            {safeWhitelist.map(id => {
               const info = getEntityInfo(id);
               return (
                 <div key={id} className="listItem">
