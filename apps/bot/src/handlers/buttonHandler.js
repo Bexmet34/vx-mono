@@ -535,10 +535,10 @@ async function handleRegisterButtons(interaction) {
             try {
                 const targetMember = await interaction.guild.members.fetch(targetUserId);
 
-                // Format Nickname: [TURQ]Ign - RealName Age
-                let prefix = '[NAN]';
+                // Format Nickname: [TURQ] Ign - RealName Age
+                let prefix = '[NAN] ';
                 if (guildName && guildName.length > 0) {
-                    prefix = `[${guildName.substring(0, 4).toUpperCase()}]`;
+                    prefix = `[${guildName.substring(0, 4).toUpperCase()}] `;
                 }
                 
                 // Fallback for IGN if not in field (old tickets)
@@ -548,10 +548,19 @@ async function handleRegisterButtons(interaction) {
                     if (titleMatch && titleMatch[1]) ign = titleMatch[1];
                 }
 
+                // Capitalize first letters function
+                const capitalize = (str) => {
+                    if (!str) return '';
+                    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+                };
+
+                const capIgn = capitalize(ign);
+                const capRealName = capitalize(realName);
+
                 // Protect against empty age or realName
                 const safeAge = age ? ` ${age}` : '';
-                const safeRealName = realName ? ` - ${realName}` : '';
-                const newNickname = `${prefix}${ign}${safeRealName}${safeAge}`.trim();
+                const safeRealName = capRealName ? ` - ${capRealName}` : '';
+                const newNickname = `${prefix}${capIgn}${safeRealName}${safeAge}`.trim();
 
                 // Assign role if configured
                 const givenRoleId = guildConfig?.registration_given_role_id;
