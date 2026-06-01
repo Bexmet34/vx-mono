@@ -257,6 +257,10 @@ async function handleRegisterModal(interaction) {
                 embed.addFields({ name: '📅 Yaş', value: age, inline: true });
             }
 
+            if (guildConfig?.embed_thumbnail_url) {
+                embed.setThumbnail(guildConfig.embed_thumbnail_url);
+            }
+
             const row = new ActionRowBuilder().addComponents(
                 new ButtonBuilder().setCustomId(`reg_approve_${interaction.user.id}`).setLabel(lang === 'tr' ? 'Onayla' : 'Approve').setStyle(ButtonStyle.Success),
                 new ButtonBuilder().setCustomId(`reg_reject_${interaction.user.id}`).setLabel(lang === 'tr' ? 'Reddet' : 'Reject').setStyle(ButtonStyle.Danger)
