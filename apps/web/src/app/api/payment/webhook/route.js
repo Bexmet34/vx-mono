@@ -85,15 +85,39 @@ export async function POST(req) {
       // Gün ekle
       currentExpiry.setDate(currentExpiry.getDate() + payment.duration_days);
 
+      const isUnlimited = payment.duration_days >= 90;
+
       await supabase
         .from('subscriptions')
         .update({ 
           expires_at: currentExpiry.toISOString(),
-          is_active: true
+          is_active: true,
+          is_unlimited: isUnlimited || subscription.is_unlimited
         })
         .eq('id', subscription.id);
 
       console.log(`[Cryptomus Webhook] Order ${order_id} processed. Guild ${payment.guild_id} extended by ${payment.duration_days} days.`);
+
+      // Send Discord notification to Support Server (1490798764427051088)
+      const botToken = process.env.DISCORD_BOT_TOKEN;
+      if (botToken) {
+         try {
+            const planName = payment.duration_days >= 365 ? '1 Yıllık Paket' : (payment.duration_days >= 90 ? '3 Aylık Paket' : (payment.duration_days >= 30 ? '1 Aylık Paket' : '7 Günlük Paket'));
+            await fetch('https://discord.com/api/v10/channels/1490798764427051088/messages', {
+               method: 'POST',
+               headers: {
+                  'Authorization': `Bot ${botToken}`,
+                  'Content-Type': 'application/json'
+               },
+               body: JSON.stringify({
+                  content: `🎉 <@${payment.user_id}>, **${subscription.guild_name || 'Sunucu'}** sunucusu için **${planName}** satın aldı! Bizi tercih ettiğiniz için teşekkür ederiz. Destek taleplerinize artık öncelikli olarak bakılacaktır.`
+               })
+            });
+         } catch(e) {
+            console.error("[Cryptomus Webhook] Discord notification error:", e);
+         }
+      }
+
       return NextResponse.json({ message: "Success" }, { status: 200 });
     }
 

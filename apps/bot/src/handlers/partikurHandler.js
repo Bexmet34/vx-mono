@@ -5,7 +5,7 @@ const { getGuildConfig } = require('../services/guildConfig');
 const { t } = require('../services/i18n');
 const config = require('../config/config');
 
-const { isSubscriptionActive } = require('@veyronix/database');
+const { isSubscriptionActive, getSubscription } = require('@veyronix/database');
 const { createPartikurEmbed, buildRolesFields, addFooterFields } = require('../builders/embedBuilder');
 const { createCustomPartyComponents } = require('../builders/componentBuilder');
 const db = require('../services/db');
@@ -49,8 +49,11 @@ async function handleCreatePartyCommand(interaction) {
     const isDeveloper = config.WHITELIST_USERS.includes(userId);
     const whitelisted = isOwner || isDeveloper || await isWhitelisted(userId, interaction.guildId);
 
+    const sub = await getSubscription(interaction.guildId, interaction.guild.name, interaction.guild.ownerId);
+    const isUnlimited = sub && sub.is_unlimited;
+
     const partyCount = getActivePartyCount(userId);
-    const limit = whitelisted ? 3 : 1;
+    const limit = isUnlimited ? 999 : (whitelisted ? 3 : 1);
 
     if (partyCount >= limit) {
         let errorMsg = whitelisted
@@ -140,8 +143,11 @@ async function handleTempCommand(interaction) {
     const isDeveloper = config.WHITELIST_USERS?.includes(userId);
     const whitelisted = isOwner || isDeveloper || await isWhitelisted(userId, interaction.guildId);
 
+    const sub = await getSubscription(interaction.guildId, interaction.guild.name, interaction.guild.ownerId);
+    const isUnlimited = sub && sub.is_unlimited;
+
     const partyCount = getActivePartyCount(userId);
-    const limit = whitelisted ? 3 : 1;
+    const limit = isUnlimited ? 999 : (whitelisted ? 3 : 1);
 
     if (partyCount >= limit) {
         let errorMsg = whitelisted
