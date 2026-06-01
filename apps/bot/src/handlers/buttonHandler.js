@@ -57,154 +57,7 @@ async function handlePartyButtons(interaction) {
 
 
 
-    // Registration System: Open Modal
-    if (customId === 'register_btn') {
-        const modal = new ModalBuilder()
-            .setCustomId('register_modal')
-            .setTitle(lang === 'en' ? 'Registration' : 'Kayıt Sistemi');
 
-        const realNameInput = new TextInputBuilder()
-            .setCustomId('real_name')
-            .setLabel(lang === 'en' ? 'Your Real Name' : 'Gerçek İsminiz')
-            .setStyle(TextInputStyle.Short)
-            .setRequired(true)
-            .setMinLength(2)
-            .setMaxLength(30);
-
-        const inGameNameInput = new TextInputBuilder()
-            .setCustomId('ingame_name')
-            .setLabel(lang === 'en' ? 'Albion In-Game Nickname' : 'Albion Oyun İçi Nickiniz')
-            .setStyle(TextInputStyle.Short)
-            .setRequired(true)
-            .setMinLength(3)
-            .setMaxLength(30);
-
-        const ageInput = new TextInputBuilder()
-            .setCustomId('age')
-            .setLabel(lang === 'en' ? 'Your Age' : 'Yaşınız')
-            .setStyle(TextInputStyle.Short)
-            .setRequired(true)
-            .setMinLength(1)
-            .setMaxLength(2);
-
-        modal.addComponents(
-            new ActionRowBuilder().addComponents(realNameInput),
-            new ActionRowBuilder().addComponents(inGameNameInput),
-            new ActionRowBuilder().addComponents(ageInput)
-        );
-
-        return await interaction.showModal(modal);
-    }
-
-    // Registration System: Approve/Reject Actions
-    if (customId.startsWith('reg_approve_') || customId.startsWith('reg_reject_')) {
-        const action = customId.startsWith('reg_approve_') ? 'approve' : 'reject';
-        const targetUserId = customId.split('_')[2];
-
-        // 1. Fetch the ticket's embed to get details
-        const embed = message.embeds[0];
-        if (!embed) return interaction.reply({ content: '❌ Hata: Kayıt bilgileri bulunamadı.', flags: [MessageFlags.Ephemeral] });
-
-        let realName = '';
-        let ign = '';
-        let age = '';
-        let guildName = '';
-
-        // Extract from embed fields
-        embed.fields.forEach(field => {
-            if (field.name.includes('Gerçek İsim')) realName = field.value;
-            if (field.name.includes('Yaş')) age = field.value;
-            if (field.name.includes('Oyun İçi Nick')) ign = field.value;
-            
-            // Extract Guild from the "Diğer" / "Others" field
-            if (field.name.includes('Diğer') || field.name.includes('Others')) {
-                const match = field.value.match(/\*\*Guild:\*\* `([^`]+)`/);
-                if (match && match[1] && match[1] !== '-' && match[1] !== 'No Guild') {
-                    guildName = match[1];
-                }
-            }
-        });
-
-        // Fallback for guildName from Title if not found in fields
-        if (!guildName && embed.title) {
-            const titleMatch = embed.title.match(/\[(.*?)\]/);
-            if (titleMatch && titleMatch[1] && titleMatch[1] !== 'No Guild') {
-                guildName = titleMatch[1];
-            }
-        }
-
-        if (action === 'reject') {
-            await interaction.reply({ content: `✅ Kayıt reddedildi ve kanal siliniyor...` });
-            setTimeout(() => interaction.channel.delete().catch(() => {}), 3000);
-            return;
-        }
-
-        if (action === 'approve') {
-            await interaction.deferReply();
-            
-            try {
-                const targetMember = await interaction.guild.members.fetch(targetUserId);
-
-                // Format Nickname: [TURQ]Ign - RealName Age
-                let prefix = '[NAN]';
-                if (guildName && guildName.length > 0) {
-                    prefix = `[${guildName.substring(0, 4).toUpperCase()}]`;
-                }
-                
-                // Fallback for IGN if not in field (old tickets)
-                if (!ign && embed.author?.name) ign = embed.author.name;
-                if (!ign && embed.title) {
-                    const titleMatch = embed.title.match(/🛡️ (.*?) \[/);
-                    if (titleMatch && titleMatch[1]) ign = titleMatch[1];
-                }
-
-                // Protect against empty age or realName
-                const safeAge = age ? ` ${age}` : '';
-                const safeRealName = realName ? ` - ${realName}` : '';
-                const newNickname = `${prefix}${ign}${safeRealName}${safeAge}`.trim();
-
-                // Assign role if configured
-                const givenRoleId = guildConfig?.registration_given_role_id;
-                let roleStatus = '';
-                if (givenRoleId) {
-                    try {
-                        await targetMember.roles.add(givenRoleId);
-                        roleStatus = `\n✅ **Rol Verildi:** <@&${givenRoleId}>`;
-                    } catch (e) {
-                        console.error('Role add error:', e);
-                        roleStatus = `\n⚠️ **Rol Verilemedi:** Botun yetkisi bu rolü vermeye yetmiyor olabilir. (Rolü botun rolünün altına taşıyın)`;
-                    }
-                }
-
-                // Change nickname
-                let nickStatus = '';
-                if (interaction.guild.ownerId !== targetUserId) {
-                    try {
-                        await targetMember.setNickname(newNickname);
-                        nickStatus = `\n✅ **Yeni İsim:** ${newNickname}`;
-                    } catch (e) {
-                        console.error('Nickname error:', e);
-                        nickStatus = `\n⚠️ **İsim Değiştirilemedi:** Botun yetkisi bu kişinin ismini değiştirmeye yetmiyor. (Kullanıcının rolü botun rolünden yüksek olabilir)`;
-                    }
-                } else {
-                    nickStatus = `\nℹ️ Sunucu sahibinin ismi bot tarafından değiştirilemez.`;
-                }
-
-                await interaction.editReply({ content: `✅ <@${targetUserId}> adlı kullanıcının kaydı onaylandı!${nickStatus}${roleStatus}` });
-                
-                // Remove the buttons so it can't be clicked again
-                const disabledRow = new ActionRowBuilder().addComponents(
-                    new ButtonBuilder().setCustomId('approved_btn').setLabel('Onaylandı').setStyle(ButtonStyle.Success).setDisabled(true)
-                );
-                await message.edit({ components: [disabledRow] }).catch(() => {});
-
-            } catch (err) {
-                console.error('[RegApprove Error]', err);
-                await interaction.editReply({ content: `❌ Bir hata oluştu: ${err.message}` });
-            }
-        }
-        return;
-    }
 
     if (customId.startsWith('close_party_')) {
         const ownerId = customId.split('_')[2];
@@ -582,30 +435,51 @@ async function handleRegisterButtons(interaction) {
     const customId = interaction.customId;
     const guildConfig = await getGuildConfig(interaction.guildId);
     const lang = guildConfig?.language || 'tr';
+    const message = interaction.message;
 
     // 1. User clicks "Register" button in welcome channel
-    if (customId === 'register_start') {
+    if (customId === 'register_start' || customId === 'register_btn') {
         const modal = new ModalBuilder()
             .setCustomId('register_modal')
-            .setTitle(lang === 'tr' ? 'Albion Kayıt Sistemi' : 'Albion Registration');
+            .setTitle(lang === 'en' ? 'Registration' : 'Kayıt Sistemi');
 
-        const ignInput = new TextInputBuilder()
-            .setCustomId('register_ign')
-            .setLabel(lang === 'tr' ? 'Oyun İçi Adınız (IGN)' : 'In-Game Name (IGN)')
-            .setPlaceholder('Örn: Art0rius, Bexmet...')
+        const realNameInput = new TextInputBuilder()
+            .setCustomId('real_name')
+            .setLabel(lang === 'en' ? 'Your Real Name' : 'Gerçek İsminiz')
             .setStyle(TextInputStyle.Short)
-            .setMinLength(3)
-            .setMaxLength(30)
-            .setRequired(true);
+            .setRequired(true)
+            .setMinLength(2)
+            .setMaxLength(30);
 
-        modal.addComponents(new ActionRowBuilder().addComponents(ignInput));
+        const inGameNameInput = new TextInputBuilder()
+            .setCustomId('ingame_name')
+            .setLabel(lang === 'en' ? 'Albion In-Game Nickname' : 'Albion Oyun İçi Nickiniz')
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true)
+            .setMinLength(3)
+            .setMaxLength(30);
+
+        const ageInput = new TextInputBuilder()
+            .setCustomId('age')
+            .setLabel(lang === 'en' ? 'Your Age' : 'Yaşınız')
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true)
+            .setMinLength(1)
+            .setMaxLength(2);
+
+        modal.addComponents(
+            new ActionRowBuilder().addComponents(realNameInput),
+            new ActionRowBuilder().addComponents(inGameNameInput),
+            new ActionRowBuilder().addComponents(ageInput)
+        );
+
         return await interaction.showModal(modal);
     }
 
     // 2. Staff clicks "Approve" or "Reject"
     if (customId.startsWith('reg_approve_') || customId.startsWith('reg_reject_')) {
         const action = customId.startsWith('reg_approve_') ? 'approve' : 'reject';
-        const applicantId = customId.split('_')[2];
+        const targetUserId = customId.split('_')[2];
         const staffRoles = guildConfig?.registration_staff_role_ids?.split(',') || [];
         
         const isStaff = interaction.member.roles.cache.some(r => staffRoles.includes(r.id)) || interaction.member.permissions.has('Administrator');
@@ -617,13 +491,111 @@ async function handleRegisterButtons(interaction) {
             });
         }
 
-        if (action === 'approve') {
-            await interaction.reply({ content: lang === 'tr' ? '✅ Başvuru onaylandı! Kanal 5 saniye içinde kapatılacak.' : '✅ Application approved! Channel will close in 5 seconds.' });
-        } else {
-            await interaction.reply({ content: lang === 'tr' ? '❌ Başvuru reddedildi! Kanal 5 saniye içinde kapatılacak.' : '❌ Application rejected! Channel will close in 5 seconds.' });
+        // Fetch the ticket's embed to get details
+        const embed = message.embeds[0];
+        if (!embed) return interaction.reply({ content: '❌ Hata: Kayıt bilgileri bulunamadı.', flags: [MessageFlags.Ephemeral] });
+
+        let realName = '';
+        let ign = '';
+        let age = '';
+        let guildName = '';
+
+        // Extract from embed fields
+        embed.fields.forEach(field => {
+            if (field.name.includes('Gerçek İsim')) realName = field.value;
+            if (field.name.includes('Yaş')) age = field.value;
+            if (field.name.includes('Oyun İçi Nick')) ign = field.value;
+            
+            // Extract Guild from the "Diğer" / "Others" field
+            if (field.name.includes('Diğer') || field.name.includes('Others')) {
+                const match = field.value.match(/\*\*Guild:\*\* `([^`]+)`/);
+                if (match && match[1] && match[1] !== '-' && match[1] !== 'No Guild') {
+                    guildName = match[1];
+                }
+            }
+        });
+
+        // Fallback for guildName from Title if not found in fields
+        if (!guildName && embed.title) {
+            const titleMatch = embed.title.match(/\[(.*?)\]/);
+            if (titleMatch && titleMatch[1] && titleMatch[1] !== 'No Guild') {
+                guildName = titleMatch[1];
+            }
         }
 
-        setTimeout(() => interaction.channel.delete().catch(() => {}), 5000);
+        if (action === 'reject') {
+            await interaction.reply({ content: `✅ Kayıt reddedildi ve kanal siliniyor...` });
+            setTimeout(() => interaction.channel.delete().catch(() => {}), 3000);
+            return;
+        }
+
+        if (action === 'approve') {
+            await interaction.deferReply();
+            
+            try {
+                const targetMember = await interaction.guild.members.fetch(targetUserId);
+
+                // Format Nickname: [TURQ]Ign - RealName Age
+                let prefix = '[NAN]';
+                if (guildName && guildName.length > 0) {
+                    prefix = `[${guildName.substring(0, 4).toUpperCase()}]`;
+                }
+                
+                // Fallback for IGN if not in field (old tickets)
+                if (!ign && embed.author?.name) ign = embed.author.name;
+                if (!ign && embed.title) {
+                    const titleMatch = embed.title.match(/🛡️ (.*?) \[/);
+                    if (titleMatch && titleMatch[1]) ign = titleMatch[1];
+                }
+
+                // Protect against empty age or realName
+                const safeAge = age ? ` ${age}` : '';
+                const safeRealName = realName ? ` - ${realName}` : '';
+                const newNickname = `${prefix}${ign}${safeRealName}${safeAge}`.trim();
+
+                // Assign role if configured
+                const givenRoleId = guildConfig?.registration_given_role_id;
+                let roleStatus = '';
+                if (givenRoleId) {
+                    try {
+                        await targetMember.roles.add(givenRoleId);
+                        roleStatus = `\n✅ **Rol Verildi:** <@&${givenRoleId}>`;
+                    } catch (e) {
+                        console.error('Role add error:', e);
+                        roleStatus = `\n⚠️ **Rol Verilemedi:** Botun yetkisi bu rolü vermeye yetmiyor olabilir. (Rolü botun rolünün altına taşıyın)`;
+                    }
+                }
+
+                // Change nickname
+                let nickStatus = '';
+                if (interaction.guild.ownerId !== targetUserId) {
+                    try {
+                        await targetMember.setNickname(newNickname);
+                        nickStatus = `\n✅ **Yeni İsim:** ${newNickname}`;
+                    } catch (e) {
+                        console.error('Nickname error:', e);
+                        nickStatus = `\n⚠️ **İsim Değiştirilemedi:** Botun yetkisi bu kişinin ismini değiştirmeye yetmiyor. (Kullanıcının rolü botun rolünden yüksek olabilir)`;
+                    }
+                } else {
+                    nickStatus = `\nℹ️ Sunucu sahibinin ismi bot tarafından değiştirilemez.`;
+                }
+
+                await interaction.editReply({ content: `✅ <@${targetUserId}> adlı kullanıcının kaydı onaylandı!${nickStatus}${roleStatus}\n\nKanal 5 saniye içinde kapatılacak.` });
+                
+                // Remove the buttons so it can't be clicked again
+                const disabledRow = new ActionRowBuilder().addComponents(
+                    new ButtonBuilder().setCustomId('approved_btn').setLabel('Onaylandı').setStyle(ButtonStyle.Success).setDisabled(true)
+                );
+                await message.edit({ components: [disabledRow] }).catch(() => {});
+
+                setTimeout(() => interaction.channel.delete().catch(() => {}), 5000);
+
+            } catch (err) {
+                console.error('[RegApprove Error]', err);
+                await interaction.editReply({ content: `❌ Bir hata oluştu: ${err.message}` });
+            }
+        }
+        return;
     }
 }
 

@@ -95,6 +95,7 @@ export default function ServerSettings() {
             registration_staff_role_ids: s.registration_staff_role_ids || "",
             registration_category_id: s.registration_category_id || "",
             registration_welcome_message: s.registration_welcome_message || "",
+            registration_given_role_id: s.registration_given_role_id || "",
           });
           if (s.embed_thumbnail_url) {
              const img = new Image();
