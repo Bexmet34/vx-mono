@@ -35,13 +35,23 @@ export async function GET(req, { params }) {
 
         const BASE = 'https://gameinfo-ams.albiononline.com/api/gameinfo';
 
-        // Fetch kills (guild members as killers) and deaths (guild members as victims)
-        const [killEvents, deathEvents] = await Promise.all([
-            fetchAlbion(`${BASE}/guilds/${albionGuildId}/kills?offset=0&limit=51`),
-            fetchAlbion(`${BASE}/guilds/${albionGuildId}/deaths?offset=0&limit=51`)
-        ]);
+        // Fetch recent events for the guild
+        const events = await fetchAlbion(`${BASE}/events?offset=0&limit=51&guildId=${albionGuildId}`);
 
-        console.log(`[KillBoard Preview] ${albionGuildId}: ${killEvents.length} kills, ${deathEvents.length} deaths`);
+        // Separate into kills and deaths
+        const killEvents = [];
+        const deathEvents = [];
+
+        for (const ev of events) {
+            if (ev.Killer?.GuildId === albionGuildId) {
+                killEvents.push(ev);
+            }
+            if (ev.Victim?.GuildId === albionGuildId) {
+                deathEvents.push(ev);
+            }
+        }
+
+        console.log(`[KillBoard Preview] ${albionGuildId}: ${killEvents.length} kills, ${deathEvents.length} deaths from ${events.length} events`);
 
         // Top killers: aggregate by killer name
         const killerMap = {};
