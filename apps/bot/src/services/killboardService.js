@@ -172,16 +172,18 @@ async function sendKillBoardSummary(client, guildCfg) {
             .setFooter({ text: 'Veyronix KillBoard Sistemi', iconURL: client.user.displayAvatarURL() });
 
         // Top killers list
+        const medals = ['🥇', '🥈', '🥉', '🏅', '🏅', '🏅', '🏅', '🏅', '🏅', '🏅'];
         if (topKillers.length > 0) {
-            const medals = ['🥇', '🥈', '🥉', '🏅', '🏅', '🏅', '🏅', '🏅', '🏅', '🏅'];
-            const killerText = topKillers
-                .map((k, i) => `${medals[i]} [**${k.Name}**](https://albiononline.com/en/killboard/player/${k.Id}) — \`${k.Kills}\` kill | \`${(k.KillFame / 1000000).toFixed(2)}M\` fame`)
-                .join('\n');
-            embed.addFields({
-                name: '⚔️ En Çok Kill Alanlar',
-                value: killerText,
-                inline: false
-            });
+            const firstHalf = topKillers.slice(0, 5);
+            const secondHalf = topKillers.slice(5, 10);
+            
+            const killerText1 = firstHalf.map((k, i) => `${medals[i]} [**${k.Name}**](https://albiononline.com/en/killboard/player/${k.Id}) — \`${k.Kills}\` kill | \`${(k.KillFame / 1000000).toFixed(2)}M\` fame`).join('\n');
+            embed.addFields({ name: '⚔️ En Çok Kill Alanlar (İlk 5)', value: killerText1, inline: false });
+            
+            if (secondHalf.length > 0) {
+                const killerText2 = secondHalf.map((k, i) => `${medals[i+5]} [**${k.Name}**](https://albiononline.com/en/killboard/player/${k.Id}) — \`${k.Kills}\` kill | \`${(k.KillFame / 1000000).toFixed(2)}M\` fame`).join('\n');
+                embed.addFields({ name: '⚔️ En Çok Kill Alanlar (6-10)', value: killerText2, inline: false });
+            }
         }
 
         // Top deaths list
@@ -193,16 +195,18 @@ async function sendKillBoardSummary(client, guildCfg) {
                 'Bugün de bedava eşya dağıtarak hayır işledi.',
                 'Ekranı gri görmekten gözleri bozuldu.'
             ];
-            const medals = ['🥇', '🥈', '🥉', '🏅', '🏅', '🏅', '🏅', '🏅', '🏅', '🏅'];
-            const deathText = topDeaths
-                .map((d, i) => `${medals[i]} [**${d.Name}**](https://albiononline.com/en/killboard/player/${d.Id}) — \`${d.Deaths}\` ölüm | \`${(d.DeathFame / 1000000).toFixed(2)}M\` kayıp fame`)
-                .join('\n');
+            
+            const firstHalf = topDeaths.slice(0, 5);
+            const secondHalf = topDeaths.slice(5, 10);
             const randomJoke = jokes[Math.floor(Math.random() * jokes.length)];
-            embed.addFields({
-                name: '💀 Morgun Daimi Müşterileri',
-                value: `${deathText}\n\n*"${randomJoke}"*`,
-                inline: false
-            });
+
+            const deathText1 = firstHalf.map((d, i) => `${medals[i]} [**${d.Name}**](https://albiononline.com/en/killboard/player/${d.Id}) — \`${d.Deaths}\` ölüm | \`${(d.DeathFame / 1000000).toFixed(2)}M\` kayıp fame`).join('\n');
+            embed.addFields({ name: '💀 Morgun Daimi Müşterileri (İlk 5)', value: `${deathText1}${secondHalf.length === 0 ? `\n\n*"${randomJoke}"*` : ''}`, inline: false });
+
+            if (secondHalf.length > 0) {
+                const deathText2 = secondHalf.map((d, i) => `${medals[i+5]} [**${d.Name}**](https://albiononline.com/en/killboard/player/${d.Id}) — \`${d.Deaths}\` ölüm | \`${(d.DeathFame / 1000000).toFixed(2)}M\` kayıp fame`).join('\n');
+                embed.addFields({ name: '💀 Morgun Daimi Müşterileri (6-10)', value: `${deathText2}\n\n*"${randomJoke}"*`, inline: false });
+            }
         }
 
         // Top fame kill
