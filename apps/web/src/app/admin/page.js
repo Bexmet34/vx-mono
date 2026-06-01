@@ -7,7 +7,7 @@ import {
   Save, Bell, Loader2, AlertCircle, CheckCircle,
   LayoutDashboard, Server, MessageSquare, Settings, 
   Users, BarChart3, Search, Clock, Infinity, Power, 
-  Calendar, Trash2, ChevronRight, ArrowLeft, Gift, Plus, Send, Edit3, Eye, EyeOff
+  Calendar, Trash2, ChevronRight, ArrowLeft, Gift, Plus, Send, Edit3, Eye, EyeOff, DollarSign, Check, X
 } from "lucide-react";
 import { useCallback } from "react";
 import { format } from "date-fns";
@@ -54,6 +54,14 @@ export default function AdminPage() {
     buttons: []
   });
 
+  // Plans States
+  const [plans, setPlans] = useState([]);
+  const [showPlanModal, setShowPlanModal] = useState(false);
+  const [editingPlanId, setEditingPlanId] = useState(null);
+  const [newPlan, setNewPlan] = useState({
+    id: "", name_tr: "", name_en: "", amount: "", duration_days: 30, is_active: true, is_featured: false, sort_order: 0, features_tr: [], features_en: []
+  });
+
   const isAdmin = session?.user?.id === ADMIN_ID || session?.user?.id === "407234961582587916";
 
   const fetchTemplates = useCallback(async () => {
@@ -96,6 +104,16 @@ export default function AdminPage() {
     finally { setLoading(false); }
   }, []);
 
+  const fetchPlans = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/admin/plans");
+      const data = await res.json();
+      if (res.ok) setPlans(data);
+    } catch (err) { console.error(err); }
+    finally { setLoading(false); }
+  }, []);
+
   // Auth Check
   useEffect(() => {
     if (status === "unauthenticated" || (status === "authenticated" && !isAdmin)) {
@@ -111,9 +129,10 @@ export default function AdminPage() {
         if (activeTab === "servers") fetchServers();
         if (activeTab === "campaigns") fetchCampaigns();
         if (activeTab === "broadcast") fetchScheduledMessages();
+        if (activeTab === "plans") fetchPlans();
       }, 0);
     }
-  }, [status, isAdmin, activeTab, fetchTemplates, fetchServers, fetchCampaigns, fetchScheduledMessages]);
+  }, [status, isAdmin, activeTab, fetchTemplates, fetchServers, fetchCampaigns, fetchScheduledMessages, fetchPlans]);
 
 
   const handleCreateCampaign = async () => {
@@ -161,6 +180,39 @@ export default function AdminPage() {
       if (res.ok) {
         showToast("Mesaj silindi", "success");
         fetchScheduledMessages();
+      }
+    } catch (err) { showToast(err.message, "error"); }
+  };
+
+  const handleSavePlan = async () => {
+    setLoading(true);
+    try {
+      const method = editingPlanId ? "PATCH" : "POST";
+      const res = await fetch("/api/admin/plans", {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newPlan),
+      });
+      if (res.ok) {
+        showToast(`Paket başarıyla ${editingPlanId ? 'güncellendi' : 'eklendi'}!`, "success");
+        setShowPlanModal(false);
+        setEditingPlanId(null);
+        fetchPlans();
+      } else {
+        const data = await res.json();
+        showToast(data.error || "Hata oluştu", "error");
+      }
+    } catch (err) { showToast(err.message, "error"); }
+    finally { setLoading(false); }
+  };
+
+  const handleDeletePlan = async (id) => {
+    if (!confirm('Bu paketi silmek istediğinize emin misiniz?')) return;
+    try {
+      const res = await fetch(`/api/admin/plans?id=${id}`, { method: "DELETE" });
+      if (res.ok) {
+        showToast("Paket silindi", "success");
+        fetchPlans();
       }
     } catch (err) { showToast(err.message, "error"); }
   };
@@ -252,6 +304,7 @@ export default function AdminPage() {
   const menuItems = [
     { id: "overview", label: "Genel Bakış", icon: <LayoutDashboard size={20} /> },
     { id: "servers", label: "Sunucu Yönetimi", icon: <Server size={20} /> },
+    { id: "plans", label: "Paket Yönetimi", icon: <DollarSign size={20} /> },
     { id: "campaigns", label: "Kampanya & Hediye", icon: <Gift size={20} /> },
     { id: "notifications", label: "Bildirim Şablonları", icon: <Bell size={20} /> },
     { id: "broadcast", label: "Duyuru Merkezi", icon: <MessageSquare size={20} /> },
@@ -495,6 +548,158 @@ export default function AdminPage() {
                   </table>
                 </div>
               </>
+            )}
+
+            {/* PLANS TAB */}
+            {activeTab === "plans" && (
+              <div className="animate-slide-up">
+                {!showPlanModal ? (
+                  <>
+                    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem'}}>
+                       <div>
+                          <h2 style={{fontSize: '1.5rem', fontWeight: '800'}}>Paket Yönetimi</h2>
+                          <p style={{color: 'var(--admin-text-muted)'}}>Sistemdeki fiyatlandırma paketlerini ve özelliklerini düzenleyin.</p>
+                       </div>
+                       <button className="btn-primary" onClick={() => {
+                         setEditingPlanId(null);
+                         setNewPlan({id: "", name_tr: "", name_en: "", amount: "", duration_days: 30, is_active: true, is_featured: false, sort_order: 0, features_tr: [], features_en: []});
+                         setShowPlanModal(true);
+                       }} style={{padding: '0.8rem 1.5rem', borderRadius: '12px'}}>
+                          <Plus size={20} /> Yeni Paket Ekle
+                       </button>
+                    </div>
+
+                    <div className="admin-card">
+                      <table className="admin-table">
+                        <thead>
+                          <tr>
+                            <th>PAKET ADI / ID</th>
+                            <th>FİYAT</th>
+                            <th>SÜRE</th>
+                            <th>DURUM</th>
+                            <th style={{textAlign: "right"}}>İŞLEMLER</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {plans.length === 0 ? (
+                            <tr><td colSpan={5} style={{textAlign: 'center', padding: '4rem', opacity: 0.5}}>Henüz paket bulunmuyor.</td></tr>
+                          ) : plans.map(p => (
+                            <tr key={p.id}>
+                              <td>
+                                <div style={{fontWeight: '700', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+                                  {p.name_tr}
+                                  {p.is_featured && <span className="admin-badge badge-unlimited" style={{fontSize: '0.65rem', padding: '0.1rem 0.4rem'}}>Öne Çıkan</span>}
+                                </div>
+                                <code style={{fontSize: '0.8rem', color: 'var(--admin-text-muted)'}}>{p.id}</code>
+                              </td>
+                              <td>
+                                <div style={{fontWeight: '600', color: 'var(--admin-accent)'}}>{p.amount} {p.currency}</div>
+                              </td>
+                              <td>
+                                <div style={{fontSize: '0.9rem', fontWeight: '500'}}>{p.duration_days} Gün</div>
+                              </td>
+                              <td>
+                                {p.is_active ? (
+                                  <span className="admin-badge badge-active">Aktif</span>
+                                ) : (
+                                  <span className="admin-badge badge-passive">Pasif</span>
+                                )}
+                              </td>
+                              <td>
+                                <div style={{display: 'flex', gap: '0.5rem', justifyContent: 'flex-end'}}>
+                                   <button className="admin-action-btn" onClick={() => {
+                                     setEditingPlanId(p.id);
+                                     setNewPlan({...p});
+                                     setShowPlanModal(true);
+                                   }}>
+                                      <Edit3 size={18} />
+                                   </button>
+                                   <button className="admin-action-btn danger" onClick={() => handleDeletePlan(p.id)}>
+                                      <Trash2 size={18} />
+                                   </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div style={{display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem'}}>
+                       <button className="admin-action-btn" onClick={() => setShowPlanModal(false)} style={{padding: '0.5rem'}}>
+                          <ArrowLeft size={20} />
+                       </button>
+                       <div>
+                          <h2 style={{fontSize: '1.5rem', fontWeight: '800'}}>{editingPlanId ? 'Paketi Düzenle' : 'Yeni Paket Ekle'}</h2>
+                          <p style={{color: 'var(--admin-text-muted)'}}>Paket detaylarını ve kullanıcıların göreceği özellikleri belirleyin.</p>
+                       </div>
+                    </div>
+
+                    <div className="admin-card" style={{padding: '2.5rem'}}>
+                      <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1.5rem', marginBottom: '2rem'}}>
+                         <div>
+                            <label className="admin-label">Paket ID (Örn: 1_month)</label>
+                            <input className="admin-input-field" value={newPlan.id} disabled={!!editingPlanId} onChange={e => setNewPlan({...newPlan, id: e.target.value})} />
+                         </div>
+                         <div>
+                            <label className="admin-label">Fiyat (USDT)</label>
+                            <input className="admin-input-field" type="number" step="0.01" value={newPlan.amount} onChange={e => setNewPlan({...newPlan, amount: e.target.value})} />
+                         </div>
+                         <div>
+                            <label className="admin-label">Süre (Gün)</label>
+                            <input className="admin-input-field" type="number" value={newPlan.duration_days} onChange={e => setNewPlan({...newPlan, duration_days: parseInt(e.target.value)})} />
+                         </div>
+                      </div>
+
+                      <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '2rem'}}>
+                         <div>
+                            <label className="admin-label">Paket Adı (TR)</label>
+                            <input className="admin-input-field" value={newPlan.name_tr} onChange={e => setNewPlan({...newPlan, name_tr: e.target.value})} />
+                         </div>
+                         <div>
+                            <label className="admin-label">Paket Adı (EN)</label>
+                            <input className="admin-input-field" value={newPlan.name_en} onChange={e => setNewPlan({...newPlan, name_en: e.target.value})} />
+                         </div>
+                      </div>
+                      
+                      <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '2.5rem'}}>
+                         <div>
+                            <label className="admin-label">Özellikler (TR - Virgülle ayırın)</label>
+                            <textarea className="admin-input-field" style={{height: '100px', resize: 'none'}} value={newPlan.features_tr.join('\n')} onChange={e => setNewPlan({...newPlan, features_tr: e.target.value.split('\n').filter(x=>x.trim()!=='')})} placeholder="Gelişmiş Parti Sistemi&#10;Sınırsız Kullanım" />
+                         </div>
+                         <div>
+                            <label className="admin-label">Özellikler (EN - Virgülle ayırın)</label>
+                            <textarea className="admin-input-field" style={{height: '100px', resize: 'none'}} value={newPlan.features_en.join('\n')} onChange={e => setNewPlan({...newPlan, features_en: e.target.value.split('\n').filter(x=>x.trim()!=='')})} placeholder="Advanced Party System&#10;Unlimited Usage" />
+                         </div>
+                      </div>
+
+                      <div style={{display: 'flex', gap: '2rem', marginBottom: '3rem', padding: '1.5rem', background: 'rgba(0,0,0,0.2)', borderRadius: '12px'}}>
+                         <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+                            <input type="checkbox" id="isActive" checked={newPlan.is_active} onChange={e => setNewPlan({...newPlan, is_active: e.target.checked})} style={{width: '20px', height: '20px', accentColor: 'var(--admin-accent)'}} />
+                            <label htmlFor="isActive" style={{fontWeight: '600', cursor: 'pointer'}}>Aktif (Satışta)</label>
+                         </div>
+                         <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+                            <input type="checkbox" id="isFeatured" checked={newPlan.is_featured} onChange={e => setNewPlan({...newPlan, is_featured: e.target.checked})} style={{width: '20px', height: '20px', accentColor: 'var(--admin-accent)'}} />
+                            <label htmlFor="isFeatured" style={{fontWeight: '600', cursor: 'pointer'}}>Öne Çıkan (Best Seller)</label>
+                         </div>
+                         <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem', marginLeft: 'auto'}}>
+                            <label className="admin-label" style={{margin: 0}}>Sıralama:</label>
+                            <input type="number" className="admin-input-field" style={{width: '80px', padding: '0.4rem'}} value={newPlan.sort_order} onChange={e => setNewPlan({...newPlan, sort_order: parseInt(e.target.value)})} />
+                         </div>
+                      </div>
+
+                      <div style={{display: 'flex', gap: '1rem'}}>
+                        <button className="admin-btn-secondary" style={{width: '200px'}} onClick={() => setShowPlanModal(false)}>İptal</button>
+                        <button className="btn-primary" style={{width: '250px', padding: '1rem'}} onClick={handleSavePlan} disabled={loading || !newPlan.id || !newPlan.amount}>
+                          {loading ? <Loader2 size={20} className="spin" /> : <><Save size={20}/> {editingPlanId ? 'Değişiklikleri Kaydet' : 'Paketi Oluştur'}</>}
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
             )}
 
             {/* NOTIFICATION TEMPLATES TAB */}

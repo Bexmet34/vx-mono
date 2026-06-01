@@ -14,6 +14,8 @@ export default function Home() {
   const [gifs, setGifs] = useState([]);
   const [serverCount, setServerCount] = useState(0);
   const [activeCampaigns, setActiveCampaigns] = useState([]);
+  const [plans, setPlans] = useState([]);
+  const [loadingPlans, setLoadingPlans] = useState(true);
   
   // Checkout Modal States
   const [showCheckout, setShowCheckout] = useState(false);
@@ -85,6 +87,17 @@ export default function Home() {
       .then(res => res.json())
       .then(data => setActiveCampaigns(data.filter(c => c.show_on_home)))
       .catch(console.error);
+
+    fetch('/api/plans')
+      .then(res => res.json())
+      .then(data => {
+        setPlans(data);
+        setLoadingPlans(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setLoadingPlans(false);
+      });
   }, []);
 
   const renderGif = (cmdName) => {
@@ -188,67 +201,34 @@ export default function Home() {
           </div>
 
           <div className={styles.pricingGrid}>
-            {/* 7 Days */}
-            <div className={`${styles.pricingCard} glass-panel`}>
-              <h3 className={styles.priceTitle}>{t.sevenDays}</h3>
-              <div className={styles.priceValue}>1.00 <span>USDT</span></div>
-              <ul className={styles.featureList}>
-                <li className={styles.featureItem}><Sword size={18} className={styles.checkIcon} /> {t.featParty}</li>
-                <li className={styles.featureItem}><Command size={18} className={styles.checkIcon} /> {t.featLimit}</li>
-                <li className={styles.featureItem}><Users size={18} className={styles.checkIcon} /> {t.featDash}</li>
-                <li className={styles.featureItem}><Shield size={18} className={styles.checkIcon} /> {t.featSupport}</li>
-              </ul>
-              <button className="btn-primary" style={{ width: '100%', marginTop: 'auto' }} onClick={() => handleBuyClick('7_days')}>
-                {t.buyNow}
-              </button>
-            </div>
-
-            {/* 1 Month */}
-            <div className={`${styles.pricingCard} glass-panel`}>
-              <h3 className={styles.priceTitle}>{t.oneMonth}</h3>
-              <div className={styles.priceValue}>3.00 <span>USDT</span></div>
-              <ul className={styles.featureList}>
-                <li className={styles.featureItem}><Sword size={18} className={styles.checkIcon} /> {t.featParty}</li>
-                <li className={styles.featureItem}><Command size={18} className={styles.checkIcon} /> {t.featLimit}</li>
-                <li className={styles.featureItem}><Users size={18} className={styles.checkIcon} /> {t.featDash}</li>
-                <li className={styles.featureItem}><Shield size={18} className={styles.checkIcon} /> {t.featSupport}</li>
-              </ul>
-              <button className="btn-primary" style={{ width: '100%', marginTop: 'auto' }} onClick={() => handleBuyClick('1_month')}>
-                {t.buyNow}
-              </button>
-            </div>
-
-            {/* 3 Months - BEST SELLER */}
-            <div className={`${styles.pricingCard} ${styles.featured} glass-panel`}>
-              <div className={styles.bestSellerBadge}>{t.bestSeller}</div>
-              <h3 className={styles.priceTitle}>{t.threeMonths}</h3>
-              <div className={styles.priceValue}>8.00 <span>USDT</span></div>
-              <ul className={styles.featureList}>
-                <li className={styles.featureItem}><Sword size={18} className={styles.checkIcon} /> {t.featParty}</li>
-                <li className={styles.featureItem}><Command size={18} className={styles.checkIcon} /> {t.featLimit}</li>
-                <li className={styles.featureItem}><Users size={18} className={styles.checkIcon} /> {t.featDash}</li>
-                <li className={styles.featureItem}><Shield size={18} className={styles.checkIcon} /> {t.featSupport}</li>
-              </ul>
-              <button className="btn-primary" style={{ width: '100%', marginTop: 'auto' }} onClick={() => handleBuyClick('3_months')}>
-                {t.buyNow}
-              </button>
-            </div>
-
-            {/* 1 Year */}
-            <div className={`${styles.pricingCard} glass-panel`}>
-              <h3 className={styles.priceTitle}>{t.oneYear}</h3>
-              <div className={styles.priceValue}>25.00 <span>USDT</span></div>
-              <ul className={styles.featureList}>
-                <li className={styles.featureItem}><Sword size={18} className={styles.checkIcon} /> {t.featParty}</li>
-                <li className={styles.featureItem}><Command size={18} className={styles.checkIcon} /> {t.featLimit}</li>
-                <li className={styles.featureItem}><Users size={18} className={styles.checkIcon} /> {t.featDash}</li>
-                <li className={styles.featureItem}><Shield size={18} className={styles.checkIcon} /> {t.featSupport}</li>
-              </ul>
-              <button className="btn-primary" style={{ width: '100%', marginTop: 'auto' }} onClick={() => handleBuyClick('1_year')}>
-                {t.buyNow}
-              </button>
-            </div>
-
+            {loadingPlans ? (
+              <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
+                <Loader2 className="spin" size={40} style={{ margin: '0 auto 1rem', color: 'var(--accent-color)' }} />
+                Yükleniyor...
+              </div>
+            ) : plans.length === 0 ? (
+              <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
+                Şu anda aktif paket bulunmamaktadır.
+              </div>
+            ) : plans.map((plan) => {
+              const features = lang === 'tr' ? (plan.features_tr || []) : (plan.features_en || []);
+              
+              return (
+                <div key={plan.id} className={`${styles.pricingCard} ${plan.is_featured ? styles.featured : ''} glass-panel`}>
+                  {plan.is_featured && <div className={styles.bestSellerBadge}>{t.bestSeller}</div>}
+                  <h3 className={styles.priceTitle}>{lang === 'tr' ? plan.name_tr : plan.name_en}</h3>
+                  <div className={styles.priceValue}>{plan.amount} <span>USDT</span></div>
+                  <ul className={styles.featureList}>
+                    {features.map((feat, idx) => (
+                      <li key={idx} className={styles.featureItem}><Sword size={18} className={styles.checkIcon} /> {feat}</li>
+                    ))}
+                  </ul>
+                  <button className="btn-primary" style={{ width: '100%', marginTop: 'auto' }} onClick={() => handleBuyClick(plan.id)}>
+                    {t.buyNow}
+                  </button>
+                </div>
+              );
+            })}
           </div>
         </div>
 

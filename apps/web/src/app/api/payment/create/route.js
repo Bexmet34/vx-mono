@@ -6,13 +6,6 @@ import crypto from 'crypto';
 
 export const dynamic = 'force-dynamic';
 
-const PLANS = {
-  '7_days': { amount: '1.00', days: 7, name: '7 Günlük Paket' },
-  '1_month': { amount: '3.00', days: 30, name: '1 Aylık Paket' },
-  '3_months': { amount: '8.00', days: 90, name: '3 Aylık Paket' },
-  '1_year': { amount: '25.00', days: 365, name: '1 Yıllık Paket' }
-};
-
 export async function POST(req) {
   try {
     const session = await getServerSession(authOptions);
@@ -23,11 +16,20 @@ export async function POST(req) {
 
     const { guildId, planId } = await req.json();
 
-    if (!guildId || !planId || !PLANS[planId]) {
+    if (!guildId || !planId) {
       return NextResponse.json({ error: "Geçersiz sunucu veya paket seçimi." }, { status: 400 });
     }
 
-    const plan = PLANS[planId];
+    const { data: plan, error: planError } = await supabase
+      .from('pricing_plans')
+      .select('*')
+      .eq('id', planId)
+      .eq('is_active', true)
+      .single();
+
+    if (planError || !plan) {
+      return NextResponse.json({ error: "Geçersiz veya pasif paket seçimi." }, { status: 400 });
+    }
     const orderId = `VX_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
     // 1. Veritabanına bekleyen (pending) ödemeyi kaydet
