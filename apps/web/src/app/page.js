@@ -2,7 +2,7 @@
 
 import Navbar from "@/components/Navbar";
 import styles from "./page.module.css";
-import { Shield, Users, Sword, Command, Star, MessageCircle } from "lucide-react";
+import { Shield, Users, Sword, Command, Star, MessageCircle, Zap, Activity, HelpCircle, Eye } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useEffect, useState } from "react";
 import { useSession, signIn } from "next-auth/react";
@@ -103,7 +103,7 @@ export default function Home() {
   const renderGif = (cmdName) => {
     if (gifs.includes(cmdName)) {
       return (
-        <div className={styles.gifWrapper}>
+        <div className={styles.gifTooltip}>
           <img src={`/gif/${cmdName}.gif`} alt={`${cmdName} command`} className={styles.gifImage} />
         </div>
       );
@@ -115,10 +115,15 @@ export default function Home() {
     <>
       <Navbar />
       <main className={styles.main}>
+        {/* --- HERO SECTION --- */}
         <div className={`${styles.hero} animate-fade-in`}>
           <div className={styles.heroGlow}></div>
+          <div className={styles.badge}>
+            <Zap size={14} className={styles.badgeHighlight} />
+            Veyronix v2.0 Yayında
+          </div>
           <h1 className={styles.title}>
-            {t.heroTitle1} <br />
+            {t.heroTitle1} 
             <span className={styles.highlight}>{t.heroTitle2}</span>
           </h1>
           <p className={styles.description}>
@@ -129,16 +134,16 @@ export default function Home() {
               href="https://discord.com/oauth2/authorize?client_id=1082239904169336902&permissions=510977&scope=bot+applications.commands"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-primary" 
-              style={{ padding: '1rem 2rem', fontSize: '1.1rem', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
+              className="btn-primary delay-1 animate-fade-in" 
             >
+              <Zap size={18} fill="currentColor" />
               {t.heroBtn}
             </a>
             <a
               href="https://top.gg/bot/1082239904169336902"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-topgg"
+              className="btn-topgg delay-2 animate-fade-in"
             >
               <Star size={18} fill="currentColor" />
               {t.topggBtn ?? ("top.gg'de Oyla")}
@@ -147,169 +152,227 @@ export default function Home() {
               href="https://discord.gg/D6T3t4beqa"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-topgg"
-              style={{ background: 'rgba(88, 101, 242, 0.1)', borderColor: '#5865F2', color: '#fff' }}
+              className="btn-topgg delay-3 animate-fade-in"
+              style={{ background: 'transparent', borderColor: 'rgba(255,255,255,0.1)' }}
             >
-              <MessageCircle size={18} fill="currentColor" />
+              <MessageCircle size={18} />
               {t.supportBtn}
             </a>
           </div>
           
-          <div className={styles.statsContainer} style={{ marginTop: '3rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
-            <div className="glass-panel" style={{ padding: '0.75rem 1.5rem', borderRadius: '50px', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', border: '1px solid rgba(255, 255, 255, 0.1)', background: 'rgba(255, 255, 255, 0.03)' }}>
-              <Users size={20} className={styles.featureIcon} style={{ margin: 0 }} />
-              <span style={{ fontWeight: '600', fontSize: '1.1rem', color: 'var(--text)' }}>
-                {serverCount > 0 ? `${serverCount} Sunucuda Aktif` : "Sunucu sayısı yükleniyor..."}
+          <div className={`${styles.statsContainer} delay-4 animate-fade-in`}>
+            <div className="glass-panel" style={{ padding: '0.75rem 1.5rem', borderRadius: '50px', display: 'inline-flex', alignItems: 'center', gap: '0.75rem' }}>
+              <Activity size={20} className={styles.badgeHighlight} />
+              <span style={{ fontWeight: '600', fontSize: '1rem', color: 'var(--text-main)' }}>
+                {serverCount > 0 ? `${serverCount.toLocaleString()} Sunucuda Aktif` : "Sunucu sayısı yükleniyor..."}
               </span>
             </div>
             
-            <a href="https://top.gg/bot/1082239904169336902" target="_blank" rel="noopener noreferrer" className={styles.widgetLink} style={{ transition: 'transform 0.2s ease' }} onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'} onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}>
-              <img src="https://top.gg/api/widget/1082239904169336902.svg" alt="Top.gg Widget" height="120" style={{ borderRadius: '8px' }} />
+            <a href="https://top.gg/bot/1082239904169336902" target="_blank" rel="noopener noreferrer" style={{ transition: 'transform 0.3s ease' }} onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'} onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}>
+              <img src="https://top.gg/api/widget/1082239904169336902.svg" alt="Top.gg Widget" height="120" style={{ borderRadius: '12px' }} />
             </a>
           </div>
         </div>
 
-        {/* Active Campaigns Showcase */}
+        {/* --- ACTIVE CAMPAIGNS --- */}
         {activeCampaigns.length > 0 && (
-          <div className={`${styles.promoSection} animate-fade-in`}>
-            {activeCampaigns.map((camp, idx) => (
-              <div key={camp.id} className={styles.promoCard}>
-                <div className={styles.promoBadge}>{t.promoBadge}</div>
-                <Star size={32} className={styles.promoIcon} fill="#fca311" />
-                <h2 className={styles.promoTitle}>{lang === 'tr' ? camp.title_tr : camp.title_en}</h2>
-                <p className={styles.promoDesc}>{lang === 'tr' ? camp.description_tr : camp.description_en}</p>
-                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: 'auto' }}>
+          <section className={`${styles.promoSection} animate-fade-in delay-2`}>
+            <div className={styles.promoGrid}>
+              {activeCampaigns.map((camp, idx) => (
+                <div key={camp.id} className={styles.promoCard}>
+                  <div className={styles.promoIcon}>
+                    <Star size={24} fill="currentColor" />
+                  </div>
+                  <h2 className={styles.promoTitle}>{lang === 'tr' ? camp.title_tr : camp.title_en}</h2>
+                  <p className={styles.promoDesc}>{lang === 'tr' ? camp.description_tr : camp.description_en}</p>
                   <a 
                     href="https://discord.gg/D6T3t4beqa" 
                     target="_blank" 
                     rel="noopener noreferrer" 
                     className="btn-primary" 
-                    style={{ padding: '0.6rem 1.5rem', background: '#5865F2', borderColor: '#5865F2', fontSize: '0.9rem' }}
+                    style={{ padding: '0.6rem 1.5rem', fontSize: '0.9rem' }}
                   >
                     {t.promoBtn}
                   </a>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </section>
         )}
 
-        <div className={`${styles.pricingSection} animate-fade-in`} style={{ animationDelay: '0.3s' }}>
-          <div className={styles.pricingHeader}>
-            <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>{t.pricingTitle}</h2>
-            <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>{t.pricingSubtitle}</p>
+        {/* --- BENTO GRID FEATURES --- */}
+        <section className={`${styles.bentoSection} animate-fade-in delay-3`}>
+          <div className={styles.bentoHeader}>
+            <h2>Güçlü & Yenilikçi Özellikler</h2>
+            <p>Albion Online loncanızı ve partilerinizi yönetmek hiç bu kadar profesyonel olmamıştı.</p>
+          </div>
+          
+          <div className={`${styles.bentoCard} ${styles.bentoLarge}`}>
+            <div className={styles.bentoIcon}><Users size={24} /></div>
+            <h3 className={styles.bentoTitle}>{t.feat1Title}</h3>
+            <p className={styles.bentoDesc}>{t.feat1Desc}</p>
+          </div>
+          <div className={styles.bentoCard}>
+            <div className={styles.bentoIcon}><Sword size={24} /></div>
+            <h3 className={styles.bentoTitle}>{t.feat2Title}</h3>
+            <p className={styles.bentoDesc}>{t.feat2Desc}</p>
+          </div>
+          <div className={styles.bentoCard}>
+            <div className={styles.bentoIcon}><Shield size={24} /></div>
+            <h3 className={styles.bentoTitle}>{t.feat3Title}</h3>
+            <p className={styles.bentoDesc}>{t.feat3Desc}</p>
+          </div>
+          <div className={`${styles.bentoCard} ${styles.bentoLarge}`} style={{ background: 'linear-gradient(135deg, rgba(88, 101, 242, 0.05) 0%, rgba(10, 10, 15, 0.5) 100%)' }}>
+            <div className={styles.bentoIcon} style={{ background: 'rgba(88, 101, 242, 0.1)', color: '#5865F2' }}><Activity size={24} /></div>
+            <h3 className={styles.bentoTitle}>Tam Kapsamlı KillBoard (Premium)</h3>
+            <p className={styles.bentoDesc}>Her gün saat 20:00'da Albion Online KillBoard verilerini çekerek, loncanızın en iyi performans gösteren oyuncularını otomatik olarak listeler ve Discord üzerinden duyurur.</p>
+          </div>
+        </section>
+
+        {/* --- PRICING SECTION --- */}
+        <section className={`${styles.pricingSection} animate-fade-in`}>
+          <div className={styles.bentoHeader}>
+            <h2>{t.pricingTitle}</h2>
+            <p>{t.pricingSubtitle}</p>
           </div>
 
           <div className={styles.pricingGrid}>
             {loadingPlans ? (
-              <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
+              <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
                 <Loader2 className="spin" size={40} style={{ margin: '0 auto 1rem', color: 'var(--accent-color)' }} />
                 Yükleniyor...
               </div>
             ) : plans.length === 0 ? (
-              <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
+              <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
                 Şu anda aktif paket bulunmamaktadır.
               </div>
             ) : plans.map((plan) => {
               const features = lang === 'tr' ? (plan.features_tr || []) : (plan.features_en || []);
               
               return (
-                <div key={plan.id} className={`${styles.pricingCard} ${plan.is_featured ? styles.featured : ''} glass-panel`}>
+                <div key={plan.id} className={`${styles.pricingCard} ${plan.is_featured ? styles.featured : ''}`}>
                   {plan.is_featured && <div className={styles.bestSellerBadge}>{t.bestSeller}</div>}
                   <h3 className={styles.priceTitle}>{lang === 'tr' ? plan.name_tr : plan.name_en}</h3>
-                  <div className={styles.priceValue}>{plan.amount} <span>USDT</span></div>
+                  <div className={styles.priceValue}>{plan.amount}<span>USDT</span></div>
                   <ul className={styles.featureList}>
                     {features.map((feat, idx) => (
-                      <li key={idx} className={styles.featureItem}><Sword size={18} className={styles.checkIcon} /> {feat}</li>
+                      <li key={idx} className={styles.featureItem}><Star size={16} className={styles.checkIcon} /> {feat}</li>
                     ))}
                   </ul>
-                  <button className="btn-primary" style={{ width: '100%', marginTop: 'auto' }} onClick={() => handleBuyClick(plan.id)}>
+                  <button className="btn-primary" onClick={() => handleBuyClick(plan.id)}>
                     {t.buyNow}
                   </button>
                 </div>
               );
             })}
           </div>
-        </div>
+        </section>
 
-        <div className={`${styles.features} animate-fade-in`} style={{ animationDelay: '0.4s' }}>
-          <div className={`${styles.featureCard} glass-panel`}>
-            <Users className={styles.featureIcon} size={32} />
-            <h3 className={styles.featureTitle}>{t.feat1Title}</h3>
-            <p className={styles.featureDesc}>{t.feat1Desc}</p>
-          </div>
-          <div className={`${styles.featureCard} glass-panel`}>
-            <Sword className={styles.featureIcon} size={32} />
-            <h3 className={styles.featureTitle}>{t.feat2Title}</h3>
-            <p className={styles.featureDesc}>{t.feat2Desc}</p>
-          </div>
-          <div className={`${styles.featureCard} glass-panel`}>
-            <Shield className={styles.featureIcon} size={32} />
-            <h3 className={styles.featureTitle}>{t.feat3Title}</h3>
-            <p className={styles.featureDesc}>{t.feat3Desc}</p>
-          </div>
-        </div>
+        {/* --- COMMANDS SECTION --- */}
+        <section className={`${styles.commandsSection} animate-fade-in`}>
+          <div className={styles.container}>
+            <div className={styles.commandsHeader}>
+              <Command size={48} className={styles.badgeHighlight} style={{ margin: '0 auto 1.5rem' }} />
+              <h2 style={{ fontSize: '2.5rem', fontWeight: '800' }}>{t.cmdTitle}</h2>
+              <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginTop: '1rem' }}>Veyronix'in gücünü keşfedin.</p>
+            </div>
+            
+            <div className={styles.commandCategory}>
+              <h3><Users size={20} /> {t.cmdUser}</h3>
+              <div className={styles.commandGrid}>
+                <div className={styles.cmdCard}>
+                  <div className={styles.cmdHeader}>
+                    <code>/help</code>
+                    <div className={styles.gifTrigger}><Eye size={18} />{renderGif('help')}</div>
+                  </div>
+                  <span>{t.cHelp}</span>
+                </div>
+                <div className={styles.cmdCard}>
+                  <div className={styles.cmdHeader}>
+                    <code>/createparty</code>
+                    <div className={styles.gifTrigger}><Eye size={18} />{renderGif('createparty')}</div>
+                  </div>
+                  <span>{t.cCreate}</span>
+                </div>
+                <div className={styles.cmdCard}>
+                  <div className={styles.cmdHeader}>
+                    <code>/closeparty</code>
+                    <div className={styles.gifTrigger}><Eye size={18} />{renderGif('closeparty')}</div>
+                  </div>
+                  <span>{t.cClose}</span>
+                </div>
+                <div className={styles.cmdCard}>
+                  <div className={styles.cmdHeader}>
+                    <code>/vote</code>
+                    <div className={styles.gifTrigger}><Eye size={18} />{renderGif('vote')}</div>
+                  </div>
+                  <span>{t.cVote}</span>
+                </div>
+              </div>
+            </div>
 
+            <div className={styles.commandCategory}>
+              <h3><Shield size={20} /> {t.cmdAdmin}</h3>
+              <div className={styles.commandGrid}>
+                <div className={styles.cmdCard}>
+                  <div className={styles.cmdHeader}>
+                    <code>/settings</code>
+                    <div className={styles.gifTrigger}><Eye size={18} />{renderGif('settings')}</div>
+                  </div>
+                  <span>{t.cSettings}</span>
+                </div>
+                <div className={styles.cmdCard}>
+                  <div className={styles.cmdHeader}>
+                    <code>/whitelistadd</code>
+                    <div className={styles.gifTrigger}><Eye size={18} />{renderGif('whitelistadd')}</div>
+                  </div>
+                  <span>{t.cWhiteAdd}</span>
+                </div>
+                <div className={styles.cmdCard}>
+                  <div className={styles.cmdHeader}>
+                    <code>/whitelistremove</code>
+                    <div className={styles.gifTrigger}><Eye size={18} />{renderGif('whitelistremove')}</div>
+                  </div>
+                  <span>{t.cWhiteRem}</span>
+                </div>
+              </div>
+            </div>
 
-        <div className={`${styles.commandsSection} animate-fade-in`} style={{ animationDelay: '0.4s' }}>
-          <div className={styles.commandsHeader}>
-            <Command size={28} className={styles.featureIcon} style={{ margin: 0 }} />
-            <h2 style={{ fontSize: '2rem' }}>{t.cmdTitle}</h2>
-          </div>
-          
-          <div className={styles.commandCategory}>
-            <h3>⚔️ {t.cmdUser}</h3>
-            <div className={styles.commandGrid}>
-              <div className={styles.cmdCard}><code>/help</code> <span>{t.cHelp}</span> {renderGif('help')}</div>
-              <div className={styles.cmdCard}><code>/createparty</code> <span>{t.cCreate}</span> {renderGif('createparty')}</div>
-              <div className={styles.cmdCard}><code>/closeparty</code> <span>{t.cClose}</span> {renderGif('closeparty')}</div>
-              <div className={styles.cmdCard}><code>/vote</code> <span>{t.cVote}</span> {renderGif('vote')}</div>
+            <div className={styles.proTip}>
+              <HelpCircle size={24} className={styles.proTipIcon} />
+              <p>{t.cmdProTip}</p>
             </div>
           </div>
-
-          <div className={styles.commandCategory}>
-            <h3>⚙️ {t.cmdAdmin}</h3>
-            <div className={styles.commandGrid}>
-              <div className={styles.cmdCard}><code>/settings</code> <span>{t.cSettings}</span> {renderGif('settings')}</div>
-              <div className={styles.cmdCard}><code>/whitelistadd</code> <span>{t.cWhiteAdd}</span> {renderGif('whitelistadd')}</div>
-              <div className={styles.cmdCard}><code>/whitelistremove</code> <span>{t.cWhiteRem}</span> {renderGif('whitelistremove')}</div>
-            </div>
-          </div>
-
-
-          <div className={styles.proTip}>
-            <p>{t.cmdProTip}</p>
-          </div>
-        </div>
+        </section>
       </main>
 
       {/* Checkout Modal */}
       {showCheckout && (
-        <div className="admin-modal-overlay" onClick={() => setShowCheckout(false)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
-          <div className="admin-modal animate-slide-up" onClick={e => e.stopPropagation()} style={{ background: '#1e1e24', border: '1px solid rgba(255,255,255,0.1)', padding: '2rem', borderRadius: '16px', maxWidth: '400px', width: '90%' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: '800' }}>Ödeme Yap</h2>
-              <button onClick={() => setShowCheckout(false)} style={{ background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer' }}>
+        <div onClick={() => setShowCheckout(false)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
+          <div className="animate-fade-in glass-panel" onClick={e => e.stopPropagation()} style={{ padding: '2.5rem', maxWidth: '420px', width: '90%', position: 'relative' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+              <h2 style={{ fontSize: '1.5rem', fontWeight: '800', color: '#fff' }}>Ödeme Yap</h2>
+              <button onClick={() => setShowCheckout(false)} style={{ background: 'transparent', border: 'none', color: '#fff' }}>
                 <X size={24} />
               </button>
             </div>
             
-            <p style={{ color: '#aaa', marginBottom: '1.5rem', fontSize: '0.95rem' }}>
+            <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '0.95rem', lineHeight: '1.5' }}>
               Premium ayrıcalıklarını aktif etmek istediğiniz sunucuyu seçin. Sistem sizi güvenli kripto ödeme sayfasına (Cryptomus) yönlendirecektir.
             </p>
 
             {checkoutError && (
-              <div style={{ background: 'rgba(231, 76, 60, 0.1)', border: '1px solid #e74c3c', color: '#e74c3c', padding: '0.8rem', borderRadius: '8px', marginBottom: '1rem', fontSize: '0.9rem' }}>
+              <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', color: '#ef4444', padding: '0.8rem', borderRadius: '12px', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
                 {checkoutError}
               </div>
             )}
 
-            <div style={{ marginBottom: '2rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', fontSize: '0.9rem' }}>Hedef Sunucu</label>
+            <div style={{ marginBottom: '2.5rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.75rem', fontWeight: '600', fontSize: '0.9rem', color: '#fff' }}>Hedef Sunucu</label>
               <select 
                 value={selectedServer}
                 onChange={e => setSelectedServer(e.target.value)}
-                style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: '1rem' }}
+                style={{ width: '100%', padding: '1rem', borderRadius: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-color)', color: '#fff', fontSize: '1rem', outline: 'none', fontFamily: 'inherit' }}
               >
                 <option value="">-- Sunucu Seçin --</option>
                 {userServers.map(s => (
@@ -317,13 +380,13 @@ export default function Home() {
                 ))}
               </select>
               {userServers.length === 0 && (
-                <p style={{ color: '#aaa', fontSize: '0.8rem', marginTop: '0.5rem' }}>Yüklenecek sunucu bulunamadı veya yetkiniz yok.</p>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: '0.75rem' }}>Yüklenecek sunucu bulunamadı veya yetkiniz yok.</p>
               )}
             </div>
 
             <button 
               className="btn-primary" 
-              style={{ width: '100%', padding: '1rem', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }} 
+              style={{ width: '100%', display: 'flex', justifyContent: 'center' }} 
               onClick={handleConfirmPurchase}
               disabled={isProcessing || !selectedServer}
             >
