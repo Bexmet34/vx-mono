@@ -14,6 +14,7 @@ export default function KillBoardTab({
   searchGuilds, 
   searchingGuild, 
   guildSearchResults, 
+  setGuildSearchResults,
   guildDetail, 
   setGuildDetail, 
   killboardPreview, 

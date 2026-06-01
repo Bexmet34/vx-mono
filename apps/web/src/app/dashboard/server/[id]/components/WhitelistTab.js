@@ -11,7 +11,7 @@ export default function WhitelistTab({ t, settings, setSettings, whitelistAddTab
   );
   
   const filteredMembers = (discordMembers || []).filter(m => 
-    m?.user?.username?.toLowerCase().includes(safeSearch) && !safeWhitelist.includes(m.user.id)
+    m?.username?.toLowerCase().includes(safeSearch) && !safeWhitelist.includes(m.id)
   );
 
   const handleAdd = (id) => {
@@ -24,8 +24,8 @@ export default function WhitelistTab({ t, settings, setSettings, whitelistAddTab
   const getEntityInfo = (id) => {
     const r = (discordRoles || []).find(r => r.id === id);
     if (r) return { name: `@${r.name}`, color: r.color ? `#${r.color.toString(16).padStart(6, '0')}` : '#fff', type: 'role' };
-    const m = (discordMembers || []).find(m => m.user?.id === id);
-    if (m) return { name: m.user?.username || 'Unknown', color: '#fff', type: 'user' };
+    const m = (discordMembers || []).find(m => m.id === id);
+    if (m) return { name: m.username || 'Unknown', color: '#fff', type: 'user' };
     return { name: `ID: ${id}`, color: '#888', type: 'unknown' };
   };
 
@@ -90,14 +90,14 @@ export default function WhitelistTab({ t, settings, setSettings, whitelistAddTab
             ))
           ) : (
             filteredMembers.slice(0, 50).map(member => (
-              <div key={member.user.id} className="listItem" style={{ marginBottom: '0.25rem', padding: '0.5rem 0.75rem' }}>
+              <div key={member.id} className="listItem" style={{ marginBottom: '0.25rem', padding: '0.5rem 0.75rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                    <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#333' }}>
-                     {member.user.avatar && <img src={`https://cdn.discordapp.com/avatars/${member.user.id}/${member.user.avatar}.png`} style={{ width: '100%', height: '100%', borderRadius: '50%' }} />}
+                     {member.avatar && <img src={`https://cdn.discordapp.com/avatars/${member.id}/${member.avatar}.png`} style={{ width: '100%', height: '100%', borderRadius: '50%' }} />}
                    </div>
-                   <span style={{ color: '#fff', fontSize: '0.9rem' }}>{member.user.username}</span>
+                   <span style={{ color: '#fff', fontSize: '0.9rem' }}>{member.username}</span>
                 </div>
-                <button className="dockItem" style={{ padding: '0.4rem', borderRadius: '6px' }} onClick={() => handleAdd(member.user.id)}>
+                <button className="dockItem" style={{ padding: '0.4rem', borderRadius: '6px' }} onClick={() => handleAdd(member.id)}>
                   <Plus size={16} />
                 </button>
               </div>
