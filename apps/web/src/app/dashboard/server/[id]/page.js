@@ -35,7 +35,6 @@ export default function ServerSettings() {
   const [selectedTemplateId, setSelectedTemplateId] = useState(null);
   const [settings, setSettings] = useState({
     language: "tr",
-    auto_role_sync: false,
     embed_thumbnail_url: "",
     whitelist: [],
     party_templates: [],
@@ -83,7 +82,6 @@ export default function ServerSettings() {
         if (s) {
           setSettings({
             language: s.language || "tr",
-            auto_role_sync: s.auto_role_sync || false,
             embed_thumbnail_url: s.embed_thumbnail_url || "",
             whitelist: s.whitelist || [],
             party_templates: s.party_templates || [],
@@ -313,8 +311,8 @@ export default function ServerSettings() {
           <button className={`dockItem ${activeTab === 'templates' ? 'active' : ''}`} onClick={() => setActiveTab('templates')}>
             <Copy size={18} /> Templates
           </button>
-          <button className="dockItem premium" disabled title="Premium Feature">
-            <Lock size={16} /> KillBoard <span className="proBadge">PRO</span>
+          <button className={`dockItem ${activeTab === 'killboard' ? 'active' : ''}`} onClick={() => setActiveTab('killboard')}>
+            <Lock size={16} /> KillBoard
           </button>
           <button className="dockItem premium" disabled title="Premium Feature">
             <Lock size={16} /> Reg <span className="proBadge">PRO</span>

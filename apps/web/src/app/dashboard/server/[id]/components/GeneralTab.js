@@ -19,20 +19,6 @@ export default function GeneralTab({ t, settings, setSettings }) {
               <option value="tr">Türkçe</option>
               <option value="en">English</option>
             </select>
-            <p className="hint">{t.dLangHint}</p>
-          </div>
-
-          <div className="inputGroup">
-            <label className="label">{t.dRoleSyncLabel}</label>
-            <select
-              className="select"
-              value={settings.auto_role_sync ? "true" : "false"}
-              onChange={(e) => setSettings({ ...settings, auto_role_sync: e.target.value === "true" })}
-            >
-              <option value="true">{t.dRoleSyncOn}</option>
-              <option value="false">{t.dRoleSyncOff}</option>
-            </select>
-            <p className="hint">{t.dRoleSyncHint}</p>
           </div>
         </div>
       </div>
