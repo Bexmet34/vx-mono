@@ -7,7 +7,7 @@ import {
   Save, Bell, Loader2, AlertCircle, CheckCircle,
   LayoutDashboard, Server, MessageSquare, Settings, 
   Users, BarChart3, Search, Clock, Infinity, Power, 
-  Calendar, Trash2, ChevronRight, ArrowLeft, Gift, Plus, Send, Edit3, Eye, EyeOff, DollarSign, Check, X
+  Calendar, Trash2, ChevronRight, ArrowLeft, Gift, Plus, Send, Edit3, Eye, EyeOff, DollarSign, Check, X, Gamepad2
 } from "lucide-react";
 import { useCallback } from "react";
 import { format } from "date-fns";
@@ -393,8 +393,8 @@ export default function AdminPage() {
             {/* SERVER MANAGEMENT TAB */}
             {activeTab === "servers" && (
               <>
-                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '2rem', marginBottom: '2.5rem'}}>
-                   <div style={{flex: 1}}>
+                <div className="server-tab-header">
+                   <div>
                       <div className="admin-search-container" style={{marginBottom: 0}}>
                         <Search style={{ position: "absolute", left: "1.2rem", top: "50%", transform: "translateY(-50%)", color: "var(--admin-text-muted)" }} size={18} />
                         <input 
@@ -406,7 +406,7 @@ export default function AdminPage() {
                       </div>
                    </div>
                    
-                   <div style={{display: 'flex', gap: '1rem', alignItems: 'center'}}>
+                   <div className="server-stats-row">
                       <div className="stat-mini-card">
                          <div className="label">Toplam</div>
                          <div className="value">{servers.length}</div>
@@ -425,14 +425,14 @@ export default function AdminPage() {
                       </div>
                       
                       {/* Küçük Süresi Dolmuş Kartı */}
-                      <div className="stat-mini-card" style={{padding: '0.5rem 0.8rem', minWidth: '90px', borderStyle: 'dashed'}}>
+                      <div className="stat-mini-card" style={{borderStyle: 'dashed'}}>
                          <div className="label" style={{fontSize: '0.6rem', color: '#ff4757'}}>S. Dolmuş</div>
                          <div className="value" style={{fontSize: '1rem'}}>{servers.filter(s => !s.is_unlimited && new Date(s.expires_at) < new Date()).length}</div>
                       </div>
                    </div>
                 </div>
 
-                <div style={{display: 'flex', gap: '0.8rem', marginBottom: '1.5rem'}}>
+                <div className="server-filter-row">
                    {['all', 'active', 'unlimited', 'passive', 'expired'].map(f => (
                      <button 
                        key={f}
@@ -454,7 +454,7 @@ export default function AdminPage() {
                     <thead>
                       <tr>
                         <th>SUNUCU BİLGİSİ</th>
-                        <th>SAHİP ID</th>
+                        <th className="hide-on-tablet">SAHİP ID</th>
                         <th>DURUM</th>
                         <th>BİTİŞ TARİHİ</th>
                         <th style={{textAlign: "right"}}>İŞLEMLER</th>
@@ -483,7 +483,7 @@ export default function AdminPage() {
                                 </div>
                               </div>
                             </td>
-                            <td>
+                            <td className="hide-on-tablet">
                               <code style={{ fontSize: "0.85rem", color: "var(--admin-text-muted)", background: 'rgba(255,255,255,0.03)', padding: '0.3rem 0.6rem', borderRadius: '6px' }}>{s.owner_id}</code>
                             </td>
                             <td>
@@ -496,6 +496,9 @@ export default function AdminPage() {
                               ) : (
                                 <span className="admin-badge badge-active">Aktif</span>
                               )}
+                              {s.unlimited_party && (
+                                <span className="admin-badge" style={{background: 'rgba(252,163,17,0.12)', color: '#fca311', border: '1px solid rgba(252,163,17,0.3)', marginLeft: '0.4rem', fontSize: '0.62rem'}}>🎮 Party ∞</span>
+                              )}
                             </td>
                             <td>
                               <div style={{ fontSize: "0.9rem", fontWeight: "600", color: isExpired && !s.is_unlimited ? "var(--admin-error)" : "inherit" }}>
@@ -506,7 +509,7 @@ export default function AdminPage() {
                               </div>
                             </td>
                             <td>
-                              <div style={{ display: "flex", gap: "0.6rem", justifyContent: "flex-end" }}>
+                              <div className="table-actions">
                                 <button 
                                   className="admin-action-btn" 
                                   title="Süre Yönetimi" 
@@ -518,6 +521,15 @@ export default function AdminPage() {
                                   }}
                                 >
                                   <Clock size={18} />
+                                </button>
+
+                                <button 
+                                  className={`admin-action-btn ${s.unlimited_party ? 'party-unlimited' : ''}`}
+                                  title={s.unlimited_party ? 'Sınırsız Party Aç: AÇIK — Kapat' : 'Sınırsız Party Aç: KAPALI — Aç'}
+                                  disabled={savingId === s.guild_id}
+                                  onClick={() => handleServerAction(s.guild_id, 'toggle_unlimited_party', !s.unlimited_party)}
+                                >
+                                  {savingId === s.guild_id ? <Loader2 size={18} className="spin" /> : <Gamepad2 size={18} />}
                                 </button>
                                 
                                 <button 
@@ -1109,18 +1121,21 @@ export default function AdminPage() {
                </p>
             </div>
 
-            <div style={{display: 'flex', gap: '0.5rem', background: 'rgba(0,0,0,0.2)', padding: '0.4rem', borderRadius: '12px', marginBottom: '1.5rem'}}>
+            <div className="modal-tab-bar">
                <button 
+                 className="modal-tab-btn"
                  onClick={() => setShowDayModal({...showDayModal, mode: 'add'})}
-                 style={{flex: 1, padding: '0.6rem', borderRadius: '8px', border: 'none', background: showDayModal.mode === 'add' ? 'var(--admin-accent)' : 'transparent', color: showDayModal.mode === 'add' ? 'var(--admin-bg)' : 'white', fontWeight: '700', transition: '0.2s', fontSize: '0.85rem'}}
+                 style={{background: showDayModal.mode === 'add' ? 'var(--admin-accent)' : 'transparent', color: showDayModal.mode === 'add' ? 'var(--admin-bg)' : 'white'}}
                >Ekle</button>
                <button 
+                 className="modal-tab-btn"
                  onClick={() => setShowDayModal({...showDayModal, mode: 'remove'})}
-                 style={{flex: 1, padding: '0.6rem', borderRadius: '8px', border: 'none', background: showDayModal.mode === 'remove' ? 'var(--admin-error)' : 'transparent', color: 'white', fontWeight: '700', transition: '0.2s', fontSize: '0.85rem'}}
+                 style={{background: showDayModal.mode === 'remove' ? 'var(--admin-error)' : 'transparent', color: 'white'}}
                >Çıkar</button>
                <button 
+                 className="modal-tab-btn"
                  onClick={() => setShowDayModal({...showDayModal, mode: 'set_date'})}
-                 style={{flex: 1, padding: '0.6rem', borderRadius: '8px', border: 'none', background: showDayModal.mode === 'set_date' ? 'var(--admin-accent)' : 'transparent', color: showDayModal.mode === 'set_date' ? 'var(--admin-bg)' : 'white', fontWeight: '700', transition: '0.2s', fontSize: '0.85rem'}}
+                 style={{background: showDayModal.mode === 'set_date' ? 'var(--admin-accent)' : 'transparent', color: showDayModal.mode === 'set_date' ? 'var(--admin-bg)' : 'white'}}
                >Tarih</button>
             </div>
             

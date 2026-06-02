@@ -69,6 +69,9 @@ export async function PATCH(req) {
   if (action === 'toggle_unlimited') {
     updateData.is_unlimited = value;
     templateId = value ? 'sub_unlimited' : 'sub_extended';
+  } else if (action === 'toggle_unlimited_party') {
+    updateData.unlimited_party = value;
+    // No notification needed for this internal setting
   } else if (action === 'toggle_active') {
     updateData.is_active = value;
     templateId = value ? 'sub_extended' : 'sub_suspended';

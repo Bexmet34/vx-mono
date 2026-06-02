@@ -51,9 +51,10 @@ async function handleCreatePartyCommand(interaction) {
 
     const sub = await getSubscription(interaction.guildId, interaction.guild.name, interaction.guild.ownerId);
     const isUnlimited = sub && sub.is_unlimited;
+    const hasUnlimitedParty = sub && sub.unlimited_party;
 
     const partyCount = getActivePartyCount(userId);
-    const limit = isUnlimited ? 999 : (whitelisted ? 3 : 1);
+    const limit = (isUnlimited || hasUnlimitedParty) ? 999 : (whitelisted ? 3 : 1);
 
     if (partyCount >= limit) {
         let errorMsg = whitelisted
@@ -145,9 +146,10 @@ async function handleTempCommand(interaction) {
 
     const sub = await getSubscription(interaction.guildId, interaction.guild.name, interaction.guild.ownerId);
     const isUnlimited = sub && sub.is_unlimited;
+    const hasUnlimitedParty = sub && sub.unlimited_party;
 
     const partyCount = getActivePartyCount(userId);
-    const limit = isUnlimited ? 999 : (whitelisted ? 3 : 1);
+    const limit = (isUnlimited || hasUnlimitedParty) ? 999 : (whitelisted ? 3 : 1);
 
     if (partyCount >= limit) {
         let errorMsg = whitelisted
