@@ -48,8 +48,8 @@ async function handlePartyButtons(interaction) {
         );
 
 
-        return await interaction.update({ 
-            embeds: [newEmbed], 
+        return await interaction.update({
+            embeds: [newEmbed],
             components: [row, linkRow]
         });
     }
@@ -87,8 +87,8 @@ async function handlePartyButtons(interaction) {
         removeActiveParty(ownerId, message.id);
 
 
-        const response = await interaction.update({ 
-            embeds: [closedEmbed], 
+        const response = await interaction.update({
+            embeds: [closedEmbed],
             components: [closedRow]
         });
 
@@ -159,8 +159,8 @@ async function handlePartyButtons(interaction) {
 
             const { newEmbed, newComponents } = await finalizeRoleUpdate(freshMessage, rolesWithMembers, multiRoleWaitlist, data, lang, guildName);
 
-            await interaction.update({ 
-                embeds: [newEmbed], 
+            await interaction.update({
+                embeds: [newEmbed],
                 components: newComponents
             });
         } catch (e) {
@@ -172,12 +172,12 @@ async function handlePartyButtons(interaction) {
     }
 
     // --- SETTINGS BUTTON HANDLERS ---
-    
+
     if (customId === 'swap_roles_btn') {
         const data = parseEmbedData(message.embeds[0], lang);
         const rolesWithMembers = data.rolesWithMembers;
         const isUserInAnySlot = rolesWithMembers.some(r => r.userId === interaction.user.id);
-        
+
         if (!isUserInAnySlot) {
             const isInWaitlist = data.multiRoleWaitlist?.some(u => u.userId === interaction.user.id);
             if (!isInWaitlist) {
@@ -203,7 +203,7 @@ async function handlePartyButtons(interaction) {
                 .setValue(`${index}`)
                 .setEmoji(resolveRoleEmoji(label, interaction.guild))
                 .setDescription(lang === 'tr' ? 'Yedek rol seçiminiz için işaretleyin' : 'Select for swap role option');
-            
+
             multiJoinMenu.addOptions(multiOption);
         });
 
@@ -327,7 +327,7 @@ async function handleAddMemberButton(interaction, lang) {
     if (!message) return;
 
     const data = parseEmbedData(message.embeds[0], lang);
-    
+
     // Map with original indices and filter for empty actual roles
     const rolesWithIndex = data.rolesWithMembers.map((r, i) => ({ ...r, originalIndex: i }));
     const emptyRoles = rolesWithIndex.filter(r => !r.userId && !r.role.startsWith('#'));
@@ -407,10 +407,10 @@ async function handleObjectiveButtons(interaction) {
     if (customId.startsWith('obj_join_')) {
         const objectiveId = customId.split('_')[2];
         const userId = interaction.user.id;
-        
+
         // Toggle join state in database
         const existing = await db.get('SELECT id FROM objective_attendees WHERE objective_id = ? AND user_id = ?', [objectiveId, userId]);
-        
+
         if (existing) {
             await db.run('DELETE FROM objective_attendees WHERE objective_id = ? AND user_id = ?', [objectiveId, userId]);
         } else {
@@ -420,7 +420,7 @@ async function handleObjectiveButtons(interaction) {
         // Update the embed with new count
         const attendees = await db.all('SELECT user_id FROM objective_attendees WHERE objective_id = ?', [objectiveId]);
         const count = attendees.length;
-        
+
         const { createObjectiveButtons } = require('../builders/componentBuilder');
         const newButtons = createObjectiveButtons(objectiveId, count);
 
@@ -481,9 +481,9 @@ async function handleRegisterButtons(interaction) {
         const action = customId.startsWith('reg_approve_') ? 'approve' : 'reject';
         const targetUserId = customId.split('_')[2];
         const staffRoles = guildConfig?.registration_staff_role_ids?.split(',') || [];
-        
+
         const isStaff = interaction.member.roles.cache.some(r => staffRoles.includes(r.id)) || interaction.member.permissions.has('Administrator');
-        
+
         if (!isStaff) {
             return await interaction.reply({
                 content: `⛔ **${lang === 'tr' ? 'Sadece yetkililer bu işlemi yapabilir!' : 'Only staff can perform this action!'}**`,
@@ -505,7 +505,7 @@ async function handleRegisterButtons(interaction) {
             if (field.name.includes('Gerçek İsim')) realName = field.value;
             if (field.name.includes('Yaş')) age = field.value;
             if (field.name.includes('Oyun İçi Nick')) ign = field.value;
-            
+
             // Extract Guild from the "Diğer" / "Others" field
             if (field.name.includes('Diğer') || field.name.includes('Others')) {
                 const match = field.value.match(/\*\*Guild:\*\* `([^`]+)`/);
@@ -524,14 +524,14 @@ async function handleRegisterButtons(interaction) {
         }
 
         if (action === 'reject') {
-            await interaction.reply({ content: `✅ Kayıt reddedildi ve kanal siliniyor...` });
-            setTimeout(() => interaction.channel.delete().catch(() => {}), 3000);
+            await interaction.reply({ content: `❌ Kayıt reddedildi ve kanal siliniyor...` });
+            setTimeout(() => interaction.channel.delete().catch(() => { }), 3000);
             return;
         }
 
         if (action === 'approve') {
             await interaction.deferReply();
-            
+
             try {
                 const targetMember = await interaction.guild.members.fetch(targetUserId);
 
@@ -540,7 +540,7 @@ async function handleRegisterButtons(interaction) {
                 if (guildName && guildName.length > 0) {
                     prefix = `[${guildName.substring(0, 4).toUpperCase()}] `;
                 }
-                
+
                 // Fallback for IGN if not in field (old tickets)
                 if (!ign && embed.author?.name) ign = embed.author.name;
                 if (!ign && embed.title) {
@@ -590,14 +590,14 @@ async function handleRegisterButtons(interaction) {
                 }
 
                 await interaction.editReply({ content: `✅ <@${targetUserId}> adlı kullanıcının kaydı onaylandı!${nickStatus}${roleStatus}\n\nKanal 5 saniye içinde kapatılacak.` });
-                
+
                 // Remove the buttons so it can't be clicked again
                 const disabledRow = new ActionRowBuilder().addComponents(
                     new ButtonBuilder().setCustomId('approved_btn').setLabel('Onaylandı').setStyle(ButtonStyle.Success).setDisabled(true)
                 );
-                await message.edit({ components: [disabledRow] }).catch(() => {});
+                await message.edit({ components: [disabledRow] }).catch(() => { });
 
-                setTimeout(() => interaction.channel.delete().catch(() => {}), 5000);
+                setTimeout(() => interaction.channel.delete().catch(() => { }), 5000);
 
             } catch (err) {
                 console.error('[RegApprove Error]', err);
