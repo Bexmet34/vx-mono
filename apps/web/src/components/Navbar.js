@@ -23,9 +23,6 @@ export default function Navbar() {
               Veyronix
             </Link>
             <div className="desktop-links">
-              <a href="https://docs.veyronix.com.tr/" target="_blank" rel="noopener noreferrer" className="nav-link">
-                Wiki
-              </a>
               <Link href="/changelog" className="nav-link">
                 {t.changelog}
               </Link>
@@ -78,7 +75,6 @@ export default function Navbar() {
           <div className="mobile-links">
             <Link href="/" onClick={() => setIsMenuOpen(false)}>{lang === 'tr' ? 'Ana Sayfa' : 'Home'}</Link>
             <Link href="/dashboard" onClick={() => setIsMenuOpen(false)}>{t.dashboard}</Link>
-            <a href="https://docs.veyronix.com.tr/" target="_blank" rel="noopener noreferrer" onClick={() => setIsMenuOpen(false)}>{t.wiki}</a>
             <Link href="/changelog" onClick={() => setIsMenuOpen(false)}>{t.changelog}</Link>
             {isAdmin && (
               <Link href="/admin" onClick={() => setIsMenuOpen(false)} style={{ color: 'var(--accent-color)' }}>Admin Panel</Link>
