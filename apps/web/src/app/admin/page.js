@@ -293,10 +293,10 @@ export default function AdminPage() {
     
     if (!matchesSearch) return false;
     
-    if (statusFilter === 'active') return s.is_active && !s.is_unlimited;
+    if (statusFilter === 'active') return s.is_active && !s.is_unlimited && new Date(s.expires_at) >= new Date();
     if (statusFilter === 'unlimited') return s.is_unlimited;
     if (statusFilter === 'passive') return !s.is_active;
-    if (statusFilter === 'expired') return !s.is_unlimited && new Date(s.expires_at) < new Date();
+    if (statusFilter === 'expired') return s.is_active && !s.is_unlimited && new Date(s.expires_at) < new Date();
     
     return true;
   });
@@ -413,21 +413,19 @@ export default function AdminPage() {
                       </div>
                       <div className="stat-mini-card">
                          <div className="label" style={{color: 'var(--admin-success)'}}>Aktif</div>
-                         <div className="value">{servers.filter(s => s.is_active && !s.is_unlimited).length}</div>
+                         <div className="value">{servers.filter(s => s.is_active && !s.is_unlimited && new Date(s.expires_at) >= new Date()).length}</div>
                       </div>
                       <div className="stat-mini-card">
                          <div className="label" style={{color: '#fca311'}}>Sınırsız</div>
                          <div className="value">{servers.filter(s => s.is_unlimited).length}</div>
                       </div>
                       <div className="stat-mini-card">
+                         <div className="label" style={{color: '#ff4757'}}>S. Dolmuş</div>
+                         <div className="value">{servers.filter(s => s.is_active && !s.is_unlimited && new Date(s.expires_at) < new Date()).length}</div>
+                      </div>
+                      <div className="stat-mini-card">
                          <div className="label" style={{color: 'var(--admin-error)'}}>Pasif</div>
                          <div className="value">{servers.filter(s => !s.is_active).length}</div>
-                      </div>
-                      
-                      {/* Küçük Süresi Dolmuş Kartı */}
-                      <div className="stat-mini-card" style={{borderStyle: 'dashed'}}>
-                         <div className="label" style={{fontSize: '0.6rem', color: '#ff4757'}}>S. Dolmuş</div>
-                         <div className="value" style={{fontSize: '1rem'}}>{servers.filter(s => !s.is_unlimited && new Date(s.expires_at) < new Date()).length}</div>
                       </div>
                    </div>
                 </div>
