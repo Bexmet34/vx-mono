@@ -78,12 +78,6 @@ async function handlePartiModal(interaction) {
         if (msgId) {
             setActiveParty(userId, msgId, chanId);
 
-            // Informational vote reminder (Non-blocking)
-            interaction.followUp({
-                content: t('vote.info_reminder', lang),
-                flags: [MessageFlags.Ephemeral]
-            }).catch(() => { });
-
             // SAVE TO DB (Async/Non-blocking for the interaction response)
             (async () => {
                 try {

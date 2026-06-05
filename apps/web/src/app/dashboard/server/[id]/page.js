@@ -185,12 +185,33 @@ export default function ServerSettings() {
     setTriggeringKillBoard(true);
     try {
       const res = await fetch(`/api/killboard/trigger/${guildId}`, { method: "POST" });
-      if (res.ok) {
-        showToast(lang === "en" ? "KillBoard triggered successfully!" : "KillBoard başarıyla tetiklendi!", "success");
-      } else {
+      if (!res.ok) {
         const data = await res.json();
         throw new Error(data.error || "Trigger failed");
       }
+      
+      showToast(lang === "en" ? "Triggering KillBoard... Please wait." : "KillBoard tetikleniyor... Lütfen bekleyin.", "success");
+
+      let isDone = false;
+      let attempts = 0;
+      while (!isDone && attempts < 35) { // max ~70s wait
+        await new Promise(r => setTimeout(r, 2000));
+        const checkRes = await fetch(`/api/guild-settings/${guildId}`);
+        if (checkRes.ok) {
+           const checkData = await checkRes.json();
+           if (checkData.settings && checkData.settings.trigger_killboard === false) {
+              isDone = true;
+           }
+        }
+        attempts++;
+      }
+      
+      if (isDone) {
+        showToast(lang === "en" ? "KillBoard posted successfully!" : "KillBoard başarıyla kanala gönderildi!", "success");
+      } else {
+        showToast(lang === "en" ? "Taking too long. Process continues in background." : "İşlem uzun sürdü, arka planda devam ediyor.", "warning");
+      }
+
     } catch (err) {
       showToast(err.message, "error");
     } finally {
