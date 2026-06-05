@@ -57,7 +57,9 @@ export async function POST(req, { params }) {
       language, auto_role_sync, embed_thumbnail_url, whitelist, party_templates,
       albion_guild_id, albion_guild_name, killboard_channel_id, killboard_time,
       registration_enabled, registration_channel_id, registration_staff_role_ids,
-      registration_category_id, registration_welcome_message, registration_given_role_id
+      registration_category_id, registration_welcome_message, registration_given_role_id,
+      registration_unregistered_role_id, registration_log_channel_id,
+      registration_welcome_channel_id, registration_welcome_message_text, auto_role_on_join_id
     } = body;
 
     // Upsert: varsa güncelle, yoksa ekle
@@ -82,6 +84,11 @@ export async function POST(req, { params }) {
           registration_category_id: registration_category_id || null,
           registration_welcome_message: registration_welcome_message || null,
           registration_given_role_id: registration_given_role_id || null,
+          registration_unregistered_role_id: registration_unregistered_role_id || null,
+          registration_log_channel_id: registration_log_channel_id || null,
+          registration_welcome_channel_id: registration_welcome_channel_id || null,
+          registration_welcome_message_text: registration_welcome_message_text || null,
+          auto_role_on_join_id: auto_role_on_join_id || null,
         },
         { onConflict: 'guild_id' }
       )

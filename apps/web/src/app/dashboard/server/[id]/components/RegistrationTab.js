@@ -128,6 +128,38 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
             ))}
           </select>
         </div>
+
+        <div className="inputGroup">
+          <label className="label">
+            {lang === 'en' ? 'Unregistered Role (Role to remove upon approval)' : 'Kayıtsız Rolü (Onaylanınca otomatik alınacak)'}
+          </label>
+          <select
+            className="select"
+            value={settings.registration_unregistered_role_id || ""}
+            onChange={(e) => setSettings({ ...settings, registration_unregistered_role_id: e.target.value })}
+          >
+            <option value="">{lang === 'en' ? 'Select Role' : 'Rol Seçin'}</option>
+            {(discordRoles || []).map(r => (
+              <option key={r.id} value={r.id}>@{r.name}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="inputGroup">
+          <label className="label">
+            {lang === 'en' ? 'Auto Role on Join (Given immediately on join)' : 'Otomatik Rol (Sunucuya girene anında verilir)'}
+          </label>
+          <select
+            className="select"
+            value={settings.auto_role_on_join_id || ""}
+            onChange={(e) => setSettings({ ...settings, auto_role_on_join_id: e.target.value })}
+          >
+            <option value="">{lang === 'en' ? 'Select Role' : 'Rol Seçin'}</option>
+            {(discordRoles || []).map(r => (
+              <option key={r.id} value={r.id}>@{r.name}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* Message Setup Section */}
@@ -144,11 +176,11 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
 
         <div className="inputGroup" style={{ flexGrow: 1 }}>
           <label className="label">
-            {lang === 'en' ? 'Message Text' : 'Mesaj Metni'}
+            {lang === 'en' ? 'Message Text' : 'Buton Mesaj Metni'}
           </label>
           <textarea
             className="textarea"
-            rows={10}
+            rows={4}
             placeholder={lang === 'en' ? 'Welcome! Click the button below to register.' : 'Hoşgeldiniz! Kayıt olmak için aşağıdaki butona tıklayın.'}
             value={settings.registration_welcome_message || ""}
             onChange={(e) => setSettings({ ...settings, registration_welcome_message: e.target.value })}
@@ -156,6 +188,61 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
           />
         </div>
         
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', margin: '1rem 0' }}></div>
+        
+        <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', color: 'var(--accent-color)' }}>
+          {lang === 'en' ? 'Post-Registration Settings' : 'Kayıt Sonrası İşlemler'}
+        </h3>
+
+        <div className="inputGroup">
+          <label className="label">
+            {lang === 'en' ? 'Log Channel (Where approve/reject results are sent)' : 'Log Kanalı (Onay/Red sonuçlarının atılacağı kanal)'}
+          </label>
+          <select
+            className="select"
+            value={settings.registration_log_channel_id || ""}
+            onChange={(e) => setSettings({ ...settings, registration_log_channel_id: e.target.value })}
+          >
+            <option value="">{lang === 'en' ? 'Select Channel' : 'Kanal Seçin'}</option>
+            {textChannels.map(c => (
+              <option key={c.id} value={c.id}>#{c.name}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="inputGroup">
+          <label className="label">
+            {lang === 'en' ? 'Public Welcome Channel (Where new members are announced)' : 'Genel Karşılama Kanalı (Yeni üyelerin duyurulacağı kanal)'}
+          </label>
+          <select
+            className="select"
+            value={settings.registration_welcome_channel_id || ""}
+            onChange={(e) => setSettings({ ...settings, registration_welcome_channel_id: e.target.value })}
+          >
+            <option value="">{lang === 'en' ? 'Select Channel' : 'Kanal Seçin'}</option>
+            {textChannels.map(c => (
+              <option key={c.id} value={c.id}>#{c.name}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="inputGroup" style={{ flexGrow: 1 }}>
+          <label className="label">
+            {lang === 'en' ? 'Public Welcome Message' : 'Genel Karşılama Mesajı'}
+          </label>
+          <textarea
+            className="textarea"
+            rows={3}
+            placeholder={lang === 'en' ? 'Welcome to the guild, {user} ({gamenickname})!' : 'Aramıza hoş geldin {user}! Oyun içi adın: {gamenickname}'}
+            value={settings.registration_welcome_message_text || ""}
+            onChange={(e) => setSettings({ ...settings, registration_welcome_message_text: e.target.value })}
+            style={{ resize: 'vertical' }}
+          />
+          <p style={{fontSize: '0.75rem', color: '#aaa', marginTop: '0.3rem'}}>
+            {lang === 'en' ? 'Variables: {user}, {gamenickname}, {realname}, {age}' : 'Değişkenler: {user}, {gamenickname}, {realname}, {age}'}
+          </p>
+        </div>
+
         <button 
           className="dockItem" 
           style={{ width: '100%', justifyContent: 'center', background: 'var(--accent-color)', color: '#000', marginTop: '1rem', padding: '1rem' }} 

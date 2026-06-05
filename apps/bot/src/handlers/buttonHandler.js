@@ -525,6 +525,25 @@ async function handleRegisterButtons(interaction) {
 
         if (action === 'reject') {
             await interaction.reply({ content: `❌ Kayıt reddedildi ve kanal siliniyor...` });
+            
+            // Log rejection
+            const logChannelId = guildConfig?.registration_log_channel_id;
+            if (logChannelId) {
+                const logChannel = interaction.guild.channels.cache.get(logChannelId);
+                if (logChannel) {
+                    const logEmbed = new EmbedBuilder()
+                        .setTitle('❌ Kayıt Reddedildi')
+                        .setColor('#ff4757')
+                        .addFields(
+                            { name: '👤 Kullanıcı', value: `<@${targetUserId}>`, inline: true },
+                            { name: '🛡️ İsim', value: `${ign || '-'} / ${realName || '-'}`, inline: true },
+                            { name: '👮 Yetkili', value: `<@${interaction.user.id}>`, inline: true }
+                        )
+                        .setTimestamp();
+                    await logChannel.send({ embeds: [logEmbed] }).catch(()=>{});
+                }
+            }
+
             setTimeout(() => interaction.channel.delete().catch(() => { }), 3000);
             return;
         }
@@ -562,7 +581,7 @@ async function handleRegisterButtons(interaction) {
                 const safeRealName = capRealName ? ` - ${capRealName}` : '';
                 const newNickname = `${prefix}${capIgn}${safeRealName}${safeAge}`.trim();
 
-                // Assign role if configured
+                // Assign given role if configured
                 const givenRoleId = guildConfig?.registration_given_role_id;
                 let roleStatus = '';
                 if (givenRoleId) {
@@ -572,6 +591,21 @@ async function handleRegisterButtons(interaction) {
                     } catch (e) {
                         console.error('Role add error:', e);
                         roleStatus = `\n⚠️ **Rol Verilemedi:** Botun yetkisi bu rolü vermeye yetmiyor olabilir. (Rolü botun rolünün altına taşıyın)`;
+                    }
+                }
+
+                // Remove unregistered role if configured
+                const unregisteredRoleId = guildConfig?.registration_unregistered_role_id;
+                let unregRoleStatus = '';
+                if (unregisteredRoleId) {
+                    try {
+                        if (targetMember.roles.cache.has(unregisteredRoleId)) {
+                            await targetMember.roles.remove(unregisteredRoleId);
+                            unregRoleStatus = `\n✅ **Kayıtsız Rolü Alındı:** <@&${unregisteredRoleId}>`;
+                        }
+                    } catch (e) {
+                        console.error('Role remove error:', e);
+                        unregRoleStatus = `\n⚠️ **Kayıtsız Rolü Alınamadı:** Yetki yetersiz.`;
                     }
                 }
 
@@ -589,7 +623,40 @@ async function handleRegisterButtons(interaction) {
                     nickStatus = `\nℹ️ Sunucu sahibinin ismi bot tarafından değiştirilemez.`;
                 }
 
-                await interaction.editReply({ content: `✅ <@${targetUserId}> adlı kullanıcının kaydı onaylandı!${nickStatus}${roleStatus}\n\nKanal 5 saniye içinde kapatılacak.` });
+                await interaction.editReply({ content: `✅ <@${targetUserId}> adlı kullanıcının kaydı onaylandı!${nickStatus}${roleStatus}${unregRoleStatus}\n\nKanal 5 saniye içinde kapatılacak.` });
+
+                // Log approval
+                const logChannelId = guildConfig?.registration_log_channel_id;
+                if (logChannelId) {
+                    const logChannel = interaction.guild.channels.cache.get(logChannelId);
+                    if (logChannel) {
+                        const logEmbed = new EmbedBuilder()
+                            .setTitle('✅ Kayıt Onaylandı')
+                            .setColor('#2ed573')
+                            .addFields(
+                                { name: '👤 Kullanıcı', value: `<@${targetUserId}>`, inline: true },
+                                { name: '🎮 Yeni İsim', value: newNickname, inline: true },
+                                { name: '👮 Yetkili', value: `<@${interaction.user.id}>`, inline: true }
+                            )
+                            .setTimestamp();
+                        await logChannel.send({ embeds: [logEmbed] }).catch(()=>{});
+                    }
+                }
+
+                // Welcome Message
+                const welcomeChannelId = guildConfig?.registration_welcome_channel_id;
+                const welcomeMessageText = guildConfig?.registration_welcome_message_text;
+                if (welcomeChannelId && welcomeMessageText) {
+                    const welcomeChannel = interaction.guild.channels.cache.get(welcomeChannelId);
+                    if (welcomeChannel) {
+                        const formattedMsg = welcomeMessageText
+                            .replace(/{user}/g, `<@${targetUserId}>`)
+                            .replace(/{gamenickname}/g, ign || '')
+                            .replace(/{realname}/g, realName || '')
+                            .replace(/{age}/g, age || '');
+                        await welcomeChannel.send({ content: formattedMsg }).catch(()=>{});
+                    }
+                }
 
                 // Remove the buttons so it can't be clicked again
                 const disabledRow = new ActionRowBuilder().addComponents(

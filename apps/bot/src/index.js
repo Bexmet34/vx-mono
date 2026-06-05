@@ -284,6 +284,20 @@ client.on('interactionCreate', async interaction => {
     }
 });
 
+client.on(Events.GuildMemberAdd, async (member) => {
+    try {
+        const guildConfig = await getGuildConfig(member.guild.id);
+        const autoRoleId = guildConfig?.auto_role_on_join_id;
+        if (autoRoleId) {
+            await member.roles.add(autoRoleId).catch(e => {
+                console.error(`[AutoRole] Failed to add role to ${member.user.tag} in ${member.guild.name}:`, e.message);
+            });
+        }
+    } catch (err) {
+        console.error(`[GuildMemberAdd] Error for ${member.user.tag}:`, err);
+    }
+});
+
 client.on(Events.MessageReactionAdd, async (reaction, user) => {
     await handleReactionAdd(reaction, user);
 });

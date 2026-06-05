@@ -217,6 +217,22 @@ async function handleRegisterModal(interaction) {
 
             // 2. Create Ticket Channel
             const categoryId = guildConfig?.registration_category_id;
+            
+            // --- ANTI-SPAM CHECK ---
+            if (categoryId) {
+                const category = interaction.guild.channels.cache.get(categoryId);
+                if (category) {
+                    const existingChannel = category.children.cache.find(ch => 
+                        ch.permissionOverwrites.cache.has(interaction.user.id)
+                    );
+                    if (existingChannel) {
+                        return await interaction.editReply({
+                            content: `❌ **${lang === 'tr' ? 'Zaten açık bir kayıt biletiniz bulunuyor:' : 'You already have an open registration ticket:'}** <#${existingChannel.id}>`
+                        });
+                    }
+                }
+            }
+            
             const staffRoles = guildConfig?.registration_staff_role_ids?.split(',') || [];
             
             const permissionOverwrites = [
