@@ -1,9 +1,20 @@
 "use client";
 
 import { Copy, Plus, Trash2 } from "lucide-react";
+import { useState, useEffect } from "react";
 
 export default function TemplateTab({ t, lang, settings, setSettings, selectedTemplateId, setSelectedTemplateId }) {
   const selectedTemplate = settings.party_templates?.find(tpl => tpl.id === selectedTemplateId) || null;
+
+  const [localReq, setLocalReq] = useState("");
+  const [localOpt, setLocalOpt] = useState("");
+
+  useEffect(() => {
+    if (selectedTemplate) {
+      setLocalReq((selectedTemplate.required_roles || []).join("\n"));
+      setLocalOpt((selectedTemplate.optional_roles || []).join("\n"));
+    }
+  }, [selectedTemplateId]);
 
   const handleCreateTemplate = () => {
     const newTemplate = { id: `tpl_${Date.now()}`, name: "New Template", required_roles: [], optional_roles: [] };
@@ -27,11 +38,21 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
     if (selectedTemplateId === id) setSelectedTemplateId(null);
   };
 
+  const handleReqChange = (e) => {
+    setLocalReq(e.target.value);
+    handleUpdateTemplate({ required_roles: e.target.value.split("\n").map(r => r.trim()).filter(Boolean) });
+  };
+
+  const handleOptChange = (e) => {
+    setLocalOpt(e.target.value);
+    handleUpdateTemplate({ optional_roles: e.target.value.split("\n").map(r => r.trim()).filter(Boolean) });
+  };
+
   return (
     <div className="bentoGrid">
       <div className="bentoBox span4" style={{ padding: 0 }}>
         <div style={{ padding: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h2 className="bentoTitle" style={{ margin: 0 }}><Copy /> Templates</h2>
+          <h2 className="bentoTitle" style={{ margin: 0 }}><Copy /> {lang === 'en' ? 'Templates' : 'Şablonlar'}</h2>
           <button className="dockItem" style={{ padding: '0.4rem', borderRadius: '8px' }} onClick={handleCreateTemplate}>
              <Plus size={18} />
           </button>
@@ -39,7 +60,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
         
         <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
           {(!settings.party_templates || settings.party_templates.length === 0) ? (
-            <div style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>No templates yet.</div>
+            <div style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>{lang === 'en' ? 'No templates yet.' : 'Henüz şablon yok.'}</div>
           ) : (
             settings.party_templates.map(tpl => (
               <div 
@@ -61,13 +82,13 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
       <div className="bentoBox span8">
         {!selectedTemplate ? (
           <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666' }}>
-            Select or create a template to edit.
+            {lang === 'en' ? 'Select or create a template to edit.' : 'Düzenlemek için bir şablon seçin veya oluşturun.'}
           </div>
         ) : (
           <div>
-            <h3 className="bentoTitle" style={{ fontSize: '1.25rem' }}>Edit Template</h3>
+            <h3 className="bentoTitle" style={{ fontSize: '1.25rem' }}>{lang === 'en' ? 'Edit Template' : 'Şablonu Düzenle'}</h3>
             <div className="inputGroup">
-              <label className="label">Template Name</label>
+              <label className="label">{lang === 'en' ? 'Template Name' : 'Şablon Adı'}</label>
               <input 
                 type="text" 
                 className="input" 
@@ -77,23 +98,25 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
             </div>
             
             <div className="inputGroup">
-              <label className="label">Required Roles (comma separated)</label>
-              <input 
-                type="text" 
-                className="input" 
-                value={(selectedTemplate.required_roles || []).join(", ")} 
-                onChange={(e) => handleUpdateTemplate({ required_roles: e.target.value.split(",").map(r => r.trim()).filter(Boolean) })} 
+              <label className="label">{lang === 'en' ? 'Required Roles (one per line)' : 'Gerekli Roller (Her satıra bir tane)'}</label>
+              <textarea 
+                className="textarea" 
+                rows={5}
+                value={localReq} 
+                onChange={handleReqChange} 
+                style={{ resize: 'vertical' }}
               />
-              <p className="hint">E.g. Tank, Healer, DPS</p>
+              <p className="hint">{lang === 'en' ? 'E.g. Tank\nHealer\nDPS' : 'Örn: Tank\nHealer\nDPS'}</p>
             </div>
 
             <div className="inputGroup">
-              <label className="label">Optional Roles (comma separated)</label>
-              <input 
-                type="text" 
-                className="input" 
-                value={(selectedTemplate.optional_roles || []).join(", ")} 
-                onChange={(e) => handleUpdateTemplate({ optional_roles: e.target.value.split(",").map(r => r.trim()).filter(Boolean) })} 
+              <label className="label">{lang === 'en' ? 'Optional Roles (one per line)' : 'İsteğe Bağlı Roller (Her satıra bir tane)'}</label>
+              <textarea 
+                className="textarea" 
+                rows={3}
+                value={localOpt} 
+                onChange={handleOptChange} 
+                style={{ resize: 'vertical' }}
               />
             </div>
           </div>

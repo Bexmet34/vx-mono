@@ -11,28 +11,43 @@ export async function GET(request) {
   }
 
   try {
-    const url = `https://gameinfo-ams.albiononline.com/api/gameinfo/search?q=${encodeURIComponent(query)}`;
-    const response = await fetch(url, {
-      headers: { 'Accept': 'application/json' },
-      next: { revalidate: 0 }
-    });
+    const urls = [
+      `https://gameinfo.albiononline.com/api/gameinfo/search?q=${encodeURIComponent(query)}`,
+      `https://gameinfo-ams.albiononline.com/api/gameinfo/search?q=${encodeURIComponent(query)}`,
+      `https://gameinfo-sgp.albiononline.com/api/gameinfo/search?q=${encodeURIComponent(query)}`
+    ];
 
-    if (!response.ok) {
-      throw new Error(`Albion API error: ${response.status}`);
+    const responses = await Promise.all(
+      urls.map(url => fetch(url, { headers: { 'Accept': 'application/json' }, next: { revalidate: 0 } }).catch(e => null))
+    );
+
+    let allGuilds = [];
+    for (const response of responses) {
+      if (response && response.ok) {
+        const data = await response.json().catch(() => ({}));
+        if (data.guilds) {
+          allGuilds = allGuilds.concat(data.guilds);
+        }
+      }
     }
 
-    const data = await response.json();
-    const guilds = (data.guilds || []).map(g => ({
-      Id: g.Id || g.id,
-      Name: g.Name || g.name,
-      AllianceId: g.AllianceId || g.allianceId,
-      AllianceName: g.AllianceName || g.allianceName,
-      AllianceTag: g.AllianceTag || g.allianceTag,
-      KillFame: g.KillFame || g.killFame || 0,
-      MemberCount: g.MemberCount || g.memberCount || 0
-    }));
+    const uniqueGuilds = new Map();
+    allGuilds.forEach(g => {
+      const id = g.Id || g.id;
+      if (!uniqueGuilds.has(id)) {
+        uniqueGuilds.set(id, {
+          Id: id,
+          Name: g.Name || g.name,
+          AllianceId: g.AllianceId || g.allianceId,
+          AllianceName: g.AllianceName || g.allianceName,
+          AllianceTag: g.AllianceTag || g.allianceTag,
+          KillFame: g.KillFame || g.killFame || 0,
+          MemberCount: g.MemberCount || g.memberCount || 0
+        });
+      }
+    });
 
-    return NextResponse.json(guilds);
+    return NextResponse.json(Array.from(uniqueGuilds.values()));
   } catch (error) {
     console.error('[Albion Search API] Error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
