@@ -78,7 +78,9 @@ export default function KillBoardTab({
                   <div key={g.Id} className="listItem" style={{ cursor: 'pointer', marginBottom: '0.25rem' }} onClick={() => handleSelectGuild(g)}>
                     <div>
                       <div style={{ fontWeight: 600, color: '#fff' }}>{g.Name}</div>
-                      <div style={{ fontSize: '0.8rem', color: '#888' }}>Alliance: {g.AllianceTag || 'None'}</div>
+                      <div style={{ fontSize: '0.8rem', color: '#888' }}>
+                        Kill Fame: {g.KillFame ? g.KillFame.toLocaleString() : 0} &bull; Death Fame: {g.DeathFame ? g.DeathFame.toLocaleString() : 0}
+                      </div>
                     </div>
                   </div>
                 ))}

@@ -42,6 +42,7 @@ export async function GET(request) {
           AllianceName: g.AllianceName || g.allianceName,
           AllianceTag: g.AllianceTag || g.allianceTag,
           KillFame: g.KillFame || g.killFame || 0,
+          DeathFame: g.DeathFame || g.deathFame || 0,
           MemberCount: g.MemberCount || g.memberCount || 0
         });
       }
