@@ -1,0 +1,35 @@
+---
+title: Albion Online Sistemleri
+description: Albion Online kayıt, rol verme ve killboard yönetim sistemi.
+---
+
+Veyronix, Albion Online Avrupa sunucuları ile doğrudan entegre çalışır. Loncanızın yükünü hafifletmek için tasarlanmış sistemler şu şekilde işler:
+
+## 1. Lonca Tanıtımı (`/setup-guild`)
+
+Tüm sistemlerin sağlıklı çalışması için öncelikle botun hangi loncaya hizmet ettiğini bilmesi gerekir.
+
+1. Discord'da herhangi bir kanala `/setup-guild` yazın.
+2. Çıkan seçeneğe oyun içi loncanızın tam adını yazın.
+3. Bot, Albion API'sinde arama yapıp size doğru loncayı sunacaktır. Seçerek işlemi tamamlayın.
+
+## 2. Otomatik Kayıt Sistemi (`/setup-registration`)
+
+Manuel olarak "Şu rolü bana ver" diyen oyuncularla uğraşmanıza gerek yok.
+
+Kayıt sistemini aktif ettiğiniz kanala bot şık bir buton bırakır. Oyuncu bu butona tıkladığında oyun içi adını girmesi istenir. Veyronix arka planda:
+- Karakterin gerçekten o isme sahip olup olmadığını,
+- Karakterin sizin loncanızda (veya ittifakınızda) olup olmadığını kontrol eder.
+
+> [!TIP]
+> Doğrulama başarılı olursa, oyuncuya otomatik olarak `Üye` (veya panelden ayarladığınız diğer roller) verilir. Eğer oyuncu daha sonra loncadan çıkarsa, Veyronix bunu tespit eder ve rollerini geri alır!
+
+## 3. Günlük Killboard Özeti (`/setup-killboard`)
+
+Loncanızın savaş performansını her gün otomatik olarak sunucunuza getirin.
+
+`/setup-killboard` komutunu kullanarak bir kanal ve bir saat (UTC cinsinden) belirleyin.
+Örneğin `saat: 21:00` ayarlarsanız, bot o saatte şunları özetler:
+- Loncanızın o gün attığı en değerli (Fame) Kill'ler.
+- En çok Fame kazanan üyeler.
+- Toplam Kill / Death oranları.

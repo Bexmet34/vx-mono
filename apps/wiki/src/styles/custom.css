@@ -1,0 +1,96 @@
+/* Veyronix Pro - Final Stable Theme */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+
+:root {
+  --sl-font: 'Plus Jakarta Sans', system-ui, sans-serif;
+  
+  /* Cyber Pro Palette */
+  --accent-cyan: #00f2ff;
+  --accent-glow: rgba(0, 242, 255, 0.1);
+  
+  --sl-color-accent: var(--accent-cyan);
+  --sl-color-bg: #050505;
+  --sl-color-bg-nav: #080808;
+  
+  --sl-color-white: #ffffff;
+  --sl-color-gray-1: #f8fafc;
+  --sl-color-gray-2: #e2e8f0;
+  --sl-color-gray-3: #94a3b8;
+  --sl-color-gray-4: #475569;
+}
+
+/* Stability Fixes */
+* {
+  transition: none !important; /* Prevents font-size transitions and jumping */
+}
+
+body {
+  background-color: var(--sl-color-bg);
+  background-image: radial-gradient(circle at 50% -20%, var(--accent-glow), transparent 40%);
+  background-attachment: fixed;
+  font-display: swap;
+}
+
+/* Header */
+.site-title {
+  font-weight: 800 !important;
+  color: #fff !important;
+  letter-spacing: -0.02em;
+}
+
+/* Hero Section */
+.hero {
+  padding-block: 5rem 7rem;
+}
+
+.hero .copy h1 {
+  font-size: clamp(2rem, 8vw, 3.5rem) !important;
+  font-weight: 800;
+  line-height: 1.1;
+  color: #fff !important;
+  filter: drop-shadow(0 0 10px var(--accent-glow));
+}
+
+.hero .tagline {
+  color: var(--sl-color-gray-3) !important;
+  font-size: 1.1rem !important;
+}
+
+/* Card Styling */
+.card {
+  background: #0a0a0a !important;
+  border: 1px solid #1a1a1a !important;
+  border-radius: 2px !important;
+  padding: 1.5rem !important;
+}
+
+.card:hover {
+  border-color: var(--accent-cyan) !important;
+  box-shadow: 0 0 15px var(--accent-glow);
+}
+
+.card .title {
+  color: #fff !important;
+  font-weight: 700 !important;
+}
+
+/* Buttons */
+.action.primary {
+  background: #fff !important;
+  color: #000 !important;
+  border-radius: 4px !important;
+  font-weight: 700 !important;
+}
+
+.action.primary:hover {
+  background: var(--accent-cyan) !important;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: #333;
+}
