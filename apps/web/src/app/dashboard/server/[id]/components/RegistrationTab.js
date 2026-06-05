@@ -115,12 +115,44 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
 
         <div className="inputGroup">
           <label className="label">
-            {lang === 'en' ? 'Given Role (Role assigned upon approval)' : 'Verilecek Rol (Kayıt onaylandığında verilecek)'}
+            {lang === 'en' ? 'Given Role 1 (Assigned on button 1)' : 'Verilecek Rol 1 (Kayıt onaylandığında verilecek)'}
           </label>
           <select
             className="select"
             value={settings.registration_given_role_id || ""}
             onChange={(e) => setSettings({ ...settings, registration_given_role_id: e.target.value })}
+          >
+            <option value="">{lang === 'en' ? 'Select Role' : 'Rol Seçin'}</option>
+            {(discordRoles || []).map(r => (
+              <option key={r.id} value={r.id}>@{r.name}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="inputGroup">
+          <label className="label">
+            {lang === 'en' ? 'Given Role 2 (Assigned on button 2)' : 'Verilecek Rol 2 (Kayıt onaylandığında verilecek)'}
+          </label>
+          <select
+            className="select"
+            value={settings.registration_given_role_id_2 || ""}
+            onChange={(e) => setSettings({ ...settings, registration_given_role_id_2: e.target.value })}
+          >
+            <option value="">{lang === 'en' ? 'Select Role' : 'Rol Seçin'}</option>
+            {(discordRoles || []).map(r => (
+              <option key={r.id} value={r.id}>@{r.name}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="inputGroup">
+          <label className="label">
+            {lang === 'en' ? 'Given Role 3 (Assigned on button 3)' : 'Verilecek Rol 3 (Kayıt onaylandığında verilecek)'}
+          </label>
+          <select
+            className="select"
+            value={settings.registration_given_role_id_3 || ""}
+            onChange={(e) => setSettings({ ...settings, registration_given_role_id_3: e.target.value })}
           >
             <option value="">{lang === 'en' ? 'Select Role' : 'Rol Seçin'}</option>
             {(discordRoles || []).map(r => (

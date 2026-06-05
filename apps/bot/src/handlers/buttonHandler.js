@@ -479,7 +479,25 @@ async function handleRegisterButtons(interaction) {
     // 2. Staff clicks "Approve" or "Reject"
     if (customId.startsWith('reg_approve_') || customId.startsWith('reg_reject_')) {
         const action = customId.startsWith('reg_approve_') ? 'approve' : 'reject';
-        const targetUserId = customId.split('_')[2];
+        const parts = customId.split('_');
+        
+        let targetUserId;
+        let roleIndex = 1;
+
+        if (action === 'approve') {
+            if (parts.length === 4) {
+                // New format: reg_approve_{index}_{userid}
+                roleIndex = parseInt(parts[2], 10);
+                targetUserId = parts[3];
+            } else {
+                // Old format: reg_approve_{userid}
+                targetUserId = parts[2];
+            }
+        } else {
+            // reg_reject_{userid}
+            targetUserId = parts[2];
+        }
+
         const staffRoles = guildConfig?.registration_staff_role_ids?.split(',') || [];
 
         const isStaff = interaction.member.roles.cache.some(r => staffRoles.includes(r.id)) || interaction.member.permissions.has('Administrator');
@@ -582,7 +600,10 @@ async function handleRegisterButtons(interaction) {
                 const newNickname = `${prefix}${capIgn}${safeRealName}${safeAge}`.trim();
 
                 // Assign given role if configured
-                const givenRoleId = guildConfig?.registration_given_role_id;
+                let givenRoleId = guildConfig?.registration_given_role_id;
+                if (roleIndex === 2) givenRoleId = guildConfig?.registration_given_role_id_2;
+                if (roleIndex === 3) givenRoleId = guildConfig?.registration_given_role_id_3;
+
                 let roleStatus = '';
                 if (givenRoleId) {
                     try {

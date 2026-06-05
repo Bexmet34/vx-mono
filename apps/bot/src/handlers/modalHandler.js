@@ -281,9 +281,46 @@ async function handleRegisterModal(interaction) {
                 embed.setThumbnail(guildConfig.embed_thumbnail_url);
             }
 
-            const row = new ActionRowBuilder().addComponents(
-                new ButtonBuilder().setCustomId(`reg_approve_${interaction.user.id}`).setLabel(lang === 'tr' ? 'Onayla' : 'Approve').setStyle(ButtonStyle.Success),
-                new ButtonBuilder().setCustomId(`reg_reject_${interaction.user.id}`).setLabel(lang === 'tr' ? 'Reddet' : 'Reject').setStyle(ButtonStyle.Danger)
+            const role1 = guildConfig?.registration_given_role_id;
+            const role2 = guildConfig?.registration_given_role_id_2;
+            const role3 = guildConfig?.registration_given_role_id_3;
+            
+            const row = new ActionRowBuilder();
+            let addedButtons = 0;
+
+            const addApproveButton = (roleId, index) => {
+                if (!roleId) return;
+                const role = interaction.guild.roles.cache.get(roleId);
+                const roleName = role ? role.name : `Rol ${index}`;
+                const labelText = lang === 'tr' ? `Onayla (${roleName})` : `Approve (${roleName})`;
+                row.addComponents(
+                    new ButtonBuilder()
+                        .setCustomId(`reg_approve_${index}_${interaction.user.id}`)
+                        .setLabel(labelText.substring(0, 80))
+                        .setStyle(ButtonStyle.Success)
+                );
+                addedButtons++;
+            };
+
+            addApproveButton(role1, 1);
+            addApproveButton(role2, 2);
+            addApproveButton(role3, 3);
+
+            // If no roles are configured, provide a generic fallback button
+            if (addedButtons === 0) {
+                row.addComponents(
+                    new ButtonBuilder()
+                        .setCustomId(`reg_approve_1_${interaction.user.id}`)
+                        .setLabel(lang === 'tr' ? 'Onayla' : 'Approve')
+                        .setStyle(ButtonStyle.Success)
+                );
+            }
+
+            row.addComponents(
+                new ButtonBuilder()
+                    .setCustomId(`reg_reject_${interaction.user.id}`)
+                    .setLabel(lang === 'tr' ? 'Reddet' : 'Reject')
+                    .setStyle(ButtonStyle.Danger)
             );
 
             // Ping staff if configured

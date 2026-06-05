@@ -58,6 +58,7 @@ export async function POST(req, { params }) {
       albion_guild_id, albion_guild_name, killboard_channel_id, killboard_time,
       registration_enabled, registration_channel_id, registration_staff_role_ids,
       registration_category_id, registration_welcome_message, registration_given_role_id,
+      registration_given_role_id_2, registration_given_role_id_3,
       registration_unregistered_role_id, registration_log_channel_id,
       registration_welcome_channel_id, registration_welcome_message_text, auto_role_on_join_id
     } = body;
@@ -84,6 +85,8 @@ export async function POST(req, { params }) {
           registration_category_id: registration_category_id || null,
           registration_welcome_message: registration_welcome_message || null,
           registration_given_role_id: registration_given_role_id || null,
+          registration_given_role_id_2: registration_given_role_id_2 || null,
+          registration_given_role_id_3: registration_given_role_id_3 || null,
           registration_unregistered_role_id: registration_unregistered_role_id || null,
           registration_log_channel_id: registration_log_channel_id || null,
           registration_welcome_channel_id: registration_welcome_channel_id || null,
