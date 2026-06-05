@@ -14,6 +14,8 @@ const { EMPTY_SLOT } = require('../constants/constants');
 const { buildRolesFields, addFooterFields, createObjectiveEmbed, createPlayerCardEmbed } = require('../builders/embedBuilder');
 const { createObjectiveButtons } = require('../builders/componentBuilder');
 const { parseTimeToMs, getNow } = require('../utils/timeUtils');
+const { getSubscription } = require('@veyronix/database');
+const config = require('../config/config');
 
 async function handlePartiModal(interaction) {
     if (interaction.customId.startsWith('parti_modal:')) {
@@ -24,10 +26,18 @@ async function handlePartiModal(interaction) {
         const guildName = guildConfig?.guild_name || 'Albion';
 
         const userId = interaction.user.id;
-        const whitelisted = await isWhitelisted(userId, interaction.guildId);
-        const partyCount = getActivePartyCount(userId);
+        const isOwner = userId === interaction.guild?.ownerId;
+        const isDeveloper = config.WHITELIST_USERS?.includes(userId);
+        const whitelisted = isOwner || isDeveloper || await isWhitelisted(userId, interaction.guildId);
+        
+        const sub = await getSubscription(interaction.guildId, interaction.guild.name, interaction.guild.ownerId);
+        const isUnlimited = sub && sub.is_unlimited;
+        const hasUnlimitedParty = sub && sub.unlimited_party;
 
-        const limit = whitelisted ? 3 : 1;
+        const partyCount = getActivePartyCount(userId);
+        let limit = 1;
+        if (whitelisted) limit = 3;
+        if ((isUnlimited || hasUnlimitedParty) && (isOwner || isDeveloper)) limit = 999;
 
         if (partyCount >= limit) {
             let errorMsg = whitelisted

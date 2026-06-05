@@ -149,5 +149,25 @@ module.exports = {
         notification_unlimited_desc: 'Unlimited subscription has been defined for **{guildName}**. You can now use the bot without limits!',
         notification_disabled_title: '🚫 Server Disabled',
         notification_disabled_desc: 'The server **{guildName}** has been disabled by the system. Please contact the support team.'
+    },
+    killboard: {
+        title: '🗡️ {guildName} — Daily KillBoard Summary',
+        description: '📅 **{period}**\n⚔️ Total Kills: `{kills}`  |  💀 Total Deaths: `{deaths}`',
+        top_killers_1: '⚔️ Top Killers (Top 5)',
+        top_killers_2: '⚔️ Top Killers (6-10)',
+        top_deaths_1: '💀 Regulars at the Morgue (Top 5)',
+        top_deaths_2: '💀 Regulars at the Morgue (6-10)',
+        top_fame_kill: '💰 Catch of the Day',
+        quiet_day_title: '😴 A Quiet Day Today',
+        quiet_day_desc: 'No significant PvP activity found. Maybe tomorrow will be bloodier!',
+        joke_1: 'Lay on the ground so much they turned into grass.',
+        joke_2: 'Name written in gold at the morgue entrance.',
+        joke_3: 'Gear keeps breaking, repairman got rich.',
+        joke_4: 'Did charity work today by giving out free gear.',
+        joke_5: 'Eyes went bad from seeing the grey screen.',
+        footer: 'Veyronix KillBoard System',
+        kill_format: '{medal} [**{name}**](https://albiononline.com/en/killboard/player/{id}) — `{kills}` kills | `{fame}M` fame',
+        death_format: '{medal} [**{name}**](https://albiononline.com/en/killboard/player/{id}) — `{deaths}` deaths | `{fame}M` lost fame',
+        fame: 'Fame'
     }
 };

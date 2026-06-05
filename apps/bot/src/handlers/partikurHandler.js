@@ -54,7 +54,9 @@ async function handleCreatePartyCommand(interaction) {
     const hasUnlimitedParty = sub && sub.unlimited_party;
 
     const partyCount = getActivePartyCount(userId);
-    const limit = (isUnlimited || hasUnlimitedParty) ? 999 : (whitelisted ? 3 : 1);
+    let limit = 1;
+    if (whitelisted) limit = 3;
+    if ((isUnlimited || hasUnlimitedParty) && (isOwner || isDeveloper)) limit = 999;
 
     if (partyCount >= limit) {
         let errorMsg = whitelisted
@@ -149,7 +151,9 @@ async function handleTempCommand(interaction) {
     const hasUnlimitedParty = sub && sub.unlimited_party;
 
     const partyCount = getActivePartyCount(userId);
-    const limit = (isUnlimited || hasUnlimitedParty) ? 999 : (whitelisted ? 3 : 1);
+    let limit = 1;
+    if (whitelisted) limit = 3;
+    if ((isUnlimited || hasUnlimitedParty) && (isOwner || isDeveloper)) limit = 999;
 
     if (partyCount >= limit) {
         let errorMsg = whitelisted

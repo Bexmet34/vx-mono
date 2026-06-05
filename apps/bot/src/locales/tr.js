@@ -149,5 +149,25 @@ module.exports = {
         notification_unlimited_desc: '**{guildName}** sunucusu için sınırsız abonelik tanımlandı. Artık botu sınırsız kullanabilirsiniz!',
         notification_disabled_title: '🚫 Sunucu Devre Dışı Bırakıldı',
         notification_disabled_desc: '**{guildName}** sunucusu sistem tarafından devre dışı bırakıldı. Lütfen destek ekibi ile iletişime geçin.'
+    },
+    killboard: {
+        title: '🗡️ {guildName} — Günlük KillBoard Özeti',
+        description: '📅 **{period}**\n⚔️ Toplam Kill: `{kills}`  |  💀 Toplam Ölüm: `{deaths}`',
+        top_killers_1: '⚔️ En Çok Kill Alanlar (İlk 5)',
+        top_killers_2: '⚔️ En Çok Kill Alanlar (6-10)',
+        top_deaths_1: '💀 Morgun Daimi Müşterileri (İlk 5)',
+        top_deaths_2: '💀 Morgun Daimi Müşterileri (6-10)',
+        top_fame_kill: '💰 Günün Vurgunu',
+        quiet_day_title: '😴 Bugün Sessiz Bir Gün',
+        quiet_day_desc: 'Kayda değer bir PvP aktivitesi bulunamadı. Belki yarın daha kanlı olur!',
+        joke_1: 'Yerde yatmaktan çimen oldu, üzerine basmayın.',
+        joke_2: 'Morgun kapısında adı altın harflerle yazıyor.',
+        joke_3: 'Set dayanmıyor, tamirci zengin oldu.',
+        joke_4: 'Bugün de bedava eşya dağıtarak hayır işledi.',
+        joke_5: 'Ekranı gri görmekten gözleri bozuldu.',
+        footer: 'Veyronix KillBoard Sistemi',
+        kill_format: '{medal} [**{name}**](https://albiononline.com/en/killboard/player/{id}) — `{kills}` kill | `{fame}M` fame',
+        death_format: '{medal} [**{name}**](https://albiononline.com/en/killboard/player/{id}) — `{deaths}` ölüm | `{fame}M` kayıp fame',
+        fame: 'Fame'
     }
 };
