@@ -159,15 +159,6 @@ export default function Home() {
               {t.supportBtn}
             </a>
           </div>
-          
-          <div className={`${styles.statsContainer} delay-4 animate-fade-in`}>
-            <div className="glass-panel" style={{ padding: '0.75rem 1.5rem', borderRadius: '50px', display: 'inline-flex', alignItems: 'center', gap: '0.75rem' }}>
-              <Activity size={20} className={styles.badgeHighlight} />
-              <span style={{ fontWeight: '600', fontSize: '1rem', color: 'var(--text-main)' }}>
-                {serverCount > 0 ? `${serverCount.toLocaleString()} Sunucuda Aktif` : "Sunucu sayısı yükleniyor..."}
-              </span>
-            </div>
-          </div>
         </div>
 
         {/* --- ACTIVE CAMPAIGNS --- */}
