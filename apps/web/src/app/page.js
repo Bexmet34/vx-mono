@@ -167,10 +167,6 @@ export default function Home() {
                 {serverCount > 0 ? `${serverCount.toLocaleString()} Sunucuda Aktif` : "Sunucu sayısı yükleniyor..."}
               </span>
             </div>
-            
-            <a href="https://top.gg/bot/1082239904169336902" target="_blank" rel="noopener noreferrer" style={{ transition: 'transform 0.3s ease' }} onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'} onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}>
-              <img src="https://top.gg/api/widget/1082239904169336902.svg" alt="Top.gg Widget" height="120" style={{ borderRadius: '12px' }} />
-            </a>
           </div>
         </div>
 
@@ -395,6 +391,13 @@ export default function Home() {
               <p>{t.cmdProTip}</p>
             </div>
           </div>
+        </section>
+
+        {/* Top.gg Widget */}
+        <section style={{ display: 'flex', justifyContent: 'center', padding: '2rem 0 4rem 0' }}>
+          <a href="https://top.gg/bot/1082239904169336902" target="_blank" rel="noopener noreferrer" style={{ transition: 'transform 0.3s ease' }} onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'} onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}>
+            <img src="https://top.gg/api/widget/1082239904169336902.svg" alt="Top.gg Widget" height="120" style={{ borderRadius: '12px', boxShadow: '0 10px 30px -10px rgba(88, 101, 242, 0.3)' }} />
+          </a>
         </section>
       </main>
 
