@@ -10,7 +10,7 @@ export default function PrivacyPage() {
   const content = {
     tr: {
       h1: "Veri Toplama ve KVKK",
-      p1: "Veyronix, 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) uyarınca, kullanıcılarının verilerini korumayı taahhüt eder. Sadece hizmetin işleyişi için gerekli olan Discord ID, sunucu ID ve temel ayar verileri toplanır.",
+      p1: "[PAYTR_ŞİRKET_VEYA_ŞAHIS_UNVANINIZI_GİRİN] (Bundan sonra \"Veyronix\" olarak anılacaktır), 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) uyarınca, kullanıcılarının verilerini korumayı taahhüt eder. Sadece hizmetin işleyişi için gerekli olan Discord ID, sunucu ID ve temel ayar verileri toplanır.",
       h2: "Veri Kullanımı",
       p2: "Toplanan veriler sadece botun sunduğu party yönetim sistemi ve Albion Online entegrasyonu gibi hizmetlerin sağlanması amacıyla kullanılır. Verileriniz kesinlikle üçüncü taraflarla paylaşılmaz veya satılmaz.",
       h3: "Güvenlik",
@@ -19,7 +19,7 @@ export default function PrivacyPage() {
     },
     en: {
       h1: "Information Collection & GDPR",
-      p1: "Veyronix collects minimal data required for functionality. This includes your Discord user ID, server IDs where the bot is present, and basic settings you configure. We are committed to protecting user data.",
+      p1: "[PAYTR_ŞİRKET_VEYA_ŞAHIS_UNVANINIZI_GİRİN] (Hereinafter referred to as \"Veyronix\") collects minimal data required for functionality. This includes your Discord user ID, server IDs where the bot is present, and basic settings you configure. We are committed to protecting user data.",
       h2: "Data Usage",
       p2: "Your data is used solely to provide party management services and Albion Online integration. We never sell or share your data with third parties.",
       h3: "Security",

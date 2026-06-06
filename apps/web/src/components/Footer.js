@@ -82,6 +82,11 @@ export default function Footer() {
                 <History size={18} /> {t.iptalIade}
               </Link>
             </li>
+            <li>
+              <Link href="/teslimat-kosullari" style={{ color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.5rem' }} className="hover-accent">
+                <Shield size={18} /> {t.teslimatKosullari}
+              </Link>
+            </li>
           </ul>
         </div>
 
@@ -101,10 +106,42 @@ export default function Footer() {
               {t.email}: hakkibsknn@gmail.com
             </li>
           </ul>
+            <li style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+              Adres: [PAYTR_AÇIK_ADRESİNİZİ_BURAYA_GİRİN]
+            </li>
+          </ul>
         </div>
 
+      </div>
 
-
+      {/* PayTR and Security Logos */}
+      <div style={{ 
+        maxWidth: '1200px', 
+        margin: '3rem auto 0 auto',
+        paddingTop: '2rem',
+        borderTop: '1px solid rgba(255,255,255,0.05)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '1rem'
+      }}>
+        <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
+          {/* SSL Logo */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#4CAF50', fontWeight: 'bold', fontSize: '1.2rem', padding: '0.5rem 1rem', background: 'rgba(76, 175, 80, 0.1)', borderRadius: '8px' }}>
+            <Shield size={24} /> 256-Bit SSL Güvencesiyle
+          </div>
+          
+          {/* Payment Methods Text Alternative (Since we don't have raw SVG files locally) */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', background: 'rgba(255,255,255,0.03)', padding: '0.5rem 1rem', borderRadius: '8px', color: 'var(--text-muted)' }}>
+            <span style={{ fontWeight: 'bold', color: '#1a1f71', background: '#fff', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>VISA</span>
+            <span style={{ fontWeight: 'bold', color: '#eb001b', background: '#fff', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>MasterCard</span>
+            <span style={{ fontWeight: 'bold', color: '#00a3e0', background: '#fff', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>TROY</span>
+            <span style={{ fontWeight: 'bold', color: '#000', background: '#00e574', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>PayTR</span>
+          </div>
+        </div>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', textAlign: 'center' }}>
+          Ödemeleriniz PayTR altyapısı ile %100 güvenli bir şekilde gerçekleştirilmektedir.
+        </p>
       </div>
 
       <div style={{ 

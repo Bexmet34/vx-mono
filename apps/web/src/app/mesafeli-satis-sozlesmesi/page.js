@@ -13,7 +13,12 @@ export default function DistanceSalesAgreement() {
       title: "Mesafeli Satış Sözleşmesi",
       h1: "1. TARAFLAR",
       p1: "İşbu Sözleşme aşağıdaki taraflar arasında aşağıda belirtilen hüküm ve şartlar çerçevesinde imzalanmıştır.",
-      satici: "SATICI: Veyronix (Bundan sonra \"SATICI\" olarak anılacaktır)",
+      satici: `SATICI BİLGİLERİ:
+Ünvan: [PAYTR_ŞİRKET_VEYA_ŞAHIS_UNVANINIZI_GİRİN]
+Adres: [PAYTR_AÇIK_ADRESİNİZİ_GİRİN]
+Telefon: [PAYTR_TELEFON_NUMARANIZ]
+E-Posta: hakkibsknn@gmail.com
+(Bundan sonra "SATICI" olarak anılacaktır)`,
       alici: "ALICI: Veyronix hizmetlerini web sitesi üzerinden satın alan kullanıcı (Bundan sonra \"ALICI\" olarak anılacaktır)",
       h2: "2. KONU",
       p2: "İşbu Sözleşme'nin konusu, ALICI'nın SATICI'ya ait veyronix.com.tr internet sitesi üzerinden elektronik ortamda siparişini verdiği aşağıda nitelikleri ve satış fiyatı belirtilen ürünün/hizmetin satışı ve teslimi ile ilgili olarak 6502 sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli Sözleşmeler Yönetmeliği hükümleri gereğince tarafların hak ve yükümlülüklerinin saptanmasıdır.",
@@ -56,7 +61,7 @@ export default function DistanceSalesAgreement() {
             <section style={{ marginBottom: '2rem' }}>
               <h2 style={{ color: 'var(--text-main)', fontSize: '1.2rem', marginBottom: '1rem' }}>{active.h1}</h2>
               <p>{active.p1}</p>
-              <p><strong>{active.satici}</strong></p>
+              <p style={{ whiteSpace: 'pre-wrap' }}><strong>{active.satici}</strong></p>
               <p><strong>{active.alici}</strong></p>
             </section>
 
