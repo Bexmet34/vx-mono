@@ -224,11 +224,15 @@ function createPartikurEmbed(header, rolesList, description = '', content = '', 
     }
 
     const leaderText = ownerId ? `<@${ownerId}>` : t('common.not_set', lang);
-    const descText = description || t('common.not_set', lang);
+    let topInfoValue = `👑 **${t('party.party_leader', lang)}:** ${leaderText}`;
+    
+    if (description && description.trim() !== '') {
+        topInfoValue += `\n📝 **${t('party.party_description', lang)}:** ${description.trim()}`;
+    }
 
     embed.addFields({
-        name: '',
-        value: `👑 **${t('party.party_leader', lang)}:** ${leaderText}\n📝 **${t('party.party_description', lang)}:** ${descText}`
+        name: '\u200b',
+        value: topInfoValue
     });
 
     return embed;
