@@ -1,16 +1,10 @@
 import { docs, meta } from '../../.source/server';
 import { loader } from 'fumadocs-core/source';
+import { toFumadocsSource } from 'fumadocs-mdx/runtime/server';
 
 export const source = loader({
   baseUrl: '/docs',
-  source: {
-    get pages() {
-      return docs;
-    },
-    get meta() {
-      return meta;
-    }
-  },
+  source: toFumadocsSource(docs, meta),
   i18n: {
     defaultLanguage: 'tr',
     languages: ['tr', 'en'],
