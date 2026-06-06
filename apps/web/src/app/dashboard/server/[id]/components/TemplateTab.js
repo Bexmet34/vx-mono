@@ -92,8 +92,20 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
               <input 
                 type="text" 
                 className="input" 
-                value={selectedTemplate.name} 
+                value={selectedTemplate.name || ""} 
                 onChange={(e) => handleUpdateTemplate({ name: e.target.value })} 
+              />
+            </div>
+
+            <div className="inputGroup">
+              <label className="label">{lang === 'en' ? 'Description' : 'Açıklama'}</label>
+              <textarea 
+                className="textarea" 
+                rows={2}
+                value={selectedTemplate.description || ""} 
+                onChange={(e) => handleUpdateTemplate({ description: e.target.value })} 
+                placeholder={lang === 'en' ? 'Optional description for this party...' : 'Bu parti için isteğe bağlı açıklama...'}
+                style={{ resize: 'vertical' }}
               />
             </div>
             
