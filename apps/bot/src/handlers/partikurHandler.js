@@ -188,6 +188,17 @@ function getTemplateByIndex(templatesStr, indexStr) {
     if (Array.isArray(template.roles)) {
         rolesRaw = template.roles.join('\n');
     }
+    
+    // Support new template format from Dashboard
+    if (Array.isArray(template.required_roles) || Array.isArray(template.optional_roles)) {
+        let allRoles = [];
+        if (Array.isArray(template.required_roles)) allRoles.push(...template.required_roles);
+        if (Array.isArray(template.optional_roles)) allRoles.push(...template.optional_roles);
+        if (allRoles.length > 0) {
+            rolesRaw = allRoles.join('\n');
+        }
+    }
+
     const description = template.description || '';
 
     const rolesList = rolesRaw.split('\n')
