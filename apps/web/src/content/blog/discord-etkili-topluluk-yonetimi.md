@@ -3,6 +3,7 @@ title: "Discord'da Topluluk Yönetimi Nasıl Yapılır?"
 description: "Discord sunucunuzdaki üyeleri nasıl aktif tutacağınızı, moderasyon kurallarını ve başarılı bir topluluk yaratmanın sırlarını keşfedin."
 date: "2026-06-02"
 tags: "Discord,Topluluk,Yönetim"
+lang: "tr"
 ---
 
 Bir Discord sunucusu kurmak kolaydır, ancak onu "yaşayan", aktif ve toksik olmayan bir topluluğa dönüştürmek büyük bir çaba ve doğru strateji gerektirir. Oyun klanları, yazılım toplulukları veya sadece arkadaş grupları için geçerli olan altın kuralları bir araya getirdik.

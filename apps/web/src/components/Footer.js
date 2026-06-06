@@ -31,6 +31,11 @@ export default function Footer() {
           <h4 style={{ color: 'var(--text-main)', marginBottom: '1.5rem', fontSize: '1.2rem', fontWeight: '800' }}>{t.footerResources}</h4>
           <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
             <li>
+              <Link href="/blog" style={{ color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.5rem' }} className="hover-accent">
+                <Book size={18} /> {t.blog}
+              </Link>
+            </li>
+            <li>
               <a href="https://docs.veyronix.com.tr/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.5rem' }} className="hover-accent">
                 <Book size={18} /> {t.wiki}
               </a>

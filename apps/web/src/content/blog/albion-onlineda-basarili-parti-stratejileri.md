@@ -3,6 +3,7 @@ title: "Albion Online'da Başarılı Parti Stratejileri"
 description: "Albion Online'da grubunuzu zafere taşıyacak en iyi parti kurma ve savaş stratejilerini öğrenin."
 date: "2026-06-04"
 tags: "Albion Online,Strateji,Rehber"
+lang: "tr"
 ---
 
 Albion Online, bireysel yeteneklerden ziyade grubun senkronizasyonunun ön plana çıktığı bir oyundur. İster küçük çaplı zindanlara (Dungeon) giriyor olun, ister "Black Zone" haritalarında düşman loncalarla çarpışın, doğru parti stratejisi her zaman kazananı belirler. 

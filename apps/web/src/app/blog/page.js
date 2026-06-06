@@ -1,8 +1,6 @@
-import Link from 'next/link';
 import { getAllPosts } from '@/lib/markdown';
 import Navbar from "@/components/Navbar";
-import styles from "../../app/page.module.css";
-import { BookOpen, Calendar, ArrowRight } from "lucide-react";
+import BlogListClient from "@/components/BlogListClient";
 
 export const metadata = {
   title: 'Blog & Rehberler | Veyronix',
@@ -15,51 +13,7 @@ export default function BlogIndex() {
   return (
     <>
       <Navbar />
-      <main className={styles.main}>
-        <div className={`${styles.hero} animate-fade-in`} style={{ paddingBottom: '3rem', paddingTop: '8rem' }}>
-          <div className={styles.badge}>
-            <BookOpen size={14} className={styles.badgeHighlight} />
-            Rehberler ve Blog
-          </div>
-          <h1 className={styles.title} style={{ fontSize: '3rem' }}>
-            Veyronix <span className={styles.highlight}>Blog</span>
-          </h1>
-          <p className={styles.description}>
-            Albion Online ipuçları, Discord bot yönetimi ve lonca organizasyonlarına dair en güncel içerikler.
-          </p>
-        </div>
-
-        <section className={`${styles.bentoSection} animate-fade-in delay-2`} style={{ paddingTop: '0' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '2rem', width: '100%', maxWidth: '1200px', margin: '0 auto' }}>
-            {posts.length === 0 && (
-              <div style={{ textAlign: 'center', gridColumn: '1 / -1', padding: '4rem', color: 'var(--text-muted)' }}>
-                Henüz yayınlanmış bir makale bulunmuyor.
-              </div>
-            )}
-            
-            {posts.map((post) => (
-              <Link href={`/blog/${post.slug}`} key={post.slug} style={{ textDecoration: 'none' }}>
-                <div className={`${styles.bentoCard}`} style={{ height: '100%', display: 'flex', flexDirection: 'column', cursor: 'pointer' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                    <Calendar size={14} />
-                    {new Date(post.meta.date).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' })}
-                    {post.meta.tags && (
-                      <span style={{ marginLeft: 'auto', background: 'rgba(88, 101, 242, 0.15)', color: '#5865F2', padding: '0.2rem 0.6rem', borderRadius: '50px', fontSize: '0.75rem', fontWeight: 'bold' }}>
-                        {post.meta.tags.split(',')[0]}
-                      </span>
-                    )}
-                  </div>
-                  <h2 style={{ fontSize: '1.4rem', marginBottom: '1rem', color: '#fff', lineHeight: '1.4' }}>{post.meta.title}</h2>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: '1.6', flex: 1 }}>{post.meta.description}</p>
-                  <div style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-color)', fontWeight: 'bold', fontSize: '0.9rem' }}>
-                    Devamını Oku <ArrowRight size={16} />
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-      </main>
+      <BlogListClient allPosts={posts} />
     </>
   );
 }

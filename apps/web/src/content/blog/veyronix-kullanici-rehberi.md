@@ -3,6 +3,7 @@ title: "Veyronix Kullanıcı Rehberi: Başlangıçtan Uzmanlığa"
 description: "Veyronix Discord Albion Party Finder botunu sunucunuza nasıl kuracağınızı ve loncanızı en verimli şekilde nasıl yöneteceğinizi adım adım öğrenin."
 date: "2026-06-03"
 tags: "Veyronix,Rehber,Discord"
+lang: "tr"
 ---
 
 Albion Online'da başarılı bir lonca yönetmek tam zamanlı bir iş gibidir. Veyronix, Discord üzerinden sunduğu araçlarla yöneticilerin üzerindeki yükü sıfıra indirmek için tasarlandı. Bu rehberde, Veyronix'i nasıl kuracağınızı ve özelliklerinden maksimum verim alacağınızı anlatacağız.

@@ -3,6 +3,7 @@ title: "Discord'da Oyun İçin En İyi Botlar (2026 Rehberi)"
 description: "Oyun sunucularınızı canlandırmak ve yönetmek için 2026 yılının en popüler ve kullanışlı Discord oyun botlarını keşfedin."
 date: "2026-06-05"
 tags: "Discord,Oyun Botları,Topluluk"
+lang: "tr"
 ---
 
 Discord, oyuncular için sadece bir sesli iletişim programı olmaktan çıkıp, devasa toplulukların yönetildiği bir ekosisteme dönüştü. Milyonlarca üyesi olan dev sunuculardan, sadece arkadaş grubunuzun bulunduğu küçük sunuculara kadar her türlü yapıda **Discord Botları** hayat kurtarıcı bir role sahip.

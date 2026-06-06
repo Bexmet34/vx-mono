@@ -3,6 +3,7 @@ title: "Albion Online Parti Yönetimi İpuçları ve ZvZ Stratejileri"
 description: "Albion Online'da parti yönetimi, rollerin dağılımı, iletişim teknikleri ve ZvZ savaşlarında başarılı olmanın sırları."
 date: "2026-06-06"
 tags: "Albion Online,Rehber,Parti"
+lang: "tr"
 ---
 
 Albion Online, Sandbox MMORPG türünün en büyük ve dinamik örneklerinden biridir. PvP, PvE, Gathering ve Crafting gibi birçok alanda oyunculara özgürlük sunsa da, oyunun gerçek kalbi **"Grup Oyunculuğu"** ve **"Lonca (Guild) Savaşları"**dır. İster küçük çaplı Roaming partilerinde olun, ister devasa ZvZ (Zerg vs Zerg) savaşlarında; iyi bir parti yönetimi olmadan başarıya ulaşmak neredeyse imkansızdır.

@@ -133,6 +133,20 @@ const en = {
   dRedeemBtn: "Redeem",
   dRedeemSuccess: "Success! Your subscription has been extended.",
   dRedeemError: "Error! Invalid or expired code.",
+  
+  // FAQ
+  faqTitle: "How It Works & FAQ",
+  faqSubtitle: "Adding and configuring Veyronix to your Discord server takes seconds. Here are the most frequently asked questions about installation and usage.",
+  faqQ1: "How to install Veyronix?",
+  faqA1: "Use the 'Add to Server' button above to invite the Veyronix bot to your server. After selecting a server where you have administrator privileges, the automatic installation will be completed. Then, you can quickly start using it by setting your guild information (Guild Name) and channels with the `/settings` command within Discord.",
+  faqQ2: "How does the Killboard feature work?",
+  faqA2: "When you purchase a premium plan, the system automatically connects to Albion Online's official API every evening and pulls your guild's current Killboard statistics (PvE, PvP kill data, deaths). It sends this data to your designated log channel in a detailed and visually rich way (Embed message format). Moreover, this feature is completely autonomous.",
+  faqQ3: "What does Party System Management offer?",
+  faqA3: "You can create special parties for Guild events (ZvZ, Fame Farm, Roaming, etc.). Players who want to join the party created with the `/createparty` command can choose their roles (Tank, DPS, Healer) via interactive buttons. When the party is full, the leader can close participation or open an extra slot with a special command. All organization is done within Discord.",
+  faqQ4: "Are payments secure?",
+  faqA4: "All our Premium transactions are secured with the Cryptomus infrastructure. You can make completely anonymous and 100% secure payments via USDT and other supported crypto assets. Your subscription automatically becomes active on your Discord server within seconds after the payment is confirmed on the blockchain. No manual action is required.",
+
+  blog: "Blog",
 };
 
 const tr = {
@@ -271,6 +285,20 @@ const tr = {
   dHours: "Saat",
   dQuickAccess: "Hızlı Erişim",
   dQuickDesc: "En önemli ayarlarınıza hızlıca göz atın.",
+  
+  // FAQ
+  faqTitle: "Nasıl Çalışır & Sıkça Sorulan Sorular",
+  faqSubtitle: "Veyronix'i Discord sunucunuza eklemek ve yapılandırmak saniyeler sürer. Kurulum ve kullanım hakkında en çok merak edilen detaylar aşağıda yer almaktadır.",
+  faqQ1: "Veyronix Nasıl Kurulur?",
+  faqA1: "Veyronix botunu sunucunuza davet etmek için yukarıdaki \"Discord'a Ekle\" butonunu kullanın. Yönetici yetkisine sahip olduğunuz bir sunucuyu seçtikten sonra, otomatik kurulum tamamlanacaktır. Ardından Discord içerisinden `/settings` komutu ile lonca bilgilerinizi (Guild Name) ve kanallarınızı ayarlayarak hızlıca kullanıma başlayabilirsiniz.",
+  faqQ2: "Killboard Özelliği Nasıl Çalışır?",
+  faqA2: "Premium plan satın aldığınızda, sistem her akşam otomatik olarak Albion Online resmi API'sine bağlanarak loncanızın güncel Killboard istatistiklerini (PvE, PvP kill verileri, ölümler) çeker. Bu verileri belirlediğiniz log kanalına detaylı ve görsel olarak zengin bir şekilde (Embed mesajı formatında) gönderir. Üstelik bu özellik tamamen otonomdur.",
+  faqQ3: "Parti Sistemi Yönetimi Neler Sunar?",
+  faqA3: "Guild etkinlikleri (ZvZ, Fame Farm, Roaming vb.) için özel partiler oluşturabilirsiniz. `/createparty` komutuyla oluşturulan partiye katılmak isteyen oyuncular, interaktif butonlar üzerinden rollerini (Tank, DPS, Healer) seçebilir. Parti dolduğunda lider özel komutla katılımı kapatabilir veya ekstra slot açabilir. Tüm organizasyon Discord içerisinden yapılır.",
+  faqQ4: "Ödemeler Güvenli mi?",
+  faqA4: "Tüm Premium işlemlerimiz Cryptomus altyapısı ile güvence altındadır. USDT ve desteklenen diğer kripto varlıklar üzerinden tamamen anonim ve %100 güvenli ödeme yapabilirsiniz. Aboneliğiniz, ödeme blok zincirinde onaylandıktan sonra saniyeler içinde otomatik olarak Discord sunucunuzda aktif hale gelir. Manuel işlem gerektirmez.",
+
+  blog: "Blog",
 };
 
 
