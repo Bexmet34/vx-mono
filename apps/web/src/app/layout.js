@@ -26,6 +26,9 @@ export const metadata = {
   other: {
     cryptomus: "7e16ba27",
   },
+  verification: {
+    google: "Sb34R-Xts1_g6mT_DiZvpXlRVD75T_uc-G2qp505mMQ",
+  },
 };
 
 export default function RootLayout({ children }) {
