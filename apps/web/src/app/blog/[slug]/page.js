@@ -41,7 +41,7 @@ export default async function BlogPost({ params }) {
             <ArrowLeft size={16} /> {post.meta.lang === 'en' ? 'Back to Blog' : "Blog'a Dön"}
           </Link>
           
-          <h1 style={{ fontSize: '3rem', lineHeight: '1.2', marginBottom: '1rem', color: '#fff' }}>
+          <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', lineHeight: '1.2', marginBottom: '1rem', color: '#fff' }}>
             {post.meta.title}
           </h1>
           

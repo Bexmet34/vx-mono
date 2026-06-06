@@ -34,7 +34,7 @@ export default function BlogListClient({ allPosts }) {
           <BookOpen size={14} className={styles.badgeHighlight} />
           {t.badge}
         </div>
-        <h1 className={styles.title} style={{ fontSize: '3rem' }}>
+        <h1 className={styles.title} style={{ fontSize: 'clamp(2.5rem, 6vw, 4rem)' }}>
           {t.title} <span className={styles.highlight}>{t.highlight}</span>
         </h1>
         <p className={styles.description}>
@@ -42,8 +42,8 @@ export default function BlogListClient({ allPosts }) {
         </p>
       </div>
 
-      <section className={`${styles.bentoSection} animate-fade-in delay-2`} style={{ paddingTop: '0' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '2rem', width: '100%', maxWidth: '1200px', margin: '0 auto' }}>
+      <section className={`${styles.bentoSection} animate-fade-in delay-2`} style={{ paddingTop: '0', padding: '0 1.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))', gap: '2rem', width: '100%', maxWidth: '1200px', margin: '0 auto' }}>
           {posts.length === 0 && (
             <div style={{ textAlign: 'center', gridColumn: '1 / -1', padding: '4rem', color: 'var(--text-muted)' }}>
               {t.empty}
