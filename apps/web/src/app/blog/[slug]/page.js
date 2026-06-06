@@ -8,7 +8,8 @@ import { Calendar, ArrowLeft } from "lucide-react";
 import Link from 'next/link';
 
 export async function generateMetadata({ params }) {
-  const post = getPostBySlug(params.slug);
+  const { slug } = await params;
+  const post = getPostBySlug(slug);
   if (!post) {
     return { title: 'Post Not Found' };
   }
@@ -23,8 +24,9 @@ export async function generateStaticParams() {
   return slugs.map((slug) => ({ slug: slug.replace(/\.md$/, '') }));
 }
 
-export default function BlogPost({ params }) {
-  const post = getPostBySlug(params.slug);
+export default async function BlogPost({ params }) {
+  const { slug } = await params;
+  const post = getPostBySlug(slug);
 
   if (!post) {
     notFound();
