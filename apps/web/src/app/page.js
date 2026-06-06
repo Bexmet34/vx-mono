@@ -268,6 +268,58 @@ export default function Home() {
           </div>
         </section>
 
+        {/* --- HOW IT WORKS & FAQ SECTION --- */}
+        <section className={`${styles.faqSection} animate-fade-in`} style={{ padding: '4rem 2rem', maxWidth: '1200px', margin: '0 auto' }}>
+          <div className={styles.bentoHeader}>
+            <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Nasıl Çalışır & Sıkça Sorulan Sorular</h2>
+            <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', maxWidth: '800px', margin: '0 auto' }}>
+              Veyronix'i Discord sunucunuza eklemek ve yapılandırmak saniyeler sürer. Kurulum ve kullanım hakkında en çok merak edilen detaylar aşağıda yer almaktadır.
+            </p>
+          </div>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', marginTop: '3rem' }}>
+            <div className="glass-panel" style={{ padding: '2rem', borderRadius: '16px' }}>
+              <h3 style={{ fontSize: '1.25rem', marginBottom: '1rem', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span style={{ background: 'rgba(88, 101, 242, 0.2)', color: '#5865F2', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: '1rem', fontWeight: 'bold' }}>1</span>
+                Veyronix Nasıl Kurulur?
+              </h3>
+              <p style={{ color: 'var(--text-muted)', lineHeight: '1.6' }}>
+                Veyronix botunu sunucunuza davet etmek için yukarıdaki "Discord'a Ekle" butonunu kullanın. Yönetici yetkisine sahip olduğunuz bir sunucuyu seçtikten sonra, otomatik kurulum tamamlanacaktır. Ardından Discord içerisinden <code>/settings</code> komutu ile lonca bilgilerinizi (Guild Name) ve kanallarınızı ayarlayarak hızlıca kullanıma başlayabilirsiniz.
+              </p>
+            </div>
+
+            <div className="glass-panel" style={{ padding: '2rem', borderRadius: '16px' }}>
+              <h3 style={{ fontSize: '1.25rem', marginBottom: '1rem', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span style={{ background: 'rgba(88, 101, 242, 0.2)', color: '#5865F2', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: '1rem', fontWeight: 'bold' }}>2</span>
+                Killboard Özelliği Nasıl Çalışır?
+              </h3>
+              <p style={{ color: 'var(--text-muted)', lineHeight: '1.6' }}>
+                Premium plan satın aldığınızda, sistem her akşam otomatik olarak Albion Online resmi API'sine bağlanarak loncanızın güncel Killboard istatistiklerini (PvE, PvP kill verileri, ölümler) çeker. Bu verileri belirlediğiniz log kanalına detaylı ve görsel olarak zengin bir şekilde (Embed mesajı formatında) gönderir. Üstelik bu özellik tamamen otonomdur.
+              </p>
+            </div>
+
+            <div className="glass-panel" style={{ padding: '2rem', borderRadius: '16px' }}>
+              <h3 style={{ fontSize: '1.25rem', marginBottom: '1rem', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span style={{ background: 'rgba(88, 101, 242, 0.2)', color: '#5865F2', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: '1rem', fontWeight: 'bold' }}>3</span>
+                Parti Sistemi Yönetimi Neler Sunar?
+              </h3>
+              <p style={{ color: 'var(--text-muted)', lineHeight: '1.6' }}>
+                Guild etkinlikleri (ZvZ, Fame Farm, Roaming vb.) için özel partiler oluşturabilirsiniz. <code>/createparty</code> komutuyla oluşturulan partiye katılmak isteyen oyuncular, interaktif butonlar üzerinden rollerini (Tank, DPS, Healer) seçebilir. Parti dolduğunda lider özel komutla katılımı kapatabilir veya ekstra slot açabilir. Tüm organizasyon Discord içerisinden yapılır.
+              </p>
+            </div>
+            
+            <div className="glass-panel" style={{ padding: '2rem', borderRadius: '16px' }}>
+              <h3 style={{ fontSize: '1.25rem', marginBottom: '1rem', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span style={{ background: 'rgba(88, 101, 242, 0.2)', color: '#5865F2', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: '1rem', fontWeight: 'bold' }}>4</span>
+                Ödemeler Güvenli mi?
+              </h3>
+              <p style={{ color: 'var(--text-muted)', lineHeight: '1.6' }}>
+                Tüm Premium işlemlerimiz Cryptomus altyapısı ile güvence altındadır. USDT ve desteklenen diğer kripto varlıklar üzerinden tamamen anonim ve %100 güvenli ödeme yapabilirsiniz. Aboneliğiniz, ödeme blok zincirinde onaylandıktan sonra saniyeler içinde otomatik olarak Discord sunucunuzda aktif hale gelir. Manuel işlem gerektirmez.
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* --- COMMANDS SECTION --- */}
         <section className={`${styles.commandsSection} animate-fade-in`}>
           <div className={styles.container}>

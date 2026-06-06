@@ -6,15 +6,52 @@ import Footer from "@/components/Footer";
 
 export const metadata = {
   title: "Veyronix - Discord Albion Party Finder",
-  description: "The ultimate tool to build and manage parties in Albion Online directly from your Discord server.",
+  description: "Veyronix is the ultimate Discord bot to build, manage, and track parties in Albion Online. Automate your guild with killboards, role management, and dynamic party builders directly from your Discord server.",
+  openGraph: {
+    title: "Veyronix - Discord Albion Party Finder",
+    description: "Veyronix is the ultimate Discord bot to build, manage, and track parties in Albion Online. Automate your guild with killboards, role management, and dynamic party builders directly from your Discord server.",
+    url: "https://veyronix.com.tr",
+    siteName: "Veyronix",
+    images: [
+      {
+        url: "https://veyronix.com.tr/favicon.ico",
+        width: 800,
+        height: 600,
+        alt: "Veyronix - Albion Online Party Finder",
+      },
+    ],
+    locale: "tr_TR",
+    type: "website",
+  },
   other: {
     cryptomus: "7e16ba27",
   },
 };
 
 export default function RootLayout({ children }) {
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Veyronix',
+    operatingSystem: 'Discord',
+    applicationCategory: 'UtilityApplication',
+    url: 'https://veyronix.com.tr',
+    description: 'Veyronix is the ultimate Discord bot to build, manage, and track parties in Albion Online. Automate your guild with killboards, role management, and dynamic party builders directly from your Discord server.',
+    offers: {
+      '@type': 'Offer',
+      price: '0.00',
+      priceCurrency: 'USD',
+    },
+  };
+
   return (
-    <html lang="en">
+    <html lang="tr">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body>
         <LanguageProvider>
           <NextAuthProvider>
