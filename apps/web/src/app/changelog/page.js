@@ -10,6 +10,14 @@ import remarkGfm from "remark-gfm";
 
 const staticLogs = [
   {
+    version: "2.1.0",
+    date: "2026-06-06",
+    title_tr: "Kayıt Sistemi, Admin Paneli & Killboard İyileştirmeleri",
+    title_en: "Registration System, Admin Panel & Killboard Enhancements",
+    content_tr: "### Yeni Özellikler\n- **Kayıt Sistemi:** Sunucular için yeni kayıt sistemi, özel kayıt rolleri ve kayıt reddetme mekanizması eklendi.\n- **Admin Paneli:** Yönetim işlemlerini kolaylaştıran yepyeni bir Admin Sayfası eklendi.\n- **Killboard:** Guild ismi ile arama özelliği kolaylaştırıldı, sınırsız özellik aktif edildi ve Discord bildirimlerindeki hatalar giderildi.\n### Sistem & Altyapı\n- Vercel dağıtım sürecindeki (Node.js & pnpm) paket kilitlenme sorunları çözüldü.\n- Eski dahili Wiki modülü projeden tamamen kaldırılarak altyapı hafifletildi.",
+    content_en: "### New Features\n- **Registration System:** New server registration system with custom roles and rejection handling.\n- **Admin Panel:** A brand new Admin Page added to simplify management operations.\n- **Killboard:** Improved Guild name search, activated unlimited features, and resolved Discord notification bugs.\n### System & Infrastructure\n- Resolved Vercel deployment lockfile conflicts (Node.js & pnpm).\n- Removed outdated internal Wiki module to optimize and lighten the repository."
+  },
+  {
     version: "2.0.0",
     date: "2024-04-24",
     title_tr: "Veyronix Monorepo & Altyapı Güncellemesi",
