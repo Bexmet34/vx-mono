@@ -1,4 +1,17 @@
+import { getPostSlugs, getPostBySlug } from '@/lib/markdown';
+
 export default function sitemap() {
+  const slugs = getPostSlugs() || [];
+  const posts = slugs.map((slug) => {
+    const post = getPostBySlug(slug);
+    return {
+      url: `https://veyronix.com.tr/blog/${post.slug}`,
+      lastModified: new Date(post.meta.date),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    };
+  });
+
   return [
     {
       url: 'https://veyronix.com.tr',
@@ -6,6 +19,13 @@ export default function sitemap() {
       changeFrequency: 'weekly',
       priority: 1,
     },
+    {
+      url: 'https://veyronix.com.tr/blog',
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.9,
+    },
+    ...posts,
     {
       url: 'https://veyronix.com.tr/hakkimizda',
       lastModified: new Date(),
