@@ -105,7 +105,6 @@ export default function Footer() {
             <li style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
               {t.email}: hakkibsknn@gmail.com
             </li>
-          </ul>
             <li style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
               Adres: [PAYTR_AÇIK_ADRESİNİZİ_BURAYA_GİRİN]
             </li>
