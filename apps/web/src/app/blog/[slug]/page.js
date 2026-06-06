@@ -35,7 +35,7 @@ export default async function BlogPost({ params }) {
   return (
     <>
       <Navbar />
-      <main className={styles.main} style={{ paddingTop: '8rem', paddingBottom: '4rem' }}>
+      <main className={styles.main} style={{ paddingBottom: '4rem' }}>
         <article style={{ maxWidth: '800px', margin: '0 auto', width: '100%', padding: '0 1.5rem' }}>
           <Link href="/blog" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', textDecoration: 'none', marginBottom: '2rem', fontSize: '0.9rem' }}>
             <ArrowLeft size={16} /> {post.meta.lang === 'en' ? 'Back to Blog' : "Blog'a Dön"}

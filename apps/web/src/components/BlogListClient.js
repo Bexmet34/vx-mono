@@ -29,7 +29,7 @@ export default function BlogListClient({ allPosts }) {
 
   return (
     <main className={styles.main}>
-      <div className={`${styles.hero} animate-fade-in`} style={{ paddingBottom: '3rem', paddingTop: '8rem' }}>
+      <div className={`${styles.hero} animate-fade-in`} style={{ paddingBottom: '2rem', paddingTop: '2rem' }}>
         <div className={styles.badge}>
           <BookOpen size={14} className={styles.badgeHighlight} />
           {t.badge}
@@ -42,8 +42,8 @@ export default function BlogListClient({ allPosts }) {
         </p>
       </div>
 
-      <section className={`${styles.bentoSection} animate-fade-in delay-2`} style={{ paddingTop: '0', padding: '0 1.5rem' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))', gap: '2rem', width: '100%', maxWidth: '1200px', margin: '0 auto' }}>
+      <section className="animate-fade-in delay-2" style={{ width: '100%', padding: '0 1.5rem', marginBottom: '8rem' }}>
+        <div className={styles.blogGrid}>
           {posts.length === 0 && (
             <div style={{ textAlign: 'center', gridColumn: '1 / -1', padding: '4rem', color: 'var(--text-muted)' }}>
               {t.empty}
