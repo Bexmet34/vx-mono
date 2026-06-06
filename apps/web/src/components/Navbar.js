@@ -35,43 +35,45 @@ export default function Navbar() {
             </div>
           </div>
           
-          {/* Desktop Menu */}
-          <div className="desktop-menu">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <button onClick={toggleLanguage} className="lang-toggle">
               <Globe size={18} />
-              {lang === 'en' ? 'TR' : 'EN'}
+              <span style={{ fontSize: '0.9rem' }}>{lang === 'en' ? 'TR' : 'EN'}</span>
             </button>
 
-            {session ? (
-              <div className="auth-user">
-                {isAdmin && (
-                  <Link href="/admin" className="admin-pill">
-                    Admin
+            {/* Desktop Menu */}
+            <div className="desktop-menu">
+              {session ? (
+                <div className="auth-user">
+                  {isAdmin && (
+                    <Link href="/admin" className="admin-pill">
+                      Admin
+                    </Link>
+                  )}
+                  <Link href="/dashboard" className="btn-primary" style={{ padding: "0.6rem 1.2rem", fontSize: '0.9rem' }}>
+                    <LayoutDashboard size={18} />
+                    {t.dashboard}
                   </Link>
-                )}
-                <Link href="/dashboard" className="btn-primary" style={{ padding: "0.6rem 1.2rem", fontSize: '0.9rem' }}>
-                  <LayoutDashboard size={18} />
-                  {t.dashboard}
-                </Link>
-                <button onClick={() => signOut()} className="icon-btn" title={t.logout}>
-                  <LogOut size={20} />
+                  <button onClick={() => signOut()} className="icon-btn" title={t.logout}>
+                    <LogOut size={20} />
+                  </button>
+                  {session.user?.image && (
+                    <img src={session.user.image} alt="Avatar" className="avatar" />
+                  )}
+                </div>
+              ) : (
+                <button onClick={() => signIn("discord")} className="btn-primary">
+                  <LogIn size={18} />
+                  {t.login}
                 </button>
-                {session.user?.image && (
-                  <img src={session.user.image} alt="Avatar" className="avatar" />
-                )}
-              </div>
-            ) : (
-              <button onClick={() => signIn("discord")} className="btn-primary">
-                <LogIn size={18} />
-                {t.login}
-              </button>
-            )}
-          </div>
+              )}
+            </div>
 
-          {/* Mobile Toggle */}
-          <button className="mobile-toggle" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-            {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
-          </button>
+            {/* Mobile Toggle */}
+            <button className="mobile-toggle" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+              {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -90,11 +92,6 @@ export default function Navbar() {
           </div>
 
           <div className="mobile-footer">
-            <button onClick={toggleLanguage} className="signout-btn" style={{ width: '100%', justifyContent: 'center' }}>
-              <Globe size={18} />
-              {lang === 'en' ? 'Türkçe\'ye Geç' : 'Switch to English'}
-            </button>
-            
             {session ? (
               <button onClick={() => signOut()} className="signout-btn" style={{ width: '100%', justifyContent: 'center', background: 'rgba(231, 76, 60, 0.1)', color: '#ff4d4f', borderColor: 'rgba(231, 76, 60, 0.2)' }}>
                 <LogOut size={18} />
