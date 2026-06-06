@@ -36,9 +36,9 @@ export default function Footer() {
               </Link>
             </li>
             <li>
-              <a href="https://docs.veyronix.com.tr/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.5rem' }} className="hover-accent">
+              <Link href="/docs" style={{ color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.5rem' }} className="hover-accent">
                 <Book size={18} /> {t.wiki}
-              </a>
+              </Link>
             </li>
             <li>
               <Link href="/#commands" style={{ color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.5rem' }} className="hover-accent">
