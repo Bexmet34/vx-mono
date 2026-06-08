@@ -125,7 +125,11 @@ client.once('ready', async (c) => {
 
     // Set activity safely
     try {
-        client.user.setActivity(config.ACTIVITY_TEXT || '/help', { type: ActivityType.Listening });
+        client.user.setActivity({
+            name: 'custom',
+            type: ActivityType.Custom,
+            state: config.ACTIVITY_TEXT || '🌐 veyronix.com.tr | /help'
+        });
     } catch (err) { }
 
     registerCommands(client);

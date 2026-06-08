@@ -18,7 +18,7 @@ module.exports = {
     MAX_ACTIVE_PARTIES: 3,
 
     // Activity
-    ACTIVITY_TEXT: '/createparty & /help',
+    ACTIVITY_TEXT: '🌐 veyronix.com.tr | /help',
 
     // Security
     WHITELIST_USERS: process.env.OWNER_ID ? [process.env.OWNER_ID] : [],
