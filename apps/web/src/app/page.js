@@ -185,7 +185,7 @@ export default function Home() {
         {publicServers.length > 0 && (
           <div style={{ marginTop: '2rem', textAlign: 'center' }} className="animate-fade-in delay-3">
             <h3 style={{ fontSize: '1.25rem', color: 'var(--text-muted)', fontWeight: '600', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '1.5rem' }}>
-              Veyronix'i Tercih Eden Topluluklar
+              {t.marqueeTitle}
             </h3>
             <div className={`${styles.marqueeContainer}`}>
               <div className={styles.marqueeTrack}>
@@ -262,8 +262,8 @@ export default function Home() {
         {blogs.length > 0 && (
           <section className="animate-fade-in" style={{ width: '100%', padding: '4rem 1rem', background: 'rgba(10, 10, 15, 0.5)', borderTop: '1px solid var(--border-color)' }}>
             <div className={styles.bentoHeader}>
-              <h2 style={{ fontSize: '2.5rem' }}>Son Rehberler & İpuçları</h2>
-              <p>Albion Online ve Veyronix hakkında faydalı bilgiler.</p>
+              <h2 style={{ fontSize: '2.5rem' }}>{t.blogHeaderTitle}</h2>
+              <p>{t.blogHeaderDesc}</p>
             </div>
             <div className={styles.blogGrid}>
               {blogs.slice(0, 3).map((blog, idx) => (
@@ -321,9 +321,9 @@ export default function Home() {
         {/* --- HOW IT WORKS & FAQ SECTION --- */}
         <section className={`${styles.faqSection} animate-fade-in`} style={{ padding: '4rem 2rem', maxWidth: '1200px', margin: '0 auto' }}>
           <div className={styles.bentoHeader}>
-            <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Nasıl Çalışır? & SSS</h2>
+            <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>{t.faqMainTitle}</h2>
             <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', maxWidth: '800px', margin: '0 auto' }}>
-              Veyronix'i kurmak ve kullanmaya başlamak saniyeler sürer. İşte 3 basit adım:
+              {t.faqMainDesc}
             </p>
           </div>
 
@@ -333,24 +333,24 @@ export default function Home() {
               <div style={{ background: '#5865F2', color: '#fff', width: '64px', height: '64px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', boxShadow: '0 10px 20px rgba(88, 101, 242, 0.3)' }}>
                 <Zap size={32} />
               </div>
-              <h3 style={{ fontSize: '1.5rem', color: '#fff', marginBottom: '1rem' }}>1. Botu Ekleyin</h3>
-              <p style={{ color: 'var(--text-muted)', lineHeight: '1.6' }}>Veyronix'i Discord sunucunuza davet edin. Kurulum saniyeler içinde tamamlanır ve hemen kullanıma hazırdır.</p>
+              <h3 style={{ fontSize: '1.5rem', color: '#fff', marginBottom: '1rem' }}>{t.step1Title}</h3>
+              <p style={{ color: 'var(--text-muted)', lineHeight: '1.6' }}>{t.step1Desc}</p>
             </div>
 
             <div style={{ background: 'linear-gradient(180deg, rgba(252, 163, 17, 0.1) 0%, rgba(10, 10, 15, 0.5) 100%)', padding: '2.5rem', borderRadius: '24px', border: '1px solid rgba(252, 163, 17, 0.2)', textAlign: 'center' }}>
               <div style={{ background: 'var(--accent-color)', color: '#000', width: '64px', height: '64px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', boxShadow: '0 10px 20px rgba(252, 163, 17, 0.3)' }}>
                 <Shield size={32} />
               </div>
-              <h3 style={{ fontSize: '1.5rem', color: '#fff', marginBottom: '1rem' }}>2. Ayarları Yapın</h3>
-              <p style={{ color: 'var(--text-muted)', lineHeight: '1.6' }}><code>/settings</code> veya <code>/setup-guild</code> komutlarıyla dilinizi seçin, yetkili rollerini ve Albion loncanızı bağlayın.</p>
+              <h3 style={{ fontSize: '1.5rem', color: '#fff', marginBottom: '1rem' }}>{t.step2Title}</h3>
+              <p style={{ color: 'var(--text-muted)', lineHeight: '1.6' }}>{t.step2Desc}</p>
             </div>
 
             <div style={{ background: 'linear-gradient(180deg, rgba(46, 204, 113, 0.1) 0%, rgba(10, 10, 15, 0.5) 100%)', padding: '2.5rem', borderRadius: '24px', border: '1px solid rgba(46, 204, 113, 0.2)', textAlign: 'center' }}>
               <div style={{ background: '#2ecc71', color: '#000', width: '64px', height: '64px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', boxShadow: '0 10px 20px rgba(46, 204, 113, 0.3)' }}>
                 <Sword size={32} />
               </div>
-              <h3 style={{ fontSize: '1.5rem', color: '#fff', marginBottom: '1rem' }}>3. Partini Kur</h3>
-              <p style={{ color: 'var(--text-muted)', lineHeight: '1.6' }}>Savaşa hazırsınız! <code>/createparty</code> yazarak dinamik ZvZ veya PVE partinizi oluşturun ve üyeleri toplamaya başlayın.</p>
+              <h3 style={{ fontSize: '1.5rem', color: '#fff', marginBottom: '1rem' }}>{t.step3Title}</h3>
+              <p style={{ color: 'var(--text-muted)', lineHeight: '1.6' }}>{t.step3Desc}</p>
             </div>
           </div>
           
@@ -508,11 +508,11 @@ export default function Home() {
             )}
 
             <div style={{ marginBottom: '2.5rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.75rem', fontWeight: '600', fontSize: '0.9rem', color: '#fff' }}>Hedef Sunucu</label>
+              <label style={{ display: 'block', marginBottom: '0.75rem', fontWeight: '600', fontSize: '0.9rem', color: '#fff' }}>{t.checkoutTargetServer}</label>
               
               {isLoadingServers ? (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '1rem', background: 'rgba(0,0,0,0.3)', borderRadius: '12px', color: 'var(--text-muted)' }}>
-                  <Loader2 className="spin" size={18} /> Sunucular yükleniyor...
+                  <Loader2 className="spin" size={18} /> {t.checkoutLoading}
                 </div>
               ) : (
                 <>
@@ -521,16 +521,16 @@ export default function Home() {
                     onChange={e => setSelectedServer(e.target.value)}
                     style={{ width: '100%', padding: '1rem', borderRadius: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-color)', color: '#fff', fontSize: '1rem', outline: 'none', fontFamily: 'inherit' }}
                   >
-                    <option value="">-- Sunucu Seçin --</option>
+                    <option value="">{t.checkoutSelectServer}</option>
                     {userServers.map(s => (
                       <option key={s.guild_id} value={s.guild_id}>{s.guild_name}</option>
                     ))}
                   </select>
                   {userServers.length === 0 && (
                     <div style={{ marginTop: '1rem', textAlign: 'center' }}>
-                      <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1rem' }}>Sistemde aktif bir sunucunuz bulunamadı. Lütfen önce botu Discord sunucunuza ekleyin.</p>
+                      <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1rem' }}>{t.checkoutNoServerText}</p>
                       <a href="https://discord.com/oauth2/authorize?client_id=1082239904169336902&permissions=510977&scope=bot+applications.commands" target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ display: 'inline-block', padding: '0.5rem 1rem', fontSize: '0.85rem' }}>
-                        Botu Sunucuna Ekle
+                        {t.checkoutAddBotBtn}
                       </a>
                     </div>
                   )}

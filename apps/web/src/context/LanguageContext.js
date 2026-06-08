@@ -147,6 +147,30 @@ const en = {
   faqQ4: "Are payments secure?",
   faqA4: "All our Premium transactions are secured with the Cryptomus infrastructure. You can make completely anonymous and 100% secure payments via USDT and other supported crypto assets. Your subscription automatically becomes active on your Discord server within seconds after the payment is confirmed on the blockchain. No manual action is required.",
 
+  // Marquee
+  marqueeTitle: "Communities Trusting Veyronix",
+  
+  // Blog
+  blogHeaderTitle: "Latest Guides & Tips",
+  blogHeaderDesc: "Useful information about Albion Online and Veyronix.",
+
+  // How it works
+  faqMainTitle: "How It Works & FAQ",
+  faqMainDesc: "Setting up and starting to use Veyronix takes seconds. Here are 3 simple steps:",
+  step1Title: "1. Add the Bot",
+  step1Desc: "Invite Veyronix to your Discord server. Installation takes seconds and it's ready to use immediately.",
+  step2Title: "2. Configure Settings",
+  step2Desc: "Select your language, link admin roles and your Albion guild using /settings or /setup-guild commands.",
+  step3Title: "3. Build Your Party",
+  step3Desc: "Ready for battle! Type /createparty to create your dynamic ZvZ or PVE party and start gathering members.",
+  
+  // Checkout Modal Additions
+  checkoutTargetServer: "Target Server",
+  checkoutSelectServer: "-- Select a Server --",
+  checkoutLoading: "Loading servers...",
+  checkoutNoServerText: "No active server found in the system. Please add the bot to your Discord server first.",
+  checkoutAddBotBtn: "Add Bot to Server",
+
   blog: "Blog",
 };
 
@@ -299,6 +323,30 @@ const tr = {
   faqA3: "Guild etkinlikleri (ZvZ, Fame Farm, Roaming vb.) için özel partiler oluşturabilirsiniz. `/createparty` komutuyla oluşturulan partiye katılmak isteyen oyuncular, interaktif butonlar üzerinden rollerini (Tank, DPS, Healer) seçebilir. Parti dolduğunda lider özel komutla katılımı kapatabilir veya ekstra slot açabilir. Tüm organizasyon Discord içerisinden yapılır.",
   faqQ4: "Ödemeler Güvenli mi?",
   faqA4: "Tüm Premium işlemlerimiz Cryptomus altyapısı ile güvence altındadır. USDT ve desteklenen diğer kripto varlıklar üzerinden tamamen anonim ve %100 güvenli ödeme yapabilirsiniz. Aboneliğiniz, ödeme blok zincirinde onaylandıktan sonra saniyeler içinde otomatik olarak Discord sunucunuzda aktif hale gelir. Manuel işlem gerektirmez.",
+
+  // Marquee
+  marqueeTitle: "Veyronix'i Tercih Eden Topluluklar",
+  
+  // Blog
+  blogHeaderTitle: "Son Rehberler & İpuçları",
+  blogHeaderDesc: "Albion Online ve Veyronix hakkında faydalı bilgiler.",
+
+  // How it works
+  faqMainTitle: "Nasıl Çalışır? & SSS",
+  faqMainDesc: "Veyronix'i kurmak ve kullanmaya başlamak saniyeler sürer. İşte 3 basit adım:",
+  step1Title: "1. Botu Ekleyin",
+  step1Desc: "Veyronix'i Discord sunucunuza davet edin. Kurulum saniyeler içinde tamamlanır ve hemen kullanıma hazırdır.",
+  step2Title: "2. Ayarları Yapın",
+  step2Desc: "/settings veya /setup-guild komutlarıyla dilinizi seçin, yetkili rollerini ve Albion loncanızı bağlayın.",
+  step3Title: "3. Partini Kur",
+  step3Desc: "Savaşa hazırsınız! /createparty yazarak dinamik ZvZ veya PVE partinizi oluşturun ve üyeleri toplamaya başlayın.",
+  
+  // Checkout Modal Additions
+  checkoutTargetServer: "Hedef Sunucu",
+  checkoutSelectServer: "-- Sunucu Seçin --",
+  checkoutLoading: "Sunucular yükleniyor...",
+  checkoutNoServerText: "Sistemde aktif bir sunucunuz bulunamadı. Lütfen önce botu Discord sunucunuza ekleyin.",
+  checkoutAddBotBtn: "Botu Sunucuna Ekle",
 
   blog: "Blog",
 };
