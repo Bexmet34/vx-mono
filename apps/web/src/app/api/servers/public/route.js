@@ -13,7 +13,6 @@ export async function GET() {
     const { data: guilds, error } = await supabase
       .from('subscriptions')
       .select('guild_name')
-      .eq('is_active', true)
       .limit(50);
 
     if (error) {

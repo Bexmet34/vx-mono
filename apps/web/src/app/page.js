@@ -350,43 +350,43 @@ export default function Home() {
             <h2 style={{ fontSize: '2rem', marginBottom: '1rem' }}>Sıkça Sorulan Sorular</h2>
           </div>
           
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', marginTop: '3rem' }}>
-            <div className="glass-panel" style={{ padding: '2rem', borderRadius: '16px' }}>
-              <h3 style={{ fontSize: '1.25rem', marginBottom: '1rem', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ background: 'rgba(88, 101, 242, 0.2)', color: '#5865F2', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: '1rem', fontWeight: 'bold' }}>1</span>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem', marginTop: '3rem', justifyContent: 'center' }}>
+            <div style={{ background: '#0a0a0f', padding: '2rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.05)', width: 'calc(33.333% - 1.5rem)', minWidth: '300px' }}>
+              <h3 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: '800' }}>
+                <span style={{ background: '#2B2D42', color: '#8b94f7', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: '0.9rem', fontWeight: 'bold', flexShrink: 0 }}>1</span>
                 {t.faqQ1}
               </h3>
-              <p style={{ color: 'var(--text-muted)', lineHeight: '1.6' }}>
+              <p style={{ color: '#8a8a93', lineHeight: '1.7', fontSize: '0.95rem' }}>
                 {t.faqA1}
               </p>
             </div>
 
-            <div className="glass-panel" style={{ padding: '2rem', borderRadius: '16px' }}>
-              <h3 style={{ fontSize: '1.25rem', marginBottom: '1rem', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ background: 'rgba(88, 101, 242, 0.2)', color: '#5865F2', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: '1rem', fontWeight: 'bold' }}>2</span>
+            <div style={{ background: '#0a0a0f', padding: '2rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.05)', width: 'calc(33.333% - 1.5rem)', minWidth: '300px' }}>
+              <h3 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: '800' }}>
+                <span style={{ background: '#2B2D42', color: '#8b94f7', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: '0.9rem', fontWeight: 'bold', flexShrink: 0 }}>2</span>
                 {t.faqQ2}
               </h3>
-              <p style={{ color: 'var(--text-muted)', lineHeight: '1.6' }}>
+              <p style={{ color: '#8a8a93', lineHeight: '1.7', fontSize: '0.95rem' }}>
                 {t.faqA2}
               </p>
             </div>
 
-            <div className="glass-panel" style={{ padding: '2rem', borderRadius: '16px' }}>
-              <h3 style={{ fontSize: '1.25rem', marginBottom: '1rem', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ background: 'rgba(88, 101, 242, 0.2)', color: '#5865F2', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: '1rem', fontWeight: 'bold' }}>3</span>
+            <div style={{ background: '#0a0a0f', padding: '2rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.05)', width: 'calc(33.333% - 1.5rem)', minWidth: '300px' }}>
+              <h3 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: '800' }}>
+                <span style={{ background: '#2B2D42', color: '#8b94f7', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: '0.9rem', fontWeight: 'bold', flexShrink: 0 }}>3</span>
                 {t.faqQ3}
               </h3>
-              <p style={{ color: 'var(--text-muted)', lineHeight: '1.6' }}>
+              <p style={{ color: '#8a8a93', lineHeight: '1.7', fontSize: '0.95rem' }}>
                 {t.faqA3}
               </p>
             </div>
             
-            <div className="glass-panel" style={{ padding: '2rem', borderRadius: '16px' }}>
-              <h3 style={{ fontSize: '1.25rem', marginBottom: '1rem', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ background: 'rgba(88, 101, 242, 0.2)', color: '#5865F2', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: '1rem', fontWeight: 'bold' }}>4</span>
+            <div style={{ background: '#0a0a0f', padding: '2rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.05)', width: 'calc(33.333% - 1.5rem)', minWidth: '300px' }}>
+              <h3 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: '800' }}>
+                <span style={{ background: '#2B2D42', color: '#8b94f7', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: '0.9rem', fontWeight: 'bold', flexShrink: 0 }}>4</span>
                 {t.faqQ4}
               </h3>
-              <p style={{ color: 'var(--text-muted)', lineHeight: '1.6' }}>
+              <p style={{ color: '#8a8a93', lineHeight: '1.7', fontSize: '0.95rem' }}>
                 {t.faqA4}
               </p>
             </div>
