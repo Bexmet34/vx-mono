@@ -534,3 +534,67 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* --- MARQUEE SOCIAL PROOF --- */
+.marqueeContainer {
+  width: 100%;
+  overflow: hidden;
+  background: linear-gradient(90deg, rgba(10, 10, 15, 1) 0%, rgba(20, 20, 25, 0.8) 50%, rgba(10, 10, 15, 1) 100%);
+  padding: 2rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  position: relative;
+}
+
+.marqueeContainer::before,
+.marqueeContainer::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 150px;
+  height: 100%;
+  z-index: 2;
+}
+
+.marqueeContainer::before {
+  left: 0;
+  background: linear-gradient(to right, rgba(10, 10, 15, 1) 0%, transparent 100%);
+}
+
+.marqueeContainer::after {
+  right: 0;
+  background: linear-gradient(to left, rgba(10, 10, 15, 1) 0%, transparent 100%);
+}
+
+.marqueeTrack {
+  display: flex;
+  white-space: nowrap;
+  animation: scroll 40s linear infinite;
+  gap: 3rem;
+  padding-left: 3rem;
+}
+
+.marqueeItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-family: 'Outfit', sans-serif;
+  letter-spacing: 1px;
+}
+
+.marqueeItem span {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.2rem 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); } /* Since we double the list */
+}

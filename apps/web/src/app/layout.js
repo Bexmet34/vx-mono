@@ -1,6 +1,7 @@
 import "./globals.css";
 import NextAuthProvider from "@/components/SessionProvider";
 import { LanguageProvider } from "@/context/LanguageContext";
+import { cookies } from "next/headers";
 
 import Footer from "@/components/Footer";
 
@@ -47,8 +48,11 @@ export default function RootLayout({ children }) {
     },
   };
 
+  const cookieStore = cookies();
+  const lang = cookieStore.get("NEXT_LOCALE")?.value || "tr";
+
   return (
-    <html lang="tr">
+    <html lang={lang}>
       <head>
         <script
           type="application/ld+json"

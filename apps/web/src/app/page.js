@@ -16,6 +16,8 @@ export default function Home() {
   const [activeCampaigns, setActiveCampaigns] = useState([]);
   const [plans, setPlans] = useState([]);
   const [loadingPlans, setLoadingPlans] = useState(true);
+  const [publicServers, setPublicServers] = useState([]);
+  const [blogs, setBlogs] = useState([]);
   
   // Checkout Modal States
   const [showCheckout, setShowCheckout] = useState(false);
@@ -24,6 +26,7 @@ export default function Home() {
   const [selectedServer, setSelectedServer] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
+  const [isLoadingServers, setIsLoadingServers] = useState(false);
 
   const handleBuyClick = (planId) => {
     if (status !== "authenticated") {
@@ -36,14 +39,21 @@ export default function Home() {
   };
 
   const fetchUserServers = async () => {
+    setIsLoadingServers(true);
+    setCheckoutError("");
     try {
       const res = await fetch("/api/dashboard");
       const data = await res.json();
       if (res.ok) {
         setUserServers(data);
+      } else {
+        setCheckoutError("Sunucular yüklenemedi.");
       }
     } catch (err) {
       console.error(err);
+      setCheckoutError("Sunucular yüklenirken bir hata oluştu.");
+    } finally {
+      setIsLoadingServers(false);
     }
   };
 
@@ -98,6 +108,16 @@ export default function Home() {
         console.error(err);
         setLoadingPlans(false);
       });
+
+    fetch('/api/servers/public')
+      .then(res => res.json())
+      .then(data => setPublicServers(data))
+      .catch(console.error);
+
+    fetch('/api/blogs')
+      .then(res => res.json())
+      .then(data => setBlogs(data))
+      .catch(console.error);
   }, []);
 
   const renderGif = (cmdName) => {
@@ -161,6 +181,20 @@ export default function Home() {
           </div>
         </div>
 
+        {/* --- MARQUEE SOCIAL PROOF --- */}
+        {publicServers.length > 0 && (
+          <div className={`${styles.marqueeContainer} animate-fade-in delay-3`}>
+            <div className={styles.marqueeTrack}>
+              {[...publicServers, ...publicServers, ...publicServers].map((server, idx) => (
+                <div key={idx} className={styles.marqueeItem}>
+                  <Shield size={18} className={styles.checkIcon} />
+                  <span>{server.length > 20 ? server.substring(0, 17) + '...' : server}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* --- ACTIVE CAMPAIGNS --- */}
         {activeCampaigns.length > 0 && (
           <section className={`${styles.promoSection} animate-fade-in delay-2`}>
@@ -216,6 +250,27 @@ export default function Home() {
           </div>
         </section>
 
+        {/* --- BLOG SECTION --- */}
+        {blogs.length > 0 && (
+          <section className="animate-fade-in" style={{ width: '100%', padding: '4rem 1rem', background: 'rgba(10, 10, 15, 0.5)', borderTop: '1px solid var(--border-color)' }}>
+            <div className={styles.bentoHeader}>
+              <h2 style={{ fontSize: '2.5rem' }}>Son Rehberler & İpuçları</h2>
+              <p>Albion Online ve Veyronix hakkında faydalı bilgiler.</p>
+            </div>
+            <div className={styles.blogGrid}>
+              {blogs.slice(0, 3).map((blog, idx) => (
+                <a href={`/blog/${blog.slug}`} key={idx} style={{ textDecoration: 'none' }}>
+                  <div className={styles.bentoCard} style={{ padding: '2rem', height: '100%' }}>
+                    <div className={styles.bentoIcon} style={{ background: 'rgba(88, 101, 242, 0.1)', color: '#5865F2' }}><Star size={24} /></div>
+                    <h3 className={styles.bentoTitle} style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>{blog.title}</h3>
+                    <p className={styles.bentoDesc} style={{ fontSize: '0.95rem' }}>{blog.description}</p>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* --- PRICING SECTION --- */}
         <section className={`${styles.pricingSection} animate-fade-in`}>
           <div className={styles.bentoHeader}>
@@ -258,10 +313,41 @@ export default function Home() {
         {/* --- HOW IT WORKS & FAQ SECTION --- */}
         <section className={`${styles.faqSection} animate-fade-in`} style={{ padding: '4rem 2rem', maxWidth: '1200px', margin: '0 auto' }}>
           <div className={styles.bentoHeader}>
-            <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>{t.faqTitle}</h2>
+            <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Nasıl Çalışır? & SSS</h2>
             <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', maxWidth: '800px', margin: '0 auto' }}>
-              {t.faqSubtitle}
+              Veyronix'i kurmak ve kullanmaya başlamak saniyeler sürer. İşte 3 basit adım:
             </p>
+          </div>
+
+          {/* 3-Step Onboarding */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem', marginTop: '3rem', marginBottom: '4rem' }}>
+            <div style={{ background: 'linear-gradient(180deg, rgba(88, 101, 242, 0.1) 0%, rgba(10, 10, 15, 0.5) 100%)', padding: '2.5rem', borderRadius: '24px', border: '1px solid rgba(88, 101, 242, 0.2)', textAlign: 'center' }}>
+              <div style={{ background: '#5865F2', color: '#fff', width: '64px', height: '64px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', boxShadow: '0 10px 20px rgba(88, 101, 242, 0.3)' }}>
+                <Zap size={32} />
+              </div>
+              <h3 style={{ fontSize: '1.5rem', color: '#fff', marginBottom: '1rem' }}>1. Botu Ekleyin</h3>
+              <p style={{ color: 'var(--text-muted)', lineHeight: '1.6' }}>Veyronix'i Discord sunucunuza davet edin. Kurulum saniyeler içinde tamamlanır ve hemen kullanıma hazırdır.</p>
+            </div>
+
+            <div style={{ background: 'linear-gradient(180deg, rgba(252, 163, 17, 0.1) 0%, rgba(10, 10, 15, 0.5) 100%)', padding: '2.5rem', borderRadius: '24px', border: '1px solid rgba(252, 163, 17, 0.2)', textAlign: 'center' }}>
+              <div style={{ background: 'var(--accent-color)', color: '#000', width: '64px', height: '64px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', boxShadow: '0 10px 20px rgba(252, 163, 17, 0.3)' }}>
+                <Shield size={32} />
+              </div>
+              <h3 style={{ fontSize: '1.5rem', color: '#fff', marginBottom: '1rem' }}>2. Ayarları Yapın</h3>
+              <p style={{ color: 'var(--text-muted)', lineHeight: '1.6' }}><code>/settings</code> veya <code>/setup-guild</code> komutlarıyla dilinizi seçin, yetkili rollerini ve Albion loncanızı bağlayın.</p>
+            </div>
+
+            <div style={{ background: 'linear-gradient(180deg, rgba(46, 204, 113, 0.1) 0%, rgba(10, 10, 15, 0.5) 100%)', padding: '2.5rem', borderRadius: '24px', border: '1px solid rgba(46, 204, 113, 0.2)', textAlign: 'center' }}>
+              <div style={{ background: '#2ecc71', color: '#000', width: '64px', height: '64px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', boxShadow: '0 10px 20px rgba(46, 204, 113, 0.3)' }}>
+                <Sword size={32} />
+              </div>
+              <h3 style={{ fontSize: '1.5rem', color: '#fff', marginBottom: '1rem' }}>3. Partini Kur</h3>
+              <p style={{ color: 'var(--text-muted)', lineHeight: '1.6' }}>Savaşa hazırsınız! <code>/createparty</code> yazarak dinamik ZvZ veya PVE partinizi oluşturun ve üyeleri toplamaya başlayın.</p>
+            </div>
+          </div>
+          
+          <div className={styles.bentoHeader}>
+            <h2 style={{ fontSize: '2rem', marginBottom: '1rem' }}>Sıkça Sorulan Sorular</h2>
           </div>
           
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', marginTop: '3rem' }}>
@@ -415,18 +501,32 @@ export default function Home() {
 
             <div style={{ marginBottom: '2.5rem' }}>
               <label style={{ display: 'block', marginBottom: '0.75rem', fontWeight: '600', fontSize: '0.9rem', color: '#fff' }}>Hedef Sunucu</label>
-              <select 
-                value={selectedServer}
-                onChange={e => setSelectedServer(e.target.value)}
-                style={{ width: '100%', padding: '1rem', borderRadius: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-color)', color: '#fff', fontSize: '1rem', outline: 'none', fontFamily: 'inherit' }}
-              >
-                <option value="">-- Sunucu Seçin --</option>
-                {userServers.map(s => (
-                  <option key={s.guild_id} value={s.guild_id}>{s.guild_name}</option>
-                ))}
-              </select>
-              {userServers.length === 0 && (
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: '0.75rem' }}>Yüklenecek sunucu bulunamadı veya yetkiniz yok.</p>
+              
+              {isLoadingServers ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '1rem', background: 'rgba(0,0,0,0.3)', borderRadius: '12px', color: 'var(--text-muted)' }}>
+                  <Loader2 className="spin" size={18} /> Sunucular yükleniyor...
+                </div>
+              ) : (
+                <>
+                  <select 
+                    value={selectedServer}
+                    onChange={e => setSelectedServer(e.target.value)}
+                    style={{ width: '100%', padding: '1rem', borderRadius: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-color)', color: '#fff', fontSize: '1rem', outline: 'none', fontFamily: 'inherit' }}
+                  >
+                    <option value="">-- Sunucu Seçin --</option>
+                    {userServers.map(s => (
+                      <option key={s.guild_id} value={s.guild_id}>{s.guild_name}</option>
+                    ))}
+                  </select>
+                  {userServers.length === 0 && (
+                    <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+                      <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1rem' }}>Sistemde aktif bir sunucunuz bulunamadı. Lütfen önce botu Discord sunucunuza ekleyin.</p>
+                      <a href="https://discord.com/oauth2/authorize?client_id=1082239904169336902&permissions=510977&scope=bot+applications.commands" target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ display: 'inline-block', padding: '0.5rem 1rem', fontSize: '0.85rem' }}>
+                        Botu Sunucuna Ekle
+                      </a>
+                    </div>
+                  )}
+                </>
               )}
             </div>
 

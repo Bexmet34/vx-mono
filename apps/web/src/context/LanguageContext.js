@@ -315,6 +315,7 @@ export function LanguageProvider({ children }) {
     const saved = localStorage.getItem("appLang");
     if (saved && saved !== lang) {
       setLang(saved);
+      document.cookie = `NEXT_LOCALE=${saved}; path=/; max-age=31536000`;
     }
   }, []);
 
@@ -322,6 +323,7 @@ export function LanguageProvider({ children }) {
     setLang((prev) => {
       const target = prev === "en" ? "tr" : "en";
       localStorage.setItem("appLang", target);
+      document.cookie = `NEXT_LOCALE=${target}; path=/; max-age=31536000`;
       return target;
     });
   };
