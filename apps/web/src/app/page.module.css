@@ -568,7 +568,7 @@
 .marqueeTrack {
   display: flex;
   white-space: nowrap;
-  animation: scroll 60s linear infinite;
+  animation: scroll 200s linear infinite;
   gap: 2rem;
   padding-left: 2rem;
   align-items: center;
