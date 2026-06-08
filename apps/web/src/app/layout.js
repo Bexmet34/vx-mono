@@ -32,7 +32,7 @@ export const metadata = {
   },
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
@@ -48,7 +48,7 @@ export default function RootLayout({ children }) {
     },
   };
 
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const lang = cookieStore.get("NEXT_LOCALE")?.value || "tr";
 
   return (
