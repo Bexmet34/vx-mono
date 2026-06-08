@@ -539,12 +539,9 @@
 .marqueeContainer {
   width: 100%;
   overflow: hidden;
-  background: linear-gradient(90deg, rgba(10, 10, 15, 1) 0%, rgba(20, 20, 25, 0.8) 50%, rgba(10, 10, 15, 1) 100%);
-  padding: 2rem 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  display: flex;
   position: relative;
+  padding: 1rem 0;
+  margin-top: 1rem;
 }
 
 .marqueeContainer::before,
@@ -555,6 +552,7 @@
   width: 150px;
   height: 100%;
   z-index: 2;
+  pointer-events: none;
 }
 
 .marqueeContainer::before {
@@ -570,28 +568,48 @@
 .marqueeTrack {
   display: flex;
   white-space: nowrap;
-  animation: scroll 40s linear infinite;
-  gap: 3rem;
-  padding-left: 3rem;
+  animation: scroll 60s linear infinite;
+  gap: 2rem;
+  padding-left: 2rem;
+  align-items: center;
 }
 
 .marqueeItem {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  font-family: 'Outfit', sans-serif;
-  letter-spacing: 1px;
+  gap: 0.75rem;
+  padding: 0.5rem 1.25rem 0.5rem 0.5rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 99px;
+  transition: all 0.3s ease;
+  cursor: default;
 }
 
-.marqueeItem span {
-  color: var(--text-main);
+.marqueeItem:hover {
   background: rgba(255, 255, 255, 0.05);
-  padding: 0.2rem 1rem;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-color: rgba(88, 101, 242, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(88, 101, 242, 0.15);
+}
+
+.marqueeIconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: rgba(88, 101, 242, 0.1);
+  color: #8b94f7;
+  border-radius: 50%;
+}
+
+.marqueeText {
+  color: #e2e2e2;
+  font-size: 1.05rem;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.5px;
 }
 
 @keyframes scroll {

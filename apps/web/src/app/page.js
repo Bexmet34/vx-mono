@@ -2,7 +2,7 @@
 
 import Navbar from "@/components/Navbar";
 import styles from "./page.module.css";
-import { Shield, Users, Sword, Command, Star, MessageCircle, Zap, Activity, HelpCircle, Eye } from "lucide-react";
+import { Shield, Users, Sword, Command, Star, MessageCircle, Zap, Activity, HelpCircle, Eye, Server, BadgeCheck } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useEffect, useState } from "react";
 import { useSession, signIn } from "next-auth/react";
@@ -183,14 +183,22 @@ export default function Home() {
 
         {/* --- MARQUEE SOCIAL PROOF --- */}
         {publicServers.length > 0 && (
-          <div className={`${styles.marqueeContainer} animate-fade-in delay-3`}>
-            <div className={styles.marqueeTrack}>
-              {[...publicServers, ...publicServers, ...publicServers].map((server, idx) => (
-                <div key={idx} className={styles.marqueeItem}>
-                  <Shield size={18} className={styles.checkIcon} />
-                  <span>{server.length > 20 ? server.substring(0, 17) + '...' : server}</span>
-                </div>
-              ))}
+          <div style={{ marginTop: '2rem', textAlign: 'center' }} className="animate-fade-in delay-3">
+            <h3 style={{ fontSize: '1.25rem', color: 'var(--text-muted)', fontWeight: '600', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '1.5rem' }}>
+              Veyronix'i Tercih Eden Topluluklar
+            </h3>
+            <div className={`${styles.marqueeContainer}`}>
+              <div className={styles.marqueeTrack}>
+                {[...publicServers, ...publicServers, ...publicServers].map((server, idx) => (
+                  <div key={idx} className={styles.marqueeItem}>
+                    <div className={styles.marqueeIconWrapper}>
+                      <Server size={16} />
+                    </div>
+                    <span className={styles.marqueeText}>{server.length > 20 ? server.substring(0, 17) + '...' : server}</span>
+                    <BadgeCheck size={18} color="#5865F2" style={{ marginLeft: '4px' }} />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )}
