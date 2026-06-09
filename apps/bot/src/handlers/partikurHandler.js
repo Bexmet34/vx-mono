@@ -34,30 +34,33 @@ async function handleCreatePartyCommand(interaction) {
 
     if (needsVote) {
         if (topggApi) {
+            let hasVoted = false;
             try {
-                const hasVoted = await topggApi.hasVoted(userId);
-                if (!hasVoted) {
-                    const voteEmbed = new EmbedBuilder()
-                        .setTitle(t('subscription.vote_required_title', lang))
-                        .setDescription(t('subscription.vote_required_desc', lang))
-                        .setColor('#5865F2')
-                        .setFooter({ text: 'Veyronix Party Master • Top.gg System' });
-
-                    const row = new ActionRowBuilder().addComponents(
-                        new ButtonBuilder()
-                            .setLabel(t('subscription.vote_button', lang))
-                            .setURL(config.TOPGG_LINK || 'https://top.gg/bot/1082239904169336902')
-                            .setStyle(ButtonStyle.Link)
-                    );
-
-                    return await interaction.reply({
-                        embeds: [voteEmbed],
-                        components: [row],
-                        flags: [MessageFlags.Ephemeral]
-                    });
-                }
+                hasVoted = await topggApi.hasVoted(userId);
             } catch (err) {
-                console.error('[PartikurHandler] Top.gg API error:', err);
+                console.error('[PartikurHandler] Top.gg API error:', err.message || err);
+                hasVoted = false;
+            }
+
+            if (!hasVoted) {
+                const voteEmbed = new EmbedBuilder()
+                    .setTitle(t('subscription.vote_required_title', lang))
+                    .setDescription(t('subscription.vote_required_desc', lang))
+                    .setColor('#5865F2')
+                    .setFooter({ text: 'Veyronix Party Master • Top.gg System' });
+
+                const row = new ActionRowBuilder().addComponents(
+                    new ButtonBuilder()
+                        .setLabel(t('subscription.vote_button', lang))
+                        .setURL(config.TOPGG_LINK || 'https://top.gg/bot/1082239904169336902')
+                        .setStyle(ButtonStyle.Link)
+                );
+
+                return await interaction.reply({
+                    embeds: [voteEmbed],
+                    components: [row],
+                    flags: [MessageFlags.Ephemeral]
+                });
             }
         }
     }
@@ -156,30 +159,33 @@ async function handleTempCommand(interaction) {
 
     if (needsVote) {
         if (topggApi) {
+            let hasVoted = false;
             try {
-                const hasVoted = await topggApi.hasVoted(userId);
-                if (!hasVoted) {
-                    const voteEmbed = new EmbedBuilder()
-                        .setTitle(t('subscription.vote_required_title', lang))
-                        .setDescription(t('subscription.vote_required_desc', lang))
-                        .setColor('#5865F2')
-                        .setFooter({ text: 'Veyronix Party Master • Top.gg System' });
-
-                    const row = new ActionRowBuilder().addComponents(
-                        new ButtonBuilder()
-                            .setLabel(t('subscription.vote_button', lang))
-                            .setURL(config.TOPGG_LINK || 'https://top.gg/bot/1082239904169336902')
-                            .setStyle(ButtonStyle.Link)
-                    );
-
-                    return await interaction.reply({
-                        embeds: [voteEmbed],
-                        components: [row],
-                        flags: [MessageFlags.Ephemeral]
-                    });
-                }
+                hasVoted = await topggApi.hasVoted(userId);
             } catch (err) {
-                console.error('[PartikurHandler] Top.gg API error:', err);
+                console.error('[PartikurHandler] Top.gg API error:', err.message || err);
+                hasVoted = false;
+            }
+
+            if (!hasVoted) {
+                const voteEmbed = new EmbedBuilder()
+                    .setTitle(t('subscription.vote_required_title', lang))
+                    .setDescription(t('subscription.vote_required_desc', lang))
+                    .setColor('#5865F2')
+                    .setFooter({ text: 'Veyronix Party Master • Top.gg System' });
+
+                const row = new ActionRowBuilder().addComponents(
+                    new ButtonBuilder()
+                        .setLabel(t('subscription.vote_button', lang))
+                        .setURL(config.TOPGG_LINK || 'https://top.gg/bot/1082239904169336902')
+                        .setStyle(ButtonStyle.Link)
+                );
+
+                return await interaction.reply({
+                    embeds: [voteEmbed],
+                    components: [row],
+                    flags: [MessageFlags.Ephemeral]
+                });
             }
         }
     }
