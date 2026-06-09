@@ -59,9 +59,7 @@ async function handleCreatePartyCommand(interaction) {
         }
     }
 
-    const guildConfig = await getGuildConfig(interaction.guildId);
-    const lang = guildConfig?.language || 'tr';
-    const userId = interaction.user.id;
+
 
     const isOwner = userId === interaction.guild.ownerId;
     const isDeveloper = config.WHITELIST_USERS.includes(userId);
