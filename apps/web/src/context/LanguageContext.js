@@ -94,6 +94,7 @@ const en = {
   featLimit: "Unlimited Party Creation",
   featDash: "Full Web Dashboard Access",
   featSupport: "Priority Discord Support",
+  featNoVote: "Unlimited Use Without Voting",
 
   // Dashboard Settings
   dOverview: "Overview",
@@ -290,6 +291,7 @@ const tr = {
   featLimit: "Sınırsız Parti Kurma",
   featDash: "Tam Web Paneli Erişimi",
   featSupport: "Öncelikli Discord Desteği",
+  featNoVote: "Oy Vermeden Sınırsız Kullanım",
 
   // Dashboard Ayarları
   dOverview: "Genel Durum",

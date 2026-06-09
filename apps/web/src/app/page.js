@@ -308,6 +308,7 @@ export default function Home() {
                     {features.map((feat, idx) => (
                       <li key={idx} className={styles.featureItem}><Star size={16} className={styles.checkIcon} /> {feat}</li>
                     ))}
+                    <li className={styles.featureItem}><Star size={16} className={styles.checkIcon} /> {t.featNoVote}</li>
                   </ul>
                   <button className="btn-primary" onClick={() => handleBuyClick(plan.id)}>
                     {t.buyNow}

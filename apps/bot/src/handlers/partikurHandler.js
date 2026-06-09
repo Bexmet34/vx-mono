@@ -4,6 +4,12 @@ const { isWhitelisted } = require('../services/whitelistManager');
 const { getGuildConfig } = require('../services/guildConfig');
 const { t } = require('../services/i18n');
 const config = require('../config/config');
+const { Api } = require('@top-gg/sdk');
+
+let topggApi = null;
+if (config.TOPGG_TOKEN) {
+    topggApi = new Api(config.TOPGG_TOKEN);
+}
 
 const { isSubscriptionActive, getSubscription } = require('@veyronix/database');
 const { createPartikurEmbed, buildRolesFields, addFooterFields } = require('../builders/embedBuilder');
@@ -16,29 +22,41 @@ const db = require('../services/db');
 async function handleCreatePartyCommand(interaction) {
     // 0. Subscription Check
     const active = await isSubscriptionActive(interaction.guildId, interaction.guild.name, interaction.guild.ownerId);
+    const guildConfig = await getGuildConfig(interaction.guildId);
+    const lang = guildConfig?.language || 'tr';
+    const userId = interaction.user.id;
     
     if (!active) {
-        const guildConfig = await getGuildConfig(interaction.guildId);
-        const lang = guildConfig?.language || 'tr';
+        // Free user logic: Must vote on top.gg
+        if (topggApi) {
+            try {
+                const hasVoted = await topggApi.hasVoted(userId);
+                if (!hasVoted) {
+                    const voteEmbed = new EmbedBuilder()
+                        .setTitle(t('subscription.vote_required_title', lang))
+                        .setDescription(t('subscription.vote_required_desc', lang))
+                        .setColor('#5865F2')
+                        .setFooter({ text: 'Veyronix Party Master • Top.gg System' });
 
-        const expiredEmbed = new EmbedBuilder()
-            .setTitle(t('subscription.expired_title', lang))
-            .setDescription(t('subscription.expired_desc', lang))
-            .setColor('#FF0000')
-            .setFooter({ text: 'Veyronix Party Master • Subscription System' });
+                    const row = new ActionRowBuilder().addComponents(
+                        new ButtonBuilder()
+                            .setLabel(t('subscription.vote_button', lang))
+                            .setURL(config.TOPGG_LINK || 'https://top.gg/bot/1082239904169336902')
+                            .setStyle(ButtonStyle.Link)
+                    );
 
-        const row = new ActionRowBuilder().addComponents(
-            new ButtonBuilder()
-                .setLabel(t('subscription.support_button', lang))
-                .setURL(config.SUPPORT_SERVER_LINK)
-                .setStyle(ButtonStyle.Link)
-        );
-
-        return await interaction.reply({
-            embeds: [expiredEmbed],
-            components: [row],
-            flags: [MessageFlags.Ephemeral]
-        });
+                    return await interaction.reply({
+                        embeds: [voteEmbed],
+                        components: [row],
+                        flags: [MessageFlags.Ephemeral]
+                    });
+                }
+                // If hasVoted is true, proceed to create party (freemium limits apply below)
+            } catch (err) {
+                console.error('[PartikurHandler] Top.gg API error:', err);
+                // Fallback: If top.gg is down, maybe allow or show error. We will allow them to pass through.
+            }
+        }
     }
 
     const guildConfig = await getGuildConfig(interaction.guildId);
@@ -134,11 +152,36 @@ async function handleTempCommand(interaction) {
     // 0. Subscription Check
     const active = await isSubscriptionActive(interaction.guildId, interaction.guild.name, interaction.guild.ownerId);
     if (!active) {
-        const expiredEmbed = new EmbedBuilder()
-            .setTitle(t('subscription.expired_title', lang))
-            .setDescription(t('subscription.expired_desc', lang))
-            .setColor('#FF0000');
-        return await interaction.reply({ embeds: [expiredEmbed], flags: [MessageFlags.Ephemeral] });
+        // Free user logic: Must vote on top.gg
+        if (topggApi) {
+            try {
+                const hasVoted = await topggApi.hasVoted(userId);
+                if (!hasVoted) {
+                    const voteEmbed = new EmbedBuilder()
+                        .setTitle(t('subscription.vote_required_title', lang))
+                        .setDescription(t('subscription.vote_required_desc', lang))
+                        .setColor('#5865F2')
+                        .setFooter({ text: 'Veyronix Party Master • Top.gg System' });
+
+                    const row = new ActionRowBuilder().addComponents(
+                        new ButtonBuilder()
+                            .setLabel(t('subscription.vote_button', lang))
+                            .setURL(config.TOPGG_LINK || 'https://top.gg/bot/1082239904169336902')
+                            .setStyle(ButtonStyle.Link)
+                    );
+
+                    return await interaction.reply({
+                        embeds: [voteEmbed],
+                        components: [row],
+                        flags: [MessageFlags.Ephemeral]
+                    });
+                }
+                // If hasVoted is true, proceed to create party (freemium limits apply below)
+            } catch (err) {
+                console.error('[PartikurHandler] Top.gg API error:', err);
+                // Fallback
+            }
+        }
     }
 
     // Check Limits
