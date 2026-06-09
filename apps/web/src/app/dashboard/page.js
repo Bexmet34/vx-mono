@@ -168,8 +168,9 @@ export default function Dashboard() {
                     >
                       <Key size={16} /> Redeem
                     </button>
-                    <Link href={`/dashboard/server/${server.guild_id}`} className={`${styles.btnAction} ${styles.btnPrimary}`}>
-                      Manage <ChevronRight size={16} />
+                    <Link href={`/dashboard/server/${server.guild_id}`} className="btn-primary" style={{ padding: '0.5rem 1rem' }}>
+                      <Settings size={18} />
+                      {t.dashManageBtn}
                     </Link>
                   </div>
                 </div>
