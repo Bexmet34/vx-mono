@@ -27,7 +27,7 @@ module.exports = {
     LOG_CHANNELS: process.env.LOG_CHANNELS ? process.env.LOG_CHANNELS.split(',') : [],
 
     // Top.gg Configuration
-    TOPGG_TOKEN: process.env.TOPGG_TOKEN,
+    TOPGG_TOKEN: process.env.TOPGG_TOKEN || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfdCI6Ijg1MjE0MDA1NDM5NjcwMjcyMCIsImlkIjoiODE2MjQxMDU5OTQxNjQ2MzM2IiwiaWF0IjoxNzgxMDAyODIwfQ.EHU3u_E0Iq_OqLBlgS_ZrNHYdfJgEyIRqyR5Tso1thM",
 
     // Supabase Configuration
     SUPABASE_URL: process.env.SUPABASE_URL,
