@@ -678,12 +678,33 @@ export default function AdminPage() {
                       
                       <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '2.5rem'}}>
                          <div>
-                            <label className="admin-label">Özellikler (TR - Virgülle ayırın)</label>
-                            <textarea className="admin-input-field" style={{height: '100px', resize: 'none'}} value={newPlan.features_tr.join('\n')} onChange={e => setNewPlan({...newPlan, features_tr: e.target.value.split('\n').filter(x=>x.trim()!=='')})} placeholder="Gelişmiş Parti Sistemi&#10;Sınırsız Kullanım" />
+                            <label className="admin-label">Özellikler (TR) — Her satıra bir özellik yazın</label>
+                            <textarea 
+                              className="admin-input-field" 
+                              style={{height: '140px', resize: 'vertical'}} 
+                              value={newPlan.features_tr.join('\n')} 
+                              onChange={e => {
+                                // Support both newline and comma separated input
+                                const raw = e.target.value;
+                                const items = raw.split(/[\n,]/).map(x => x.trim()).filter(x => x !== '');
+                                setNewPlan({...newPlan, features_tr: items});
+                              }}
+                              placeholder={"Gelişmiş Parti Sistemi\nSınırsız Parti Kurma\nOy Vermeden Sınırsız Kullanım"}
+                            />
                          </div>
                          <div>
-                            <label className="admin-label">Özellikler (EN - Virgülle ayırın)</label>
-                            <textarea className="admin-input-field" style={{height: '100px', resize: 'none'}} value={newPlan.features_en.join('\n')} onChange={e => setNewPlan({...newPlan, features_en: e.target.value.split('\n').filter(x=>x.trim()!=='')})} placeholder="Advanced Party System&#10;Unlimited Usage" />
+                            <label className="admin-label">Features (EN) — One feature per line</label>
+                            <textarea 
+                              className="admin-input-field" 
+                              style={{height: '140px', resize: 'vertical'}} 
+                              value={newPlan.features_en.join('\n')} 
+                              onChange={e => {
+                                const raw = e.target.value;
+                                const items = raw.split(/[\n,]/).map(x => x.trim()).filter(x => x !== '');
+                                setNewPlan({...newPlan, features_en: items});
+                              }}
+                              placeholder={"Advanced Party System\nUnlimited Party Setup\nVote-Free Unlimited Usage"}
+                            />
                          </div>
                       </div>
 
