@@ -132,10 +132,10 @@ export default function Dashboard() {
                 timeStatus = "Unlimited";
                 statusClass = styles.statusInfinity;
               } else if (expired) {
-                timeStatus = "Expired";
-                statusClass = styles.statusExpired;
+                timeStatus = t.dFreePlan || "Free Plan";
+                statusClass = styles.statusExpired; // We can keep the same class or change it, it's just styling
               } else {
-                timeStatus = "Active";
+                timeStatus = t.dPremiumPlan || "Premium";
                 statusClass = styles.statusActive;
               }
 
@@ -157,8 +157,8 @@ export default function Dashboard() {
                       {!server.is_unlimited && !expired && (
                          <>{formatDistanceToNow(new Date(server.expires_at), { locale })} left</>
                       )}
-                      {expired && !server.is_unlimited && "Subscription ended"}
-                      {server.is_unlimited && "Lifetime access"}
+                      {expired && !server.is_unlimited && (lang === 'tr' ? "Freemium (Top.gg Onaylı)" : "Freemium (Top.gg Required)")}
+                      {server.is_unlimited && (lang === 'tr' ? "Sınırsız (Ömür Boyu)" : "Lifetime access")}
                     </div>
                   </div>
                   <div className={styles.widgetFooter}>
@@ -168,15 +168,9 @@ export default function Dashboard() {
                     >
                       <Key size={16} /> Redeem
                     </button>
-                    {expired && !server.is_unlimited ? (
-                      <button className={`${styles.btnAction} ${styles.btnDisabled}`} disabled>
-                        Manage
-                      </button>
-                    ) : (
-                      <Link href={`/dashboard/server/${server.guild_id}`} className={`${styles.btnAction} ${styles.btnPrimary}`}>
-                        Manage <ChevronRight size={16} />
-                      </Link>
-                    )}
+                    <Link href={`/dashboard/server/${server.guild_id}`} className={`${styles.btnAction} ${styles.btnPrimary}`}>
+                      Manage <ChevronRight size={16} />
+                    </Link>
                   </div>
                 </div>
               );
