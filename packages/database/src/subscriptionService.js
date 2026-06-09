@@ -56,7 +56,9 @@ async function getSubscription(guildId, guildName, ownerId) {
 }
 
 /**
- * Checks if subscription is active
+ * Checks if subscription is a PAID/PREMIUM active subscription.
+ * Trial subscriptions do NOT count as paid — they only allow basic access.
+ * Only unlimited (is_unlimited=true) or explicitly paid (trial_used=false) subs return true.
  * @param {string} guildId 
  * @param {string} guildName 
  * @param {string} ownerId 
@@ -65,8 +67,13 @@ async function isSubscriptionActive(guildId, guildName, ownerId) {
     const sub = await getSubscription(guildId, guildName, ownerId);
     
     if (!sub) return false;
-    if (sub.is_unlimited) return true;
+
+    // Must be explicitly premium (unlimited OR paid — not trial)
+    const isPaid = sub.is_unlimited || (sub.trial_used === false);
+    if (!isPaid) return false; // trial_used=true means it's just a trial → not premium
+
     if (!sub.is_active) return false;
+    if (sub.is_unlimited) return true;
 
     const expiresAt = new Date(sub.expires_at);
     const now = new Date();
@@ -99,6 +106,7 @@ async function addSubscriptionDays(guildId, days) {
         .update({ 
             expires_at: baseDate.toISOString(), 
             is_active: true,
+            trial_used: false, // Mark as paid, not trial
             updated_at: new Date().toISOString() 
         })
         .eq('guild_id', guildId);
