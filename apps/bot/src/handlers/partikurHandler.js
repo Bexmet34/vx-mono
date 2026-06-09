@@ -20,14 +20,19 @@ const db = require('../services/db');
  * Handles /createparty command
  */
 async function handleCreatePartyCommand(interaction) {
-    // 0. Subscription Check
-    const active = await isSubscriptionActive(interaction.guildId, interaction.guild.name, interaction.guild.ownerId);
     const guildConfig = await getGuildConfig(interaction.guildId);
     const lang = guildConfig?.language || 'tr';
     const userId = interaction.user.id;
+    const isOwner = userId === interaction.guild.ownerId;
+    const isDeveloper = config.WHITELIST_USERS.includes(userId);
+
+    // 0. Subscription & Vote Check
+    const active = await isSubscriptionActive(interaction.guildId, interaction.guild.name, interaction.guild.ownerId);
     
-    if (!active) {
-        // Free user logic: Must vote on top.gg
+    // Everyone must vote, EXCEPT developers or the OWNER of a premium (active) server.
+    const needsVote = !(isDeveloper || (active && isOwner));
+
+    if (needsVote) {
         if (topggApi) {
             try {
                 const hasVoted = await topggApi.hasVoted(userId);
@@ -51,18 +56,12 @@ async function handleCreatePartyCommand(interaction) {
                         flags: [MessageFlags.Ephemeral]
                     });
                 }
-                // If hasVoted is true, proceed to create party (freemium limits apply below)
             } catch (err) {
                 console.error('[PartikurHandler] Top.gg API error:', err);
-                // Fallback: If top.gg is down, maybe allow or show error. We will allow them to pass through.
             }
         }
     }
 
-
-
-    const isOwner = userId === interaction.guild.ownerId;
-    const isDeveloper = config.WHITELIST_USERS.includes(userId);
     const whitelisted = isOwner || isDeveloper || await isWhitelisted(userId, interaction.guildId);
 
     const sub = await getSubscription(interaction.guildId, interaction.guild.name, interaction.guild.ownerId);
@@ -146,11 +145,16 @@ async function handleTempCommand(interaction) {
     const guildConfig = await getGuildConfig(interaction.guildId);
     const lang = guildConfig?.language || 'tr';
     const userId = interaction.user.id;
+    const isOwner = userId === interaction.guild?.ownerId;
+    const isDeveloper = config.WHITELIST_USERS?.includes(userId);
 
-    // 0. Subscription Check
+    // 0. Subscription & Vote Check
     const active = await isSubscriptionActive(interaction.guildId, interaction.guild.name, interaction.guild.ownerId);
-    if (!active) {
-        // Free user logic: Must vote on top.gg
+
+    // Everyone must vote, EXCEPT developers or the OWNER of a premium (active) server.
+    const needsVote = !(isDeveloper || (active && isOwner));
+
+    if (needsVote) {
         if (topggApi) {
             try {
                 const hasVoted = await topggApi.hasVoted(userId);
@@ -174,17 +178,13 @@ async function handleTempCommand(interaction) {
                         flags: [MessageFlags.Ephemeral]
                     });
                 }
-                // If hasVoted is true, proceed to create party (freemium limits apply below)
             } catch (err) {
                 console.error('[PartikurHandler] Top.gg API error:', err);
-                // Fallback
             }
         }
     }
 
     // Check Limits
-    const isOwner = userId === interaction.guild?.ownerId;
-    const isDeveloper = config.WHITELIST_USERS?.includes(userId);
     const whitelisted = isOwner || isDeveloper || await isWhitelisted(userId, interaction.guildId);
 
     const sub = await getSubscription(interaction.guildId, interaction.guild.name, interaction.guild.ownerId);
