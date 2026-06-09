@@ -454,7 +454,7 @@ export default function AdminPage() {
                         <th>SUNUCU BİLGİSİ</th>
                         <th className="hide-on-tablet">SAHİP ID</th>
                         <th>DURUM</th>
-                        <th>BİTİŞ TARİHİ</th>
+                        <th>PLAN</th>
                         <th style={{textAlign: "right"}}>İŞLEMLER</th>
                       </tr>
                     </thead>
@@ -499,12 +499,14 @@ export default function AdminPage() {
                               )}
                             </td>
                             <td>
-                              <div style={{ fontSize: "0.9rem", fontWeight: "600", color: isExpired && !s.is_unlimited ? "var(--admin-error)" : "inherit" }}>
-                                {s.is_unlimited ? "Süresiz" : format(new Date(s.expires_at), "dd MMM yyyy", { locale: tr })}
-                              </div>
-                              <div style={{fontSize: '0.75rem', color: 'var(--admin-text-muted)'}}>
-                                {s.is_unlimited ? "∞" : format(new Date(s.expires_at), "HH:mm")}
-                              </div>
+                              {/* PLAN column: Freemium / Premium / Unlimited */}
+                              {s.is_unlimited ? (
+                                <span className="admin-badge badge-unlimited" style={{fontSize:'0.8rem'}}>♾️ Sınırsız</span>
+                              ) : s.trial_used === false ? (
+                                <span className="admin-badge badge-active" style={{fontSize:'0.8rem'}}>💎 Premium</span>
+                              ) : (
+                                <span className="admin-badge badge-expired" style={{fontSize:'0.8rem'}}>🆓 Freemium</span>
+                              )}
                             </td>
                             <td>
                               <div className="table-actions">
