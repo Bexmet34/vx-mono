@@ -16,11 +16,11 @@ export default function OverviewTab({ subscription, setActiveTab }) {
   if (subscription) {
     expired = isPast(new Date(subscription.expires_at));
     if (subscription.is_unlimited) {
-      timeStatus = t.dashUnlimited || "Unlimited";
+      timeStatus = t.dPremiumPlan || "Premium";
       statusColor = "var(--accent-color)";
     } else if (expired) {
-      timeStatus = t.dashExpired || "Expired";
-      statusColor = "#ef4444";
+      timeStatus = t.dFreePlan || "Free Plan";
+      statusColor = "#ef4444"; // keeping it reddish to indicate action needed (voting) or we can make it gray
     } else {
       timeStatus = formatDistanceToNow(new Date(subscription.expires_at), { locale }) + ` ${t.dashLeft || "left"}`;
       statusColor = "#22c55e";
@@ -56,7 +56,7 @@ export default function OverviewTab({ subscription, setActiveTab }) {
            )}
            <div>
              <div style={{ fontSize: '1.5rem', fontWeight: 800, color: statusColor }}>{timeStatus}</div>
-             <div style={{ color: '#888', fontSize: '0.85rem' }}>{subscription && !subscription.is_unlimited && !expired ? 'Premium Access' : 'Current Plan'}</div>
+             <div style={{ color: '#888', fontSize: '0.85rem' }}>{subscription && !subscription.is_unlimited && !expired ? 'Premium Access' : (expired ? 'Freemium (Top.gg)' : 'Lifetime Access')}</div>
            </div>
         </div>
       </div>
