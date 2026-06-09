@@ -131,12 +131,14 @@ export default function Dashboard() {
               if (server.is_unlimited) {
                 timeStatus = "Unlimited";
                 statusClass = styles.statusInfinity;
-              } else if (expired) {
-                timeStatus = t.dFreePlan || "Free Plan";
-                statusClass = styles.statusExpired; // We can keep the same class or change it, it's just styling
-              } else {
+              } else if (server.trial_used === false && !expired) {
+                // Real paid subscription, not expired
                 timeStatus = t.dPremiumPlan || "Premium";
                 statusClass = styles.statusActive;
+              } else {
+                // Trial (trial_used=true) OR expired paid plan → Freemium
+                timeStatus = t.dFreePlan || "Freemium";
+                statusClass = styles.statusExpired;
               }
 
               return (
@@ -154,11 +156,11 @@ export default function Dashboard() {
                       {server.guild_name || "Unknown Server"}
                     </div>
                     <div className={styles.widgetMeta}>
-                      {!server.is_unlimited && !expired && (
-                         <>{formatDistanceToNow(new Date(server.expires_at), { locale })} left</>
-                      )}
-                      {expired && !server.is_unlimited && (lang === 'tr' ? "Freemium (Top.gg Onaylı)" : "Freemium (Top.gg Required)")}
                       {server.is_unlimited && (lang === 'tr' ? "Sınırsız (Ömür Boyu)" : "Lifetime access")}
+                      {!server.is_unlimited && server.trial_used === false && !expired && (
+                        <>{formatDistanceToNow(new Date(server.expires_at), { locale })} left</>
+                      )}
+                      {!server.is_unlimited && (server.trial_used !== false || expired) && (lang === 'tr' ? "Freemium — Top.gg oyu gerekli" : "Freemium — Top.gg vote required")}
                     </div>
                   </div>
                   <div className={styles.widgetFooter}>

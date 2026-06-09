@@ -22,7 +22,7 @@ export async function GET(req) {
     // Fetch subscriptions where owner_id = Discord ID
     const { data: guilds, error } = await supabase
       .from('subscriptions')
-      .select('id, guild_id, guild_name, expires_at, is_unlimited, is_active')
+      .select('id, guild_id, guild_name, expires_at, is_unlimited, is_active, trial_used')
       .eq('owner_id', discordId);
 
     if (error) {
