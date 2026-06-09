@@ -15,14 +15,20 @@ export const metadata = {
     siteName: "Veyronix",
     images: [
       {
-        url: "https://veyronix.com.tr/favicon.ico",
-        width: 800,
-        height: 600,
-        alt: "Veyronix - Albion Online Party Finder",
+        url: "https://veyronix.com.tr/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Veyronix - Discord Albion Party Finder",
       },
     ],
     locale: "tr_TR",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Veyronix - Discord Albion Party Finder",
+    description: "Veyronix is the ultimate Discord bot to build, manage, and track parties in Albion Online. Automate your guild with killboards, role management, and dynamic party builders directly from your Discord server.",
+    images: ["https://veyronix.com.tr/og-image.png"],
   },
   other: {
     cryptomus: "7e16ba27",
