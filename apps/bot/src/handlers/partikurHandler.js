@@ -36,15 +36,17 @@ async function handleCreatePartyCommand(interaction) {
     const needsVote = !(isDeveloper || (active && isOwner));
 
     if (needsVote) {
-        // If topggApi is missing, block everyone — no bypass allowed
         let hasVoted = false;
         if (topggApi) {
             try {
                 hasVoted = await topggApi.hasVoted(userId);
                 console.log(`[PartikurHandler] Vote check for ${userId}: ${hasVoted}`);
             } catch (err) {
-                console.error('[PartikurHandler] Top.gg API error:', err.message || err);
-                // Treat API errors as 'not voted' — block the user
+                if (err.message?.includes('404') || err.message?.includes('Not Found')) {
+                    console.error('[PartikurHandler] Top.gg 404 — TOPGG_TOKEN yanlış bota ait veya bot Top.gg\'de bulunamadı.');
+                } else {
+                    console.error('[PartikurHandler] Top.gg API error:', err.message || err);
+                }
                 hasVoted = false;
             }
         } else {
@@ -166,14 +168,17 @@ async function handleTempCommand(interaction) {
     const needsVote = !(isDeveloper || (active && isOwner));
 
     if (needsVote) {
-        // If topggApi is missing, block everyone — no bypass allowed
         let hasVoted = false;
         if (topggApi) {
             try {
                 hasVoted = await topggApi.hasVoted(userId);
                 console.log(`[PartikurHandler] Vote check for ${userId}: ${hasVoted}`);
             } catch (err) {
-                console.error('[PartikurHandler] Top.gg API error:', err.message || err);
+                if (err.message?.includes('404') || err.message?.includes('Not Found')) {
+                    console.error('[PartikurHandler] Top.gg 404 — TOPGG_TOKEN yanlış bota ait veya bot Top.gg\'de bulunamadı.');
+                } else {
+                    console.error('[PartikurHandler] Top.gg API error:', err.message || err);
+                }
                 hasVoted = false;
             }
         } else {

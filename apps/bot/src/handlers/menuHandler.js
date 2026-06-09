@@ -604,7 +604,7 @@ async function handleAddMemberUserSelect(interaction) {
 
         // DB update
         const roleName = rolesWithMembers[roleIndex].role;
-        await db.run('INSERT INTO party_members (party_id, user_id, role, status) SELECT id, ?, ?, "joined" FROM parties WHERE message_id = ?',
+        await db.run("INSERT INTO party_members (party_id, user_id, role, status) SELECT id, ?, ?, 'joined' FROM parties WHERE message_id = ?",
             [targetUserId, roleName, messageId]).catch(e => console.error(e));
 
         const multiRoleWaitlist = data.multiRoleWaitlist || [];

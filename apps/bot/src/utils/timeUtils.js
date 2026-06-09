@@ -25,29 +25,50 @@ function parseTimeToMs(timeStr) {
 
 let timeOffsetMs = 0;
 
+// Time APIs tried in order — first success wins
+const TIME_APIS = [
+    {
+        url: 'https://timeapi.io/api/time/current/zone?timeZone=UTC',
+        parse: (data) => new Date(data.dateTime).getTime(),
+    },
+    {
+        url: 'http://worldtimeapi.org/api/timezone/Etc/UTC',
+        parse: (data) => new Date(data.utc_datetime).getTime(),
+    },
+];
+
 /**
  * Syncs the system time with an external API to calculate offset.
- * Useful if the VPS clock is desynchronized.
+ * Tries multiple APIs with a short timeout. Fails silently if all unavailable.
  */
 async function syncTimeOffset() {
-    try {
-        const res = await fetch('http://worldtimeapi.org/api/timezone/Etc/UTC');
-        if (res.ok) {
-            const data = await res.json();
-            const realTime = new Date(data.utc_datetime).getTime();
-            const systemTime = Date.now();
-            timeOffsetMs = realTime - systemTime;
-            
-            const offsetMins = (timeOffsetMs / 60000).toFixed(1);
-            if (Math.abs(timeOffsetMs) > 5000) {
-                console.log(`[TimeSync] Sistem saati ${offsetMins} dakika hatalı. Otomatik düzeltme aktif.`);
-            } else {
-                console.log(`[TimeSync] Sistem saati senkronize (Sapma: ${timeOffsetMs}ms).`);
+    for (const api of TIME_APIS) {
+        try {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 5000);
+            const res = await fetch(api.url, { signal: controller.signal });
+            clearTimeout(timeout);
+
+            if (res.ok) {
+                const data = await res.json();
+                const realTime = api.parse(data);
+                const systemTime = Date.now();
+                timeOffsetMs = realTime - systemTime;
+
+                const offsetMins = (timeOffsetMs / 60000).toFixed(1);
+                if (Math.abs(timeOffsetMs) > 5000) {
+                    console.log(`[TimeSync] Sistem saati ${offsetMins} dakika hatalı. Otomatik düzeltme aktif.`);
+                } else {
+                    console.log(`[TimeSync] Sistem saati senkronize (Sapma: ${timeOffsetMs}ms).`);
+                }
+                return; // success — stop trying
             }
+        } catch (_) {
+            // Try next API silently
         }
-    } catch (err) {
-        console.error('[TimeSync] Saat eşitleme hatası:', err.message);
     }
+    // All APIs failed — VPS has no outbound HTTP, use system clock as-is
+    console.log('[TimeSync] Harici saat API\'lerine erişilemiyor, sistem saati kullanılıyor.');
 }
 
 /**
