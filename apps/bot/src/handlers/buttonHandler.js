@@ -68,6 +68,7 @@ async function handlePartyButtons(interaction) {
                 flags: [MessageFlags.Ephemeral]
             });
         }
+        await interaction.deferUpdate().catch(() => {});
 
         const oldEmbed = message.embeds[0];
         const fields = oldEmbed.fields || [];
@@ -87,7 +88,7 @@ async function handlePartyButtons(interaction) {
         removeActiveParty(ownerId, message.id);
 
 
-        const response = await interaction.update({
+        const response = await interaction.editReply({
             embeds: [closedEmbed],
             components: [closedRow]
         });
@@ -98,6 +99,7 @@ async function handlePartyButtons(interaction) {
 
 
     if (customId === 'leave' || customId.startsWith('join_')) {
+        await interaction.deferUpdate().catch(() => {});
         const release = await acquireLock(message.id);
         try {
             // Fetch fresh message state to avoid race condition
@@ -146,7 +148,7 @@ async function handlePartyButtons(interaction) {
                     await db.run('INSERT INTO party_members (party_id, user_id, role, status) SELECT id, ?, ?, \'joined\' FROM parties WHERE message_id = ?', [userId, roleName, message.id]).catch(e => console.error(e));
                 } else if (joinIndex !== -1 && rolesWithMembers[joinIndex].userId) {
                     release();
-                    return await interaction.reply({ content: `❌ ${t('common.error', lang)}`, flags: [MessageFlags.Ephemeral] });
+                    return await interaction.followUp({ content: `❌ ${t('common.error', lang)}`, flags: [MessageFlags.Ephemeral] });
                 }
             }
 
@@ -159,7 +161,7 @@ async function handlePartyButtons(interaction) {
 
             const { newEmbed, newComponents } = await finalizeRoleUpdate(freshMessage, rolesWithMembers, multiRoleWaitlist, data, lang, guildName);
 
-            await interaction.update({
+            await interaction.editReply({
                 embeds: [newEmbed],
                 components: newComponents
             });
@@ -236,6 +238,7 @@ async function handlePartyButtons(interaction) {
     }
 
     if (customId.startsWith('settings_close_')) {
+        await interaction.deferUpdate().catch(() => {});
         const { handleCloseOption } = require('./menuHandler');
         const partyMsgId = customId.split('_')[2];
         const partyMessage = await interaction.channel.messages.fetch(partyMsgId);

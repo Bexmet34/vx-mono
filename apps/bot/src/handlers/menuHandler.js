@@ -46,6 +46,10 @@ async function handleCloseOption(interaction, ownerId, lang) {
     }
     if (!message || !message.embeds[0]) return;
 
+    if (!interaction.deferred && !interaction.replied) {
+        await interaction.deferUpdate().catch(() => {});
+    }
+
     const release = await acquireLock(message.id);
     try {
         const channel = interaction.channel || await interaction.client.channels.fetch(interaction.channelId);
@@ -77,12 +81,23 @@ async function handleCloseOption(interaction, ownerId, lang) {
                 embeds: [closedEmbed], 
                 components: [closedRow]
             });
-            await interaction.update({ content: `✅ ${t('common.party_closed_label', lang)}`, embeds: [], components: [] });
+            if (interaction.deferred || interaction.replied) {
+                await interaction.editReply({ content: `✅ ${t('common.party_closed_label', lang)}`, embeds: [], components: [] }).catch(()=>{});
+            } else {
+                await interaction.update({ content: `✅ ${t('common.party_closed_label', lang)}`, embeds: [], components: [] }).catch(()=>{});
+            }
         } else {
-            await interaction.update({ 
-                embeds: [closedEmbed], 
-                components: [closedRow]
-            });
+            if (interaction.deferred || interaction.replied) {
+                await interaction.editReply({ 
+                    embeds: [closedEmbed], 
+                    components: [closedRow]
+                }).catch(()=>{});
+            } else {
+                await interaction.update({ 
+                    embeds: [closedEmbed], 
+                    components: [closedRow]
+                }).catch(()=>{});
+            }
         }
     } catch (e) {
         console.error('Error in handleCloseOption:', e);
