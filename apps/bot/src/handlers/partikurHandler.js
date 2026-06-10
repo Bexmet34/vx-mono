@@ -74,7 +74,7 @@ async function checkWeeklyVote(userId) {
         }
     } catch (err) {
         if (err.message?.includes('404') || err.message?.includes('Not Found')) {
-            console.error('[checkWeeklyVote] Top.gg 404 — TOPGG_TOKEN yanlış bota ait veya bot Top.gg\\'de bulunamadı.');
+            console.error("[checkWeeklyVote] Top.gg 404 — TOPGG_TOKEN yanlış bota ait veya bot Top.gg'de bulunamadı.");
         } else {
             console.error('[checkWeeklyVote] Top.gg API error:', err.message || err);
         }
