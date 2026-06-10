@@ -20,6 +20,61 @@ const { createCustomPartyComponents } = require('../builders/componentBuilder');
 const db = require('../services/db');
 
 /**
+ * Custom Vote Checker (Local DB Cache + Top.gg)
+ */
+async function checkWeeklyVote(userId) {
+    if (!topggApi) {
+        console.warn(`[checkWeeklyVote] topggApi is null — blocking user ${userId} (no token configured)`);
+        return false;
+    }
+    
+    // 1. Get configured cooldown (default 168 hours = 7 days)
+    let cooldownHours = 168;
+    try {
+        const setting = await db.get("SELECT value FROM system_settings WHERE key = 'vote_cooldown_hours'");
+        if (setting && setting.value) {
+            cooldownHours = parseInt(setting.value, 10);
+            if (isNaN(cooldownHours) || cooldownHours < 0) cooldownHours = 168;
+        }
+    } catch (e) {
+        console.error('[checkWeeklyVote] Error fetching cooldown', e.message);
+    }
+
+    const cooldownMs = cooldownHours * 60 * 60 * 1000;
+    const now = Date.now();
+
+    // 2. Check local DB cache
+    try {
+        const row = await db.get("SELECT last_vote_time FROM user_votes WHERE user_id = ?", [userId]);
+        if (row && row.last_vote_time) {
+            if (now - row.last_vote_time < cooldownMs) {
+                return true; // Still valid locally
+            }
+        }
+    } catch (e) {
+        console.error('[checkWeeklyVote] Error checking user_votes', e.message);
+    }
+
+    // 3. Fallback to Top.gg API
+    try {
+        const hasVoted = await topggApi.hasVoted(userId);
+        if (hasVoted) {
+            // Update local cache
+            await db.run("INSERT OR REPLACE INTO user_votes (user_id, last_vote_time) VALUES (?, ?)", [userId, now]);
+            return true;
+        }
+    } catch (err) {
+        if (err.message?.includes('404') || err.message?.includes('Not Found')) {
+            console.error('[checkWeeklyVote] Top.gg 404 — TOPGG_TOKEN yanlış bota ait veya bot Top.gg\\'de bulunamadı.');
+        } else {
+            console.error('[checkWeeklyVote] Top.gg API error:', err.message || err);
+        }
+    }
+
+    return false;
+}
+
+/**
  * Handles /createparty command
  */
 async function handleCreatePartyCommand(interaction) {
@@ -36,22 +91,7 @@ async function handleCreatePartyCommand(interaction) {
     const needsVote = !(isDeveloper || (active && isOwner));
 
     if (needsVote) {
-        let hasVoted = false;
-        if (topggApi) {
-            try {
-                hasVoted = await topggApi.hasVoted(userId);
-                console.log(`[PartikurHandler] Vote check for ${userId}: ${hasVoted}`);
-            } catch (err) {
-                if (err.message?.includes('404') || err.message?.includes('Not Found')) {
-                    console.error('[PartikurHandler] Top.gg 404 — TOPGG_TOKEN yanlış bota ait veya bot Top.gg\'de bulunamadı.');
-                } else {
-                    console.error('[PartikurHandler] Top.gg API error:', err.message || err);
-                }
-                hasVoted = false;
-            }
-        } else {
-            console.warn(`[PartikurHandler] topggApi is null — blocking user ${userId} (no token configured)`);
-        }
+        let hasVoted = await checkWeeklyVote(userId);
 
         if (!hasVoted) {
             const voteEmbed = new EmbedBuilder()

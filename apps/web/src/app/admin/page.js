@@ -62,6 +62,9 @@ export default function AdminPage() {
     id: "", name_tr: "", name_en: "", amount: "", duration_days: 30, is_active: true, is_featured: false, sort_order: 0, features_tr: [], features_en: []
   });
 
+  // Settings States
+  const [systemSettings, setSystemSettings] = useState({ vote_cooldown_hours: 168 });
+
   const isAdmin = session?.user?.id === ADMIN_ID || session?.user?.id === "407234961582587916";
 
   const fetchTemplates = useCallback(async () => {
@@ -114,6 +117,16 @@ export default function AdminPage() {
     finally { setLoading(false); }
   }, []);
 
+  const fetchSettings = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/admin/settings");
+      const data = await res.json();
+      if (res.ok) setSystemSettings(prev => ({...prev, ...data}));
+    } catch (err) { console.error(err); }
+    finally { setLoading(false); }
+  }, []);
+
   // Auth Check
   useEffect(() => {
     if (status === "unauthenticated" || (status === "authenticated" && !isAdmin)) {
@@ -130,9 +143,10 @@ export default function AdminPage() {
         if (activeTab === "campaigns") fetchCampaigns();
         if (activeTab === "broadcast") fetchScheduledMessages();
         if (activeTab === "plans") fetchPlans();
+        if (activeTab === "settings") fetchSettings();
       }, 0);
     }
-  }, [status, isAdmin, activeTab, fetchTemplates, fetchServers, fetchCampaigns, fetchScheduledMessages, fetchPlans]);
+  }, [status, isAdmin, activeTab, fetchTemplates, fetchServers, fetchCampaigns, fetchScheduledMessages, fetchPlans, fetchSettings]);
 
 
   const handleCreateCampaign = async () => {
@@ -147,6 +161,23 @@ export default function AdminPage() {
         showToast("Kampanya başarıyla oluşturuldu ve kuyruğa alındı!", "success");
         setShowCampaignModal(false);
         fetchCampaigns();
+      }
+    } catch (err) { showToast(err.message, "error"); }
+    finally { setLoading(false); }
+  };
+
+  const handleSaveSettings = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(systemSettings),
+      });
+      if (res.ok) {
+        showToast("Sistem ayarları başarıyla güncellendi!", "success");
+      } else {
+        showToast("Ayarlar güncellenirken hata oluştu", "error");
       }
     } catch (err) { showToast(err.message, "error"); }
     finally { setLoading(false); }
@@ -1117,10 +1148,45 @@ export default function AdminPage() {
                         </button>
                       </div>
                     </div>
+                    </div>
                   </>
                 )}
               </div>
             )}
+
+            {/* SETTINGS TAB */}
+            {activeTab === "settings" && (
+              <div className="animate-slide-up">
+                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem'}}>
+                   <div>
+                      <h2 style={{fontSize: '1.5rem', fontWeight: '800'}}>Sistem Ayarları</h2>
+                      <p style={{color: 'var(--admin-text-muted)'}}>Global bot ve site ayarlarını yapılandırın.</p>
+                   </div>
+                   <button className="btn-primary" onClick={handleSaveSettings} disabled={loading} style={{padding: '0.8rem 1.5rem', borderRadius: '12px'}}>
+                      {loading ? <Loader2 size={20} className="spin" /> : <><Save size={20} /> Ayarları Kaydet</>}
+                   </button>
+                </div>
+
+                <div className="admin-card" style={{padding: '2.5rem'}}>
+                  <h3 style={{marginBottom: '1.5rem', fontSize: '1.2rem', fontWeight: '700'}}>Top.gg Oy Sistemi</h3>
+                  
+                  <div style={{marginBottom: '2rem'}}>
+                     <label className="admin-label">Oy Geçerlilik Süresi (Saat)</label>
+                     <p style={{fontSize: '0.85rem', color: 'var(--admin-text-muted)', marginBottom: '1rem'}}>
+                        Bir kullanıcı Top.gg üzerinden oy verdiğinde, bu oy sistemde kaç saat boyunca geçerli sayılsın? (Örn: 1 Hafta = 168 Saat)
+                     </p>
+                     <input 
+                       className="admin-input-field" 
+                       type="number" 
+                       value={systemSettings.vote_cooldown_hours || 168} 
+                       onChange={e => setSystemSettings({...systemSettings, vote_cooldown_hours: parseInt(e.target.value) || 0})} 
+                       style={{width: '200px'}}
+                     />
+                  </div>
+                </div>
+              </div>
+            )}
+
           </div>
         )}
 

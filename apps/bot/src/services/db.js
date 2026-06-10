@@ -55,6 +55,12 @@ function initDb() {
                 value TEXT
             )`);
 
+            // Custom vote cache table for Top.gg
+            db.exec(`CREATE TABLE IF NOT EXISTS user_votes (
+                user_id TEXT PRIMARY KEY,
+                last_vote_time INTEGER
+            )`);
+
             // User stats for prestige
             db.exec(`CREATE TABLE IF NOT EXISTS user_stats (
                 user_id TEXT PRIMARY KEY,
@@ -134,6 +140,11 @@ function initDb() {
             safeAlter("ALTER TABLE guild_configs ADD COLUMN registration_welcome_message TEXT");
             safeAlter("ALTER TABLE guild_configs ADD COLUMN registration_enabled INTEGER DEFAULT 0");
             safeAlter("ALTER TABLE guild_configs ADD COLUMN embed_thumbnail_url TEXT");
+
+            // Set default settings if not exists
+            try {
+                db.exec(`INSERT OR IGNORE INTO system_settings (key, value) VALUES ('vote_cooldown_hours', '168')`); // 1 week default
+            } catch (e) {}
 
             resolve();
         } catch (err) {
