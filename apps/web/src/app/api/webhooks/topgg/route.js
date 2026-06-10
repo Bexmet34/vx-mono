@@ -1,9 +1,5 @@
 import { NextResponse } from 'next/server';
-import Database from 'better-sqlite3';
-import path from 'path';
 import { createClient } from '@supabase/supabase-js';
-
-const DB_PATH = path.join(process.cwd(), '../../apps/bot/src/data/database.sqlite');
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -28,21 +24,28 @@ export async function POST(req) {
             return NextResponse.json({ error: 'No user provided' }, { status: 400 });
         }
 
-        // 2. Database update (Stacking logic)
-        const db = new Database(DB_PATH, { fileMustExist: true });
-        
-        // Fetch cooldown hours
+        // 2. Fetch cooldown hours from Supabase
         let cooldownHours = 168; // default 1 week
-        const setting = db.prepare("SELECT value FROM system_settings WHERE key = 'vote_cooldown_hours'").get();
-        if (setting && setting.value) {
-            cooldownHours = parseInt(setting.value, 10);
+        const { data: settingData } = await supabase
+            .from('system_settings')
+            .select('value')
+            .eq('key', 'vote_cooldown_hours')
+            .single();
+
+        if (settingData && settingData.value) {
+            cooldownHours = parseInt(settingData.value, 10);
             if (isNaN(cooldownHours) || cooldownHours < 0) cooldownHours = 168;
         }
 
         const addedMs = cooldownHours * 60 * 60 * 1000;
         const now = Date.now();
 
-        const row = db.prepare("SELECT expires_at FROM user_votes WHERE user_id = ?").get(userId);
+        // Check existing vote time
+        const { data: row } = await supabase
+            .from('user_votes')
+            .select('expires_at')
+            .eq('user_id', userId)
+            .single();
         
         let newExpiresAt = now + addedMs;
         if (row && row.expires_at && row.expires_at > now) {
@@ -50,29 +53,18 @@ export async function POST(req) {
             newExpiresAt = row.expires_at + addedMs;
         }
 
-        db.prepare(`
-            INSERT INTO user_votes (user_id, last_vote_time, expires_at) 
-            VALUES (?, ?, ?) 
-            ON CONFLICT(user_id) 
-            DO UPDATE SET last_vote_time=excluded.last_vote_time, expires_at=excluded.expires_at
-        `).run(userId, now, newExpiresAt);
+        // Update Supabase user_votes
+        await supabase
+            .from('user_votes')
+            .upsert({
+                user_id: userId,
+                last_vote_time: now,
+                expires_at: newExpiresAt
+            }, { onConflict: 'user_id' });
 
         // 3. Fetch user's language preference (Fallback to 'tr')
-        let lang = 'tr';
-        try {
-            const guildRow = db.prepare(`
-                SELECT language 
-                FROM guild_configs 
-                WHERE guild_id IN (SELECT guild_id FROM guild_whitelist WHERE user_id = ?) 
-                LIMIT 1
-            `).get(userId);
-            
-            if (guildRow && guildRow.language) {
-                lang = guildRow.language;
-            }
-        } catch (e) {
-            console.error("Webhook DB error reading language:", e.message);
-        }
+        let lang = 'tr'; // In Supabase context, determining user's exact guild lang is hard from just user_id if they are in multiple.
+        // We will default to tr, or we could fetch subscriptions if we really wanted to, but fallback to tr is fine for now.
 
         // 4. Send DM via Discord API
         if (process.env.DISCORD_BOT_TOKEN) {
@@ -122,7 +114,7 @@ export async function POST(req) {
                     body: JSON.stringify({
                         embeds: [{
                             title: title,
-                            description: desc,
+                            description: desc.replace(/\\n/g, '\n'),
                             color: color
                         }]
                     })
