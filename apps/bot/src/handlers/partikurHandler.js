@@ -14,13 +14,13 @@ if (config.TOPGG_TOKEN) {
     console.warn('[PartikurHandler] WARNING: TOPGG_TOKEN is missing! Vote checks will BLOCK all users.');
 }
 
-const { isSubscriptionActive, getSubscription } = require('@veyronix/database');
+const { isSubscriptionActive, getSubscription, supabase } = require('@veyronix/database');
 const { createPartikurEmbed, buildRolesFields, addFooterFields } = require('../builders/embedBuilder');
 const { createCustomPartyComponents } = require('../builders/componentBuilder');
 const db = require('../services/db');
 
 /**
- * Custom Vote Checker (Local DB Cache + Top.gg)
+ * Custom Vote Checker (Supabase Cache + Top.gg)
  */
 async function checkWeeklyVote(userId) {
     if (!topggApi) {
@@ -31,7 +31,7 @@ async function checkWeeklyVote(userId) {
     // 1. Get configured cooldown (default 168 hours = 7 days)
     let cooldownHours = 168;
     try {
-        const setting = await db.get("SELECT value FROM system_settings WHERE key = 'vote_cooldown_hours'");
+        const { data: setting } = await supabase.from('system_settings').select('value').eq('key', 'vote_cooldown_hours').single();
         if (setting && setting.value) {
             cooldownHours = parseInt(setting.value, 10);
             if (isNaN(cooldownHours) || cooldownHours < 0) cooldownHours = 168;
@@ -43,9 +43,9 @@ async function checkWeeklyVote(userId) {
     const cooldownMs = cooldownHours * 60 * 60 * 1000;
     const now = Date.now();
 
-    // 2. Check local DB cache
+    // 2. Check Supabase DB cache
     try {
-        const row = await db.get("SELECT last_vote_time, expires_at FROM user_votes WHERE user_id = ?", [userId]);
+        const { data: row } = await supabase.from('user_votes').select('expires_at, last_vote_time').eq('user_id', userId).single();
         if (row) {
             // Check new expires_at system
             if (row.expires_at && now < row.expires_at) {
@@ -57,19 +57,20 @@ async function checkWeeklyVote(userId) {
             }
         }
     } catch (e) {
-        console.error('[checkWeeklyVote] Error checking user_votes', e.message);
+        // If row doesn't exist, Supabase returns error. We ignore it.
     }
 
     // 3. Fallback to Top.gg API (if webhook missed it)
     try {
         const hasVoted = await topggApi.hasVoted(userId);
         if (hasVoted) {
-            // Update local cache: give them the default cooldown from right now
-            const newExpires = now + cooldownMs;
-            await db.run(
-                "INSERT INTO user_votes (user_id, last_vote_time, expires_at) VALUES (?, ?, ?) ON CONFLICT(user_id) DO UPDATE SET last_vote_time=excluded.last_vote_time, expires_at=excluded.expires_at", 
-                [userId, now, newExpires]
-            );
+            // Update Supabase cache: give them the default cooldown from right now
+            const newExpiresAt = now + cooldownMs;
+            await supabase.from('user_votes').upsert({
+                user_id: userId,
+                last_vote_time: now,
+                expires_at: newExpiresAt
+            }, { onConflict: 'user_id' });
             return true;
         }
     } catch (err) {
