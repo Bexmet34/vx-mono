@@ -45,22 +45,31 @@ async function checkWeeklyVote(userId) {
 
     // 2. Check local DB cache
     try {
-        const row = await db.get("SELECT last_vote_time FROM user_votes WHERE user_id = ?", [userId]);
-        if (row && row.last_vote_time) {
-            if (now - row.last_vote_time < cooldownMs) {
-                return true; // Still valid locally
+        const row = await db.get("SELECT last_vote_time, expires_at FROM user_votes WHERE user_id = ?", [userId]);
+        if (row) {
+            // Check new expires_at system
+            if (row.expires_at && now < row.expires_at) {
+                return true;
+            }
+            // Fallback to legacy system for backwards compatibility
+            if (!row.expires_at && row.last_vote_time && (now - row.last_vote_time < cooldownMs)) {
+                return true;
             }
         }
     } catch (e) {
         console.error('[checkWeeklyVote] Error checking user_votes', e.message);
     }
 
-    // 3. Fallback to Top.gg API
+    // 3. Fallback to Top.gg API (if webhook missed it)
     try {
         const hasVoted = await topggApi.hasVoted(userId);
         if (hasVoted) {
-            // Update local cache
-            await db.run("INSERT OR REPLACE INTO user_votes (user_id, last_vote_time) VALUES (?, ?)", [userId, now]);
+            // Update local cache: give them the default cooldown from right now
+            const newExpires = now + cooldownMs;
+            await db.run(
+                "INSERT INTO user_votes (user_id, last_vote_time, expires_at) VALUES (?, ?, ?) ON CONFLICT(user_id) DO UPDATE SET last_vote_time=excluded.last_vote_time, expires_at=excluded.expires_at", 
+                [userId, now, newExpires]
+            );
             return true;
         }
     } catch (err) {

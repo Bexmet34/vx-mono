@@ -58,7 +58,8 @@ function initDb() {
             // Custom vote cache table for Top.gg
             db.exec(`CREATE TABLE IF NOT EXISTS user_votes (
                 user_id TEXT PRIMARY KEY,
-                last_vote_time INTEGER
+                last_vote_time INTEGER,
+                expires_at INTEGER
             )`);
 
             // User stats for prestige
@@ -140,6 +141,7 @@ function initDb() {
             safeAlter("ALTER TABLE guild_configs ADD COLUMN registration_welcome_message TEXT");
             safeAlter("ALTER TABLE guild_configs ADD COLUMN registration_enabled INTEGER DEFAULT 0");
             safeAlter("ALTER TABLE guild_configs ADD COLUMN embed_thumbnail_url TEXT");
+            safeAlter("ALTER TABLE user_votes ADD COLUMN expires_at INTEGER");
 
             // Set default settings if not exists
             try {
