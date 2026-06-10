@@ -36,10 +36,19 @@ function startScheduledMessageService(client) {
                 if (msg.schedule_type === 'recurring') {
                     // Check if time matches exactly HH:mm
                     if (msg.send_time === currentHHmm) {
-                        // Check if not sent today
                         const lastSent = msg.last_sent_at ? new Date(msg.last_sent_at) : null;
-                        if (!lastSent || lastSent.toISOString().split('T')[0] !== currentDateString) {
+                        if (!lastSent) {
                             shouldSend = true;
+                        } else {
+                            const interval = msg.interval_days || 1;
+                            const today = new Date(currentDateString);
+                            const lastSentDateStr = lastSent.toISOString().split('T')[0];
+                            const last = new Date(lastSentDateStr);
+                            const daysElapsed = Math.round((today - last) / (1000 * 60 * 60 * 24));
+                            
+                            if (daysElapsed >= interval) {
+                                shouldSend = true;
+                            }
                         }
                     }
                 } else if (msg.schedule_type === 'once') {

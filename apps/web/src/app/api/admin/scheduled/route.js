@@ -43,6 +43,7 @@ export async function POST(req) {
           ping_everyone: body.ping_everyone,
           buttons: body.buttons || [],
           schedule_type: body.schedule_type,
+          interval_days: body.interval_days || 1,
           send_time: body.send_time,
           is_active: body.is_active !== undefined ? body.is_active : true
         })
@@ -59,6 +60,7 @@ export async function POST(req) {
           ping_everyone: body.ping_everyone || false,
           buttons: body.buttons || [],
           schedule_type: body.schedule_type,
+          interval_days: body.interval_days || 1,
           send_time: body.send_time,
           is_active: true
         }]);

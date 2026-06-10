@@ -50,6 +50,7 @@ export default function AdminPage() {
     message_content: "",
     ping_everyone: false,
     schedule_type: "recurring",
+    interval_days: 1,
     send_time: "",
     buttons: []
   });
@@ -195,7 +196,7 @@ export default function AdminPage() {
         showToast("Zamanlanmış mesaj başarıyla eklendi!", "success");
         setShowScheduledModal(false);
         fetchScheduledMessages();
-        setNewScheduled({ message_content: "", ping_everyone: false, schedule_type: "recurring", send_time: "", buttons: [] });
+        setNewScheduled({ message_content: "", ping_everyone: false, schedule_type: "recurring", interval_days: 1, send_time: "", buttons: [] });
       } else {
         const data = await res.json();
         showToast(data.error || "Hata", "error");
@@ -1002,7 +1003,7 @@ export default function AdminPage() {
                               </td>
                               <td>
                                 <div style={{fontWeight: '700'}}>
-                                  {m.schedule_type === 'recurring' ? 'Her Gün' : 'Tek Seferlik'}
+                                  {m.schedule_type === 'recurring' ? (m.interval_days > 1 ? `${m.interval_days} Günde Bir` : 'Her Gün') : 'Tek Seferlik'}
                                 </div>
                                 <code style={{fontSize: '0.8rem', color: 'var(--admin-accent)', background: 'var(--admin-accent-muted)', padding: '0.2rem 0.5rem', borderRadius: '4px'}}>{m.send_time}</code>
                               </td>
@@ -1049,9 +1050,22 @@ export default function AdminPage() {
                          <div>
                             <label className="admin-label">Zamanlama Türü</label>
                             <select className="admin-input-field" value={newScheduled.schedule_type} onChange={e => setNewScheduled({...newScheduled, schedule_type: e.target.value})}>
-                               <option value="recurring">Her Gün (Recurring)</option>
+                               <option value="recurring">Tekrarlanan (Recurring)</option>
                                <option value="once">Tek Seferlik (Once)</option>
                             </select>
+                            {newScheduled.schedule_type === 'recurring' && (
+                              <div style={{marginTop: '1rem'}}>
+                                 <label className="admin-label">Tekrar Aralığı (Gün)</label>
+                                 <input 
+                                   type="number" 
+                                   min="1"
+                                   className="admin-input-field" 
+                                   value={newScheduled.interval_days || 1} 
+                                   onChange={e => setNewScheduled({...newScheduled, interval_days: parseInt(e.target.value) || 1})} 
+                                 />
+                                 <p style={{fontSize: '0.75rem', color: 'var(--admin-text-muted)', marginTop: '0.3rem'}}>1 = Her gün, 3 = 3 günde bir, 7 = Haftalık vb.</p>
+                              </div>
+                            )}
                          </div>
                          <div>
                             <label className="admin-label">
