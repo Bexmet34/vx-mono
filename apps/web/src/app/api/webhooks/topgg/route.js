@@ -54,13 +54,17 @@ export async function POST(req) {
         }
 
         // Update Supabase user_votes
-        await supabase
+        const { error: upsertError } = await supabase
             .from('user_votes')
             .upsert({
                 user_id: userId,
                 last_vote_time: now,
                 expires_at: newExpiresAt
             }, { onConflict: 'user_id' });
+            
+        if (upsertError) {
+            return NextResponse.json({ error: 'Upsert failed', details: upsertError }, { status: 500 });
+        }
 
         // 3. Fetch user's language preference (Fallback to 'tr')
         let lang = 'tr'; // In Supabase context, determining user's exact guild lang is hard from just user_id if they are in multiple.
