@@ -522,12 +522,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Top.gg Widget */}
-        <section className="flex justify-center pb-24 px-margin-mobile">
-          <a href="https://top.gg/bot/1082239904169336902" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-transform duration-300">
-            <img src="https://top.gg/api/widget/1082239904169336902.svg" alt="Top.gg Widget" height="120" className="rounded-sm border border-outline-variant shadow-2xl" />
-          </a>
-        </section>
+
       </main>
 
       {/* Checkout Modal (Imperial Conquest Design) */}

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSession, signIn, signOut } from "next-auth/react";
 import Image from "next/image";
-import { LogIn, LogOut, LayoutDashboard, Globe, Menu, X } from "lucide-react";
+import { LogIn, LogOut, LayoutDashboard, Globe, Menu, X, ChevronRight } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useState, useEffect } from "react";
 
@@ -134,13 +134,13 @@ export default function Navbar() {
               <span className="text-[10px] font-label-bold text-outline uppercase tracking-[0.2em] mb-4 block">Central Hub</span>
               <Link href="/" className="menu-item-hover group flex items-center justify-between py-2" onClick={() => setIsMenuOpen(false)}>
                 <span className="font-headline-lg-mobile text-headline-lg-mobile text-primary-container transition-transform group-active:translate-x-2">{lang === 'tr' ? 'Ana Sayfa' : 'Home'}</span>
-                <span className="material-symbols-outlined text-primary-container/20 group-hover:text-primary-container transition-colors">chevron_right</span>
+                <ChevronRight className="text-primary-container/20 group-hover:text-primary-container transition-colors" />
               </Link>
               <div className="indicator"></div>
               
               <Link href="/dashboard" className="menu-item-hover group flex items-center justify-between py-2 mt-4" onClick={() => setIsMenuOpen(false)}>
                 <span className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant hover:text-primary-container transition-all group-active:translate-x-2">{t.dashboard}</span>
-                <span className="material-symbols-outlined text-primary-container/0 group-hover:text-primary-container transition-colors">chevron_right</span>
+                <ChevronRight className="text-primary-container/0 group-hover:text-primary-container transition-colors" />
               </Link>
               <div className="indicator"></div>
             </div>
@@ -149,19 +149,19 @@ export default function Navbar() {
               <span className="text-[10px] font-label-bold text-outline uppercase tracking-[0.2em] mb-4 block">Resources</span>
               <Link href="/blog" className="menu-item-hover group flex items-center justify-between py-2" onClick={() => setIsMenuOpen(false)}>
                 <span className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant hover:text-primary-container transition-all group-active:translate-x-2">{t.blog}</span>
-                <span className="material-symbols-outlined text-primary-container/0 group-hover:text-primary-container transition-colors">chevron_right</span>
+                <ChevronRight className="text-primary-container/0 group-hover:text-primary-container transition-colors" />
               </Link>
               <div className="indicator"></div>
 
               <a href="https://docs.veyronix.com.tr/" target="_blank" rel="noopener noreferrer" className="menu-item-hover group flex items-center justify-between py-2 mt-4" onClick={() => setIsMenuOpen(false)}>
                 <span className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant hover:text-primary-container transition-all group-active:translate-x-2">{t.wiki}</span>
-                <span className="material-symbols-outlined text-primary-container/0 group-hover:text-primary-container transition-colors">chevron_right</span>
+                <ChevronRight className="text-primary-container/0 group-hover:text-primary-container transition-colors" />
               </a>
               <div className="indicator"></div>
 
               <Link href="/changelog" className="menu-item-hover group flex items-center justify-between py-2 mt-4" onClick={() => setIsMenuOpen(false)}>
                 <span className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant hover:text-primary-container transition-all group-active:translate-x-2">{t.changelog}</span>
-                <span className="material-symbols-outlined text-primary-container/0 group-hover:text-primary-container transition-colors">chevron_right</span>
+                <ChevronRight className="text-primary-container/0 group-hover:text-primary-container transition-colors" />
               </Link>
               <div className="indicator"></div>
             </div>
@@ -171,7 +171,7 @@ export default function Navbar() {
                 <span className="text-[10px] font-label-bold text-error uppercase tracking-[0.2em] mb-4 block">Admin</span>
                 <Link href="/admin" className="menu-item-hover group flex items-center justify-between py-2" onClick={() => setIsMenuOpen(false)}>
                   <span className="font-headline-lg-mobile text-headline-lg-mobile text-error hover:text-error-container transition-all group-active:translate-x-2">Admin Panel</span>
-                  <span className="material-symbols-outlined text-error/0 group-hover:text-error transition-colors">chevron_right</span>
+                  <ChevronRight className="text-error/0 group-hover:text-error transition-colors" />
                 </Link>
                 <div className="indicator !bg-error"></div>
               </div>
