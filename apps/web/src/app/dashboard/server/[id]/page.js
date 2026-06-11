@@ -304,8 +304,24 @@ export default function ServerSettings() {
   if (!mounted) return null;
 
   if (loading) return (
-    <div className="appWrapper" style={{justifyContent: 'center', alignItems: 'center'}}>
-       <Loader2 size={40} className="spin" color="#fff" />
+    <div style={{ position: 'fixed', inset: 0, zIndex: 99999, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#0a0a0f', overflow: 'hidden' }}>
+      <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(252, 163, 17, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(252, 163, 17, 0.05) 1px, transparent 1px)', backgroundSize: '40px 40px', opacity: 0.5 }}></div>
+      
+      <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem' }}>
+        <div style={{ position: 'relative', width: '100px', height: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: '2px solid rgba(252, 163, 17, 0.1)', borderTopColor: '#fca311', animation: 'spin 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite' }}></div>
+          <div style={{ position: 'absolute', inset: '10px', borderRadius: '50%', border: '2px solid rgba(252, 163, 17, 0.1)', borderBottomColor: '#fca311', animation: 'spin 2s linear infinite reverse' }}></div>
+          <Loader2 size={32} color="#fca311" className="spin" style={{ animationDuration: '3s' }} />
+        </div>
+        
+        <div style={{ textAlign: 'center' }}>
+          <h2 style={{ fontFamily: 'var(--font-headline)', color: '#fca311', fontSize: '1.5rem', textTransform: 'uppercase', letterSpacing: '6px', marginBottom: '0.5rem', animation: 'pulse 2s infinite' }}>ESTABLISHING LINK</h2>
+          <p style={{ color: '#666', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '3px' }}>Veyronix Tactical Command Center</p>
+        </div>
+      </div>
+      
+      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.5) 51%)', backgroundSize: '100% 4px', opacity: 0.2, pointerEvents: 'none' }}></div>
+      <style>{`@keyframes spin { 100% { transform: rotate(360deg); } } @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }`}</style>
     </div>
   );
 
