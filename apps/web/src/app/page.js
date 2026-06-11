@@ -289,8 +289,8 @@ export default function Home() {
                 <div className="w-12 h-12 bg-primary-container/20 border border-primary-container flex items-center justify-center text-primary-container mb-6 shadow-[0_0_15px_rgba(255,215,0,0.2)]">
                   <Activity size={24} />
                 </div>
-                <h3 className="font-headline-md text-headline-md text-primary-container mb-2">Tam Kapsamlı KillBoard (Premium)</h3>
-                <p className="font-body-md text-body-md text-on-surface-variant max-w-md">Her gün saat 20:00'da Albion Online KillBoard verilerini çekerek, loncanızın en iyi performans gösteren oyuncularını otomatik olarak listeler ve Discord üzerinden duyurur.</p>
+                <h3 className="font-headline-md text-headline-md text-primary-container mb-2">{t.feat4Title}</h3>
+                <p className="font-body-md text-body-md text-on-surface-variant max-w-md">{t.feat4Desc}</p>
               </div>
             </div>
           </div>

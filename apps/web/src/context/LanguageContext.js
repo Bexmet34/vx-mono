@@ -22,6 +22,8 @@ const en = {
   feat2Desc: "Create a party with a few clicks. Members can join or leave via Discord buttons.",
   feat3Title: "Web Dashboard",
   feat3Desc: "Control your Discord server settings, events, and member attendance stats from the web interface.",
+  feat4Title: "Comprehensive KillBoard (Premium)",
+  feat4Desc: "Automatically fetches Albion Online KillBoard data at your specified time, listing your guild's top performing players and announcing them on Discord.",
   
   // Home - Commands
   cmdTitle: "Command List",
@@ -194,6 +196,8 @@ const tr = {
   feat2Desc: "Birkaç tıklamayla parti kurun. Üyeler Discord üzerinden butonlarla partiye katılıp ayrılsın.",
   feat3Title: "Yönetim Paneli (Dashboard)",
   feat3Desc: "Web arayüzünden Discord sunucu ayarlarını, etkinlikleri ve üyelerin katılım istatistiklerini kontrol edin.",
+  feat4Title: "Tam Kapsamlı KillBoard (Premium)",
+  feat4Desc: "Belirlediğiniz saatte Albion Online KillBoard verilerini çekerek, loncanızın en iyi performans gösteren oyuncularını otomatik olarak listeler ve Discord üzerinden duyurur.",
   
   cmdTitle: "Komut Listesi",
   cmdUser: "Genel Kullanıcı Komutları",
