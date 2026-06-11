@@ -82,7 +82,7 @@ export default function ServerSettings() {
         const { settings: s, subscription: sub } = data;
         setSubscription(sub);
         if (s) {
-          setSettings({
+          const loadedSettings = {
             language: s.language || "tr",
             embed_thumbnail_url: s.embed_thumbnail_url || "",
             whitelist: s.whitelist || [],
