@@ -33,6 +33,7 @@ export default function ServerSettings() {
   const [activeTab, setActiveTab] = useState("overview");
   const [subscription, setSubscription] = useState(null);
   const [selectedTemplateId, setSelectedTemplateId] = useState(null);
+  const [initialSettings, setInitialSettings] = useState(null);
   const [settings, setSettings] = useState({
     language: "tr",
     embed_thumbnail_url: "",
@@ -96,7 +97,9 @@ export default function ServerSettings() {
             registration_category_id: s.registration_category_id || "",
             registration_welcome_message: s.registration_welcome_message || "",
             registration_given_role_id: s.registration_given_role_id || "",
-          });
+          };
+          setSettings(loadedSettings);
+          setInitialSettings(loadedSettings);
           if (s.embed_thumbnail_url) {
              const img = new Image();
              img.onload = () => setThumbError(null);
@@ -137,6 +140,18 @@ export default function ServerSettings() {
     if (status === "unauthenticated") router.push("/");
   }, [status, router]);
 
+  const hasChanges = initialSettings && JSON.stringify(settings) !== JSON.stringify(initialSettings);
+
+  useEffect(() => {
+    if (!hasChanges) return;
+    const handleBeforeUnload = (e) => {
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasChanges]);
+
   useEffect(() => {
     if (status === "authenticated" && guildId) {
       setTimeout(() => {
@@ -167,7 +182,10 @@ export default function ServerSettings() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(settings),
       });
-      if (res.ok) showToast(lang === "en" ? "Settings saved!" : "Ayarlar kaydedildi!", "success");
+      if (res.ok) {
+        setInitialSettings(settings);
+        showToast(lang === "en" ? "Settings saved!" : "Ayarlar kaydedildi!", "success");
+      }
       else throw new Error("Save failed");
     } catch (err) {
       showToast(err.message, "error");
@@ -403,11 +421,25 @@ export default function ServerSettings() {
 
       </main>
 
-      {/* Floating Action Button for Saving (Replaces the SaveButton component) */}
-      <button className="floatingSave" onClick={handleSave} disabled={saving}>
-        {saving ? <Loader2 className="spin" size={20} /> : <Save size={20} />}
-        {saving ? "Saving..." : "Save Changes"}
-      </button>
+      {/* Unsaved Changes Banner */}
+      {hasChanges && (
+        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'rgba(10,10,15,0.95)', borderTop: '2px solid var(--accent-color)', padding: '1.5rem', zIndex: 1000, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '3rem', backdropFilter: 'blur(20px)', animation: 'slideUp 0.3s ease-out' }}>
+          <div style={{ color: '#fff', fontWeight: 700, fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+             <AlertTriangle size={24} color="var(--accent-color)" />
+             {lang === 'en' ? 'You have unsaved changes!' : 'Kaydedilmemiş değişiklikleriniz var!'}
+          </div>
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <button onClick={() => setSettings(initialSettings)} style={{ padding: '0.75rem 2rem', background: 'transparent', border: '1px solid #666', color: '#fff', borderRadius: '12px', cursor: 'pointer', fontWeight: 600, fontSize: '1rem', transition: 'all 0.2s' }}>
+              {lang === 'en' ? 'Discard' : 'İptal Et'}
+            </button>
+            <button onClick={handleSave} disabled={saving} style={{ padding: '0.75rem 2rem', background: 'var(--accent-color)', border: 'none', color: '#000', borderRadius: '12px', cursor: 'pointer', fontWeight: 800, fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', transition: 'all 0.2s' }}>
+              {saving ? <Loader2 size={20} className="spin" /> : <Save size={20} />}
+              {lang === 'en' ? 'Save Changes' : 'Değişiklikleri Kaydet'}
+            </button>
+          </div>
+          <style>{`@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }`}</style>
+        </div>
+      )}
 
       {imageToCrop && (
         <div style={{position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem'}}>

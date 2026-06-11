@@ -1,7 +1,7 @@
 /* Complete Rewrite of Server Dashboard CSS */
 
 .appWrapper {
-  min-height: calc(100vh - var(--nav-height));
+  min-height: 150vh;
   display: flex;
   flex-direction: column;
   background: #000;
