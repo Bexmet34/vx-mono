@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSession, signIn, signOut } from "next-auth/react";
 import Image from "next/image";
-import { LogIn, LogOut, LayoutDashboard, Globe, Menu, X, ChevronRight } from "lucide-react";
+import { LogIn, LogOut, LayoutDashboard, Globe, Menu, X, ChevronRight, Shield } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useState, useEffect } from "react";
 
@@ -56,21 +56,36 @@ export default function Navbar() {
               </button>
 
               {session ? (
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-5 pl-4 ml-2 border-l border-on-surface/10">
                   {isAdmin && (
-                    <Link href="/admin" className="bg-error/20 text-error px-3 py-1 rounded-full font-label-bold text-xs uppercase border border-error/30 hover:bg-error/30 transition-colors">
-                      Admin
+                    <Link href="/admin" className="flex items-center gap-1.5 px-3 py-1.5 bg-[#ffb4ab]/5 border border-[#ffb4ab]/30 text-[#ffb4ab] font-headline-md text-[11px] uppercase tracking-[0.15em] hover:bg-[#ffb4ab]/15 hover:border-[#ffb4ab] transition-all shadow-[0_0_10px_rgba(255,180,171,0.05)]">
+                      <Shield size={14} strokeWidth={2.5} />
+                      ADMIN
                     </Link>
                   )}
-                  <Link href="/dashboard" className="bg-surface-container-highest text-on-surface px-4 py-2 font-label-bold text-label-sm hover:brightness-110 border border-outline-variant transition-all rounded">
+                  
+                  <Link href="/dashboard" className="group relative flex items-center gap-2 px-5 py-2 bg-primary-container text-on-primary font-headline-md text-sm uppercase tracking-wider hover:brightness-110 transition-all duration-300 shadow-[0_0_15px_rgba(255,215,0,0.15)] hover:shadow-[0_0_25px_rgba(255,215,0,0.3)]">
+                    <div className="absolute inset-0 border border-primary-container group-hover:scale-[1.04] transition-transform duration-300"></div>
+                    <LayoutDashboard size={16} strokeWidth={2.5} />
                     {t.dashboard}
                   </Link>
-                  <button onClick={() => signOut()} title={t.logout} className="text-on-surface-variant hover:text-error transition-colors p-2">
-                    <LogOut size={20} />
-                  </button>
-                  {session.user?.image && (
-                    <img src={session.user.image} alt="Avatar" className="w-10 h-10 rounded border border-outline-variant" />
-                  )}
+
+                  <div className="flex items-center gap-4 border-l border-on-surface/10 pl-5">
+                    <button onClick={() => signOut()} title={t.logout} className="text-on-surface-variant hover:text-[#ffb4ab] hover:bg-[#ffb4ab]/10 transition-all p-2 border border-transparent hover:border-[#ffb4ab]/30 flex items-center justify-center group/logout">
+                      <LogOut size={18} className="group-hover/logout:-translate-x-0.5 transition-transform" />
+                    </button>
+                    
+                    {session.user?.image && (
+                      <div className="relative group cursor-pointer w-10 h-10">
+                        {/* Offset frame background */}
+                        <div className="absolute inset-0 bg-primary-container/20 translate-x-1.5 translate-y-1.5 border border-primary-container/30 transition-transform duration-300 group-hover:translate-x-2 group-hover:translate-y-2"></div>
+                        {/* Avatar */}
+                        <img src={session.user.image} alt="Avatar" className="w-full h-full object-cover border border-outline-variant group-hover:border-primary-container relative z-10 transition-colors duration-300" />
+                        
+                        {/* Optional user name tooltip/popover space */}
+                      </div>
+                    )}
+                  </div>
                 </div>
               ) : (
                 <button 
