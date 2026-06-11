@@ -23,7 +23,10 @@
     "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
+    "autoprefixer": "^10.5.0",
     "eslint": "^9",
-    "eslint-config-next": "16.2.3"
+    "eslint-config-next": "16.2.3",
+    "postcss": "^8.5.15",
+    "tailwindcss": "^3.4.19"
   }
 }

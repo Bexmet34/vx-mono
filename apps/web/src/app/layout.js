@@ -58,7 +58,7 @@ export default async function RootLayout({ children }) {
   const lang = cookieStore.get("NEXT_LOCALE")?.value || "tr";
 
   return (
-    <html lang={lang}>
+    <html lang={lang} className="dark">
       <head>
         <script
           type="application/ld+json"

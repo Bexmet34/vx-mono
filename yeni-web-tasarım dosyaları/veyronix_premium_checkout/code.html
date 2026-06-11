@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Veyronix | Tactical Upgrade</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@100..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed-dim": "#c8c6c7",
+                    "on-error-container": "#ffdad6",
+                    "surface-container-lowest": "#040e1f",
+                    "primary-fixed": "#ffe16d",
+                    "surface-tint": "#e9c400",
+                    "error-container": "#93000a",
+                    "on-secondary-fixed-variant": "#653e00",
+                    "secondary-fixed-dim": "#ffb95f",
+                    "on-tertiary-fixed": "#1c1b1c",
+                    "surface-variant": "#2a3548",
+                    "inverse-primary": "#705d00",
+                    "secondary": "#ffb95f",
+                    "background": "#081425",
+                    "outline-variant": "#4d4732",
+                    "outline": "#999077",
+                    "on-surface-variant": "#d0c6ab",
+                    "on-primary-fixed": "#221b00",
+                    "error": "#ffb4ab",
+                    "tertiary": "#f9f5f6",
+                    "surface-dim": "#081425",
+                    "primary-fixed-dim": "#e9c400",
+                    "surface": "#081425",
+                    "secondary-container": "#ee9800",
+                    "surface-container-high": "#1f2a3c",
+                    "surface-container": "#152031",
+                    "on-error": "#690005",
+                    "on-surface": "#d8e3fb",
+                    "on-primary-fixed-variant": "#544600",
+                    "on-primary": "#3a3000",
+                    "on-secondary-fixed": "#2a1700",
+                    "secondary-fixed": "#ffddb8",
+                    "on-tertiary-container": "#605e60",
+                    "on-tertiary": "#313031",
+                    "on-tertiary-fixed-variant": "#474647",
+                    "on-primary-container": "#705e00",
+                    "primary": "#fff6df",
+                    "on-background": "#d8e3fb",
+                    "inverse-on-surface": "#263143",
+                    "on-secondary": "#472a00",
+                    "on-secondary-container": "#5b3800",
+                    "inverse-surface": "#d8e3fb",
+                    "surface-bright": "#2f3a4c",
+                    "tertiary-container": "#dcd9da",
+                    "tertiary-fixed": "#e5e2e3",
+                    "primary-container": "#ffd700",
+                    "surface-container-highest": "#2a3548",
+                    "surface-container-low": "#111c2d"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "container-max": "1440px",
+                    "unit": "8px",
+                    "margin-desktop": "64px",
+                    "margin-mobile": "20px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Sora"],
+                    "headline-lg": ["Sora"],
+                    "body-md": ["Sora"],
+                    "headline-xl": ["Sora"],
+                    "label-bold": ["Sora"],
+                    "headline-md": ["Sora"],
+                    "label-sm": ["Sora"],
+                    "headline-lg-mobile": ["Sora"]
+            },
+            "fontSize": {
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-xl": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "label-bold": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #081425;
+            color: #d8e3fb;
+            font-family: 'Sora', sans-serif;
+            overflow-x: hidden;
+        }
+        .glass-panel {
+            background: rgba(10, 10, 11, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glow-gold {
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.15);
+        }
+        .scan-line {
+            background: linear-gradient(to right, transparent, rgba(255, 215, 0, 0.1), transparent);
+            height: 1px;
+            width: 100%;
+            position: absolute;
+            animation: scan 3s linear infinite;
+        }
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+        .server-row:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+<!-- Top Navigation Bar -->
+<nav class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-white/10 shadow-[0_0_15px_rgba(255,215,0,0.15)]">
+<div class="flex justify-between items-center px-margin-desktop py-4 max-w-container-max mx-auto">
+<div class="font-headline-md text-headline-md font-bold tracking-tighter text-primary-container">Veyronix</div>
+<div class="hidden md:flex space-x-8">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">War Board</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Logistics</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Archives</a>
+</div>
+<button class="bg-primary-container text-on-primary px-6 py-2 font-label-bold text-label-bold transition-all duration-300 ease-in-out active:scale-95 hover:brightness-110 hover:shadow-[0_0_20px_rgba(255,215,0,0.2)]">
+                Connect Discord
+            </button>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-grow flex items-center justify-center pt-24 pb-12 px-margin-mobile md:px-margin-desktop relative overflow-hidden">
+<!-- Atmospheric Background Element -->
+<div class="absolute inset-0 pointer-events-none opacity-20">
+
+</div>
+<!-- Checkout Container -->
+<div class="relative z-10 w-full max-w-2xl">
+<div class="glass-panel glow-gold flex flex-col p-8 md:p-12 relative overflow-hidden">
+<!-- Inner Decorative Highlight -->
+<div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-right from-transparent via-primary-container to-transparent opacity-50"></div>
+<div class="mb-10 text-center">
+<span class="inline-block py-1 px-3 mb-4 bg-primary-container text-on-primary font-label-bold text-label-sm tracking-widest uppercase">Premium Deployment</span>
+<h1 class="font-headline-xl text-headline-xl text-on-surface mb-2">Upgrade Infrastructure</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Select the strategic asset for Guild Master integration.</p>
+</div>
+<div class="space-y-8">
+<!-- Section: Server Selection -->
+<div class="space-y-4">
+<div class="flex justify-between items-end">
+<h2 class="font-label-bold text-label-bold text-primary-container uppercase tracking-widest">Target Servers</h2>
+<a class="font-label-sm text-label-sm text-secondary-fixed hover:text-primary-fixed-dim transition-colors flex items-center gap-1" href="#">
+<span class="material-symbols-outlined text-[16px]">add_circle</span>
+                                Add Bot to New Server
+                            </a>
+</div>
+<!-- Server List Grid -->
+<div class="space-y-2 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+<!-- Server Item 1 (Selected) -->
+<label class="server-row flex items-center justify-between p-4 border border-primary-container/30 bg-primary-container/5 cursor-pointer transition-all">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-surface-container-high border border-outline flex items-center justify-center overflow-hidden">
+<img alt="Legion Server" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYsEWQZ9IgrI-CqNRpcOpay23hGvUZS1Jk9fHkUw-r9IP-XV4OY6xll1WVYTJPLZmSuQotOLa7MUEKG_FJRPBJ1fmjimgYl4YehyET7fIK4H6E3_lwL1Wy5aHTMf0RQZVp1wizTH5IE1pC9xsYViBpPMRQkB4fiGiDEDSH5NCAzsIP6OjxLh24FHUdRx9doDobxEwfHMzQw9943eRr1RU5G2DWXb2uXTeWtB6EypCxfucVICnfT-Z72haAiwyoeauVvXpKj3ICAcff"/>
+</div>
+<div>
+<div class="font-body-md text-body-md font-bold text-on-surface">The Iron Legion</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant">2,400 members • Role: Owner</div>
+</div>
+</div>
+<input checked="" class="w-5 h-5 text-primary-container bg-surface border-outline focus:ring-primary-container" name="server" type="radio"/>
+</label>
+<!-- Server Item 2 -->
+<label class="server-row flex items-center justify-between p-4 border border-outline-variant hover:border-outline cursor-pointer transition-all">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-surface-container-high border border-outline flex items-center justify-center overflow-hidden">
+<img alt="Nexus Server" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHKqptrZk8IoOnNcrfeImKOVHAJ63THe1vpNJLGXLK-jMBjFummnJuiGTG59e15TYju84n1XbRgxrldwvojhZa11qNiW6xvtT2HN1Fop5l76jTH7geiUD8L5xxHgrOUMmIQIegzoZtdZ_6mRqygoY_x-OPo8uxk00HTg6cre1YY0kLg5VBRwXvJJguxmWhdzFoC7bHB4iFaO7ioxoyTYB1-ESXcMiImBT_bad11Mctb-Upde9btqk1Es2xeyXvr_ZvMyojmBn2XcZW"/>
+</div>
+<div>
+<div class="font-body-md text-body-md font-bold text-on-surface">Nexus Command</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant">150 members • Role: Admin</div>
+</div>
+</div>
+<input class="w-5 h-5 text-primary-container bg-surface border-outline focus:ring-primary-container" name="server" type="radio"/>
+</label>
+<!-- Server Item 3 -->
+<label class="server-row flex items-center justify-between p-4 border border-outline-variant hover:border-outline cursor-pointer transition-all">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-surface-container-high border border-outline flex items-center justify-center overflow-hidden">
+<img alt="Shadow Server" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgERJEYw80DdzesX2rhFedgBt16RwLyYKfktY1u_jgMgvRXDjrsPvA8mvGA0QM6T7hHitiSxyhRj_BS4AU7HmA9qFP9VffOz4m6BdyAOLfpvUh_Bw1qX7pm2foOorx2GMMynAb4p6-UFtDVQYRneGHL5o2L6hw3tLwvKIoxw11E6bEQk07UUDQ6OhRNVBM4-tcLJmaBuEeAsh9Q5Jpr3JMEuIB-gbK4U7K9SdQUxnOavz5gmUI4sP8xNhGmNMI4JbmzfTAX7PR2W9w"/>
+</div>
+<div>
+<div class="font-body-md text-body-md font-bold text-on-surface">Shadow Syndicate</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant">892 members • Role: Owner</div>
+</div>
+</div>
+<input class="w-5 h-5 text-primary-container bg-surface border-outline focus:ring-primary-container" name="server" type="radio"/>
+</label>
+</div>
+</div>
+<!-- Section: Plan Summary -->
+<div class="bg-surface-container p-6 border-l-4 border-primary-container">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="font-label-bold text-label-bold text-on-surface mb-1 uppercase tracking-tight">Guild Master Package</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Annual Tier Deployment</p>
+</div>
+<div class="text-right">
+<div class="font-headline-md text-headline-md text-primary-container">$499.00</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant">per year</div>
+</div>
+</div>
+<ul class="space-y-2">
+<li class="flex items-center gap-2 font-label-sm text-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-primary-container text-[18px]">verified</span> Unlimited Automated Coordination
+                            </li>
+<li class="flex items-center gap-2 font-label-sm text-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-primary-container text-[18px]">verified</span> Priority API Tactical Access
+                            </li>
+<li class="flex items-center gap-2 font-label-sm text-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-primary-container text-[18px]">verified</span> Custom Brand White-Labeling
+                            </li>
+</ul>
+</div>
+<!-- Payment Action -->
+<div class="space-y-4">
+<button class="w-full py-5 bg-primary-container text-on-primary font-label-bold text-body-md flex items-center justify-center gap-3 transition-all duration-300 hover:brightness-110 active:scale-[0.98] shadow-[0_10px_20px_rgba(255,215,0,0.1)]">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+                            PAY WITH USDT (CRYPTOMUS)
+                        </button>
+<p class="text-center font-label-sm text-label-sm text-on-tertiary-container">
+                            Secure cryptographic transaction processed via Cryptomus Terminal.
+                        </p>
+</div>
+</div>
+</div>
+<!-- Trust Badges -->
+<div class="mt-8 flex justify-center gap-8 opacity-60">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant">lock</span>
+<span class="font-label-sm text-label-sm">Military-Grade Encryption</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant">speed</span>
+<span class="font-label-sm text-label-sm">Instant Activation</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Section -->
+<footer class="bg-surface-container-lowest border-t border-outline-variant w-full py-12">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-desktop max-w-container-max mx-auto gap-gutter">
+<div class="font-headline-sm text-headline-sm font-black text-primary-container mb-4 md:mb-0">Veyronix</div>
+<div class="flex flex-wrap justify-center gap-6 mb-4 md:mb-0">
+<a class="font-label-sm text-label-sm text-on-tertiary-container hover:text-primary transition-colors" href="#">Documentation</a>
+<a class="font-label-sm text-label-sm text-on-tertiary-container hover:text-primary transition-colors" href="#">API Reference</a>
+<a class="font-label-sm text-label-sm text-on-tertiary-container hover:text-primary transition-colors" href="#">Status</a>
+<a class="font-label-sm text-label-sm text-on-tertiary-container hover:text-primary transition-colors" href="#">Support</a>
+<a class="font-label-sm text-label-sm text-on-tertiary-container hover:text-primary transition-colors" href="#">Terms of Service</a>
+</div>
+<div class="font-label-sm text-label-sm text-on-tertiary-container opacity-80">
+                © 2024 Veyronix Tactical Command. All rights reserved.
+            </div>
+</div>
+</footer>
+<script>
+        // Simple micro-interaction for radio selection visualization
+        const serverRows = document.querySelectorAll('.server-row');
+        serverRows.forEach(row => {
+            row.addEventListener('click', () => {
+                serverRows.forEach(r => {
+                    r.classList.remove('border-primary-container/30', 'bg-primary-container/5');
+                    r.classList.add('border-outline-variant');
+                });
+                row.classList.remove('border-outline-variant');
+                row.classList.add('border-primary-container/30', 'bg-primary-container/5');
+            });
+        });
+    </script>
+</body></html>

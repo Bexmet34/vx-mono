@@ -1,12 +1,10 @@
 "use client";
 
 import Navbar from "@/components/Navbar";
-import styles from "./page.module.css";
-import { Shield, Users, Sword, Command, Star, MessageCircle, Zap, Activity, HelpCircle, Eye, Server, BadgeCheck } from "lucide-react";
+import { Shield, Users, Sword, Command, Star, MessageCircle, Zap, Activity, HelpCircle, Eye, Server, BadgeCheck, X, Loader2 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useEffect, useState } from "react";
 import { useSession, signIn } from "next-auth/react";
-import { Loader2, X } from "lucide-react";
 
 export default function Home() {
   const { lang, t } = useLanguage();
@@ -28,12 +26,12 @@ export default function Home() {
   const [checkoutError, setCheckoutError] = useState("");
   const [isLoadingServers, setIsLoadingServers] = useState(false);
 
-  const handleBuyClick = (planId) => {
+  const handleBuyClick = (plan) => {
     if (status !== "authenticated") {
       signIn("discord");
       return;
     }
-    setSelectedPlan(planId);
+    setSelectedPlan(plan);
     setShowCheckout(true);
     fetchUserServers();
   };
@@ -66,7 +64,7 @@ export default function Home() {
       const res = await fetch("/api/payment/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ guildId: selectedServer, planId: selectedPlan })
+        body: JSON.stringify({ guildId: selectedServer, planId: selectedPlan.id })
       });
       const data = await res.json();
       
@@ -123,8 +121,8 @@ export default function Home() {
   const renderGif = (cmdName) => {
     if (gifs.includes(cmdName)) {
       return (
-        <div className={styles.gifTooltip}>
-          <img src={`/gif/${cmdName}.gif`} alt={`${cmdName} command`} className={styles.gifImage} />
+        <div className="absolute hidden group-hover:block bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-1 bg-surface-container-high border border-outline-variant z-50 shadow-2xl">
+          <img src={`/gif/${cmdName}.gif`} alt={`${cmdName} command`} className="w-full h-auto" />
         </div>
       );
     }
@@ -134,92 +132,108 @@ export default function Home() {
   return (
     <>
       <Navbar />
-      <main className={styles.main}>
+      <main className="pt-24 min-h-screen">
         {/* --- HERO SECTION --- */}
-        <div className={`${styles.hero} animate-fade-in`}>
-          <div className={styles.heroGlow}></div>
-          <div className={styles.badge}>
-            <Zap size={14} className={styles.badgeHighlight} />
+        <section className="relative px-margin-mobile md:px-margin-desktop py-20 max-w-container-max mx-auto text-center flex flex-col items-center">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-primary-container/5 blur-[120px] pointer-events-none rounded-full"></div>
+          
+          <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 bg-surface-container-highest border border-white/10 rounded-full font-label-bold text-label-sm text-primary-container uppercase tracking-widest shadow-[0_0_15px_rgba(255,215,0,0.1)]">
+            <Zap size={14} className="animate-pulse" />
             Veyronix v2.0 Yayında
           </div>
-          <h1 className={styles.title}>
-            {t.heroTitle1} 
-            <span className={styles.highlight}>{t.heroTitle2}</span>
+          
+          <h1 className="font-headline-xl text-4xl md:text-6xl text-on-surface mb-6 max-w-4xl mx-auto uppercase tracking-tight leading-tight">
+            {t.heroTitle1} <br className="hidden md:block" />
+            <span className="text-primary-container drop-shadow-[0_0_20px_rgba(255,215,0,0.3)]">{t.heroTitle2}</span>
           </h1>
-          <p className={styles.description}>
+          
+          <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto mb-12">
             {t.heroDesc}
           </p>
-          <div className={styles.cta}>
+          
+          <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
             <a 
               href="https://discord.com/oauth2/authorize?client_id=1082239904169336902&permissions=510977&scope=bot+applications.commands"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-primary delay-1 animate-fade-in" 
+              className="w-full sm:w-auto bg-primary-container text-on-primary px-8 py-4 font-label-bold text-label-bold uppercase tracking-widest transition-all duration-300 active:scale-95 hover:brightness-110 tactical-glow rounded-sm flex items-center justify-center gap-2"
             >
-              <Zap size={18} fill="currentColor" />
+              <Zap size={20} className="fill-current" />
               {t.heroBtn}
             </a>
             <a
               href="https://top.gg/bot/1082239904169336902"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-topgg delay-2 animate-fade-in"
+              className="w-full sm:w-auto bg-surface-container-high border border-outline-variant text-on-surface hover:border-primary-container hover:text-primary-container px-8 py-4 font-label-bold text-label-bold uppercase tracking-widest transition-all duration-300 active:scale-95 rounded-sm flex items-center justify-center gap-2"
             >
-              <Star size={18} fill="currentColor" />
+              <Star size={20} className="fill-current" />
               {t.topggBtn ?? ("top.gg'de Oyla")}
             </a>
             <a
               href="https://discord.gg/D6T3t4beqa"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-topgg delay-3 animate-fade-in"
-              style={{ background: 'transparent', borderColor: 'rgba(255,255,255,0.1)' }}
+              className="w-full sm:w-auto bg-transparent border border-white/10 text-on-surface hover:bg-white/5 px-8 py-4 font-label-bold text-label-bold uppercase tracking-widest transition-all duration-300 active:scale-95 rounded-sm flex items-center justify-center gap-2"
             >
-              <MessageCircle size={18} />
+              <MessageCircle size={20} />
               {t.supportBtn}
             </a>
           </div>
-        </div>
+        </section>
 
         {/* --- MARQUEE SOCIAL PROOF --- */}
         {publicServers.length > 0 && (
-          <div style={{ marginTop: '2rem', textAlign: 'center' }} className="animate-fade-in delay-3">
-            <h3 style={{ fontSize: '1.25rem', color: 'var(--text-muted)', fontWeight: '600', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '1.5rem' }}>
+          <section className="py-12 border-y border-white/5 bg-surface-container-low overflow-hidden">
+            <h3 className="text-center font-label-bold text-label-sm text-on-surface-variant uppercase tracking-[0.2em] mb-8">
               {t.marqueeTitle}
             </h3>
-            <div className={`${styles.marqueeContainer}`}>
-              <div className={styles.marqueeTrack}>
+            <div className="relative flex overflow-x-hidden w-full group">
+              <div className="animate-marquee flex whitespace-nowrap items-center gap-12 px-6">
                 {[...publicServers, ...publicServers, ...publicServers].map((server, idx) => (
-                  <div key={idx} className={styles.marqueeItem}>
-                    <div className={styles.marqueeIconWrapper}>
-                      <Server size={16} />
-                    </div>
-                    <span className={styles.marqueeText}>{server.length > 20 ? server.substring(0, 17) + '...' : server}</span>
-                    <BadgeCheck size={18} color="#5865F2" style={{ marginLeft: '4px' }} />
+                  <div key={idx} className="flex items-center gap-3 bg-surface-container-high px-4 py-2 border border-white/5">
+                    <Server size={18} className="text-primary-container" />
+                    <span className="font-label-bold text-on-surface">{server.length > 20 ? server.substring(0, 17) + '...' : server}</span>
+                    <BadgeCheck size={18} className="text-[#5865F2]" />
+                  </div>
+                ))}
+              </div>
+              <div className="absolute top-0 animate-marquee2 flex whitespace-nowrap items-center gap-12 px-6">
+                {[...publicServers, ...publicServers, ...publicServers].map((server, idx) => (
+                  <div key={`dup-${idx}`} className="flex items-center gap-3 bg-surface-container-high px-4 py-2 border border-white/5">
+                    <Server size={18} className="text-primary-container" />
+                    <span className="font-label-bold text-on-surface">{server.length > 20 ? server.substring(0, 17) + '...' : server}</span>
+                    <BadgeCheck size={18} className="text-[#5865F2]" />
                   </div>
                 ))}
               </div>
             </div>
-          </div>
+            <style jsx>{`
+              .animate-marquee { animation: marquee 30s linear infinite; }
+              .animate-marquee2 { animation: marquee2 30s linear infinite; }
+              @keyframes marquee { 0% { transform: translateX(0%); } 100% { transform: translateX(-100%); } }
+              @keyframes marquee2 { 0% { transform: translateX(100%); } 100% { transform: translateX(0%); } }
+            `}</style>
+          </section>
         )}
 
         {/* --- ACTIVE CAMPAIGNS --- */}
         {activeCampaigns.length > 0 && (
-          <section className={`${styles.promoSection} animate-fade-in delay-2`}>
-            <div className={styles.promoGrid}>
+          <section className="px-margin-mobile md:px-margin-desktop py-16 max-w-container-max mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {activeCampaigns.map((camp, idx) => (
-                <div key={camp.id} className={styles.promoCard}>
-                  <div className={styles.promoIcon}>
-                    <Star size={24} fill="currentColor" />
+                <div key={camp.id} className="glass-panel p-8 relative overflow-hidden group hover:border-primary-container transition-colors duration-500">
+                  <div className="absolute -right-10 -top-10 w-40 h-40 bg-primary-container/10 blur-3xl rounded-full group-hover:bg-primary-container/20 transition-all"></div>
+                  <div className="w-12 h-12 bg-primary-container/10 border border-primary-container/30 flex items-center justify-center text-primary-container mb-6">
+                    <Star size={24} className="fill-current" />
                   </div>
-                  <h2 className={styles.promoTitle}>{lang === 'tr' ? camp.title_tr : camp.title_en}</h2>
-                  <p className={styles.promoDesc}>{lang === 'tr' ? camp.description_tr : camp.description_en}</p>
+                  <h2 className="font-headline-md text-headline-md text-on-surface mb-3">{lang === 'tr' ? camp.title_tr : camp.title_en}</h2>
+                  <p className="font-body-md text-body-md text-on-surface-variant mb-6">{lang === 'tr' ? camp.description_tr : camp.description_en}</p>
                   <a 
                     href="https://discord.gg/D6T3t4beqa" 
                     target="_blank" 
                     rel="noopener noreferrer" 
-                    className="btn-primary" 
-                    style={{ padding: '0.6rem 1.5rem', fontSize: '0.9rem' }}
+                    className="inline-flex items-center gap-2 bg-transparent border border-primary-container text-primary-container px-6 py-2 font-label-bold text-label-bold uppercase tracking-widest transition-all hover:bg-primary-container hover:text-on-primary"
                   >
                     {t.promoBtn}
                   </a>
@@ -230,86 +244,135 @@ export default function Home() {
         )}
 
         {/* --- BENTO GRID FEATURES --- */}
-        <section className={`${styles.bentoSection} animate-fade-in delay-3`}>
-          <div className={styles.bentoHeader}>
-            <h2>Güçlü & Yenilikçi Özellikler</h2>
-            <p>Albion Online loncanızı ve partilerinizi yönetmek hiç bu kadar profesyonel olmamıştı.</p>
+        <section className="px-margin-mobile md:px-margin-desktop py-20 max-w-container-max mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="font-headline-lg text-headline-lg text-on-surface uppercase tracking-tight mb-4">Güçlü & Yenilikçi Özellikler</h2>
+            <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">Albion Online loncanızı ve partilerinizi yönetmek hiç bu kadar profesyonel olmamıştı.</p>
           </div>
           
-          <div className={`${styles.bentoCard} ${styles.bentoLarge}`}>
-            <div className={styles.bentoIcon}><Users size={24} /></div>
-            <h3 className={styles.bentoTitle}>{t.feat1Title}</h3>
-            <p className={styles.bentoDesc}>{t.feat1Desc}</p>
-          </div>
-          <div className={styles.bentoCard}>
-            <div className={styles.bentoIcon}><Sword size={24} /></div>
-            <h3 className={styles.bentoTitle}>{t.feat2Title}</h3>
-            <p className={styles.bentoDesc}>{t.feat2Desc}</p>
-          </div>
-          <div className={styles.bentoCard}>
-            <div className={styles.bentoIcon}><Shield size={24} /></div>
-            <h3 className={styles.bentoTitle}>{t.feat3Title}</h3>
-            <p className={styles.bentoDesc}>{t.feat3Desc}</p>
-          </div>
-          <div className={`${styles.bentoCard} ${styles.bentoLarge}`} style={{ background: 'linear-gradient(135deg, rgba(88, 101, 242, 0.05) 0%, rgba(10, 10, 15, 0.5) 100%)' }}>
-            <div className={styles.bentoIcon} style={{ background: 'rgba(88, 101, 242, 0.1)', color: '#5865F2' }}><Activity size={24} /></div>
-            <h3 className={styles.bentoTitle}>Tam Kapsamlı KillBoard (Premium)</h3>
-            <p className={styles.bentoDesc}>Her gün saat 20:00'da Albion Online KillBoard verilerini çekerek, loncanızın en iyi performans gösteren oyuncularını otomatik olarak listeler ve Discord üzerinden duyurur.</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 auto-rows-[280px]">
+            <div className="md:col-span-2 glass-panel p-8 md:p-10 flex flex-col justify-end relative overflow-hidden group border border-outline-variant hover:border-primary-container/50 transition-colors">
+              <div className="absolute top-8 right-8 text-on-surface-variant/20 group-hover:text-primary-container/20 transition-colors">
+                <Users size={120} />
+              </div>
+              <div className="relative z-10">
+                <div className="w-12 h-12 bg-surface border border-outline-variant flex items-center justify-center text-on-surface mb-6">
+                  <Users size={24} />
+                </div>
+                <h3 className="font-headline-md text-headline-md text-on-surface mb-2">{t.feat1Title}</h3>
+                <p className="font-body-md text-body-md text-on-surface-variant max-w-md">{t.feat1Desc}</p>
+              </div>
+            </div>
+            
+            <div className="glass-panel p-8 flex flex-col justify-end relative overflow-hidden border border-outline-variant hover:border-primary-container/50 transition-colors">
+              <div className="relative z-10">
+                <div className="w-12 h-12 bg-surface border border-outline-variant flex items-center justify-center text-on-surface mb-6">
+                  <Sword size={24} />
+                </div>
+                <h3 className="font-headline-md text-headline-md text-on-surface mb-2">{t.feat2Title}</h3>
+                <p className="font-body-md text-body-md text-on-surface-variant">{t.feat2Desc}</p>
+              </div>
+            </div>
+            
+            <div className="glass-panel p-8 flex flex-col justify-end relative overflow-hidden border border-outline-variant hover:border-primary-container/50 transition-colors">
+              <div className="relative z-10">
+                <div className="w-12 h-12 bg-surface border border-outline-variant flex items-center justify-center text-on-surface mb-6">
+                  <Shield size={24} />
+                </div>
+                <h3 className="font-headline-md text-headline-md text-on-surface mb-2">{t.feat3Title}</h3>
+                <p className="font-body-md text-body-md text-on-surface-variant">{t.feat3Desc}</p>
+              </div>
+            </div>
+            
+            <div className="md:col-span-2 glass-panel p-8 md:p-10 flex flex-col justify-end relative overflow-hidden group border border-primary-container/30 bg-primary-container/5 hover:border-primary-container transition-colors">
+              <div className="scanline"></div>
+              <div className="absolute top-8 right-8 text-primary-container/10 group-hover:text-primary-container/30 transition-colors">
+                <Activity size={120} />
+              </div>
+              <div className="relative z-10">
+                <div className="w-12 h-12 bg-primary-container/20 border border-primary-container flex items-center justify-center text-primary-container mb-6 shadow-[0_0_15px_rgba(255,215,0,0.2)]">
+                  <Activity size={24} />
+                </div>
+                <h3 className="font-headline-md text-headline-md text-primary-container mb-2">Tam Kapsamlı KillBoard (Premium)</h3>
+                <p className="font-body-md text-body-md text-on-surface-variant max-w-md">Her gün saat 20:00'da Albion Online KillBoard verilerini çekerek, loncanızın en iyi performans gösteren oyuncularını otomatik olarak listeler ve Discord üzerinden duyurur.</p>
+              </div>
+            </div>
           </div>
         </section>
 
         {/* --- BLOG SECTION --- */}
         {blogs.length > 0 && (
-          <section className="animate-fade-in" style={{ width: '100%', padding: '4rem 1rem', background: 'rgba(10, 10, 15, 0.5)', borderTop: '1px solid var(--border-color)' }}>
-            <div className={styles.bentoHeader}>
-              <h2 style={{ fontSize: '2.5rem' }}>{t.blogHeaderTitle}</h2>
-              <p>{t.blogHeaderDesc}</p>
-            </div>
-            <div className={styles.blogGrid}>
-              {blogs.slice(0, 3).map((blog, idx) => (
-                <a href={`/blog/${blog.slug}`} key={idx} style={{ textDecoration: 'none' }}>
-                  <div className={styles.bentoCard} style={{ padding: '2rem', height: '100%' }}>
-                    <div className={styles.bentoIcon} style={{ background: 'rgba(88, 101, 242, 0.1)', color: '#5865F2' }}><Star size={24} /></div>
-                    <h3 className={styles.bentoTitle} style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>{blog.title}</h3>
-                    <p className={styles.bentoDesc} style={{ fontSize: '0.95rem' }}>{blog.description}</p>
-                  </div>
-                </a>
-              ))}
+          <section className="px-margin-mobile md:px-margin-desktop py-20 bg-surface-container-lowest border-y border-white/5">
+            <div className="max-w-container-max mx-auto">
+              <div className="mb-12">
+                <h2 className="font-headline-lg text-headline-lg text-on-surface uppercase tracking-tight">{t.blogHeaderTitle}</h2>
+                <p className="font-body-lg text-body-lg text-on-surface-variant">{t.blogHeaderDesc}</p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {blogs.slice(0, 3).map((blog, idx) => (
+                  <a href={`/blog/${blog.slug}`} key={idx} className="block group">
+                    <div className="h-full glass-panel p-8 border border-outline-variant group-hover:border-primary-container/50 transition-colors relative overflow-hidden">
+                      <div className="w-10 h-10 bg-surface border border-outline-variant flex items-center justify-center text-primary-container mb-4 group-hover:bg-primary-container group-hover:text-on-primary transition-colors">
+                        <Star size={20} />
+                      </div>
+                      <h3 className="font-headline-md text-xl text-on-surface mb-2 line-clamp-2">{blog.title}</h3>
+                      <p className="font-body-md text-body-md text-on-surface-variant line-clamp-3">{blog.description}</p>
+                    </div>
+                  </a>
+                ))}
+              </div>
             </div>
           </section>
         )}
 
         {/* --- PRICING SECTION --- */}
-        <section className={`${styles.pricingSection} animate-fade-in`}>
-          <div className={styles.bentoHeader}>
-            <h2>{t.pricingTitle}</h2>
-            <p>{t.pricingSubtitle}</p>
+        <section className="px-margin-mobile md:px-margin-desktop py-24 max-w-container-max mx-auto relative">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] bg-primary-container/5 blur-[100px] pointer-events-none rounded-full"></div>
+          
+          <div className="text-center mb-16 relative z-10">
+            <h2 className="font-headline-lg text-headline-lg text-on-surface uppercase tracking-tight mb-4">{t.pricingTitle}</h2>
+            <p className="font-body-lg text-body-lg text-on-surface-variant">{t.pricingSubtitle}</p>
           </div>
 
-          <div className={styles.pricingGrid}>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
             {loadingPlans ? (
-              <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
-                <Loader2 className="spin" size={40} style={{ margin: '0 auto 1rem', color: 'var(--accent-color)' }} />
-                Yükleniyor...
+              <div className="col-span-full flex flex-col items-center justify-center py-20 text-primary-container">
+                <Loader2 className="animate-spin mb-4" size={48} />
+                <span className="font-label-bold uppercase tracking-widest">Veriler Bekleniyor...</span>
               </div>
             ) : plans.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
+              <div className="col-span-full text-center py-20 text-on-surface-variant font-body-lg border border-dashed border-outline-variant">
                 Şu anda aktif paket bulunmamaktadır.
               </div>
             ) : plans.map((plan) => {
               const features = lang === 'tr' ? (plan.features_tr || []) : (plan.features_en || []);
               
               return (
-                <div key={plan.id} className={`${styles.pricingCard} ${plan.is_featured ? styles.featured : ''}`}>
-                  {plan.is_featured && <div className={styles.bestSellerBadge}>{t.bestSeller}</div>}
-                  <h3 className={styles.priceTitle}>{lang === 'tr' ? plan.name_tr : plan.name_en}</h3>
-                  <div className={styles.priceValue}>{plan.amount}<span>USDT</span></div>
-                  <ul className={styles.featureList}>
+                <div key={plan.id} className={`glass-panel p-8 flex flex-col relative overflow-hidden border ${plan.is_featured ? 'border-primary-container shadow-[0_0_30px_rgba(255,215,0,0.1)]' : 'border-outline-variant hover:border-primary-container/50'} transition-colors`}>
+                  {plan.is_featured && (
+                    <div className="absolute top-0 right-0 bg-primary-container text-on-primary font-label-bold text-[10px] uppercase tracking-widest px-4 py-1 rounded-bl">
+                      {t.bestSeller}
+                    </div>
+                  )}
+                  
+                  <h3 className="font-headline-md text-xl text-on-surface mb-2 uppercase">{lang === 'tr' ? plan.name_tr : plan.name_en}</h3>
+                  <div className="font-headline-xl text-primary-container mb-8 flex items-baseline gap-2">
+                    {plan.amount} <span className="font-label-bold text-label-sm text-on-surface-variant">USDT</span>
+                  </div>
+                  
+                  <ul className="flex-grow space-y-4 mb-8">
                     {features.map((feat, idx) => (
-                      <li key={idx} className={styles.featureItem}><Star size={16} className={styles.checkIcon} /> {feat}</li>
+                      <li key={idx} className="flex items-start gap-3 font-body-md text-sm text-on-surface-variant">
+                        <Star size={16} className="text-primary-container shrink-0 mt-1" /> 
+                        <span>{feat}</span>
+                      </li>
                     ))}
                   </ul>
-                  <button className="btn-primary" onClick={() => handleBuyClick(plan.id)}>
+                  
+                  <button 
+                    className={`w-full py-4 font-label-bold text-label-bold uppercase tracking-widest transition-all active:scale-95 ${plan.is_featured ? 'bg-primary-container text-on-primary tactical-glow hover:brightness-110' : 'bg-surface border border-outline text-on-surface hover:border-primary-container hover:text-primary-container'}`}
+                    onClick={() => handleBuyClick(plan)}
+                  >
                     {t.buyNow}
                   </button>
                 </div>
@@ -319,233 +382,273 @@ export default function Home() {
         </section>
 
         {/* --- HOW IT WORKS & FAQ SECTION --- */}
-        <section className={`${styles.faqSection} animate-fade-in`} style={{ padding: '4rem 2rem', maxWidth: '1200px', margin: '0 auto' }}>
-          <div className={styles.bentoHeader}>
-            <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>{t.faqMainTitle}</h2>
-            <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', maxWidth: '800px', margin: '0 auto' }}>
-              {t.faqMainDesc}
-            </p>
-          </div>
+        <section className="px-margin-mobile md:px-margin-desktop py-20 bg-surface-container-low border-y border-white/5">
+          <div className="max-w-container-max mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="font-headline-lg text-headline-lg text-on-surface uppercase tracking-tight mb-4">{t.faqMainTitle}</h2>
+              <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">{t.faqMainDesc}</p>
+            </div>
 
-          {/* 3-Step Onboarding */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem', marginTop: '3rem', marginBottom: '4rem' }}>
-            <div style={{ background: 'linear-gradient(180deg, rgba(88, 101, 242, 0.1) 0%, rgba(10, 10, 15, 0.5) 100%)', padding: '2.5rem', borderRadius: '24px', border: '1px solid rgba(88, 101, 242, 0.2)', textAlign: 'center' }}>
-              <div style={{ background: '#5865F2', color: '#fff', width: '64px', height: '64px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', boxShadow: '0 10px 20px rgba(88, 101, 242, 0.3)' }}>
-                <Zap size={32} />
+            {/* 3-Step Onboarding */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-24">
+              <div className="glass-panel p-8 text-center border border-outline-variant">
+                <div className="w-16 h-16 mx-auto bg-surface-container-highest border border-outline flex items-center justify-center text-primary-container mb-6">
+                  <span className="font-headline-md">1</span>
+                </div>
+                <h3 className="font-headline-md text-xl text-on-surface mb-3 uppercase">{t.step1Title}</h3>
+                <p className="font-body-md text-sm text-on-surface-variant">{t.step1Desc}</p>
               </div>
-              <h3 style={{ fontSize: '1.5rem', color: '#fff', marginBottom: '1rem' }}>{t.step1Title}</h3>
-              <p style={{ color: 'var(--text-muted)', lineHeight: '1.6' }}>{t.step1Desc}</p>
-            </div>
 
-            <div style={{ background: 'linear-gradient(180deg, rgba(252, 163, 17, 0.1) 0%, rgba(10, 10, 15, 0.5) 100%)', padding: '2.5rem', borderRadius: '24px', border: '1px solid rgba(252, 163, 17, 0.2)', textAlign: 'center' }}>
-              <div style={{ background: 'var(--accent-color)', color: '#000', width: '64px', height: '64px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', boxShadow: '0 10px 20px rgba(252, 163, 17, 0.3)' }}>
-                <Shield size={32} />
+              <div className="glass-panel p-8 text-center border border-primary-container/30 bg-primary-container/5 relative overflow-hidden">
+                <div className="scanline"></div>
+                <div className="w-16 h-16 mx-auto bg-primary-container/20 border border-primary-container flex items-center justify-center text-primary-container mb-6 shadow-[0_0_15px_rgba(255,215,0,0.2)]">
+                  <span className="font-headline-md">2</span>
+                </div>
+                <h3 className="font-headline-md text-xl text-on-surface mb-3 uppercase">{t.step2Title}</h3>
+                <p className="font-body-md text-sm text-on-surface-variant">{t.step2Desc}</p>
               </div>
-              <h3 style={{ fontSize: '1.5rem', color: '#fff', marginBottom: '1rem' }}>{t.step2Title}</h3>
-              <p style={{ color: 'var(--text-muted)', lineHeight: '1.6' }}>{t.step2Desc}</p>
-            </div>
 
-            <div style={{ background: 'linear-gradient(180deg, rgba(46, 204, 113, 0.1) 0%, rgba(10, 10, 15, 0.5) 100%)', padding: '2.5rem', borderRadius: '24px', border: '1px solid rgba(46, 204, 113, 0.2)', textAlign: 'center' }}>
-              <div style={{ background: '#2ecc71', color: '#000', width: '64px', height: '64px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', boxShadow: '0 10px 20px rgba(46, 204, 113, 0.3)' }}>
-                <Sword size={32} />
+              <div className="glass-panel p-8 text-center border border-outline-variant">
+                <div className="w-16 h-16 mx-auto bg-surface-container-highest border border-outline flex items-center justify-center text-primary-container mb-6">
+                  <span className="font-headline-md">3</span>
+                </div>
+                <h3 className="font-headline-md text-xl text-on-surface mb-3 uppercase">{t.step3Title}</h3>
+                <p className="font-body-md text-sm text-on-surface-variant">{t.step3Desc}</p>
               </div>
-              <h3 style={{ fontSize: '1.5rem', color: '#fff', marginBottom: '1rem' }}>{t.step3Title}</h3>
-              <p style={{ color: 'var(--text-muted)', lineHeight: '1.6' }}>{t.step3Desc}</p>
-            </div>
-          </div>
-          
-          <div className={styles.bentoHeader}>
-            <h2 style={{ fontSize: '2rem', marginBottom: '1rem' }}>Sıkça Sorulan Sorular</h2>
-          </div>
-          
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem', marginTop: '3rem', justifyContent: 'center' }}>
-            <div style={{ background: '#0a0a0f', padding: '2rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.05)', width: 'calc(33.333% - 1.5rem)', minWidth: '300px' }}>
-              <h3 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: '800' }}>
-                <span style={{ background: '#2B2D42', color: '#8b94f7', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: '0.9rem', fontWeight: 'bold', flexShrink: 0 }}>1</span>
-                {t.faqQ1}
-              </h3>
-              <p style={{ color: '#8a8a93', lineHeight: '1.7', fontSize: '0.95rem' }}>
-                {t.faqA1}
-              </p>
-            </div>
-
-            <div style={{ background: '#0a0a0f', padding: '2rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.05)', width: 'calc(33.333% - 1.5rem)', minWidth: '300px' }}>
-              <h3 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: '800' }}>
-                <span style={{ background: '#2B2D42', color: '#8b94f7', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: '0.9rem', fontWeight: 'bold', flexShrink: 0 }}>2</span>
-                {t.faqQ2}
-              </h3>
-              <p style={{ color: '#8a8a93', lineHeight: '1.7', fontSize: '0.95rem' }}>
-                {t.faqA2}
-              </p>
-            </div>
-
-            <div style={{ background: '#0a0a0f', padding: '2rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.05)', width: 'calc(33.333% - 1.5rem)', minWidth: '300px' }}>
-              <h3 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: '800' }}>
-                <span style={{ background: '#2B2D42', color: '#8b94f7', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: '0.9rem', fontWeight: 'bold', flexShrink: 0 }}>3</span>
-                {t.faqQ3}
-              </h3>
-              <p style={{ color: '#8a8a93', lineHeight: '1.7', fontSize: '0.95rem' }}>
-                {t.faqA3}
-              </p>
             </div>
             
-            <div style={{ background: '#0a0a0f', padding: '2rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.05)', width: 'calc(33.333% - 1.5rem)', minWidth: '300px' }}>
-              <h3 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: '800' }}>
-                <span style={{ background: '#2B2D42', color: '#8b94f7', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: '0.9rem', fontWeight: 'bold', flexShrink: 0 }}>4</span>
-                {t.faqQ4}
-              </h3>
-              <p style={{ color: '#8a8a93', lineHeight: '1.7', fontSize: '0.95rem' }}>
-                {t.faqA4}
-              </p>
+            <div className="text-center mb-12">
+              <h2 className="font-headline-lg text-headline-lg text-on-surface uppercase tracking-tight">Sıkça Sorulan Sorular</h2>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {[
+                { q: t.faqQ1, a: t.faqA1, num: 1 },
+                { q: t.faqQ2, a: t.faqA2, num: 2 },
+                { q: t.faqQ3, a: t.faqA3, num: 3 },
+                { q: t.faqQ4, a: t.faqA4, num: 4 }
+              ].map((item, idx) => (
+                <div key={idx} className="bg-surface border border-outline-variant p-8 relative overflow-hidden group hover:border-primary-container/30 transition-colors">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-outline-variant group-hover:bg-primary-container transition-colors"></div>
+                  <h3 className="font-headline-md text-lg text-on-surface mb-4 flex items-center gap-4">
+                    <span className="text-primary-container font-label-bold opacity-50">0{item.num}</span>
+                    {item.q}
+                  </h3>
+                  <p className="font-body-md text-sm text-on-surface-variant pl-9 leading-relaxed">
+                    {item.a}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
 
         {/* --- COMMANDS SECTION --- */}
-        <section className={`${styles.commandsSection} animate-fade-in`}>
-          <div className={styles.container}>
-            <div className={styles.commandsHeader}>
-              <Command size={48} className={styles.badgeHighlight} style={{ margin: '0 auto 1.5rem' }} />
-              <h2 style={{ fontSize: '2.5rem', fontWeight: '800' }}>{t.cmdTitle}</h2>
-              <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginTop: '1rem' }}>Veyronix'in gücünü keşfedin.</p>
-            </div>
-            
-            <div className={styles.commandCategory}>
-              <h3><Users size={20} /> {t.cmdUser}</h3>
-              <div className={styles.commandGrid}>
-                <div className={styles.cmdCard}>
-                  <div className={styles.cmdHeader}>
-                    <code>/help</code>
-                    <div className={styles.gifTrigger}><Eye size={18} />{renderGif('help')}</div>
+        <section className="px-margin-mobile md:px-margin-desktop py-20 max-w-container-max mx-auto">
+          <div className="text-center mb-16">
+            <Command size={48} className="text-primary-container mx-auto mb-6" />
+            <h2 className="font-headline-lg text-headline-lg text-on-surface uppercase tracking-tight mb-4">{t.cmdTitle}</h2>
+            <p className="font-body-lg text-body-lg text-on-surface-variant">Veyronix'in gücünü keşfedin.</p>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <div className="space-y-6">
+              <h3 className="font-headline-md text-xl text-on-surface flex items-center gap-3 border-b border-white/10 pb-4 uppercase">
+                <Users size={20} className="text-primary-container" /> {t.cmdUser}
+              </h3>
+              <div className="space-y-3">
+                {[
+                  { cmd: '/help', desc: t.cHelp },
+                  { cmd: '/createparty', desc: t.cCreate },
+                  { cmd: '/closeparty', desc: t.cClose },
+                  { cmd: '/vote', desc: t.cVote }
+                ].map((item, idx) => (
+                  <div key={idx} className="glass-panel p-4 flex flex-col sm:flex-row sm:items-center gap-4 border border-outline-variant relative group">
+                    <div className="flex items-center gap-2">
+                      <code className="bg-surface-container-highest text-primary-container px-3 py-1 font-mono text-sm border border-outline-variant">{item.cmd}</code>
+                      <div className="text-on-surface-variant hover:text-primary-container cursor-help relative inline-block">
+                        <Eye size={18} />
+                        {renderGif(item.cmd.replace('/', ''))}
+                      </div>
+                    </div>
+                    <span className="font-body-md text-sm text-on-surface-variant">{item.desc}</span>
                   </div>
-                  <span>{t.cHelp}</span>
-                </div>
-                <div className={styles.cmdCard}>
-                  <div className={styles.cmdHeader}>
-                    <code>/createparty</code>
-                    <div className={styles.gifTrigger}><Eye size={18} />{renderGif('createparty')}</div>
-                  </div>
-                  <span>{t.cCreate}</span>
-                </div>
-                <div className={styles.cmdCard}>
-                  <div className={styles.cmdHeader}>
-                    <code>/closeparty</code>
-                    <div className={styles.gifTrigger}><Eye size={18} />{renderGif('closeparty')}</div>
-                  </div>
-                  <span>{t.cClose}</span>
-                </div>
-                <div className={styles.cmdCard}>
-                  <div className={styles.cmdHeader}>
-                    <code>/vote</code>
-                    <div className={styles.gifTrigger}><Eye size={18} />{renderGif('vote')}</div>
-                  </div>
-                  <span>{t.cVote}</span>
-                </div>
+                ))}
               </div>
             </div>
 
-            <div className={styles.commandCategory}>
-              <h3><Shield size={20} /> {t.cmdAdmin}</h3>
-              <div className={styles.commandGrid}>
-                <div className={styles.cmdCard}>
-                  <div className={styles.cmdHeader}>
-                    <code>/settings</code>
-                    <div className={styles.gifTrigger}><Eye size={18} />{renderGif('settings')}</div>
+            <div className="space-y-6">
+              <h3 className="font-headline-md text-xl text-on-surface flex items-center gap-3 border-b border-white/10 pb-4 uppercase">
+                <Shield size={20} className="text-primary-container" /> {t.cmdAdmin}
+              </h3>
+              <div className="space-y-3">
+                {[
+                  { cmd: '/settings', desc: t.cSettings },
+                  { cmd: '/whitelistadd', desc: t.cWhiteAdd },
+                  { cmd: '/whitelistremove', desc: t.cWhiteRem }
+                ].map((item, idx) => (
+                  <div key={idx} className="glass-panel p-4 flex flex-col sm:flex-row sm:items-center gap-4 border border-outline-variant relative group">
+                    <div className="flex items-center gap-2">
+                      <code className="bg-surface-container-highest text-error px-3 py-1 font-mono text-sm border border-error/20">{item.cmd}</code>
+                      <div className="text-on-surface-variant hover:text-primary-container cursor-help relative inline-block">
+                        <Eye size={18} />
+                        {renderGif(item.cmd.replace('/', ''))}
+                      </div>
+                    </div>
+                    <span className="font-body-md text-sm text-on-surface-variant">{item.desc}</span>
                   </div>
-                  <span>{t.cSettings}</span>
-                </div>
-                <div className={styles.cmdCard}>
-                  <div className={styles.cmdHeader}>
-                    <code>/whitelistadd</code>
-                    <div className={styles.gifTrigger}><Eye size={18} />{renderGif('whitelistadd')}</div>
-                  </div>
-                  <span>{t.cWhiteAdd}</span>
-                </div>
-                <div className={styles.cmdCard}>
-                  <div className={styles.cmdHeader}>
-                    <code>/whitelistremove</code>
-                    <div className={styles.gifTrigger}><Eye size={18} />{renderGif('whitelistremove')}</div>
-                  </div>
-                  <span>{t.cWhiteRem}</span>
-                </div>
+                ))}
               </div>
             </div>
+          </div>
 
-            <div className={styles.proTip}>
-              <HelpCircle size={24} className={styles.proTipIcon} />
-              <p>{t.cmdProTip}</p>
-            </div>
+          <div className="mt-12 bg-primary-container/10 border border-primary-container/30 p-6 flex items-start gap-4">
+            <HelpCircle size={24} className="text-primary-container shrink-0" />
+            <p className="font-body-md text-sm text-primary-fixed">{t.cmdProTip}</p>
           </div>
         </section>
 
         {/* Top.gg Widget */}
-        <section style={{ display: 'flex', justifyContent: 'center', padding: '2rem 0 4rem 0' }}>
-          <a href="https://top.gg/bot/1082239904169336902" target="_blank" rel="noopener noreferrer" style={{ transition: 'transform 0.3s ease' }} onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'} onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}>
-            <img src="https://top.gg/api/widget/1082239904169336902.svg" alt="Top.gg Widget" height="120" style={{ borderRadius: '12px', boxShadow: '0 10px 30px -10px rgba(88, 101, 242, 0.3)' }} />
+        <section className="flex justify-center pb-24 px-margin-mobile">
+          <a href="https://top.gg/bot/1082239904169336902" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-transform duration-300">
+            <img src="https://top.gg/api/widget/1082239904169336902.svg" alt="Top.gg Widget" height="120" className="rounded-sm border border-outline-variant shadow-2xl" />
           </a>
         </section>
       </main>
 
-      {/* Checkout Modal */}
-      {showCheckout && (
-        <div onClick={() => setShowCheckout(false)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
-          <div className="animate-fade-in glass-panel" onClick={e => e.stopPropagation()} style={{ padding: '2.5rem', maxWidth: '420px', width: '90%', position: 'relative' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: '800', color: '#fff' }}>Ödeme Yap</h2>
-              <button onClick={() => setShowCheckout(false)} style={{ background: 'transparent', border: 'none', color: '#fff' }}>
+      {/* Checkout Modal (Imperial Conquest Design) */}
+      {showCheckout && selectedPlan && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6 overflow-y-auto">
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-md" onClick={() => setShowCheckout(false)}></div>
+          
+          <div className="relative z-10 w-full max-w-2xl my-auto pt-20 pb-10">
+            <div className="glass-panel glow-gold flex flex-col p-6 md:p-12 relative border border-primary-container/20">
+              {/* Inner Decorative Highlight */}
+              <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-right from-transparent via-primary-container to-transparent opacity-50"></div>
+              
+              {/* Close Button */}
+              <button 
+                className="absolute top-6 right-6 text-on-surface-variant hover:text-error transition-colors"
+                onClick={() => setShowCheckout(false)}
+              >
                 <X size={24} />
               </button>
-            </div>
-            
-            <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '0.95rem', lineHeight: '1.5' }}>
-              Premium ayrıcalıklarını aktif etmek istediğiniz sunucuyu seçin. Sistem sizi güvenli kripto ödeme sayfasına (Cryptomus) yönlendirecektir.
-            </p>
 
-            {checkoutError && (
-              <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', color: '#ef4444', padding: '0.8rem', borderRadius: '12px', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
-                {checkoutError}
+              <div className="mb-10 text-center mt-4">
+                <span className="inline-block py-1 px-3 mb-4 bg-primary-container text-on-primary font-label-bold text-label-sm tracking-widest uppercase">Premium Deployment</span>
+                <h1 className="font-headline-xl text-3xl md:text-5xl text-on-surface mb-2 uppercase tracking-tight">Upgrade Infrastructure</h1>
+                <p className="font-body-md text-body-md text-on-surface-variant">Select the strategic asset for {lang === 'tr' ? selectedPlan.name_tr : selectedPlan.name_en} integration.</p>
               </div>
-            )}
 
-            <div style={{ marginBottom: '2.5rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.75rem', fontWeight: '600', fontSize: '0.9rem', color: '#fff' }}>{t.checkoutTargetServer}</label>
-              
-              {isLoadingServers ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '1rem', background: 'rgba(0,0,0,0.3)', borderRadius: '12px', color: 'var(--text-muted)' }}>
-                  <Loader2 className="spin" size={18} /> {t.checkoutLoading}
+              {checkoutError && (
+                <div className="mb-8 p-4 bg-error/10 border border-error text-error font-body-md text-sm">
+                  {checkoutError}
                 </div>
-              ) : (
-                <>
-                  <select 
-                    value={selectedServer}
-                    onChange={e => setSelectedServer(e.target.value)}
-                    style={{ width: '100%', padding: '1rem', borderRadius: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-color)', color: '#fff', fontSize: '1rem', outline: 'none', fontFamily: 'inherit' }}
-                  >
-                    <option value="">{t.checkoutSelectServer}</option>
-                    {userServers.map(s => (
-                      <option key={s.guild_id} value={s.guild_id}>{s.guild_name}</option>
-                    ))}
-                  </select>
-                  {userServers.length === 0 && (
-                    <div style={{ marginTop: '1rem', textAlign: 'center' }}>
-                      <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1rem' }}>{t.checkoutNoServerText}</p>
-                      <a href="https://discord.com/oauth2/authorize?client_id=1082239904169336902&permissions=510977&scope=bot+applications.commands" target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ display: 'inline-block', padding: '0.5rem 1rem', fontSize: '0.85rem' }}>
-                        {t.checkoutAddBotBtn}
-                      </a>
-                    </div>
-                  )}
-                </>
               )}
-            </div>
 
-            <button 
-              className="btn-primary" 
-              style={{ width: '100%', display: 'flex', justifyContent: 'center' }} 
-              onClick={handleConfirmPurchase}
-              disabled={isProcessing || !selectedServer}
-            >
-              {isProcessing ? <Loader2 className="spin" size={20} /> : "Ödemeye Geç (USDT)"}
-            </button>
+              <div className="space-y-8">
+                {/* Section: Server Selection */}
+                <div className="space-y-4">
+                  <div className="flex justify-between items-end flex-wrap gap-2">
+                    <h2 className="font-label-bold text-label-bold text-primary-container uppercase tracking-widest">Target Servers</h2>
+                    <a className="font-label-sm text-label-sm text-secondary-fixed hover:text-primary-fixed-dim transition-colors flex items-center gap-1" href="https://discord.com/oauth2/authorize?client_id=1082239904169336902&permissions=510977&scope=bot+applications.commands" target="_blank" rel="noopener noreferrer">
+                      <span className="material-symbols-outlined text-[16px]">add_circle</span>
+                      Add Bot to New Server
+                    </a>
+                  </div>
+                  
+                  {/* Server List Grid */}
+                  <div className="space-y-2 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+                    {isLoadingServers ? (
+                      <div className="flex items-center justify-center p-8 text-primary-container">
+                        <Loader2 className="animate-spin mr-3" size={24} />
+                        <span className="font-label-bold tracking-widest uppercase">Scanning Assets...</span>
+                      </div>
+                    ) : userServers.length === 0 ? (
+                      <div className="p-8 text-center border border-dashed border-outline-variant text-on-surface-variant">
+                        {t.checkoutNoServerText || "No active servers found. Add bot to a server first."}
+                      </div>
+                    ) : (
+                      userServers.map(s => (
+                        <label key={s.guild_id} className={`server-row flex items-center justify-between p-4 border cursor-pointer transition-all ${selectedServer === s.guild_id ? 'border-primary-container/50 bg-primary-container/10' : 'border-outline-variant hover:border-outline'}`}>
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-surface-container-high border border-outline flex items-center justify-center overflow-hidden">
+                              {s.icon ? (
+                                <img alt={s.guild_name} className="w-full h-full object-cover" src={`https://cdn.discordapp.com/icons/${s.guild_id}/${s.icon}.png`} />
+                              ) : (
+                                <Server size={20} className="text-on-surface-variant" />
+                              )}
+                            </div>
+                            <div>
+                              <div className="font-body-md text-body-md font-bold text-on-surface">{s.guild_name}</div>
+                              <div className="font-label-sm text-label-sm text-on-surface-variant">ID: {s.guild_id}</div>
+                            </div>
+                          </div>
+                          <input 
+                            checked={selectedServer === s.guild_id} 
+                            onChange={() => setSelectedServer(s.guild_id)}
+                            className="w-5 h-5 text-primary-container bg-surface border-outline focus:ring-primary-container" 
+                            name="server" 
+                            type="radio"
+                          />
+                        </label>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                {/* Section: Plan Summary */}
+                <div className="bg-surface-container p-6 border-l-4 border-primary-container">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 className="font-label-bold text-label-bold text-on-surface mb-1 uppercase tracking-tight">{lang === 'tr' ? selectedPlan.name_tr : selectedPlan.name_en} Package</h3>
+                      <p className="font-label-sm text-label-sm text-on-surface-variant">Tactical Deployment Tier</p>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-headline-md text-headline-md text-primary-container">{selectedPlan.amount}</div>
+                      <div className="font-label-sm text-label-sm text-on-surface-variant">USDT</div>
+                    </div>
+                  </div>
+                  <ul className="space-y-2">
+                    {(lang === 'tr' ? (selectedPlan.features_tr || []) : (selectedPlan.features_en || [])).slice(0,3).map((feat, idx) => (
+                      <li key={idx} className="flex items-center gap-2 font-label-sm text-label-sm text-on-surface-variant">
+                        <span className="material-symbols-outlined text-primary-container text-[18px]">verified</span> {feat}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Payment Action */}
+                <div className="space-y-4">
+                  <button 
+                    onClick={handleConfirmPurchase}
+                    disabled={isProcessing || !selectedServer}
+                    className="w-full py-5 bg-primary-container text-on-primary font-label-bold text-body-md flex items-center justify-center gap-3 transition-all duration-300 hover:brightness-110 active:scale-[0.98] shadow-[0_10px_20px_rgba(255,215,0,0.1)] disabled:opacity-50 disabled:cursor-not-allowed uppercase"
+                  >
+                    {isProcessing ? (
+                      <><Loader2 className="animate-spin" size={24} /> INITIALIZING DEPLOYMENT...</>
+                    ) : (
+                      <><span className="material-symbols-outlined">account_balance_wallet</span> PAY WITH USDT (CRYPTOMUS)</>
+                    )}
+                  </button>
+                  <p className="text-center font-label-sm text-label-sm text-on-tertiary-container">
+                    Secure cryptographic transaction processed via Cryptomus Terminal.
+                  </p>
+                </div>
+              </div>
+
+              {/* Trust Badges */}
+              <div className="mt-8 flex justify-center gap-8 opacity-60 flex-wrap">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-on-surface-variant">lock</span>
+                  <span className="font-label-sm text-label-sm text-on-surface-variant">Military-Grade Encryption</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-on-surface-variant">speed</span>
+                  <span className="font-label-sm text-label-sm text-on-surface-variant">Instant Activation</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}

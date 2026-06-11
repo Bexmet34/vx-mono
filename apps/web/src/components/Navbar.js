@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { useSession, signIn, signOut } from "next-auth/react";
 import Image from "next/image";
-import { LogIn, LogOut, LayoutDashboard, Globe, Menu, X } from "lucide-react";
+import { LogIn, LogOut, LayoutDashboard, Globe } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Navbar() {
   const { data: session } = useSession();
@@ -14,197 +14,203 @@ export default function Navbar() {
 
   const isAdmin = session?.user?.id && (session.user.id === process.env.NEXT_PUBLIC_ADMIN_ID || session.user.id === "407234961582587916");
 
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.classList.add('overflow-hidden');
+    } else {
+      document.body.classList.remove('overflow-hidden');
+    }
+  }, [isMenuOpen]);
+
   return (
-    <nav className="navbar">
-      <div className="container">
-        <div className="navbar-content">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-            <Link href="/" className="navbar-brand text-logo">
+    <>
+      <nav className="fixed top-0 w-full z-40 bg-surface/80 backdrop-blur-md border-b border-white/10 shadow-[0_0_15px_rgba(255,215,0,0.15)] transition-all">
+        <div className="flex justify-between items-center px-4 md:px-margin-desktop py-4 max-w-container-max mx-auto">
+          <div className="flex items-center gap-6">
+            <Link href="/" className="font-headline-md text-headline-md font-bold tracking-tighter text-primary-container">
               Veyronix
             </Link>
-            <div className="desktop-links">
-              <Link href="/blog" className="nav-link">
+            
+            <div className="hidden md:flex space-x-6 lg:space-x-8 items-center border-l border-white/10 pl-6">
+              <Link href="/blog" className="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors">
                 {t.blog}
               </Link>
-              <a href="https://docs.veyronix.com.tr/" target="_blank" rel="noopener noreferrer" className="nav-link">
+              <a href="https://docs.veyronix.com.tr/" target="_blank" rel="noopener noreferrer" className="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors">
                 Wiki
               </a>
-              <Link href="/changelog" className="nav-link">
+              <Link href="/changelog" className="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors">
                 {t.changelog}
               </Link>
             </div>
           </div>
           
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <button onClick={toggleLanguage} className="lang-toggle">
-              <Globe size={18} />
-              <span style={{ fontSize: '0.9rem' }}>{lang === 'en' ? 'TR' : 'EN'}</span>
-            </button>
+          <div className="flex items-center gap-4">
+            {/* Desktop Auth */}
+            <div className="hidden md:flex items-center gap-4">
+              <button 
+                onClick={toggleLanguage} 
+                className="flex items-center gap-2 text-on-surface-variant hover:text-primary-container transition-colors font-label-bold"
+              >
+                <Globe size={18} />
+                <span>{lang === 'en' ? 'TR' : 'EN'}</span>
+              </button>
 
-            {/* Desktop Menu */}
-            <div className="desktop-menu">
               {session ? (
-                <div className="auth-user">
+                <div className="flex items-center gap-3">
                   {isAdmin && (
-                    <Link href="/admin" className="admin-pill">
+                    <Link href="/admin" className="bg-error/20 text-error px-3 py-1 rounded-full font-label-bold text-xs uppercase border border-error/30 hover:bg-error/30 transition-colors">
                       Admin
                     </Link>
                   )}
-                  <Link href="/dashboard" className="btn-primary" style={{ padding: "0.6rem 1.2rem", fontSize: '0.9rem' }}>
-                    <LayoutDashboard size={18} />
+                  <Link href="/dashboard" className="bg-surface-container-highest text-on-surface px-4 py-2 font-label-bold text-label-sm hover:brightness-110 border border-outline-variant transition-all rounded">
                     {t.dashboard}
                   </Link>
-                  <button onClick={() => signOut()} className="icon-btn" title={t.logout}>
+                  <button onClick={() => signOut()} title={t.logout} className="text-on-surface-variant hover:text-error transition-colors p-2">
                     <LogOut size={20} />
                   </button>
                   {session.user?.image && (
-                    <img src={session.user.image} alt="Avatar" className="avatar" />
+                    <img src={session.user.image} alt="Avatar" className="w-10 h-10 rounded border border-outline-variant" />
                   )}
                 </div>
               ) : (
-                <button onClick={() => signIn("discord")} className="btn-primary">
-                  <LogIn size={18} />
-                  {t.login}
+                <button 
+                  onClick={() => signIn("discord")} 
+                  className="bg-primary-container text-on-primary px-6 py-2 font-label-bold text-label-bold transition-all duration-300 ease-in-out active:scale-95 hover:brightness-110 hover:shadow-[0_0_20px_rgba(255,215,0,0.2)] rounded"
+                >
+                  <span className="flex items-center gap-2">
+                    <LogIn size={18} />
+                    {t.login}
+                  </span>
                 </button>
               )}
             </div>
 
-            {/* Mobile Toggle */}
-            <button className="mobile-toggle" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-              {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+            {/* Mobile Menu Toggle */}
+            <button 
+              className="md:hidden p-2 text-primary-container active:scale-95 transition-transform" 
+              onClick={() => setIsMenuOpen(true)}
+            >
+              <span className="material-symbols-outlined text-4xl">menu</span>
             </button>
           </div>
         </div>
-      </div>
+      </nav>
 
-      {/* Mobile Menu Overlay */}
-      <div className={`mobile-overlay ${isMenuOpen ? 'open' : ''}`}>
-        <div className="mobile-menu-content">
-          <div className="mobile-links">
-            <Link href="/" onClick={() => setIsMenuOpen(false)}>{lang === 'tr' ? 'Ana Sayfa' : 'Home'}</Link>
-            <Link href="/dashboard" onClick={() => setIsMenuOpen(false)}>{t.dashboard}</Link>
-            <Link href="/blog" onClick={() => setIsMenuOpen(false)}>{t.blog}</Link>
-            <a href="https://docs.veyronix.com.tr/" target="_blank" rel="noopener noreferrer" onClick={() => setIsMenuOpen(false)}>{t.wiki}</a>
-            <Link href="/changelog" onClick={() => setIsMenuOpen(false)}>{t.changelog}</Link>
-            {isAdmin && (
-              <Link href="/admin" onClick={() => setIsMenuOpen(false)} style={{ color: 'var(--accent-color)' }}>Admin Panel</Link>
-            )}
+      {/* Mobile Navigation Overlay */}
+      <div className={`fixed inset-0 z-50 transform ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'} transition-transform duration-500 ease-out flex`}>
+        {/* Backdrop */}
+        <div 
+          className={`flex-grow bg-black/40 backdrop-blur-sm transition-opacity duration-500 ${isMenuOpen ? 'opacity-100' : 'opacity-0'}`} 
+          onClick={() => setIsMenuOpen(false)}
+        ></div>
+        
+        {/* Sliding Content Area */}
+        <div className="w-[85%] max-w-sm glass-panel flex flex-col relative h-full">
+          {/* Decorative Glow Top */}
+          <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-right from-transparent via-primary-container/30 to-transparent"></div>
+          
+          {/* Header */}
+          <div className="flex justify-between items-center px-6 py-6 border-b border-white/10">
+            <span className="font-headline-md text-headline-md font-bold tracking-tighter text-primary-container">Veyronix</span>
+            <button 
+              className="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-primary-container transition-colors" 
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <span className="material-symbols-outlined">close</span>
+            </button>
           </div>
+          
+          {/* Navigation Links */}
+          <nav className="flex-grow px-6 py-8 flex flex-col gap-y-6 overflow-y-auto">
+            <div className="flex justify-between items-center border-b border-white/5 pb-4 mb-2">
+              <span className="text-[10px] font-label-bold text-outline uppercase tracking-[0.2em]">Language</span>
+              <button onClick={toggleLanguage} className="flex items-center gap-2 text-primary-container font-label-bold">
+                <Globe size={18} />
+                <span>{lang === 'en' ? 'TR' : 'EN'}</span>
+              </button>
+            </div>
 
-          <div className="mobile-footer">
+            <div className="menu-item-group">
+              <span className="text-[10px] font-label-bold text-outline uppercase tracking-[0.2em] mb-4 block">Central Hub</span>
+              <Link href="/" className="menu-item-hover group flex items-center justify-between py-2" onClick={() => setIsMenuOpen(false)}>
+                <span className="font-headline-lg-mobile text-headline-lg-mobile text-primary-container transition-transform group-active:translate-x-2">{lang === 'tr' ? 'Ana Sayfa' : 'Home'}</span>
+                <span className="material-symbols-outlined text-primary-container/20 group-hover:text-primary-container transition-colors">chevron_right</span>
+              </Link>
+              <div className="indicator"></div>
+              
+              <Link href="/dashboard" className="menu-item-hover group flex items-center justify-between py-2 mt-4" onClick={() => setIsMenuOpen(false)}>
+                <span className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant hover:text-primary-container transition-all group-active:translate-x-2">{t.dashboard}</span>
+                <span className="material-symbols-outlined text-primary-container/0 group-hover:text-primary-container transition-colors">chevron_right</span>
+              </Link>
+              <div className="indicator"></div>
+            </div>
+
+            <div className="menu-item-group">
+              <span className="text-[10px] font-label-bold text-outline uppercase tracking-[0.2em] mb-4 block">Resources</span>
+              <Link href="/blog" className="menu-item-hover group flex items-center justify-between py-2" onClick={() => setIsMenuOpen(false)}>
+                <span className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant hover:text-primary-container transition-all group-active:translate-x-2">{t.blog}</span>
+                <span className="material-symbols-outlined text-primary-container/0 group-hover:text-primary-container transition-colors">chevron_right</span>
+              </Link>
+              <div className="indicator"></div>
+
+              <a href="https://docs.veyronix.com.tr/" target="_blank" rel="noopener noreferrer" className="menu-item-hover group flex items-center justify-between py-2 mt-4" onClick={() => setIsMenuOpen(false)}>
+                <span className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant hover:text-primary-container transition-all group-active:translate-x-2">{t.wiki}</span>
+                <span className="material-symbols-outlined text-primary-container/0 group-hover:text-primary-container transition-colors">chevron_right</span>
+              </a>
+              <div className="indicator"></div>
+
+              <Link href="/changelog" className="menu-item-hover group flex items-center justify-between py-2 mt-4" onClick={() => setIsMenuOpen(false)}>
+                <span className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant hover:text-primary-container transition-all group-active:translate-x-2">{t.changelog}</span>
+                <span className="material-symbols-outlined text-primary-container/0 group-hover:text-primary-container transition-colors">chevron_right</span>
+              </Link>
+              <div className="indicator"></div>
+            </div>
+            
+            {isAdmin && (
+              <div className="menu-item-group">
+                <span className="text-[10px] font-label-bold text-error uppercase tracking-[0.2em] mb-4 block">Admin</span>
+                <Link href="/admin" className="menu-item-hover group flex items-center justify-between py-2" onClick={() => setIsMenuOpen(false)}>
+                  <span className="font-headline-lg-mobile text-headline-lg-mobile text-error hover:text-error-container transition-all group-active:translate-x-2">Admin Panel</span>
+                  <span className="material-symbols-outlined text-error/0 group-hover:text-error transition-colors">chevron_right</span>
+                </Link>
+                <div className="indicator !bg-error"></div>
+              </div>
+            )}
+          </nav>
+          
+          {/* Bottom Action */}
+          <div className="px-6 py-10 bg-surface-container-low border-t border-white/5 space-y-8">
             {session ? (
-              <button onClick={() => signOut()} className="signout-btn" style={{ width: '100%', justifyContent: 'center', background: 'rgba(231, 76, 60, 0.1)', color: '#ff4d4f', borderColor: 'rgba(231, 76, 60, 0.2)' }}>
-                <LogOut size={18} />
+              <button 
+                onClick={() => { signOut(); setIsMenuOpen(false); }} 
+                className="w-full h-14 border border-error/30 text-error hover:bg-error/10 font-label-bold text-label-bold uppercase tracking-widest active:scale-95 transition-all flex items-center justify-center gap-3"
+              >
+                <LogOut size={20} />
                 {t.logout}
               </button>
             ) : (
-              <button onClick={() => signIn("discord")} className="btn-primary" style={{ width: '100%' }}>
+              <button 
+                onClick={() => { signIn("discord"); setIsMenuOpen(false); }} 
+                className="w-full h-14 bg-primary-container text-on-primary font-label-bold text-label-bold uppercase tracking-widest active:scale-95 transition-all flex items-center justify-center gap-3 tactical-glow"
+              >
                 <LogIn size={20} />
                 {t.login}
               </button>
             )}
+            
+            <div className="flex flex-col gap-6">
+              <p className="font-label-sm text-label-sm text-on-surface-variant/40 max-w-[200px]">
+                © 2024 Veyronix Tactical Command. All rights reserved.
+              </p>
+            </div>
+          </div>
+          
+          {/* Scanline Effect Overlay */}
+          <div className="absolute inset-0 pointer-events-none opacity-10">
+            <div className="scanline"></div>
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        .desktop-links {
-          display: flex;
-          gap: 1.5rem;
-        }
-        .nav-link {
-          color: var(--text-muted);
-          font-weight: 600;
-          font-size: 0.95rem;
-        }
-        .nav-link:hover {
-          color: var(--text-main);
-        }
-        .desktop-menu {
-          display: flex;
-          align-items: center;
-          gap: 1.25rem;
-        }
-        .lang-toggle {
-          background: transparent;
-          color: var(--text-muted);
-          font-weight: 700;
-          padding: 0.5rem;
-          border: 1px solid transparent;
-        }
-        .lang-toggle:hover {
-          color: var(--accent-color);
-        }
-        .admin-pill {
-          background: var(--accent-color);
-          color: var(--bg-color);
-          padding: 0.3rem 0.8rem;
-          border-radius: 50px;
-          font-size: 0.75rem;
-          font-weight: 800;
-          text-transform: uppercase;
-        }
-        .icon-btn {
-          background: transparent;
-          color: var(--text-muted);
-          padding: 0.5rem;
-        }
-        .icon-btn:hover {
-          color: #ff4d4f;
-        }
-        .mobile-toggle {
-          display: none;
-          background: transparent;
-          color: var(--text-main);
-          padding: 0.5rem;
-        }
-        
-        .mobile-overlay {
-          position: fixed;
-          top: var(--nav-height);
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: var(--bg-color);
-          z-index: 999;
-          transform: translateX(100%);
-          transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-          display: flex;
-          flex-direction: column;
-          padding: 2rem;
-        }
-        .mobile-overlay.open {
-          transform: translateX(0);
-        }
-        .mobile-menu-content {
-          display: flex;
-          flex-direction: column;
-          height: 100%;
-          justify-content: space-between;
-        }
-        .mobile-links {
-          display: flex;
-          flex-direction: column;
-          gap: 2rem;
-        }
-        .mobile-links a {
-          font-size: 1.75rem;
-          font-weight: 800;
-          color: var(--text-main);
-        }
-        .mobile-footer {
-          display: flex;
-          flex-direction: column;
-          gap: 1rem;
-          padding-bottom: 2rem;
-        }
-
-        @media (max-width: 960px) {
-          .desktop-links, .desktop-menu { display: none; }
-          .mobile-toggle { display: flex; }
-        }
-      `}</style>
-    </nav>
+    </>
   );
 }
-
