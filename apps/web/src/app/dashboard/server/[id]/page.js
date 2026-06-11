@@ -421,13 +421,7 @@ export default function ServerSettings() {
 
       </main>
 
-      {/* Floating Action Button for Saving (Visible when no changes) */}
-      {!hasChanges && (
-        <button className="floatingSave" onClick={handleSave} disabled={saving || !hasChanges} style={{ opacity: hasChanges ? 1 : 0.5 }}>
-          {saving ? <Loader2 className="spin" size={20} /> : <Save size={20} />}
-          {saving ? (lang === 'en' ? "Saving..." : "Kaydediliyor...") : (lang === 'en' ? "Save Changes" : "Değişiklikleri Kaydet")}
-        </button>
-      )}
+
 
       {/* Unsaved Changes Banner */}
       {hasChanges && (
