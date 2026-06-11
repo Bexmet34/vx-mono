@@ -11,6 +11,7 @@ export default function Navbar() {
   const { data: session } = useSession();
   const { lang, toggleLanguage, t } = useLanguage();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const isAdmin = session?.user?.id && (session.user.id === process.env.NEXT_PUBLIC_ADMIN_ID || session.user.id === "407234961582587916");
 
@@ -56,34 +57,78 @@ export default function Navbar() {
               </button>
 
               {session ? (
-                <div className="flex items-center gap-5 pl-4 ml-2 border-l border-on-surface/10">
-                  {isAdmin && (
-                    <Link href="/admin" className="flex items-center gap-1.5 px-3 py-1.5 bg-[#ffb4ab]/5 border border-[#ffb4ab]/30 text-[#ffb4ab] font-headline-md text-[11px] uppercase tracking-[0.15em] hover:bg-[#ffb4ab]/15 hover:border-[#ffb4ab] transition-all shadow-[0_0_10px_rgba(255,180,171,0.05)]">
-                      <Shield size={14} strokeWidth={2.5} />
-                      ADMIN
-                    </Link>
-                  )}
-                  
-                  <Link href="/dashboard" className="group relative flex items-center gap-2 px-5 py-2 bg-primary-container text-on-primary font-headline-md text-sm uppercase tracking-wider hover:brightness-110 transition-all duration-300 shadow-[0_0_15px_rgba(255,215,0,0.15)] hover:shadow-[0_0_25px_rgba(255,215,0,0.3)]">
+                <div className="flex items-center gap-4 pl-4 ml-2 border-l border-on-surface/10">
+                  <Link href="/dashboard" className="group relative hidden md:flex items-center gap-2 px-5 py-2 bg-primary-container text-on-primary font-headline-md text-sm uppercase tracking-wider hover:brightness-110 transition-all duration-300 shadow-[0_0_15px_rgba(255,215,0,0.15)] hover:shadow-[0_0_25px_rgba(255,215,0,0.3)]">
                     <div className="absolute inset-0 border border-primary-container group-hover:scale-[1.04] transition-transform duration-300"></div>
                     <LayoutDashboard size={16} strokeWidth={2.5} />
                     {t.dashboard}
                   </Link>
 
-                  <div className="flex items-center gap-4 border-l border-on-surface/10 pl-5">
-                    <button onClick={() => signOut()} title={t.logout} className="text-on-surface-variant hover:text-[#ffb4ab] hover:bg-[#ffb4ab]/10 transition-all p-2 border border-transparent hover:border-[#ffb4ab]/30 flex items-center justify-center group/logout">
-                      <LogOut size={18} className="group-hover/logout:-translate-x-0.5 transition-transform" />
-                    </button>
-                    
-                    {session.user?.image && (
-                      <div className="relative group cursor-pointer w-10 h-10">
-                        {/* Offset frame background */}
-                        <div className="absolute inset-0 bg-primary-container/20 translate-x-1.5 translate-y-1.5 border border-primary-container/30 transition-transform duration-300 group-hover:translate-x-2 group-hover:translate-y-2"></div>
-                        {/* Avatar */}
-                        <img src={session.user.image} alt="Avatar" className="w-full h-full object-cover border border-outline-variant group-hover:border-primary-container relative z-10 transition-colors duration-300" />
-                        
-                        {/* Optional user name tooltip/popover space */}
+                  <div className="relative border-l border-on-surface/10 pl-4 md:pl-6 ml-1 md:ml-2">
+                    <button 
+                      onClick={() => setIsProfileOpen(!isProfileOpen)}
+                      className="flex items-center gap-3 group focus:outline-none"
+                    >
+                      <div className="flex flex-col items-end hidden md:flex">
+                        <span className="font-label-bold text-sm text-on-surface group-hover:text-primary-container transition-colors">
+                          {session.user?.name || 'Commander'}
+                        </span>
+                        {isAdmin && (
+                          <span className="text-[10px] text-[#ffb4ab] font-headline-md uppercase tracking-widest">Admin Access</span>
+                        )}
                       </div>
+                      
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-primary-container/30 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <img 
+                          src={session.user?.image || 'https://cdn.discordapp.com/embed/avatars/0.png'} 
+                          alt="Avatar" 
+                          className="w-10 h-10 rounded-full border-2 border-outline-variant group-hover:border-primary-container relative z-10 transition-colors duration-300 object-cover" 
+                        />
+                      </div>
+                    </button>
+
+                    {isProfileOpen && (
+                      <>
+                        <div 
+                          className="fixed inset-0 z-40" 
+                          onClick={() => setIsProfileOpen(false)}
+                        ></div>
+                        
+                        <div className="absolute top-full right-0 mt-4 w-56 bg-surface-container border border-outline-variant/50 p-2 z-50 shadow-[0_10px_40px_rgba(0,0,0,0.8)] animate-in fade-in slide-in-from-top-2 rounded-sm">
+                          <div className="flex flex-col gap-1">
+                            <Link 
+                              href="/dashboard" 
+                              className="md:hidden flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm"
+                              onClick={() => setIsProfileOpen(false)}
+                            >
+                              <LayoutDashboard size={16} />
+                              <span className="font-label-bold text-xs uppercase tracking-wider">{t.dashboard}</span>
+                            </Link>
+                            
+                            {isAdmin && (
+                              <Link 
+                                href="/admin" 
+                                className="flex items-center gap-3 px-4 py-3 text-[#ffb4ab]/80 hover:text-[#ffb4ab] hover:bg-[#ffb4ab]/10 transition-colors rounded-sm"
+                                onClick={() => setIsProfileOpen(false)}
+                              >
+                                <Shield size={16} />
+                                <span className="font-label-bold text-xs uppercase tracking-wider">Admin Panel</span>
+                              </Link>
+                            )}
+                            
+                            <div className="h-[1px] bg-outline-variant/30 my-1"></div>
+                            
+                            <button 
+                              onClick={() => { signOut(); setIsProfileOpen(false); }} 
+                              className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-[#ffb4ab] hover:bg-[#ffb4ab]/10 transition-colors rounded-sm w-full text-left"
+                            >
+                              <LogOut size={16} />
+                              <span className="font-label-bold text-xs uppercase tracking-wider">{t.logout}</span>
+                            </button>
+                          </div>
+                        </div>
+                      </>
                     )}
                   </div>
                 </div>
