@@ -421,19 +421,27 @@ export default function ServerSettings() {
 
       </main>
 
+      {/* Floating Action Button for Saving (Visible when no changes) */}
+      {!hasChanges && (
+        <button className="floatingSave" onClick={handleSave} disabled={saving || !hasChanges} style={{ opacity: hasChanges ? 1 : 0.5 }}>
+          {saving ? <Loader2 className="spin" size={20} /> : <Save size={20} />}
+          {saving ? (lang === 'en' ? "Saving..." : "Kaydediliyor...") : (lang === 'en' ? "Save Changes" : "Değişiklikleri Kaydet")}
+        </button>
+      )}
+
       {/* Unsaved Changes Banner */}
       {hasChanges && (
-        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'rgba(10,10,15,0.95)', borderTop: '2px solid var(--accent-color)', padding: '1.5rem', zIndex: 1000, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '3rem', backdropFilter: 'blur(20px)', animation: 'slideUp 0.3s ease-out' }}>
-          <div style={{ color: '#fff', fontWeight: 700, fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-             <AlertTriangle size={24} color="var(--accent-color)" />
+        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'rgba(10,10,15,0.95)', borderTop: '2px solid #fca311', padding: '1.5rem', zIndex: 1000, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '3rem', backdropFilter: 'blur(20px)', animation: 'slideUp 0.3s ease-out' }}>
+          <div style={{ color: '#fff', fontWeight: 700, fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+             <AlertTriangle size={24} color="#fca311" />
              {lang === 'en' ? 'You have unsaved changes!' : 'Kaydedilmemiş değişiklikleriniz var!'}
           </div>
           <div style={{ display: 'flex', gap: '1rem' }}>
-            <button onClick={() => setSettings(initialSettings)} style={{ padding: '0.75rem 2rem', background: 'transparent', border: '1px solid #666', color: '#fff', borderRadius: '12px', cursor: 'pointer', fontWeight: 600, fontSize: '1rem', transition: 'all 0.2s' }}>
+            <button onClick={() => setSettings(initialSettings)} style={{ padding: '0.6rem 1.5rem', background: 'transparent', border: '1px solid #666', color: '#fff', borderRadius: '12px', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem', transition: 'all 0.2s' }}>
               {lang === 'en' ? 'Discard' : 'İptal Et'}
             </button>
-            <button onClick={handleSave} disabled={saving} style={{ padding: '0.75rem 2rem', background: 'var(--accent-color)', border: 'none', color: '#000', borderRadius: '12px', cursor: 'pointer', fontWeight: 800, fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', transition: 'all 0.2s' }}>
-              {saving ? <Loader2 size={20} className="spin" /> : <Save size={20} />}
+            <button onClick={handleSave} disabled={saving} style={{ padding: '0.6rem 1.5rem', background: '#fca311', border: 'none', color: '#000', borderRadius: '12px', cursor: 'pointer', fontWeight: 800, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem', transition: 'all 0.2s', boxShadow: '0 4px 15px rgba(252, 163, 17, 0.3)' }}>
+              {saving ? <Loader2 size={18} className="spin" /> : <Save size={18} />}
               {lang === 'en' ? 'Save Changes' : 'Değişiklikleri Kaydet'}
             </button>
           </div>
