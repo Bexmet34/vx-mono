@@ -9,10 +9,11 @@ export async function GET() {
        return NextResponse.json({ error: "Supabase credentials missing" }, { status: 500 });
     }
 
-    // Fetch up to 50 active subscriptions to display their names
+    // Fetch up to 50 active subscriptions to display their names (excluding specific test owner)
     const { data: guilds, error } = await supabase
       .from('subscriptions')
       .select('guild_name')
+      .neq('owner_id', '407234961582587916')
       .limit(50);
 
     if (error) {
