@@ -56,19 +56,21 @@ export default function Navbar() {
             </div>
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 md:gap-4">
+            {/* Language Toggle */}
+            <button 
+              onClick={toggleLanguage} 
+              className="flex items-center justify-center gap-2 px-3 py-1.5 rounded-full bg-surface-container/80 border border-outline-variant/30 text-on-surface-variant hover:text-primary-container hover:border-primary-container/50 hover:bg-primary-container/10 transition-all font-label-bold shadow-sm"
+              title="Change Language"
+            >
+              <Globe size={16} className={lang === 'en' ? 'text-[#ffb4ab]' : 'text-primary-container'} />
+              <span className="text-xs uppercase tracking-wider">{lang === 'en' ? 'TR' : 'EN'}</span>
+            </button>
+
             {/* Desktop Auth */}
             <div className="hidden md:flex items-center gap-4">
-              <button 
-                onClick={toggleLanguage} 
-                className="flex items-center gap-2 text-on-surface-variant hover:text-primary-container transition-colors font-label-bold"
-              >
-                <Globe size={18} />
-                <span>{lang === 'en' ? 'TR' : 'EN'}</span>
-              </button>
-
               {session ? (
-                <div className="flex items-center gap-4 pl-4 ml-2 border-l border-on-surface/10">
+                <div className="flex items-center gap-4 pl-4 border-l border-on-surface/10">
                   <Link href="/dashboard" className="group relative hidden md:flex items-center gap-2 px-5 py-2 bg-primary-container text-on-primary font-headline-md text-sm uppercase tracking-wider hover:brightness-110 transition-all duration-300 shadow-[0_0_15px_rgba(255,215,0,0.15)] hover:shadow-[0_0_25px_rgba(255,215,0,0.3)]">
                     <div className="absolute inset-0 border border-primary-container group-hover:scale-[1.04] transition-transform duration-300"></div>
                     <LayoutDashboard size={16} strokeWidth={2.5} />
@@ -186,14 +188,6 @@ export default function Navbar() {
           
           {/* Navigation Links */}
           <nav className="flex-grow px-6 py-8 flex flex-col gap-y-6 overflow-y-auto">
-            <div className="flex justify-between items-center border-b border-on-surface/ pb-4 mb-2">
-              <span className="text-[10px] font-label-bold text-outline uppercase tracking-[0.2em]">Language</span>
-              <button onClick={toggleLanguage} className="flex items-center gap-2 text-primary-container font-label-bold">
-                <Globe size={18} />
-                <span>{lang === 'en' ? 'TR' : 'EN'}</span>
-              </button>
-            </div>
-
             <div className="menu-item-group">
               <span className="text-[10px] font-label-bold text-outline uppercase tracking-[0.2em] mb-4 block">Central Hub</span>
               <Link href="/" className="menu-item-hover group flex items-center justify-between py-2" onClick={() => setIsMenuOpen(false)}>

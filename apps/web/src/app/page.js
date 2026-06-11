@@ -246,7 +246,7 @@ export default function Home() {
             <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">Albion Online loncanızı ve partilerinizi yönetmek hiç bu kadar profesyonel olmamıştı.</p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 auto-rows-[280px]">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 auto-rows-[minmax(280px,auto)]">
             <div className="md:col-span-2 glass-panel p-8 md:p-10 flex flex-col justify-end relative overflow-hidden group border border-outline-variant hover:border-primary-container/50 transition-colors">
               <div className="absolute top-8 right-8 text-on-surface-variant/20 group-hover:text-primary-container/20 transition-colors">
                 <Users size={120} />
