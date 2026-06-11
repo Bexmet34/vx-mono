@@ -209,8 +209,8 @@ export default function Home() {
               </div>
             </div>
             <style jsx>{`
-              .animate-marquee { animation: marquee 30s linear infinite; }
-              .animate-marquee2 { animation: marquee2 30s linear infinite; }
+              .animate-marquee { animation: marquee 80s linear infinite; }
+              .animate-marquee2 { animation: marquee2 80s linear infinite; }
               @keyframes marquee { 0% { transform: translateX(0%); } 100% { transform: translateX(-100%); } }
               @keyframes marquee2 { 0% { transform: translateX(100%); } 100% { transform: translateX(0%); } }
             `}</style>

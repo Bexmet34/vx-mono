@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSession, signIn, signOut } from "next-auth/react";
 import Image from "next/image";
-import { LogIn, LogOut, LayoutDashboard, Globe } from "lucide-react";
+import { LogIn, LogOut, LayoutDashboard, Globe, Menu, X } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useState, useEffect } from "react";
 
@@ -90,7 +90,7 @@ export default function Navbar() {
               className="md:hidden p-2 text-primary-container active:scale-95 transition-transform" 
               onClick={() => setIsMenuOpen(true)}
             >
-              <span className="material-symbols-outlined text-4xl">menu</span>
+              <Menu size={32} />
             </button>
           </div>
         </div>
@@ -116,7 +116,7 @@ export default function Navbar() {
               className="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-primary-container transition-colors" 
               onClick={() => setIsMenuOpen(false)}
             >
-              <span className="material-symbols-outlined">close</span>
+              <X size={24} />
             </button>
           </div>
           
