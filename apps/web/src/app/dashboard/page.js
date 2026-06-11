@@ -9,6 +9,7 @@ import { formatDistanceToNow, isPast } from "date-fns";
 import { tr, enUS } from "date-fns/locale";
 import { useLanguage } from "@/context/LanguageContext";
 import { useToast, ToastContainer } from "@/components/Toast";
+import Navbar from "@/components/Navbar";
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
@@ -87,14 +88,19 @@ export default function Dashboard() {
 
   if (status === "loading" || !session) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="animate-spin text-primary-container" size={48} />
-      </div>
+      <>
+        <Navbar />
+        <div className="min-h-screen flex items-center justify-center">
+          <Loader2 className="animate-spin text-primary-container" size={48} />
+        </div>
+      </>
     );
   }
 
   return (
-    <main className="pt-32 pb-20 min-h-screen max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+    <>
+      <Navbar />
+      <main className="pt-32 pb-20 min-h-screen max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
       <ToastContainer toasts={toasts} />
 
       <div className="flex flex-col items-center mb-16 text-center">
@@ -207,9 +213,10 @@ export default function Dashboard() {
                 {redeeming ? <Loader2 className="animate-spin" size={16}/> : "Activate"}
               </button>
             </div>
+            </div>
           </div>
-        </div>
-      )}
-    </main>
+        )}
+      </main>
+    </>
   );
 }
