@@ -137,10 +137,6 @@ export default function Home() {
         <section className="relative px-margin-mobile md:px-margin-desktop py-20 max-w-container-max mx-auto text-center flex flex-col items-center">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-primary-container/5 blur-[120px] pointer-events-none rounded-full"></div>
           
-          <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 bg-surface-container-highest border border-on-surface/ rounded-full font-label-bold text-label-sm text-primary-container uppercase tracking-widest shadow-[0_0_15px_rgba(255,215,0,0.1)]">
-            <Zap size={14} className="animate-pulse" />
-            Veyronix v2.0 Yayında
-          </div>
           
           <h1 className="font-headline-xl text-4xl md:text-6xl text-on-surface mb-6 max-w-4xl mx-auto uppercase tracking-tight leading-tight">
             {t.heroTitle1} <br className="hidden md:block" />
