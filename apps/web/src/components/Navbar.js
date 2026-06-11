@@ -5,7 +5,7 @@ import { useSession, signIn, signOut } from "next-auth/react";
 import Image from "next/image";
 import { LogIn, LogOut, LayoutDashboard, Globe, Menu, X, ChevronRight, Shield } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export default function Navbar() {
   const { data: session } = useSession();
@@ -22,6 +22,17 @@ export default function Navbar() {
       document.body.classList.remove('overflow-hidden');
     }
   }, [isMenuOpen]);
+
+  const profileRef = useRef(null);
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setIsProfileOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <>
@@ -64,7 +75,7 @@ export default function Navbar() {
                     {t.dashboard}
                   </Link>
 
-                  <div className="relative border-l border-on-surface/10 pl-4 md:pl-6 ml-1 md:ml-2">
+                  <div ref={profileRef} className="relative border-l border-on-surface/10 pl-4 md:pl-6 ml-1 md:ml-2">
                     <button 
                       onClick={() => setIsProfileOpen(!isProfileOpen)}
                       className="flex items-center gap-3 group focus:outline-none"
@@ -89,12 +100,6 @@ export default function Navbar() {
                     </button>
 
                     {isProfileOpen && (
-                      <>
-                        <div 
-                          className="fixed inset-0 z-40" 
-                          onClick={() => setIsProfileOpen(false)}
-                        ></div>
-                        
                         <div className="absolute top-full right-0 mt-4 w-56 bg-surface-container border border-outline-variant/50 p-2 z-50 shadow-[0_10px_40px_rgba(0,0,0,0.8)] animate-in fade-in slide-in-from-top-2 rounded-sm">
                           <div className="flex flex-col gap-1">
                             <Link 
@@ -128,7 +133,6 @@ export default function Navbar() {
                             </button>
                           </div>
                         </div>
-                      </>
                     )}
                   </div>
                 </div>
