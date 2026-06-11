@@ -137,7 +137,7 @@ export default function Home() {
         <section className="relative px-margin-mobile md:px-margin-desktop py-20 max-w-container-max mx-auto text-center flex flex-col items-center">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-primary-container/5 blur-[120px] pointer-events-none rounded-full"></div>
           
-          <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 bg-surface-container-highest border border-white/10 rounded-full font-label-bold text-label-sm text-primary-container uppercase tracking-widest shadow-[0_0_15px_rgba(255,215,0,0.1)]">
+          <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 bg-surface-container-highest border border-on-surface/ rounded-full font-label-bold text-label-sm text-primary-container uppercase tracking-widest shadow-[0_0_15px_rgba(255,215,0,0.1)]">
             <Zap size={14} className="animate-pulse" />
             Veyronix v2.0 Yayında
           </div>
@@ -174,7 +174,7 @@ export default function Home() {
               href="https://discord.gg/D6T3t4beqa"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full sm:w-auto bg-transparent border border-white/10 text-on-surface hover:bg-white/5 px-8 py-4 font-label-bold text-label-bold uppercase tracking-widest transition-all duration-300 active:scale-95 rounded-sm flex items-center justify-center gap-2"
+              className="w-full sm:w-auto bg-transparent border border-on-surface/ text-on-surface hover:bg-on-surface/ px-8 py-4 font-label-bold text-label-bold uppercase tracking-widest transition-all duration-300 active:scale-95 rounded-sm flex items-center justify-center gap-2"
             >
               <MessageCircle size={20} />
               {t.supportBtn}
@@ -184,26 +184,26 @@ export default function Home() {
 
         {/* --- MARQUEE SOCIAL PROOF --- */}
         {publicServers.length > 0 && (
-          <section className="py-12 border-y border-white/5 bg-surface-container-low overflow-hidden">
+          <section className="py-12 border-y border-on-surface/ bg-surface-container-low overflow-hidden">
             <h3 className="text-center font-label-bold text-label-sm text-on-surface-variant uppercase tracking-[0.2em] mb-8">
               {t.marqueeTitle}
             </h3>
             <div className="relative flex overflow-x-hidden w-full group">
               <div className="animate-marquee flex whitespace-nowrap items-center gap-12 px-6">
                 {[...publicServers, ...publicServers, ...publicServers].map((server, idx) => (
-                  <div key={idx} className="flex items-center gap-3 bg-surface-container-high px-4 py-2 border border-white/5">
+                  <div key={idx} className="flex items-center gap-3 bg-surface-container-high px-4 py-2 border border-on-surface/">
                     <Server size={18} className="text-primary-container" />
                     <span className="font-label-bold text-on-surface">{server.length > 20 ? server.substring(0, 17) + '...' : server}</span>
-                    <BadgeCheck size={18} className="text-[#5865F2]" />
+                    <BadgeCheck size={18} className="text-[#e9c400]" />
                   </div>
                 ))}
               </div>
               <div className="absolute top-0 animate-marquee2 flex whitespace-nowrap items-center gap-12 px-6">
                 {[...publicServers, ...publicServers, ...publicServers].map((server, idx) => (
-                  <div key={`dup-${idx}`} className="flex items-center gap-3 bg-surface-container-high px-4 py-2 border border-white/5">
+                  <div key={`dup-${idx}`} className="flex items-center gap-3 bg-surface-container-high px-4 py-2 border border-on-surface/">
                     <Server size={18} className="text-primary-container" />
                     <span className="font-label-bold text-on-surface">{server.length > 20 ? server.substring(0, 17) + '...' : server}</span>
-                    <BadgeCheck size={18} className="text-[#5865F2]" />
+                    <BadgeCheck size={18} className="text-[#e9c400]" />
                   </div>
                 ))}
               </div>
@@ -302,7 +302,7 @@ export default function Home() {
 
         {/* --- BLOG SECTION --- */}
         {blogs.length > 0 && (
-          <section className="px-margin-mobile md:px-margin-desktop py-20 bg-surface-container-lowest border-y border-white/5">
+          <section className="px-margin-mobile md:px-margin-desktop py-20 bg-surface-container-lowest border-y border-on-surface/">
             <div className="max-w-container-max mx-auto">
               <div className="mb-12">
                 <h2 className="font-headline-lg text-headline-lg text-on-surface uppercase tracking-tight">{t.blogHeaderTitle}</h2>
@@ -334,21 +334,21 @@ export default function Home() {
             <p className="font-body-lg text-body-lg text-on-surface-variant">{t.pricingSubtitle}</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
+          <div className="flex flex-wrap justify-center gap-6 relative z-10">
             {loadingPlans ? (
-              <div className="col-span-full flex flex-col items-center justify-center py-20 text-primary-container">
+              <div className="w-full flex flex-col items-center justify-center py-20 text-primary-container">
                 <Loader2 className="animate-spin mb-4" size={48} />
                 <span className="font-label-bold uppercase tracking-widest">Veriler Bekleniyor...</span>
               </div>
             ) : plans.length === 0 ? (
-              <div className="col-span-full text-center py-20 text-on-surface-variant font-body-lg border border-dashed border-outline-variant">
+              <div className="w-full text-center py-20 text-on-surface-variant font-body-lg border border-dashed border-outline-variant">
                 Şu anda aktif paket bulunmamaktadır.
               </div>
             ) : plans.map((plan) => {
               const features = lang === 'tr' ? (plan.features_tr || []) : (plan.features_en || []);
               
               return (
-                <div key={plan.id} className={`glass-panel p-8 flex flex-col relative overflow-hidden border ${plan.is_featured ? 'border-primary-container shadow-[0_0_30px_rgba(255,215,0,0.1)]' : 'border-outline-variant hover:border-primary-container/50'} transition-colors`}>
+                <div key={plan.id} className={`w-full md:w-[320px] flex-shrink-0 glass-panel p-8 flex flex-col relative overflow-hidden border ${plan.is_featured ? 'border-primary-container shadow-[0_0_30px_rgba(255,215,0,0.1)]' : 'border-outline-variant hover:border-primary-container/50'} transition-colors`}>
                   {plan.is_featured && (
                     <div className="absolute top-0 right-0 bg-primary-container text-on-primary font-label-bold text-[10px] uppercase tracking-widest px-4 py-1 rounded-bl">
                       {t.bestSeller}
@@ -382,7 +382,7 @@ export default function Home() {
         </section>
 
         {/* --- HOW IT WORKS & FAQ SECTION --- */}
-        <section className="px-margin-mobile md:px-margin-desktop py-20 bg-surface-container-low border-y border-white/5">
+        <section className="px-margin-mobile md:px-margin-desktop py-20 bg-surface-container-low border-y border-on-surface/">
           <div className="max-w-container-max mx-auto">
             <div className="text-center mb-16">
               <h2 className="font-headline-lg text-headline-lg text-on-surface uppercase tracking-tight mb-4">{t.faqMainTitle}</h2>
@@ -453,7 +453,7 @@ export default function Home() {
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             <div className="space-y-6">
-              <h3 className="font-headline-md text-xl text-on-surface flex items-center gap-3 border-b border-white/10 pb-4 uppercase">
+              <h3 className="font-headline-md text-xl text-on-surface flex items-center gap-3 border-b border-on-surface/ pb-4 uppercase">
                 <Users size={20} className="text-primary-container" /> {t.cmdUser}
               </h3>
               <div className="space-y-3">
@@ -478,7 +478,7 @@ export default function Home() {
             </div>
 
             <div className="space-y-6">
-              <h3 className="font-headline-md text-xl text-on-surface flex items-center gap-3 border-b border-white/10 pb-4 uppercase">
+              <h3 className="font-headline-md text-xl text-on-surface flex items-center gap-3 border-b border-on-surface/ pb-4 uppercase">
                 <Shield size={20} className="text-primary-container" /> {t.cmdAdmin}
               </h3>
               <div className="space-y-3">
@@ -519,7 +519,7 @@ export default function Home() {
       {/* Checkout Modal (Imperial Conquest Design) */}
       {showCheckout && selectedPlan && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6 overflow-y-auto">
-          <div className="fixed inset-0 bg-black/80 backdrop-blur-md" onClick={() => setShowCheckout(false)}></div>
+          <div className="fixed inset-0 bg-background/ backdrop-blur-md" onClick={() => setShowCheckout(false)}></div>
           
           <div className="relative z-10 w-full max-w-2xl my-auto pt-20 pb-10">
             <div className="glass-panel glow-gold flex flex-col p-6 md:p-12 relative border border-primary-container/20">

@@ -24,14 +24,14 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="fixed top-0 w-full z-40 bg-surface/80 backdrop-blur-md border-b border-white/10 shadow-[0_0_15px_rgba(255,215,0,0.15)] transition-all">
+      <nav className="fixed top-0 w-full z-40 bg-surface/80 backdrop-blur-md border-b border-on-surface/ shadow-[0_0_15px_rgba(255,215,0,0.15)] transition-all">
         <div className="flex justify-between items-center px-4 md:px-margin-desktop py-4 max-w-container-max mx-auto">
           <div className="flex items-center gap-6">
             <Link href="/" className="font-headline-md text-headline-md font-bold tracking-tighter text-primary-container">
               Veyronix
             </Link>
             
-            <div className="hidden md:flex space-x-6 lg:space-x-8 items-center border-l border-white/10 pl-6">
+            <div className="hidden md:flex space-x-6 lg:space-x-8 items-center border-l border-on-surface/ pl-6">
               <Link href="/blog" className="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors">
                 {t.blog}
               </Link>
@@ -100,7 +100,7 @@ export default function Navbar() {
       <div className={`fixed inset-0 z-50 transform ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'} transition-transform duration-500 ease-out flex`}>
         {/* Backdrop */}
         <div 
-          className={`flex-grow bg-black/40 backdrop-blur-sm transition-opacity duration-500 ${isMenuOpen ? 'opacity-100' : 'opacity-0'}`} 
+          className={`flex-grow bg-background/ backdrop-blur-sm transition-opacity duration-500 ${isMenuOpen ? 'opacity-100' : 'opacity-0'}`} 
           onClick={() => setIsMenuOpen(false)}
         ></div>
         
@@ -110,7 +110,7 @@ export default function Navbar() {
           <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-right from-transparent via-primary-container/30 to-transparent"></div>
           
           {/* Header */}
-          <div className="flex justify-between items-center px-6 py-6 border-b border-white/10">
+          <div className="flex justify-between items-center px-6 py-6 border-b border-on-surface/">
             <span className="font-headline-md text-headline-md font-bold tracking-tighter text-primary-container">Veyronix</span>
             <button 
               className="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-primary-container transition-colors" 
@@ -122,7 +122,7 @@ export default function Navbar() {
           
           {/* Navigation Links */}
           <nav className="flex-grow px-6 py-8 flex flex-col gap-y-6 overflow-y-auto">
-            <div className="flex justify-between items-center border-b border-white/5 pb-4 mb-2">
+            <div className="flex justify-between items-center border-b border-on-surface/ pb-4 mb-2">
               <span className="text-[10px] font-label-bold text-outline uppercase tracking-[0.2em]">Language</span>
               <button onClick={toggleLanguage} className="flex items-center gap-2 text-primary-container font-label-bold">
                 <Globe size={18} />
@@ -179,7 +179,7 @@ export default function Navbar() {
           </nav>
           
           {/* Bottom Action */}
-          <div className="px-6 py-10 bg-surface-container-low border-t border-white/5 space-y-8">
+          <div className="px-6 py-10 bg-surface-container-low border-t border-on-surface/ space-y-8">
             {session ? (
               <button 
                 onClick={() => { signOut(); setIsMenuOpen(false); }} 
