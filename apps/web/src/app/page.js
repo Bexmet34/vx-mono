@@ -1,7 +1,7 @@
 "use client";
 
 import Navbar from "@/components/Navbar";
-import { Shield, Users, Sword, Command, Star, MessageCircle, Zap, Activity, HelpCircle, Eye, Server, BadgeCheck, X, Loader2 } from "lucide-react";
+import { Shield, Users, Sword, Command, Star, MessageCircle, Zap, Activity, HelpCircle, Eye, Server, BadgeCheck, X, Loader2, PlusCircle, CheckCircle, Wallet, Lock } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useEffect, useState } from "react";
 import { useSession, signIn } from "next-auth/react";
@@ -557,7 +557,7 @@ export default function Home() {
                   <div className="flex justify-between items-end flex-wrap gap-2">
                     <h2 className="font-label-bold text-label-bold text-primary-container uppercase tracking-widest">Target Servers</h2>
                     <a className="font-label-sm text-label-sm text-secondary-fixed hover:text-primary-fixed-dim transition-colors flex items-center gap-1" href="https://discord.com/oauth2/authorize?client_id=1082239904169336902&permissions=510977&scope=bot+applications.commands" target="_blank" rel="noopener noreferrer">
-                      <span className="material-symbols-outlined text-[16px]">add_circle</span>
+                      <PlusCircle size={16} />
                       Add Bot to New Server
                     </a>
                   </div>
@@ -606,7 +606,7 @@ export default function Home() {
                 <div className="bg-surface-container p-6 border-l-4 border-primary-container">
                   <div className="flex justify-between items-start mb-4">
                     <div>
-                      <h3 className="font-label-bold text-label-bold text-on-surface mb-1 uppercase tracking-tight">{lang === 'tr' ? selectedPlan.name_tr : selectedPlan.name_en} Package</h3>
+                      <h3 className="font-label-bold text-label-bold text-on-surface mb-1 uppercase tracking-tight">{lang === 'tr' ? selectedPlan.name_tr : `${selectedPlan.name_en} Package`}</h3>
                       <p className="font-label-sm text-label-sm text-on-surface-variant">Tactical Deployment Tier</p>
                     </div>
                     <div className="text-right">
@@ -617,7 +617,7 @@ export default function Home() {
                   <ul className="space-y-2">
                     {(lang === 'tr' ? (selectedPlan.features_tr || []) : (selectedPlan.features_en || [])).slice(0,3).map((feat, idx) => (
                       <li key={idx} className="flex items-center gap-2 font-label-sm text-label-sm text-on-surface-variant">
-                        <span className="material-symbols-outlined text-primary-container text-[18px]">verified</span> {feat}
+                        <CheckCircle size={18} className="text-primary-container shrink-0" /> {feat}
                       </li>
                     ))}
                   </ul>
@@ -628,12 +628,12 @@ export default function Home() {
                   <button 
                     onClick={handleConfirmPurchase}
                     disabled={isProcessing || !selectedServer}
-                    className="w-full py-5 bg-primary-container text-on-primary font-label-bold text-body-md flex items-center justify-center gap-3 transition-all duration-300 hover:brightness-110 active:scale-[0.98] shadow-[0_10px_20px_rgba(255,215,0,0.1)] disabled:opacity-50 disabled:cursor-not-allowed uppercase"
+                    className="w-full py-5 px-4 bg-primary-container text-on-primary font-label-bold text-body-md flex items-center justify-center gap-3 transition-all duration-300 hover:brightness-110 active:scale-[0.98] shadow-[0_10px_20px_rgba(255,215,0,0.1)] disabled:opacity-50 disabled:cursor-not-allowed uppercase text-center"
                   >
                     {isProcessing ? (
-                      <><Loader2 className="animate-spin" size={24} /> INITIALIZING DEPLOYMENT...</>
+                      <><Loader2 className="animate-spin shrink-0" size={24} /> INITIALIZING DEPLOYMENT...</>
                     ) : (
-                      <><span className="material-symbols-outlined">account_balance_wallet</span> PAY WITH USDT (CRYPTOMUS)</>
+                      <><Wallet size={24} className="shrink-0" /> <span>PAY WITH USDT (CRYPTOMUS)</span></>
                     )}
                   </button>
                   <p className="text-center font-label-sm text-label-sm text-on-tertiary-container">
@@ -645,11 +645,11 @@ export default function Home() {
               {/* Trust Badges */}
               <div className="mt-8 flex justify-center gap-8 opacity-60 flex-wrap">
                 <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-on-surface-variant">lock</span>
+                  <Lock size={18} className="text-on-surface-variant" />
                   <span className="font-label-sm text-label-sm text-on-surface-variant">Military-Grade Encryption</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-on-surface-variant">speed</span>
+                  <Zap size={18} className="text-on-surface-variant" />
                   <span className="font-label-sm text-label-sm text-on-surface-variant">Instant Activation</span>
                 </div>
               </div>
