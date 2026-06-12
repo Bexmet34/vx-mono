@@ -14,6 +14,11 @@ const en = {
   heroDesc: "Easily build your GvG, ZvZ, or Dungeon parties directly from your Discord server. Manage roles, track attendance, and always enter the battlefield prepared.",
   heroBtn: "Add to Server",
   supportBtn: "Support Server",
+
+  featuresSectionTitle: "Powerful & Innovative Features",
+  featuresSectionDesc: "Managing your Albion Online guild and parties has never been this professional.",
+  securePayment: "Your payments are processed 100% securely.",
+  faqTitle2: "Frequently Asked Questions",
   
   // Home - Features
   feat1Title: "Advanced Registration",
@@ -273,9 +278,14 @@ const tr = {
   
   heroTitle1: "Albion Online İçin",
   heroTitle2: "Nihai Parti Yönetimi",
-  heroDesc: "Discord sunucunuz üzerinden GvG, ZvZ veya Zindan partilerinizi kolayca kurun. Rolleri yönetin, katılımı takip edin ve savaş alanına her zaman hazırlıklı girin.",
+  heroDesc: "GvG, ZvZ veya Dungeon partilerinizi doğrudan Discord sunucunuz üzerinden kolayca kurun. Rolleri yönetin, katılımı takip edin ve savaş alanına her zaman hazırlıklı girin.",
   heroBtn: "Sunucuya Ekle",
   supportBtn: "Destek Sunucusu",
+
+  featuresSectionTitle: "Güçlü & Yenilikçi Özellikler",
+  featuresSectionDesc: "Albion Online loncanızı ve partilerinizi yönetmek hiç bu kadar profesyonel olmamıştı.",
+  securePayment: "Ödemeleriniz %100 güvenli bir şekilde gerçekleştirilmektedir.",
+  faqTitle2: "Sıkça Sorulan Sorular",
 
   feat1Title: "Gelişmiş Kayıt Sistemi",
   feat1Desc: "Guild üyelerinizi otomatik algılayın. Discord rolleriyle oyun içi rolleri (Tank, Healer, DPS) senkronize edin.",

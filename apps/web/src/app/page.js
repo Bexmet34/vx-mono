@@ -242,8 +242,8 @@ export default function Home() {
         {/* --- BENTO GRID FEATURES --- */}
         <section className="px-margin-mobile md:px-margin-desktop py-20 max-w-container-max mx-auto">
           <div className="text-center mb-16">
-            <h2 className="font-headline-lg text-headline-lg text-on-surface uppercase tracking-tight mb-4">Güçlü & Yenilikçi Özellikler</h2>
-            <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">Albion Online loncanızı ve partilerinizi yönetmek hiç bu kadar profesyonel olmamıştı.</p>
+            <h2 className="font-headline-lg text-headline-lg text-on-surface uppercase tracking-tight mb-4">{t.featuresSectionTitle}</h2>
+            <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">{t.featuresSectionDesc}</p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 auto-rows-[minmax(280px,auto)]">
@@ -414,7 +414,7 @@ export default function Home() {
             </div>
             
             <div className="text-center mb-12">
-              <h2 className="font-headline-lg text-headline-lg text-on-surface uppercase tracking-tight">Sıkça Sorulan Sorular</h2>
+              <h2 className="font-headline-lg text-headline-lg text-on-surface uppercase tracking-tight">{t.faqTitle2}</h2>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

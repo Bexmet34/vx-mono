@@ -124,7 +124,7 @@ export default function Footer() {
           </div>
         </div>
         <p className="font-body-md text-xs text-on-surface-variant/70 text-center uppercase tracking-widest">
-          Ödemeleriniz %100 güvenli bir şekilde gerçekleştirilmektedir.
+          {t.securePayment}
         </p>
       </div>
 
