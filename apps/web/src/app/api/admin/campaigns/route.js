@@ -3,6 +3,8 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { getActiveCampaigns, createCampaign, supabase } from "@veyronix/database";
 import { NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic";
+
 const ADMIN_ID = process.env.NEXT_PUBLIC_ADMIN_ID;
 
 export async function GET(request) {

@@ -1,15 +1,11 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from "@/utils/supabase";
+
+export const dynamic = "force-dynamic";
 
 const ADMIN_ID = process.env.NEXT_PUBLIC_ADMIN_ID;
-
-// Bu API için anon key değil, gerekirse role izinlerini bypass edecek key de kullanılabilir.
-// Ancak anon key'de tabloya Select/Update izinleri açıksa kullanılabilir.
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 export async function GET() {
   try {

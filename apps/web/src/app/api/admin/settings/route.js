@@ -1,13 +1,9 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]/route";
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from "@/utils/supabase";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
-
+export const dynamic = "force-dynamic";
 export async function GET(req) {
     const session = await getServerSession(authOptions);
     if (!session || (session.user.id !== process.env.NEXT_PUBLIC_ADMIN_ID && session.user.id !== "407234961582587916")) {

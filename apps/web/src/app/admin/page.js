@@ -232,7 +232,7 @@ export default function AdminPage() {
         fetchPlans();
       } else {
         const data = await res.json();
-        showToast(data.error || "Hata oluştu", "error");
+        showToast(data.error || "Hata", "error");
       }
     } catch (err) { showToast(err.message, "error"); }
     finally { setLoading(false); }

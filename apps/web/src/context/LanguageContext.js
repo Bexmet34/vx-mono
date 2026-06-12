@@ -170,13 +170,100 @@ const en = {
   step3Desc: "Ready for battle! Type /createparty to create your dynamic ZvZ or PVE party and start gathering members.",
   
   // Checkout Modal Additions
-  checkoutTargetServer: "Target Server",
-  checkoutSelectServer: "-- Select a Server --",
-  checkoutLoading: "Loading servers...",
   checkoutNoServerText: "No active server found in the system. Please add the bot to your Discord server first.",
   checkoutAddBotBtn: "Add Bot to Server",
 
   blog: "Blog",
+  
+  legal: {
+    privacy: {
+      h1: "Information Collection & GDPR",
+      p1: "[ŞİRKET_VEYA_ŞAHIS_UNVANINIZI_GİRİN] (Hereinafter referred to as \"Veyronix\") collects minimal data required for functionality. This includes your Discord user ID, server IDs where the bot is present, and basic settings you configure. We are committed to protecting user data.",
+      h2: "Data Usage",
+      p2: "Your data is used solely to provide party management services and Albion Online integration. We never sell or share your data with third parties.",
+      h3: "Security",
+      p3: "We implement industry-standard security measures to protect your information. Data is stored on secure servers with restricted access.",
+      footer: "By using Veyronix services, you agree to these policies. If you have questions about your data rights, please contact us at hakkibsknn@gmail.com.",
+      lastUpdated: "Last updated: April 2026"
+    },
+    terms: {
+      title: "Terms of Service",
+      h1: "Acceptance of Terms",
+      p1: "By using the Veyronix bot and web panel, you agree to these terms. If you do not agree to the terms, please do not use the service.",
+      h2: "Service Usage",
+      p2: "Veyronix is designed to help Discord communities manage their operations. Users must not use the bot for malicious purposes, spam, or to violate Discord's terms of service.",
+      h3: "Premium Services",
+      p3: "Premium subscriptions are non-refundable unless required by law. Subscriptions automatically grant premium features to the specified Discord server for the duration of the plan.",
+      footer: "Veyronix reserves the right to modify these terms at any time. Continued use of the service constitutes acceptance of the new terms.",
+      lastUpdated: "Last updated: April 2026"
+    },
+    about: {
+      title: "About Us & Contact",
+      h1: "About Veyronix",
+      p1: "Veyronix is a professional bot service designed to enhance the management and interaction of your Discord servers. Our goal is to provide community owners and managers with advanced tools to manage their servers more efficiently and interact better with their members.",
+      p2: "With our advanced party system, moderation tools, and user-friendly interface, we continue to make a difference in the Discord ecosystem.",
+      infoTitle: "Contact Information",
+      addressVal: "[AÇIK_ADRESİNİZİ_GİRİN]",
+      supportVal: "Our Discord Server"
+    },
+    sales: {
+      title: "Distance Sales Agreement",
+      h1: "1. PARTIES",
+      p1: "This Agreement has been signed between the following parties within the framework of the terms and conditions stated below.",
+      satici: `SELLER INFORMATION:
+Title: [ŞİRKET_VEYA_ŞAHIS_UNVANINIZI_GİRİN]
+Address: [AÇIK_ADRESİNİZİ_GİRİN]
+Phone: [TELEFON_NUMARANIZ]
+Email: hakkibsknn@gmail.com
+(Hereinafter referred to as "SELLER")`,
+      alici: "BUYER: The user who purchases Veyronix services through the website (Hereinafter referred to as \"BUYER\")",
+      h2: "2. SUBJECT OF THE AGREEMENT",
+      p2: "The subject of this agreement is to determine the rights and obligations of the parties in accordance with the provisions of the Law No. 6502 on the Protection of Consumers and the Regulation on Distance Contracts regarding the sale and delivery of the digital service (Veyronix Premium Subscription) that the BUYER ordered electronically through the SELLER's website.",
+      h3: "3. PRODUCT AND DELIVERY",
+      p3: "The product subject to the contract consists of completely digital services (Discord bot premium features). There is no physical delivery. After the payment is successfully completed, the service is automatically activated on the Discord server specified by the user.",
+      h4: "4. RIGHT OF WITHDRAWAL",
+      p4: "Since the services subject to this contract are services performed instantly in the electronic environment and intangible goods delivered instantly to the consumer, the right of withdrawal cannot be exercised in accordance with Article 15/1-ğ of the Regulation on Distance Contracts. Refunds cannot be requested for purchased and activated premium memberships."
+    },
+    refund: {
+      title: "Cancellation & Refund Policy",
+      h1: "DIGITAL PRODUCT AND SERVICE REFUND",
+      p1: "All products and services offered by Veyronix (Subscriptions, Premium features, etc.) are within the scope of digital content.",
+      important: "IMPORTANT: Since the purchased services are performed instantly in the electronic environment, no refund is possible in accordance with the Law on Consumer Protection No. 6502 and the Distance Contracts Regulation.",
+      h2: "CANCELLATION PROCEDURE",
+      p2: "You can cancel our subscription-based services at any time. When the cancellation is performed, you can continue to benefit from the service until the end of your current usage period. No deduction will be made from your card in the next billing period.",
+      h3: "ERRONEOUS TRANSACTIONS",
+      p3: "In case the service is not defined due to erroneous deductions or technical failures caused by the system, you can contact us at hakkibsknn@gmail.com to report the situation. Necessary corrections will be made in the requests found justified after the examination.",
+      h4: "CONTACT",
+      p4: "For all your questions about refund and cancellation issues:",
+      email: "Email",
+      support: "Discord Support"
+    },
+    delivery: {
+      title: "Delivery Policy",
+      h1: "DIGITAL DELIVERY PROCESS",
+      p1: "All services purchased through Veyronix (subscriptions, premium features, etc.) are carried out entirely in a digital environment.",
+      p2: "As soon as the payment for your order is successfully completed via the secure payment infrastructure, the service you have purchased is automatically and instantly assigned to your Discord account or the Discord server you specified.",
+      important: "IMPORTANT: There is no physical cargo or mail delivery. The execution of the service starts digitally instantly.",
+      h2: "DELIVERY TIME",
+      p3: "After payment confirmation, delivery (activation of the service) is automatically carried out by the system within an average of 1-5 minutes.",
+      h3: "POSSIBLE DELAYS",
+      p4: "In the event of an unusual delay in delivery due to delays originating from the Discord API or system congestion, you can get instant support by contacting us via our support server or at hakkibsknn@gmail.com."
+    }
+  },
+  
+  admin: {
+    successSave: "Settings saved successfully!",
+    errorSave: "Failed to save settings.",
+    deleteMsg: "Message deleted",
+    addPlanSuccess: "Plan added successfully!",
+    editPlanSuccess: "Plan updated successfully!",
+    deletePlanConfirm: "Are you sure you want to delete this plan?",
+    planDeleted: "Plan deleted",
+    campaignUpdated: "Campaign updated.",
+    templateUpdated: "Template updated successfully!",
+    actionSuccess: "Action completed successfully!",
+    confirmDeleteMsg: "Are you sure you want to delete this message?"
+  }
 };
 
 const tr = {
@@ -352,13 +439,100 @@ const tr = {
   step3Desc: "Savaşa hazırsınız! /createparty yazarak dinamik ZvZ veya PVE partinizi oluşturun ve üyeleri toplamaya başlayın.",
   
   // Checkout Modal Additions
-  checkoutTargetServer: "Hedef Sunucu",
-  checkoutSelectServer: "-- Sunucu Seçin --",
-  checkoutLoading: "Sunucular yükleniyor...",
   checkoutNoServerText: "Sistemde aktif bir sunucunuz bulunamadı. Lütfen önce botu Discord sunucunuza ekleyin.",
   checkoutAddBotBtn: "Botu Sunucuna Ekle",
 
   blog: "Blog",
+  
+  legal: {
+    privacy: {
+      h1: "Veri Toplama ve KVKK",
+      p1: "[ŞİRKET_VEYA_ŞAHIS_UNVANINIZI_GİRİN] (Bundan sonra \"Veyronix\" olarak anılacaktır), 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) uyarınca, kullanıcılarının verilerini korumayı taahhüt eder. Sadece hizmetin işleyişi için gerekli olan Discord ID, sunucu ID ve temel ayar verileri toplanır.",
+      h2: "Veri Kullanımı",
+      p2: "Toplanan veriler sadece botun sunduğu party yönetim sistemi ve Albion Online entegrasyonu gibi hizmetlerin sağlanması amacıyla kullanılır. Verileriniz kesinlikle üçüncü taraflarla paylaşılmaz veya satılmaz.",
+      h3: "Güvenlik",
+      p3: "Verileriniz güvenli sunucularda saklanmakta olup, yetkisiz erişime karşı endüstri standardı güvenlik önlemleri uygulanmaktadır.",
+      footer: "Veyronix hizmetlerini kullanarak bu politikaları kabul etmiş sayılırsınız. KVKK kapsamındaki haklarınız ve diğer sorularınız için hakkibsknn@gmail.com adresinden bizimle iletişime geçebilirsiniz.",
+      lastUpdated: "Son güncelleme: Nisan 2026"
+    },
+    terms: {
+      title: "Kullanım Koşulları",
+      h1: "Koşulların Kabulü",
+      p1: "Veyronix botunu ve web panelini kullanarak bu koşulları kabul etmiş sayılırsınız. Eğer koşulları kabul etmiyorsanız lütfen hizmeti kullanmayınız.",
+      h2: "Hizmet Kullanımı",
+      p2: "Veyronix, Discord topluluklarının operasyonlarını yönetmelerine yardımcı olmak için tasarlanmıştır. Kullanıcılar botu kötü amaçlı işlemler, spam veya Discord hizmet şartlarını ihlal edecek şekilde kullanamazlar.",
+      h3: "Premium Hizmetler",
+      p3: "Premium abonelikler yasa gereği zorunlu olmadığı sürece iade edilemez. Abonelikler, plan süresi boyunca belirtilen Discord sunucusuna otomatik olarak premium özellikleri sağlar.",
+      footer: "Veyronix bu koşulları dilediği zaman değiştirme hakkını saklı tutar. Hizmeti kullanmaya devam etmeniz, yeni koşulları kabul ettiğiniz anlamına gelir.",
+      lastUpdated: "Son güncelleme: Nisan 2026"
+    },
+    about: {
+      title: "Hakkımızda ve İletişim",
+      h1: "Veyronix Hakkında",
+      p1: "Veyronix, Discord sunucularınızın yönetimini ve etkileşimini artırmak için tasarlanmış profesyonel bir bot hizmetidir. Amacımız, topluluk sahiplerine ve yöneticilere, sunucularını daha verimli bir şekilde yönetebilecekleri, üyeleriyle daha iyi etkileşim kurabilecekleri gelişmiş araçlar sunmaktır.",
+      p2: "Gelişmiş parti sistemi, moderasyon araçları ve kullanıcı dostu arayüzümüzle, Discord ekosisteminde fark yaratmaya devam ediyoruz.",
+      infoTitle: "İletişim Bilgileri",
+      addressVal: "[AÇIK_ADRESİNİZİ_GİRİN]",
+      supportVal: "Discord Sunucumuz"
+    },
+    sales: {
+      title: "Mesafeli Satış Sözleşmesi",
+      h1: "1. TARAFLAR",
+      p1: "İşbu Sözleşme aşağıdaki taraflar arasında aşağıda belirtilen hüküm ve şartlar çerçevesinde imzalanmıştır.",
+      satici: `SATICI BİLGİLERİ:
+Ünvan: [ŞİRKET_VEYA_ŞAHIS_UNVANINIZI_GİRİN]
+Adres: [AÇIK_ADRESİNİZİ_GİRİN]
+Telefon: [TELEFON_NUMARANIZ]
+E-Posta: hakkibsknn@gmail.com
+(Bundan sonra "SATICI" olarak anılacaktır)`,
+      alici: "ALICI: Veyronix hizmetlerini web sitesi üzerinden satın alan kullanıcı (Bundan sonra \"ALICI\" olarak anılacaktır)",
+      h2: "2. SÖZLEŞMENİN KONUSU",
+      p2: "İşbu sözleşmenin konusu, ALICI'nın SATICI'ya ait internet sitesi üzerinden elektronik ortamda siparişini yaptığı dijital hizmetin (Veyronix Premium Abonelik) satışı ve teslimi ile ilgili olarak 6502 sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli Sözleşmeler Yönetmeliği hükümleri gereğince tarafların hak ve yükümlülüklerinin saptanmasıdır.",
+      h3: "3. ÜRÜN VE TESLİMAT",
+      p3: "Sözleşme konusu ürün, tamamen dijital hizmetlerden (Discord bot premium özellikleri) oluşmaktadır. Fiziksel bir teslimat yoktur. Ödeme başarıyla tamamlandıktan sonra, hizmet otomatik olarak kullanıcının belirttiği Discord sunucusunda aktif hale gelir.",
+      h4: "4. CAYMA HAKKI",
+      p4: "İşbu sözleşmeye konu hizmetler, Mesafeli Sözleşmeler Yönetmeliği'nin 15/1-ğ maddesi uyarınca elektronik ortamda anında ifa edilen hizmetler ve tüketiciye anında teslim edilen gayrimaddi mallar kapsamında olduğundan cayma hakkı kullanılamaz. Satın alınan ve aktif edilen premium üyelikler için ücret iadesi talep edilemez."
+    },
+    refund: {
+      title: "İptal ve İade Koşulları",
+      h1: "DİJİTAL ÜRÜN VE HİZMET İADESİ",
+      p1: "Veyronix tarafından sunulan tüm ürün ve hizmetler (Abonelikler, Premium Özellikler vb.) dijital içerik kapsamındadır.",
+      important: "ÖNEMLİ: Satın alınan hizmetler elektronik ortamda anında ifa edildiği için, 6502 sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli Sözleşmeler Yönetmeliği gereği iadesi mümkün değildir.",
+      h2: "İPTAL PROSEDÜRÜ",
+      p2: "Abonelik bazlı hizmetlerimizi dilediğiniz zaman iptal edebilirsiniz. İptal işlemi gerçekleştirildiğinde, mevcut kullanım sürenizin sonuna kadar hizmetten yararlanmaya devam edebilirsiniz. Bir sonraki faturalandırma döneminde kartınızdan herhangi bir çekim yapılmayacaktır.",
+      h3: "HATALI İŞLEMLER",
+      p3: "Sistemden kaynaklı hatalı çekimler veya teknik aksaklıklar nedeniyle hizmetin tanımlanmaması durumunda, durumu bildirmek için hakkibsknn@gmail.com adresi üzerinden bizimle iletişime geçebilirsiniz. İnceleme sonrası haklı bulunan taleplerde gerekli düzeltmeler yapılacaktır.",
+      h4: "İLETİŞİM",
+      p4: "İade ve iptal konularındaki tüm sorularınız için:",
+      email: "E-posta",
+      support: "Discord Destek"
+    },
+    delivery: {
+      title: "Teslimat Koşulları",
+      h1: "DİJİTAL TESLİMAT SÜRECİ",
+      p1: "Veyronix üzerinden satın alınan tüm hizmetler (abonelikler, premium özellikler vb.) tamamen dijital ortamda gerçekleştirilmektedir.",
+      p2: "Siparişinizin ödemesi güvenli ödeme altyapısı üzerinden başarıyla tamamlandığı anda, satın almış olduğunuz hizmet Discord hesabınıza veya belirttiğiniz Discord sunucusuna otomatik ve anında tanımlanır.",
+      important: "ÖNEMLİ: Herhangi bir fiziksel kargo veya posta teslimatı yapılmamaktadır. Hizmet ifası anında dijital olarak başlar.",
+      h2: "TESLİMAT SÜRESİ",
+      p3: "Ödeme onayı alındıktan sonra teslimat (hizmetin aktifleşmesi) ortalama 1-5 dakika içerisinde sistem tarafından otomatik olarak gerçekleştirilir.",
+      h3: "OLASI GECİKMELER",
+      p4: "Discord API kaynaklı gecikmeler veya sistem yoğunlukları sebebiyle teslimatta olağan dışı bir gecikme yaşanması durumunda, destek sunucumuz üzerinden veya hakkibsknn@gmail.com adresinden bize ulaşarak anında destek alabilirsiniz."
+    }
+  },
+  
+  admin: {
+    successSave: "Ayarlar başarıyla kaydedildi!",
+    errorSave: "Ayarlar kaydedilemedi.",
+    deleteMsg: "Mesaj silindi",
+    addPlanSuccess: "Paket başarıyla eklendi!",
+    editPlanSuccess: "Paket başarıyla güncellendi!",
+    deletePlanConfirm: "Bu paketi silmek istediğinize emin misiniz?",
+    planDeleted: "Paket silindi",
+    campaignUpdated: "Kampanya güncellendi.",
+    templateUpdated: "Şablon başarıyla güncellendi!",
+    actionSuccess: "İşlem başarıyla gerçekleşti!",
+    confirmDeleteMsg: "Emin misiniz?"
+  }
 };
 
 

@@ -1,12 +1,9 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from "@/utils/supabase";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
+export const dynamic = "force-dynamic";
 
 const ADMIN_ID = process.env.NEXT_PUBLIC_ADMIN_ID;
 

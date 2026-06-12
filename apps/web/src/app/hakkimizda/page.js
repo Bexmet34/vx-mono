@@ -9,33 +9,14 @@ import { useLanguage } from "@/context/LanguageContext";
 export default function AboutPage() {
   const { t, lang } = useLanguage();
   
-  const content = {
-    tr: {
-      title: "Hakkımızda",
-      p1: "Veyronix, Discord sunucularınızın yönetimini ve etkileşimini artırmak için tasarlanmış profesyonel bir bot hizmetidir. Amacımız, topluluk sahiplerine ve yöneticilere, sunucularını daha verimli bir şekilde yönetebilecekleri, üyeleriyle daha iyi etkileşim kurabilecekleri gelişmiş araçlar sunmaktır.",
-      p2: "Gelişmiş parti sistemi, moderasyon araçları ve kullanıcı dostu arayüzümüzle, Discord ekosisteminde fark yaratmaya devam ediyoruz.",
-      infoTitle: "İletişim Bilgileri",
-      addressVal: "[AÇIK_ADRESİNİZİ_GİRİN]",
-      supportVal: "Discord Sunucumuz"
-    },
-    en: {
-      title: "About Us",
-      p1: "Veyronix is a professional bot service designed to enhance the management and interaction of your Discord servers. Our goal is to provide community owners and managers with advanced tools to manage their servers more efficiently and interact better with their members.",
-      p2: "With our advanced party system, moderation tools, and user-friendly interface, we continue to make a difference in the Discord ecosystem.",
-      infoTitle: "Contact Information",
-      addressVal: "[AÇIK_ADRESİNİZİ_GİRİN]",
-      supportVal: "Our Discord Server"
-    }
-  };
-
-  const activeContent = content[lang] || content.en;
+  const activeContent = t.legal.about;
 
   return (
     <>
       <Navbar />
       <main className="container" style={{ paddingTop: '10rem', paddingBottom: '5rem', minHeight: '80vh' }}>
         <div className="glass-panel animate-fade-in" style={{ padding: '3rem', maxWidth: '800px', margin: '0 auto' }}>
-          <h1 className="text-logo" style={{ fontSize: '2.5rem', marginBottom: '2rem' }}>{activeContent.title}</h1>
+          <h1 className="text-logo" style={{ fontSize: '2.5rem', marginBottom: '2rem' }}>{t.hakkimizda}</h1>
           
           <div style={{ lineHeight: '1.8', color: 'var(--text-muted)', marginBottom: '3rem' }}>
             <p style={{ marginBottom: '1.5rem' }}>
