@@ -15,7 +15,7 @@ export default function AboutPage() {
       p1: "Veyronix, Discord sunucularınızın yönetimini ve etkileşimini artırmak için tasarlanmış profesyonel bir bot hizmetidir. Amacımız, topluluk sahiplerine ve yöneticilere, sunucularını daha verimli bir şekilde yönetebilecekleri, üyeleriyle daha iyi etkileşim kurabilecekleri gelişmiş araçlar sunmaktır.",
       p2: "Gelişmiş parti sistemi, moderasyon araçları ve kullanıcı dostu arayüzümüzle, Discord ekosisteminde fark yaratmaya devam ediyoruz.",
       infoTitle: "İletişim Bilgileri",
-      addressVal: "[PAYTR_AÇIK_ADRESİNİZİ_GİRİN]",
+      addressVal: "[AÇIK_ADRESİNİZİ_GİRİN]",
       supportVal: "Discord Sunucumuz"
     },
     en: {
@@ -23,7 +23,7 @@ export default function AboutPage() {
       p1: "Veyronix is a professional bot service designed to enhance the management and interaction of your Discord servers. Our goal is to provide community owners and managers with advanced tools to manage their servers more efficiently and interact better with their members.",
       p2: "With our advanced party system, moderation tools, and user-friendly interface, we continue to make a difference in the Discord ecosystem.",
       infoTitle: "Contact Information",
-      addressVal: "[PAYTR_AÇIK_ADRESİNİZİ_GİRİN]",
+      addressVal: "[AÇIK_ADRESİNİZİ_GİRİN]",
       supportVal: "Our Discord Server"
     }
   };

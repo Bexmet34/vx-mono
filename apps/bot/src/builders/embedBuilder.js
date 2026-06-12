@@ -324,8 +324,7 @@ function createDonateEmbed(lang = 'tr', guild = null, thumbnailUrl = null) {
 
     embed.addFields(
             { name: '\u200b', value: t('help.donate_bank_info', lang) }
-        )
-        .setFooter({ text: t('help.donate_paytr_soon', lang) });
+        );
 
     return embed;
 }

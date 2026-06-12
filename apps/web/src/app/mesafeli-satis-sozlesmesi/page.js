@@ -14,9 +14,9 @@ export default function DistanceSalesAgreement() {
       h1: "1. TARAFLAR",
       p1: "İşbu Sözleşme aşağıdaki taraflar arasında aşağıda belirtilen hüküm ve şartlar çerçevesinde imzalanmıştır.",
       satici: `SATICI BİLGİLERİ:
-Ünvan: [PAYTR_ŞİRKET_VEYA_ŞAHIS_UNVANINIZI_GİRİN]
-Adres: [PAYTR_AÇIK_ADRESİNİZİ_GİRİN]
-Telefon: [PAYTR_TELEFON_NUMARANIZ]
+Ünvan: [ŞİRKET_VEYA_ŞAHIS_UNVANINIZI_GİRİN]
+Adres: [AÇIK_ADRESİNİZİ_GİRİN]
+Telefon: [TELEFON_NUMARANIZ]
 E-Posta: hakkibsknn@gmail.com
 (Bundan sonra "SATICI" olarak anılacaktır)`,
       alici: "ALICI: Veyronix hizmetlerini web sitesi üzerinden satın alan kullanıcı (Bundan sonra \"ALICI\" olarak anılacaktır)",

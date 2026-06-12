@@ -101,14 +101,14 @@ export default function Footer() {
               {t.email}: hakkibsknn@gmail.com
             </li>
             <li className="font-body-md text-sm text-on-surface-variant">
-              Adres: [PAYTR_AÇIK_ADRESİNİZİ_BURAYA_GİRİN]
+              Adres: [AÇIK_ADRESİNİZİ_BURAYA_GİRİN]
             </li>
           </ul>
         </div>
 
       </div>
 
-      {/* PayTR and Security Logos */}
+      {/* Security Logos */}
       <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop mt-16 pt-8 border-t border-outline-variant flex flex-col items-center gap-6">
         <div className="flex flex-wrap justify-center items-center gap-6">
           {/* SSL Logo */}
@@ -121,11 +121,10 @@ export default function Footer() {
             <span className="font-label-bold text-label-sm uppercase text-on-surface">VISA</span>
             <span className="font-label-bold text-label-sm uppercase text-on-surface">MasterCard</span>
             <span className="font-label-bold text-label-sm uppercase text-on-surface">TROY</span>
-            <span className="font-label-bold text-label-sm uppercase text-primary-container border-l border-outline-variant pl-4">PayTR</span>
           </div>
         </div>
         <p className="font-body-md text-xs text-on-surface-variant/70 text-center uppercase tracking-widest">
-          Ödemeleriniz PayTR altyapısı ile %100 güvenli bir şekilde gerçekleştirilmektedir.
+          Ödemeleriniz %100 güvenli bir şekilde gerçekleştirilmektedir.
         </p>
       </div>
 
