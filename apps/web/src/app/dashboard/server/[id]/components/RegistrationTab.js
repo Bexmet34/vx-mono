@@ -370,10 +370,11 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
               </div>
             </div>
 
-            <div className="inputGroup">
-              <label className="label">
-                {lang === 'en' ? 'Check Interval (Days, Min 3)' : 'Kontrol Aralığı (Gün, Min 3)'}
-              </label>
+            <div style={{ opacity: settings.auto_check_enabled ? 1 : 0.4, pointerEvents: settings.auto_check_enabled ? 'auto' : 'none', transition: 'opacity 0.3s' }}>
+              <div className="inputGroup" style={{ marginTop: '1.5rem' }}>
+                <label className="label">
+                  {lang === 'en' ? 'Check Interval (Days, Min 3)' : 'Kontrol Aralığı (Gün, Min 3)'}
+                </label>
               <input
                 type="number"
                 min="3"
@@ -388,36 +389,56 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
               />
             </div>
 
-            <div className="inputGroup">
-              <label className="label">
-                {lang === 'en' ? 'Guild Tag (Max 5 chars, will strip [TAG])' : 'Guild Tagi (Max 5 harf, isimden [TAG] silinecek)'}
-              </label>
-              <input
-                type="text"
-                maxLength="5"
-                className="input"
-                placeholder={lang === 'en' ? 'e.g. ABCDE' : 'Örn: TAG'}
-                value={settings.auto_check_guild_tag || ""}
-                onChange={(e) => setSettings({ ...settings, auto_check_guild_tag: e.target.value })}
-              />
+              <div className="inputGroup">
+                <label className="label">
+                  {lang === 'en' ? 'Guild Tag (Optional, Max 5 chars)' : 'Guild Tagi (İsteğe Bağlı, Max 5 harf)'}
+                </label>
+                <input
+                  type="text"
+                  maxLength="5"
+                  className="input"
+                  placeholder={lang === 'en' ? 'e.g. ABCDE' : 'Örn: TAG'}
+                  value={settings.auto_check_guild_tag || ""}
+                  onChange={(e) => setSettings({ ...settings, auto_check_guild_tag: e.target.value })}
+                />
+              </div>
             </div>
           </div>
 
-          <div>
+          <div style={{ opacity: settings.auto_check_enabled ? 1 : 0.4, pointerEvents: settings.auto_check_enabled ? 'auto' : 'none', transition: 'opacity 0.3s' }}>
             <div className="inputGroup">
               <label className="label">
                 {lang === 'en' ? 'Role for Leavers' : "Guild'den Çıkanlara Verilecek Rol"}
               </label>
               <select
                 className="select"
-                value={settings.auto_check_custom_role_id || ""}
-                onChange={(e) => setSettings({ ...settings, auto_check_custom_role_id: e.target.value })}
+                value={settings.auto_check_custom_role_id ? "custom" : "default"}
+                onChange={(e) => {
+                  if (e.target.value === "default") {
+                    setSettings({ ...settings, auto_check_custom_role_id: "" });
+                  } else {
+                    setSettings({ ...settings, auto_check_custom_role_id: discordRoles?.[0]?.id || "none" });
+                  }
+                }}
               >
-                <option value="">{lang === 'en' ? 'Use Default Unregistered Role' : 'Varsayılan Kayıtsız Rolünü Kullan'}</option>
-                {(discordRoles || []).map(r => (
-                  <option key={r.id} value={r.id}>@{r.name}</option>
-                ))}
+                <option value="default">{lang === 'en' ? 'Use Default Unregistered Role' : 'Varsayılan Kayıtsız Rolünü Kullan'}</option>
+                <option value="custom">{lang === 'en' ? 'Select a Custom Role' : 'Başka Rol Seç'}</option>
               </select>
+              
+              {settings.auto_check_custom_role_id && settings.auto_check_custom_role_id !== "default" && (
+                <div style={{ marginTop: '0.75rem', animation: 'fadeSlideUp 0.3s ease' }}>
+                  <select
+                    className="select"
+                    value={settings.auto_check_custom_role_id === "none" ? "" : settings.auto_check_custom_role_id}
+                    onChange={(e) => setSettings({ ...settings, auto_check_custom_role_id: e.target.value })}
+                  >
+                    <option value="" disabled>{lang === 'en' ? 'Select Role...' : 'Rol Seçin...'}</option>
+                    {(discordRoles || []).map(r => (
+                      <option key={r.id} value={r.id}>@{r.name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
 
             <div className="inputGroup">
