@@ -453,23 +453,31 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
               <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
                 {lang === 'en' ? 'Role for Leavers' : "Guild'den Çıkanlara Verilecek Rol"}
               </label>
-              <select
-                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
-                value={settings.auto_check_custom_role_id ? "custom" : "default"}
-                onChange={(e) => {
-                  if (e.target.value === "default") {
-                    setSettings({ ...settings, auto_check_custom_role_id: "" });
-                  } else {
-                    setSettings({ ...settings, auto_check_custom_role_id: discordRoles?.[0]?.id || "none" });
-                  }
-                }}
-              >
-                <option value="default">{lang === 'en' ? 'Use Default Unregistered Role' : 'Varsayılan Kayıtsız Rolünü Kullan'}</option>
-                <option value="custom">{lang === 'en' ? 'Select a Custom Role' : 'Başka Rol Seç'}</option>
-              </select>
+              <div className="flex items-center gap-4 mt-2">
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={!settings.auto_check_custom_role_id}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSettings({ ...settings, auto_check_custom_role_id: "" });
+                      } else {
+                        setSettings({ ...settings, auto_check_custom_role_id: discordRoles?.[0]?.id || "none" });
+                      }
+                    }}
+                  />
+                  <div className="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+                </label>
+                <span className="text-sm font-label-bold uppercase tracking-widest text-on-surface-variant">
+                  {!settings.auto_check_custom_role_id 
+                    ? (lang === 'en' ? 'Default Unregistered Role' : 'Kayıtsız Rolü Verilsin') 
+                    : (lang === 'en' ? 'Custom Role' : 'Özel Rol Verilsin')}
+                </span>
+              </div>
               
-              {settings.auto_check_custom_role_id && settings.auto_check_custom_role_id !== "default" && (
-                <div className="mt-3 animate-slide-up">
+              {settings.auto_check_custom_role_id && (
+                <div className="mt-4 animate-slide-up">
                   <select
                     className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
                     value={settings.auto_check_custom_role_id === "none" ? "" : settings.auto_check_custom_role_id}
