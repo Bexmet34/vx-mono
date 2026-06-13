@@ -45,38 +45,46 @@ export default function OverviewTab({ subscription, setActiveTab, settings }) {
   }
 
   return (
-    <div className="bentoGrid">
-      {/* Main Welcome Bento */}
-      <div className="bentoBox span12" style={{ background: 'linear-gradient(135deg, rgba(252, 163, 17, 0.05) 0%, rgba(10, 10, 15, 0.8) 100%)', borderLeft: '4px solid var(--accent-color)' }}>
-        <h2 className="bentoTitle"><Star /> {lang === 'en' ? 'Overview' : 'Genel Bakış'}</h2>
-        <p style={{ color: '#888', fontSize: '1.1rem', marginBottom: '2rem' }}>
-          {lang === 'tr'
-            ? 'Sunucu komuta merkezine hoş geldiniz. Entegrasyonları yapılandırın, şablonları yönetin ve performansı izleyin.'
-            : 'Welcome to your server command center. Configure integrations, manage templates, and monitor performance.'}
-        </p>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-slide-up">
+      {/* Main Welcome Box */}
+      <div className="md:col-span-2 glass-panel p-8 relative overflow-hidden border border-primary-container/30 bg-primary-container/5 hover:border-primary-container transition-colors group">
+        <div className="scanline"></div>
+        <div className="absolute top-8 right-8 text-primary-container/10 group-hover:text-primary-container/30 transition-colors">
+          <Star size={120} />
+        </div>
+        <div className="relative z-10">
+          <h2 className="font-headline-lg text-2xl text-primary-container mb-4 flex items-center gap-3 uppercase tracking-tight">
+            <Star size={24} className="fill-current" /> {lang === 'en' ? 'Overview' : 'Genel Bakış'}
+          </h2>
+          <p className="font-body-lg text-on-surface-variant max-w-2xl mb-8 leading-relaxed">
+            {lang === 'tr'
+              ? 'Sunucu komuta merkezine hoş geldiniz. Entegrasyonları yapılandırın, şablonları yönetin ve performansı izleyin.'
+              : 'Welcome to your server command center. Configure integrations, manage templates, and monitor performance.'}
+          </p>
 
-        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-          <button className="floatingSave" style={{ position: 'relative', bottom: 'auto', right: 'auto', boxShadow: 'none' }} onClick={() => setActiveTab('general')}>
+          <button className="px-8 py-3 bg-primary-container text-on-primary font-label-bold uppercase tracking-widest flex items-center gap-2 transition-all hover:brightness-110 active:scale-95 tactical-glow rounded-sm" onClick={() => setActiveTab('general')}>
             {lang === 'tr' ? 'Hızlı Kurulum' : 'Quick Setup'}
           </button>
         </div>
       </div>
 
-      {/* Subscription Status Bento */}
-      <div className="bentoBox span6">
-        <h3 className="bentoTitle" style={{ fontSize: '1.1rem' }}>
+      {/* Subscription Status Box */}
+      <div className="glass-panel p-8 relative overflow-hidden border border-outline-variant hover:border-primary-container/50 transition-colors">
+        <h3 className="font-headline-md text-xl text-on-surface mb-6 uppercase tracking-tight">
           {lang === 'tr' ? 'Abonelik Durumu' : 'Subscription Status'}
         </h3>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <StatusIcon size={40} color={statusColor} />
+        <div className="flex items-center gap-6">
+          <div className="w-16 h-16 rounded bg-surface border border-outline flex items-center justify-center shadow-lg" style={{ color: statusColor, borderColor: statusColor }}>
+            <StatusIcon size={32} />
+          </div>
           <div>
-            <div style={{ fontSize: '1.5rem', fontWeight: 800, color: statusColor }}>{timeStatus}</div>
-            <div style={{ color: '#888', fontSize: '0.85rem', marginTop: '0.25rem' }}>{statusDesc}</div>
+            <div className="font-headline-lg text-2xl uppercase tracking-tight" style={{ color: statusColor }}>{timeStatus}</div>
+            <div className="font-label-sm text-sm text-on-surface-variant mt-1 uppercase tracking-widest">{statusDesc}</div>
           </div>
         </div>
 
         {tier === 'freemium' && (
-          <div style={{ marginTop: '1.5rem', padding: '0.75rem 1rem', background: 'rgba(252, 163, 17, 0.08)', borderRadius: '8px', border: '1px solid rgba(252, 163, 17, 0.2)', fontSize: '0.85rem', color: '#fca30b' }}>
+          <div className="mt-8 p-4 bg-primary-container/10 border border-primary-container/30 text-primary-container font-body-md text-sm">
             {lang === 'tr'
               ? '💡 Premium paket alarak oy zorunluluğunu kaldırabilirsiniz.'
               : '💡 Upgrade to Premium to remove the vote requirement.'}
@@ -84,23 +92,27 @@ export default function OverviewTab({ subscription, setActiveTab, settings }) {
         )}
       </div>
 
-      {/* Quick Stats Bento */}
-      <div className="bentoBox span6">
-        <h3 className="bentoTitle" style={{ fontSize: '1.1rem' }}>
+      {/* Quick Stats Box */}
+      <div className="glass-panel p-8 relative overflow-hidden border border-outline-variant hover:border-primary-container/50 transition-colors">
+        <h3 className="font-headline-md text-xl text-on-surface mb-6 uppercase tracking-tight">
           {lang === 'tr' ? 'Sistem Durumu' : 'System Status'}
         </h3>
-        <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-           <li className="listItem" style={{ padding: '0.5rem 1rem', color: settings?.albion_guild_id ? '#22c55e' : '#888' }}>
-             {settings?.albion_guild_id ? '✓' : '✗'} {lang === 'tr' ? 'Albion Lonca Bağlantısı' : 'Albion Guild Link'} <span style={{ float: 'right', fontSize: '0.8rem' }}>{settings?.albion_guild_id ? (lang === 'tr' ? 'Bağlı' : 'Linked') : (lang === 'tr' ? 'Kurulum Bekliyor' : 'Setup Required')}</span>
+        <ul className="space-y-3">
+           <li className={`flex items-center justify-between p-3 border rounded-sm font-label-bold text-sm uppercase tracking-widest ${settings?.albion_guild_id ? 'border-success/30 bg-success/5 text-success' : 'border-outline text-on-surface-variant'}`}>
+             <span className="flex items-center gap-2">{settings?.albion_guild_id ? '✓' : '✗'} {lang === 'tr' ? 'Albion Lonca Bağlantısı' : 'Albion Guild Link'}</span>
+             <span>{settings?.albion_guild_id ? (lang === 'tr' ? 'Bağlı' : 'Linked') : (lang === 'tr' ? 'Kurulum Bekliyor' : 'Setup Required')}</span>
            </li>
-           <li className="listItem" style={{ padding: '0.5rem 1rem', color: settings?.registration_enabled ? '#22c55e' : '#888' }}>
-             {settings?.registration_enabled ? '✓' : '✗'} {lang === 'tr' ? 'Kayıt (Registration) Sistemi' : 'Registration System'} <span style={{ float: 'right', fontSize: '0.8rem' }}>{settings?.registration_enabled ? (lang === 'tr' ? 'Aktif' : 'Active') : (lang === 'tr' ? 'Kapalı' : 'Disabled')}</span>
+           <li className={`flex items-center justify-between p-3 border rounded-sm font-label-bold text-sm uppercase tracking-widest ${settings?.registration_enabled ? 'border-success/30 bg-success/5 text-success' : 'border-outline text-on-surface-variant'}`}>
+             <span className="flex items-center gap-2">{settings?.registration_enabled ? '✓' : '✗'} {lang === 'tr' ? 'Kayıt (Registration) Sistemi' : 'Registration System'}</span>
+             <span>{settings?.registration_enabled ? (lang === 'tr' ? 'Aktif' : 'Active') : (lang === 'tr' ? 'Kapalı' : 'Disabled')}</span>
            </li>
-           <li className="listItem" style={{ padding: '0.5rem 1rem', color: settings?.auto_check_enabled ? '#22c55e' : '#888' }}>
-             {settings?.auto_check_enabled ? '✓' : '✗'} {lang === 'tr' ? 'Otomatik Ayrılık Kontrolü' : 'Guild Leave Auto-Check'} <span style={{ float: 'right', fontSize: '0.8rem' }}>{settings?.auto_check_enabled ? (lang === 'tr' ? 'Aktif' : 'Active') : (lang === 'tr' ? 'Kapalı' : 'Disabled')}</span>
+           <li className={`flex items-center justify-between p-3 border rounded-sm font-label-bold text-sm uppercase tracking-widest ${settings?.auto_check_enabled ? 'border-success/30 bg-success/5 text-success' : 'border-outline text-on-surface-variant'}`}>
+             <span className="flex items-center gap-2">{settings?.auto_check_enabled ? '✓' : '✗'} {lang === 'tr' ? 'Otomatik Ayrılık Kontrolü' : 'Guild Leave Auto-Check'}</span>
+             <span>{settings?.auto_check_enabled ? (lang === 'tr' ? 'Aktif' : 'Active') : (lang === 'tr' ? 'Kapalı' : 'Disabled')}</span>
            </li>
-           <li className="listItem" style={{ padding: '0.5rem 1rem', color: settings?.killboard_channel_id ? '#22c55e' : '#888' }}>
-             {settings?.killboard_channel_id ? '✓' : '✗'} {lang === 'tr' ? 'KillBoard Bildirimleri' : 'KillBoard Notifications'} <span style={{ float: 'right', fontSize: '0.8rem' }}>{settings?.killboard_channel_id ? (lang === 'tr' ? 'Aktif' : 'Active') : (lang === 'tr' ? 'Kapalı' : 'Disabled')}</span>
+           <li className={`flex items-center justify-between p-3 border rounded-sm font-label-bold text-sm uppercase tracking-widest ${settings?.killboard_channel_id ? 'border-success/30 bg-success/5 text-success' : 'border-outline text-on-surface-variant'}`}>
+             <span className="flex items-center gap-2">{settings?.killboard_channel_id ? '✓' : '✗'} {lang === 'tr' ? 'KillBoard Raporları' : 'KillBoard Reports'}</span>
+             <span>{settings?.killboard_channel_id ? (lang === 'tr' ? 'Aktif' : 'Active') : (lang === 'tr' ? 'Kapalı' : 'Disabled')}</span>
            </li>
         </ul>
       </div>

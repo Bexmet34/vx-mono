@@ -17,15 +17,15 @@ export default function GeneralTab({
   };
 
   return (
-    <div className="bentoGrid">
-      <div className="bentoBox span12">
-        <h2 className="bentoTitle"><Layout /> {t.dGeneral}</h2>
+    <div className="grid grid-cols-1 gap-6 animate-slide-up">
+      <div className="glass-panel p-8 relative overflow-hidden border border-outline-variant hover:border-primary-container/50 transition-colors">
+        <h2 className="font-headline-lg text-2xl text-on-surface mb-6 flex items-center gap-3 uppercase tracking-tight"><Layout className="text-primary-container" /> {t.dGeneral}</h2>
         
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
-          <div className="inputGroup">
-            <label className="label">{t.dLangLabel}</label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">{t.dLangLabel}</label>
             <select
-              className="select"
+              className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
               value={settings.language || "tr"}
               onChange={(e) => setSettings({ ...settings, language: e.target.value })}
             >
@@ -37,22 +37,22 @@ export default function GeneralTab({
       </div>
 
       {/* Search & Select Guild - Moved from Killboard */}
-      <div className="bentoBox span12">
-        <h2 className="bentoTitle"><Sword /> Albion Guild Configuration</h2>
-        <p className="hint" style={{ marginBottom: '1.5rem' }}>Search and link your Albion Online Guild to be used globally across all features.</p>
+      <div className="glass-panel p-8 relative overflow-hidden border border-outline-variant hover:border-primary-container/50 transition-colors">
+        <h2 className="font-headline-lg text-2xl text-on-surface mb-2 flex items-center gap-3 uppercase tracking-tight"><Sword className="text-primary-container" /> Albion Guild Configuration</h2>
+        <p className="font-body-md text-on-surface-variant mb-6">Search and link your Albion Online Guild to be used globally across all features.</p>
 
         {settings.albion_guild_id && guildDetail ? (
-          <div style={{ background: 'rgba(252, 163, 17, 0.1)', border: '1px solid var(--accent-color)', borderRadius: '12px', padding: '1.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div className="bg-primary-container/5 border border-primary-container/50 rounded-sm p-6 mb-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
              <div>
-               <div style={{ fontSize: '0.85rem', color: 'var(--accent-color)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.25rem' }}>Active Guild</div>
-               <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff' }}>
+               <div className="text-xs font-label-bold text-primary-container uppercase tracking-widest mb-1">Active Guild</div>
+               <div className="text-2xl font-headline-lg text-on-surface">
                  {guildDetail.AllianceTag ? `[${guildDetail.AllianceTag}] ` : ''}{guildDetail.Name}
                </div>
-               <div style={{ fontSize: '0.85rem', color: '#888', marginTop: '0.25rem' }}>
-                 Leader: <span style={{color: '#fff'}}>{guildDetail.FounderName || 'Unknown'}</span> &bull; Members: <span style={{color: '#fff'}}>{guildDetail.MemberCount || 0}</span>
+               <div className="text-sm font-body-md text-on-surface-variant mt-1">
+                 Leader: <span className="text-on-surface">{guildDetail.FounderName || 'Unknown'}</span> &bull; Members: <span className="text-on-surface">{guildDetail.MemberCount || 0}</span>
                </div>
              </div>
-             <button className="dockItem" style={{ color: '#ef4444', padding: '0.5rem 1rem' }} onClick={() => {
+             <button className="px-6 py-2 bg-error/10 text-error border border-error/50 hover:bg-error hover:text-on-error rounded-sm font-label-bold uppercase tracking-widest transition-colors" onClick={() => {
                 setSettings({ ...settings, albion_guild_id: "", albion_guild_name: "" });
                 setGuildDetail(null);
              }}>
@@ -61,29 +61,27 @@ export default function GeneralTab({
           </div>
         ) : (
           <div>
-            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+            <div className="flex gap-2 mb-4">
               <input 
                 type="text" 
-                className="input" 
+                className="flex-1 bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md" 
                 placeholder="Enter Albion Guild Name..."
                 value={guildSearchQuery}
                 onChange={(e) => setGuildSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && searchGuilds()}
               />
-              <button className="dockItem" style={{ background: '#fff', color: '#000', borderRadius: '8px' }} onClick={searchGuilds} disabled={searchingGuild || guildSearchQuery.length < 3}>
-                {searchingGuild ? <Loader2 size={18} className="spin" /> : <Search size={18} />}
+              <button className="px-6 py-3 bg-surface-container-highest border border-outline-variant text-on-surface hover:text-primary-container hover:border-primary-container rounded-sm transition-colors disabled:opacity-50" onClick={searchGuilds} disabled={searchingGuild || guildSearchQuery.length < 3}>
+                {searchingGuild ? <Loader2 size={20} className="animate-spin" /> : <Search size={20} />}
               </button>
             </div>
 
             {guildSearchResults.length > 0 && (
-              <div style={{ background: '#000', borderRadius: '12px', padding: '0.5rem', maxHeight: '300px', overflowY: 'auto', border: '1px solid rgba(255,255,255,0.1)' }}>
+              <div className="bg-surface-container border border-outline-variant rounded-sm p-2 max-h-[300px] overflow-y-auto custom-scrollbar">
                 {guildSearchResults.map(g => (
-                  <div key={g.Id} className="listItem" style={{ cursor: 'pointer', marginBottom: '0.25rem' }} onClick={() => handleSelectGuild(g)}>
-                    <div>
-                      <div style={{ fontWeight: 600, color: '#fff' }}>{g.Name}</div>
-                      <div style={{ fontSize: '0.8rem', color: '#888' }}>
-                        Kill Fame: {g.KillFame ? g.KillFame.toLocaleString() : 0} &bull; Death Fame: {g.DeathFame ? g.DeathFame.toLocaleString() : 0}
-                      </div>
+                  <div key={g.Id} className="flex flex-col p-3 hover:bg-white/5 cursor-pointer border-b border-outline-variant/30 last:border-0 transition-colors" onClick={() => handleSelectGuild(g)}>
+                    <div className="font-label-bold text-on-surface">{g.Name}</div>
+                    <div className="text-xs font-body-md text-on-surface-variant mt-1">
+                      Kill Fame: {g.KillFame ? g.KillFame.toLocaleString() : 0} &bull; Death Fame: {g.DeathFame ? g.DeathFame.toLocaleString() : 0}
                     </div>
                   </div>
                 ))}

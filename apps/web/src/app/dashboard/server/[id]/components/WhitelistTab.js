@@ -30,27 +30,27 @@ export default function WhitelistTab({ t, settings, setSettings, whitelistAddTab
   };
 
   return (
-    <div className="bentoGrid">
-      <div className="bentoBox span7">
-        <h2 className="bentoTitle"><Users /> Active Whitelist</h2>
-        <p className="hint" style={{ marginBottom: '1.5rem' }}>Users or roles listed here can use restricted commands like /createparty.</p>
+    <div className="grid grid-cols-1 md:grid-cols-12 gap-6 animate-slide-up">
+      <div className="glass-panel p-8 relative overflow-hidden border border-outline-variant hover:border-primary-container/50 transition-colors md:col-span-7">
+        <h2 className="font-headline-lg text-2xl text-on-surface mb-2 flex items-center gap-3 uppercase tracking-tight"><Users className="text-primary-container" /> Active Whitelist</h2>
+        <p className="font-body-md text-on-surface-variant mb-6">Users or roles listed here can use restricted commands like /createparty.</p>
 
         {safeWhitelist.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '3rem 1rem', background: 'rgba(0,0,0,0.4)', borderRadius: '12px', color: '#666' }}>
+          <div className="text-center p-12 bg-surface-container-highest border border-outline-variant rounded-sm text-on-surface-variant font-body-md">
             No whitelist entries. Everyone can use commands.
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '400px', overflowY: 'auto' }}>
+          <div className="flex flex-col gap-2 max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
             {safeWhitelist.map(id => {
               const info = getEntityInfo(id);
               return (
-                <div key={id} className="listItem">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div className="listItemIcon" style={{ width: '12px', height: '12px', background: info.color }}></div>
-                    <span style={{ fontWeight: 600, color: '#fff' }}>{info.name}</span>
+                <div key={id} className="flex justify-between items-center p-4 bg-surface-container border border-outline-variant rounded-sm hover:border-primary-container/50 transition-colors group">
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 rounded-full" style={{ background: info.color }}></div>
+                    <span className="font-label-bold text-on-surface">{info.name}</span>
                   </div>
-                  <button className="btnIcon" onClick={() => removeWhitelistId(id)}>
-                    <Trash2 size={16} />
+                  <button className="p-2 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-sm transition-colors opacity-50 group-hover:opacity-100" onClick={() => removeWhitelistId(id)}>
+                    <Trash2 size={18} />
                   </button>
                 </div>
               );
@@ -59,45 +59,44 @@ export default function WhitelistTab({ t, settings, setSettings, whitelistAddTab
         )}
       </div>
 
-      <div className="bentoBox span5">
-        <h3 className="bentoTitle" style={{ fontSize: '1.1rem' }}>Add New Entry</h3>
-        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
-          <button className={`dockItem ${whitelistAddTab === 'roles' ? 'active' : ''}`} style={{ flex: 1, justifyContent: 'center' }} onClick={() => setWhitelistAddTab('roles')}>Roles</button>
-          <button className={`dockItem ${whitelistAddTab === 'users' ? 'active' : ''}`} style={{ flex: 1, justifyContent: 'center' }} onClick={() => setWhitelistAddTab('users')}>Users</button>
+      <div className="glass-panel p-8 relative overflow-hidden border border-outline-variant hover:border-primary-container/50 transition-colors md:col-span-5">
+        <h3 className="font-headline-md text-xl text-on-surface mb-6 uppercase tracking-tight">Add New Entry</h3>
+        <div className="flex gap-2 mb-4 bg-surface-container-highest p-1 rounded-sm border border-outline-variant">
+          <button className={`flex-1 py-2 rounded-sm font-label-bold uppercase tracking-widest text-sm transition-colors ${whitelistAddTab === 'roles' ? 'bg-primary-container text-on-primary tactical-glow' : 'text-on-surface-variant hover:text-on-surface'}`} onClick={() => setWhitelistAddTab('roles')}>Roles</button>
+          <button className={`flex-1 py-2 rounded-sm font-label-bold uppercase tracking-widest text-sm transition-colors ${whitelistAddTab === 'users' ? 'bg-primary-container text-on-primary tactical-glow' : 'text-on-surface-variant hover:text-on-surface'}`} onClick={() => setWhitelistAddTab('users')}>Users</button>
         </div>
 
         <input
           type="text"
-          className="input"
+          className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md mb-4"
           placeholder="Search..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          style={{ marginBottom: '1rem' }}
         />
 
-        <div style={{ background: '#000', borderRadius: '12px', padding: '0.5rem', maxHeight: '250px', overflowY: 'auto' }}>
+        <div className="bg-surface-container border border-outline-variant rounded-sm p-2 max-h-[350px] overflow-y-auto custom-scrollbar">
           {whitelistAddTab === 'roles' ? (
             filteredRoles.slice(0, 50).map(role => (
-              <div key={role.id} className="listItem" style={{ marginBottom: '0.25rem', padding: '0.5rem 0.75rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: role.color ? `#${role.color.toString(16).padStart(6, '0')}` : '#fff' }}></div>
-                  <span style={{ color: '#fff', fontSize: '0.9rem' }}>{role.name}</span>
+              <div key={role.id} className="flex justify-between items-center p-3 mb-1 hover:bg-white/5 rounded-sm transition-colors group">
+                <div className="flex items-center gap-3">
+                  <div className="w-2.5 h-2.5 rounded-full" style={{ background: role.color ? `#${role.color.toString(16).padStart(6, '0')}` : '#fff' }}></div>
+                  <span className="font-label-bold text-on-surface text-sm">{role.name}</span>
                 </div>
-                <button className="dockItem" style={{ padding: '0.4rem', borderRadius: '6px' }} onClick={() => handleAdd(role.id)}>
+                <button className="p-1.5 text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 rounded-sm transition-colors opacity-0 group-hover:opacity-100" onClick={() => handleAdd(role.id)}>
                   <Plus size={16} />
                 </button>
               </div>
             ))
           ) : (
             filteredMembers.slice(0, 50).map(member => (
-              <div key={member.id} className="listItem" style={{ marginBottom: '0.25rem', padding: '0.5rem 0.75rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                   <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#333' }}>
-                     {member.avatar && <img src={`https://cdn.discordapp.com/avatars/${member.id}/${member.avatar}.png`} style={{ width: '100%', height: '100%', borderRadius: '50%' }} />}
+              <div key={member.id} className="flex justify-between items-center p-3 mb-1 hover:bg-white/5 rounded-sm transition-colors group">
+                <div className="flex items-center gap-3">
+                   <div className="w-6 h-6 rounded-full bg-surface-container-highest overflow-hidden">
+                     {member.avatar && <img src={`https://cdn.discordapp.com/avatars/${member.id}/${member.avatar}.png`} className="w-full h-full object-cover" />}
                    </div>
-                   <span style={{ color: '#fff', fontSize: '0.9rem' }}>{member.username}</span>
+                   <span className="font-label-bold text-on-surface text-sm">{member.username}</span>
                 </div>
-                <button className="dockItem" style={{ padding: '0.4rem', borderRadius: '6px' }} onClick={() => handleAdd(member.id)}>
+                <button className="p-1.5 text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 rounded-sm transition-colors opacity-0 group-hover:opacity-100" onClick={() => handleAdd(member.id)}>
                   <Plus size={16} />
                 </button>
               </div>

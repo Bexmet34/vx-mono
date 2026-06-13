@@ -49,28 +49,28 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
   };
 
   return (
-    <div className="bentoGrid">
-      <div className="bentoBox span4" style={{ padding: 0 }}>
-        <div style={{ padding: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h2 className="bentoTitle" style={{ margin: 0 }}><Copy /> {lang === 'en' ? 'Templates' : 'Şablonlar'}</h2>
-          <button className="dockItem" style={{ padding: '0.4rem', borderRadius: '8px' }} onClick={handleCreateTemplate}>
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-12 gap-6 animate-slide-up">
+      <div className="glass-panel relative overflow-hidden border border-outline-variant hover:border-primary-container/50 transition-colors md:col-span-4 flex flex-col">
+        <div className="p-6 border-b border-outline-variant/50 flex justify-between items-center bg-surface-container-highest/30">
+          <h2 className="font-headline-md text-xl text-on-surface flex items-center gap-2 uppercase tracking-tight m-0"><Copy className="text-primary-container" /> {lang === 'en' ? 'Templates' : 'Şablonlar'}</h2>
+          <button className="p-2 bg-surface-container border border-outline-variant hover:border-primary-container hover:text-primary-container rounded-sm transition-colors text-on-surface-variant" onClick={handleCreateTemplate}>
              <Plus size={18} />
           </button>
         </div>
         
-        <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
+        <div className="flex-1 overflow-y-auto custom-scrollbar min-h-[300px] max-h-[500px]">
           {(!settings.party_templates || settings.party_templates.length === 0) ? (
-            <div style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>{lang === 'en' ? 'No templates yet.' : 'Henüz şablon yok.'}</div>
+            <div className="p-8 text-center text-on-surface-variant font-body-md">{lang === 'en' ? 'No templates yet.' : 'Henüz şablon yok.'}</div>
           ) : (
             settings.party_templates.map(tpl => (
               <div 
                 key={tpl.id} 
-                className={`listItem ${selectedTemplateId === tpl.id ? 'active' : ''}`}
-                style={{ margin: 0, borderRadius: 0, border: 'none', borderBottom: '1px solid rgba(255,255,255,0.05)', cursor: 'pointer', background: selectedTemplateId === tpl.id ? 'rgba(252,163,17,0.1)' : 'transparent' }}
+                className={`flex justify-between items-center p-4 border-b border-outline-variant/30 cursor-pointer transition-colors group ${selectedTemplateId === tpl.id ? 'bg-primary-container/10 border-l-2 border-l-primary-container' : 'hover:bg-white/5 border-l-2 border-l-transparent'}`}
                 onClick={() => setSelectedTemplateId(tpl.id)}
               >
-                <div style={{ fontWeight: 600, color: selectedTemplateId === tpl.id ? 'var(--accent-color)' : '#fff' }}>{tpl.name}</div>
-                <button className="btnIcon" onClick={(e) => { e.stopPropagation(); handleDeleteTemplate(tpl.id); }}>
+                <div className={`font-label-bold ${selectedTemplateId === tpl.id ? 'text-primary-container' : 'text-on-surface'}`}>{tpl.name}</div>
+                <button className="p-1.5 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-sm transition-colors opacity-0 group-hover:opacity-100" onClick={(e) => { e.stopPropagation(); handleDeleteTemplate(tpl.id); }}>
                   <Trash2 size={16} />
                 </button>
               </div>
@@ -79,57 +79,58 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
         </div>
       </div>
 
-      <div className="bentoBox span8">
+      <div className="glass-panel p-8 relative overflow-hidden border border-outline-variant hover:border-primary-container/50 transition-colors md:col-span-8">
         {!selectedTemplate ? (
-          <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666' }}>
+          <div className="h-full min-h-[400px] flex items-center justify-center text-on-surface-variant font-body-md bg-surface-container-lowest/50 border border-dashed border-outline-variant/50 rounded-sm">
             {lang === 'en' ? 'Select or create a template to edit.' : 'Düzenlemek için bir şablon seçin veya oluşturun.'}
           </div>
         ) : (
-          <div>
-            <h3 className="bentoTitle" style={{ fontSize: '1.25rem' }}>{lang === 'en' ? 'Edit Template' : 'Şablonu Düzenle'}</h3>
-            <div className="inputGroup">
-              <label className="label">{lang === 'en' ? 'Template Name' : 'Şablon Adı'}</label>
+          <div className="animate-slide-up">
+            <h3 className="font-headline-lg text-2xl text-on-surface mb-8 pb-4 border-b border-outline-variant/50 uppercase tracking-tight">{lang === 'en' ? 'Edit Template' : 'Şablonu Düzenle'}</h3>
+            
+            <div className="mb-6">
+              <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">{lang === 'en' ? 'Template Name' : 'Şablon Adı'}</label>
               <input 
                 type="text" 
-                className="input" 
+                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md" 
                 value={selectedTemplate.name || ""} 
                 onChange={(e) => handleUpdateTemplate({ name: e.target.value })} 
               />
             </div>
 
-            <div className="inputGroup">
-              <label className="label">{lang === 'en' ? 'Description' : 'Açıklama'}</label>
+            <div className="mb-6">
+              <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">{lang === 'en' ? 'Description' : 'Açıklama'}</label>
               <textarea 
-                className="textarea" 
+                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md resize-y" 
                 rows={2}
                 value={selectedTemplate.description || ""} 
                 onChange={(e) => handleUpdateTemplate({ description: e.target.value })} 
                 placeholder={lang === 'en' ? 'Optional description for this party...' : 'Bu parti için isteğe bağlı açıklama...'}
-                style={{ resize: 'vertical' }}
               />
             </div>
             
-            <div className="inputGroup">
-              <label className="label">{lang === 'en' ? 'Required Roles (one per line)' : 'Gerekli Roller (Her satıra bir tane)'}</label>
-              <textarea 
-                className="textarea" 
-                rows={5}
-                value={localReq} 
-                onChange={handleReqChange} 
-                style={{ resize: 'vertical' }}
-              />
-              <p className="hint">{lang === 'en' ? 'E.g. Tank\nHealer\nDPS' : 'Örn: Tank\nHealer\nDPS'}</p>
-            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="mb-6">
+                <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">{lang === 'en' ? 'Required Roles' : 'Gerekli Roller'}</label>
+                <textarea 
+                  className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md resize-y" 
+                  rows={5}
+                  value={localReq} 
+                  onChange={handleReqChange} 
+                />
+                <p className="text-xs font-body-md text-on-surface-variant mt-2">{lang === 'en' ? 'One per line. E.g. Tank\nHealer\nDPS' : 'Her satıra bir tane. Örn: Tank\nHealer\nDPS'}</p>
+              </div>
 
-            <div className="inputGroup">
-              <label className="label">{lang === 'en' ? 'Optional Roles (one per line)' : 'İsteğe Bağlı Roller (Her satıra bir tane)'}</label>
-              <textarea 
-                className="textarea" 
-                rows={3}
-                value={localOpt} 
-                onChange={handleOptChange} 
-                style={{ resize: 'vertical' }}
-              />
+              <div className="mb-6">
+                <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">{lang === 'en' ? 'Optional Roles' : 'İsteğe Bağlı Roller'}</label>
+                <textarea 
+                  className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md resize-y" 
+                  rows={5}
+                  value={localOpt} 
+                  onChange={handleOptChange} 
+                />
+                <p className="text-xs font-body-md text-on-surface-variant mt-2">{lang === 'en' ? 'One per line.' : 'Her satıra bir tane.'}</p>
+              </div>
             </div>
           </div>
         )}

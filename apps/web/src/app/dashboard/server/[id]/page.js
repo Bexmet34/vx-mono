@@ -10,7 +10,6 @@ import { useToast, ToastContainer } from "@/components/Toast";
 import Cropper from "react-easy-crop";
 import getCroppedImg from "@/utils/cropImage";
 import { supabase } from "@/utils/supabase";
-import "./server-dashboard.css";
 
 // Modular Components (These will be refactored to use new Bento grid classes)
 import OverviewTab from "./components/OverviewTab";
@@ -352,49 +351,49 @@ export default function ServerSettings() {
   );
 
   return (
-    <div className="appWrapper" suppressHydrationWarning>
+    <div className="min-h-screen flex flex-col pt-24 bg-background relative" suppressHydrationWarning>
       <ToastContainer toasts={toasts} />
       
       {/* Floating Dock Navigation */}
-      <div className="topDockWrapper">
-        <nav className="topDock">
-          <Link href="/dashboard" className="dockItem" style={{marginRight: '1rem'}}>
+      <div className="sticky top-24 z-50 flex justify-center px-4 py-4 pointer-events-none">
+        <nav className="flex items-center gap-2 bg-surface-container-high/80 backdrop-blur-xl border border-outline-variant p-2 rounded-full pointer-events-auto shadow-2xl overflow-x-auto max-w-full custom-scrollbar">
+          <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2 rounded-full text-on-surface-variant font-label-bold text-sm transition-all hover:text-on-surface hover:bg-white/5 mr-4 border border-transparent">
              <ArrowLeft size={18} />
           </Link>
-          <button className={`dockItem ${activeTab === 'overview' ? 'active' : ''}`} onClick={() => setActiveTab('overview')}>
+          <button className={`flex items-center gap-2 px-4 py-2 rounded-full font-label-bold text-sm transition-all whitespace-nowrap ${activeTab === 'overview' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('overview')}>
             <Home size={18} /> Overview
           </button>
-          <button className={`dockItem ${activeTab === 'general' ? 'active' : ''}`} onClick={() => setActiveTab('general')}>
+          <button className={`flex items-center gap-2 px-4 py-2 rounded-full font-label-bold text-sm transition-all whitespace-nowrap ${activeTab === 'general' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('general')}>
             <Layout size={18} /> General
           </button>
-          <button className={`dockItem ${activeTab === 'embed' ? 'active' : ''}`} onClick={() => setActiveTab('embed')}>
+          <button className={`flex items-center gap-2 px-4 py-2 rounded-full font-label-bold text-sm transition-all whitespace-nowrap ${activeTab === 'embed' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('embed')}>
             <ImageIcon size={18} /> Branding
           </button>
-          <button className={`dockItem ${activeTab === 'whitelist' ? 'active' : ''}`} onClick={() => setActiveTab('whitelist')}>
+          <button className={`flex items-center gap-2 px-4 py-2 rounded-full font-label-bold text-sm transition-all whitespace-nowrap ${activeTab === 'whitelist' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('whitelist')}>
             <Users size={18} /> Access
           </button>
-          <button className={`dockItem ${activeTab === 'templates' ? 'active' : ''}`} onClick={() => setActiveTab('templates')}>
+          <button className={`flex items-center gap-2 px-4 py-2 rounded-full font-label-bold text-sm transition-all whitespace-nowrap ${activeTab === 'templates' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('templates')}>
             <Copy size={18} /> Templates
           </button>
-          <button className={`dockItem ${activeTab === 'killboard' ? 'active' : ''}`} onClick={() => setActiveTab('killboard')}>
-            <Lock size={16} /> KillBoard <span className="proBadge" style={{ background: 'var(--accent-color)', color: '#000' }}>BETA</span>
+          <button className={`flex items-center gap-2 px-4 py-2 rounded-full font-label-bold text-sm transition-all whitespace-nowrap ${activeTab === 'killboard' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('killboard')}>
+            <Lock size={16} /> KillBoard <span className="bg-primary-container text-on-primary text-[10px] px-2 py-0.5 rounded font-black ml-1 uppercase tracking-widest">BETA</span>
           </button>
-          <button className={`dockItem ${activeTab === 'registration' ? 'active' : ''}`} onClick={() => setActiveTab('registration')}>
-            <Users size={16} /> Reg <span className="proBadge" style={{ background: 'var(--accent-color)', color: '#000' }}>BETA</span>
+          <button className={`flex items-center gap-2 px-4 py-2 rounded-full font-label-bold text-sm transition-all whitespace-nowrap ${activeTab === 'registration' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('registration')}>
+            <Users size={16} /> Reg <span className="bg-primary-container text-on-primary text-[10px] px-2 py-0.5 rounded font-black ml-1 uppercase tracking-widest">BETA</span>
           </button>
         </nav>
       </div>
 
-      <main className="appMain">
-        <header className="heroHeader">
-          <div className="heroInfo">
-            <div className="heroAvatar">
+      <main className="flex-1 w-full max-w-[1200px] mx-auto px-4 md:px-8 py-10 pb-32 flex flex-col">
+        <header className="flex flex-col md:flex-row items-center md:items-end justify-between mb-12 pb-8 border-b border-outline-variant/50">
+          <div className="flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
+            <div className="w-24 h-24 rounded-2xl bg-surface border border-outline-variant flex items-center justify-center text-3xl font-headline-xl text-primary-container shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
               {guildDetail?.Name?.charAt(0) || guildId.charAt(0).toUpperCase()}
             </div>
-            <div className="heroText">
-              <h1>{guildDetail?.Name || 'Server Settings'}</h1>
-              <div className="heroBadge">
-                 <Shield size={16} /> Administrator Access
+            <div>
+              <h1 className="font-headline-xl text-3xl md:text-5xl text-on-surface mb-2 uppercase tracking-tight">{guildDetail?.Name || 'Server Settings'}</h1>
+              <div className="flex items-center justify-center md:justify-start gap-2 text-on-surface-variant font-label-bold uppercase tracking-widest text-sm">
+                 <Shield size={16} className="text-primary-container" /> Administrator Access
               </div>
             </div>
           </div>
@@ -433,34 +432,35 @@ export default function ServerSettings() {
 
       {/* Unsaved Changes Banner */}
       {hasChanges && (
-        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'rgba(10,10,15,0.95)', borderTop: '2px solid #fca311', padding: '1.5rem', zIndex: 1000, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '3rem', backdropFilter: 'blur(20px)', animation: 'slideUp 0.3s ease-out' }}>
-          <div style={{ color: '#fff', fontWeight: 700, fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-             <AlertTriangle size={24} color="#fca311" />
+        <div className="fixed bottom-0 left-0 right-0 bg-surface-container-highest/95 border-t border-primary-container p-6 z-[1000] flex justify-center items-center gap-12 backdrop-blur-xl animate-slide-up shadow-[0_-10px_40px_rgba(255,215,0,0.1)]">
+          <div className="text-on-surface font-label-bold text-lg flex items-center gap-3 uppercase tracking-widest">
+             <AlertTriangle size={24} className="text-primary-container" />
              {lang === 'en' ? 'You have unsaved changes!' : 'Kaydedilmemiş değişiklikleriniz var!'}
           </div>
-          <div style={{ display: 'flex', gap: '1rem' }}>
-            <button onClick={() => setSettings(initialSettings)} style={{ padding: '0.6rem 1.5rem', background: 'transparent', border: '1px solid #666', color: '#fff', borderRadius: '12px', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem', transition: 'all 0.2s' }}>
+          <div className="flex gap-4">
+            <button onClick={() => setSettings(initialSettings)} className="px-8 py-3 bg-transparent border border-outline-variant text-on-surface-variant hover:text-on-surface hover:border-outline rounded-sm font-label-bold uppercase tracking-widest transition-all">
               {lang === 'en' ? 'Discard' : 'İptal Et'}
             </button>
-            <button onClick={handleSave} disabled={saving} style={{ padding: '0.6rem 1.5rem', background: '#fca311', border: 'none', color: '#000', borderRadius: '12px', cursor: 'pointer', fontWeight: 800, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem', transition: 'all 0.2s', boxShadow: '0 4px 15px rgba(252, 163, 17, 0.3)' }}>
-              {saving ? <Loader2 size={18} className="spin" /> : <Save size={18} />}
+            <button onClick={handleSave} disabled={saving} className="px-8 py-3 bg-primary-container text-on-primary border border-primary-container rounded-sm font-label-bold uppercase tracking-widest flex items-center gap-2 transition-all hover:brightness-110 active:scale-95 tactical-glow disabled:opacity-50 disabled:cursor-not-allowed">
+              {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
               {lang === 'en' ? 'Save Changes' : 'Değişiklikleri Kaydet'}
             </button>
           </div>
-          <style>{`@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }`}</style>
+          <style>{`@keyframes slide-up { from { transform: translateY(100%); } to { transform: translateY(0); } } .animate-slide-up { animation: slide-up 0.3s ease-out forwards; }`}</style>
         </div>
       )}
 
       {imageToCrop && (
-        <div style={{position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem'}}>
-           <div className="bentoBox span6" style={{maxWidth: '600px', width: '100%', padding: '2rem'}}>
-              <h2 className="bentoTitle"><Crop size={22}/> Crop Logo</h2>
-              <div style={{height: '400px', position: 'relative', background: '#000', borderRadius: '12px', overflow: 'hidden', marginBottom: '2rem'}}>
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-8">
+           <div className="glass-panel max-w-[600px] w-full p-8 border border-primary-container relative">
+              <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-right from-transparent via-primary-container to-transparent opacity-50"></div>
+              <h2 className="font-headline-lg text-2xl text-on-surface mb-6 flex items-center gap-3 uppercase tracking-tight"><Crop size={24} className="text-primary-container"/> Crop Logo</h2>
+              <div className="h-[400px] relative bg-black rounded-sm overflow-hidden mb-8 border border-outline-variant">
                  <Cropper image={imageToCrop} crop={crop} zoom={zoom} aspect={1} onCropChange={setCrop} onCropComplete={onCropComplete} onZoomChange={setZoom} />
               </div>
-              <div style={{display: 'flex', justifyContent: 'flex-end', gap: '1rem'}}>
-                 <button className="dockItem" onClick={() => setImageToCrop(null)} style={{width: 'auto', background: 'rgba(255,255,255,0.05)'}}>Cancel</button>
-                 <button className="floatingSave" style={{position: 'relative', bottom: 'auto', right: 'auto'}} onClick={uploadCroppedImage} disabled={uploadingThumb}>Apply & Upload</button>
+              <div className="flex justify-end gap-4">
+                 <button className="px-6 py-3 bg-transparent border border-outline-variant text-on-surface-variant hover:text-on-surface hover:border-outline transition-colors font-label-bold uppercase tracking-widest rounded-sm" onClick={() => setImageToCrop(null)}>Cancel</button>
+                 <button className="px-6 py-3 bg-primary-container text-on-primary font-label-bold uppercase tracking-widest tactical-glow rounded-sm transition-all hover:brightness-110 disabled:opacity-50" onClick={uploadCroppedImage} disabled={uploadingThumb}>Apply & Upload</button>
               </div>
            </div>
         </div>
