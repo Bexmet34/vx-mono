@@ -36,7 +36,7 @@ export default function KillBoardTab({
       )}
 
       {/* KillBoard Settings & Triggers */}
-      <div className="bentoBox span6">
+      <div className="bentoBox span6" style={{ opacity: settings.albion_guild_id ? 1 : 0.4, pointerEvents: settings.albion_guild_id ? 'auto' : 'none', transition: 'opacity 0.3s' }}>
         <h2 className="bentoTitle"><Send /> Discord Integration</h2>
         <p className="hint" style={{ marginBottom: '1.5rem' }}>Where and when should the KillBoard report be posted?</p>
 
