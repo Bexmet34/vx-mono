@@ -346,7 +346,6 @@ export default function ServerSettings() {
       </div>
       
       <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.5) 51%)', backgroundSize: '100% 4px', opacity: 0.2, pointerEvents: 'none' }}></div>
-      <style>{`@keyframes spin { 100% { transform: rotate(360deg); } } @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }`}</style>
     </div>
   );
 
@@ -446,7 +445,6 @@ export default function ServerSettings() {
               {lang === 'en' ? 'Save Changes' : 'Değişiklikleri Kaydet'}
             </button>
           </div>
-          <style>{`@keyframes slide-up { from { transform: translateY(100%); } to { transform: translateY(0); } } .animate-slide-up { animation: slide-up 0.3s ease-out forwards; }`}</style>
         </div>
       )}
 
