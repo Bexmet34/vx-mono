@@ -399,7 +399,7 @@ export default function ServerSettings() {
         </header>
 
         {/* Tab Content Rendering with Bento Grids */}
-        {activeTab === 'overview' && <OverviewTab t={t} subscription={subscription} setActiveTab={setActiveTab} showToast={showToast} />}
+        {activeTab === 'overview' && <OverviewTab t={t} lang={lang} subscription={subscription} setActiveTab={setActiveTab} showToast={showToast} settings={settings} />}
         
         {activeTab === 'general' && (
           <GeneralTab t={t} settings={settings} setSettings={setSettings} discordChannels={discordChannels} handleSave={handleSave} saving={saving} guildSearchQuery={guildSearchQuery} setGuildSearchQuery={setGuildSearchQuery} searchGuilds={searchGuilds} searchingGuild={searchingGuild} guildSearchResults={guildSearchResults} setGuildSearchResults={setGuildSearchResults} guildDetail={guildDetail} setGuildDetail={setGuildDetail} />

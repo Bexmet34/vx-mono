@@ -5,7 +5,7 @@ import { formatDistanceToNow, isPast } from "date-fns";
 import { tr, enUS } from "date-fns/locale";
 import { useLanguage } from "@/context/LanguageContext";
 
-export default function OverviewTab({ subscription, setActiveTab }) {
+export default function OverviewTab({ subscription, setActiveTab, settings }) {
   const { lang, t } = useLanguage();
   const locale = lang === 'tr' ? tr : enUS;
 
@@ -48,7 +48,7 @@ export default function OverviewTab({ subscription, setActiveTab }) {
     <div className="bentoGrid">
       {/* Main Welcome Bento */}
       <div className="bentoBox span12" style={{ background: 'linear-gradient(135deg, rgba(252, 163, 17, 0.05) 0%, rgba(10, 10, 15, 0.8) 100%)', borderLeft: '4px solid var(--accent-color)' }}>
-        <h2 className="bentoTitle"><Star /> Overview</h2>
+        <h2 className="bentoTitle"><Star /> {lang === 'en' ? 'Overview' : 'Genel Bakış'}</h2>
         <p style={{ color: '#888', fontSize: '1.1rem', marginBottom: '2rem' }}>
           {lang === 'tr'
             ? 'Sunucu komuta merkezine hoş geldiniz. Entegrasyonları yapılandırın, şablonları yönetin ve performansı izleyin.'
@@ -87,13 +87,20 @@ export default function OverviewTab({ subscription, setActiveTab }) {
       {/* Quick Stats Bento */}
       <div className="bentoBox span6">
         <h3 className="bentoTitle" style={{ fontSize: '1.1rem' }}>
-          {lang === 'tr' ? 'Aktif Özellikler' : 'Active Features'}
+          {lang === 'tr' ? 'Sistem Durumu' : 'System Status'}
         </h3>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-           <li className="listItem" style={{ padding: '0.5rem 1rem' }}>✓ Party Creator</li>
-           <li className="listItem" style={{ padding: '0.5rem 1rem' }}>✓ Role Whitelists</li>
-           <li className="listItem" style={{ padding: '0.5rem 1rem', opacity: 0.5 }}>
-             - Auto Registration ({lang === 'tr' ? 'Kurulum gerekli' : 'Setup required'})
+           <li className="listItem" style={{ padding: '0.5rem 1rem', color: settings?.albion_guild_id ? '#22c55e' : '#888' }}>
+             {settings?.albion_guild_id ? '✓' : '✗'} {lang === 'tr' ? 'Albion Lonca Bağlantısı' : 'Albion Guild Link'} <span style={{ float: 'right', fontSize: '0.8rem' }}>{settings?.albion_guild_id ? (lang === 'tr' ? 'Bağlı' : 'Linked') : (lang === 'tr' ? 'Kurulum Bekliyor' : 'Setup Required')}</span>
+           </li>
+           <li className="listItem" style={{ padding: '0.5rem 1rem', color: settings?.registration_enabled ? '#22c55e' : '#888' }}>
+             {settings?.registration_enabled ? '✓' : '✗'} {lang === 'tr' ? 'Kayıt (Registration) Sistemi' : 'Registration System'} <span style={{ float: 'right', fontSize: '0.8rem' }}>{settings?.registration_enabled ? (lang === 'tr' ? 'Aktif' : 'Active') : (lang === 'tr' ? 'Kapalı' : 'Disabled')}</span>
+           </li>
+           <li className="listItem" style={{ padding: '0.5rem 1rem', color: settings?.auto_check_enabled ? '#22c55e' : '#888' }}>
+             {settings?.auto_check_enabled ? '✓' : '✗'} {lang === 'tr' ? 'Otomatik Ayrılık Kontrolü' : 'Guild Leave Auto-Check'} <span style={{ float: 'right', fontSize: '0.8rem' }}>{settings?.auto_check_enabled ? (lang === 'tr' ? 'Aktif' : 'Active') : (lang === 'tr' ? 'Kapalı' : 'Disabled')}</span>
+           </li>
+           <li className="listItem" style={{ padding: '0.5rem 1rem', color: settings?.killboard_channel_id ? '#22c55e' : '#888' }}>
+             {settings?.killboard_channel_id ? '✓' : '✗'} {lang === 'tr' ? 'KillBoard Bildirimleri' : 'KillBoard Notifications'} <span style={{ float: 'right', fontSize: '0.8rem' }}>{settings?.killboard_channel_id ? (lang === 'tr' ? 'Aktif' : 'Active') : (lang === 'tr' ? 'Kapalı' : 'Disabled')}</span>
            </li>
         </ul>
       </div>
