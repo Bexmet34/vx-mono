@@ -103,6 +103,8 @@ export default function ServerSettings() {
             auto_check_guild_tag: s.auto_check_guild_tag || "",
             auto_check_log_channel_id: s.auto_check_log_channel_id || "",
             registered_count: s.registered_count || 0,
+            is_syncing: s.is_syncing || false,
+            last_sync_result: s.last_sync_result || null,
           };
           setSettings(loadedSettings);
           setInitialSettings(loadedSettings);
