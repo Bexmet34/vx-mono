@@ -20,7 +20,6 @@ export default function KillBoardTab({
 
 
   return (
-  return (
     <div className="grid grid-cols-1 gap-6 animate-slide-up">
       {/* Search & Select Guild - Moved to General */}
       {!settings.albion_guild_id && (

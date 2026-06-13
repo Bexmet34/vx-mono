@@ -49,7 +49,6 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
   };
 
   return (
-  return (
     <div className="grid grid-cols-1 md:grid-cols-12 gap-6 animate-slide-up">
       <div className="glass-panel relative overflow-hidden border border-outline-variant hover:border-primary-container/50 transition-colors md:col-span-4 flex flex-col">
         <div className="p-6 border-b border-outline-variant/50 flex justify-between items-center bg-surface-container-highest/30">

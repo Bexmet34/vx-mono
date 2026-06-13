@@ -4,7 +4,6 @@ import { Image as ImageIcon, Upload, Link as LinkIcon, Trash } from "lucide-reac
 
 export default function VisualTab({ t, settings, setSettings, uploadingThumb, checkImage, handleFileSelect, thumbError, renderStatus }) {
   return (
-  return (
     <div className="grid grid-cols-1 gap-6 animate-slide-up">
       <div className="glass-panel p-8 relative overflow-hidden border border-outline-variant hover:border-primary-container/50 transition-colors">
         <h2 className="font-headline-lg text-2xl text-on-surface mb-8 flex items-center gap-3 uppercase tracking-tight"><ImageIcon className="text-primary-container" /> Branding & Visuals</h2>
