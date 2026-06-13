@@ -92,6 +92,13 @@ function startCronService(client) {
         console.log('[CronService] Nightly server cleanup running (02:00 UTC)...');
         await performServerCleanup(client, 'Otomatik Gece Taraması');
     }, { timezone: "UTC" });
+
+    // --- Daily Auto Guild Checks (12:00 UTC) ---
+    cron.schedule('0 12 * * *', async () => {
+        console.log('[CronService] Daily auto guild checks running (12:00 UTC)...');
+        const { runAutoCheck } = require('./autoCheckService');
+        await runAutoCheck(client);
+    }, { timezone: "UTC" });
 }
 
 /**

@@ -119,6 +119,17 @@ function initDb() {
                 PRIMARY KEY (guild_id, user_id)
             )`);
 
+            // Guild Registrations
+            db.exec(`CREATE TABLE IF NOT EXISTS guild_registrations (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                guild_id TEXT,
+                user_id TEXT,
+                albion_ign TEXT,
+                albion_id TEXT,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(guild_id, user_id)
+            )`);
+
             // Migrations for existing tables (safe to run multiple times)
             const safeAlter = (sql) => {
                 try { db.exec(sql); } catch (e) { /* column already exists */ }
@@ -142,6 +153,14 @@ function initDb() {
             safeAlter("ALTER TABLE guild_configs ADD COLUMN registration_enabled INTEGER DEFAULT 0");
             safeAlter("ALTER TABLE guild_configs ADD COLUMN embed_thumbnail_url TEXT");
             safeAlter("ALTER TABLE user_votes ADD COLUMN expires_at INTEGER");
+
+            // Auto Check System
+            safeAlter("ALTER TABLE guild_configs ADD COLUMN auto_check_enabled INTEGER DEFAULT 0");
+            safeAlter("ALTER TABLE guild_configs ADD COLUMN auto_check_interval INTEGER DEFAULT 3");
+            safeAlter("ALTER TABLE guild_configs ADD COLUMN auto_check_custom_role_id TEXT");
+            safeAlter("ALTER TABLE guild_configs ADD COLUMN auto_check_guild_tag TEXT");
+            safeAlter("ALTER TABLE guild_configs ADD COLUMN auto_check_log_channel_id TEXT");
+            safeAlter("ALTER TABLE guild_configs ADD COLUMN last_auto_check_date TEXT");
 
             // Set default settings if not exists
             try {

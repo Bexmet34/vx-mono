@@ -276,6 +276,9 @@ async function handleRegisterModal(interaction) {
             if (age) {
                 embed.addFields({ name: '📅 Yaş', value: age, inline: true });
             }
+            if (playerData && playerData.Id) {
+                embed.addFields({ name: '🔑 Albion ID', value: playerData.Id, inline: true });
+            }
 
             if (guildConfig?.embed_thumbnail_url) {
                 embed.setThumbnail(guildConfig.embed_thumbnail_url);

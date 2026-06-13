@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { Settings, MessageSquare, Tag, Users, Send, Loader2 } from "lucide-react";
 
-export default function RegistrationTab({ t, lang, settings, setSettings, discordChannels, discordRoles, handleSave, saving, guildId }) {
+export default function RegistrationTab({ t, lang, settings, setSettings, discordChannels, discordRoles, handleSave, saving, guildId, registeredCount = 0 }) {
   const [sendingSetup, setSendingSetup] = useState(false);
+  const [syncing, setSyncing] = useState(false);
   const textChannels = (discordChannels || []).filter(c => c.type === 0);
   const categories = (discordChannels || []).filter(c => c.type === 4);
 
@@ -27,6 +28,22 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
       alert(err.message);
     } finally {
       setSendingSetup(false);
+    }
+  const handleSync = async () => {
+    if (!settings.albion_guild_id) {
+      alert(lang === 'en' ? "Please set your guild in General settings first!" : "Lütfen önce Genel ayarlardan guildinizi seçin!");
+      return;
+    }
+    setSyncing(true);
+    try {
+      const res = await fetch(`/api/register/sync/${guildId}`, { method: 'POST' });
+      const data = await res.json();
+      if (res.ok) alert(lang === 'en' ? "Sync process started in background." : "Senkronizasyon işlemi arka planda başlatıldı.");
+      else alert(data.error || "Failed to start sync.");
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setSyncing(false);
     }
   };
 
@@ -289,6 +306,137 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
             ? 'Save your settings first, then click this button to send the persistent message with the Register button.' 
             : 'Önce ayarları kaydedin, ardından butonu içeren sabit mesajı göndermek için buraya tıklayın.'}
         </p>
+
+        {/* Total Registered Count */}
+        <div style={{ marginTop: '2rem', padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', textAlign: 'center' }}>
+          <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#fff' }}>
+            {lang === 'en' ? `Total Registered Members: ${registeredCount}` : `Toplam Kayıtlı Üye: ${registeredCount}`}
+          </div>
+        </div>
+      </div>
+
+      {/* Auto Check System Section */}
+      <div className="bentoBox span12" style={{ animation: 'fadeSlideUp 0.3s ease-out' }}>
+        <h2 className="bentoTitle">
+          <Users size={24} style={{ color: 'var(--accent-color)' }} />
+          {lang === 'en' ? 'Guild Leave Auto-Check System' : 'Guild Ayrılık Kontrol Sistemi'}
+        </h2>
+        <p className="hint" style={{ marginBottom: '1.5rem' }}>
+          {lang === 'en' 
+            ? 'Automatically cross-checks registered users with your Albion guild roster. Removes roles if they leave.' 
+            : 'Kayıtlı kullanıcıları Albion guild listenizle otomatik karşılaştırır. Ayrılanların yetkilerini alır.'}
+        </p>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+          <div>
+            <div className="inputGroup">
+              <label className="label">
+                {lang === 'en' ? 'Enable Auto-Check' : 'Sistemi Aktif Et'}
+              </label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.5rem' }}>
+                <label className="switch">
+                  <input
+                    type="checkbox"
+                    checked={settings.auto_check_enabled || false}
+                    onChange={(e) => setSettings({ ...settings, auto_check_enabled: e.target.checked })}
+                  />
+                  <span className="slider"></span>
+                </label>
+                <span style={{ color: '#ccc', fontSize: '0.9rem' }}>
+                  {settings.auto_check_enabled 
+                    ? (lang === 'en' ? 'Enabled' : 'Aktif') 
+                    : (lang === 'en' ? 'Disabled' : 'Kapalı')}
+                </span>
+              </div>
+            </div>
+
+            <div className="inputGroup">
+              <label className="label">
+                {lang === 'en' ? 'Check Interval (Days, Min 3)' : 'Kontrol Aralığı (Gün, Min 3)'}
+              </label>
+              <input
+                type="number"
+                min="3"
+                className="input"
+                value={settings.auto_check_interval || 3}
+                onChange={(e) => {
+                  let val = parseInt(e.target.value);
+                  if (isNaN(val)) val = 3;
+                  if (val < 3) val = 3;
+                  setSettings({ ...settings, auto_check_interval: val });
+                }}
+              />
+            </div>
+
+            <div className="inputGroup">
+              <label className="label">
+                {lang === 'en' ? 'Guild Tag (Max 5 chars, will strip [TAG])' : 'Guild Tagi (Max 5 harf, isimden [TAG] silinecek)'}
+              </label>
+              <input
+                type="text"
+                maxLength="5"
+                className="input"
+                placeholder={lang === 'en' ? 'e.g. ABCDE' : 'Örn: TAG'}
+                value={settings.auto_check_guild_tag || ""}
+                onChange={(e) => setSettings({ ...settings, auto_check_guild_tag: e.target.value })}
+              />
+            </div>
+          </div>
+
+          <div>
+            <div className="inputGroup">
+              <label className="label">
+                {lang === 'en' ? 'Role for Leavers' : "Guild'den Çıkanlara Verilecek Rol"}
+              </label>
+              <select
+                className="select"
+                value={settings.auto_check_custom_role_id || ""}
+                onChange={(e) => setSettings({ ...settings, auto_check_custom_role_id: e.target.value })}
+              >
+                <option value="">{lang === 'en' ? 'Use Default Unregistered Role' : 'Varsayılan Kayıtsız Rolünü Kullan'}</option>
+                {(discordRoles || []).map(r => (
+                  <option key={r.id} value={r.id}>@{r.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="inputGroup">
+              <label className="label">
+                {lang === 'en' ? 'Report Log Channel' : 'Rapor/Log Kanalı'}
+              </label>
+              <select
+                className="select"
+                value={settings.auto_check_log_channel_id || ""}
+                onChange={(e) => setSettings({ ...settings, auto_check_log_channel_id: e.target.value })}
+              >
+                <option value="">{lang === 'en' ? 'Select Channel' : 'Kanal Seçin'}</option>
+                {textChannels.map(c => (
+                  <option key={c.id} value={c.id}>#{c.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="inputGroup" style={{ marginTop: '2rem' }}>
+              <label className="label" style={{ color: 'var(--accent-color)' }}>
+                {lang === 'en' ? 'Backward Compatibility Sync' : 'Geriye Dönük Senkronizasyon (Sync)'}
+              </label>
+              <p className="hint" style={{ marginBottom: '1rem', fontSize: '0.8rem' }}>
+                {lang === 'en' 
+                  ? 'Adds existing old members to the database safely. (Requires Guild to be set in General Settings)' 
+                  : 'Eski kayıtlı üyelerinizi sisteme güvenle dahil eder. (Genel ayarlardan guild seçilmiş olması zorunludur)'}
+              </p>
+              <button 
+                className="dockItem" 
+                style={{ width: '100%', justifyContent: 'center', background: settings.albion_guild_id ? '#3b82f6' : 'rgba(255,255,255,0.1)', color: '#fff' }} 
+                onClick={handleSync} 
+                disabled={syncing}
+              >
+                {syncing ? <Loader2 size={18} className="spin"/> : <Users size={18}/>} 
+                {lang === 'en' ? (settings.albion_guild_id ? 'Start Sync Process' : 'Set Guild in General Settings First') : (settings.albion_guild_id ? 'Senkronizasyon İşlemini Başlat' : 'Önce Genel Ayarlardan Guild Seçin')}
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

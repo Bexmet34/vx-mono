@@ -95,6 +95,28 @@ async function checkUpdates(client, initial = false) {
                     .eq('guild_id', config.guild_id);
             }
         }
+
+        // --- NEW: Check Registration Sync Manual Triggers ---
+        const { data: syncConfigs, error: syncError } = await supabase
+            .from('guild_settings')
+            .select('guild_id')
+            .eq('trigger_sync', true);
+
+        if (!syncError && syncConfigs) {
+            const { syncRegistrations } = require('./registrationSyncService');
+            for (const config of syncConfigs) {
+                console.log(`[DbListener] Manual Registration Sync trigger for guild: ${config.guild_id}`);
+                
+                // Reset trigger flag immediately
+                await supabase
+                    .from('guild_settings')
+                    .update({ trigger_sync: false })
+                    .eq('guild_id', config.guild_id);
+
+                // Run sync without awaiting to not block polling
+                syncRegistrations(client, config.guild_id).catch(console.error);
+            }
+        }
     } catch (err) {
         console.error('[DbListenerService] Polling Error:', err.message);
     }

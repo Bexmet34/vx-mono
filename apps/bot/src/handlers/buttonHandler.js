@@ -520,12 +520,14 @@ async function handleRegisterButtons(interaction) {
         let ign = '';
         let age = '';
         let guildName = '';
+        let albionId = '';
 
         // Extract from embed fields
         embed.fields.forEach(field => {
             if (field.name.includes('Gerçek İsim')) realName = field.value;
             if (field.name.includes('Yaş')) age = field.value;
             if (field.name.includes('Oyun İçi Nick')) ign = field.value;
+            if (field.name.includes('Albion ID')) albionId = field.value;
 
             // Extract Guild from the "Diğer" / "Others" field
             if (field.name.includes('Diğer') || field.name.includes('Others')) {
@@ -576,9 +578,13 @@ async function handleRegisterButtons(interaction) {
                 const targetMember = await interaction.guild.members.fetch(targetUserId);
 
                 // Format Nickname: [TURQ] Ign - RealName Age
-                let prefix = '[NAN] ';
-                if (guildName && guildName.length > 0) {
+                let prefix = '';
+                if (guildConfig?.auto_check_guild_tag) {
+                    prefix = `[${guildConfig.auto_check_guild_tag}] `;
+                } else if (guildName && guildName.length > 0) {
                     prefix = `[${guildName.substring(0, 4).toUpperCase()}] `;
+                } else {
+                    prefix = '[NAN] ';
                 }
 
                 // Fallback for IGN if not in field (old tickets)
@@ -648,6 +654,27 @@ async function handleRegisterButtons(interaction) {
                 }
 
                 await interaction.editReply({ content: `✅ <@${targetUserId}> adlı kullanıcının kaydı onaylandı!${nickStatus}${roleStatus}${unregRoleStatus}\n\nKanal 5 saniye içinde kapatılacak.` });
+
+                // Save to guild_registrations
+                if (albionId) {
+                    const db = require('../services/db');
+                    try {
+                        await db.run(
+                            `INSERT OR REPLACE INTO guild_registrations (guild_id, user_id, albion_ign, albion_id) VALUES (?, ?, ?, ?)`,
+                            [interaction.guildId, targetUserId, capIgn, albionId]
+                        );
+                        
+                        // Update registered count in Supabase
+                        const { getSupabaseGuildSettings, updateSupabaseGuildSettings } = require('@veyronix/database');
+                        const currentSettings = await getSupabaseGuildSettings(interaction.guildId);
+                        if (currentSettings) {
+                            const newCount = (currentSettings.registered_count || 0) + 1;
+                            await updateSupabaseGuildSettings(interaction.guildId, { registered_count: newCount });
+                        }
+                    } catch (dbErr) {
+                        console.error('Error saving registration to DB:', dbErr);
+                    }
+                }
 
                 // Log approval
                 const logChannelId = guildConfig?.registration_log_channel_id;

@@ -97,6 +97,12 @@ export default function ServerSettings() {
             registration_category_id: s.registration_category_id || "",
             registration_welcome_message: s.registration_welcome_message || "",
             registration_given_role_id: s.registration_given_role_id || "",
+            auto_check_enabled: s.auto_check_enabled || false,
+            auto_check_interval: s.auto_check_interval || 3,
+            auto_check_custom_role_id: s.auto_check_custom_role_id || "",
+            auto_check_guild_tag: s.auto_check_guild_tag || "",
+            auto_check_log_channel_id: s.auto_check_log_channel_id || "",
+            registered_count: s.registered_count || 0,
           };
           setSettings(loadedSettings);
           setInitialSettings(loadedSettings);
@@ -396,7 +402,7 @@ export default function ServerSettings() {
         {activeTab === 'overview' && <OverviewTab t={t} subscription={subscription} setActiveTab={setActiveTab} showToast={showToast} />}
         
         {activeTab === 'general' && (
-          <GeneralTab t={t} settings={settings} setSettings={setSettings} discordChannels={discordChannels} handleSave={handleSave} saving={saving} />
+          <GeneralTab t={t} settings={settings} setSettings={setSettings} discordChannels={discordChannels} handleSave={handleSave} saving={saving} guildSearchQuery={guildSearchQuery} setGuildSearchQuery={setGuildSearchQuery} searchGuilds={searchGuilds} searchingGuild={searchingGuild} guildSearchResults={guildSearchResults} setGuildSearchResults={setGuildSearchResults} guildDetail={guildDetail} setGuildDetail={setGuildDetail} />
         )}
 
         {activeTab === 'embed' && (
@@ -416,7 +422,7 @@ export default function ServerSettings() {
         )}
 
         {activeTab === 'registration' && (
-          <RegistrationTab t={t} lang={lang} settings={settings} setSettings={setSettings} discordChannels={discordChannels} discordRoles={discordRoles} handleSave={handleSave} saving={saving} />
+          <RegistrationTab t={t} lang={lang} settings={settings} setSettings={setSettings} discordChannels={discordChannels} discordRoles={discordRoles} handleSave={handleSave} saving={saving} guildId={guildId} registeredCount={settings.registered_count || 0} />
         )}
 
       </main>

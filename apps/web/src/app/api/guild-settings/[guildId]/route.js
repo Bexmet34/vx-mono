@@ -60,7 +60,9 @@ export async function POST(req, { params }) {
       registration_category_id, registration_welcome_message, registration_given_role_id,
       registration_given_role_id_2, registration_given_role_id_3,
       registration_unregistered_role_id, registration_log_channel_id,
-      registration_welcome_channel_id, registration_welcome_message_text, auto_role_on_join_id
+      registration_welcome_channel_id, registration_welcome_message_text, auto_role_on_join_id,
+      auto_check_enabled, auto_check_interval, auto_check_custom_role_id,
+      auto_check_guild_tag, auto_check_log_channel_id
     } = body;
 
     // Upsert: varsa güncelle, yoksa ekle
@@ -92,6 +94,11 @@ export async function POST(req, { params }) {
           registration_welcome_channel_id: registration_welcome_channel_id || null,
           registration_welcome_message_text: registration_welcome_message_text || null,
           auto_role_on_join_id: auto_role_on_join_id || null,
+          auto_check_enabled: auto_check_enabled ?? false,
+          auto_check_interval: auto_check_interval ?? 3,
+          auto_check_custom_role_id: auto_check_custom_role_id || null,
+          auto_check_guild_tag: auto_check_guild_tag || null,
+          auto_check_log_channel_id: auto_check_log_channel_id || null,
         },
         { onConflict: 'guild_id' }
       )
