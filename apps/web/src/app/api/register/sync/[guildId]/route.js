@@ -17,10 +17,10 @@ export async function POST(req, { params }) {
 
     const { guildId } = await params;
 
-    // We set trigger_sync to true so the bot's dbListenerService picks it up
+    // We set trigger_sync to true so the bot's dbListenerService picks it up, and is_syncing to prevent UI duplicate clicks
     const { error } = await supabase
       .from('guild_settings')
-      .update({ trigger_sync: true })
+      .update({ trigger_sync: true, is_syncing: true })
       .eq('guild_id', guildId);
 
     if (error) {

@@ -101,7 +101,8 @@ async function syncRegistrations(client, guildId) {
 
         await updateSupabaseGuildSettings(guildId, { 
             registered_count: registeredCount,
-            last_sync_result: syncResult
+            last_sync_result: syncResult,
+            is_syncing: false
         });
         console.log(`[SyncService] Completed sync for guild ${guildId}. Total registered: ${registeredCount}`);
         
@@ -120,6 +121,8 @@ async function syncRegistrations(client, guildId) {
 
     } catch (err) {
         console.error(`[SyncService] Fatal error syncing guild ${guildId}:`, err);
+        // Ensure UI unlocks on crash
+        await updateSupabaseGuildSettings(guildId, { is_syncing: false });
     }
 }
 

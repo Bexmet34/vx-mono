@@ -471,14 +471,14 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
               </p>
               <button 
                 className="dockItem" 
-                style={{ width: '100%', justifyContent: 'center', background: settings.albion_guild_id ? (syncing ? 'rgba(59, 130, 246, 0.5)' : '#3b82f6') : 'rgba(255,255,255,0.1)', color: '#fff', cursor: syncing ? 'not-allowed' : 'pointer' }} 
+                style={{ width: '100%', justifyContent: 'center', background: settings.albion_guild_id ? ((syncing || settings.is_syncing) ? 'rgba(59, 130, 246, 0.5)' : '#3b82f6') : 'rgba(255,255,255,0.1)', color: '#fff', cursor: (syncing || settings.is_syncing) ? 'not-allowed' : 'pointer' }} 
                 onClick={handleSync} 
-                disabled={syncing || !settings.albion_guild_id}
+                disabled={syncing || settings.is_syncing || !settings.albion_guild_id}
               >
-                {syncing ? <Loader2 size={18} className="spin"/> : <Users size={18}/>} 
+                {(syncing || settings.is_syncing) ? <Loader2 size={18} className="spin"/> : <Users size={18}/>} 
                 {lang === 'en' 
-                  ? (settings.albion_guild_id ? (syncing ? 'Syncing...' : 'Start Sync Process') : 'Set Guild in General Settings First') 
-                  : (settings.albion_guild_id ? (syncing ? 'Şu an Senkronize Ediliyor...' : 'Senkronizasyon İşlemini Başlat') : 'Önce Genel Ayarlardan Guild Seçin')}
+                  ? (settings.albion_guild_id ? ((syncing || settings.is_syncing) ? 'Syncing...' : 'Start Sync Process') : 'Set Guild in General Settings First') 
+                  : (settings.albion_guild_id ? ((syncing || settings.is_syncing) ? 'Şu an Senkronize Ediliyor...' : 'Senkronizasyon İşlemini Başlat') : 'Önce Genel Ayarlardan Guild Seçin')}
               </button>
 
               {settings.last_sync_result && (
