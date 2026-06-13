@@ -22,7 +22,8 @@ async function syncRegistrations(client, guildId) {
         await discordGuild.members.fetch(); // Fetch all members
 
         let registeredCount = 0;
-        
+        let processedCount = 0;
+        let skippedCount = 0;
         // Find users who have the registered role (given_role_id) or tag in name
         const givenRoleId1 = settings.registration_given_role_id;
         const givenRoleId2 = settings.registration_given_role_id_2;
@@ -78,16 +79,30 @@ async function syncRegistrations(client, guildId) {
                         registeredCount++;
                         console.log(`[SyncService] Synced ${ign} (${playerData.Id}) for guild ${guildId}`);
                     } else {
+                         skippedCount++;
                          console.log(`[SyncService] Player ${ign} is in guild ${playerData.GuildId}, not ${albionGuildId}. Skipped.`);
                     }
+                } else {
+                     skippedCount++;
                 }
             } catch (err) {
                 console.error(`[SyncService] Error processing member ${member.id}:`, err);
             }
+            processedCount++;
         }
 
-        // Update final count in Supabase
-        await updateSupabaseGuildSettings(guildId, { registered_count: registeredCount });
+        // Update final count and sync result in Supabase
+        const syncResult = {
+            scanned: processedCount,
+            synced: registeredCount,
+            skipped: skippedCount,
+            timestamp: new Date().toISOString()
+        };
+
+        await updateSupabaseGuildSettings(guildId, { 
+            registered_count: registeredCount,
+            last_sync_result: syncResult
+        });
         console.log(`[SyncService] Completed sync for guild ${guildId}. Total registered: ${registeredCount}`);
         
         // Notify in log channel

@@ -480,6 +480,20 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                   ? (settings.albion_guild_id ? (syncing ? 'Syncing...' : 'Start Sync Process') : 'Set Guild in General Settings First') 
                   : (settings.albion_guild_id ? (syncing ? 'Şu an Senkronize Ediliyor...' : 'Senkronizasyon İşlemini Başlat') : 'Önce Genel Ayarlardan Guild Seçin')}
               </button>
+
+              {settings.last_sync_result && (
+                <div style={{ marginTop: '1.5rem', padding: '1rem', background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '8px', animation: 'fadeSlideUp 0.3s ease-out' }}>
+                  <h4 style={{ margin: '0 0 0.5rem 0', color: '#3b82f6', fontSize: '0.9rem' }}>{lang === 'en' ? 'Last Sync Result' : 'Son Senkronizasyon Çıktısı'}</h4>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem', fontSize: '0.85rem' }}>
+                    <div style={{ color: '#ccc' }}>{lang === 'en' ? 'Scanned:' : 'Taranan:'} <strong style={{ color: '#fff' }}>{settings.last_sync_result.scanned || 0}</strong></div>
+                    <div style={{ color: '#ccc' }}>{lang === 'en' ? 'Synced:' : 'Eklenen:'} <strong style={{ color: '#22c55e' }}>{settings.last_sync_result.synced || 0}</strong></div>
+                    <div style={{ color: '#ccc' }}>{lang === 'en' ? 'Skipped:' : 'Atlanan:'} <strong style={{ color: '#ef4444' }}>{settings.last_sync_result.skipped || 0}</strong></div>
+                  </div>
+                  <div style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: '#666' }}>
+                    {new Date(settings.last_sync_result.timestamp).toLocaleString(lang === 'en' ? 'en-US' : 'tr-TR')}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
