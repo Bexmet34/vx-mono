@@ -29,6 +29,8 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
     } finally {
       setSendingSetup(false);
     }
+  };
+
   const handleSync = async () => {
     if (!settings.albion_guild_id) {
       alert(lang === 'en' ? "Please set your guild in General settings first!" : "Lütfen önce Genel ayarlardan guildinizi seçin!");
