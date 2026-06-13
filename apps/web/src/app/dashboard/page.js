@@ -89,7 +89,7 @@ export default function Dashboard() {
   if (status === "loading" || !session) {
     return (
       <>
-        <Navbar />
+        <Navbar isStatic={true} />
         <div className="min-h-screen flex items-center justify-center">
           <Loader2 className="animate-spin text-primary-container" size={48} />
         </div>
@@ -99,7 +99,7 @@ export default function Dashboard() {
 
   return (
     <>
-      <Navbar />
+      <Navbar isStatic={true} />
       <main className="pt-32 pb-20 min-h-screen max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
       <ToastContainer toasts={toasts} />
 

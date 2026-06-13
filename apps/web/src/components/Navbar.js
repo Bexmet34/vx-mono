@@ -7,7 +7,7 @@ import { LogIn, LogOut, LayoutDashboard, Globe, Menu, X, ChevronRight, Shield } 
 import { useLanguage } from "@/context/LanguageContext";
 import { useState, useEffect, useRef } from "react";
 
-export default function Navbar() {
+export default function Navbar({ isStatic = false }) {
   const { data: session } = useSession();
   const { lang, toggleLanguage, t } = useLanguage();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -36,7 +36,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="fixed top-0 w-full z-40 bg-surface/80 backdrop-blur-md border-b border-on-surface/ shadow-[0_0_15px_rgba(255,215,0,0.15)] transition-all">
+      <nav className={`${isStatic ? 'absolute' : 'fixed'} top-0 w-full z-40 bg-surface/80 backdrop-blur-md border-b border-on-surface/ shadow-[0_0_15px_rgba(255,215,0,0.15)] transition-all`}>
         <div className="flex justify-between items-center px-4 md:px-margin-desktop py-4 max-w-container-max mx-auto">
           <div className="flex items-center gap-6">
             <Link href="/" className="font-headline-md text-headline-md font-bold tracking-tighter text-primary-container">

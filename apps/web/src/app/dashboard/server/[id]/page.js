@@ -355,7 +355,7 @@ export default function ServerSettings() {
       <ToastContainer toasts={toasts} />
       
       {/* Floating Dock Navigation */}
-      <div className="sticky top-24 z-50 flex justify-center px-4 py-4 pointer-events-none">
+      <div className="relative z-50 flex justify-center px-4 pt-12 pb-4 pointer-events-none">
         <nav className="flex items-center gap-2 bg-surface-container-high/80 backdrop-blur-xl border border-outline-variant p-2 rounded-full pointer-events-auto shadow-2xl overflow-x-auto max-w-full custom-scrollbar">
           <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2 rounded-full text-on-surface-variant font-label-bold text-sm transition-all hover:text-on-surface hover:bg-white/5 mr-4 border border-transparent">
              <ArrowLeft size={18} />
