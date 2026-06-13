@@ -40,11 +40,14 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
     try {
       const res = await fetch(`/api/register/sync/${guildId}`, { method: 'POST' });
       const data = await res.json();
-      if (res.ok) alert(lang === 'en' ? "Sync process started in background." : "Senkronizasyon işlemi arka planda başlatıldı.");
-      else alert(data.error || "Failed to start sync.");
+      if (res.ok) {
+        alert(lang === 'en' ? "Sync process started in background. The button will stay disabled while it runs." : "Senkronizasyon işlemi arka planda başlatıldı. İşlem bitene kadar buton kapalı kalacaktır.");
+      } else {
+        alert(data.error || "Failed to start sync.");
+        setSyncing(false);
+      }
     } catch (err) {
       alert(err.message);
-    } finally {
       setSyncing(false);
     }
   };
@@ -468,12 +471,14 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
               </p>
               <button 
                 className="dockItem" 
-                style={{ width: '100%', justifyContent: 'center', background: settings.albion_guild_id ? '#3b82f6' : 'rgba(255,255,255,0.1)', color: '#fff' }} 
+                style={{ width: '100%', justifyContent: 'center', background: settings.albion_guild_id ? (syncing ? 'rgba(59, 130, 246, 0.5)' : '#3b82f6') : 'rgba(255,255,255,0.1)', color: '#fff', cursor: syncing ? 'not-allowed' : 'pointer' }} 
                 onClick={handleSync} 
-                disabled={syncing}
+                disabled={syncing || !settings.albion_guild_id}
               >
                 {syncing ? <Loader2 size={18} className="spin"/> : <Users size={18}/>} 
-                {lang === 'en' ? (settings.albion_guild_id ? 'Start Sync Process' : 'Set Guild in General Settings First') : (settings.albion_guild_id ? 'Senkronizasyon İşlemini Başlat' : 'Önce Genel Ayarlardan Guild Seçin')}
+                {lang === 'en' 
+                  ? (settings.albion_guild_id ? (syncing ? 'Syncing...' : 'Start Sync Process') : 'Set Guild in General Settings First') 
+                  : (settings.albion_guild_id ? (syncing ? 'Şu an Senkronize Ediliyor...' : 'Senkronizasyon İşlemini Başlat') : 'Önce Genel Ayarlardan Guild Seçin')}
               </button>
             </div>
           </div>
