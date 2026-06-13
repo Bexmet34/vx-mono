@@ -7,6 +7,7 @@ async function syncRegistrations(client, guildId) {
         const settings = await getSupabaseGuildSettings(guildId);
         if (!settings || !settings.albion_guild_id) {
             console.log(`[SyncService] No albion_guild_id found for guild ${guildId}. Aborting sync.`);
+            await updateSupabaseGuildSettings(guildId, { is_syncing: false });
             return;
         }
 
@@ -16,6 +17,7 @@ async function syncRegistrations(client, guildId) {
         const discordGuild = client.guilds.cache.get(guildId);
         if (!discordGuild) {
             console.log(`[SyncService] Bot is not in guild ${guildId}.`);
+            await updateSupabaseGuildSettings(guildId, { is_syncing: false });
             return;
         }
 
