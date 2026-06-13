@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Settings, MessageSquare, Tag, Users, Send, Loader2 } from "lucide-react";
 
-export default function RegistrationTab({ t, lang, settings, setSettings, discordChannels, discordRoles, handleSave, saving, guildId, registeredCount = 0 }) {
+export default function RegistrationTab({ t, lang, settings, setSettings, discordChannels, discordRoles, handleSave, saving, guildId, registeredCount = 0, setActiveTab }) {
   const [sendingSetup, setSendingSetup] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const textChannels = (discordChannels || []).filter(c => c.type === 0);
@@ -328,6 +328,24 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
             ? 'Automatically cross-checks registered users with your Albion guild roster. Removes roles if they leave.' 
             : 'Kayıtlı kullanıcıları Albion guild listenizle otomatik karşılaştırır. Ayrılanların yetkilerini alır.'}
         </p>
+
+        {!settings.albion_guild_id && (
+          <div style={{ padding: '1.5rem', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '8px', marginBottom: '1.5rem', color: '#ef4444', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <h3 style={{ margin: '0 0 0.5rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.1rem' }}>
+                <Users size={20} /> {lang === 'en' ? 'Action Required' : 'İşlem Gerekiyor'}
+              </h3>
+              <p style={{ margin: 0 }}>
+                {lang === 'en' 
+                  ? 'You must set your Albion Guild in General Settings to use the Auto-Check and Sync systems.' 
+                  : 'Otomatik kontrol ve Senkronizasyon sistemlerini kullanabilmek için Genel ayarlardan Albion Guildinizi seçmelisiniz.'}
+              </p>
+            </div>
+            <button onClick={() => setActiveTab && setActiveTab('general')} style={{ padding: '0.6rem 1.2rem', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', flexShrink: 0, marginLeft: '1rem' }}>
+              {lang === 'en' ? 'Go to General Settings' : 'Genel Ayarlara Git'}
+            </button>
+          </div>
+        )}
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
           <div>

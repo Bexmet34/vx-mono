@@ -13,7 +13,8 @@ export default function KillBoardTab({
   loadingPreview, 
   handlePreviewKillBoard, 
   handleTriggerKillBoard, 
-  triggeringKillBoard 
+  triggeringKillBoard,
+  setActiveTab
 }) {
 
 
@@ -21,10 +22,16 @@ export default function KillBoardTab({
   return (
     <div className="bentoGrid">
       {/* Search & Select Guild - Moved to General */}
+      {/* Search & Select Guild - Moved to General */}
       {!settings.albion_guild_id && (
-        <div className="bentoBox span12" style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444' }}>
-          <h2 className="bentoTitle" style={{ color: '#ef4444' }}><ShieldAlert /> Action Required</h2>
-          <p>{lang === 'en' ? 'Please select an Albion Guild in the General settings before using the KillBoard.' : 'KillBoard kullanmadan önce lütfen Genel ayarlardan bir Albion Loncası seçin.'}</p>
+        <div className="bentoBox span12" style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#ef4444', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <h2 className="bentoTitle" style={{ color: '#ef4444', marginBottom: '0.5rem' }}><ShieldAlert /> {lang === 'en' ? 'Action Required' : 'İşlem Gerekiyor'}</h2>
+            <p style={{ margin: 0 }}>{lang === 'en' ? 'Please select an Albion Guild in the General settings before using the KillBoard.' : 'KillBoard kullanmadan önce lütfen Genel ayarlardan bir Albion Loncası seçin.'}</p>
+          </div>
+          <button onClick={() => setActiveTab('general')} style={{ padding: '0.6rem 1.2rem', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', flexShrink: 0, marginLeft: '1rem' }}>
+            {lang === 'en' ? 'Go to General Settings' : 'Genel Ayarlara Git'}
+          </button>
         </div>
       )}
 
