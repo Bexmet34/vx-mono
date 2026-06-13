@@ -29,8 +29,14 @@ async function syncRegistrations(client, guildId) {
         const givenRoleId2 = settings.registration_given_role_id_2;
         const givenRoleId3 = settings.registration_given_role_id_3;
 
+        // Fetch existing users from DB to skip them
+        const existingRecords = await db.all(`SELECT user_id FROM guild_registrations WHERE guild_id = ?`, [guildId]);
+        const existingUserIds = new Set(existingRecords.map(r => r.user_id));
+
         const membersToSync = discordGuild.members.cache.filter(m => {
             if (m.user.bot) return false;
+            if (existingUserIds.has(m.id)) return false; // Skip already registered members
+
             const hasRole = (givenRoleId1 && m.roles.cache.has(givenRoleId1)) ||
                             (givenRoleId2 && m.roles.cache.has(givenRoleId2)) ||
                             (givenRoleId3 && m.roles.cache.has(givenRoleId3));
@@ -99,12 +105,15 @@ async function syncRegistrations(client, guildId) {
             timestamp: new Date().toISOString()
         };
 
+        const totalRegistered = await db.get(`SELECT COUNT(*) as count FROM guild_registrations WHERE guild_id = ?`, [guildId]);
+        const totalCount = totalRegistered ? totalRegistered.count : 0;
+
         await updateSupabaseGuildSettings(guildId, { 
-            registered_count: registeredCount,
+            registered_count: totalCount,
             last_sync_result: syncResult,
             is_syncing: false
         });
-        console.log(`[SyncService] Completed sync for guild ${guildId}. Total registered: ${registeredCount}`);
+        console.log(`[SyncService] Completed sync for guild ${guildId}. Added: ${registeredCount}, Total: ${totalCount}`);
         
         // Notify in log channel
         const logChannelId = settings.registration_log_channel_id;
@@ -113,8 +122,8 @@ async function syncRegistrations(client, guildId) {
             if (logChannel) {
                 const lang = settings.language || 'tr';
                 const msg = lang === 'en' 
-                    ? `🔄 **Sync Process Completed!**\nTotal synchronized members: **${registeredCount}**` 
-                    : `🔄 **Senkronizasyon İşlemi Tamamlandı!**\nToplam eşzamanlanan üye: **${registeredCount}**`;
+                    ? `🔄 **Sync Process Completed!**\nNew members synced: **${registeredCount}**\nTotal synchronized members: **${totalCount}**` 
+                    : `🔄 **Senkronizasyon İşlemi Tamamlandı!**\nYeni eşzamanlanan üye: **${registeredCount}**\nToplam kayıtlı üye: **${totalCount}**`;
                 await logChannel.send({ content: msg }).catch(()=>{});
             }
         }
