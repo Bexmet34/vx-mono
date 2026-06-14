@@ -7,6 +7,22 @@ export default function DemoReklamPage() {
     const [timeLeft, setTimeLeft] = useState(15);
 
     useEffect(() => {
+        // Popunder Script'i zorla (native olarak) sayfaya enjekte etme yöntemi
+        // Next.js'in Script bileşeni bazen popunder'ları engelleyebiliyor.
+        const popunderScript = document.createElement('script');
+        popunderScript.src = "https://pl29746072.effectivecpmnetwork.com/6d/1d/7d/6d1d7d7f928f5303a220767bfc6a6f5e.js";
+        popunderScript.async = true;
+        document.body.appendChild(popunderScript);
+
+        return () => {
+            // Sayfadan çıkıldığında temizle
+            if (document.body.contains(popunderScript)) {
+                document.body.removeChild(popunderScript);
+            }
+        };
+    }, []);
+
+    useEffect(() => {
         if (timeLeft > 0) {
             const timerId = setTimeout(() => {
                 setTimeLeft(timeLeft - 1);
@@ -18,12 +34,6 @@ export default function DemoReklamPage() {
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-[#0B0E14] text-white p-4 font-sans overflow-x-hidden">
             
-            {/* Adsterra Popunder Script */}
-            <Script 
-                src="https://pl29746072.effectivecpmnetwork.com/6d/1d/7d/6d1d7d7f928f5303a220767bfc6a6f5e.js" 
-                strategy="afterInteractive" 
-            />
-
             {/* Adsterra Native Banner/Social Bar Script (Loads Once Globally) */}
             <Script 
                 src="https://pl29746098.effectivecpmnetwork.com/76065e7d3fa28e6d941142b176377f08/invoke.js" 
