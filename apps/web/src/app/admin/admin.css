@@ -78,15 +78,15 @@
 /* Mobile App Layout (Bottom Navigation) */
 @media (max-width: 768px) {
   .admin-container {
-    padding-bottom: 80px; /* Space for bottom nav */
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)); /* Space for bottom nav */
   }
   .admin-sidebar {
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 70px;
-    padding: 0 1rem;
+    height: calc(70px + env(safe-area-inset-bottom));
+    padding: 0 1rem env(safe-area-inset-bottom) 1rem;
     background: rgba(11, 12, 16, 0.85);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -117,7 +117,7 @@
     min-width: 48px;
   }
   .admin-nav-item span {
-    font-size: 0.6rem !important;
+    font-size: 0.65rem !important;
     display: block !important;
     font-weight: 600;
   }
@@ -128,117 +128,85 @@
     transform: none !important;
   }
   .admin-sidebar > div:last-child {
-    display: none !important; /* Hide user profile on mobile bottom nav */
+    display: none !important;
   }
-}
 
-@media (min-width: 600px) and (max-width: 1024px) {
-  .admin-nav-item span {
-    display: block;
-  }
-}
-
-.admin-sidebar-header {
-  margin-bottom: 2.5rem;
-  padding: 0.5rem;
-}
-
-.admin-nav-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  flex: 1;
-}
-
-.admin-nav-item {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 0.85rem 1.25rem;
-  border-radius: 12px;
-  color: var(--admin-text-muted);
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  background: transparent;
-  font-weight: 500;
-  font-size: 0.95rem;
-}
-
-.admin-nav-item:hover {
-  background: rgba(255, 255, 255, 0.03);
-  color: var(--admin-text);
-  transform: translateX(4px);
-}
-
-.admin-nav-item.active {
-  background: var(--admin-accent-muted);
-  color: var(--admin-accent);
-  font-weight: 700;
-}
-
-/* Main Content */
-.admin-main {
-  flex: 1;
-  overflow-y: auto;
-  padding: 2.5rem 4rem;
-  background-image: radial-gradient(circle at top right, rgba(var(--primary-rgb), 0.08) 0%, transparent 40%),
-                    radial-gradient(circle at bottom left, rgba(var(--secondary-rgb), 0.05) 0%, transparent 40%);
-}
-
-@media (max-width: 768px) {
   .admin-main {
-    padding: 1rem 0.5rem;
+    padding: 1.5rem 1rem;
   }
   .admin-header {
     flex-direction: column;
     align-items: flex-start !important;
     gap: 1rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
     padding: 0 0.5rem;
   }
   .admin-card {
-    border-radius: 16px;
+    border-radius: 20px;
     border: none;
     background: transparent;
     box-shadow: none;
   }
   
-  /* Mobile App-like Table-to-Cards */
+  /* Mobile App-like Dashboard Cards */
   .admin-table, .admin-table tbody, .admin-table tr, .admin-table td {
     display: block;
     width: 100%;
   }
   .admin-table thead {
-    display: none; /* Hide headers */
+    display: none;
   }
   .admin-table tr {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 16px;
-    margin-bottom: 1rem;
-    padding: 1rem;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border-radius: 20px;
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    position: relative;
   }
   .admin-table td {
-    padding: 0.5rem 0;
+    padding: 0.6rem 0;
     border: none;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
   }
   .admin-table td::before {
     content: attr(data-label);
-    font-size: 0.75rem;
+    font-size: 0.65rem;
     font-weight: 800;
     text-transform: uppercase;
     color: var(--text-secondary);
-    min-width: 90px;
+    letter-spacing: 0.5px;
   }
+  .admin-table td > div, .admin-table td > span {
+    width: 100%;
+    display: flex;
+  }
+  
+  /* Action Bar at the bottom of the card */
   .admin-table td:last-child {
-    margin-top: 0.5rem;
-    padding-top: 1rem;
-    border-top: 1px solid rgba(255,255,255,0.05);
+    margin-top: 1rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .admin-table td:last-child::before {
+    display: none; /* Hide label for actions */
+  }
+  .admin-table td:last-child > div.table-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.75rem;
+    width: 100%;
+  }
+  .admin-table td:last-child > div.table-actions > button {
+    flex: 1 1 calc(50% - 0.75rem); /* Buttons take 50% width */
+    min-height: 48px; /* Large touch target */
     justify-content: center;
+    border-radius: 12px;
   }
 }
 
