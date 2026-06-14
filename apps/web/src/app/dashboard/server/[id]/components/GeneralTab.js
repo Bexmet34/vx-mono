@@ -1,6 +1,8 @@
 "use client";
 
 import { Layout, Search, Loader2, Sword } from "lucide-react";
+import InfoTooltip from "@/components/InfoTooltip";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function GeneralTab({ 
   t, settings, setSettings, 
@@ -9,6 +11,8 @@ export default function GeneralTab({
   guildSearchResults, setGuildSearchResults, 
   guildDetail, setGuildDetail 
 }) {
+  const { lang } = useLanguage();
+
   const handleSelectGuild = (guild) => {
     setSettings({ ...settings, albion_guild_id: guild.Id, albion_guild_name: guild.Name });
     setGuildDetail(guild);
@@ -23,7 +27,10 @@ export default function GeneralTab({
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">{t.dLangLabel}</label>
+            <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+              {t.dLangLabel}
+              <InfoTooltip text={lang === 'en' ? 'Determines the main language the bot uses when sending messages in your server.' : 'Botun sunucunuzda mesaj atarken kullanacağı ana dili belirler.'} />
+            </label>
             <select
               className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
               value={settings.language || "tr"}
@@ -38,7 +45,10 @@ export default function GeneralTab({
 
       {/* Search & Select Guild - Moved from Killboard */}
       <div className="glass-panel p-8 relative overflow-hidden border border-outline-variant hover:border-primary-container/50 transition-colors">
-        <h2 className="font-headline-lg text-2xl text-on-surface mb-2 flex items-center gap-3 uppercase tracking-tight"><Sword className="text-primary-container" /> Albion Guild Configuration</h2>
+        <h2 className="font-headline-lg text-2xl text-on-surface mb-2 flex items-center gap-3 uppercase tracking-tight">
+          <Sword className="text-primary-container" /> Albion Guild Configuration
+          <InfoTooltip text={lang === 'en' ? 'Search and link your Albion Online Guild. This is required for Killboard and Auto-Check features to work globally.' : 'Albion Online Loncanızı arayıp bağlayın. Killboard ve Otomatik Kontrol özelliklerinin çalışması için bu zorunludur.'} />
+        </h2>
         <p className="font-body-md text-on-surface-variant mb-6">Search and link your Albion Online Guild to be used globally across all features.</p>
 
         {settings.albion_guild_id && guildDetail ? (

@@ -1,8 +1,11 @@
 "use client";
 
 import { Image as ImageIcon, Upload, Link as LinkIcon, Trash } from "lucide-react";
+import InfoTooltip from "@/components/InfoTooltip";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function VisualTab({ t, settings, setSettings, uploadingThumb, checkImage, handleFileSelect, thumbError, renderStatus }) {
+  const { lang } = useLanguage();
   return (
     <div className="grid grid-cols-1 gap-6 animate-slide-up">
       <div className="glass-panel p-8 relative overflow-hidden border border-outline-variant hover:border-primary-container/50 transition-colors">
@@ -11,7 +14,10 @@ export default function VisualTab({ t, settings, setSettings, uploadingThumb, ch
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           <div>
             <div className="mb-8">
-              <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">Thumbnail Image URL</label>
+              <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+                Thumbnail Image URL
+                <InfoTooltip text={lang === 'en' ? 'The URL of the image to display in the top right corner of the bot\'s messages.' : 'Botun attığı mesajların sağ üst köşesinde görünecek küçük resmin (logo) bağlantısı.'} />
+              </label>
               <div className="flex gap-2 items-center bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 focus-within:border-primary-container transition-colors">
                 <LinkIcon size={18} className="text-on-surface-variant flex-shrink-0" />
                 <input
@@ -31,7 +37,10 @@ export default function VisualTab({ t, settings, setSettings, uploadingThumb, ch
             </div>
 
             <div>
-              <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">Or Upload a Logo</label>
+              <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+                Or Upload a Logo
+                <InfoTooltip text={lang === 'en' ? 'Upload an image directly from your computer instead of using a URL.' : 'URL kullanmak yerine bilgisayarınızdan doğrudan bir logo yükleyin.'} />
+              </label>
               <div className="relative">
                 <input
                   type="file"
@@ -49,7 +58,10 @@ export default function VisualTab({ t, settings, setSettings, uploadingThumb, ch
           </div>
 
           <div>
-             <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">Live Preview</label>
+             <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+               Live Preview
+               <InfoTooltip text={lang === 'en' ? 'A real-time preview of how your settings will look on Discord.' : 'Discord üzerinde mesajlarınızın nasıl görüneceğinin anlık önizlemesi.'} />
+             </label>
              <div className="bg-[#2b2d31] rounded-sm p-4 border border-[#1e1f22] min-h-[200px] shadow-lg">
                 <div className="flex gap-4">
                    <div className="flex-1 mt-1">

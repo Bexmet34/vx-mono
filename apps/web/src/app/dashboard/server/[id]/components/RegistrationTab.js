@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Settings, MessageSquare, Tag, Users, Send, Loader2 } from "lucide-react";
+import InfoTooltip from "@/components/InfoTooltip";
 
 export default function RegistrationTab({ t, lang, settings, setSettings, discordChannels, discordRoles, handleSave, saving, guildId, registeredCount = 0, setActiveTab }) {
   const [sendingSetup, setSendingSetup] = useState(false);
@@ -104,8 +105,9 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+            <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
               {lang === 'en' ? 'Enable Registration System' : 'Kayıt Sistemini Aktifleştir'}
+              <InfoTooltip text={lang === 'en' ? 'Turn the entire registration system on or off.' : 'Tüm kayıt sistemini açıp kapatmanızı sağlar.'} />
             </label>
             <div className="flex items-center gap-4 mt-2">
               <label className="relative inline-flex items-center cursor-pointer">
@@ -126,8 +128,9 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
           </div>
 
           <div>
-            <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+            <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
               {lang === 'en' ? 'Welcome Channel' : 'Karşılama Kanalı'}
+              <InfoTooltip text={lang === 'en' ? 'The channel where the "Register" button message will be sent.' : '"Kayıt Ol" butonunun bulunacağı sabit mesajın gönderileceği kanal.'} />
             </label>
             <select
               className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
@@ -142,8 +145,9 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
           </div>
 
           <div>
-            <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+            <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
               {lang === 'en' ? 'Ticket Category' : 'Ticket Kategorisi'}
+              <InfoTooltip text={lang === 'en' ? 'The Discord category where private registration tickets will be created.' : 'Kullanıcılar kayıt butonuna bastığında açılacak özel kanalların (ticket) oluşturulacağı kategori.'} />
             </label>
             <select
               className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
@@ -158,8 +162,9 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
           </div>
 
           <div>
-            <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+            <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
               {lang === 'en' ? 'Staff Role' : 'Yetkili Rolü'}
+              <InfoTooltip text={lang === 'en' ? 'The role allowed to see, review, and approve registration tickets.' : 'Kayıt kanallarını (ticket) görebilecek ve onaylayabilecek yetkili rolü.'} />
             </label>
             <select
               className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
@@ -268,8 +273,9 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
         </p>
 
         <div className="mb-6">
-          <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+          <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
             {lang === 'en' ? 'Message Text' : 'Buton Mesaj Metni'}
+            <InfoTooltip text={lang === 'en' ? 'The text that appears above the Register button in the Welcome channel.' : 'Karşılama kanalındaki Kayıt Ol butonunun üzerinde yazacak açıklama metni.'} />
           </label>
           <textarea
             className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md resize-y"
@@ -288,8 +294,9 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div>
-            <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+            <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
               {lang === 'en' ? 'Log Channel' : 'Log Kanalı'}
+              <InfoTooltip text={lang === 'en' ? 'The channel where registration approvals and rejections will be logged.' : 'Kayıt onay veya red işlemlerinin loglanacağı (kaydedileceği) kanal.'} />
             </label>
             <select
               className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
@@ -304,8 +311,9 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
           </div>
 
           <div>
-            <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+            <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
               {lang === 'en' ? 'Public Welcome Channel' : 'Genel Karşılama Kanalı'}
+              <InfoTooltip text={lang === 'en' ? 'The channel where a public welcome message is sent after successful registration.' : 'Kayıt işlemi başarıyla tamamlandıktan sonra herkese açık hoş geldin mesajının atılacağı kanal.'} />
             </label>
             <select
               className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
@@ -321,8 +329,9 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
         </div>
 
         <div className="mb-6">
-          <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+          <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
             {lang === 'en' ? 'Public Welcome Message' : 'Genel Karşılama Mesajı'}
+            <InfoTooltip text={lang === 'en' ? 'The text sent to the public welcome channel when a user registers.' : 'Bir kullanıcı kayıt olduğunda genel karşılama kanalına atılacak kutlama mesajı.'} />
           </label>
           <textarea
             className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md resize-y"
@@ -392,8 +401,9 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+              <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
                 {lang === 'en' ? 'Enable Auto-Check' : 'Sistemi Aktif Et'}
+                <InfoTooltip text={lang === 'en' ? 'Turn on the automatic guild roster checking system.' : 'Otomatik lonca oyuncu kontrol sistemini açıp kapatır.'} />
               </label>
               <div className="flex items-center gap-4 mt-2">
                 <label className="relative inline-flex items-center cursor-pointer">
@@ -450,8 +460,9 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
 
           <div className={`space-y-6 transition-all ${settings.auto_check_enabled ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
             <div>
-              <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+              <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
                 {lang === 'en' ? 'Role for Leavers' : "Guild'den Çıkanlara Verilecek Rol"}
+                <InfoTooltip text={lang === 'en' ? 'The role to give someone when they are detected as leaving the guild.' : 'Bir kişi loncadan ayrıldığında veya atıldığında ona verilecek Discord rolü.'} />
               </label>
               <div className="flex items-center gap-4 mt-2">
                 <label className="relative inline-flex items-center cursor-pointer">
@@ -493,8 +504,9 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
             </div>
 
             <div>
-              <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+              <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
                 {lang === 'en' ? 'Report Log Channel' : 'Rapor/Log Kanalı'}
+                <InfoTooltip text={lang === 'en' ? 'The channel where auto-check removal notifications will be sent.' : 'Otomatik sistemin loncadan çıkanları tespit edip yetkilerini aldığına dair atacağı raporların kanalı.'} />
               </label>
               <select
                 className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"

@@ -1,6 +1,7 @@
 "use client";
 
 import { Search, Loader2, Sword, Send, Eye, ShieldAlert } from "lucide-react";
+import InfoTooltip from "@/components/InfoTooltip";
 import Image from "next/image";
 
 export default function KillBoardTab({ 
@@ -41,7 +42,10 @@ export default function KillBoardTab({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div>
-            <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">Target Channel</label>
+            <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+              Target Channel
+              <InfoTooltip text={lang === 'en' ? 'The Discord channel where the daily killboard report will be sent.' : 'Günlük killboard raporunun atılacağı Discord kanalı.'} />
+            </label>
             <select 
               className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md" 
               value={settings.killboard_channel_id || ""}
@@ -55,7 +59,10 @@ export default function KillBoardTab({
           </div>
 
           <div>
-            <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">Daily Post Time (UTC)</label>
+            <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+              Daily Post Time (UTC)
+              <InfoTooltip text={lang === 'en' ? 'The time (in UTC) when the daily report will be generated and sent automatically.' : 'Günlük raporun otomatik olarak oluşturulup gönderileceği saat (UTC saat diliminde).'} />
+            </label>
             <input 
               type="time" 
               className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md" 

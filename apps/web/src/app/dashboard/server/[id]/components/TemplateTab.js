@@ -1,6 +1,7 @@
 "use client";
 
 import { Copy, Plus, Trash2 } from "lucide-react";
+import InfoTooltip from "@/components/InfoTooltip";
 import { useState, useEffect } from "react";
 
 export default function TemplateTab({ t, lang, settings, setSettings, selectedTemplateId, setSelectedTemplateId }) {
@@ -52,7 +53,10 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
     <div className="grid grid-cols-1 md:grid-cols-12 gap-6 animate-slide-up">
       <div className="glass-panel relative overflow-hidden border border-outline-variant hover:border-primary-container/50 transition-colors md:col-span-4 flex flex-col">
         <div className="p-6 border-b border-outline-variant/50 flex justify-between items-center bg-surface-container-highest/30">
-          <h2 className="font-headline-md text-xl text-on-surface flex items-center gap-2 uppercase tracking-tight m-0"><Copy className="text-primary-container" /> {lang === 'en' ? 'Templates' : 'Şablonlar'}</h2>
+          <h2 className="font-headline-md text-xl text-on-surface flex items-center gap-2 uppercase tracking-tight m-0">
+            <Copy className="text-primary-container" /> {lang === 'en' ? 'Templates' : 'Şablonlar'}
+            <InfoTooltip text={lang === 'en' ? 'Create reusable party setups. Use the /temp command in Discord to quickly start a party using these templates.' : 'Tekrar kullanılabilir parti ayarları oluşturun. Discord\'da /temp komutunu kullanarak bu şablonlarla saniyeler içinde parti kurabilirsiniz.'} />
+          </h2>
           <button className="p-2 bg-surface-container border border-outline-variant hover:border-primary-container hover:text-primary-container rounded-sm transition-colors text-on-surface-variant" onClick={handleCreateTemplate}>
              <Plus size={18} />
           </button>
@@ -88,7 +92,10 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
             <h3 className="font-headline-lg text-2xl text-on-surface mb-8 pb-4 border-b border-outline-variant/50 uppercase tracking-tight">{lang === 'en' ? 'Edit Template' : 'Şablonu Düzenle'}</h3>
             
             <div className="mb-6">
-              <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">{lang === 'en' ? 'Template Name' : 'Şablon Adı'}</label>
+              <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+                {lang === 'en' ? 'Template Name' : 'Şablon Adı'}
+                <InfoTooltip text={lang === 'en' ? 'Give your template a clear name (e.g., ZvZ Build, Fame Farm).' : 'Şablonunuza net bir isim verin (Örn: ZvZ Setup, Fame Farm).'} />
+              </label>
               <input 
                 type="text" 
                 className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md" 
@@ -110,7 +117,10 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="mb-6">
-                <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">{lang === 'en' ? 'Required Roles' : 'Gerekli Roller'}</label>
+                <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+                  {lang === 'en' ? 'Required Roles' : 'Gerekli Roller'}
+                  <InfoTooltip text={lang === 'en' ? 'Roles that are absolutely necessary for this party. Write one role per line.' : 'Bu parti için kesinlikle gerekli olan roller. Her satıra bir tane gelecek şekilde yazın.'} />
+                </label>
                 <textarea 
                   className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md resize-y" 
                   rows={5}
