@@ -606,7 +606,11 @@ async function handleRegisterButtons(interaction) {
                 // Protect against empty age or realName
                 const safeAge = age ? ` ${age}` : '';
                 const safeRealName = capRealName ? ` - ${capRealName}` : '';
-                const newNickname = `${prefix}${capIgn}${safeRealName}${safeAge}`.trim();
+                let newNickname = `${prefix}${capIgn}${safeRealName}${safeAge}`.trim();
+                
+                if (newNickname.length > 32) {
+                    newNickname = newNickname.substring(0, 32);
+                }
 
                 // Assign given role if configured
                 let givenRoleId = guildConfig?.registration_given_role_id;
