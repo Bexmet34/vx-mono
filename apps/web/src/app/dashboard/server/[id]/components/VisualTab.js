@@ -8,7 +8,7 @@ export default function VisualTab({ t, settings, setSettings, uploadingThumb, ch
   const { lang } = useLanguage();
   return (
     <div className="grid grid-cols-1 gap-6 animate-slide-up">
-      <div className="glass-panel p-8 relative overflow-hidden border border-outline-variant hover:border-primary-container/50 transition-colors">
+      <div className="glass-panel p-8 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
         <h2 className="font-headline-lg text-2xl text-on-surface mb-8 flex items-center gap-3 uppercase tracking-tight"><ImageIcon className="text-primary-container" /> Branding & Visuals</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">

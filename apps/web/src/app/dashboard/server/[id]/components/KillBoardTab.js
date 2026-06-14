@@ -24,7 +24,7 @@ export default function KillBoardTab({
     <div className="grid grid-cols-1 gap-6 animate-slide-up">
       {/* Search & Select Guild - Moved to General */}
       {!settings.albion_guild_id && (
-        <div className="glass-panel p-6 relative overflow-hidden border border-error/50 bg-error/5 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="glass-panel p-6 relative overflow-visible border border-error/50 bg-error/5 flex flex-col md:flex-row justify-between items-center gap-4">
           <div>
             <h2 className="font-headline-lg text-xl text-error mb-2 flex items-center gap-3 uppercase tracking-tight"><ShieldAlert /> {lang === 'en' ? 'Action Required' : 'İşlem Gerekiyor'}</h2>
             <p className="font-body-md text-error/80">{lang === 'en' ? 'Please select an Albion Guild in the General settings before using the KillBoard.' : 'KillBoard kullanmadan önce lütfen Genel ayarlardan bir Albion Loncası seçin.'}</p>
@@ -36,7 +36,7 @@ export default function KillBoardTab({
       )}
 
       {/* KillBoard Settings & Triggers */}
-      <div className={`glass-panel p-8 relative overflow-hidden border border-outline-variant hover:border-primary-container/50 transition-all ${!settings.albion_guild_id ? 'opacity-40 pointer-events-none' : ''}`}>
+      <div className={`glass-panel p-8 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-all ${!settings.albion_guild_id ? 'opacity-40 pointer-events-none' : ''}`}>
         <h2 className="font-headline-lg text-2xl text-on-surface mb-2 flex items-center gap-3 uppercase tracking-tight"><Send className="text-primary-container" /> Discord Integration</h2>
         <p className="font-body-md text-on-surface-variant mb-6">Where and when should the KillBoard report be posted?</p>
 
@@ -86,7 +86,7 @@ export default function KillBoardTab({
 
       {/* Preview Section */}
       {killboardPreview && (
-        <div className="glass-panel p-8 relative overflow-hidden border border-primary-container/30 animate-slide-up">
+        <div className="glass-panel p-8 relative overflow-visible border border-primary-container/30 animate-slide-up">
           <h2 className="font-headline-lg text-2xl text-on-surface mb-6 uppercase tracking-tight">Daily Summary Preview</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
              <div className="bg-surface-container-lowest border border-outline-variant rounded-sm p-6 text-center">

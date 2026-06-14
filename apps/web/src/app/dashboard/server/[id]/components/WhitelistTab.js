@@ -34,7 +34,7 @@ export default function WhitelistTab({ t, settings, setSettings, whitelistAddTab
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-12 gap-6 animate-slide-up">
-      <div className="glass-panel p-8 relative overflow-hidden border border-outline-variant hover:border-primary-container/50 transition-colors md:col-span-7">
+      <div className="glass-panel p-8 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors md:col-span-7">
         <h2 className="font-headline-lg text-2xl text-on-surface mb-2 flex items-center gap-3 uppercase tracking-tight">
           <Users className="text-primary-container" /> Active Whitelist
           <InfoTooltip text={lang === 'en' ? 'Only the users and roles listed here will be able to use restricted commands like /createparty.' : 'Sadece burada listelenen kullanıcılar veya roller /createparty gibi komutları kullanabilir.'} />
@@ -65,7 +65,7 @@ export default function WhitelistTab({ t, settings, setSettings, whitelistAddTab
         )}
       </div>
 
-      <div className="glass-panel p-8 relative overflow-hidden border border-outline-variant hover:border-primary-container/50 transition-colors md:col-span-5">
+      <div className="glass-panel p-8 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors md:col-span-5">
         <h3 className="font-headline-md text-xl text-on-surface mb-6 flex items-center uppercase tracking-tight">
           Add New Entry
           <InfoTooltip text={lang === 'en' ? 'Search for a Discord role or user to add them to the whitelist.' : 'Beyaz listeye eklemek için bir Discord rolü veya kullanıcı arayın.'} />

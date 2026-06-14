@@ -51,7 +51,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-12 gap-6 animate-slide-up">
-      <div className="glass-panel relative overflow-hidden border border-outline-variant hover:border-primary-container/50 transition-colors md:col-span-4 flex flex-col">
+      <div className="glass-panel relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors md:col-span-4 flex flex-col">
         <div className="p-6 border-b border-outline-variant/50 flex justify-between items-center bg-surface-container-highest/30">
           <h2 className="font-headline-md text-xl text-on-surface flex items-center gap-2 uppercase tracking-tight m-0">
             <Copy className="text-primary-container" /> {lang === 'en' ? 'Templates' : 'Şablonlar'}
@@ -82,7 +82,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
         </div>
       </div>
 
-      <div className="glass-panel p-8 relative overflow-hidden border border-outline-variant hover:border-primary-container/50 transition-colors md:col-span-8">
+      <div className="glass-panel p-8 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors md:col-span-8">
         {!selectedTemplate ? (
           <div className="h-full min-h-[400px] flex items-center justify-center text-on-surface-variant font-body-md bg-surface-container-lowest/50 border border-dashed border-outline-variant/50 rounded-sm">
             {lang === 'en' ? 'Select or create a template to edit.' : 'Düzenlemek için bir şablon seçin veya oluşturun.'}

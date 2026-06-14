@@ -92,7 +92,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
   return (
     <div className="grid grid-cols-1 gap-6 animate-slide-up">
       {/* Settings Section */}
-      <div className="glass-panel p-8 relative overflow-hidden border border-outline-variant hover:border-primary-container/50 transition-colors">
+      <div className="glass-panel p-8 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
         <h2 className="font-headline-lg text-2xl text-on-surface mb-2 flex items-center gap-3 uppercase tracking-tight">
           <Settings className="text-primary-container" />
           {lang === 'en' ? 'Registration Config' : 'Kayıt Ayarları'}
@@ -261,7 +261,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
       </div>
 
       {/* Message Setup Section */}
-      <div className="glass-panel p-8 relative overflow-hidden border border-outline-variant hover:border-primary-container/50 transition-colors">
+      <div className="glass-panel p-8 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
         <h2 className="font-headline-lg text-2xl text-on-surface mb-2 flex items-center gap-3 uppercase tracking-tight">
           <MessageSquare className="text-primary-container" />
           {lang === 'en' ? 'Welcome Message' : 'Karşılama Mesajı'}
@@ -369,7 +369,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
       </div>
 
       {/* Auto Check System Section */}
-      <div className="glass-panel p-8 relative overflow-hidden border border-outline-variant hover:border-primary-container/50 transition-colors md:col-span-2">
+      <div className="glass-panel p-8 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors md:col-span-2">
         <h2 className="font-headline-lg text-2xl text-on-surface mb-2 flex items-center gap-3 uppercase tracking-tight">
           <Users className="text-primary-container" />
           {lang === 'en' ? 'Guild Leave Auto-Check System' : 'Guild Ayrılık Kontrol Sistemi'}
@@ -381,7 +381,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
         </p>
 
         {!settings.albion_guild_id && (
-          <div className="glass-panel p-6 relative overflow-hidden border border-error/50 bg-error/5 flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+          <div className="glass-panel p-6 relative overflow-visible border border-error/50 bg-error/5 flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
             <div>
               <h3 className="font-headline-md text-lg text-error mb-2 flex items-center gap-2 uppercase tracking-tight">
                 <Users size={20} /> {lang === 'en' ? 'Action Required' : 'İşlem Gerekiyor'}

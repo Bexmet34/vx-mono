@@ -22,7 +22,7 @@ export default function GeneralTab({
 
   return (
     <div className="grid grid-cols-1 gap-6 animate-slide-up">
-      <div className="glass-panel p-8 relative overflow-hidden border border-outline-variant hover:border-primary-container/50 transition-colors">
+      <div className="glass-panel p-8 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
         <h2 className="font-headline-lg text-2xl text-on-surface mb-6 flex items-center gap-3 uppercase tracking-tight"><Layout className="text-primary-container" /> {t.dGeneral}</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -44,7 +44,7 @@ export default function GeneralTab({
       </div>
 
       {/* Search & Select Guild - Moved from Killboard */}
-      <div className="glass-panel p-8 relative overflow-hidden border border-outline-variant hover:border-primary-container/50 transition-colors">
+      <div className="glass-panel p-8 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
         <h2 className="font-headline-lg text-2xl text-on-surface mb-2 flex items-center gap-3 uppercase tracking-tight">
           <Sword className="text-primary-container" /> Albion Guild Configuration
           <InfoTooltip text={lang === 'en' ? 'Search and link your Albion Online Guild. This is required for Killboard and Auto-Check features to work globally.' : 'Albion Online Loncanızı arayıp bağlayın. Killboard ve Otomatik Kontrol özelliklerinin çalışması için bu zorunludur.'} />

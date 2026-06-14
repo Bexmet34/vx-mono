@@ -47,7 +47,7 @@ export default function OverviewTab({ subscription, setActiveTab, settings }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-slide-up">
       {/* Main Welcome Box */}
-      <div className="md:col-span-2 glass-panel p-8 relative overflow-hidden border border-primary-container/30 bg-primary-container/5 hover:border-primary-container transition-colors group">
+      <div className="md:col-span-2 glass-panel p-8 relative overflow-visible border border-primary-container/30 bg-primary-container/5 hover:border-primary-container transition-colors group">
         <div className="scanline"></div>
         <div className="absolute top-8 right-8 text-primary-container/10 group-hover:text-primary-container/30 transition-colors">
           <Star size={120} />
@@ -69,7 +69,7 @@ export default function OverviewTab({ subscription, setActiveTab, settings }) {
       </div>
 
       {/* Subscription Status Box */}
-      <div className="glass-panel p-8 relative overflow-hidden border border-outline-variant hover:border-primary-container/50 transition-colors">
+      <div className="glass-panel p-8 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
         <h3 className="font-headline-md text-xl text-on-surface mb-6 uppercase tracking-tight">
           {lang === 'tr' ? 'Abonelik Durumu' : 'Subscription Status'}
         </h3>
@@ -93,7 +93,7 @@ export default function OverviewTab({ subscription, setActiveTab, settings }) {
       </div>
 
       {/* Quick Stats Box */}
-      <div className="glass-panel p-8 relative overflow-hidden border border-outline-variant hover:border-primary-container/50 transition-colors">
+      <div className="glass-panel p-8 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
         <h3 className="font-headline-md text-xl text-on-surface mb-6 uppercase tracking-tight">
           {lang === 'tr' ? 'Sistem Durumu' : 'System Status'}
         </h3>
