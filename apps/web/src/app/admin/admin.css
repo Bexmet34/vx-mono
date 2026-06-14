@@ -41,11 +41,11 @@
   backdrop-filter: blur(20px);
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1024px) and (min-width: 769px) {
   .admin-sidebar {
     width: 100%;
     border-right: none;
-    border-bottom: 1px solid var(--admin-border);
+    border-bottom: 1px solid var(--border);
     flex-direction: row;
     align-items: center;
     overflow-x: auto;
@@ -57,7 +57,7 @@
   .admin-sidebar-header {
     margin-bottom: 0 !important;
     padding: 0 1rem 0 0 !important;
-    border-right: 1px solid var(--admin-border);
+    border-right: 1px solid var(--border);
     margin-right: 1rem;
   }
   .admin-nav-group {
@@ -70,11 +70,65 @@
     white-space: nowrap;
     font-size: 0.8rem !important;
   }
+  .admin-sidebar > div:last-child {
+    display: none !important;
+  }
+}
+
+/* Mobile App Layout (Bottom Navigation) */
+@media (max-width: 768px) {
+  .admin-container {
+    padding-bottom: 80px; /* Space for bottom nav */
+  }
+  .admin-sidebar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    padding: 0 1rem;
+    background: rgba(11, 12, 16, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    border-right: none;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    z-index: 9999;
+    box-shadow: 0 -4px 30px rgba(0,0,0,0.5);
+  }
+  .admin-sidebar-header {
+    display: none !important;
+  }
+  .admin-nav-group {
+    flex-direction: row !important;
+    justify-content: space-between;
+    width: 100%;
+    gap: 0;
+  }
+  .admin-nav-item {
+    flex-direction: column !important;
+    gap: 0.3rem !important;
+    padding: 0.5rem !important;
+    background: transparent !important;
+    border-radius: 8px !important;
+    color: var(--text-secondary);
+    min-width: 48px;
+  }
   .admin-nav-item span {
-    display: none; /* Hide text on very small screens or keep icons only */
+    font-size: 0.6rem !important;
+    display: block !important;
+    font-weight: 600;
+  }
+  .admin-nav-item.active {
+    color: var(--primary) !important;
+  }
+  .admin-nav-item:hover {
+    transform: none !important;
   }
   .admin-sidebar > div:last-child {
-    display: none !important; /* Hide user profile on mobile sidebar to save space */
+    display: none !important; /* Hide user profile on mobile bottom nav */
   }
 }
 
@@ -132,17 +186,59 @@
 
 @media (max-width: 768px) {
   .admin-main {
-    padding: 1.5rem 1rem;
+    padding: 1rem 0.5rem;
   }
   .admin-header {
     flex-direction: column;
     align-items: flex-start !important;
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 0 0.5rem;
   }
   .admin-card {
-    border-radius: 12px;
-    overflow-x: auto; /* Allow table scrolling */
+    border-radius: 16px;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+  }
+  
+  /* Mobile App-like Table-to-Cards */
+  .admin-table, .admin-table tbody, .admin-table tr, .admin-table td {
+    display: block;
+    width: 100%;
+  }
+  .admin-table thead {
+    display: none; /* Hide headers */
+  }
+  .admin-table tr {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+  .admin-table td {
+    padding: 0.5rem 0;
+    border: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+  .admin-table td::before {
+    content: attr(data-label);
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    min-width: 90px;
+  }
+  .admin-table td:last-child {
+    margin-top: 0.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    justify-content: center;
   }
 }
 
@@ -498,7 +594,14 @@ select.admin-input-field option {
   display: flex;
   gap: 0.8rem;
   margin-bottom: 1.5rem;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 0.5rem;
+}
+
+.server-filter-row::-webkit-scrollbar {
+  display: none; /* Hide scrollbar for clean app UI */
 }
 
 /* Table action buttons wrapper */
@@ -588,19 +691,31 @@ select.admin-input-field option {
     gap: 0.4rem;
   }
 
-  /* Modal on mobile */
+  /* Modal on mobile - Bottom Sheet */
+  .admin-modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
   .admin-modal {
-    padding: 1.5rem;
-    border-radius: 18px;
+    border-radius: 24px 24px 0 0;
+    margin: 0;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 2rem 1.5rem 3rem 1.5rem;
+    animation: slideUpSheet 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  @keyframes slideUpSheet {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
   }
 
   .admin-modal h2 {
-    font-size: 1.2rem !important;
+    font-size: 1.3rem !important;
   }
 
   .modal-tab-btn {
-    font-size: 0.78rem;
-    padding: 0.55rem 0.3rem;
+    font-size: 0.8rem;
+    padding: 0.65rem 0.3rem;
   }
 
   .admin-btn-group {
@@ -609,8 +724,8 @@ select.admin-input-field option {
 
   .admin-btn-secondary,
   .admin-btn-primary {
-    padding: 0.75rem;
-    font-size: 0.9rem;
+    padding: 0.85rem;
+    font-size: 0.95rem;
   }
 }
 

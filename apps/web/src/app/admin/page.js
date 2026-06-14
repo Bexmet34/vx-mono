@@ -497,7 +497,7 @@ export default function AdminPage() {
                         
                         return (
                           <tr key={s.id} className="admin-tr-hover" style={{opacity: isPassive ? 0.5 : 1}}>
-                            <td>
+                            <td data-label="SUNUCU BİLGİSİ">
                               <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
                                 <div style={{ 
                                   width: "42px", height: "42px", borderRadius: "12px", 
@@ -513,10 +513,10 @@ export default function AdminPage() {
                                 </div>
                               </div>
                             </td>
-                            <td className="hide-on-tablet">
+                            <td className="hide-on-tablet" data-label="SAHİP ID">
                               <code style={{ fontSize: "0.85rem", color: "var(--admin-text-muted)", background: 'rgba(255,255,255,0.03)', padding: '0.3rem 0.6rem', borderRadius: '6px' }}>{s.owner_id}</code>
                             </td>
-                            <td>
+                            <td data-label="DURUM">
                               {isPassive ? (
                                 <span className="admin-badge badge-passive">Pasif</span>
                               ) : (
@@ -526,7 +526,7 @@ export default function AdminPage() {
                                 <span className="admin-badge" style={{background: 'rgba(252,163,17,0.12)', color: '#fca311', border: '1px solid rgba(252,163,17,0.3)', marginLeft: '0.4rem', fontSize: '0.62rem'}}>🎮 Party ∞</span>
                               )}
                             </td>
-                            <td>
+                            <td data-label="PLAN">
                               {/* PLAN column: Freemium / Premium / Unlimited */}
                               {s.is_unlimited ? (
                                 <span className="admin-badge badge-unlimited" style={{fontSize:'0.8rem'}}>♾️ Sınırsız</span>
@@ -536,7 +536,7 @@ export default function AdminPage() {
                                 <span className="admin-badge badge-expired" style={{fontSize:'0.8rem'}}>🆓 Freemium</span>
                               )}
                             </td>
-                            <td>
+                            <td data-label="İŞLEMLER">
                               <div className="table-actions">
                                 <button 
                                   className="admin-action-btn" 
@@ -631,27 +631,27 @@ export default function AdminPage() {
                             <tr><td colSpan={5} style={{textAlign: 'center', padding: '4rem', opacity: 0.5}}>Henüz paket bulunmuyor.</td></tr>
                           ) : plans.map(p => (
                             <tr key={p.id}>
-                              <td>
+                              <td data-label="PAKET ADI / ID">
                                 <div style={{fontWeight: '700', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
                                   {p.name_tr}
                                   {p.is_featured && <span className="admin-badge badge-unlimited" style={{fontSize: '0.65rem', padding: '0.1rem 0.4rem'}}>Öne Çıkan</span>}
                                 </div>
                                 <code style={{fontSize: '0.8rem', color: 'var(--admin-text-muted)'}}>{p.id}</code>
                               </td>
-                              <td>
+                              <td data-label="FİYAT">
                                 <div style={{fontWeight: '600', color: 'var(--admin-accent)'}}>{p.amount} {p.currency}</div>
                               </td>
-                              <td>
+                              <td data-label="SÜRE">
                                 <div style={{fontSize: '0.9rem', fontWeight: '500'}}>{p.duration_days} Gün</div>
                               </td>
-                              <td>
+                              <td data-label="DURUM">
                                 {p.is_active ? (
                                   <span className="admin-badge badge-active">Aktif</span>
                                 ) : (
                                   <span className="admin-badge badge-passive">Pasif</span>
                                 )}
                               </td>
-                              <td>
+                              <td data-label="İŞLEMLER">
                                 <div style={{display: 'flex', gap: '0.5rem', justifyContent: 'flex-end'}}>
                                    <button className="admin-action-btn" onClick={() => {
                                      setEditingPlanId(p.id);
@@ -849,11 +849,11 @@ export default function AdminPage() {
                         <tr><td colSpan={6} style={{textAlign: 'center', padding: '4rem', opacity: 0.5}}>Henüz kampanya oluşturulmadı.</td></tr>
                       ) : campaigns.map(c => (
                         <tr key={c.id}>
-                          <td>
+                          <td data-label="KAMPANYA ADI / KOD">
                             <div style={{fontWeight: '700'}}>{c.title_tr}</div>
                             <code style={{fontSize: '0.8rem', color: 'var(--admin-accent)', background: 'var(--admin-accent-muted)', padding: '0.2rem 0.5rem', borderRadius: '4px'}}>{c.promo_code}</code>
                           </td>
-                          <td>
+                          <td data-label="HEDEF">
                             <span style={{fontSize: '0.85rem', textTransform: 'capitalize'}}>
                               {c.target_type === 'active' && 'Aktif Üyeler'}
                               {c.target_type === 'expired' && 'Süresi Bitenler'}
@@ -861,10 +861,10 @@ export default function AdminPage() {
                               {c.target_type === 'manual' && 'Özel Seçim'}
                             </span>
                           </td>
-                          <td>
+                          <td data-label="ÖDÜL">
                             <div style={{fontWeight: '600', color: 'var(--admin-success)'}}>+{c.reward_days} Gün</div>
                           </td>
-                          <td>
+                          <td data-label="KULLANIM">
                             <div style={{fontSize: '0.9rem', fontWeight: '700'}}>
                               {c.current_usage} / {c.usage_limit}
                             </div>
@@ -872,14 +872,14 @@ export default function AdminPage() {
                                <div style={{width: `${(c.current_usage / c.usage_limit) * 100}%`, height: '100%', background: 'var(--admin-accent)'}} />
                             </div>
                           </td>
-                          <td>
+                          <td data-label="DURUM">
                             {c.is_active ? (
                               <span className="admin-badge badge-active">Yayında</span>
                             ) : (
                               <span className="admin-badge badge-passive">Pasif</span>
                             )}
                           </td>
-                          <td>
+                          <td data-label="İŞLEMLER">
                             <div style={{display: 'flex', gap: '0.5rem', justifyContent: 'flex-end'}}>
                                <button className="admin-action-btn" title="Anasayfa Görünürlüğü" onClick={() => handleToggleCampaign(c.id, 'show_on_home', !c.show_on_home)}>
                                   {c.show_on_home ? <Eye size={18} color="var(--admin-accent)" /> : <EyeOff size={18} />}
@@ -998,31 +998,31 @@ export default function AdminPage() {
                             <tr><td colSpan={5} style={{textAlign: 'center', padding: '4rem', opacity: 0.5}}>Henüz zamanlanmış mesaj yok.</td></tr>
                           ) : scheduledMessages.map(m => (
                             <tr key={m.id}>
-                              <td style={{maxWidth: '300px'}}>
+                              <td style={{maxWidth: '300px'}} data-label="MESAJ İÇERİĞİ">
                                 <div style={{fontWeight: '500', fontSize: '0.9rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>
                                   {m.message_content}
                                 </div>
                               </td>
-                              <td>
+                              <td data-label="TÜR & ZAMAN">
                                 <div style={{fontWeight: '700'}}>
                                   {m.schedule_type === 'recurring' ? (m.interval_days > 1 ? `${m.interval_days} Günde Bir` : 'Her Gün') : 'Tek Seferlik'}
                                 </div>
                                 <code style={{fontSize: '0.8rem', color: 'var(--admin-accent)', background: 'var(--admin-accent-muted)', padding: '0.2rem 0.5rem', borderRadius: '4px'}}>{m.send_time}</code>
                               </td>
-                              <td>
+                              <td data-label="EKSTRALAR">
                                 <div style={{display: 'flex', gap: '0.5rem'}}>
                                   {m.ping_everyone && <span className="admin-badge" style={{background: 'rgba(88, 101, 242, 0.2)', color: '#5865F2'}}>@everyone</span>}
                                   {m.buttons?.length > 0 && <span className="admin-badge" style={{background: 'rgba(252, 163, 17, 0.2)', color: '#fca311'}}>{m.buttons.length} Buton</span>}
                                 </div>
                               </td>
-                              <td>
+                              <td data-label="DURUM">
                                 {m.is_active ? (
                                   <span className="admin-badge badge-active">Aktif</span>
                                 ) : (
                                   <span className="admin-badge badge-passive">Pasif</span>
                                 )}
                               </td>
-                              <td>
+                              <td data-label="İŞLEMLER">
                                 <div style={{display: 'flex', gap: '0.5rem', justifyContent: 'flex-end'}}>
                                    <button className="admin-action-btn danger" onClick={() => handleDeleteScheduled(m.id)}>
                                       <Trash2 size={18} />
