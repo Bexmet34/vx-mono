@@ -1,14 +1,14 @@
 :root {
-  --admin-bg: #0b0c10;
-  --admin-card: rgba(31, 40, 51, 0.4);
-  --admin-accent: #fca311;
-  --admin-accent-muted: rgba(252, 163, 17, 0.1);
-  --admin-border: rgba(255, 255, 255, 0.08);
-  --admin-text: #ffffff;
-  --admin-text-muted: #c5c6c7;
-  --admin-success: #2ecc71;
-  --admin-error: #e74c3c;
-  --admin-unlimited: #9b59b6;
+  --admin-bg: var(--background);
+  --admin-card: var(--surface);
+  --admin-accent: var(--primary);
+  --admin-accent-muted: rgba(var(--primary-rgb), 0.15);
+  --admin-border: var(--border);
+  --admin-text: var(--text-primary);
+  --admin-text-muted: var(--text-secondary);
+  --admin-success: var(--success);
+  --admin-error: var(--error);
+  --admin-unlimited: #a855f7;
 }
 
 .admin-container {
@@ -32,8 +32,8 @@
 /* Sidebar */
 .admin-sidebar {
   width: 260px;
-  background: rgba(11, 12, 16, 0.8);
-  border-right: 1px solid var(--admin-border);
+  background: var(--surface);
+  border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   padding: 1.5rem;
@@ -126,7 +126,8 @@
   flex: 1;
   overflow-y: auto;
   padding: 2.5rem 4rem;
-  background-image: radial-gradient(circle at top right, rgba(252, 163, 17, 0.05) 0%, transparent 40%);
+  background-image: radial-gradient(circle at top right, rgba(var(--primary-rgb), 0.08) 0%, transparent 40%),
+                    radial-gradient(circle at bottom left, rgba(var(--secondary-rgb), 0.05) 0%, transparent 40%);
 }
 
 @media (max-width: 768px) {
@@ -170,12 +171,12 @@
 
 /* Cards & Tables */
 .admin-card {
-  background: var(--admin-card);
-  border: 1px solid var(--admin-border);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 20px;
   backdrop-filter: blur(16px);
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
 }
 
 .admin-table {

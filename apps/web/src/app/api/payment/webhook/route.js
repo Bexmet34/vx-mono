@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { supabase } from "@veyronix/database";
 import crypto from 'crypto';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(req) {
   try {
     const rawBody = await req.text();

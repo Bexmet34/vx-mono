@@ -325,10 +325,10 @@ export default function AdminPage() {
     
     if (!matchesSearch) return false;
     
-    if (statusFilter === 'active') return s.is_active && !s.is_unlimited && new Date(s.expires_at) >= new Date();
+    if (statusFilter === 'premium') return s.is_active && !s.is_unlimited && new Date(s.expires_at) >= new Date();
     if (statusFilter === 'unlimited') return s.is_unlimited;
     if (statusFilter === 'passive') return !s.is_active;
-    if (statusFilter === 'expired') return s.is_active && !s.is_unlimited && new Date(s.expires_at) < new Date();
+    if (statusFilter === 'freemium') return s.is_active && !s.is_unlimited && new Date(s.expires_at) < new Date();
     
     return true;
   });
@@ -444,7 +444,7 @@ export default function AdminPage() {
                          <div className="value">{servers.length}</div>
                       </div>
                       <div className="stat-mini-card">
-                         <div className="label" style={{color: 'var(--admin-success)'}}>Aktif</div>
+                         <div className="label" style={{color: 'var(--admin-success)'}}>Premium</div>
                          <div className="value">{servers.filter(s => s.is_active && !s.is_unlimited && new Date(s.expires_at) >= new Date()).length}</div>
                       </div>
                       <div className="stat-mini-card">
@@ -452,7 +452,7 @@ export default function AdminPage() {
                          <div className="value">{servers.filter(s => s.is_unlimited).length}</div>
                       </div>
                       <div className="stat-mini-card">
-                         <div className="label" style={{color: '#ff4757'}}>S. Dolmuş</div>
+                         <div className="label" style={{color: '#ff4757'}}>Freemium</div>
                          <div className="value">{servers.filter(s => s.is_active && !s.is_unlimited && new Date(s.expires_at) < new Date()).length}</div>
                       </div>
                       <div className="stat-mini-card">
@@ -463,18 +463,18 @@ export default function AdminPage() {
                 </div>
 
                 <div className="server-filter-row">
-                   {['all', 'active', 'unlimited', 'passive', 'expired'].map(f => (
+                   {['all', 'premium', 'unlimited', 'passive', 'freemium'].map(f => (
                      <button 
                        key={f}
                        onClick={() => setStatusFilter(f)}
                        className={`filter-btn ${statusFilter === f ? 'active' : ''}`}
-                       style={f === 'expired' ? {borderColor: '#ff4757', color: statusFilter === 'expired' ? 'white' : '#ff4757'} : {}}
+                       style={f === 'freemium' ? {borderColor: '#ff4757', color: statusFilter === 'freemium' ? 'white' : '#ff4757'} : {}}
                      >
                        {f === 'all' && 'Hepsi'}
-                       {f === 'active' && 'Sadece Aktif'}
+                       {f === 'premium' && 'Sadece Premium'}
                        {f === 'unlimited' && 'Sadece Sınırsız'}
                        {f === 'passive' && 'Sadece Pasif'}
-                       {f === 'expired' && 'Süresi Dolmuş'}
+                       {f === 'freemium' && 'Sadece Freemium'}
                      </button>
                    ))}
                 </div>
@@ -519,10 +519,6 @@ export default function AdminPage() {
                             <td>
                               {isPassive ? (
                                 <span className="admin-badge badge-passive">Pasif</span>
-                              ) : s.is_unlimited ? (
-                                <span className="admin-badge badge-unlimited">Sınırsız</span>
-                              ) : isExpired ? (
-                                <span className="admin-badge badge-expired">Süresi Dolmuş</span>
                               ) : (
                                 <span className="admin-badge badge-active">Aktif</span>
                               )}
@@ -534,7 +530,7 @@ export default function AdminPage() {
                               {/* PLAN column: Freemium / Premium / Unlimited */}
                               {s.is_unlimited ? (
                                 <span className="admin-badge badge-unlimited" style={{fontSize:'0.8rem'}}>♾️ Sınırsız</span>
-                              ) : s.trial_used === false ? (
+                              ) : !isExpired ? (
                                 <span className="admin-badge badge-active" style={{fontSize:'0.8rem'}}>💎 Premium</span>
                               ) : (
                                 <span className="admin-badge badge-expired" style={{fontSize:'0.8rem'}}>🆓 Freemium</span>
@@ -544,15 +540,21 @@ export default function AdminPage() {
                               <div className="table-actions">
                                 <button 
                                   className="admin-action-btn" 
-                                  title="Süre Yönetimi" 
-                                  onClick={() => { 
-                                    const currentExpiry = s.expires_at ? format(new Date(s.expires_at), "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd");
-                                    setShowDayModal({ guildId: s.guild_id, mode: 'add' }); 
-                                    setDaysToAdd(30);
-                                    setExpiryDate(currentExpiry);
-                                  }}
+                                  title="+30 Gün Ekle" 
+                                  disabled={savingId === s.guild_id}
+                                  onClick={() => handleServerAction(s.guild_id, 'add_days', 30)}
+                                  style={{color: 'var(--admin-success)', borderColor: 'rgba(46, 204, 113, 0.3)'}}
                                 >
-                                  <Clock size={18} />
+                                  {savingId === s.guild_id ? <Loader2 size={18} className="spin" /> : <Plus size={18} />}
+                                </button>
+                                
+                                <button 
+                                  className="admin-action-btn danger" 
+                                  title="-30 Gün Çıkar" 
+                                  disabled={savingId === s.guild_id}
+                                  onClick={() => handleServerAction(s.guild_id, 'remove_days', 30)}
+                                >
+                                  {savingId === s.guild_id ? <Loader2 size={18} className="spin" /> : <Clock size={18} />}
                                 </button>
 
                                 <button 
