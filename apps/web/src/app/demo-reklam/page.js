@@ -16,7 +16,7 @@ export default function DemoReklamPage() {
     }, [timeLeft]);
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-[#0B0E14] text-white p-2 font-sans overflow-x-hidden">
+        <div className="min-h-screen flex flex-col items-center justify-center bg-[#0B0E14] text-white p-4 font-sans overflow-x-hidden">
             
             {/* Adsterra Popunder Script */}
             <Script 
@@ -24,7 +24,7 @@ export default function DemoReklamPage() {
                 strategy="afterInteractive" 
             />
 
-            {/* Adsterra Native Banner/Social Bar Script (Loads Once) */}
+            {/* Adsterra Native Banner/Social Bar Script (Loads Once Globally) */}
             <Script 
                 src="https://pl29746098.effectivecpmnetwork.com/76065e7d3fa28e6d941142b176377f08/invoke.js" 
                 strategy="afterInteractive"
@@ -32,39 +32,44 @@ export default function DemoReklamPage() {
             />
 
             {/* TOP AD CONTAINER */}
-            <div className="w-full max-w-sm mb-4 min-h-[50px] flex items-center justify-center">
+            <div className="w-full max-w-md mb-4 min-h-[50px] flex items-center justify-center">
                 <div id="container-76065e7d3fa28e6d941142b176377f08"></div>
             </div>
 
-            {/* KART KÜÇÜLTÜLDÜ: max-w-md -> max-w-sm, p-8 -> p-6 */}
-            <div className="bg-[#151921] border border-gray-800 p-6 rounded-2xl shadow-xl max-w-sm w-full text-center relative overflow-hidden">
+            {/* MAIN CARD (Restored to original size) */}
+            <div className="bg-[#151921] border border-gray-800 p-8 rounded-2xl shadow-xl max-w-md w-full text-center relative overflow-hidden">
                 {/* Decorative background glow */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-24 bg-blue-500/10 blur-[40px] pointer-events-none"></div>
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-32 bg-blue-500/10 blur-[50px] pointer-events-none"></div>
 
-                <div className="mb-4 relative z-10">
-                    <span className="text-3xl block mb-2">🛡️</span>
-                    <h1 className="text-xl font-bold mb-1">Güvenlik Doğrulaması</h1>
-                    <p className="text-gray-400 text-xs">
+                <div className="mb-6 relative z-10">
+                    <span className="text-4xl block mb-4">🛡️</span>
+                    <h1 className="text-2xl font-bold mb-2">Güvenlik Doğrulaması</h1>
+                    <p className="text-gray-400 text-sm">
                         Bot sistemini kullanmak için lütfen işlemin tamamlanmasını bekleyin. Bu sayfada beklemeniz yeterlidir.
                     </p>
                 </div>
 
-                <div className="bg-[#0B0E14] rounded-xl p-4 mb-5 border border-gray-800 relative z-10">
+                <div className="bg-[#0B0E14] rounded-xl p-6 mb-6 border border-gray-800 relative z-10">
                     {timeLeft > 0 ? (
                         <div>
-                            <div className="text-4xl font-mono font-bold text-yellow-500 mb-1 drop-shadow-[0_0_8px_rgba(234,179,8,0.5)]">
+                            <div className="text-5xl font-mono font-bold text-yellow-500 mb-2 drop-shadow-[0_0_8px_rgba(234,179,8,0.5)]">
                                 {timeLeft}
                             </div>
-                            <div className="text-gray-500 text-[10px] uppercase tracking-wider font-semibold">Saniye Kaldı</div>
+                            <div className="text-gray-500 text-xs uppercase tracking-wider font-semibold">Saniye Kaldı</div>
                         </div>
                     ) : (
                         <div className="animate-in zoom-in duration-300">
-                            <div className="text-4xl font-mono font-bold text-green-500 mb-1 drop-shadow-[0_0_8px_rgba(34,197,94,0.5)]">
+                            <div className="text-5xl font-mono font-bold text-green-500 mb-2 drop-shadow-[0_0_8px_rgba(34,197,94,0.5)]">
                                 ✓
                             </div>
-                            <div className="text-green-500 text-xs font-bold tracking-wide uppercase">Doğrulama Tamamlandı</div>
+                            <div className="text-green-500 text-sm font-bold tracking-wide uppercase">Doğrulama Tamamlandı</div>
                         </div>
                     )}
+                </div>
+
+                {/* AD CONTAINER UNDER THE COUNTDOWN (INSIDE CARD) */}
+                <div className="w-full mb-6 min-h-[50px] flex items-center justify-center relative z-10 bg-[#0B0E14]/50 rounded-lg py-2">
+                    <div id="container-76065e7d3fa28e6d941142b176377f08"></div>
                 </div>
 
                 <button 
@@ -72,10 +77,10 @@ export default function DemoReklamPage() {
                     onClick={() => {
                         alert("Harika! Gerçek sistemde bu butona basıldığında yetki verilecek ve Discord'a yönlendirilecek.");
                     }}
-                    className={`relative z-10 w-full py-3 px-4 rounded-xl font-bold transition-all duration-300 text-xs uppercase tracking-wider ${
+                    className={`relative z-10 w-full py-4 px-4 rounded-xl font-bold transition-all duration-300 text-sm uppercase tracking-wider ${
                         timeLeft > 0 
                         ? 'bg-gray-800/50 text-gray-600 cursor-not-allowed border border-gray-700/50' 
-                        : 'bg-blue-600 hover:bg-blue-500 text-white shadow-[0_0_15px_rgba(37,99,235,0.4)] hover:shadow-[0_0_20px_rgba(59,130,246,0.6)] border border-blue-500/50'
+                        : 'bg-blue-600 hover:bg-blue-500 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] hover:shadow-[0_0_25px_rgba(59,130,246,0.6)] border border-blue-500/50'
                     }`}
                 >
                     {timeLeft > 0 ? 'Lütfen Bekleyin...' : '🚀 Bota Geri Dön'}
@@ -83,11 +88,11 @@ export default function DemoReklamPage() {
             </div>
             
             {/* BOTTOM AD CONTAINER */}
-            <div className="w-full max-w-sm mt-4 min-h-[50px] flex items-center justify-center">
+            <div className="w-full max-w-md mt-4 min-h-[50px] flex items-center justify-center">
                 <div id="container-76065e7d3fa28e6d941142b176377f08"></div>
             </div>
 
-            <p className="text-gray-600 text-[10px] mt-4 max-w-xs text-center">
+            <p className="text-gray-600 text-xs mt-8 max-w-sm text-center">
                 Sayfada rastgele bir yere tıkladığınızda sponsor reklamları açılabilir. Bu, sistemin ücretsiz kalmasını sağlar.
             </p>
         </div>
