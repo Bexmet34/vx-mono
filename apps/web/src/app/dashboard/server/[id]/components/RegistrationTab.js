@@ -531,10 +531,13 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
               <label className="block text-sm font-label-bold text-primary-container uppercase tracking-widest mb-2">
                 {lang === 'en' ? 'Backward Compatibility Sync' : 'Geriye Dönük Senkronizasyon (Sync)'}
               </label>
-              <p className="text-xs font-body-md text-on-surface-variant mb-4">
-                {lang === 'en' 
+              <p className="text-xs font-body-md text-on-surface-variant mb-4 flex flex-col gap-1">
+                <span>{lang === 'en' 
                   ? 'Adds existing old members to the database safely. (Requires Guild to be set in General Settings)' 
-                  : 'Eski kayıtlı üyelerinizi sisteme güvenle dahil eder. (Genel ayarlardan guild seçilmiş olması zorunludur)'}
+                  : 'Eski kayıtlı üyelerinizi sisteme güvenle dahil eder. (Genel ayarlardan guild seçilmiş olması zorunludur)'}</span>
+                <strong className="text-error/90 mt-1 font-label-bold">{lang === 'en'
+                  ? '⚠️ Note: This process may take up to 15 minutes. It runs in the background, so you can safely close this website once it starts.'
+                  : '⚠️ Not: Bu işlem 15 dakikaya kadar sürebilir. İşlem tamamen arka planda çalışır, başlattıktan sonra bu web sayfasını güvenle kapatabilirsiniz.'}</strong>
               </p>
               <button 
                 className={`w-full px-6 py-4 font-label-bold uppercase tracking-widest rounded-sm transition-all flex items-center justify-center gap-2 ${settings.albion_guild_id ? ((syncing || settings.is_syncing) ? 'bg-primary-container/20 border border-primary-container/50 text-primary-container cursor-not-allowed' : 'bg-primary-container text-on-primary hover:brightness-110 tactical-glow cursor-pointer') : 'bg-surface-container border border-outline-variant text-on-surface-variant cursor-not-allowed'}`} 
