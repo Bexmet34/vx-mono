@@ -173,8 +173,12 @@ export default function RoleMenuTab({ t, lang, guildId, discordChannels, showToa
             onClick={handleSetupRoles}
             disabled={triggeringSetup}
           >
-            {triggeringSetup ? <Loader2 size={20} className="animate-spin" /> : <ShieldPlus size={20} />}
-            {lang === 'en' ? 'Install Bot Roles Now' : 'Bot Rollerini Sunucuya Kur'}
+            {triggeringSetup ? (
+              <span className="flex items-center justify-center"><Loader2 size={20} className="animate-spin" /></span>
+            ) : (
+              <span className="flex items-center justify-center"><ShieldPlus size={20} /></span>
+            )}
+            <span>{lang === 'en' ? 'Install Bot Roles Now' : 'Bot Rollerini Sunucuya Kur'}</span>
           </button>
         </div>
       </div>
@@ -195,12 +199,20 @@ export default function RoleMenuTab({ t, lang, guildId, discordChannels, showToa
            </h2>
            <div className="flex gap-3">
              <button onClick={handleSave} disabled={saving} className="px-6 py-2.5 bg-surface-container border border-outline-variant text-on-surface hover:text-primary-container hover:border-primary-container rounded-sm font-label-bold uppercase tracking-widest flex items-center gap-2 transition-all disabled:opacity-50">
-               {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-               {lang === 'en' ? 'Save' : 'Kaydet'}
+               {saving ? (
+                 <span className="flex items-center justify-center"><Loader2 size={16} className="animate-spin" /></span>
+               ) : (
+                 <span className="flex items-center justify-center"><Save size={16} /></span>
+               )}
+               <span>{lang === 'en' ? 'Save' : 'Kaydet'}</span>
              </button>
              <button onClick={handleSendMenu} disabled={triggeringSend} className="px-6 py-2.5 bg-primary-container text-on-primary rounded-sm font-label-bold uppercase tracking-widest flex items-center gap-2 transition-all hover:brightness-110 tactical-glow disabled:opacity-50">
-               {triggeringSend ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-               {lang === 'en' ? 'Send to Channel' : 'Kanala Gönder'}
+               {triggeringSend ? (
+                 <span className="flex items-center justify-center"><Loader2 size={16} className="animate-spin" /></span>
+               ) : (
+                 <span className="flex items-center justify-center"><Send size={16} /></span>
+               )}
+               <span>{lang === 'en' ? 'Send to Channel' : 'Kanala Gönder'}</span>
              </button>
            </div>
         </div>

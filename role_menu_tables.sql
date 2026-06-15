@@ -1,3 +1,8 @@
+-- Eski tabloları çakışmayı önlemek için siliyoruz (Veri kaybı istemiyorsanız bu satırları silebilirsiniz)
+DROP TABLE IF EXISTS guild_roles CASCADE;
+DROP TABLE IF EXISTS guild_role_menus CASCADE;
+DROP TABLE IF EXISTS global_roles CASCADE;
+
 -- 1. Ana rolleri ve çevirilerini tutacağımız sabit tablo
 CREATE TABLE global_roles (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
