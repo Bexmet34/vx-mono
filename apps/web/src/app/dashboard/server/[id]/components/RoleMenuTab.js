@@ -89,7 +89,7 @@ export default function RoleMenuTab({ t, lang, guildId, discordChannels, showToa
               showToast(lang === "en" ? "Roles installed successfully!" : "Roller başarıyla kuruldu!", "success");
             }
           }
-          if (attempts > 30) {
+          if (attempts > 60) {
             clearInterval(interval);
             setTriggeringSetup(false);
             showToast(lang === "en" ? "Taking too long. Check back later." : "İşlem uzun sürdü, daha sonra tekrar kontrol edin.", "warning");

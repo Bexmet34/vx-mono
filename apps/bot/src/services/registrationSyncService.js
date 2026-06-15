@@ -74,7 +74,7 @@ async function syncRegistrations(client, guildId) {
                 if (!ign) continue;
 
                 // Call Albion API to search for player
-                const { getPlayerInfo } = require('../utils/apiUtils');
+                const { getPlayerInfo } = require('./albionService');
                 const playerData = await getPlayerInfo(ign);
                 
                 if (playerData && playerData.Id) {
