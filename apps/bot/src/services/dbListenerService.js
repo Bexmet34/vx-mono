@@ -117,6 +117,24 @@ async function checkUpdates(client, initial = false) {
                 syncRegistrations(client, config.guild_id).catch(console.error);
             }
         }
+
+        // --- NEW: Check Role Menu Triggers ---
+        const { data: roleMenus, error: rmError } = await supabase
+            .from('guild_role_menus')
+            .select('guild_id, trigger_roles_setup, trigger_roles_menu_send')
+            .or('trigger_roles_setup.eq.true,trigger_roles_menu_send.eq.true');
+
+        if (!rmError && roleMenus) {
+            const { setupGuildRoles, sendRoleMenu } = require('./roleMenuService');
+            for (const menu of roleMenus) {
+                if (menu.trigger_roles_setup) {
+                    setupGuildRoles(client, menu.guild_id).catch(console.error);
+                }
+                if (menu.trigger_roles_menu_send) {
+                    sendRoleMenu(client, menu.guild_id).catch(console.error);
+                }
+            }
+        }
     } catch (err) {
         console.error('[DbListenerService] Polling Error:', err.message);
     }

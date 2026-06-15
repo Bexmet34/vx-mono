@@ -19,6 +19,7 @@ import WhitelistTab from "./components/WhitelistTab";
 import TemplateTab from "./components/TemplateTab";
 import KillBoardTab from "./components/KillBoardTab";
 import RegistrationTab from "./components/RegistrationTab";
+import RoleMenuTab from "./components/RoleMenuTab";
 
 export default function ServerSettings() {
   const { data: session, status } = useSession();
@@ -394,6 +395,9 @@ export default function ServerSettings() {
           <button className={`flex items-center gap-2 px-4 py-2 rounded-full font-label-bold text-sm transition-all whitespace-nowrap ${activeTab === 'registration' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('registration')}>
             <Users size={16} /> Reg <span className="bg-primary-container text-on-primary text-[10px] px-2 py-0.5 rounded font-black ml-1 uppercase tracking-widest">BETA</span>
           </button>
+          <button className={`flex items-center gap-2 px-4 py-2 rounded-full font-label-bold text-sm transition-all whitespace-nowrap ${activeTab === 'rolemenu' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('rolemenu')}>
+            <Users size={16} /> Roles
+          </button>
         </nav>
       </div>
 
@@ -437,6 +441,10 @@ export default function ServerSettings() {
 
         {activeTab === 'registration' && (
           <RegistrationTab t={t} lang={lang} settings={settings} setSettings={setSettings} discordChannels={discordChannels} discordRoles={discordRoles} handleSave={handleSave} saving={saving} guildId={guildId} registeredCount={settings.registered_count || 0} setActiveTab={setActiveTab} />
+        )}
+
+        {activeTab === 'rolemenu' && (
+          <RoleMenuTab t={t} lang={lang} guildId={guildId} discordChannels={discordChannels} showToast={showToast} />
         )}
 
       </main>

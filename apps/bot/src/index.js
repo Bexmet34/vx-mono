@@ -260,6 +260,9 @@ client.on('interactionCreate', async interaction => {
                 await handleSettingsLanguageSelect(interaction);
             } else if (interaction.customId.startsWith('sub_manage:')) {
                 await handleSubscriptionSelect(interaction);
+            } else if (interaction.customId.startsWith('role_menu_')) {
+                const { handleRoleMenuSelect } = require('./handlers/roleMenuHandler');
+                await handleRoleMenuSelect(interaction);
             }
         } else if (interaction.isUserSelectMenu()) {
             if (interaction.customId.startsWith('add_member_user_select_')) {

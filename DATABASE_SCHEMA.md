@@ -64,6 +64,33 @@ Botun tüm sunuculara otomatik olarak göndereceği zamanlanmış (tek seferlik 
 - `last_sent_at` (timestamp): Son gönderilme tarihi (günlük tekrarlarda kontrol için).
 - `created_at` (timestamp): Oluşturulma tarihi.
 
+### 8. `global_roles`
+Botun sunuculara kuracağı varsayılan global rollerin tanımlarını saklar (PvP, Gatherer vb.).
+- `id` (uuid): Benzersiz ID.
+- `role_key` (varchar): Kod içi benzersiz erişim anahtarı.
+- `role_name` (varchar): Sunucuda ve arayüzde gösterilecek İngilizce rol adı.
+- `category` (varchar): Rolün kategorisi (combat, economy, gathering, crafting).
+- `color` (varchar): Rolün rengi (HEX).
+- `icon_emoji` (text): Menüde gösterilecek opsiyonel emoji.
+
+### 9. `guild_roles`
+Botun belirli bir sunucuda oluşturduğu rolleri, Discord üzerindeki gerçek Rol ID'leri ile eşleştirir.
+- `guild_id` (text): Sunucunun Discord ID'si.
+- `role_key` (varchar): İlgili `global_roles` anahtarı.
+- `discord_role_id` (text): Sunucuda açılan rolün Discord ID'si.
+
+### 10. `guild_role_menus`
+Sunucunun rol seçim menüsü ayarlarını ve gönderilen mesaj bilgilerini tutar.
+- `guild_id` (text): Sunucunun Discord ID'si.
+- `channel_id` (text): Mesajın gönderileceği veya gönderildiği kanal.
+- `message_id` (text): Gönderilen Embed mesajının ID'si.
+- `active_roles` (jsonb): Menüde gösterilecek rollerin dizisi.
+- `category_limits` (jsonb): Kategorilere göre maksimum seçim limitleri (örn: `{"combat": 2}`).
+- `header_image_url` (text): Mesajın üstünde gösterilecek resim.
+- `is_installed` (boolean): Roller sunucuda oluşturuldu mu?
+- `trigger_roles_setup` (boolean): Botun rolleri kurması için tetikleyici.
+- `trigger_roles_menu_send` (boolean): Botun menüyü kanala atması için tetikleyici.
+
 ---
 
 ## Silinen / Arşivlenen Tablolar (Notlar)
