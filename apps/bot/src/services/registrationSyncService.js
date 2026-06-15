@@ -97,6 +97,19 @@ async function syncRegistrations(client, guildId) {
                 console.error(`[SyncService] Error processing member ${member.id}:`, err);
             }
             processedCount++;
+
+            // Canlı ilerlemeyi her 2 kişide bir (yaklaşık 3 saniyede bir) Supabase'e yaz
+            if (processedCount > 0 && processedCount % 2 === 0) {
+                await updateSupabaseGuildSettings(guildId, { 
+                    last_sync_result: {
+                        scanned: processedCount,
+                        synced: registeredCount,
+                        skipped: skippedCount,
+                        total: membersArray.length,
+                        timestamp: new Date().toISOString()
+                    }
+                });
+            }
         }
 
         // Update final count and sync result in Supabase

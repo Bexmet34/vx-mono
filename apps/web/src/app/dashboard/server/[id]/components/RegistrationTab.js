@@ -20,13 +20,20 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
           if (res.ok) {
             const data = await res.json();
             if (data && data.settings) {
+              // Canlı ilerlemeyi göstermek için veriyi her seferinde güncelle
+              if (data.settings.last_sync_result) {
+                setSettings(prev => ({
+                  ...prev,
+                  last_sync_result: data.settings.last_sync_result,
+                  registered_count: data.settings.registered_count
+                }));
+              }
+
               if (data.settings.is_syncing === false) {
                 // Sync finished! Update settings and stop polling
                 setSettings(prev => ({
                   ...prev,
-                  is_syncing: false,
-                  last_sync_result: data.settings.last_sync_result,
-                  registered_count: data.settings.registered_count
+                  is_syncing: false
                 }));
                 setSyncing(false);
                 clearInterval(interval);
@@ -536,15 +543,15 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
               >
                 {(syncing || settings.is_syncing) ? <Loader2 size={18} className="animate-spin"/> : <Users size={18}/>} 
                 {lang === 'en' 
-                  ? (settings.albion_guild_id ? ((syncing || settings.is_syncing) ? 'Syncing...' : 'Start Sync Process') : 'Set Guild in General Settings First') 
-                  : (settings.albion_guild_id ? ((syncing || settings.is_syncing) ? 'Şu an Senkronize Ediliyor...' : 'Senkronizasyon İşlemini Başlat') : 'Önce Genel Ayarlardan Guild Seçin')}
+                  ? (settings.albion_guild_id ? ((syncing || settings.is_syncing) ? `Syncing... ${settings.last_sync_result?.scanned || 0} / ${settings.last_sync_result?.total || '?'}` : 'Start Sync Process') : 'Set Guild in General Settings First') 
+                  : (settings.albion_guild_id ? ((syncing || settings.is_syncing) ? `Şu an Taranıyor: ${settings.last_sync_result?.scanned || 0} / ${settings.last_sync_result?.total || '?'}` : 'Senkronizasyon İşlemini Başlat') : 'Önce Genel Ayarlardan Guild Seçin')}
               </button>
 
               {settings.last_sync_result && (
                 <div className="mt-6 p-4 bg-primary-container/5 border border-primary-container/30 rounded-sm animate-slide-up">
-                  <h4 className="text-sm font-label-bold text-primary-container uppercase tracking-widest mb-2">{lang === 'en' ? 'Last Sync Result' : 'Son Senkronizasyon Çıktısı'}</h4>
+                  <h4 className="text-sm font-label-bold text-primary-container uppercase tracking-widest mb-2">{(syncing || settings.is_syncing) ? (lang === 'en' ? 'Live Progress' : 'Canlı Tarama İlerlemesi') : (lang === 'en' ? 'Last Sync Result' : 'Son Senkronizasyon Çıktısı')}</h4>
                   <div className="grid grid-cols-3 gap-2 text-sm font-body-md">
-                    <div className="text-on-surface-variant">{lang === 'en' ? 'Scanned:' : 'Taranan:'} <strong className="text-on-surface ml-1">{settings.last_sync_result.scanned || 0}</strong></div>
+                    <div className="text-on-surface-variant">{lang === 'en' ? 'Scanned:' : 'Taranan:'} <strong className="text-on-surface ml-1">{settings.last_sync_result.scanned || 0} {settings.last_sync_result.total ? `/ ${settings.last_sync_result.total}` : ''}</strong></div>
                     <div className="text-on-surface-variant">{lang === 'en' ? 'Synced:' : 'Eklenen:'} <strong className="text-success ml-1">{settings.last_sync_result.synced || 0}</strong></div>
                     <div className="text-on-surface-variant">{lang === 'en' ? 'Skipped:' : 'Atlanan:'} <strong className="text-error ml-1">{settings.last_sync_result.skipped || 0}</strong></div>
                   </div>
