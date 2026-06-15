@@ -94,36 +94,7 @@ async function handleCreatePartyCommand(interaction) {
     const isOwner = userId === interaction.guild.ownerId;
     const isDeveloper = config.WHITELIST_USERS.includes(userId);
 
-    // 0. Subscription & Vote Check
-    const active = await isSubscriptionActive(interaction.guildId, interaction.guild.name, interaction.guild.ownerId);
-    
-    // Everyone must vote, EXCEPT developers or the OWNER of a premium (active) server.
-    const needsVote = !(isDeveloper || (active && isOwner));
-
-    if (needsVote) {
-        let hasVoted = await checkWeeklyVote(userId);
-
-        if (!hasVoted) {
-            const voteEmbed = new EmbedBuilder()
-                .setTitle(t('subscription.vote_required_title', lang))
-                .setDescription(t('subscription.vote_required_desc', lang))
-                .setColor('#5865F2')
-                .setFooter({ text: 'Veyronix Party Master • Top.gg System' });
-
-            const row = new ActionRowBuilder().addComponents(
-                new ButtonBuilder()
-                    .setLabel(t('subscription.vote_button', lang))
-                    .setURL(config.TOPGG_LINK || 'https://top.gg/bot/1082239904169336902')
-                    .setStyle(ButtonStyle.Link)
-            );
-
-            return await interaction.reply({
-                embeds: [voteEmbed],
-                components: [row],
-                flags: [MessageFlags.Ephemeral]
-            });
-        }
-    }
+    // Vote check is moved to Modal Submit (modalHandler) to prevent Discord 3-second timeout!
 
     const whitelisted = isOwner || isDeveloper || await isWhitelisted(userId, interaction.guildId);
 
@@ -211,6 +182,7 @@ async function handleTempCommand(interaction) {
     const isOwner = userId === interaction.guild?.ownerId;
     const isDeveloper = config.WHITELIST_USERS?.includes(userId);
 
+    await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
     // 0. Subscription & Vote Check
     const active = await isSubscriptionActive(interaction.guildId, interaction.guild.name, interaction.guild.ownerId);
 
@@ -294,7 +266,7 @@ function getTemplateByIndex(templatesStr, indexStr) {
     const template = getTemplateByIndex(guildConfig?.party_templates, templateIndex);
     
     if (!template) {
-        return await interaction.reply({ content: '❌ Hata: Şablon bulunamadı!', flags: [MessageFlags.Ephemeral] });
+        return await interaction.editReply({ content: '❌ Hata: Şablon bulunamadı!' });
     }
 
     const header = template.header || template.name || 'Parti';
@@ -320,13 +292,10 @@ function getTemplateByIndex(templatesStr, indexStr) {
         .filter(r => r.length > 0);
 
     if (rolesList.length === 0) {
-        return await interaction.reply({ content: '❌ Bu şablonda hiç rol tanımlanmamış.', flags: [MessageFlags.Ephemeral] });
+        return await interaction.editReply({ content: '❌ Bu şablonda hiç rol tanımlanmamış.' });
     }
 
-    // Defer reply instead of replying immediately so we can create the party message and reference it if we want to confirm ephemeral, 
-    // Wait, the regular /createparty responds an ephemeral wait then creates a real message. Actually /createparty opens modal, then modal completes.
-    // Let's send the actual party into the channel directly, and reply ephemeral with success.
-    await interaction.reply({ content: '⏳ Şablon yükleniyor ve parti oluşturuluyor...', flags: [MessageFlags.Ephemeral] });
+    await interaction.editReply({ content: '⏳ Şablon yükleniyor ve parti oluşturuluyor...' });
 
     // Use shared creation logic
     const embed = createPartikurEmbed(header, rolesList, description, '', 0, interaction.guild, lang, userId, guildConfig?.embed_thumbnail_url);
@@ -372,5 +341,7 @@ function getTemplateByIndex(templatesStr, indexStr) {
 module.exports = {
     handleCreatePartyCommand,
     handleTempCommand,
-    handleTempAutocomplete
+    handleTempAutocomplete,
+    checkWeeklyVote,
+    topggApi
 };

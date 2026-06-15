@@ -5,6 +5,7 @@ const { getActivePartyCount, setActiveParty } = require('../services/partyManage
 const { isWhitelisted } = require('../services/whitelistManager');
 const { getPlayerInfo, formatFame } = require('../services/albionService');
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, PermissionFlagsBits, MessageFlags } = require('discord.js');
+const { checkWeeklyVote } = require('./partikurHandler');
 const db = require('../services/db');
 const { getGuildConfig } = require('../services/guildConfig');
 const { t } = require('../services/i18n');
@@ -34,6 +35,36 @@ async function handlePartiModal(interaction) {
         const isUnlimited = sub && sub.is_unlimited;
         const hasUnlimitedParty = sub && sub.unlimited_party;
 
+        // 0. Subscription & Vote Check
+        const active = await getSubscription(interaction.guildId, interaction.guild.name, interaction.guild.ownerId).then(s => s?.is_active);
+        const needsVote = !(isDeveloper || (active && isOwner));
+
+        await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
+
+        if (needsVote) {
+            let hasVoted = await checkWeeklyVote(userId);
+
+            if (!hasVoted) {
+                const voteEmbed = new EmbedBuilder()
+                    .setTitle(t('subscription.vote_required_title', lang))
+                    .setDescription(t('subscription.vote_required_desc', lang))
+                    .setColor('#5865F2')
+                    .setFooter({ text: 'Veyronix Party Master • Top.gg System' });
+
+                const row = new ActionRowBuilder().addComponents(
+                    new ButtonBuilder()
+                        .setLabel(t('subscription.vote_button', lang))
+                        .setURL(config.TOPGG_LINK || 'https://top.gg/bot/1082239904169336902')
+                        .setStyle(ButtonStyle.Link)
+                );
+
+                return await interaction.editReply({
+                    embeds: [voteEmbed],
+                    components: [row]
+                });
+            }
+        }
+
         const partyCount = getActivePartyCount(userId);
         let limit = 1;
         if (whitelisted) limit = 3;
@@ -44,9 +75,8 @@ async function handlePartiModal(interaction) {
                 ? `❌ **${t('party.limit_reached', lang)}**\n\n${t('party.limit_desc_whitelisted', lang)}`
                 : `❌ **${t('party.already_active', lang)}**\n\n${t('party.limit_desc_normal', lang)}`;
 
-            return await interaction.reply({
-                content: errorMsg,
-                flags: [MessageFlags.Ephemeral]
+            return await interaction.editReply({
+                content: errorMsg
             });
         }
 
@@ -70,7 +100,9 @@ async function handlePartiModal(interaction) {
         const actualRoles = rolesList.filter(r => !r.startsWith('#HEADER:') && !r.startsWith('#'));
         addFooterFields(embed, 0, actualRoles.length, lang);
 
-        const msg = await safeReply(interaction, { content: '@everyone', embeds: [embed], components: components });
+        const msg = await interaction.channel.send({ content: '@everyone', embeds: [embed], components: components });
+        
+        await interaction.editReply({ content: '✅ Başarıyla oluşturuldu!' }).catch(()=>{});
 
         const msgId = msg?.id;
         const chanId = msg?.channelId || interaction.channelId;
