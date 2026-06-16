@@ -17,15 +17,7 @@ export default function Home() {
       setIsVideoMuted(!isVideoMuted);
     }
   };
-  const [isVideoMuted, setIsVideoMuted] = useState(true);
-  const videoRef = useRef(null);
 
-  const toggleMute = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !isVideoMuted;
-      setIsVideoMuted(!isVideoMuted);
-    }
-  };
   const { data: session, status } = useSession();
   const [gifs, setGifs] = useState([]);
   const [serverCount, setServerCount] = useState(0);
