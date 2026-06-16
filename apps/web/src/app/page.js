@@ -372,7 +372,7 @@ export default function Home() {
                 <p className="font-body-md text-sm text-on-surface-variant">{t.step3Desc}</p>
               </div>
             </div>
-            
+          </div>
         </section>
 
 {/* --- DASHBOARD SHOWCASE SECTION --- */}
