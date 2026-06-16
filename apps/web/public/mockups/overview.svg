@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0B0F19"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="panel-bg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1F2937" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#111827" stop-opacity="0.9"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#EAB308"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+    <linearGradient id="accent-blue" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3B82F6"/>
+      <stop offset="100%" stop-color="#2563EB"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#bg)"/>
+  
+  <text x="50" y="80" font-family="sans-serif" font-size="28" font-weight="bold" fill="#ffffff">OVERVIEW</text>
+  <text x="50" y="110" font-family="sans-serif" font-size="14" fill="#9CA3AF">Welcome to your server command center.</text>
+  
+  <!-- Welcome Box -->
+  <rect x="50" y="150" width="1100" height="180" rx="12" fill="url(#accent)" fill-opacity="0.05" stroke="#F59E0B" stroke-width="1"/>
+  <text x="90" y="200" font-family="sans-serif" font-size="24" font-weight="bold" fill="#F59E0B">SERVER COMMAND CENTER</text>
+  <text x="90" y="240" font-family="sans-serif" font-size="16" fill="#D1D5DB" width="600">Configure integrations, manage templates, and monitor performance.</text>
+  <rect x="90" y="270" width="160" height="40" rx="4" fill="url(#accent)"/>
+  <text x="170" y="295" font-family="sans-serif" font-size="14" font-weight="bold" fill="#111827" text-anchor="middle">QUICK SETUP</text>
+  
+  <!-- Status Box -->
+  <rect x="50" y="360" width="535" height="200" rx="12" fill="url(#panel-bg)" stroke="#374151" stroke-width="1"/>
+  <text x="90" y="410" font-family="sans-serif" font-size="20" font-weight="bold" fill="#F3F4F6">Subscription Status</text>
+  <rect x="90" y="440" width="60" height="60" rx="8" fill="#10B981" fill-opacity="0.1" stroke="#10B981" stroke-width="2"/>
+  <text x="170" y="465" font-family="sans-serif" font-size="24" font-weight="bold" fill="#10B981">PREMIUM</text>
+  <text x="170" y="485" font-family="sans-serif" font-size="14" fill="#9CA3AF">LIFETIME ACCESS ACTIVE</text>
+  
+  <!-- System Status -->
+  <rect x="615" y="360" width="535" height="280" rx="12" fill="url(#panel-bg)" stroke="#374151" stroke-width="1"/>
+  <text x="655" y="410" font-family="sans-serif" font-size="20" font-weight="bold" fill="#F3F4F6">System Status</text>
+  <rect x="655" y="440" width="455" height="40" rx="4" fill="#10B981" fill-opacity="0.05" stroke="#10B981" stroke-width="1" stroke-opacity="0.3"/>
+  <text x="670" y="465" font-family="sans-serif" font-size="14" font-weight="bold" fill="#10B981">✓ ALBION GUILD LINK</text>
+  <text x="1080" y="465" font-family="sans-serif" font-size="14" font-weight="bold" fill="#10B981" text-anchor="end">LINKED</text>
+  
+  <rect x="655" y="490" width="455" height="40" rx="4" fill="#10B981" fill-opacity="0.05" stroke="#10B981" stroke-width="1" stroke-opacity="0.3"/>
+  <text x="670" y="515" font-family="sans-serif" font-size="14" font-weight="bold" fill="#10B981">✓ KILLBOARD REPORTS</text>
+  <text x="1080" y="515" font-family="sans-serif" font-size="14" font-weight="bold" fill="#10B981" text-anchor="end">ACTIVE</text>
+  
+  <rect x="655" y="540" width="455" height="40" rx="4" fill="#374151" fill-opacity="0.2" stroke="#374151" stroke-width="1"/>
+  <text x="670" y="565" font-family="sans-serif" font-size="14" font-weight="bold" fill="#9CA3AF">✗ AUTO-CHECK</text>
+  <text x="1080" y="565" font-family="sans-serif" font-size="14" font-weight="bold" fill="#9CA3AF" text-anchor="end">DISABLED</text>
+
+</svg>
