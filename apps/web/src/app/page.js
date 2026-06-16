@@ -1,13 +1,31 @@
 "use client";
 
 import Navbar from "@/components/Navbar";
-import { Shield, Users, Sword, Command, Star, MessageCircle, Zap, Activity, HelpCircle, Eye, Server, BadgeCheck, X, Loader2, PlusCircle, CheckCircle, Wallet, Lock } from "lucide-react";
+import { Shield, Users, Sword, Command, Star, MessageCircle, Zap, Activity, HelpCircle, Eye, Server, BadgeCheck, X, Loader2, PlusCircle, CheckCircle, Wallet, Lock, Volume2, VolumeX } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSession, signIn } from "next-auth/react";
 
 export default function Home() {
   const { lang, t } = useLanguage();
+  const [isVideoMuted, setIsVideoMuted] = useState(true);
+  const videoRef = useRef(null);
+
+  const toggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !isVideoMuted;
+      setIsVideoMuted(!isVideoMuted);
+    }
+  };
+  const [isVideoMuted, setIsVideoMuted] = useState(true);
+  const videoRef = useRef(null);
+
+  const toggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !isVideoMuted;
+      setIsVideoMuted(!isVideoMuted);
+    }
+  };
   const { data: session, status } = useSession();
   const [gifs, setGifs] = useState([]);
   const [serverCount, setServerCount] = useState(0);
@@ -247,12 +265,20 @@ export default function Home() {
           </div>
           
           {/* Promotional Video */}
-          <div className="mb-20 max-w-5xl mx-auto rounded-xl overflow-hidden shadow-[0_0_50px_rgba(255,215,0,0.15)] border border-primary-container/30 relative group">
+          <div className="mb-20 max-w-5xl mx-auto rounded-xl overflow-hidden shadow-[0_0_50px_rgba(255,215,0,0.15)] border border-primary-container/30 relative group cursor-pointer" onClick={toggleMute}>
             <div className="absolute inset-0 bg-primary-container/10 mix-blend-overlay pointer-events-none group-hover:opacity-0 transition-opacity duration-500"></div>
+            
+            {/* Custom Sound Toggle Overlay */}
+            <div className="absolute bottom-4 right-4 z-10 bg-black/60 hover:bg-primary-container hover:text-on-primary text-white p-3 rounded-full backdrop-blur-sm transition-all duration-300 opacity-0 group-hover:opacity-100 flex items-center gap-2">
+              {isVideoMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}
+              <span className="font-label-bold text-sm hidden md:block">{isVideoMuted ? (lang === 'tr' ? 'Sesi Aç' : 'Unmute') : (lang === 'tr' ? 'Sesi Kapat' : 'Mute')}</span>
+            </div>
+
             <video 
-              autoPlay
-              loop
-              controls 
+              ref={videoRef}
+              autoPlay 
+              loop 
+              muted 
               playsInline 
               className="w-full h-auto object-cover"
               poster="/mockups/video_intro_1.svg"
