@@ -659,8 +659,9 @@ async function handleRegisterButtons(interaction) {
 
                 await interaction.editReply({ content: `✅ <@${targetUserId}> adlı kullanıcının kaydı onaylandı!${nickStatus}${roleStatus}${unregRoleStatus}\n\nKanal 5 saniye içinde kapatılacak.` });
 
-                // Save to guild_registrations
-                if (albionId) {
+                // Save to guild_registrations ONLY IF they are given the MAIN guild role (roleIndex === 1)
+                // We do not save Guests/Alliance (roleIndex 2 or 3) to prevent Auto-Check from kicking them.
+                if (albionId && roleIndex === 1) {
                     const db = require('../services/db');
                     try {
                         await db.run(

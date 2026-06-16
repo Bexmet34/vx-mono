@@ -246,6 +246,22 @@ export default function Home() {
             <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">{t.featuresSectionDesc}</p>
           </div>
           
+          {/* Promotional Video */}
+          <div className="mb-20 max-w-5xl mx-auto rounded-xl overflow-hidden shadow-[0_0_50px_rgba(255,215,0,0.15)] border border-primary-container/30 relative group">
+            <div className="absolute inset-0 bg-primary-container/10 mix-blend-overlay pointer-events-none group-hover:opacity-0 transition-opacity duration-500"></div>
+            <video 
+              autoPlay 
+              loop 
+              muted 
+              playsInline 
+              className="w-full h-auto object-cover"
+              poster="/mockups/video_intro_1.svg"
+            >
+              <source src="/videos/tanitim.mp4" type="video/mp4" />
+              Tarayıcınız video etiketini desteklemiyor.
+            </video>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 auto-rows-[minmax(280px,auto)]">
             <div className="md:col-span-2 glass-panel p-8 md:p-10 flex flex-col justify-end relative overflow-hidden group border border-outline-variant hover:border-primary-container/50 transition-colors">
               <div className="absolute top-8 right-8 text-on-surface-variant/20 group-hover:text-primary-container/20 transition-colors">
@@ -321,62 +337,6 @@ export default function Home() {
           </section>
         )}
 
-        {/* --- PRICING SECTION --- */}
-        <section className="px-margin-mobile md:px-margin-desktop py-24 max-w-container-max mx-auto relative">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] bg-primary-container/5 blur-[100px] pointer-events-none rounded-full"></div>
-          
-          <div className="text-center mb-16 relative z-10">
-            <h2 className="font-headline-lg text-headline-lg text-on-surface uppercase tracking-tight mb-4">{t.pricingTitle}</h2>
-            <p className="font-body-lg text-body-lg text-on-surface-variant">{t.pricingSubtitle}</p>
-          </div>
-
-          <div className="flex flex-wrap justify-center gap-6 relative z-10">
-            {loadingPlans ? (
-              <div className="w-full flex flex-col items-center justify-center py-20 text-primary-container">
-                <Loader2 className="animate-spin mb-4" size={48} />
-                <span className="font-label-bold uppercase tracking-widest">Veriler Bekleniyor...</span>
-              </div>
-            ) : plans.length === 0 ? (
-              <div className="w-full text-center py-20 text-on-surface-variant font-body-lg border border-dashed border-outline-variant">
-                Şu anda aktif paket bulunmamaktadır.
-              </div>
-            ) : plans.map((plan) => {
-              const features = lang === 'tr' ? (plan.features_tr || []) : (plan.features_en || []);
-              
-              return (
-                <div key={plan.id} className={`w-full md:w-[320px] flex-shrink-0 glass-panel p-8 flex flex-col relative overflow-hidden border ${plan.is_featured ? 'border-primary-container shadow-[0_0_30px_rgba(255,215,0,0.1)]' : 'border-outline-variant hover:border-primary-container/50'} transition-colors`}>
-                  {plan.is_featured && (
-                    <div className="absolute top-0 right-0 bg-primary-container text-on-primary font-label-bold text-[10px] uppercase tracking-widest px-4 py-1 rounded-bl">
-                      {t.bestSeller}
-                    </div>
-                  )}
-                  
-                  <h3 className="font-headline-md text-xl text-on-surface mb-2 uppercase">{lang === 'tr' ? plan.name_tr : plan.name_en}</h3>
-                  <div className="font-headline-xl text-primary-container mb-8 flex items-baseline gap-2">
-                    {plan.amount} <span className="font-label-bold text-label-sm text-on-surface-variant">USDT</span>
-                  </div>
-                  
-                  <ul className="flex-grow space-y-4 mb-8">
-                    {features.map((feat, idx) => (
-                      <li key={idx} className="flex items-start gap-3 font-body-md text-sm text-on-surface-variant">
-                        <Star size={16} className="text-primary-container shrink-0 mt-1" /> 
-                        <span>{feat}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  
-                  <button 
-                    className={`w-full py-4 font-label-bold text-label-bold uppercase tracking-widest transition-all active:scale-95 ${plan.is_featured ? 'bg-primary-container text-on-primary tactical-glow hover:brightness-110' : 'bg-surface border border-outline text-on-surface hover:border-primary-container hover:text-primary-container'}`}
-                    onClick={() => handleBuyClick(plan)}
-                  >
-                    {t.buyNow}
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-
         {/* --- HOW IT WORKS & FAQ SECTION --- */}
         <section className="px-margin-mobile md:px-margin-desktop py-20 bg-surface-container-low border-y border-on-surface/">
           <div className="max-w-container-max mx-auto">
@@ -413,33 +373,9 @@ export default function Home() {
               </div>
             </div>
             
-            <div className="text-center mb-12">
-              <h2 className="font-headline-lg text-headline-lg text-on-surface uppercase tracking-tight">{t.faqTitle2}</h2>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {[
-                { q: t.faqQ1, a: t.faqA1, num: 1 },
-                { q: t.faqQ2, a: t.faqA2, num: 2 },
-                { q: t.faqQ3, a: t.faqA3, num: 3 },
-                { q: t.faqQ4, a: t.faqA4, num: 4 }
-              ].map((item, idx) => (
-                <div key={idx} className="bg-surface border border-outline-variant p-8 relative overflow-hidden group hover:border-primary-container/30 transition-colors">
-                  <div className="absolute top-0 left-0 w-1 h-full bg-outline-variant group-hover:bg-primary-container transition-colors"></div>
-                  <h3 className="font-headline-md text-lg text-on-surface mb-4 flex items-center gap-4">
-                    <span className="text-primary-container font-label-bold opacity-50">0{item.num}</span>
-                    {item.q}
-                  </h3>
-                  <p className="font-body-md text-sm text-on-surface-variant pl-9 leading-relaxed">
-                    {item.a}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
         </section>
 
-        {/* --- DASHBOARD SHOWCASE SECTION --- */}
+{/* --- DASHBOARD SHOWCASE SECTION --- */}
         <section className="px-margin-mobile md:px-margin-desktop py-24 bg-surface-container-lowest border-t border-on-surface/20">
           <div className="max-w-container-max mx-auto">
             <div className="text-center mb-16">
@@ -478,6 +414,35 @@ export default function Home() {
                     <img src={item.src} alt={item.title} className="w-full h-auto rounded-md shadow-2xl group-hover:scale-[1.02] transition-transform duration-500 border border-outline-variant/30" />
                     <p className="mt-6 font-body-md text-on-surface-variant text-center">{item.desc}</p>
                   </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+                {/* --- FAQ SECTION --- */}
+        <section className="px-margin-mobile md:px-margin-desktop py-20 bg-surface-container-low border-y border-on-surface/">
+          <div className="max-w-container-max mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="font-headline-lg text-headline-lg text-on-surface uppercase tracking-tight">{t.faqTitle2}</h2>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {[
+                { q: t.faqQ1, a: t.faqA1, num: 1 },
+                { q: t.faqQ2, a: t.faqA2, num: 2 },
+                { q: t.faqQ3, a: t.faqA3, num: 3 },
+                { q: t.faqQ4, a: t.faqA4, num: 4 }
+              ].map((item, idx) => (
+                <div key={idx} className="bg-surface border border-outline-variant p-8 relative overflow-hidden group hover:border-primary-container/30 transition-colors">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-outline-variant group-hover:bg-primary-container transition-colors"></div>
+                  <h3 className="font-headline-md text-lg text-on-surface mb-4 flex items-center gap-4">
+                    <span className="text-primary-container font-label-bold opacity-50">0{item.num}</span>
+                    {item.q}
+                  </h3>
+                  <p className="font-body-md text-sm text-on-surface-variant pl-9 leading-relaxed">
+                    {item.a}
+                  </p>
                 </div>
               ))}
             </div>
@@ -564,7 +529,63 @@ export default function Home() {
         </section>
 
 
-      </main>
+{/* --- PRICING SECTION --- */}
+        <section className="px-margin-mobile md:px-margin-desktop py-24 max-w-container-max mx-auto relative">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] bg-primary-container/5 blur-[100px] pointer-events-none rounded-full"></div>
+          
+          <div className="text-center mb-16 relative z-10">
+            <h2 className="font-headline-lg text-headline-lg text-on-surface uppercase tracking-tight mb-4">{t.pricingTitle}</h2>
+            <p className="font-body-lg text-body-lg text-on-surface-variant">{t.pricingSubtitle}</p>
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-6 relative z-10">
+            {loadingPlans ? (
+              <div className="w-full flex flex-col items-center justify-center py-20 text-primary-container">
+                <Loader2 className="animate-spin mb-4" size={48} />
+                <span className="font-label-bold uppercase tracking-widest">Veriler Bekleniyor...</span>
+              </div>
+            ) : plans.length === 0 ? (
+              <div className="w-full text-center py-20 text-on-surface-variant font-body-lg border border-dashed border-outline-variant">
+                Şu anda aktif paket bulunmamaktadır.
+              </div>
+            ) : plans.map((plan) => {
+              const features = lang === 'tr' ? (plan.features_tr || []) : (plan.features_en || []);
+              
+              return (
+                <div key={plan.id} className={`w-full md:w-[320px] flex-shrink-0 glass-panel p-8 flex flex-col relative overflow-hidden border ${plan.is_featured ? 'border-primary-container shadow-[0_0_30px_rgba(255,215,0,0.1)]' : 'border-outline-variant hover:border-primary-container/50'} transition-colors`}>
+                  {plan.is_featured && (
+                    <div className="absolute top-0 right-0 bg-primary-container text-on-primary font-label-bold text-[10px] uppercase tracking-widest px-4 py-1 rounded-bl">
+                      {t.bestSeller}
+                    </div>
+                  )}
+                  
+                  <h3 className="font-headline-md text-xl text-on-surface mb-2 uppercase">{lang === 'tr' ? plan.name_tr : plan.name_en}</h3>
+                  <div className="font-headline-xl text-primary-container mb-8 flex items-baseline gap-2">
+                    {plan.amount} <span className="font-label-bold text-label-sm text-on-surface-variant">USDT</span>
+                  </div>
+                  
+                  <ul className="flex-grow space-y-4 mb-8">
+                    {features.map((feat, idx) => (
+                      <li key={idx} className="flex items-start gap-3 font-body-md text-sm text-on-surface-variant">
+                        <Star size={16} className="text-primary-container shrink-0 mt-1" /> 
+                        <span>{feat}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  
+                  <button 
+                    className={`w-full py-4 font-label-bold text-label-bold uppercase tracking-widest transition-all active:scale-95 ${plan.is_featured ? 'bg-primary-container text-on-primary tactical-glow hover:brightness-110' : 'bg-surface border border-outline text-on-surface hover:border-primary-container hover:text-primary-container'}`}
+                    onClick={() => handleBuyClick(plan)}
+                  >
+                    {t.buyNow}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+              </main>
 
       {/* Checkout Modal (Imperial Conquest Design) */}
       {showCheckout && selectedPlan && (
