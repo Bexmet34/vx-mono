@@ -235,7 +235,7 @@ const regSvg = wrapSvg(`
   <text x="110" y="358" font-family="sans-serif" font-size="15" fill="#D1D5DB">@Guild Member</text>
 
   <rect x="615" y="150" width="535" height="400" rx="12" fill="url(#panel-bg)" stroke="#374151" stroke-width="1"/>
-  <text x="655" y="200" font-family="sans-serif" font-size="20" font-weight="bold" fill="#F3F4F6">Auto-Check & Cleanup</text>
+  <text x="655" y="200" font-family="sans-serif" font-size="20" font-weight="bold" fill="#F3F4F6">Auto-Check &amp; Cleanup</text>
   <text x="655" y="230" font-family="sans-serif" font-size="14" fill="#9CA3AF">Automatically remove roles when members leave.</text>
   
   <rect x="655" y="260" width="455" height="80" rx="6" fill="#111827" stroke="#F59E0B" stroke-width="1"/>

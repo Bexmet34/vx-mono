@@ -1,20 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1150" width="1200" height="1150">
-  <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0B0F19"/>
-      <stop offset="100%" stop-color="#111827"/>
-    </linearGradient>
-    <linearGradient id="panel-bg" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#1F2937" stop-opacity="0.8"/>
-      <stop offset="100%" stop-color="#111827" stop-opacity="0.9"/>
-    </linearGradient>
-    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#EAB308"/>
-      <stop offset="100%" stop-color="#F59E0B"/>
-    </linearGradient>
-  </defs>
-  <rect width="1200" height="1150" fill="url(#bg)"/>
-  
+const fs = require('fs');
+const path = require('path');
+
+const regSvg = `
   <text x="50" y="80" font-family="sans-serif" font-size="28" font-weight="bold" fill="#ffffff">REGISTRATION SETTINGS</text>
   <text x="50" y="110" font-family="sans-serif" font-size="14" fill="#9CA3AF">Set up an automated registration system and auto-check integration.</text>
 
@@ -93,5 +80,28 @@
   <text x="655" y="980" font-family="sans-serif" font-size="12" fill="#9CA3AF">Adds existing old members to the database safely.</text>
   <rect x="655" y="1010" width="455" height="50" rx="4" fill="#1F2937" stroke="#F59E0B" stroke-width="1"/>
   <text x="882" y="1040" font-family="sans-serif" font-size="14" font-weight="bold" fill="#F59E0B" text-anchor="middle">START SYNC PROCESS</text>
+`;
 
-</svg>
+function wrapSvg(content) {
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1150" width="1200" height="1150">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0B0F19"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="panel-bg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1F2937" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#111827" stop-opacity="0.9"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#EAB308"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="1150" fill="url(#bg)"/>
+  ${content}
+</svg>`;
+}
+
+fs.writeFileSync(path.join(__dirname, 'apps', 'web', 'public', 'mockups', 'registration.svg'), wrapSvg(regSvg));
+console.log('Registration SVG generated!');
