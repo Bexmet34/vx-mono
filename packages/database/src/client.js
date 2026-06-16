@@ -6,7 +6,8 @@ const { createClient } = require('@supabase/supabase-js');
  */
 const getClient = () => {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || 'https://placeholder.supabase.co';
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_KEY || 'placeholder';
+  // RLS bypass için öncelikle SERVICE_ROLE_KEY kullanmayı dener
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_KEY || 'placeholder';
 
   if (!url || !key) {
     console.warn('[Supabase] GEREKLİ AYARLAR EKSİK! (.env kontrol edin)');
