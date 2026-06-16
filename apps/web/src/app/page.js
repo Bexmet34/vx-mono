@@ -250,9 +250,9 @@ export default function Home() {
           <div className="mb-20 max-w-5xl mx-auto rounded-xl overflow-hidden shadow-[0_0_50px_rgba(255,215,0,0.15)] border border-primary-container/30 relative group">
             <div className="absolute inset-0 bg-primary-container/10 mix-blend-overlay pointer-events-none group-hover:opacity-0 transition-opacity duration-500"></div>
             <video 
-              autoPlay 
-              loop 
-              muted 
+              autoPlay
+              loop
+              controls 
               playsInline 
               className="w-full h-auto object-cover"
               poster="/mockups/video_intro_1.svg"
