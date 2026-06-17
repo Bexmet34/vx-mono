@@ -131,7 +131,9 @@ export default function ServerSettings() {
         }
       }
     } catch (err) { console.error(err); }
-    finally { setLoading(false); }
+    finally { 
+      setTimeout(() => setLoading(false), 800);
+    }
   }, [guildId]);
 
   const fetchDiscordData = useCallback(async () => {

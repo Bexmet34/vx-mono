@@ -1,5 +1,7 @@
+const { MessageFlags } = require('discord.js');
+
 async function handleRoleMenuSelect(interaction) {
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     try {
         const selectedRoleIds = interaction.values; // Array of selected discord role IDs
