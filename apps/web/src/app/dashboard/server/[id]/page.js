@@ -87,9 +87,9 @@ export default function ServerSettings() {
       const res = await fetch(`/api/guild-settings/${guildId}`);
       const data = await res.json();
       if (res.ok && data) {
-        const { settings: s, subscription: sub } = data;
+        const { settings: s, subscription: sub, isOwner: ownerStatus } = data;
         setSubscription(sub);
-        setIsOwner(sub?.owner_id === session?.user?.id);
+        setIsOwner(ownerStatus);
         if (s) {
           const loadedSettings = {
             language: s.language || "tr",
@@ -136,7 +136,7 @@ export default function ServerSettings() {
     finally { 
       setTimeout(() => setLoading(false), 800);
     }
-  }, [guildId]);
+  }, [guildId, session]);
 
   const fetchDiscordData = useCallback(async () => {
     try {
@@ -375,7 +375,7 @@ export default function ServerSettings() {
   );
 
   return (
-    <div className="min-h-screen flex flex-col pt-24 bg-background relative" suppressHydrationWarning>
+    <div className="min-h-screen flex flex-col pt-24 bg-background relative overflow-x-hidden" suppressHydrationWarning>
       <ToastContainer toasts={toasts} />
       
       {/* Floating Dock Navigation */}

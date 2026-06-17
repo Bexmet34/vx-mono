@@ -15,7 +15,7 @@ export async function GET(req, { params }) {
 
     const { guildId } = await params;
 
-    const { hasAccess } = await checkDashboardAccess(guildId, session.user.id);
+    const { hasAccess, isOwner } = await checkDashboardAccess(guildId, session.user.id);
     if (!hasAccess) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
@@ -38,7 +38,8 @@ export async function GET(req, { params }) {
 
     return NextResponse.json({ 
       settings: settings || null, 
-      subscription: subscription || null 
+      subscription: subscription || null,
+      isOwner: isOwner
     });
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 });
