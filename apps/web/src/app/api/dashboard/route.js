@@ -19,11 +19,11 @@ export async function GET(req) {
        return NextResponse.json({ error: "Supabase credentials missing" }, { status: 500 });
     }
 
-    // Fetch subscriptions where owner_id = Discord ID
+    // Fetch subscriptions where owner_id = Discord ID OR authorized_users contains Discord ID
     const { data: guilds, error } = await supabase
       .from('subscriptions')
-      .select('id, guild_id, guild_name, expires_at, is_unlimited, is_active, trial_used')
-      .eq('owner_id', discordId);
+      .select('id, guild_id, guild_name, expires_at, is_unlimited, is_active, trial_used, authorized_users')
+      .or(`owner_id.eq.${discordId},authorized_users.cs.{${discordId}}`);
 
     if (error) {
       console.error("Supabase Error:", error);
