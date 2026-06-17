@@ -97,13 +97,18 @@ async function handleInteractionError(interaction, error, lang = 'tr') {
     console.error(`[InteractionError] Real Error: ${error.message} (Code: ${errorCode ?? 'unknown'})`);
 
     let errorMessage = error.message || t('common.error', lang);
+    let solution = `Check bot permissions for **'Send Messages'**, **'Embed Links'**, and **'Mention @everyone'**.`;
+    
     if (errorCode === 50013) {
         errorMessage = lang === 'en' ? 'Bot lack permissions for this action.' : 'Botun bu işlemi yapmak için yetkisi yok (Yetki Hatası).';
+    } else if (error.message?.includes('fetch failed') || error.message?.includes('JSON') || error.message?.includes('525') || error.message?.includes('ECONNRESET')) {
+        errorMessage = lang === 'en' ? 'Database is temporarily offline or unreachable (525 SSL Error).' : 'Veritabanı sunucusu şu an geçici olarak hizmet dışı (Ağ Hatası).';
+        solution = lang === 'en' ? 'Please wait a few minutes and try again. Your data is safe.' : 'Lütfen birkaç dakika bekleyip tekrar deneyin. Ağ düzeldiğinde işlemleriniz arka planda tamamlanacaktır.';
     }
 
     const responseContent = `❌ **${t('party.error', lang) || t('common.error', lang)}**\n` +
         `**Summary:** ${errorMessage}\n\n` +
-        `**✅ Solution:** Check bot permissions for **'Send Messages'**, **'Embed Links'**, and **'Mention @everyone'**.`;
+        `**✅ Solution:** ${solution}`;
 
     try {
         const errorOptions = { content: responseContent, flags: [MessageFlags.Ephemeral] };

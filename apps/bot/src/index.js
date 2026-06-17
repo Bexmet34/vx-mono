@@ -50,15 +50,22 @@ client.on('error', async error => {
 });
 
 process.on('unhandledRejection', error => {
-    if (!error.message?.includes('SSL')) {
+    const isNetworkError = error.message?.includes('SSL') || error.message?.includes('fetch failed') || error.message?.includes('JSON') || error.message?.includes('525') || error.message?.includes('ECONNRESET');
+    if (isNetworkError) {
+        console.warn('[Network Error Swallowed] A database or network request failed but was swallowed to prevent crash:', error.message);
+    } else {
         console.error('Sistemsel bir hata oluştu (Promise Rejection):', error);
     }
 });
 
 process.on('uncaughtException', error => {
     const fs = require('fs');
-    fs.writeFileSync('error.log', `Error: ${error.message}\nStack: ${error.stack}\n`);
-    if (!error.message?.includes('SSL')) {
+    const isNetworkError = error.message?.includes('SSL') || error.message?.includes('fetch failed') || error.message?.includes('JSON') || error.message?.includes('525') || error.message?.includes('ECONNRESET');
+    
+    if (isNetworkError) {
+        console.warn('[Network Error Swallowed] An uncaught database or network request failed but was swallowed to prevent crash:', error.message);
+    } else {
+        fs.writeFileSync('error.log', `Error: ${error.message}\nStack: ${error.stack}\n`, { flag: 'a' });
         console.error('Sistemsel bir hata oluştu (Uncaught Exception):', error);
     }
 });

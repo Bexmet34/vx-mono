@@ -11,6 +11,14 @@ const { t } = require('./i18n');
  * @param {import('discord.js').Client} client 
  */
 function startCronService(client) {
+    // --- Offline DB Queue Processor (Every 2 minutes) ---
+    cron.schedule('*/2 * * * *', async () => {
+        const { processQueue } = require('./queueService');
+        await processQueue().catch(err => {
+            // Ignore queue processing errors silently to prevent crashes
+        });
+    });
+
     // Run every hour at minute 0
     cron.schedule('0 * * * *', async () => {
         console.log('[CronService] 24-hour expiration check running...');
