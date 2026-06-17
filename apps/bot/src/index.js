@@ -267,7 +267,7 @@ client.on('interactionCreate', async interaction => {
                 await handleSettingsLanguageSelect(interaction);
             } else if (interaction.customId.startsWith('sub_manage:')) {
                 await handleSubscriptionSelect(interaction);
-            } else if (interaction.customId.startsWith('role_menu_')) {
+            } else if (interaction.customId.startsWith('role_menu_') || interaction.customId.startsWith('custom_role_select_')) {
                 const { handleRoleMenuSelect } = require('./handlers/roleMenuHandler');
                 await handleRoleMenuSelect(interaction);
             }

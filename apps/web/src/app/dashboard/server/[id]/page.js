@@ -444,7 +444,7 @@ export default function ServerSettings() {
         )}
 
         {activeTab === 'rolemenu' && (
-          <RoleMenuTab t={t} lang={lang} guildId={guildId} discordChannels={discordChannels} showToast={showToast} />
+          <RoleMenuTab t={t} lang={lang} guildId={guildId} discordChannels={discordChannels} discordRoles={discordRoles} showToast={showToast} />
         )}
 
       </main>

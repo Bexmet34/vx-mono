@@ -14,24 +14,18 @@ export async function GET(req, { params }) {
 
     const { guildId } = await params;
 
-    const { data: settings, error: settingsError } = await supabase
-      .from('guild_role_menus')
+    const { data: configs, error: settingsError } = await supabase
+      .from('custom_role_menus')
       .select('*')
       .eq('guild_id', guildId)
-      .single();
+      .order('updated_at', { ascending: false });
 
-    if (settingsError && settingsError.code !== 'PGRST116') {
+    if (settingsError) {
       return NextResponse.json({ error: settingsError.message }, { status: 500 });
     }
 
-    const { data: globalRoles, error: rolesError } = await supabase
-      .from('global_roles')
-      .select('*')
-      .order('created_at', { ascending: true });
-
     return NextResponse.json({ 
-      settings: settings || null, 
-      global_roles: globalRoles || []
+      configs: configs || []
     });
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 });
@@ -48,53 +42,86 @@ export async function POST(req, { params }) {
     const { guildId } = await params;
     const body = await req.json();
     
-    // Check if this is a setup trigger or send menu trigger
-    if (body.action === 'setup') {
-      const { error } = await supabase
-        .from('guild_role_menus')
-        .upsert(
-          { guild_id: guildId, trigger_roles_setup: true },
-          { onConflict: 'guild_id' }
-        );
-      if (error) throw error;
-      return NextResponse.json({ success: true, message: "Role setup triggered" });
-    }
-    
     if (body.action === 'send_menu') {
+      if (!body.id) {
+        return NextResponse.json({ error: "Configuration ID is required to send menu" }, { status: 400 });
+      }
       const { error } = await supabase
-        .from('guild_role_menus')
-        .upsert(
-          { guild_id: guildId, trigger_roles_menu_send: true },
-          { onConflict: 'guild_id' }
-        );
+        .from('custom_role_menus')
+        .update({ trigger_menu_send: true })
+        .eq('id', body.id)
+        .eq('guild_id', guildId);
+
       if (error) throw error;
       return NextResponse.json({ success: true, message: "Menu send triggered" });
     }
 
-    // Normal settings save
+    // Save/Upsert configuration
     const { 
-      channel_id, active_roles, category_limits, header_image_url
+      id, channel_id, embed_title, embed_description, embed_color, embed_image_url, menus
     } = body;
 
-    const { data, error } = await supabase
-      .from('guild_role_menus')
-      .upsert(
-        {
-          guild_id: guildId,
-          channel_id: channel_id || null,
-          active_roles: active_roles || [],
-          category_limits: category_limits || { combat: 5, economy: 5, crafting: 5 },
-          header_image_url: header_image_url || null,
-          updated_at: new Date().toISOString()
-        },
-        { onConflict: 'guild_id' }
-      )
-      .select()
-      .single();
+    const payload = {
+      guild_id: guildId,
+      channel_id: channel_id || null,
+      embed_title: embed_title || 'Rol Seçimi',
+      embed_description: embed_description || 'Rollerinizi aşağıdaki menülerden seçebilirsiniz.',
+      embed_color: embed_color || '#fca311',
+      embed_image_url: embed_image_url || null,
+      menus: menus || [],
+      updated_at: new Date().toISOString()
+    };
+
+    let result;
+    if (id) {
+      // Update existing
+      result = await supabase
+        .from('custom_role_menus')
+        .update(payload)
+        .eq('id', id)
+        .eq('guild_id', guildId)
+        .select()
+        .single();
+    } else {
+      // Insert new
+      result = await supabase
+        .from('custom_role_menus')
+        .insert([payload])
+        .select()
+        .single();
+    }
+
+    if (result.error) throw result.error;
+
+    return NextResponse.json({ success: true, data: result.data });
+  } catch (err) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
+}
+
+export async function DELETE(req, { params }) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { guildId } = await params;
+    const { id } = await req.json();
+
+    if (!id) {
+      return NextResponse.json({ error: "Configuration ID is required" }, { status: 400 });
+    }
+
+    const { error } = await supabase
+      .from('custom_role_menus')
+      .delete()
+      .eq('id', id)
+      .eq('guild_id', guildId);
 
     if (error) throw error;
 
-    return NextResponse.json({ success: true, data });
+    return NextResponse.json({ success: true, message: "Configuration deleted" });
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
