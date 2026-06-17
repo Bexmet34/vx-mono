@@ -46,8 +46,7 @@ const LINKS = {
     WEBSITE: 'https://veyronix.com.tr',
     SUPPORT_SERVER: 'https://discord.gg/899GJS5MDf',
     SUPPORT_ACCOUNT: 'https://discord.com/users/335891393690140673',
-    TOPGG: 'https://top.gg/bot/1082239904169336902',
-    SHOPIER: 'https://www.shopier.com/veyronixbot'
+    TOPGG: 'https://top.gg/bot/1082239904169336902'
 };
 
 module.exports = {

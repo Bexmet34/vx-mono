@@ -43,8 +43,7 @@ async function handlePartyButtons(interaction) {
 
         const linkRow = new ActionRowBuilder().addComponents(
             new ButtonBuilder().setLabel(`🌐 Website`).setStyle(ButtonStyle.Link).setURL(LINKS.WEBSITE),
-            new ButtonBuilder().setLabel(`🚀 ${t('help.top_gg', lang)}`).setStyle(ButtonStyle.Link).setURL(LINKS.TOPGG),
-            new ButtonBuilder().setLabel(t('help.donate_button', lang)).setStyle(ButtonStyle.Link).setURL(LINKS.SHOPIER)
+            new ButtonBuilder().setLabel(`🚀 ${t('help.top_gg', lang)}`).setStyle(ButtonStyle.Link).setURL(LINKS.TOPGG)
         );
 
 

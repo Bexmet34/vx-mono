@@ -32,7 +32,7 @@ async function handleHelpCommand(interaction) {
 
     const linkRow = new ActionRowBuilder().addComponents(
         new ButtonBuilder().setLabel(`🌐 Website`).setStyle(ButtonStyle.Link).setURL(LINKS.WEBSITE),
-        new ButtonBuilder().setLabel(t('help.donate_button', lang)).setStyle(ButtonStyle.Link).setURL(LINKS.SHOPIER)
+        new ButtonBuilder().setLabel(t('help.donate_button', lang) || 'Top.gg').setStyle(ButtonStyle.Link).setURL(LINKS.TOPGG)
     );
 
     return await safeReply(interaction, {

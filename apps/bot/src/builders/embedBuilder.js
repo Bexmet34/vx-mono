@@ -251,7 +251,7 @@ function addFooterFields(embed, currentCount, totalCount, lang = 'tr') {
         },
         {
             name: '',
-            value: `[Website](${LINKS.WEBSITE}) - [Top.gg](${LINKS.TOPGG}) - [Shop](${LINKS.SHOPIER})\n\n`
+            value: `[Website](${LINKS.WEBSITE}) - [Top.gg](${LINKS.TOPGG})\n\n`
         }
     );
 }
