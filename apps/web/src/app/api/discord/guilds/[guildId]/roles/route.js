@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { checkDashboardAccess } from '@/utils/authUtils';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,6 +11,12 @@ export async function GET(req, { params }) {
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { guildId } = await params;
+    
+    const { hasAccess } = await checkDashboardAccess(guildId, session.user.id);
+    if (!hasAccess) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     console.log(`[API] Fetching Discord data for Guild: ${guildId}`);
 
     const token = process.env.DISCORD_BOT_TOKEN;

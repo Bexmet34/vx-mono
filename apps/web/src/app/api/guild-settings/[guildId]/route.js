@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { supabase } from '@/utils/supabase';
+import { checkDashboardAccess } from '@/utils/authUtils';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,6 +14,11 @@ export async function GET(req, { params }) {
     }
 
     const { guildId } = await params;
+
+    const { hasAccess } = await checkDashboardAccess(guildId, session.user.id);
+    if (!hasAccess) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
 
     const { data: settings, error: settingsError } = await supabase
       .from('guild_settings')
@@ -47,6 +53,12 @@ export async function POST(req, { params }) {
     }
 
     const { guildId } = await params;
+
+    const { hasAccess, subscription } = await checkDashboardAccess(guildId, session.user.id);
+    if (!hasAccess) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const body = await req.json();
     const { 
       language, auto_role_sync, embed_thumbnail_url, whitelist, party_templates,
@@ -66,7 +78,7 @@ export async function POST(req, { params }) {
       .upsert(
         {
           guild_id: guildId,
-          owner_id: session.user.id,
+          owner_id: subscription.owner_id,
           language: language ?? 'tr',
           auto_role_sync: auto_role_sync ?? false,
           embed_thumbnail_url: embed_thumbnail_url || null,
