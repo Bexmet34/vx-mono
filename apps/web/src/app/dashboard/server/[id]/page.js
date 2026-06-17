@@ -463,18 +463,18 @@ export default function ServerSettings() {
 
       {/* Unsaved Changes Banner */}
       {hasChanges && (
-        <div className="fixed bottom-0 left-0 right-0 bg-surface-container-highest/95 border-t border-primary-container p-6 z-[1000] flex justify-center items-center gap-12 backdrop-blur-xl animate-slide-up shadow-[0_-10px_40px_rgba(255,215,0,0.1)]">
-          <div className="text-on-surface font-label-bold text-lg flex items-center gap-3 uppercase tracking-widest">
-             <AlertTriangle size={24} className="text-primary-container" />
+        <div className="fixed bottom-0 left-0 right-0 bg-surface-container-highest/95 border-t border-primary-container p-4 md:p-6 z-[1000] flex flex-col md:flex-row justify-center items-center gap-4 md:gap-12 backdrop-blur-xl animate-slide-up shadow-[0_-10px_40px_rgba(255,215,0,0.1)]">
+          <div className="text-on-surface font-label-bold text-sm md:text-lg flex items-center gap-2 md:gap-3 uppercase tracking-widest text-center">
+             <AlertTriangle size={20} className="text-primary-container hidden md:block" />
              {lang === 'en' ? 'You have unsaved changes!' : 'Kaydedilmemiş değişiklikleriniz var!'}
           </div>
-          <div className="flex gap-4">
-            <button onClick={() => setSettings(initialSettings)} className="px-8 py-3 bg-transparent border border-outline-variant text-on-surface-variant hover:text-on-surface hover:border-outline rounded-sm font-label-bold uppercase tracking-widest transition-all">
+          <div className="flex gap-2 md:gap-4 w-full md:w-auto">
+            <button onClick={() => setSettings(initialSettings)} className="flex-1 md:flex-none px-4 md:px-8 py-3 md:py-3 bg-transparent border border-outline-variant text-on-surface-variant hover:text-on-surface hover:border-outline rounded-sm font-label-bold text-xs md:text-sm uppercase tracking-widest transition-all text-center">
               {lang === 'en' ? 'Discard' : 'İptal Et'}
             </button>
-            <button onClick={handleSave} disabled={saving} className="px-8 py-3 bg-primary-container text-on-primary border border-primary-container rounded-sm font-label-bold uppercase tracking-widest flex items-center gap-2 transition-all hover:brightness-110 active:scale-95 tactical-glow disabled:opacity-50 disabled:cursor-not-allowed">
-              {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
-              {lang === 'en' ? 'Save Changes' : 'Değişiklikleri Kaydet'}
+            <button onClick={handleSave} disabled={saving} className="flex-1 md:flex-none px-4 md:px-8 py-3 md:py-3 bg-primary-container text-on-primary border border-primary-container rounded-sm font-label-bold text-xs md:text-sm uppercase tracking-widest flex items-center justify-center gap-2 transition-all hover:brightness-110 active:scale-95 tactical-glow disabled:opacity-50 disabled:cursor-not-allowed">
+              {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+              {lang === 'en' ? 'Save Changes' : 'Kaydet'}
             </button>
           </div>
         </div>
