@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
-import { ArrowLeft, Loader2, Image as ImageIcon, Layout, Shield, X, Crop, Users, Copy, Lock, Home, Save, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Loader2, Image as ImageIcon, Layout, Shield, X, Crop, Users, Copy, Lock, Home, Save, AlertTriangle, Swords } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 import { useToast, ToastContainer } from "@/components/Toast";
@@ -344,23 +344,41 @@ export default function ServerSettings() {
   if (!mounted) return null;
 
   if (loading) return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 99999, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#0a0a0f', overflow: 'hidden' }}>
-      <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(252, 163, 17, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(252, 163, 17, 0.05) 1px, transparent 1px)', backgroundSize: '40px 40px', opacity: 0.5 }}></div>
+    <div className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-background overflow-hidden">
+      {/* Background Orbs */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-primary-container/20 rounded-full blur-[80px] md:blur-[120px] animate-pulse pointer-events-none"></div>
       
-      <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem' }}>
-        <div style={{ position: 'relative', width: '100px', height: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: '2px solid rgba(252, 163, 17, 0.1)', borderTopColor: '#fca311', animation: 'spin 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite' }}></div>
-          <div style={{ position: 'absolute', inset: '10px', borderRadius: '50%', border: '2px solid rgba(252, 163, 17, 0.1)', borderBottomColor: '#fca311', animation: 'spin 2s linear infinite reverse' }}></div>
-          <Loader2 size={32} color="#fca311" className="spin" style={{ animationDuration: '3s' }} />
-        </div>
+      {/* Glass Panel */}
+      <div className="relative z-10 glass-panel p-8 md:p-12 rounded-2xl flex flex-col items-center gap-8 border border-primary-container/30 shadow-[0_0_50px_rgba(252,163,17,0.15)] animate-slide-up mx-4">
         
-        <div style={{ textAlign: 'center' }}>
-          <h2 style={{ fontFamily: 'var(--font-headline)', color: '#fca311', fontSize: '1.5rem', textTransform: 'uppercase', letterSpacing: '6px', marginBottom: '0.5rem', animation: 'pulse 2s infinite' }}>ESTABLISHING LINK</h2>
-          <p style={{ color: '#666', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '3px' }}>Veyronix Tactical Command Center</p>
+        {/* Pulsing Icon */}
+        <div className="relative flex items-center justify-center mt-4">
+           <div className="absolute inset-0 bg-primary-container/30 rounded-full blur-xl animate-pulse"></div>
+           <div className="relative w-20 h-20 md:w-24 md:h-24 bg-surface-container rounded-full border-2 border-primary-container flex items-center justify-center text-primary-container shadow-[0_0_30px_rgba(252,163,17,0.3)]">
+             <Swords size={40} className="animate-pulse md:w-12 md:h-12" />
+           </div>
+           
+           {/* Rotating rings */}
+           <div className="absolute -inset-4 border border-primary-container/30 border-t-primary-container rounded-full animate-spin" style={{ animationDuration: '3s' }}></div>
+           <div className="absolute -inset-8 border border-primary-container/10 border-b-primary-container rounded-full animate-spin" style={{ animationDuration: '4s', animationDirection: 'reverse' }}></div>
         </div>
+
+        {/* Loading Text */}
+        <div className="text-center space-y-2 mt-4">
+          <h2 className="font-headline-lg text-lg md:text-2xl text-on-surface uppercase tracking-widest flex items-center justify-center gap-2">
+            {lang === 'en' ? 'Summoning Server Data' : 'Sunucu Verileri Çağrılıyor'}
+            <span className="flex gap-1 ml-1">
+              <span className="w-1.5 h-1.5 bg-primary-container rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+              <span className="w-1.5 h-1.5 bg-primary-container rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+              <span className="w-1.5 h-1.5 bg-primary-container rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+            </span>
+          </h2>
+          <p className="font-body-md text-on-surface-variant text-[10px] md:text-sm uppercase tracking-[0.2em] md:tracking-[0.3em] opacity-70">
+            {lang === 'en' ? 'Veyronix Bot Integration' : 'Veyronix Bot Entegrasyonu'}
+          </p>
+        </div>
+
       </div>
-      
-      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.5) 51%)', backgroundSize: '100% 4px', opacity: 0.2, pointerEvents: 'none' }}></div>
     </div>
   );
 
