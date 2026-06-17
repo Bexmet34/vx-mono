@@ -32,6 +32,7 @@ export default function ServerSettings() {
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
   const [subscription, setSubscription] = useState(null);
+  const [isOwner, setIsOwner] = useState(false);
   const [selectedTemplateId, setSelectedTemplateId] = useState(null);
   const [initialSettings, setInitialSettings] = useState(null);
   const [settings, setSettings] = useState({
@@ -88,6 +89,7 @@ export default function ServerSettings() {
       if (res.ok && data) {
         const { settings: s, subscription: sub } = data;
         setSubscription(sub);
+        setIsOwner(sub?.owner_id === session?.user?.id);
         if (s) {
           const loadedSettings = {
             language: s.language || "tr",
