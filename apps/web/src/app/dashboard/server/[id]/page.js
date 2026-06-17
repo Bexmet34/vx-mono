@@ -349,27 +349,19 @@ export default function ServerSettings() {
 
   if (loading) return (
     <div className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-background overflow-hidden">
-      {/* Background Orbs */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-primary-container/20 rounded-full blur-[80px] md:blur-[120px] animate-pulse pointer-events-none"></div>
+      {/* Subtle Background Glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-primary-container/10 rounded-full blur-[100px] pointer-events-none"></div>
       
-      {/* Glass Panel */}
-      <div className="relative z-10 glass-panel p-8 md:p-12 rounded-2xl flex flex-col items-center gap-8 border border-primary-container/30 shadow-[0_0_50px_rgba(252,163,17,0.15)] animate-slide-up mx-4">
-        
-        {/* Pulsing Icon */}
-        <div className="relative flex items-center justify-center mt-4">
-           <div className="absolute inset-0 bg-primary-container/30 rounded-full blur-xl animate-pulse"></div>
-           <div className="relative w-20 h-20 md:w-24 md:h-24 bg-surface-container rounded-full border-2 border-primary-container flex items-center justify-center text-primary-container shadow-[0_0_30px_rgba(252,163,17,0.3)]">
-             <Swords size={40} className="animate-pulse md:w-12 md:h-12" />
-           </div>
-           
-           {/* Rotating rings */}
-           <div className="absolute -inset-4 border border-primary-container/30 border-t-primary-container rounded-full animate-spin" style={{ animationDuration: '3s' }}></div>
-           <div className="absolute -inset-8 border border-primary-container/10 border-b-primary-container rounded-full animate-spin" style={{ animationDuration: '4s', animationDirection: 'reverse' }}></div>
+      {/* Simple Full Page Content */}
+      <div className="relative z-10 flex flex-col items-center gap-6">
+        {/* Simple Pulsing Icon */}
+        <div className="w-16 h-16 rounded-full border border-primary-container/50 flex items-center justify-center text-primary-container animate-pulse shadow-[0_0_20px_rgba(252,163,17,0.2)]">
+          <Swords size={32} />
         </div>
 
         {/* Loading Text */}
-        <div className="text-center space-y-2 mt-4">
-          <h2 className="font-headline-lg text-lg md:text-2xl text-on-surface uppercase tracking-widest flex items-center justify-center gap-2">
+        <div className="text-center space-y-2">
+          <h2 className="font-headline-md text-lg md:text-xl text-on-surface uppercase tracking-widest flex items-center justify-center gap-2">
             {lang === 'en' ? 'Summoning Server Data' : 'Sunucu Verileri Çağrılıyor'}
             <span className="flex gap-1 ml-1">
               <span className="w-1.5 h-1.5 bg-primary-container rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
@@ -377,11 +369,7 @@ export default function ServerSettings() {
               <span className="w-1.5 h-1.5 bg-primary-container rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
             </span>
           </h2>
-          <p className="font-body-md text-on-surface-variant text-[10px] md:text-sm uppercase tracking-[0.2em] md:tracking-[0.3em] opacity-70">
-            {lang === 'en' ? 'Veyronix Bot Integration' : 'Veyronix Bot Entegrasyonu'}
-          </p>
         </div>
-
       </div>
     </div>
   );
