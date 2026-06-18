@@ -1,6 +1,6 @@
 export default function Logo({ className = "" }) {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%" className={className}>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="100 100 320 260" width="100%" height="100%" className={className}>
       <defs>
         <linearGradient id="gradBlue" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stop-color="#00f2fe"/>
@@ -41,17 +41,10 @@ export default function Logo({ className = "" }) {
           <stop offset="100%" stop-color="#ffe670"/>
         </linearGradient>
 
-        <radialGradient id="bgGlow" cx="50%" cy="50%" r="60%">
-          <stop offset="0%" stop-color="#1f2336"/>
-          <stop offset="100%" stop-color="#0f111a"/>
-        </radialGradient>
-
         <filter id="drop-shadow" x="-30%" y="-30%" width="160%" height="160%">
           <feDropShadow dx="15" dy="15" stdDeviation="15" flood-color="#000" flood-opacity="0.5"/>
         </filter>
       </defs>
-
-      <rect width="500" height="500" fill="url(#bgGlow)"/>
 
       <g filter="url(#drop-shadow)">
         <polygon points="210,340 230,320 170,220 150,240" fill="url(#gradBlueDark)"/>

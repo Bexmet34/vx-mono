@@ -10,6 +10,7 @@ import { tr, enUS } from "date-fns/locale";
 import { useLanguage } from "@/context/LanguageContext";
 import { useToast, ToastContainer } from "@/components/Toast";
 import Navbar from "@/components/Navbar";
+import Logo from "@/components/Logo";
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
@@ -91,7 +92,7 @@ export default function Dashboard() {
       <>
         <Navbar isStatic={true} />
         <div className="min-h-screen flex items-center justify-center">
-          <Loader2 className="animate-spin text-primary-container" size={48} />
+          <Logo className="w-20 h-20 animate-pulse drop-shadow-[0_0_15px_rgba(255,215,0,0.3)]" />
         </div>
       </>
     );
@@ -116,7 +117,7 @@ export default function Dashboard() {
 
       {loading ? (
         <div className="flex items-center justify-center py-20 text-primary-container">
-          <Loader2 className="animate-spin" size={48} />
+          <Logo className="w-20 h-20 animate-pulse drop-shadow-[0_0_15px_rgba(255,215,0,0.3)]" />
         </div>
       ) : servers.length === 0 && !errorMsg ? (
         <div className="glass-panel p-16 text-center border-dashed border-outline-variant text-on-surface-variant max-w-2xl mx-auto flex flex-col items-center">
