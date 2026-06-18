@@ -10,6 +10,7 @@ import { useToast, ToastContainer } from "@/components/Toast";
 import Cropper from "react-easy-crop";
 import getCroppedImg from "@/utils/cropImage";
 import { supabase } from "@/utils/supabase";
+import Logo from "@/components/Logo";
 
 // Modular Components (These will be refactored to use new Bento grid classes)
 import OverviewTab from "./components/OverviewTab";
@@ -355,8 +356,8 @@ export default function ServerSettings() {
       {/* Simple Full Page Content */}
       <div className="relative z-10 flex flex-col items-center gap-6">
         {/* Simple Pulsing Icon */}
-        <div className="w-16 h-16 rounded-full border border-primary-container/50 flex items-center justify-center text-primary-container animate-pulse shadow-[0_0_20px_rgba(252,163,17,0.2)]">
-          <Swords size={32} />
+        <div className="flex items-center justify-center text-primary-container animate-pulse drop-shadow-[0_0_20px_rgba(252,163,17,0.5)]">
+          <Logo className="w-32 h-32" />
         </div>
 
         {/* Loading Text */}
