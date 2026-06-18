@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 import { Globe, MessageCircle, Book, Shield, FileText, LayoutDashboard, Code, History } from "lucide-react";
+import Logo from "@/components/Logo";
 
 export default function Footer() {
   const { t } = useLanguage();
@@ -13,7 +14,8 @@ export default function Footer() {
         
         {/* Brand Section */}
         <div className="flex flex-col gap-6">
-          <Link href="/" className="font-headline-lg text-headline-lg font-bold tracking-tighter text-primary-container uppercase">
+          <Link href="/" className="flex items-center gap-3 font-headline-lg text-headline-lg font-bold tracking-tighter text-primary-container uppercase">
+            <Logo className="w-10 h-10" />
             Veyronix
           </Link>
           <p className="font-body-md text-on-surface-variant max-w-sm">
