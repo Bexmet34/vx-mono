@@ -6,6 +6,7 @@ import Image from "next/image";
 import { LogIn, LogOut, LayoutDashboard, Globe, Menu, X, ChevronRight, Shield } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useState, useEffect, useRef } from "react";
+import Logo from "@/components/Logo";
 
 export default function Navbar({ isStatic = false }) {
   const { data: session } = useSession();
@@ -39,7 +40,8 @@ export default function Navbar({ isStatic = false }) {
       <nav className={`${isStatic ? 'absolute' : 'fixed'} top-0 w-full z-40 bg-surface/80 backdrop-blur-md border-b border-on-surface/ shadow-[0_0_15px_rgba(255,215,0,0.15)] transition-all`}>
         <div className="flex justify-between items-center px-4 md:px-margin-desktop py-4 max-w-container-max mx-auto">
           <div className="flex items-center gap-6">
-            <Link href="/" className="font-headline-md text-headline-md font-bold tracking-tighter text-primary-container">
+            <Link href="/" className="flex items-center gap-2 font-headline-md text-headline-md font-bold tracking-tighter text-primary-container">
+              <Logo className="w-10 h-10" />
               Veyronix
             </Link>
             
@@ -177,7 +179,10 @@ export default function Navbar({ isStatic = false }) {
           
           {/* Header */}
           <div className="flex justify-between items-center px-6 py-6 border-b border-on-surface/">
-            <span className="font-headline-md text-headline-md font-bold tracking-tighter text-primary-container">Veyronix</span>
+            <span className="flex items-center gap-2 font-headline-md text-headline-md font-bold tracking-tighter text-primary-container">
+              <Logo className="w-8 h-8" />
+              Veyronix
+            </span>
             <button 
               className="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-primary-container transition-colors" 
               onClick={() => setIsMenuOpen(false)}
