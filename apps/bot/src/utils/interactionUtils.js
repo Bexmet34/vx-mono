@@ -91,6 +91,7 @@ async function handleInteractionError(interaction, error, lang = 'tr') {
     const isIgnorable = isSslError ||
         errorCode === 10062 ||
         errorCode === 40060 ||
+        errorCode === 'InteractionAlreadyReplied' ||
         isUnknownInteraction;
 
     if (isIgnorable) {

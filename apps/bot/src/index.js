@@ -83,7 +83,7 @@ async function startBot() {
 }
 
 // Client ready event
-client.once('ready', async (c) => {
+client.once('clientReady', async (c) => {
     // Uygulama emojilerini yükle
     try {
         await c.application.emojis.fetch();
