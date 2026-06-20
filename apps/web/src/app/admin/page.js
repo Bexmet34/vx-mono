@@ -28,6 +28,7 @@ export default function AdminPage() {
   const [servers, setServers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [savingId, setSavingId] = useState(null);
+  const [manualPayments, setManualPayments] = useState([]);
   
   // Modal States
   const [showDayModal, setShowDayModal] = useState(null);
@@ -128,6 +129,16 @@ export default function AdminPage() {
     finally { setLoading(false); }
   }, []);
 
+  const fetchManualPayments = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/admin/manual-payments");
+      const data = await res.json();
+      if (res.ok) setManualPayments(data);
+    } catch (err) { console.error(err); }
+    finally { setLoading(false); }
+  }, []);
+
   // Auth Check
   useEffect(() => {
     if (status === "unauthenticated" || (status === "authenticated" && !isAdmin)) {
@@ -145,6 +156,7 @@ export default function AdminPage() {
         if (activeTab === "broadcast") fetchScheduledMessages();
         if (activeTab === "plans") fetchPlans();
         if (activeTab === "settings") fetchSettings();
+        if (activeTab === "manual-payments") fetchManualPayments();
       }, 0);
     }
   }, [status, isAdmin, activeTab, fetchTemplates, fetchServers, fetchCampaigns, fetchScheduledMessages, fetchPlans, fetchSettings]);
@@ -309,6 +321,29 @@ export default function AdminPage() {
     }
   };
 
+  const handleManualPaymentAction = async (id, status) => {
+    if (!confirm(status === 'paid' ? 'Bu ödemeyi onaylamak istediğinize emin misiniz? Sunucunun abonelik süresi uzatılacaktır.' : 'Bu ödemeyi reddetmek istediğinize emin misiniz?')) return;
+    setSavingId(id);
+    try {
+      const res = await fetch("/api/admin/manual-payments", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, status })
+      });
+      if (res.ok) {
+        showToast(`Ödeme başarıyla ${status === 'paid' ? 'onaylandı' : 'reddedildi'}!`, "success");
+        fetchManualPayments();
+      } else {
+        const data = await res.json();
+        showToast(data.error || "Hata", "error");
+      }
+    } catch (err) {
+      showToast(err.message, "error");
+    } finally {
+      setSavingId(null);
+    }
+  };
+
   const showToast = (text, type) => {
     setMessage({ text, type });
     setTimeout(() => setMessage(null), 3000);
@@ -337,6 +372,7 @@ export default function AdminPage() {
     { id: "overview", label: "Genel Bakış", icon: <LayoutDashboard size={20} /> },
     { id: "servers", label: "Sunucu Yönetimi", icon: <Server size={20} /> },
     { id: "plans", label: "Paket Yönetimi", icon: <DollarSign size={20} /> }, 
+    { id: "manual-payments", label: "Havale/EFT Onayları", icon: <CheckCircle size={20} /> },
     { id: "campaigns", label: "Kampanya & Hediye", icon: <Gift size={20} /> },
     { id: "notifications", label: "Bildirim Şablonları", icon: <Bell size={20} /> },
     { id: "broadcast", label: "Duyuru Merkezi", icon: <MessageSquare size={20} /> },
@@ -766,6 +802,81 @@ export default function AdminPage() {
                     </div>
                   </>
                 )}
+              </div>
+            )}
+
+            {/* MANUAL PAYMENTS TAB */}
+            {activeTab === "manual-payments" && (
+              <div className="animate-slide-up">
+                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem'}}>
+                  <div>
+                    <h2 style={{fontSize: '1.5rem', fontWeight: '800'}}>Havale/EFT Onayları</h2>
+                    <p style={{color: 'var(--admin-text-muted)'}}>Kullanıcıların yaptığı banka ödemelerini buradan onaylayabilirsiniz.</p>
+                  </div>
+                </div>
+
+                <div className="admin-card">
+                  <table className="admin-table">
+                    <thead>
+                      <tr>
+                        <th>SUNUCU / KULLANICI</th>
+                        <th>GÖNDEREN & MİKTAR</th>
+                        <th>AÇIKLAMA KODU</th>
+                        <th>DURUM</th>
+                        <th style={{textAlign: "right"}}>İŞLEMLER</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {manualPayments.length === 0 ? (
+                        <tr><td colSpan={5} style={{textAlign: 'center', padding: '4rem', opacity: 0.5}}>Henüz ödeme kaydı bulunmuyor.</td></tr>
+                      ) : manualPayments.map(p => (
+                        <tr key={p.id}>
+                          <td data-label="SUNUCU / KULLANICI">
+                            <div style={{fontWeight: '700', fontSize: '0.95rem'}}>{p.guild_name}</div>
+                            <div style={{fontSize: '0.75rem', color: 'var(--admin-text-muted)', fontFamily: 'monospace'}}>{p.guild_id}</div>
+                            <div style={{fontSize: '0.75rem', color: 'var(--admin-accent)', marginTop: '0.2rem'}}>User ID: {p.user_id}</div>
+                          </td>
+                          <td data-label="GÖNDEREN & MİKTAR">
+                            <div style={{fontWeight: '700'}}>{p.sender_name}</div>
+                            <div style={{color: 'var(--admin-accent)', fontWeight: '600'}}>{p.amount} {p.currency}</div>
+                            <div style={{fontSize: '0.75rem', color: 'var(--admin-text-muted)'}}>{p.duration_days} Günlük Paket</div>
+                          </td>
+                          <td data-label="AÇIKLAMA KODU">
+                            <code style={{fontSize: '0.9rem', color: 'var(--admin-text-muted)', background: 'rgba(255,255,255,0.05)', padding: '0.3rem 0.6rem', borderRadius: '4px', letterSpacing: '2px', fontWeight: 'bold'}}>
+                              {p.description_code}
+                            </code>
+                          </td>
+                          <td data-label="DURUM">
+                            {p.status === 'pending' && <span className="admin-badge" style={{background: 'rgba(252,163,17,0.15)', color: '#fca311'}}>Bekliyor</span>}
+                            {p.status === 'paid' && <span className="admin-badge badge-active">Onaylandı</span>}
+                            {p.status === 'rejected' && <span className="admin-badge badge-passive">Reddedildi</span>}
+                          </td>
+                          <td data-label="İŞLEMLER">
+                            {p.status === 'pending' && (
+                              <div style={{display: 'flex', gap: '0.5rem', justifyContent: 'flex-end'}}>
+                                <button 
+                                  className="admin-action-btn" 
+                                  style={{color: 'var(--admin-success)', borderColor: 'rgba(46, 204, 113, 0.3)'}}
+                                  onClick={() => handleManualPaymentAction(p.id, 'paid')}
+                                  disabled={savingId === p.id}
+                                >
+                                  {savingId === p.id ? <Loader2 size={18} className="spin" /> : <Check size={18} />}
+                                </button>
+                                <button 
+                                  className="admin-action-btn danger" 
+                                  onClick={() => handleManualPaymentAction(p.id, 'rejected')}
+                                  disabled={savingId === p.id}
+                                >
+                                  {savingId === p.id ? <Loader2 size={18} className="spin" /> : <X size={18} />}
+                                </button>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
 
