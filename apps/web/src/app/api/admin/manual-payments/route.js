@@ -82,14 +82,13 @@ export async function PATCH(req) {
         }
 
         currentExpiry.setDate(currentExpiry.getDate() + payment.duration_days);
-        const isUnlimited = payment.duration_days >= 90;
 
         await supabase
           .from('subscriptions')
           .update({ 
             expires_at: currentExpiry.toISOString(),
             is_active: true,
-            is_unlimited: isUnlimited || subscription.is_unlimited
+            is_unlimited: subscription.is_unlimited || false
           })
           .eq('id', subscription.id);
 
@@ -98,7 +97,6 @@ export async function PATCH(req) {
         // Abonelik hiç yoksa yeni oluştur
         const now = new Date();
         now.setDate(now.getDate() + payment.duration_days);
-        const isUnlimited = payment.duration_days >= 90;
 
         await supabase
           .from('subscriptions')
@@ -107,7 +105,7 @@ export async function PATCH(req) {
             guild_name: payment.guild_name || 'Bilinmeyen Sunucu',
             expires_at: now.toISOString(),
             is_active: true,
-            is_unlimited: isUnlimited
+            is_unlimited: false
           });
         
         console.log(`[Admin Manual Payment] Order ${payment.order_id} approved. Guild ${payment.guild_id} NEW subscription created for ${payment.duration_days} days.`);
