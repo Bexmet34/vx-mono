@@ -75,7 +75,6 @@ export default function Home() {
 
   const handleManualPurchase = () => {
     if (!selectedServer) return setCheckoutError("Lütfen bir sunucu seçin.");
-    if (!senderName || senderName.trim().length < 3) return setCheckoutError("Lütfen kart üzerindeki ismi doğru giriniz.");
     setCheckoutError("");
     
     // Rastgele 8 haneli kod oluştur
@@ -90,6 +89,11 @@ export default function Home() {
   };
 
   const handleConfirmManualPayment = async () => {
+    if (!senderName || senderName.trim().length < 3) {
+      alert("Lütfen kart üzerindeki isminizi giriniz.");
+      return;
+    }
+    
     setIsProcessing(true);
     try {
       const serverDetails = userServers.find(s => s.guild_id === selectedServer);
@@ -108,6 +112,7 @@ export default function Home() {
       
       if (res.ok && data.success) {
         setShowCheckout(false);
+        setSenderName(""); // Reset after success
         alert("Ödeme bildiriminiz başarıyla admin paneline iletildi. Onaylandığında paketiniz aktif olacaktır.");
       } else {
         alert(data.error || "Ödeme oluşturulamadı.");
@@ -728,6 +733,17 @@ export default function Home() {
                         </div>
                      </div>
                      
+                     <div className="w-full max-w-md mt-6 text-left space-y-2">
+                        <label className="font-label-bold text-xs text-on-surface uppercase tracking-widest opacity-70">Ödemeyi Yapan (Kart Üzerindeki İsim)</label>
+                        <input 
+                          type="text" 
+                          placeholder="Örn: Ahmet Yılmaz" 
+                          className="w-full bg-[#0B0F19] border border-outline-variant p-4 text-on-surface font-body-md focus:border-primary-container outline-none transition-colors"
+                          value={senderName}
+                          onChange={(e) => setSenderName(e.target.value)}
+                        />
+                     </div>
+                     
                      <div className="flex gap-4 w-full max-w-md mt-6">
                        <button 
                          onClick={() => setShowCheckout(false)}
@@ -737,7 +753,7 @@ export default function Home() {
                        </button>
                        <button 
                          onClick={handleConfirmManualPayment}
-                         disabled={isProcessing}
+                         disabled={isProcessing || senderName.trim().length < 3}
                          className="flex-[2] px-4 py-3 bg-primary-container text-on-primary rounded-lg font-label-bold uppercase tracking-widest transition-all shadow-[0_10px_20px_rgba(255,215,0,0.2)] hover:brightness-110 active:scale-95 disabled:opacity-50"
                        >
                          {isProcessing ? <Loader2 className="animate-spin inline mr-2" size={20} /> : null}
@@ -866,28 +882,17 @@ export default function Home() {
                         </button>
                       ) : (
                         <div className="space-y-4 bg-surface p-6 border border-outline-variant">
-                           <div className="text-sm font-body-md text-on-surface-variant mb-4">Banka ödemesi onayının hızlı olması için gönderimi yapacağınız banka hesabının sahibinin adını giriniz.</div>
-                           
-                           <div className="space-y-2">
-                              <label className="font-label-bold text-xs text-on-surface uppercase tracking-widest opacity-70">Kart Üzerindeki İsim (Ad Soyad)</label>
-                              <input 
-                                type="text" 
-                                placeholder="Örn: Ahmet Yılmaz" 
-                                className="w-full bg-[#0B0F19] border border-outline-variant p-4 text-on-surface font-body-md focus:border-primary-container outline-none transition-colors"
-                                value={senderName}
-                                onChange={(e) => setSenderName(e.target.value)}
-                              />
-                           </div>
+                           <div className="text-sm font-body-md text-on-surface-variant mb-4">Ödeme adımına geçmek için aşağıdaki butona tıklayın. Havale/EFT bilgileri bir sonraki adımda gösterilecektir.</div>
 
                            <button 
                              onClick={handleManualPurchase}
-                             disabled={isProcessing || !selectedServer || senderName.trim().length < 3}
-                             className="w-full py-5 px-4 bg-primary-container text-on-primary font-label-bold text-body-md flex items-center justify-center gap-3 transition-all duration-300 hover:brightness-110 active:scale-[0.98] shadow-[0_10px_20px_rgba(255,215,0,0.1)] disabled:opacity-50 disabled:cursor-not-allowed uppercase text-center mt-6"
+                             disabled={isProcessing || !selectedServer}
+                             className="w-full py-5 px-4 bg-primary-container text-on-primary font-label-bold text-body-md flex items-center justify-center gap-3 transition-all duration-300 hover:brightness-110 active:scale-[0.98] shadow-[0_10px_20px_rgba(255,215,0,0.1)] disabled:opacity-50 disabled:cursor-not-allowed uppercase text-center mt-2"
                            >
                              {isProcessing ? (
                                <><Loader2 className="animate-spin shrink-0" size={24} /> İŞLENİYOR...</>
                              ) : (
-                               <><span>ÖDEME BİLDİRİMİ YAP</span></>
+                               <><span>ÖDEME SAYFASINA GEÇ</span></>
                              )}
                            </button>
                         </div>

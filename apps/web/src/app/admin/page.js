@@ -571,13 +571,20 @@ export default function AdminPage() {
                             </td>
                             <td data-label="PLAN">
                               {/* PLAN column: Freemium / Premium / Unlimited */}
-                              {s.is_unlimited ? (
-                                <span className="admin-badge badge-unlimited" style={{fontSize:'0.8rem'}}>♾️ Sınırsız</span>
-                              ) : !isExpired ? (
-                                <span className="admin-badge badge-active" style={{fontSize:'0.8rem'}}>💎 Premium</span>
-                              ) : (
-                                <span className="admin-badge badge-expired" style={{fontSize:'0.8rem'}}>🆓 Freemium</span>
-                              )}
+                              <div style={{display: 'flex', flexDirection: 'column', gap: '0.4rem', alignItems: 'flex-start'}}>
+                                {s.is_unlimited ? (
+                                  <span className="admin-badge badge-unlimited" style={{fontSize:'0.8rem'}}>♾️ Sınırsız</span>
+                                ) : !isExpired ? (
+                                  <>
+                                    <span className="admin-badge badge-active" style={{fontSize:'0.8rem'}}>💎 Premium</span>
+                                    <span style={{fontSize: '0.7rem', color: 'var(--admin-text-muted)', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '4px'}}>
+                                      <Clock size={12} /> {Math.ceil((new Date(s.expires_at) - new Date()) / (1000 * 60 * 60 * 24))} Gün Kaldı
+                                    </span>
+                                  </>
+                                ) : (
+                                  <span className="admin-badge badge-expired" style={{fontSize:'0.8rem'}}>🆓 Freemium</span>
+                                )}
+                              </div>
                             </td>
                             <td data-label="İŞLEMLER">
                               <div className="table-actions">

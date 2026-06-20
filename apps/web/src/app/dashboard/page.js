@@ -134,7 +134,7 @@ export default function Dashboard() {
             if (server.is_unlimited) {
               timeStatus = "Unlimited";
               statusClass = "bg-primary-container text-on-primary";
-            } else if (server.trial_used === false && !expired) {
+            } else if (!expired) {
               timeStatus = t.dPremiumPlan || "Premium";
               statusClass = "bg-primary-container text-on-primary";
             } else {
@@ -158,10 +158,13 @@ export default function Dashboard() {
                   </h3>
                   <div className="font-body-md text-sm text-on-surface-variant">
                     {server.is_unlimited && (lang === 'tr' ? "Sınırsız (Ömür Boyu)" : "Lifetime access")}
-                    {!server.is_unlimited && server.trial_used === false && !expired && (
-                      <>{formatDistanceToNow(new Date(server.expires_at), { locale })} left</>
+                    {!server.is_unlimited && !expired && (
+                      <>
+                        <span style={{color: 'var(--on-surface)'}}>{Math.ceil((new Date(server.expires_at) - new Date()) / (1000 * 60 * 60 * 24))}</span> {lang === 'tr' ? "gün kaldı" : "days left"}
+                        <span className="text-xs ml-2 opacity-50">({formatDistanceToNow(new Date(server.expires_at), { locale })})</span>
+                      </>
                     )}
-                    {!server.is_unlimited && (server.trial_used !== false || expired) && (lang === 'tr' ? "Freemium — Top.gg oyu gerekli" : "Freemium — Top.gg vote required")}
+                    {!server.is_unlimited && expired && (lang === 'tr' ? "Freemium — Top.gg oyu gerekli" : "Freemium — Top.gg vote required")}
                   </div>
                 </div>
                 <div className="p-4 bg-surface-container-low flex justify-between gap-4">
