@@ -16,3 +16,17 @@ ADD COLUMN IF NOT EXISTS description_code TEXT;
 -- 4. Admin panelinde rahat görebilmeniz için Sunucu Adı
 ALTER TABLE public.crypto_payments 
 ADD COLUMN IF NOT EXISTS guild_name TEXT;
+
+-- 5. Kullanıcının hangi bankaya ödeme yaptığını takip etmek için
+ALTER TABLE public.crypto_payments 
+ADD COLUMN IF NOT EXISTS target_bank TEXT;
+
+-- 6. Dinamik Banka Hesapları Tablosu
+CREATE TABLE IF NOT EXISTS public.bank_accounts (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  bank_name TEXT NOT NULL,
+  account_holder TEXT NOT NULL,
+  iban TEXT NOT NULL,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
+);

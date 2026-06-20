@@ -39,6 +39,8 @@ export default function Home() {
   const [senderName, setSenderName] = useState("");
   const [manualSuccess, setManualSuccess] = useState(false);
   const [generatedCode, setGeneratedCode] = useState("");
+  const [bankAccounts, setBankAccounts] = useState([]);
+  const [selectedBank, setSelectedBank] = useState(null);
 
   const handleBuyClick = (plan) => {
     if (status !== "authenticated") {
@@ -52,6 +54,20 @@ export default function Home() {
     setGeneratedCode("");
     setShowCheckout(true);
     fetchUserServers();
+    fetchBankAccounts();
+  };
+
+  const fetchBankAccounts = async () => {
+    try {
+      const res = await fetch("/api/bank-accounts");
+      const data = await res.json();
+      if (res.ok) {
+        setBankAccounts(data);
+        if (data.length > 0) setSelectedBank(data[0]);
+      }
+    } catch (err) {
+      console.error("Banka hesapları yüklenemedi", err);
+    }
   };
 
   const fetchUserServers = async () => {
@@ -105,7 +121,8 @@ export default function Home() {
           guildName: serverDetails?.guild_name || "Bilinmeyen Sunucu",
           planId: selectedPlan.id,
           senderName: senderName.trim(),
-          descriptionCode: generatedCode
+          descriptionCode: generatedCode,
+          targetBank: selectedBank?.bank_name || "Bilinmiyor"
         })
       });
       const data = await res.json();
@@ -718,17 +735,17 @@ export default function Home() {
                      <div className="w-full max-w-md text-left font-body-md text-sm text-on-surface-variant space-y-3 bg-surface-container-high p-5 rounded-xl border border-outline-variant shadow-inner">
                         <div className="flex justify-between items-center border-b border-outline-variant/50 pb-3">
                            <strong className="text-on-surface uppercase tracking-widest text-xs opacity-70">Banka</strong> 
-                           <span className="text-on-surface font-semibold">Örnek Bankası A.Ş.</span>
+                           <span className="text-on-surface font-semibold">{selectedBank?.bank_name || "Bilinmiyor"}</span>
                         </div>
                         <div className="flex justify-between items-center border-b border-outline-variant/50 pb-3 pt-1">
                            <strong className="text-on-surface uppercase tracking-widest text-xs opacity-70">Alıcı</strong> 
-                           <span className="text-on-surface font-semibold">Veyronix Yazılım</span>
+                           <span className="text-on-surface font-semibold">{selectedBank?.account_holder || "Bilinmiyor"}</span>
                         </div>
                         <div className="pt-2">
                            <strong className="text-on-surface uppercase tracking-widest text-xs opacity-70 block mb-2">IBAN Adresi</strong>
                            <div className="font-mono bg-[#0B0F19] p-3 rounded-lg border border-outline-variant text-on-surface flex justify-between items-center group hover:border-primary-container/50 transition-colors">
-                              <span className="tracking-widest">TR12 3456 7890 1234 5678 9012 34</span>
-                              <button onClick={() => navigator.clipboard.writeText("TR123456789012345678901234")} className="text-primary-container text-xs hover:underline uppercase font-label-bold tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Kopyala</button>
+                              <span className="tracking-widest text-xs sm:text-sm">{selectedBank?.iban || "TR00 0000 0000 0000 0000 0000 00"}</span>
+                              <button onClick={() => navigator.clipboard.writeText(selectedBank?.iban || "")} className="text-primary-container text-xs hover:underline uppercase font-label-bold tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Kopyala</button>
                            </div>
                         </div>
                      </div>
@@ -876,25 +893,43 @@ export default function Home() {
                         >
                           {isProcessing ? (
                             <><Loader2 className="animate-spin shrink-0" size={24} /> INITIALIZING DEPLOYMENT...</>
-                          ) : (
                             <><Wallet size={24} className="shrink-0" /> <span>PAY WITH USDT (CRYPTOMUS)</span></>
                           )}
                         </button>
                       ) : (
                         <div className="space-y-4 bg-surface p-6 border border-outline-variant">
-                           <div className="text-sm font-body-md text-on-surface-variant mb-4">Ödeme adımına geçmek için aşağıdaki butona tıklayın. Havale/EFT bilgileri bir sonraki adımda gösterilecektir.</div>
+                           {bankAccounts.length === 0 ? (
+                             <div className="text-sm font-body-md text-error mb-4">Şu anda havale ile ödeme kabul edilmiyor. Lütfen kripto ödemesini kullanın.</div>
+                           ) : (
+                             <>
+                               <div className="text-sm font-body-md text-on-surface-variant mb-4">Ödeme adımına geçmek için işlem yapacağınız bankayı seçin ve aşağıdaki butona tıklayın. Havale/EFT bilgileri bir sonraki adımda gösterilecektir.</div>
+                               
+                               <div className="space-y-2 mb-4">
+                                  <label className="font-label-bold text-xs text-on-surface uppercase tracking-widest opacity-70">Ödeme Yapılacak Banka</label>
+                                  <select 
+                                    className="w-full bg-[#0B0F19] border border-outline-variant p-4 text-on-surface font-body-md focus:border-primary-container outline-none transition-colors"
+                                    value={selectedBank?.id || ""}
+                                    onChange={(e) => setSelectedBank(bankAccounts.find(b => b.id === e.target.value))}
+                                  >
+                                    {bankAccounts.map(b => (
+                                      <option key={b.id} value={b.id}>{b.bank_name}</option>
+                                    ))}
+                                  </select>
+                               </div>
 
-                           <button 
-                             onClick={handleManualPurchase}
-                             disabled={isProcessing || !selectedServer}
-                             className="w-full py-5 px-4 bg-primary-container text-on-primary font-label-bold text-body-md flex items-center justify-center gap-3 transition-all duration-300 hover:brightness-110 active:scale-[0.98] shadow-[0_10px_20px_rgba(255,215,0,0.1)] disabled:opacity-50 disabled:cursor-not-allowed uppercase text-center mt-2"
-                           >
-                             {isProcessing ? (
-                               <><Loader2 className="animate-spin shrink-0" size={24} /> İŞLENİYOR...</>
-                             ) : (
-                               <><span>ÖDEME SAYFASINA GEÇ</span></>
-                             )}
-                           </button>
+                               <button 
+                                 onClick={handleManualPurchase}
+                                 disabled={isProcessing || !selectedServer || !selectedBank}
+                                 className="w-full py-5 px-4 bg-primary-container text-on-primary font-label-bold text-body-md flex items-center justify-center gap-3 transition-all duration-300 hover:brightness-110 active:scale-[0.98] shadow-[0_10px_20px_rgba(255,215,0,0.1)] disabled:opacity-50 disabled:cursor-not-allowed uppercase text-center mt-2"
+                               >
+                                 {isProcessing ? (
+                                   <><Loader2 className="animate-spin shrink-0" size={24} /> İŞLENİYOR...</>
+                                 ) : (
+                                   <><span>ÖDEME SAYFASINA GEÇ</span></>
+                                 )}
+                               </button>
+                             </>
+                           )}
                         </div>
                       )}
                       {paymentMethod === 'crypto' && (

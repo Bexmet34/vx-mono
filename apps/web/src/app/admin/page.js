@@ -7,7 +7,7 @@ import {
   Save, Bell, Loader2, AlertCircle, CheckCircle,
   LayoutDashboard, Server, MessageSquare, Settings, 
   Users, BarChart3, Search, Clock, Infinity, Power, 
-  Calendar, Trash2, ChevronRight, ArrowLeft, Gift, Plus, Send, Edit3, Eye, EyeOff, DollarSign, Check, X, Gamepad2
+  Calendar, Trash2, ChevronRight, ArrowLeft, Gift, Plus, Send, Edit3, Eye, EyeOff, DollarSign, Check, X, Gamepad2, CreditCard
 } from "lucide-react";
 import { useCallback } from "react";
 import { format } from "date-fns";
@@ -29,10 +29,13 @@ export default function AdminPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [savingId, setSavingId] = useState(null);
   const [manualPayments, setManualPayments] = useState([]);
+  const [bankAccounts, setBankAccounts] = useState([]);
   
   // Modal States
   const [showDayModal, setShowDayModal] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(null);
+  const [showBankModal, setShowBankModal] = useState(false);
+  const [newBankAccount, setNewBankAccount] = useState({ bank_name: "", account_holder: "", iban: "", is_active: true });
   const [daysToAdd, setDaysToAdd] = useState(30);
   const [expiryDate, setExpiryDate] = useState("");
   const [statusFilter, setStatusFilter] = useState("all"); // all, active, unlimited, passive
@@ -140,6 +143,16 @@ export default function AdminPage() {
     finally { setLoading(false); }
   }, []);
 
+  const fetchBankAccounts = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/admin/bank-accounts");
+      const data = await res.json();
+      if (res.ok) setBankAccounts(data);
+    } catch (err) { console.error(err); }
+    finally { setLoading(false); }
+  }, []);
+
   // Auth Check
   useEffect(() => {
     if (status === "unauthenticated" || (status === "authenticated" && !isAdmin)) {
@@ -158,9 +171,10 @@ export default function AdminPage() {
         if (activeTab === "plans") fetchPlans();
         if (activeTab === "settings") fetchSettings();
         if (activeTab === "manual-payments") fetchManualPayments();
+        if (activeTab === "bank-accounts") fetchBankAccounts();
       }, 0);
     }
-  }, [status, isAdmin, activeTab, fetchTemplates, fetchServers, fetchCampaigns, fetchScheduledMessages, fetchPlans, fetchSettings]);
+  }, [status, isAdmin, activeTab, fetchTemplates, fetchServers, fetchCampaigns, fetchScheduledMessages, fetchPlans, fetchSettings, fetchManualPayments, fetchBankAccounts]);
 
 
   const handleCreateCampaign = async () => {
@@ -322,6 +336,68 @@ export default function AdminPage() {
     }
   };
 
+  const handleAddBankAccount = async (e) => {
+    e.preventDefault();
+    setSavingId('new_bank');
+    try {
+      const res = await fetch("/api/admin/bank-accounts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newBankAccount),
+      });
+      if (res.ok) {
+        showToast("Banka hesabı eklendi!", "success");
+        setNewBankAccount({ bank_name: "", account_holder: "", iban: "", is_active: true });
+        setShowBankModal(false);
+        fetchBankAccounts();
+      } else {
+        const errorData = await res.json();
+        showToast(errorData.error || "Banka hesabı eklenemedi.", "error");
+      }
+    } catch (err) {
+      showToast(err.message, "error");
+    } finally {
+      setSavingId(null);
+    }
+  };
+
+  const handleToggleBankAccount = async (id, currentStatus) => {
+    setSavingId(id);
+    try {
+      const res = await fetch("/api/admin/bank-accounts", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, is_active: !currentStatus }),
+      });
+      if (res.ok) {
+        showToast("Banka durumu güncellendi!", "success");
+        fetchBankAccounts();
+      }
+    } catch (err) {
+      showToast(err.message, "error");
+    } finally {
+      setSavingId(null);
+    }
+  };
+
+  const handleDeleteBankAccount = async (id) => {
+    if (!confirm("Bu banka hesabını silmek istediğinize emin misiniz?")) return;
+    setSavingId(id);
+    try {
+      const res = await fetch(`/api/admin/bank-accounts?id=${id}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        showToast("Banka hesabı silindi!", "success");
+        fetchBankAccounts();
+      }
+    } catch (err) {
+      showToast(err.message, "error");
+    } finally {
+      setSavingId(null);
+    }
+  };
+
   const handleManualPaymentAction = (id, status) => {
     setShowConfirmModal({ id, status });
   };
@@ -380,6 +456,7 @@ export default function AdminPage() {
     { id: "servers", label: "Sunucu Yönetimi", icon: <Server size={20} /> },
     { id: "plans", label: "Paket Yönetimi", icon: <DollarSign size={20} /> }, 
     { id: "manual-payments", label: "Havale/EFT Onayları", icon: <CheckCircle size={20} /> },
+    { id: "bank-accounts", label: "Banka Hesapları", icon: <CreditCard size={20} /> },
     { id: "campaigns", label: "Kampanya & Hediye", icon: <Gift size={20} /> },
     { id: "notifications", label: "Bildirim Şablonları", icon: <Bell size={20} /> },
     { id: "broadcast", label: "Duyuru Merkezi", icon: <MessageSquare size={20} /> },
@@ -852,6 +929,9 @@ export default function AdminPage() {
                           </td>
                           <td data-label="GÖNDEREN & MİKTAR">
                             <div style={{fontWeight: '700'}}>{p.sender_name}</div>
+                            {p.target_bank && (
+                              <div style={{fontSize: '0.75rem', color: 'var(--admin-text-muted)', marginBottom: '0.2rem'}}>Banka: {p.target_bank}</div>
+                            )}
                             <div style={{color: 'var(--admin-accent)', fontWeight: '600'}}>{p.amount} {p.currency}</div>
                             <div style={{fontSize: '0.75rem', color: 'var(--admin-text-muted)'}}>{p.duration_days} Günlük Paket</div>
                           </td>
@@ -885,6 +965,85 @@ export default function AdminPage() {
                                 </button>
                               </div>
                             )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* BANK ACCOUNTS TAB */}
+            {activeTab === "bank-accounts" && (
+              <div className="animate-slide-up">
+                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem', flexWrap: 'wrap', gap: '1rem'}}>
+                  <div>
+                    <h2 style={{fontSize: '1.5rem', fontWeight: '800'}}>Banka Hesapları</h2>
+                    <p style={{color: 'var(--admin-text-muted)'}}>Müşterilerin havale yapabileceği banka/kart bilgilerinizi yönetin.</p>
+                  </div>
+                  <button 
+                    className="admin-btn" 
+                    onClick={() => setShowBankModal(true)}
+                  >
+                    <Plus size={18} /> Yeni Ekle
+                  </button>
+                </div>
+
+                <div className="admin-card">
+                  <table className="admin-table">
+                    <thead>
+                      <tr>
+                        <th>BANKA ADI</th>
+                        <th>HESAP SAHİBİ</th>
+                        <th>IBAN / HESAP NO</th>
+                        <th>DURUM</th>
+                        <th style={{textAlign: "right"}}>İŞLEMLER</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {bankAccounts.length === 0 ? (
+                        <tr><td colSpan={5} style={{textAlign: 'center', padding: '4rem', opacity: 0.5}}>Henüz kayıtlı banka hesabı bulunmuyor.</td></tr>
+                      ) : bankAccounts.map(b => (
+                        <tr key={b.id} style={{opacity: b.is_active ? 1 : 0.5}}>
+                          <td data-label="BANKA ADI">
+                            <div style={{fontWeight: '700', fontSize: '0.95rem'}}>{b.bank_name}</div>
+                          </td>
+                          <td data-label="HESAP SAHİBİ">
+                            <div style={{fontWeight: '600'}}>{b.account_holder}</div>
+                          </td>
+                          <td data-label="IBAN / HESAP NO">
+                            <code style={{fontSize: '0.9rem', color: 'var(--admin-text-muted)', background: 'rgba(255,255,255,0.05)', padding: '0.3rem 0.6rem', borderRadius: '4px', letterSpacing: '1px'}}>
+                              {b.iban}
+                            </code>
+                          </td>
+                          <td data-label="DURUM">
+                            {b.is_active ? (
+                              <span className="admin-badge badge-active">Aktif</span>
+                            ) : (
+                              <span className="admin-badge badge-passive">Pasif</span>
+                            )}
+                          </td>
+                          <td data-label="İŞLEMLER">
+                            <div style={{display: 'flex', gap: '0.5rem', justifyContent: 'flex-end'}}>
+                              <button 
+                                className="admin-action-btn" 
+                                title={b.is_active ? "Pasife Al" : "Aktife Al"}
+                                onClick={() => handleToggleBankAccount(b.id, b.is_active)}
+                                disabled={savingId === b.id}
+                                style={{color: b.is_active ? 'var(--admin-warning)' : 'var(--admin-success)', borderColor: 'rgba(255, 255, 255, 0.1)'}}
+                              >
+                                {savingId === b.id ? <Loader2 size={18} className="spin" /> : (b.is_active ? <EyeOff size={18} /> : <Eye size={18} />)}
+                              </button>
+                              <button 
+                                className="admin-action-btn danger" 
+                                title="Sil"
+                                onClick={() => handleDeleteBankAccount(b.id)}
+                                disabled={savingId === b.id}
+                              >
+                                {savingId === b.id ? <Loader2 size={18} className="spin" /> : <Trash2 size={18} />}
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -1441,6 +1600,67 @@ export default function AdminPage() {
                 {savingId === showConfirmModal.id ? <Loader2 size={18} className="spin" /> : 'Evet, Onayla'}
               </button>
              </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bank Account Modal */}
+      {showBankModal && (
+        <div className="admin-modal-overlay" onClick={() => setShowBankModal(false)}>
+          <div className="admin-modal animate-slide-up" onClick={e => e.stopPropagation()}>
+            <div className="admin-modal-header border-b border-[var(--admin-border)] mb-4 pb-4">
+              <h3 className="admin-modal-title">Yeni Banka Hesabı Ekle</h3>
+              <button className="admin-modal-close" onClick={() => setShowBankModal(false)}>
+                <X size={20} />
+              </button>
+            </div>
+            <form onSubmit={handleAddBankAccount}>
+              <div className="admin-modal-body space-y-4">
+                <div>
+                  <label className="admin-input-label">Banka Adı</label>
+                  <input 
+                    type="text" 
+                    className="admin-input-field" 
+                    placeholder="Örn: Ziraat Bankası" 
+                    value={newBankAccount.bank_name}
+                    onChange={(e) => setNewBankAccount({...newBankAccount, bank_name: e.target.value})}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="admin-input-label">Hesap Sahibi (Ad Soyad)</label>
+                  <input 
+                    type="text" 
+                    className="admin-input-field" 
+                    placeholder="Örn: Ahmet Yılmaz" 
+                    value={newBankAccount.account_holder}
+                    onChange={(e) => setNewBankAccount({...newBankAccount, account_holder: e.target.value})}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="admin-input-label">IBAN veya Hesap No</label>
+                  <input 
+                    type="text" 
+                    className="admin-input-field font-mono" 
+                    placeholder="TR..." 
+                    value={newBankAccount.iban}
+                    onChange={(e) => setNewBankAccount({...newBankAccount, iban: e.target.value})}
+                    required
+                  />
+                </div>
+              </div>
+              <div className="admin-modal-footer mt-6 pt-4 border-t border-[var(--admin-border)]">
+                <button type="button" className="admin-btn-secondary" onClick={() => setShowBankModal(false)}>İptal</button>
+                <button 
+                  type="submit"
+                  className="admin-btn-primary"
+                  disabled={savingId === 'new_bank' || !newBankAccount.bank_name || !newBankAccount.account_holder || !newBankAccount.iban}
+                >
+                  {savingId === 'new_bank' ? <Loader2 size={18} className="spin" /> : 'Kaydet'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
