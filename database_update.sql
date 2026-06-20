@@ -30,3 +30,15 @@ CREATE TABLE IF NOT EXISTS public.bank_accounts (
   is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
+
+-- 7. Havale/EFT Ödeme Bildirim Şablonları (Onaylandı / Reddedildi)
+INSERT INTO public.notification_templates (id, title_tr, title_en, content_tr, content_en, color, is_embed)
+VALUES 
+('manual_payment_approved', '💳 Ödeme Onaylandı!', '💳 Payment Approved!', 'Merhaba, **{sunucu}** sunucusu için yaptığınız Havale/EFT işlemi onaylandı ve aboneliğinize **{gun} gün** eklendi! Bizi tercih ettiğiniz için teşekkür ederiz.', 'Hello, your manual payment for **{sunucu}** has been approved and **{gun} days** have been added to your subscription! Thank you for choosing us.', '#2ecc71', true),
+('manual_payment_rejected', '❌ Ödeme Reddedildi', '❌ Payment Rejected', 'Merhaba, **{sunucu}** sunucusu için yaptığınız Havale/EFT işlemi reddedildi. Lütfen ödeme açıklamanızın doğru olduğundan emin olun veya destek ekibiyle iletişime geçin.', 'Hello, your manual payment for **{sunucu}** has been rejected. Please ensure your payment description is correct or contact the support team.', '#e74c3c', true)
+ON CONFLICT (id) DO UPDATE SET
+  title_tr = EXCLUDED.title_tr,
+  title_en = EXCLUDED.title_en,
+  content_tr = EXCLUDED.content_tr,
+  content_en = EXCLUDED.content_en,
+  color = EXCLUDED.color;

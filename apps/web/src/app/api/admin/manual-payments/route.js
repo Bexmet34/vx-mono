@@ -5,6 +5,28 @@ import { supabase } from "@veyronix/database";
 
 const ADMIN_ID = process.env.NEXT_PUBLIC_ADMIN_ID;
 
+// Helper to fetch notification template
+async function getParsedTemplate(templateId, placeholders = {}) {
+  const { data: template } = await supabase
+    .from('notification_templates')
+    .select('*')
+    .eq('id', templateId)
+    .single();
+
+  if (!template) return null;
+
+  let title = template.title_tr; 
+  let content = template.content_tr;
+
+  Object.keys(placeholders).forEach(key => {
+    const regex = new RegExp(`{${key}}`, 'g');
+    title = title?.replace(regex, placeholders[key]);
+    content = content?.replace(regex, placeholders[key]);
+  });
+
+  return { title, content, color: template.color, is_embed: template.is_embed };
+}
+
 export const dynamic = 'force-dynamic';
 
 export async function GET(req) {
@@ -57,10 +79,13 @@ export async function PATCH(req) {
        return NextResponse.json({ error: "Already approved" }, { status: 400 });
     }
 
+    // Map 'rejected' to 'cancel' to match Cryptomus potential enum if any
+    const dbStatus = status === 'rejected' ? 'cancel' : status;
+
     // 2. Durumu güncelle
     const { error: updateError } = await supabase
       .from('crypto_payments')
-      .update({ status })
+      .update({ status: dbStatus })
       .eq('id', id);
 
     if (updateError) throw updateError;
@@ -110,9 +135,50 @@ export async function PATCH(req) {
         
         console.log(`[Admin Manual Payment] Order ${payment.order_id} approved. Guild ${payment.guild_id} NEW subscription created for ${payment.duration_days} days.`);
       }
+
+      // Queue Approval Notification
+      const parsed = await getParsedTemplate('manual_payment_approved', { 
+        sunucu: payment.guild_name || 'Sunucu',
+        gun: payment.duration_days 
+      });
+      if (parsed && payment.user_id) {
+        await supabase.from('message_queue').insert({
+          guild_id: payment.guild_id,
+          owner_id: payment.user_id,
+          message_content: JSON.stringify({
+            embeds: [{
+              title: parsed.title,
+              description: parsed.content,
+              color: parsed.color ? parseInt(parsed.color.replace('#', ''), 16) : 0x2ecc71,
+              timestamp: new Date().toISOString()
+            }]
+          }),
+          status: 'pending'
+        });
+      }
+    } else if (status === 'rejected' || status === 'cancel') {
+      // Queue Rejection Notification
+      const parsed = await getParsedTemplate('manual_payment_rejected', { 
+        sunucu: payment.guild_name || 'Sunucu'
+      });
+      if (parsed && payment.user_id) {
+        await supabase.from('message_queue').insert({
+          guild_id: payment.guild_id,
+          owner_id: payment.user_id,
+          message_content: JSON.stringify({
+            embeds: [{
+              title: parsed.title,
+              description: parsed.content,
+              color: parsed.color ? parseInt(parsed.color.replace('#', ''), 16) : 0xe74c3c,
+              timestamp: new Date().toISOString()
+            }]
+          }),
+          status: 'pending'
+        });
+      }
     }
 
-    return NextResponse.json({ success: true, status });
+    return NextResponse.json({ success: true, status: dbStatus });
   } catch (error) {
     console.error("Admin Manual Payments PATCH Error:", error);
     return NextResponse.json({ error: "Internal Error" }, { status: 500 });
