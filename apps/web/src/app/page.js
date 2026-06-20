@@ -893,6 +893,7 @@ export default function Home() {
                         >
                           {isProcessing ? (
                             <><Loader2 className="animate-spin shrink-0" size={24} /> INITIALIZING DEPLOYMENT...</>
+                          ) : (
                             <><Wallet size={24} className="shrink-0" /> <span>PAY WITH USDT (CRYPTOMUS)</span></>
                           )}
                         </button>
