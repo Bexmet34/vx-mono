@@ -52,7 +52,17 @@ function resolveRoleEmoji(displayRole, guildOrClient) {
     const client = guildOrClient?.client || guildOrClient;
 
     if (client) {
-        const normRole = displayRole.toLowerCase().replace(/[^a-z0-9]/g, '');
+        let normRole = displayRole.toLowerCase().replace(/[^a-z0-9]/g, '');
+        
+        const abbreviationMap = {
+            'sc': 'shadowcaller',
+            'bl': 'bloodletter',
+            'fs': 'firestaff'
+        };
+        
+        if (abbreviationMap[normRole]) {
+            normRole = abbreviationMap[normRole];
+        }
         
         // Match functions
         const exactFinder = (e) => e.name.toLowerCase().replace(/[^a-z0-9]/g, '') === normRole;
