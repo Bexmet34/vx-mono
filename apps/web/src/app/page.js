@@ -1,7 +1,7 @@
 "use client";
 
 import Navbar from "@/components/Navbar";
-import { Shield, Users, Sword, Command, Star, MessageCircle, Zap, Activity, HelpCircle, Eye, Server, BadgeCheck, X, Loader2, PlusCircle, CheckCircle, Wallet, Lock, Volume2, VolumeX } from "lucide-react";
+import { Shield, Users, Sword, Command, Star, MessageCircle, Zap, Activity, HelpCircle, Eye, Server, BadgeCheck, X, Loader2, PlusCircle, CheckCircle, Wallet, Lock, Volume2, VolumeX, AlertCircle } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useEffect, useState, useRef } from "react";
 import { useSession, signIn } from "next-auth/react";
@@ -35,6 +35,10 @@ export default function Home() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
   const [isLoadingServers, setIsLoadingServers] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("crypto");
+  const [senderName, setSenderName] = useState("");
+  const [manualSuccess, setManualSuccess] = useState(false);
+  const [generatedCode, setGeneratedCode] = useState("");
 
   const handleBuyClick = (plan) => {
     if (status !== "authenticated") {
@@ -42,6 +46,10 @@ export default function Home() {
       return;
     }
     setSelectedPlan(plan);
+    setPaymentMethod("crypto");
+    setSenderName("");
+    setManualSuccess(false);
+    setGeneratedCode("");
     setShowCheckout(true);
     fetchUserServers();
   };
@@ -62,6 +70,39 @@ export default function Home() {
       setCheckoutError("Sunucular yüklenirken bir hata oluştu.");
     } finally {
       setIsLoadingServers(false);
+    }
+  };
+
+  const handleManualPurchase = async () => {
+    if (!selectedServer) return setCheckoutError("Lütfen bir sunucu seçin.");
+    if (!senderName || senderName.trim().length < 3) return setCheckoutError("Lütfen kart üzerindeki ismi doğru giriniz.");
+    setCheckoutError("");
+    setIsProcessing(true);
+
+    try {
+      const serverDetails = userServers.find(s => s.guild_id === selectedServer);
+      const res = await fetch("/api/payment/manual-create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          guildId: selectedServer, 
+          guildName: serverDetails?.guild_name || "Bilinmeyen Sunucu",
+          planId: selectedPlan.id,
+          senderName: senderName.trim()
+        })
+      });
+      const data = await res.json();
+      
+      if (res.ok && data.success) {
+        setGeneratedCode(data.description_code);
+        setManualSuccess(true);
+      } else {
+        setCheckoutError(data.error || "Ödeme oluşturulamadı.");
+      }
+    } catch (err) {
+      setCheckoutError("Bağlantı hatası.");
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -707,23 +748,122 @@ export default function Home() {
                   </ul>
                 </div>
 
-                {/* Payment Action */}
-                <div className="space-y-4">
-                  <button 
-                    onClick={handleConfirmPurchase}
-                    disabled={isProcessing || !selectedServer}
-                    className="w-full py-5 px-4 bg-primary-container text-on-primary font-label-bold text-body-md flex items-center justify-center gap-3 transition-all duration-300 hover:brightness-110 active:scale-[0.98] shadow-[0_10px_20px_rgba(255,215,0,0.1)] disabled:opacity-50 disabled:cursor-not-allowed uppercase text-center"
-                  >
-                    {isProcessing ? (
-                      <><Loader2 className="animate-spin shrink-0" size={24} /> INITIALIZING DEPLOYMENT...</>
+                {/* Payment Method Tabs & Action */}
+                {!manualSuccess && (
+                  <div className="flex gap-4 mb-6">
+                    <button 
+                      onClick={() => setPaymentMethod('crypto')} 
+                      className={`flex-1 py-3 font-label-bold text-sm uppercase transition-all ${paymentMethod === 'crypto' ? 'bg-primary-container text-on-primary shadow-[0_0_15px_rgba(255,215,0,0.2)]' : 'bg-surface border border-outline text-on-surface hover:border-primary-container/50'}`}
+                    >
+                      Kripto İle Öde
+                    </button>
+                    <button 
+                      onClick={() => setPaymentMethod('havale')} 
+                      className={`flex-1 py-3 font-label-bold text-sm uppercase transition-all ${paymentMethod === 'havale' ? 'bg-primary-container text-on-primary shadow-[0_0_15px_rgba(255,215,0,0.2)]' : 'bg-surface border border-outline text-on-surface hover:border-primary-container/50'}`}
+                    >
+                      Havale / EFT
+                    </button>
+                  </div>
+                )}
+
+                {manualSuccess ? (
+                  <div className="space-y-4 bg-surface-container p-6 border border-primary-container text-center relative overflow-hidden">
+                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary-container to-transparent opacity-50"></div>
+                     <CheckCircle size={48} className="text-primary-container mx-auto mb-4 drop-shadow-[0_0_10px_rgba(255,215,0,0.5)]" />
+                     <h3 className="font-headline-md text-2xl text-on-surface uppercase tracking-tight">Talebini Aldık!</h3>
+                     <p className="text-on-surface-variant font-body-md mt-2">Aşağıdaki IBAN adresine havale/EFT yaparken açıklama kısmına kesinlikle sistemin ürettiği bu kodu yazın.</p>
+                     
+                     <div className="bg-[#0B0F19] p-6 border border-primary-container/50 rounded-sm my-6 flex items-center justify-between">
+                        <div className="text-left">
+                           <div className="font-label-bold text-[10px] text-primary-container uppercase tracking-widest mb-1 opacity-70">Açıklama Kodu (Kesinlikle Yazılmalı)</div>
+                           <div className="font-mono text-3xl font-bold text-on-surface tracking-[0.3em]">{generatedCode}</div>
+                        </div>
+                        <button 
+                           onClick={() => navigator.clipboard.writeText(generatedCode)}
+                           className="p-4 bg-primary-container/10 hover:bg-primary-container text-primary-container hover:text-on-primary transition-all border border-primary-container/30 rounded-sm"
+                           title="Kodu Kopyala"
+                        >
+                           <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                     </div>
+
+                     <div className="bg-error/10 border border-error p-5 text-left mb-6 relative overflow-hidden">
+                        <div className="absolute left-0 top-0 w-1 h-full bg-error"></div>
+                        <strong className="text-error font-headline-md uppercase text-lg block mb-2 tracking-widest flex items-center gap-2">
+                           <AlertCircle size={20} /> DİKKAT!
+                        </strong>
+                        <span className="text-on-surface font-body-md text-sm leading-relaxed">
+                           Lütfen havale açıklamasına bu kodu yazmayı <strong className="text-error">kesinlikle unutmayın!</strong> Aksi takdirde otomatik sistemimiz ödemenizi eşleştiremez ve hesabınız onaylanmaz.
+                        </span>
+                     </div>
+
+                     <div className="text-left font-body-md text-sm text-on-surface-variant space-y-3 bg-surface p-4 border border-outline-variant">
+                        <div className="flex justify-between items-center border-b border-outline-variant/50 pb-2">
+                           <strong className="text-on-surface uppercase tracking-widest text-xs opacity-70">Banka</strong> 
+                           <span className="text-on-surface font-semibold">Örnek Bankası A.Ş.</span>
+                        </div>
+                        <div className="flex justify-between items-center border-b border-outline-variant/50 pb-2">
+                           <strong className="text-on-surface uppercase tracking-widest text-xs opacity-70">Alıcı</strong> 
+                           <span className="text-on-surface font-semibold">Veyronix Yazılım</span>
+                        </div>
+                        <div className="pt-2">
+                           <strong className="text-on-surface uppercase tracking-widest text-xs opacity-70 block mb-2">IBAN Adresi</strong>
+                           <div className="font-mono bg-[#0B0F19] p-3 border border-outline-variant text-on-surface flex justify-between items-center">
+                              <span className="tracking-widest">TR12 3456 7890 1234 5678 9012 34</span>
+                              <button onClick={() => navigator.clipboard.writeText("TR123456789012345678901234")} className="text-primary-container text-xs hover:underline uppercase font-label-bold tracking-widest bg-primary-container/10 px-3 py-1">Kopyala</button>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {paymentMethod === 'crypto' ? (
+                      <button 
+                        onClick={handleConfirmPurchase}
+                        disabled={isProcessing || !selectedServer}
+                        className="w-full py-5 px-4 bg-primary-container text-on-primary font-label-bold text-body-md flex items-center justify-center gap-3 transition-all duration-300 hover:brightness-110 active:scale-[0.98] shadow-[0_10px_20px_rgba(255,215,0,0.1)] disabled:opacity-50 disabled:cursor-not-allowed uppercase text-center"
+                      >
+                        {isProcessing ? (
+                          <><Loader2 className="animate-spin shrink-0" size={24} /> INITIALIZING DEPLOYMENT...</>
+                        ) : (
+                          <><Wallet size={24} className="shrink-0" /> <span>PAY WITH USDT (CRYPTOMUS)</span></>
+                        )}
+                      </button>
                     ) : (
-                      <><Wallet size={24} className="shrink-0" /> <span>PAY WITH USDT (CRYPTOMUS)</span></>
+                      <div className="space-y-4 bg-surface p-6 border border-outline-variant">
+                         <div className="text-sm font-body-md text-on-surface-variant mb-4">Banka ödemesi onayının hızlı olması için gönderimi yapacağınız banka hesabının sahibinin adını giriniz.</div>
+                         
+                         <div className="space-y-2">
+                            <label className="font-label-bold text-xs text-on-surface uppercase tracking-widest opacity-70">Kart Üzerindeki İsim (Ad Soyad)</label>
+                            <input 
+                              type="text" 
+                              placeholder="Örn: Ahmet Yılmaz" 
+                              className="w-full bg-[#0B0F19] border border-outline-variant p-4 text-on-surface font-body-md focus:border-primary-container outline-none transition-colors"
+                              value={senderName}
+                              onChange={(e) => setSenderName(e.target.value)}
+                            />
+                         </div>
+
+                         <button 
+                           onClick={handleManualPurchase}
+                           disabled={isProcessing || !selectedServer || senderName.trim().length < 3}
+                           className="w-full py-5 px-4 bg-primary-container text-on-primary font-label-bold text-body-md flex items-center justify-center gap-3 transition-all duration-300 hover:brightness-110 active:scale-[0.98] shadow-[0_10px_20px_rgba(255,215,0,0.1)] disabled:opacity-50 disabled:cursor-not-allowed uppercase text-center mt-6"
+                         >
+                           {isProcessing ? (
+                             <><Loader2 className="animate-spin shrink-0" size={24} /> İŞLENİYOR...</>
+                           ) : (
+                             <><span>ÖDEME BİLDİRİMİ YAP</span></>
+                           )}
+                         </button>
+                      </div>
                     )}
-                  </button>
-                  <p className="text-center font-label-sm text-label-sm text-on-tertiary-container">
-                    Secure cryptographic transaction processed via Cryptomus Terminal.
-                  </p>
-                </div>
+                    {paymentMethod === 'crypto' && (
+                      <p className="text-center font-label-sm text-label-sm text-on-tertiary-container">
+                        Secure cryptographic transaction processed via Cryptomus Terminal.
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Trust Badges */}
