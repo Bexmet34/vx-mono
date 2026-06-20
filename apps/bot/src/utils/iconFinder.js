@@ -9,6 +9,15 @@ function normalize(str) {
 }
 
 /**
+ * Common abbreviations mapped to their full normalized item names.
+ */
+const abbreviationMap = {
+    'sc': 'shadowcaller',
+    'bl': 'bloodletter',
+    'fs': 'firestaff'
+};
+
+/**
  * Recursively finds all .png files in the given directory
  */
 function getAllPngs(dir, fileList = []) {
@@ -50,9 +59,14 @@ function findIconForRoles(rolesList) {
         
         // Extract base role (e.g. Hallowfall>8.3 => Hallowfall)
         const baseRole = roleStr.split('>')[0].trim();
-        const normRole = normalize(baseRole);
+        let normRole = normalize(baseRole);
 
         if (!normRole) continue;
+
+        // Apply abbreviation map if present
+        if (abbreviationMap[normRole]) {
+            normRole = abbreviationMap[normRole];
+        }
 
         // 1. Exact normalized match
         const exactMatch = allIcons.find(icon => icon.normalized === normRole);
