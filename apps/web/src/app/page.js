@@ -1,7 +1,7 @@
 "use client";
 
 import Navbar from "@/components/Navbar";
-import { Shield, Users, Sword, Command, Star, MessageCircle, Zap, Activity, HelpCircle, Eye, Server, BadgeCheck, X, Loader2, PlusCircle, CheckCircle, Wallet, Lock, Volume2, VolumeX, AlertCircle } from "lucide-react";
+import { Shield, Users, Sword, Command, Star, MessageCircle, Zap, Activity, HelpCircle, Eye, Server, BadgeCheck, X, Loader2, PlusCircle, CheckCircle, Wallet, Lock, Volume2, VolumeX, AlertCircle, CreditCard } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useEffect, useState, useRef } from "react";
 import { useSession, signIn } from "next-auth/react";
@@ -38,6 +38,7 @@ export default function Home() {
   const [paymentMethod, setPaymentMethod] = useState("crypto");
   const [senderName, setSenderName] = useState("");
   const [manualSuccess, setManualSuccess] = useState(false);
+  const [finalSuccess, setFinalSuccess] = useState(false);
   const [generatedCode, setGeneratedCode] = useState("");
   const [bankAccounts, setBankAccounts] = useState([]);
   const [selectedBank, setSelectedBank] = useState(null);
@@ -51,6 +52,7 @@ export default function Home() {
     setPaymentMethod("crypto");
     setSenderName("");
     setManualSuccess(false);
+    setFinalSuccess(false);
     setGeneratedCode("");
     setShowCheckout(true);
     fetchUserServers();
@@ -128,9 +130,7 @@ export default function Home() {
       const data = await res.json();
       
       if (res.ok && data.success) {
-        setShowCheckout(false);
-        setSenderName(""); // Reset after success
-        alert("Ödeme bildiriminiz başarıyla admin paneline iletildi. Onaylandığında paketiniz aktif olacaktır.");
+        setFinalSuccess(true);
       } else {
         alert(data.error || "Ödeme oluşturulamadı.");
       }
@@ -699,13 +699,29 @@ export default function Home() {
                 <X size={24} />
               </button>
 
-              {manualSuccess ? (
+              {finalSuccess ? (
                 <div className="flex flex-col items-center justify-center py-8 px-4 text-center animate-slide-up">
                      <div className="relative mb-8 mt-4">
                        <div className="absolute inset-0 bg-primary-container/20 blur-xl rounded-full scale-150"></div>
                        <CheckCircle size={80} className="text-primary-container relative z-10 drop-shadow-[0_0_15px_rgba(255,215,0,0.8)]" />
                      </div>
                      <h3 className="font-headline-xl text-3xl md:text-4xl text-on-surface uppercase tracking-tight mb-4">Talebini Aldık!</h3>
+                     <p className="text-on-surface-variant font-body-lg mb-8 max-w-md">Ödeme bildiriminiz başarıyla admin paneline ulaştı. Ekiplerimiz kontrol edip onayladığında paketiniz otomatik olarak hesabınıza tanımlanacaktır.</p>
+                     
+                     <button 
+                       onClick={() => setShowCheckout(false)}
+                       className="px-8 py-4 bg-primary-container text-on-primary rounded-lg font-label-bold uppercase tracking-widest transition-all shadow-[0_10px_20px_rgba(255,215,0,0.2)] hover:brightness-110 active:scale-95"
+                     >
+                       Kapat
+                     </button>
+                </div>
+              ) : manualSuccess ? (
+                <div className="flex flex-col items-center justify-center py-8 px-4 text-center animate-slide-up">
+                     <div className="relative mb-8 mt-4">
+                       <div className="absolute inset-0 bg-primary-container/20 blur-xl rounded-full scale-150"></div>
+                       <CreditCard size={80} className="text-primary-container relative z-10 drop-shadow-[0_0_15px_rgba(255,215,0,0.8)]" />
+                     </div>
+                     <h3 className="font-headline-xl text-3xl md:text-4xl text-on-surface uppercase tracking-tight mb-4">Banka Bilgileri</h3>
                      <p className="text-on-surface-variant font-body-lg mb-8 max-w-md">Aşağıdaki IBAN adresine havale/EFT yaparken açıklama kısmına kesinlikle sistemin ürettiği bu kodu yazın.</p>
                      
                      <div className="bg-[#0B0F19] p-6 border border-primary-container/50 rounded-xl mb-8 w-full max-w-md shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
