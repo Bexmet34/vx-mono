@@ -818,8 +818,12 @@ export default function Home() {
                           <p className="font-label-sm text-label-sm text-on-surface-variant">Tactical Deployment Tier</p>
                         </div>
                         <div className="text-right">
-                          <div className="font-headline-md text-headline-md text-primary-container">{selectedPlan.amount}</div>
-                          <div className="font-label-sm text-label-sm text-on-surface-variant">USDT</div>
+                          <div className="font-headline-md text-headline-md text-primary-container">
+                            {paymentMethod === 'havale' ? (selectedPlan.amount * 47).toLocaleString('tr-TR') : selectedPlan.amount}
+                          </div>
+                          <div className="font-label-sm text-label-sm text-on-surface-variant">
+                            {paymentMethod === 'havale' ? 'TL' : 'USDT'}
+                          </div>
                         </div>
                       </div>
                       <ul className="space-y-2">

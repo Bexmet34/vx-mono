@@ -72,31 +72,47 @@ export async function POST(req) {
         .single();
 
       if (subError || !subscription) {
-        console.error(`[Cryptomus Webhook] Subscription for guild ${payment.guild_id} not found`);
-        return NextResponse.json({ error: "Subscription not found" }, { status: 404 });
+        // Abonelik hiç yoksa yeni oluştur
+        const now = new Date();
+        now.setDate(now.getDate() + payment.duration_days);
+        const isUnlimited = payment.duration_days >= 90;
+
+        await supabase
+          .from('subscriptions')
+          .insert({
+            guild_id: payment.guild_id,
+            guild_name: payment.guild_name || 'Bilinmeyen Sunucu',
+            expires_at: now.toISOString(),
+            is_active: true,
+            is_unlimited: isUnlimited
+          });
+          
+        console.log(`[Cryptomus Webhook] Order ${order_id} processed. Guild ${payment.guild_id} NEW subscription created for ${payment.duration_days} days.`);
+      } else {
+        const now = new Date();
+        let currentExpiry = new Date(subscription.expires_at);
+
+        // Eğer süresi çoktan bitmişse, bugünden itibaren uzat
+        if (currentExpiry < now) {
+          currentExpiry = now;
+        }
+
+        // Gün ekle
+        currentExpiry.setDate(currentExpiry.getDate() + payment.duration_days);
+
+        const isUnlimited = payment.duration_days >= 90;
+
+        await supabase
+          .from('subscriptions')
+          .update({ 
+            expires_at: currentExpiry.toISOString(),
+            is_active: true,
+            is_unlimited: isUnlimited || subscription.is_unlimited
+          })
+          .eq('id', subscription.id);
+
+        console.log(`[Cryptomus Webhook] Order ${order_id} processed. Guild ${payment.guild_id} extended by ${payment.duration_days} days.`);
       }
-
-      const now = new Date();
-      let currentExpiry = new Date(subscription.expires_at);
-
-      // Eğer süresi çoktan bitmişse, bugünden itibaren uzat
-      if (currentExpiry < now) {
-        currentExpiry = now;
-      }
-
-      // Gün ekle
-      currentExpiry.setDate(currentExpiry.getDate() + payment.duration_days);
-
-      const isUnlimited = payment.duration_days >= 90;
-
-      await supabase
-        .from('subscriptions')
-        .update({ 
-          expires_at: currentExpiry.toISOString(),
-          is_active: true,
-          is_unlimited: isUnlimited || subscription.is_unlimited
-        })
-        .eq('id', subscription.id);
 
       console.log(`[Cryptomus Webhook] Order ${order_id} processed. Guild ${payment.guild_id} extended by ${payment.duration_days} days.`);
 

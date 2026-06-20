@@ -94,6 +94,23 @@ export async function PATCH(req) {
           .eq('id', subscription.id);
 
         console.log(`[Admin Manual Payment] Order ${payment.order_id} approved. Guild ${payment.guild_id} extended by ${payment.duration_days} days.`);
+      } else {
+        // Abonelik hiç yoksa yeni oluştur
+        const now = new Date();
+        now.setDate(now.getDate() + payment.duration_days);
+        const isUnlimited = payment.duration_days >= 90;
+
+        await supabase
+          .from('subscriptions')
+          .insert({
+            guild_id: payment.guild_id,
+            guild_name: payment.guild_name || 'Bilinmeyen Sunucu',
+            expires_at: now.toISOString(),
+            is_active: true,
+            is_unlimited: isUnlimited
+          });
+        
+        console.log(`[Admin Manual Payment] Order ${payment.order_id} approved. Guild ${payment.guild_id} NEW subscription created for ${payment.duration_days} days.`);
       }
     }
 

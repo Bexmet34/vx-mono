@@ -32,6 +32,7 @@ export default function AdminPage() {
   
   // Modal States
   const [showDayModal, setShowDayModal] = useState(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(null);
   const [daysToAdd, setDaysToAdd] = useState(30);
   const [expiryDate, setExpiryDate] = useState("");
   const [statusFilter, setStatusFilter] = useState("all"); // all, active, unlimited, passive
@@ -321,8 +322,13 @@ export default function AdminPage() {
     }
   };
 
-  const handleManualPaymentAction = async (id, status) => {
-    if (!confirm(status === 'paid' ? 'Bu ödemeyi onaylamak istediğinize emin misiniz? Sunucunun abonelik süresi uzatılacaktır.' : 'Bu ödemeyi reddetmek istediğinize emin misiniz?')) return;
+  const handleManualPaymentAction = (id, status) => {
+    setShowConfirmModal({ id, status });
+  };
+
+  const executeManualPaymentAction = async () => {
+    if (!showConfirmModal) return;
+    const { id, status } = showConfirmModal;
     setSavingId(id);
     try {
       const res = await fetch("/api/admin/manual-payments", {
@@ -341,6 +347,7 @@ export default function AdminPage() {
       showToast(err.message, "error");
     } finally {
       setSavingId(null);
+      setShowConfirmModal(null);
     }
   };
 
@@ -1388,6 +1395,48 @@ export default function AdminPage() {
       )}
 
     </main>
+
+      {/* Confirm Action Modal */}
+      {showConfirmModal && (
+        <div className="admin-modal-overlay" onClick={() => setShowConfirmModal(null)}>
+          <div className="admin-modal" onClick={e => e.stopPropagation()}>
+             <div className="admin-modal-header border-b border-[var(--admin-border)]">
+               <h3 className="admin-modal-title">Ödeme İşlemi</h3>
+               <button className="admin-modal-close" onClick={() => setShowConfirmModal(null)}>
+                 <X size={20} />
+               </button>
+             </div>
+             <div className="admin-modal-body text-center py-6">
+               <div style={{background: showConfirmModal.status === 'paid' ? 'rgba(46, 204, 113, 0.1)' : 'rgba(231, 76, 60, 0.1)', width: '64px', height: '64px', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem'}}>
+                  {showConfirmModal.status === 'paid' ? (
+                    <CheckCircle size={32} color="var(--admin-success)" />
+                  ) : (
+                    <AlertCircle size={32} color="var(--admin-error)" />
+                  )}
+               </div>
+               <h4 style={{fontSize: '1.25rem', color: 'white', fontWeight: '600', marginBottom: '0.5rem'}}>
+                 Emin misiniz?
+               </h4>
+               <p style={{color: 'var(--admin-text-muted)', fontSize: '0.9rem'}}>
+                 {showConfirmModal.status === 'paid' 
+                   ? 'Bu ödemeyi onaylamak istediğinize emin misiniz? Sunucunun abonelik süresi seçilen pakete göre uzatılacaktır.' 
+                   : 'Bu ödemeyi reddetmek istediğinize emin misiniz? Bu işlem geri alınamaz.'}
+               </p>
+             </div>
+             <div className="admin-modal-footer">
+              <button className="admin-btn-secondary" onClick={() => setShowConfirmModal(null)}>İptal</button>
+              <button 
+                className={`admin-btn-primary ${showConfirmModal.status === 'paid' ? '' : 'danger'}`}
+                style={showConfirmModal.status === 'failed' ? {background: 'var(--admin-error)'} : {}}
+                onClick={executeManualPaymentAction}
+                disabled={savingId === showConfirmModal.id}
+              >
+                {savingId === showConfirmModal.id ? <Loader2 size={18} className="spin" /> : 'Evet, Onayla'}
+              </button>
+             </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
