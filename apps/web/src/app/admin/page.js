@@ -29,6 +29,8 @@ export default function AdminPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [savingId, setSavingId] = useState(null);
   const [manualPayments, setManualPayments] = useState([]);
+  const [paymentSearchTerm, setPaymentSearchTerm] = useState("");
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState("all");
   const [bankAccounts, setBankAccounts] = useState([]);
   
   // Modal States
@@ -447,6 +449,23 @@ export default function AdminPage() {
     if (statusFilter === 'unlimited') return s.is_unlimited;
     if (statusFilter === 'passive') return !s.is_active;
     if (statusFilter === 'freemium') return s.is_active && !s.is_unlimited && new Date(s.expires_at) < new Date();
+    
+    return true;
+  });
+
+  const filteredPayments = manualPayments.filter(p => {
+    const term = paymentSearchTerm.toLowerCase();
+    const matchesSearch = 
+      (p.guild_id && p.guild_id.toLowerCase().includes(term)) ||
+      (p.user_id && p.user_id.toLowerCase().includes(term)) ||
+      (p.guild_name && p.guild_name.toLowerCase().includes(term)) ||
+      (p.description_code && p.description_code.toLowerCase().includes(term));
+      
+    if (!matchesSearch) return false;
+    
+    if (paymentStatusFilter === 'pending') return p.status === 'pending';
+    if (paymentStatusFilter === 'paid') return p.status === 'paid';
+    if (paymentStatusFilter === 'rejected') return p.status === 'rejected';
     
     return true;
   });
@@ -899,11 +918,40 @@ export default function AdminPage() {
             {/* MANUAL PAYMENTS TAB */}
             {activeTab === "manual-payments" && (
               <div className="animate-slide-up">
-                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem'}}>
+                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem', flexWrap: 'wrap', gap: '1rem'}}>
                   <div>
                     <h2 style={{fontSize: '1.5rem', fontWeight: '800'}}>Havale/EFT Onayları</h2>
                     <p style={{color: 'var(--admin-text-muted)'}}>Kullanıcıların yaptığı banka ödemelerini buradan onaylayabilirsiniz.</p>
                   </div>
+                </div>
+
+                <div className="admin-card" style={{marginBottom: '2rem'}}>
+                   <div style={{display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between'}}>
+                      <div className="admin-search-container" style={{marginBottom: 0, flex: 1, minWidth: '300px'}}>
+                        <Search style={{ position: "absolute", left: "1.2rem", top: "50%", transform: "translateY(-50%)", color: "var(--admin-text-muted)" }} size={18} />
+                        <input 
+                          className="admin-search-input" 
+                          placeholder="Sunucu ismi, Guild ID, User ID veya Açıklama Kodu ile ara..." 
+                          value={paymentSearchTerm}
+                          onChange={(e) => setPaymentSearchTerm(e.target.value)}
+                        />
+                      </div>
+                   </div>
+                </div>
+
+                <div className="server-filter-row" style={{marginBottom: '2rem'}}>
+                   {['all', 'pending', 'paid', 'rejected'].map(f => (
+                     <button 
+                       key={f}
+                       onClick={() => setPaymentStatusFilter(f)}
+                       className={`filter-btn ${paymentStatusFilter === f ? 'active' : ''}`}
+                     >
+                       {f === 'all' && 'Tüm Kayıtlar'}
+                       {f === 'pending' && 'Bekleyenler'}
+                       {f === 'paid' && 'Onaylananlar'}
+                       {f === 'rejected' && 'Reddedilenler'}
+                     </button>
+                   ))}
                 </div>
 
                 <div className="admin-card">
@@ -918,9 +966,9 @@ export default function AdminPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {manualPayments.length === 0 ? (
-                        <tr><td colSpan={5} style={{textAlign: 'center', padding: '4rem', opacity: 0.5}}>Henüz ödeme kaydı bulunmuyor.</td></tr>
-                      ) : manualPayments.map(p => (
+                      {filteredPayments.length === 0 ? (
+                        <tr><td colSpan={5} style={{textAlign: 'center', padding: '4rem', opacity: 0.5}}>Arama kriterlerine uygun ödeme kaydı bulunamadı.</td></tr>
+                      ) : filteredPayments.map(p => (
                         <tr key={p.id}>
                           <td data-label="SUNUCU / KULLANICI">
                             <div style={{fontWeight: '700', fontSize: '0.95rem'}}>{p.guild_name}</div>
