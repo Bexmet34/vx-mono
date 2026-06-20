@@ -73,12 +73,24 @@ export default function Home() {
     }
   };
 
-  const handleManualPurchase = async () => {
+  const handleManualPurchase = () => {
     if (!selectedServer) return setCheckoutError("Lütfen bir sunucu seçin.");
     if (!senderName || senderName.trim().length < 3) return setCheckoutError("Lütfen kart üzerindeki ismi doğru giriniz.");
     setCheckoutError("");
-    setIsProcessing(true);
+    
+    // Rastgele 8 haneli kod oluştur
+    const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    let code = '';
+    for (let i = 0; i < 8; i++) {
+      code += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    
+    setGeneratedCode(code);
+    setManualSuccess(true);
+  };
 
+  const handleConfirmManualPayment = async () => {
+    setIsProcessing(true);
     try {
       const serverDetails = userServers.find(s => s.guild_id === selectedServer);
       const res = await fetch("/api/payment/manual-create", {
@@ -88,19 +100,20 @@ export default function Home() {
           guildId: selectedServer, 
           guildName: serverDetails?.guild_name || "Bilinmeyen Sunucu",
           planId: selectedPlan.id,
-          senderName: senderName.trim()
+          senderName: senderName.trim(),
+          descriptionCode: generatedCode
         })
       });
       const data = await res.json();
       
       if (res.ok && data.success) {
-        setGeneratedCode(data.description_code);
-        setManualSuccess(true);
+        setShowCheckout(false);
+        alert("Ödeme bildiriminiz başarıyla admin paneline iletildi. Onaylandığında paketiniz aktif olacaktır.");
       } else {
-        setCheckoutError(data.error || "Ödeme oluşturulamadı.");
+        alert(data.error || "Ödeme oluşturulamadı.");
       }
     } catch (err) {
-      setCheckoutError("Bağlantı hatası.");
+      alert("Bağlantı hatası.");
     } finally {
       setIsProcessing(false);
     }
@@ -715,12 +728,22 @@ export default function Home() {
                         </div>
                      </div>
                      
-                     <button 
-                       onClick={() => setShowCheckout(false)}
-                       className="mt-10 px-8 py-3 border border-outline-variant text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface rounded-lg font-label-bold uppercase tracking-widest transition-all"
-                     >
-                       Pencereyi Kapat
-                     </button>
+                     <div className="flex gap-4 w-full max-w-md mt-6">
+                       <button 
+                         onClick={() => setShowCheckout(false)}
+                         className="flex-1 px-4 py-3 border border-outline-variant text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface rounded-lg font-label-bold uppercase tracking-widest transition-all"
+                       >
+                         İptal
+                       </button>
+                       <button 
+                         onClick={handleConfirmManualPayment}
+                         disabled={isProcessing}
+                         className="flex-[2] px-4 py-3 bg-primary-container text-on-primary rounded-lg font-label-bold uppercase tracking-widest transition-all shadow-[0_10px_20px_rgba(255,215,0,0.2)] hover:brightness-110 active:scale-95 disabled:opacity-50"
+                       >
+                         {isProcessing ? <Loader2 className="animate-spin inline mr-2" size={20} /> : null}
+                         Ödemeyi Yaptım
+                       </button>
+                     </div>
                 </div>
               ) : (
                 <>

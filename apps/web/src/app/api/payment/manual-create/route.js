@@ -5,15 +5,6 @@ import { supabase } from "@veyronix/database";
 
 export const dynamic = 'force-dynamic';
 
-function generateRandomCode(length) {
-  const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
-  let result = '';
-  for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  return result;
-}
-
 export async function POST(req) {
   try {
     const session = await getServerSession(authOptions);
@@ -22,9 +13,9 @@ export async function POST(req) {
       return NextResponse.json({ error: "Lütfen Discord ile giriş yapın." }, { status: 401 });
     }
 
-    const { guildId, guildName, planId, senderName } = await req.json();
+    const { guildId, guildName, planId, senderName, descriptionCode } = await req.json();
 
-    if (!guildId || !planId || !senderName) {
+    if (!guildId || !planId || !senderName || !descriptionCode) {
       return NextResponse.json({ error: "Eksik bilgi gönderdiniz. Lütfen tüm alanları doldurun." }, { status: 400 });
     }
 
@@ -40,9 +31,8 @@ export async function POST(req) {
       return NextResponse.json({ error: "Geçersiz veya pasif paket seçimi." }, { status: 400 });
     }
 
-    // Benzersiz order_id ve description_code üret
+    // Benzersiz order_id üret
     const orderId = `VX_HV_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
-    const descriptionCode = generateRandomCode(8);
 
     // Veritabanına havale/EFT ödemesini kaydet
     const { error: dbError } = await supabase
