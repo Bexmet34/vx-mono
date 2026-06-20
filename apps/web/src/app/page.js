@@ -664,219 +664,228 @@ export default function Home() {
                 <X size={24} />
               </button>
 
-              <div className="mb-10 text-center mt-4">
-                <span className="inline-block py-1 px-3 mb-4 bg-primary-container text-on-primary font-label-bold text-label-sm tracking-widest uppercase">Premium Deployment</span>
-                <h1 className="font-headline-xl text-3xl md:text-5xl text-on-surface mb-2 uppercase tracking-tight">Upgrade Infrastructure</h1>
-                <p className="font-body-md text-body-md text-on-surface-variant">Select the strategic asset for {lang === 'tr' ? selectedPlan.name_tr : selectedPlan.name_en} integration.</p>
-              </div>
-
-              {checkoutError && (
-                <div className="mb-8 p-4 bg-error/10 border border-error text-error font-body-md text-sm">
-                  {checkoutError}
-                </div>
-              )}
-
-              <div className="space-y-8">
-                {/* Section: Server Selection */}
-                <div className="space-y-4">
-                  <div className="flex justify-between items-end flex-wrap gap-2">
-                    <h2 className="font-label-bold text-label-bold text-primary-container uppercase tracking-widest">Target Servers</h2>
-                    <a className="font-label-sm text-label-sm text-secondary-fixed hover:text-primary-fixed-dim transition-colors flex items-center gap-1" href="https://discord.com/oauth2/authorize?client_id=1082239904169336902&permissions=510977&scope=bot+applications.commands" target="_blank" rel="noopener noreferrer">
-                      <PlusCircle size={16} />
-                      Add Bot to New Server
-                    </a>
-                  </div>
-                  
-                  {/* Server List Grid */}
-                  <div className="space-y-2 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
-                    {isLoadingServers ? (
-                      <div className="flex items-center justify-center p-8 text-primary-container">
-                        <Loader2 className="animate-spin mr-3" size={24} />
-                        <span className="font-label-bold tracking-widest uppercase">Scanning Assets...</span>
-                      </div>
-                    ) : userServers.length === 0 ? (
-                      <div className="p-8 text-center border border-dashed border-outline-variant text-on-surface-variant">
-                        {t.checkoutNoServerText || "No active servers found. Add bot to a server first."}
-                      </div>
-                    ) : (
-                      userServers.map(s => (
-                        <label key={s.guild_id} className={`server-row flex items-center justify-between p-4 border cursor-pointer transition-all ${selectedServer === s.guild_id ? 'border-primary-container/50 bg-primary-container/10' : 'border-outline-variant hover:border-outline'}`}>
-                          <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-surface-container-high border border-outline flex items-center justify-center overflow-hidden">
-                              {s.icon ? (
-                                <img alt={s.guild_name} className="w-full h-full object-cover" src={`https://cdn.discordapp.com/icons/${s.guild_id}/${s.icon}.png`} />
-                              ) : (
-                                <Server size={20} className="text-on-surface-variant" />
-                              )}
-                            </div>
-                            <div>
-                              <div className="font-body-md text-body-md font-bold text-on-surface">{s.guild_name}</div>
-                              <div className="font-label-sm text-label-sm text-on-surface-variant">ID: {s.guild_id}</div>
-                            </div>
-                          </div>
-                          <input 
-                            checked={selectedServer === s.guild_id} 
-                            onChange={() => setSelectedServer(s.guild_id)}
-                            className="w-5 h-5 text-primary-container bg-surface border-outline focus:ring-primary-container" 
-                            name="server" 
-                            type="radio"
-                          />
-                        </label>
-                      ))
-                    )}
-                  </div>
-                </div>
-
-                {/* Section: Plan Summary */}
-                <div className="bg-surface-container p-6 border-l-4 border-primary-container">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="font-label-bold text-label-bold text-on-surface mb-1 uppercase tracking-tight">{lang === 'tr' ? selectedPlan.name_tr : `${selectedPlan.name_en} Package`}</h3>
-                      <p className="font-label-sm text-label-sm text-on-surface-variant">Tactical Deployment Tier</p>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-headline-md text-headline-md text-primary-container">{selectedPlan.amount}</div>
-                      <div className="font-label-sm text-label-sm text-on-surface-variant">USDT</div>
-                    </div>
-                  </div>
-                  <ul className="space-y-2">
-                    {(lang === 'tr' ? (selectedPlan.features_tr || []) : (selectedPlan.features_en || [])).slice(0,3).map((feat, idx) => (
-                      <li key={idx} className="flex items-center gap-2 font-label-sm text-label-sm text-on-surface-variant">
-                        <CheckCircle size={18} className="text-primary-container shrink-0" /> {feat}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Payment Method Tabs & Action */}
-                {!manualSuccess && (
-                  <div className="flex gap-4 mb-6">
-                    <button 
-                      onClick={() => setPaymentMethod('crypto')} 
-                      className={`flex-1 py-3 font-label-bold text-sm uppercase transition-all ${paymentMethod === 'crypto' ? 'bg-primary-container text-on-primary shadow-[0_0_15px_rgba(255,215,0,0.2)]' : 'bg-surface border border-outline text-on-surface hover:border-primary-container/50'}`}
-                    >
-                      Kripto İle Öde
-                    </button>
-                    <button 
-                      onClick={() => setPaymentMethod('havale')} 
-                      className={`flex-1 py-3 font-label-bold text-sm uppercase transition-all ${paymentMethod === 'havale' ? 'bg-primary-container text-on-primary shadow-[0_0_15px_rgba(255,215,0,0.2)]' : 'bg-surface border border-outline text-on-surface hover:border-primary-container/50'}`}
-                    >
-                      Havale / EFT
-                    </button>
-                  </div>
-                )}
-
-                {manualSuccess ? (
-                  <div className="space-y-4 bg-surface-container p-6 border border-primary-container text-center relative overflow-hidden">
-                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary-container to-transparent opacity-50"></div>
-                     <CheckCircle size={48} className="text-primary-container mx-auto mb-4 drop-shadow-[0_0_10px_rgba(255,215,0,0.5)]" />
-                     <h3 className="font-headline-md text-2xl text-on-surface uppercase tracking-tight">Talebini Aldık!</h3>
-                     <p className="text-on-surface-variant font-body-md mt-2">Aşağıdaki IBAN adresine havale/EFT yaparken açıklama kısmına kesinlikle sistemin ürettiği bu kodu yazın.</p>
+              {manualSuccess ? (
+                <div className="flex flex-col items-center justify-center py-8 px-4 text-center animate-slide-up">
+                     <div className="relative mb-8 mt-4">
+                       <div className="absolute inset-0 bg-primary-container/20 blur-xl rounded-full scale-150"></div>
+                       <CheckCircle size={80} className="text-primary-container relative z-10 drop-shadow-[0_0_15px_rgba(255,215,0,0.8)]" />
+                     </div>
+                     <h3 className="font-headline-xl text-3xl md:text-4xl text-on-surface uppercase tracking-tight mb-4">Talebini Aldık!</h3>
+                     <p className="text-on-surface-variant font-body-lg mb-8 max-w-md">Aşağıdaki IBAN adresine havale/EFT yaparken açıklama kısmına kesinlikle sistemin ürettiği bu kodu yazın.</p>
                      
-                     <div className="bg-[#0B0F19] p-6 border border-primary-container/50 rounded-sm my-6 flex items-center justify-between">
-                        <div className="text-left">
-                           <div className="font-label-bold text-[10px] text-primary-container uppercase tracking-widest mb-1 opacity-70">Açıklama Kodu (Kesinlikle Yazılmalı)</div>
-                           <div className="font-mono text-3xl font-bold text-on-surface tracking-[0.3em]">{generatedCode}</div>
+                     <div className="bg-[#0B0F19] p-6 border border-primary-container/50 rounded-xl mb-8 w-full max-w-md shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
+                        <div className="font-label-bold text-xs text-primary-container uppercase tracking-widest mb-2 opacity-80">Açıklama Kodu (Kesinlikle Yazılmalı)</div>
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="font-mono text-3xl md:text-4xl font-bold text-on-surface tracking-[0.2em] break-all">{generatedCode}</div>
+                          <button 
+                             onClick={() => navigator.clipboard.writeText(generatedCode)}
+                             className="p-3 bg-primary-container/10 hover:bg-primary-container text-primary-container hover:text-on-primary transition-all border border-primary-container/30 rounded-lg shrink-0 group"
+                             title="Kodu Kopyala"
+                          >
+                             <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:scale-110 transition-transform"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                          </button>
                         </div>
-                        <button 
-                           onClick={() => navigator.clipboard.writeText(generatedCode)}
-                           className="p-4 bg-primary-container/10 hover:bg-primary-container text-primary-container hover:text-on-primary transition-all border border-primary-container/30 rounded-sm"
-                           title="Kodu Kopyala"
-                        >
-                           <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                        </button>
                      </div>
 
-                     <div className="bg-error/10 border border-error p-5 text-left mb-6 relative overflow-hidden">
+                     <div className="bg-error/10 border border-error/50 p-5 rounded-lg text-left mb-8 w-full max-w-md relative overflow-hidden">
                         <div className="absolute left-0 top-0 w-1 h-full bg-error"></div>
-                        <strong className="text-error font-headline-md uppercase text-lg block mb-2 tracking-widest flex items-center gap-2">
+                        <strong className="text-error font-headline-md uppercase text-lg mb-2 tracking-widest flex items-center gap-2">
                            <AlertCircle size={20} /> DİKKAT!
                         </strong>
-                        <span className="text-on-surface font-body-md text-sm leading-relaxed">
-                           Lütfen havale açıklamasına bu kodu yazmayı <strong className="text-error">kesinlikle unutmayın!</strong> Aksi takdirde otomatik sistemimiz ödemenizi eşleştiremez ve hesabınız onaylanmaz.
+                        <span className="text-on-surface font-body-md text-sm leading-relaxed opacity-90">
+                           Lütfen havale açıklamasına bu kodu yazmayı <strong className="text-error font-bold">kesinlikle unutmayın!</strong> Aksi takdirde otomatik sistemimiz ödemenizi eşleştiremez ve hesabınız onaylanmaz.
                         </span>
                      </div>
 
-                     <div className="text-left font-body-md text-sm text-on-surface-variant space-y-3 bg-surface p-4 border border-outline-variant">
-                        <div className="flex justify-between items-center border-b border-outline-variant/50 pb-2">
+                     <div className="w-full max-w-md text-left font-body-md text-sm text-on-surface-variant space-y-3 bg-surface-container-high p-5 rounded-xl border border-outline-variant shadow-inner">
+                        <div className="flex justify-between items-center border-b border-outline-variant/50 pb-3">
                            <strong className="text-on-surface uppercase tracking-widest text-xs opacity-70">Banka</strong> 
                            <span className="text-on-surface font-semibold">Örnek Bankası A.Ş.</span>
                         </div>
-                        <div className="flex justify-between items-center border-b border-outline-variant/50 pb-2">
+                        <div className="flex justify-between items-center border-b border-outline-variant/50 pb-3 pt-1">
                            <strong className="text-on-surface uppercase tracking-widest text-xs opacity-70">Alıcı</strong> 
                            <span className="text-on-surface font-semibold">Veyronix Yazılım</span>
                         </div>
                         <div className="pt-2">
                            <strong className="text-on-surface uppercase tracking-widest text-xs opacity-70 block mb-2">IBAN Adresi</strong>
-                           <div className="font-mono bg-[#0B0F19] p-3 border border-outline-variant text-on-surface flex justify-between items-center">
+                           <div className="font-mono bg-[#0B0F19] p-3 rounded-lg border border-outline-variant text-on-surface flex justify-between items-center group hover:border-primary-container/50 transition-colors">
                               <span className="tracking-widest">TR12 3456 7890 1234 5678 9012 34</span>
-                              <button onClick={() => navigator.clipboard.writeText("TR123456789012345678901234")} className="text-primary-container text-xs hover:underline uppercase font-label-bold tracking-widest bg-primary-container/10 px-3 py-1">Kopyala</button>
+                              <button onClick={() => navigator.clipboard.writeText("TR123456789012345678901234")} className="text-primary-container text-xs hover:underline uppercase font-label-bold tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Kopyala</button>
                            </div>
                         </div>
                      </div>
+                     
+                     <button 
+                       onClick={() => setShowCheckout(false)}
+                       className="mt-10 px-8 py-3 border border-outline-variant text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface rounded-lg font-label-bold uppercase tracking-widest transition-all"
+                     >
+                       Pencereyi Kapat
+                     </button>
+                </div>
+              ) : (
+                <>
+                  <div className="mb-10 text-center mt-4">
+                    <span className="inline-block py-1 px-3 mb-4 bg-primary-container text-on-primary font-label-bold text-label-sm tracking-widest uppercase">Premium Deployment</span>
+                    <h1 className="font-headline-xl text-3xl md:text-5xl text-on-surface mb-2 uppercase tracking-tight">Upgrade Infrastructure</h1>
+                    <p className="font-body-md text-body-md text-on-surface-variant">Select the strategic asset for {lang === 'tr' ? selectedPlan.name_tr : selectedPlan.name_en} integration.</p>
                   </div>
-                ) : (
-                  <div className="space-y-4">
-                    {paymentMethod === 'crypto' ? (
-                      <button 
-                        onClick={handleConfirmPurchase}
-                        disabled={isProcessing || !selectedServer}
-                        className="w-full py-5 px-4 bg-primary-container text-on-primary font-label-bold text-body-md flex items-center justify-center gap-3 transition-all duration-300 hover:brightness-110 active:scale-[0.98] shadow-[0_10px_20px_rgba(255,215,0,0.1)] disabled:opacity-50 disabled:cursor-not-allowed uppercase text-center"
-                      >
-                        {isProcessing ? (
-                          <><Loader2 className="animate-spin shrink-0" size={24} /> INITIALIZING DEPLOYMENT...</>
-                        ) : (
-                          <><Wallet size={24} className="shrink-0" /> <span>PAY WITH USDT (CRYPTOMUS)</span></>
-                        )}
-                      </button>
-                    ) : (
-                      <div className="space-y-4 bg-surface p-6 border border-outline-variant">
-                         <div className="text-sm font-body-md text-on-surface-variant mb-4">Banka ödemesi onayının hızlı olması için gönderimi yapacağınız banka hesabının sahibinin adını giriniz.</div>
-                         
-                         <div className="space-y-2">
-                            <label className="font-label-bold text-xs text-on-surface uppercase tracking-widest opacity-70">Kart Üzerindeki İsim (Ad Soyad)</label>
-                            <input 
-                              type="text" 
-                              placeholder="Örn: Ahmet Yılmaz" 
-                              className="w-full bg-[#0B0F19] border border-outline-variant p-4 text-on-surface font-body-md focus:border-primary-container outline-none transition-colors"
-                              value={senderName}
-                              onChange={(e) => setSenderName(e.target.value)}
-                            />
-                         </div>
 
-                         <button 
-                           onClick={handleManualPurchase}
-                           disabled={isProcessing || !selectedServer || senderName.trim().length < 3}
-                           className="w-full py-5 px-4 bg-primary-container text-on-primary font-label-bold text-body-md flex items-center justify-center gap-3 transition-all duration-300 hover:brightness-110 active:scale-[0.98] shadow-[0_10px_20px_rgba(255,215,0,0.1)] disabled:opacity-50 disabled:cursor-not-allowed uppercase text-center mt-6"
-                         >
-                           {isProcessing ? (
-                             <><Loader2 className="animate-spin shrink-0" size={24} /> İŞLENİYOR...</>
-                           ) : (
-                             <><span>ÖDEME BİLDİRİMİ YAP</span></>
-                           )}
-                         </button>
+                  {checkoutError && (
+                    <div className="mb-8 p-4 bg-error/10 border border-error text-error font-body-md text-sm">
+                      {checkoutError}
+                    </div>
+                  )}
+
+                  <div className="space-y-8">
+                    {/* Section: Server Selection */}
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-end flex-wrap gap-2">
+                        <h2 className="font-label-bold text-label-bold text-primary-container uppercase tracking-widest">Target Servers</h2>
+                        <a className="font-label-sm text-label-sm text-secondary-fixed hover:text-primary-fixed-dim transition-colors flex items-center gap-1" href="https://discord.com/oauth2/authorize?client_id=1082239904169336902&permissions=510977&scope=bot+applications.commands" target="_blank" rel="noopener noreferrer">
+                          <PlusCircle size={16} />
+                          Add Bot to New Server
+                        </a>
                       </div>
-                    )}
-                    {paymentMethod === 'crypto' && (
-                      <p className="text-center font-label-sm text-label-sm text-on-tertiary-container">
-                        Secure cryptographic transaction processed via Cryptomus Terminal.
-                      </p>
-                    )}
-                  </div>
-                )}
-              </div>
+                      
+                      {/* Server List Grid */}
+                      <div className="space-y-2 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+                        {isLoadingServers ? (
+                          <div className="flex items-center justify-center p-8 text-primary-container">
+                            <Loader2 className="animate-spin mr-3" size={24} />
+                            <span className="font-label-bold tracking-widest uppercase">Scanning Assets...</span>
+                          </div>
+                        ) : userServers.length === 0 ? (
+                          <div className="p-8 text-center border border-dashed border-outline-variant text-on-surface-variant">
+                            {t.checkoutNoServerText || "No active servers found. Add bot to a server first."}
+                          </div>
+                        ) : (
+                          userServers.map(s => (
+                            <label key={s.guild_id} className={`server-row flex items-center justify-between p-4 border cursor-pointer transition-all ${selectedServer === s.guild_id ? 'border-primary-container/50 bg-primary-container/10' : 'border-outline-variant hover:border-outline'}`}>
+                              <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 bg-surface-container-high border border-outline flex items-center justify-center overflow-hidden">
+                                  {s.icon ? (
+                                    <img alt={s.guild_name} className="w-full h-full object-cover" src={`https://cdn.discordapp.com/icons/${s.guild_id}/${s.icon}.png`} />
+                                  ) : (
+                                    <Server size={20} className="text-on-surface-variant" />
+                                  )}
+                                </div>
+                                <div>
+                                  <div className="font-body-md text-body-md font-bold text-on-surface">{s.guild_name}</div>
+                                  <div className="font-label-sm text-label-sm text-on-surface-variant">ID: {s.guild_id}</div>
+                                </div>
+                              </div>
+                              <input 
+                                checked={selectedServer === s.guild_id} 
+                                onChange={() => setSelectedServer(s.guild_id)}
+                                className="w-5 h-5 text-primary-container bg-surface border-outline focus:ring-primary-container" 
+                                name="server" 
+                                type="radio"
+                              />
+                            </label>
+                          ))
+                        )}
+                      </div>
+                    </div>
 
-              {/* Trust Badges */}
-              <div className="mt-8 flex justify-center gap-8 opacity-60 flex-wrap">
-                <div className="flex items-center gap-2">
-                  <Lock size={18} className="text-on-surface-variant" />
-                  <span className="font-label-sm text-label-sm text-on-surface-variant">Military-Grade Encryption</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Zap size={18} className="text-on-surface-variant" />
-                  <span className="font-label-sm text-label-sm text-on-surface-variant">Instant Activation</span>
-                </div>
-              </div>
+                    {/* Section: Plan Summary */}
+                    <div className="bg-surface-container p-6 border-l-4 border-primary-container">
+                      <div className="flex justify-between items-start mb-4">
+                        <div>
+                          <h3 className="font-label-bold text-label-bold text-on-surface mb-1 uppercase tracking-tight">{lang === 'tr' ? selectedPlan.name_tr : `${selectedPlan.name_en} Package`}</h3>
+                          <p className="font-label-sm text-label-sm text-on-surface-variant">Tactical Deployment Tier</p>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-headline-md text-headline-md text-primary-container">{selectedPlan.amount}</div>
+                          <div className="font-label-sm text-label-sm text-on-surface-variant">USDT</div>
+                        </div>
+                      </div>
+                      <ul className="space-y-2">
+                        {(lang === 'tr' ? (selectedPlan.features_tr || []) : (selectedPlan.features_en || [])).slice(0,3).map((feat, idx) => (
+                          <li key={idx} className="flex items-center gap-2 font-label-sm text-label-sm text-on-surface-variant">
+                            <CheckCircle size={18} className="text-primary-container shrink-0" /> {feat}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    {/* Payment Method Tabs & Action */}
+                    <div className="flex gap-4 mb-6">
+                      <button 
+                        onClick={() => setPaymentMethod('crypto')} 
+                        className={`flex-1 py-3 font-label-bold text-sm uppercase transition-all ${paymentMethod === 'crypto' ? 'bg-primary-container text-on-primary shadow-[0_0_15px_rgba(255,215,0,0.2)]' : 'bg-surface border border-outline text-on-surface hover:border-primary-container/50'}`}
+                      >
+                        Kripto İle Öde
+                      </button>
+                      <button 
+                        onClick={() => setPaymentMethod('havale')} 
+                        className={`flex-1 py-3 font-label-bold text-sm uppercase transition-all ${paymentMethod === 'havale' ? 'bg-primary-container text-on-primary shadow-[0_0_15px_rgba(255,215,0,0.2)]' : 'bg-surface border border-outline text-on-surface hover:border-primary-container/50'}`}
+                      >
+                        Havale / EFT
+                      </button>
+                    </div>
+
+                    <div className="space-y-4">
+                      {paymentMethod === 'crypto' ? (
+                        <button 
+                          onClick={handleConfirmPurchase}
+                          disabled={isProcessing || !selectedServer}
+                          className="w-full py-5 px-4 bg-primary-container text-on-primary font-label-bold text-body-md flex items-center justify-center gap-3 transition-all duration-300 hover:brightness-110 active:scale-[0.98] shadow-[0_10px_20px_rgba(255,215,0,0.1)] disabled:opacity-50 disabled:cursor-not-allowed uppercase text-center"
+                        >
+                          {isProcessing ? (
+                            <><Loader2 className="animate-spin shrink-0" size={24} /> INITIALIZING DEPLOYMENT...</>
+                          ) : (
+                            <><Wallet size={24} className="shrink-0" /> <span>PAY WITH USDT (CRYPTOMUS)</span></>
+                          )}
+                        </button>
+                      ) : (
+                        <div className="space-y-4 bg-surface p-6 border border-outline-variant">
+                           <div className="text-sm font-body-md text-on-surface-variant mb-4">Banka ödemesi onayının hızlı olması için gönderimi yapacağınız banka hesabının sahibinin adını giriniz.</div>
+                           
+                           <div className="space-y-2">
+                              <label className="font-label-bold text-xs text-on-surface uppercase tracking-widest opacity-70">Kart Üzerindeki İsim (Ad Soyad)</label>
+                              <input 
+                                type="text" 
+                                placeholder="Örn: Ahmet Yılmaz" 
+                                className="w-full bg-[#0B0F19] border border-outline-variant p-4 text-on-surface font-body-md focus:border-primary-container outline-none transition-colors"
+                                value={senderName}
+                                onChange={(e) => setSenderName(e.target.value)}
+                              />
+                           </div>
+
+                           <button 
+                             onClick={handleManualPurchase}
+                             disabled={isProcessing || !selectedServer || senderName.trim().length < 3}
+                             className="w-full py-5 px-4 bg-primary-container text-on-primary font-label-bold text-body-md flex items-center justify-center gap-3 transition-all duration-300 hover:brightness-110 active:scale-[0.98] shadow-[0_10px_20px_rgba(255,215,0,0.1)] disabled:opacity-50 disabled:cursor-not-allowed uppercase text-center mt-6"
+                           >
+                             {isProcessing ? (
+                               <><Loader2 className="animate-spin shrink-0" size={24} /> İŞLENİYOR...</>
+                             ) : (
+                               <><span>ÖDEME BİLDİRİMİ YAP</span></>
+                             )}
+                           </button>
+                        </div>
+                      )}
+                      {paymentMethod === 'crypto' && (
+                        <p className="text-center font-label-sm text-label-sm text-on-tertiary-container">
+                          Secure cryptographic transaction processed via Cryptomus Terminal.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Trust Badges */}
+                  <div className="mt-8 flex justify-center gap-8 opacity-60 flex-wrap">
+                    <div className="flex items-center gap-2">
+                      <Lock size={18} className="text-on-surface-variant" />
+                      <span className="font-label-sm text-label-sm text-on-surface-variant">Military-Grade Encryption</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Zap size={18} className="text-on-surface-variant" />
+                      <span className="font-label-sm text-label-sm text-on-surface-variant">Instant Activation</span>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
