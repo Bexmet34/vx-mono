@@ -13,6 +13,7 @@ export default function SystemStatusWidget() {
     totalMemMb: 0,
     ping: 0,
   });
+  const [isAtBottom, setIsAtBottom] = useState(false);
   
   // 15 sütunluk animasyon geçmişi
   const [cpuHistory, setCpuHistory] = useState(Array(15).fill(0));
@@ -26,6 +27,9 @@ export default function SystemStatusWidget() {
         // `fetch` ile ölçülen 210ms sizin tarayıcınızın (HTTP) yükleme süresidir.
         // Botun asıl hızını yansıtmak için gerçeğe en yakın Discord API Ping simülasyonu yapıyoruz:
         const botGatewayPing = Math.floor(Math.random() * 20) + 25; // 25ms - 45ms arası
+
+        // Tarayıcı veya Cloudflare'in hatalı 404 sayfalarını önbelleklemesini engellemek için cache-buster ekledik
+        const res = await fetch(`/api/system-status?t=${Date.now()}`);
 
         if (res.ok && mounted) {
           const data = await res.json();
@@ -41,9 +45,22 @@ export default function SystemStatusWidget() {
     
     // Her 10 saniyede bir güncelle
     const interval = setInterval(fetchStats, 10000);
+
+    // Scroll olayını dinleyerek sayfa sonuna gelip gelmediğini kontrol et
+    const handleScroll = () => {
+      const bottom = Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 100;
+      setIsAtBottom(bottom);
+      if (bottom && isOpen) {
+        setIsOpen(false); // Eğer sayfa sonuna inilirse açık olan kartı da kapat
+      }
+    };
+    
+    window.addEventListener("scroll", handleScroll);
+
     return () => {
       mounted = false;
       clearInterval(interval);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
@@ -82,7 +99,9 @@ export default function SystemStatusWidget() {
   };
 
   return (
-    <div className="fixed bottom-6 left-6 z-[9999] flex flex-col items-start">
+    <div className={`fixed bottom-6 left-6 z-[9999] flex flex-col items-start transition-all duration-300 ${
+      isAtBottom ? 'opacity-0 translate-y-10 pointer-events-none' : 'opacity-100 translate-y-0'
+    }`}>
       {/* Açılır Kart (Orta Boy) */}
       <div 
         className={`mb-4 bg-[#0B0F19] border border-outline-variant rounded-xl shadow-[0_0_40px_rgba(0,0,0,0.5)] w-80 overflow-hidden origin-bottom-left transition-all duration-300 ease-out ${

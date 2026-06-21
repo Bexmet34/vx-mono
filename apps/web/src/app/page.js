@@ -348,7 +348,6 @@ export default function Home() {
               muted 
               playsInline 
               className="w-full h-auto object-cover"
-              poster="/mockups/video_intro_1.svg"
             >
               <source src="/videos/tanitim.mp4" type="video/mp4" />
               Tarayıcınız video etiketini desteklemiyor.
