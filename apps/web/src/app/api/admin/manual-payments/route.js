@@ -82,8 +82,8 @@ export async function PATCH(req) {
        return NextResponse.json({ error: "Already approved" }, { status: 400 });
     }
 
-    // Durum tutarlılığı: rejected/cancel → 'rejected' olarak kaydet
-    const dbStatus = status === 'cancel' ? 'rejected' : status;
+    // Durum tutarlılığı: rejected → 'cancel' olarak kaydet (DB enum uyuşmazlığı için)
+    const dbStatus = status === 'rejected' ? 'cancel' : status;
 
     // 2. Durumu güncelle
     const { error: updateError } = await supabase
@@ -240,6 +240,6 @@ export async function PATCH(req) {
     return NextResponse.json({ success: true, status: dbStatus });
   } catch (error) {
     console.error("Admin Manual Payments PATCH Error:", error);
-    return NextResponse.json({ error: "Internal Error" }, { status: 500 });
+    return NextResponse.json({ error: error.message || "Internal Error", details: error }, { status: 500 });
   }
 }

@@ -568,7 +568,7 @@ export default function AdminPage() {
     
     if (paymentStatusFilter === 'pending') return p.status === 'pending';
     if (paymentStatusFilter === 'paid') return p.status === 'paid';
-    if (paymentStatusFilter === 'rejected') return p.status === 'rejected';
+    if (paymentStatusFilter === 'rejected') return p.status === 'rejected' || p.status === 'cancel';
     
     return true;
   });
@@ -1258,7 +1258,7 @@ export default function AdminPage() {
                           <td data-label="DURUM">
                             {p.status === 'pending' && <span className="admin-badge" style={{background: 'rgba(252,163,17,0.15)', color: '#fca311'}}>Bekliyor</span>}
                             {p.status === 'paid' && <span className="admin-badge badge-active">Onaylandı</span>}
-                            {p.status === 'rejected' && <span className="admin-badge badge-passive">Reddedildi</span>}
+                            {(p.status === 'rejected' || p.status === 'cancel') && <span className="admin-badge badge-passive">Reddedildi</span>}
                           </td>
                           <td data-label="İŞLEMLER">
                             {p.status === 'pending' && (
