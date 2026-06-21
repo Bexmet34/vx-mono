@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 
 import Footer from "@/components/Footer";
 import SystemStatusWidget from "@/components/SystemStatusWidget";
+import ScrollToTop from "@/components/ScrollToTop";
 
 export const metadata = {
   metadataBase: new URL("https://veyronix.com.tr"),
@@ -112,6 +113,7 @@ export default async function RootLayout({ children }) {
               </div>
               <Footer />
               <SystemStatusWidget />
+              <ScrollToTop />
             </div>
           </NextAuthProvider>
         </LanguageProvider>
