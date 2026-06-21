@@ -82,8 +82,8 @@ export async function PATCH(req) {
        return NextResponse.json({ error: "Already approved" }, { status: 400 });
     }
 
-    // Durum tutarlılığı: rejected → 'cancel' olarak kaydet (DB enum uyuşmazlığı için)
-    const dbStatus = status === 'rejected' ? 'cancel' : status;
+    // Durum tutarlılığı: rejected/cancel → 'rejected' olarak kaydet
+    const dbStatus = status === 'cancel' ? 'rejected' : status;
 
     // 2. Durumu güncelle
     const { error: updateError } = await supabase

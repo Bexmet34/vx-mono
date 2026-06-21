@@ -204,3 +204,7 @@ ADD COLUMN IF NOT EXISTS albion_server TEXT DEFAULT 'Europe';
 -- NEXT_PUBLIC_ADMIN_ID_2=407234961582587916
 -- ==============================================================
 
+
+-- 5. Kripto odeme durum kisitlamasi guncellemesi (rejected ve cancel eklendi)
+ALTER TABLE public.crypto_payments DROP CONSTRAINT IF EXISTS crypto_payments_status_check;
+ALTER TABLE public.crypto_payments ADD CONSTRAINT crypto_payments_status_check CHECK (status IN ('pending', 'paid', 'cancel', 'rejected', 'failed', 'paid_over'));
