@@ -629,7 +629,7 @@ export default function Home() {
             <p className="font-body-lg text-body-lg text-on-surface-variant">{t.pricingSubtitle}</p>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-6 relative z-10">
+          <div className="space-y-12 relative z-10 w-full">
             {loadingPlans ? (
               <div className="w-full flex flex-col items-center justify-center py-20 text-primary-container">
                 <Loader2 className="animate-spin mb-4" size={48} />
@@ -639,40 +639,107 @@ export default function Home() {
               <div className="w-full text-center py-20 text-on-surface-variant font-body-lg border border-dashed border-outline-variant">
                 Şu anda aktif paket bulunmamaktadır.
               </div>
-            ) : plans.map((plan) => {
-              const features = lang === 'tr' ? (plan.features_tr || []) : (plan.features_en || []);
-              
-              return (
-                <div key={plan.id} className={`w-full md:w-[320px] flex-shrink-0 glass-panel p-8 flex flex-col relative overflow-hidden border ${plan.is_featured ? 'border-primary-container shadow-[0_0_30px_rgba(255,215,0,0.1)]' : 'border-outline-variant hover:border-primary-container/50'} transition-colors`}>
-                  {plan.is_featured && (
-                    <div className="absolute top-0 right-0 bg-primary-container text-on-primary font-label-bold text-[10px] uppercase tracking-widest px-4 py-1 rounded-bl">
-                      {t.bestSeller}
+            ) : (
+              <>
+                {/* 1. Bireysel Paketler (Individual) */}
+                {plans.some(p => p.plan_type === 'user') && (
+                  <div className="space-y-8">
+                    <div className="w-full flex items-center justify-center opacity-50">
+                      <div className="h-[1px] bg-gradient-to-r from-transparent via-outline-variant to-transparent flex-grow"></div>
+                      <span className="px-6 font-label-bold text-xs uppercase tracking-[0.25em] text-primary-container drop-shadow-[0_0_10px_rgba(255,215,0,0.3)]">
+                        {lang === 'tr' ? 'Bireysel' : 'Individual'}
+                      </span>
+                      <div className="h-[1px] bg-gradient-to-r from-transparent via-outline-variant to-transparent flex-grow"></div>
                     </div>
-                  )}
-                  
-                  <h3 className="font-headline-md text-xl text-on-surface mb-2 uppercase">{lang === 'tr' ? plan.name_tr : plan.name_en}</h3>
-                  <div className="font-headline-xl text-primary-container mb-8 flex items-baseline gap-2">
-                    {plan.amount} <span className="font-label-bold text-label-sm text-on-surface-variant">USDT</span>
+                    
+                    <div className="flex flex-wrap justify-center gap-6">
+                      {plans.filter(p => p.plan_type === 'user').map((plan) => {
+                        const features = lang === 'tr' ? (plan.features_tr || []) : (plan.features_en || []);
+                        return (
+                          <div key={plan.id} className={`w-full md:w-[320px] flex-shrink-0 glass-panel p-8 flex flex-col relative overflow-hidden border ${plan.is_featured ? 'border-primary-container shadow-[0_0_30px_rgba(255,215,0,0.1)]' : 'border-outline-variant hover:border-primary-container/50'} transition-colors`}>
+                            {plan.is_featured && (
+                              <div className="absolute top-0 right-0 bg-primary-container text-on-primary font-label-bold text-[10px] uppercase tracking-widest px-4 py-1 rounded-bl">
+                                {t.bestSeller}
+                              </div>
+                            )}
+                            
+                            <h3 className="font-headline-md text-xl text-on-surface mb-2 uppercase">{lang === 'tr' ? plan.name_tr : plan.name_en}</h3>
+                            <div className="font-headline-xl text-primary-container mb-8 flex items-baseline gap-2">
+                              {plan.amount} <span className="font-label-bold text-label-sm text-on-surface-variant">USDT</span>
+                            </div>
+                            
+                            <ul className="flex-grow space-y-4 mb-8">
+                              {features.map((feat, idx) => (
+                                <li key={idx} className="flex items-start gap-3 font-body-md text-sm text-on-surface-variant">
+                                  <Star size={16} className="text-primary-container shrink-0 mt-1" /> 
+                                  <span>{feat}</span>
+                                </li>
+                              ))}
+                            </ul>
+                            
+                            <button 
+                              className={`w-full py-4 font-label-bold text-label-bold uppercase tracking-widest transition-all active:scale-95 ${plan.is_featured ? 'bg-primary-container text-on-primary tactical-glow hover:brightness-110' : 'bg-surface border border-outline text-on-surface hover:border-primary-container hover:text-primary-container'}`}
+                              onClick={() => handleBuyClick(plan)}
+                            >
+                              {t.buyNow}
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
-                  
-                  <ul className="flex-grow space-y-4 mb-8">
-                    {features.map((feat, idx) => (
-                      <li key={idx} className="flex items-start gap-3 font-body-md text-sm text-on-surface-variant">
-                        <Star size={16} className="text-primary-container shrink-0 mt-1" /> 
-                        <span>{feat}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  
-                  <button 
-                    className={`w-full py-4 font-label-bold text-label-bold uppercase tracking-widest transition-all active:scale-95 ${plan.is_featured ? 'bg-primary-container text-on-primary tactical-glow hover:brightness-110' : 'bg-surface border border-outline text-on-surface hover:border-primary-container hover:text-primary-container'}`}
-                    onClick={() => handleBuyClick(plan)}
-                  >
-                    {t.buyNow}
-                  </button>
-                </div>
-              );
-            })}
+                )}
+
+                {/* 2. Sunucu Premium Paketleri (Guild) */}
+                {plans.some(p => p.plan_type === 'server' || !p.plan_type) && (
+                  <div className="space-y-8 mt-12">
+                    <div className="w-full flex items-center justify-center opacity-50">
+                      <div className="h-[1px] bg-gradient-to-r from-transparent via-outline-variant to-transparent flex-grow"></div>
+                      <span className="px-6 font-label-bold text-xs uppercase tracking-[0.25em] text-primary-container drop-shadow-[0_0_10px_rgba(255,215,0,0.3)]">
+                        {lang === 'tr' ? 'Sunucu' : 'Guild'}
+                      </span>
+                      <div className="h-[1px] bg-gradient-to-r from-transparent via-outline-variant to-transparent flex-grow"></div>
+                    </div>
+                    
+                    <div className="flex flex-wrap justify-center gap-6">
+                      {plans.filter(p => p.plan_type === 'server' || !p.plan_type).map((plan) => {
+                        const features = lang === 'tr' ? (plan.features_tr || []) : (plan.features_en || []);
+                        return (
+                          <div key={plan.id} className={`w-full md:w-[320px] flex-shrink-0 glass-panel p-8 flex flex-col relative overflow-hidden border ${plan.is_featured ? 'border-primary-container shadow-[0_0_30px_rgba(255,215,0,0.1)]' : 'border-outline-variant hover:border-primary-container/50'} transition-colors`}>
+                            {plan.is_featured && (
+                              <div className="absolute top-0 right-0 bg-primary-container text-on-primary font-label-bold text-[10px] uppercase tracking-widest px-4 py-1 rounded-bl">
+                                {t.bestSeller}
+                              </div>
+                            )}
+                            
+                            <h3 className="font-headline-md text-xl text-on-surface mb-2 uppercase">{lang === 'tr' ? plan.name_tr : plan.name_en}</h3>
+                            <div className="font-headline-xl text-primary-container mb-8 flex items-baseline gap-2">
+                              {plan.amount} <span className="font-label-bold text-label-sm text-on-surface-variant">USDT</span>
+                            </div>
+                            
+                            <ul className="flex-grow space-y-4 mb-8">
+                              {features.map((feat, idx) => (
+                                <li key={idx} className="flex items-start gap-3 font-body-md text-sm text-on-surface-variant">
+                                  <Star size={16} className="text-primary-container shrink-0 mt-1" /> 
+                                  <span>{feat}</span>
+                                </li>
+                              ))}
+                            </ul>
+                            
+                            <button 
+                              className={`w-full py-4 font-label-bold text-label-bold uppercase tracking-widest transition-all active:scale-95 ${plan.is_featured ? 'bg-primary-container text-on-primary tactical-glow hover:brightness-110' : 'bg-surface border border-outline text-on-surface hover:border-primary-container hover:text-primary-container'}`}
+                              onClick={() => handleBuyClick(plan)}
+                            >
+                              {t.buyNow}
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
           </div>
         </section>
 
