@@ -548,10 +548,10 @@ E-Posta: hakkibsknn@gmail.com
 
 const LanguageContext = createContext();
 
-export function LanguageProvider({ children }) {
-  // Always start with "en" on both server and client to avoid hydration mismatch.
+export function LanguageProvider({ children, initialLang = "tr" }) {
+  // Always start with the server-rendered language to avoid hydration mismatch.
   // After hydration is complete, useEffect reads localStorage and applies the saved preference.
-  const [lang, setLang] = useState("en");
+  const [lang, setLang] = useState(initialLang);
 
   useEffect(() => {
     const saved = localStorage.getItem("appLang");

@@ -6,10 +6,12 @@ import { cookies } from "next/headers";
 import Footer from "@/components/Footer";
 
 export const metadata = {
-  title: "Veyronix - Discord Albion Party Finder",
+  metadataBase: new URL("https://veyronix.com.tr"),
+  title: "Veyronix | Albion Online Discord Bot & Killboard, Party Finder",
   description: "Veyronix is the ultimate Discord bot to build, manage, and track parties in Albion Online. Automate your guild with killboards, role management, and dynamic party builders directly from your Discord server.",
+  keywords: "Albion Online Discord Bot, Albion Party Finder, Albion Killboard Bot, Discord ZvZ Builder, ZvZ Party, Albion Online Guild Management, Albion Discord",
   openGraph: {
-    title: "Veyronix - Discord Albion Party Finder",
+    title: "Veyronix | Albion Online Discord Bot & Killboard, Party Finder",
     description: "Veyronix is the ultimate Discord bot to build, manage, and track parties in Albion Online. Automate your guild with killboards, role management, and dynamic party builders directly from your Discord server.",
     url: "https://veyronix.com.tr",
     siteName: "Veyronix",
@@ -26,7 +28,7 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Veyronix - Discord Albion Party Finder",
+    title: "Veyronix | Albion Online Discord Bot & Killboard, Party Finder",
     description: "Veyronix is the ultimate Discord bot to build, manage, and track parties in Albion Online. Automate your guild with killboards, role management, and dynamic party builders directly from your Discord server.",
     images: ["https://veyronix.com.tr/og-image.png"],
   },
@@ -54,6 +56,37 @@ export default async function RootLayout({ children }) {
     },
   };
 
+  const jsonLdFaq = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'Veyronix Nasıl Kurulur?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Veyronix botunu sunucunuza davet etmek için Discorda Ekle butonunu kullanın. Yönetici yetkisine sahip olduğunuz bir sunucuyu seçtikten sonra kurulum tamamlanacaktır.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'Killboard Özelliği Nasıl Çalışır?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Premium plan satın aldığınızda, sistem her akşam otomatik olarak Albion Online resmi APIsine bağlanarak loncanızın güncel Killboard istatistiklerini çeker ve Discord üzerinden duyurur.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'Parti Sistemi Yönetimi Neler Sunar?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Guild etkinlikleri için özel partiler oluşturabilirsiniz. Üyeler rollerini seçebilir ve parti lideri katılımı yönetebilir. Tüm işlemler Discord üzerinden tamamlanır.'
+        }
+      }
+    ]
+  };
+
   const cookieStore = await cookies();
   const lang = cookieStore.get("NEXT_LOCALE")?.value || "tr";
 
@@ -64,9 +97,13 @@ export default async function RootLayout({ children }) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFaq) }}
+        />
       </head>
       <body>
-        <LanguageProvider>
+        <LanguageProvider initialLang={lang}>
           <NextAuthProvider>
             <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
               <div style={{ flex: 1 }}>
