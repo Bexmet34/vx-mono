@@ -166,11 +166,11 @@ export default function SystemStatusWidget() {
             </div>
           </div>
 
-          {/* Ping (Ağ Gecikmesi) */}
+          {/* Ping */}
           <div className="relative z-10 flex justify-between items-center bg-surface-container-highest/50 p-4 rounded-t-lg border border-b-0 border-outline-variant/30">
              <div className="flex items-center gap-3 text-on-surface-variant">
                 <Activity size={18} className="text-primary-container/70" />
-                <span className="font-label-medium text-sm uppercase tracking-wide">Ağ Gecikmesi (Ping)</span>
+                <span className="font-label-medium text-sm uppercase tracking-wide">Ping</span>
               </div>
               <span className="font-mono text-on-surface text-sm">{stats.ping > 0 ? `${stats.ping} ms` : 'Ölçülüyor...'}</span>
           </div>
