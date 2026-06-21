@@ -197,6 +197,10 @@ export async function PATCH(req) {
       const botToken = process.env.DISCORD_BOT_TOKEN;
       if (botToken) {
         try {
+          const planDetailText = payment.plan_type === 'user'
+            ? `**Bireysel Oylama Muafiyeti (${payment.duration_days} Günlük)**`
+            : `**${payment.guild_name || 'Sunucu'}** için ${payment.duration_days} günlük Sunucu Premium`;
+
           await fetch('https://discord.com/api/v10/channels/1490798764427051088/messages', {
             method: 'POST',
             headers: {
@@ -204,7 +208,7 @@ export async function PATCH(req) {
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              content: `✅ **Havale/EFT Onaylandı!**\n<@${payment.user_id}> — **${payment.guild_name || 'Sunucu'}** için ${payment.duration_days} günlük paket onaylandı.\n📋 Kod: \`${payment.description_code}\` | 🏦 Banka: ${payment.target_bank || 'Bilinmiyor'}`
+              content: `✅ **Havale/EFT Onaylandı!**\n<@${payment.user_id}> — ${planDetailText} onaylandı.\n📋 Kod: \`${payment.description_code}\` | 🏦 Banka: ${payment.target_bank || 'Bilinmiyor'}`
             })
           });
         } catch (e) {

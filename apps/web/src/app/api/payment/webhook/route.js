@@ -143,15 +143,20 @@ export async function POST(req) {
         }
       }
 
-      console.log(`[Cryptomus Webhook] Order ${order_id} processed. Guild ${payment.guild_id} extended by ${payment.duration_days} days.`);
-
       // Send Discord notification to Support Server
       const botToken = process.env.DISCORD_BOT_TOKEN;
       if (botToken) {
          try {
-            const planName = payment.duration_days >= 365 ? '1 Yıllık Paket' : (payment.duration_days >= 90 ? '3 Aylık Paket' : (payment.duration_days >= 30 ? '1 Aylık Paket' : '7 Günlük Paket'));
-            // #6 — subscription null olabilir, payment.guild_name'i fallback olarak kullan
-            const guildNameSafe = subscription?.guild_name || payment.guild_name || 'Sunucu';
+            const planName = payment.duration_days >= 365 ? '1 Yıllık' : (payment.duration_days >= 90 ? '3 Aylık' : (payment.duration_days >= 30 ? '1 Aylık' : '7 Günlük'));
+            
+            let messageContent = '';
+            if (payment.plan_type === 'user') {
+               messageContent = `🎉 <@${payment.user_id}>, **Bireysel Oylama Muafiyeti (${planName})** satın aldı! Artık botun bulunduğu tüm sunucularda Top.gg oylaması yapması gerekmeyecek. Destek taleplerine de öncelikli olarak bakılacaktır.`;
+            } else {
+               const guildNameSafe = subscription?.guild_name || payment.guild_name || 'Sunucu';
+               messageContent = `🎉 <@${payment.user_id}>, **${guildNameSafe}** sunucusu için **Sunucu Premium (${planName})** satın aldı! Bizi tercih ettiğiniz için teşekkür ederiz. Destek taleplerinize artık öncelikli olarak bakılacaktır.`;
+            }
+
             await fetch('https://discord.com/api/v10/channels/1490798764427051088/messages', {
                method: 'POST',
                headers: {
@@ -159,7 +164,7 @@ export async function POST(req) {
                   'Content-Type': 'application/json'
                },
                body: JSON.stringify({
-                  content: `🎉 <@${payment.user_id}>, **${guildNameSafe}** sunucusu için **${planName}** satın aldı! Bizi tercih ettiğiniz için teşekkür ederiz. Destek taleplerinize artık öncelikli olarak bakılacaktır.`
+                  content: messageContent
                })
             });
          } catch(e) {
