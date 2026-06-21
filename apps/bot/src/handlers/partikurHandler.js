@@ -97,11 +97,12 @@ async function handleCreatePartyCommand(interaction) {
     // Vote check is moved to Modal Submit (modalHandler) to prevent Discord 3-second timeout!
 
     const whitelisted = isOwner || isDeveloper || await isWhitelisted(userId, interaction.guildId);
+    const userPremium = await isUserPremium(userId);
 
     const partyCount = getActivePartyCount(userId);
     let limit = 1;
     if (whitelisted) limit = 3;
-    if (isDeveloper) limit = 999;
+    if (isDeveloper || userPremium) limit = 999;
 
     if (partyCount >= limit) {
         let errorMsg = whitelisted
@@ -231,7 +232,7 @@ async function handleTempCommand(interaction) {
     const partyCount = getActivePartyCount(userId);
     let limit = 1;
     if (whitelisted) limit = 3;
-    if (isDeveloper) limit = 999;
+    if (isDeveloper || userPremium) limit = 999;
 
     if (partyCount >= limit) {
         let errorMsg = whitelisted

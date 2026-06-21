@@ -34,6 +34,12 @@ export default function AdminPage() {
   const [paymentStatusFilter, setPaymentStatusFilter] = useState("all");
   const [bankAccounts, setBankAccounts] = useState([]);
   
+  // Individual Bot User States
+  const [users, setUsers] = useState([]);
+  const [userSearchTerm, setUserSearchTerm] = useState("");
+  const [serverSubTab, setServerSubTab] = useState("guilds"); // guilds, users
+  const [showUserModal, setShowUserModal] = useState(false);
+  const [newUser, setNewUser] = useState({ discord_id: "", duration_days: 30, is_unlimited: false });
   // Modal States
   const [showDayModal, setShowDayModal] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(null);
@@ -158,6 +164,71 @@ export default function AdminPage() {
     finally { setLoading(false); }
   }, []);
 
+  const fetchUsers = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/admin/users");
+      const data = await res.json();
+      if (res.ok) setUsers(data);
+    } catch (err) { console.error(err); }
+    finally { setLoading(false); }
+  }, []);
+
+  const handleCreateUser = async (e) => {
+    e.preventDefault();
+    setSavingId('new_user');
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newUser),
+      });
+      if (res.ok) {
+        showToast("Bireysel premium başarıyla tanımlandı!", "success");
+        setNewUser({ discord_id: "", duration_days: 30, is_unlimited: false });
+        setShowUserModal(false);
+        fetchUsers();
+      } else {
+        const errorData = await res.json();
+        showToast(errorData.error || "Kullanıcı eklenemedi.", "error");
+      }
+    } catch (err) {
+      showToast(err.message, "error");
+    } finally {
+      setSavingId(null);
+    }
+  };
+
+  const handleUserAction = async (discordId, action, value) => {
+    setSavingId(discordId);
+    try {
+      if (action === 'delete') {
+        if (!confirm("Bu kullanıcının premium yetkisini tamamen kaldırmak istediğinize emin misiniz?")) return;
+        const res = await fetch(`/api/admin/users?id=${discordId}`, {
+          method: "DELETE",
+        });
+        if (res.ok) {
+          showToast("Kullanıcı premium yetkisi silindi!", "success");
+          fetchUsers();
+        }
+      } else {
+        const res = await fetch("/api/admin/users", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ discord_id: discordId, action, value }),
+        });
+        if (res.ok) {
+          showToast("Kullanıcı başarıyla güncellendi!", "success");
+          fetchUsers();
+        }
+      }
+    } catch (err) {
+      showToast(err.message, "error");
+    } finally {
+      setSavingId(null);
+    }
+  };
+
   // Auth Check
   useEffect(() => {
     if (status === "unauthenticated" || (status === "authenticated" && !isAdmin)) {
@@ -170,7 +241,10 @@ export default function AdminPage() {
     if (status === "authenticated" && isAdmin) {
       setTimeout(() => {
         if (activeTab === "notifications") fetchTemplates();
-        if (activeTab === "servers") fetchServers();
+        if (activeTab === "servers") {
+          fetchServers();
+          fetchUsers();
+        }
         if (activeTab === "campaigns") fetchCampaigns();
         if (activeTab === "broadcast") fetchScheduledMessages();
         if (activeTab === "plans") fetchPlans();
@@ -179,7 +253,7 @@ export default function AdminPage() {
         if (activeTab === "bank-accounts") fetchBankAccounts();
       }, 0);
     }
-  }, [status, isAdmin, activeTab, fetchTemplates, fetchServers, fetchCampaigns, fetchScheduledMessages, fetchPlans, fetchSettings, fetchManualPayments, fetchBankAccounts]);
+  }, [status, isAdmin, activeTab, fetchTemplates, fetchServers, fetchUsers, fetchCampaigns, fetchScheduledMessages, fetchPlans, fetchSettings, fetchManualPayments, fetchBankAccounts]);
 
 
   const handleCreateCampaign = async () => {
@@ -593,181 +667,335 @@ export default function AdminPage() {
             {/* SERVER MANAGEMENT TAB */}
             {activeTab === "servers" && (
               <>
+                {/* Sub-tab selection */}
+                <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', borderBottom: '1px solid var(--admin-border)', paddingBottom: '1rem' }}>
+                  <button 
+                    onClick={() => setServerSubTab("guilds")} 
+                    className={`filter-btn ${serverSubTab === "guilds" ? "active" : ""}`}
+                    style={{ fontSize: '0.95rem', padding: '0.6rem 1.2rem' }}
+                  >
+                    Sunucu Premium Lisansları
+                  </button>
+                  <button 
+                    onClick={() => setServerSubTab("users")} 
+                    className={`filter-btn ${serverSubTab === "users" ? "active" : ""}`}
+                    style={{ fontSize: '0.95rem', padding: '0.6rem 1.2rem' }}
+                  >
+                    Bireysel Premium Lisansları
+                  </button>
+                </div>
+
                 <div className="server-tab-header">
-                   <div>
-                      <div className="admin-search-container" style={{marginBottom: 0}}>
-                        <Search style={{ position: "absolute", left: "1.2rem", top: "50%", transform: "translateY(-50%)", color: "var(--admin-text-muted)" }} size={18} />
-                        <input 
-                          className="admin-search-input" 
-                          placeholder="Sunucu ismi, ID veya Sahip ID ile ara..." 
-                          value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                      </div>
-                   </div>
-                   
-                   <div className="server-stats-row">
-                      <div className="stat-mini-card">
-                         <div className="label">Toplam</div>
-                         <div className="value">{servers.length}</div>
-                      </div>
-                      <div className="stat-mini-card">
-                         <div className="label" style={{color: 'var(--admin-success)'}}>Premium</div>
-                         <div className="value">{servers.filter(s => s.is_active && !s.is_unlimited && new Date(s.expires_at) >= new Date()).length}</div>
-                      </div>
-                      <div className="stat-mini-card">
-                         <div className="label" style={{color: '#fca311'}}>Sınırsız</div>
-                         <div className="value">{servers.filter(s => s.is_unlimited).length}</div>
-                      </div>
-                      <div className="stat-mini-card">
-                         <div className="label" style={{color: '#ff4757'}}>Freemium</div>
-                         <div className="value">{servers.filter(s => s.is_active && !s.is_unlimited && new Date(s.expires_at) < new Date()).length}</div>
-                      </div>
-                      <div className="stat-mini-card">
-                         <div className="label" style={{color: 'var(--admin-error)'}}>Pasif</div>
-                         <div className="value">{servers.filter(s => !s.is_active).length}</div>
-                      </div>
-                   </div>
+                   {serverSubTab === "guilds" ? (
+                     <>
+                       <div>
+                          <div className="admin-search-container" style={{marginBottom: 0}}>
+                            <Search style={{ position: "absolute", left: "1.2rem", top: "50%", transform: "translateY(-50%)", color: "var(--admin-text-muted)" }} size={18} />
+                            <input 
+                              className="admin-search-input" 
+                              placeholder="Sunucu ismi, ID veya Sahip ID ile ara..." 
+                              value={searchTerm}
+                              onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                          </div>
+                       </div>
+                       
+                       <div className="server-stats-row">
+                          <div className="stat-mini-card">
+                             <div className="label">Toplam</div>
+                             <div className="value">{servers.length}</div>
+                          </div>
+                          <div className="stat-mini-card">
+                             <div className="label" style={{color: 'var(--admin-success)'}}>Premium</div>
+                             <div className="value">{servers.filter(s => s.is_active && !s.is_unlimited && new Date(s.expires_at) >= new Date()).length}</div>
+                          </div>
+                          <div className="stat-mini-card">
+                             <div className="label" style={{color: '#fca311'}}>Sınırsız</div>
+                             <div className="value">{servers.filter(s => s.is_unlimited).length}</div>
+                          </div>
+                          <div className="stat-mini-card">
+                             <div className="label" style={{color: '#ff4757'}}>Freemium</div>
+                             <div className="value">{servers.filter(s => s.is_active && !s.is_unlimited && new Date(s.expires_at) < new Date()).length}</div>
+                          </div>
+                          <div className="stat-mini-card">
+                             <div className="label" style={{color: 'var(--admin-error)'}}>Pasif</div>
+                             <div className="value">{servers.filter(s => !s.is_active).length}</div>
+                          </div>
+                       </div>
+                     </>
+                   ) : (
+                     <>
+                       <div>
+                          <div className="admin-search-container" style={{marginBottom: 0, width: '350px'}}>
+                            <Search style={{ position: "absolute", left: "1.2rem", top: "50%", transform: "translateY(-50%)", color: "var(--admin-text-muted)" }} size={18} />
+                            <input 
+                              className="admin-search-input" 
+                              placeholder="Discord ID ile ara..." 
+                              value={userSearchTerm}
+                              onChange={(e) => setUserSearchTerm(e.target.value)}
+                            />
+                          </div>
+                       </div>
+                       
+                       <button className="btn-primary" onClick={() => setShowUserModal(true)} style={{padding: '0.8rem 1.5rem', borderRadius: '12px', marginLeft: 'auto'}}>
+                          <Plus size={20} /> Bireysel Lisans Ekle
+                       </button>
+                     </>
+                   )}
                 </div>
 
-                <div className="server-filter-row">
-                   {['all', 'premium', 'unlimited', 'passive', 'freemium'].map(f => (
-                     <button 
-                       key={f}
-                       onClick={() => setStatusFilter(f)}
-                       className={`filter-btn ${statusFilter === f ? 'active' : ''}`}
-                       style={f === 'freemium' ? {borderColor: '#ff4757', color: statusFilter === 'freemium' ? 'white' : '#ff4757'} : {}}
-                     >
-                       {f === 'all' && 'Hepsi'}
-                       {f === 'premium' && 'Sadece Premium'}
-                       {f === 'unlimited' && 'Sadece Sınırsız'}
-                       {f === 'passive' && 'Sadece Pasif'}
-                       {f === 'freemium' && 'Sadece Freemium'}
-                     </button>
-                   ))}
-                </div>
+                {serverSubTab === "guilds" ? (
+                  <>
+                    <div className="server-filter-row">
+                       {['all', 'premium', 'unlimited', 'passive', 'freemium'].map(f => (
+                         <button 
+                           key={f}
+                           onClick={() => setStatusFilter(f)}
+                           className={`filter-btn ${statusFilter === f ? 'active' : ''}`}
+                           style={f === 'freemium' ? {borderColor: '#ff4757', color: statusFilter === 'freemium' ? 'white' : '#ff4757'} : {}}
+                         >
+                           {f === 'all' && 'Hepsi'}
+                           {f === 'premium' && 'Sadece Premium'}
+                           {f === 'unlimited' && 'Sadece Sınırsız'}
+                           {f === 'passive' && 'Sadece Pasif'}
+                           {f === 'freemium' && 'Sadece Freemium'}
+                         </button>
+                       ))}
+                    </div>
 
-                <div className="admin-card">
-                  <table className="admin-table">
-                    <thead>
-                      <tr>
-                        <th>SUNUCU BİLGİSİ</th>
-                        <th className="hide-on-tablet">SAHİP ID</th>
-                        <th>DURUM</th>
-                        <th>PLAN</th>
-                        <th style={{textAlign: "right"}}>İŞLEMLER</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredServers.map(s => {
-                        const isExpired = !s.is_unlimited && new Date(s.expires_at) < new Date();
-                        const isPassive = !s.is_active;
-                        
-                        return (
-                          <tr key={s.id} className="admin-tr-hover" style={{opacity: isPassive ? 0.5 : 1}}>
-                            <td data-label="SUNUCU BİLGİSİ">
-                              <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                                <div style={{ 
-                                  width: "42px", height: "42px", borderRadius: "12px", 
-                                  background: "linear-gradient(135deg, rgba(252,163,17,0.2) 0%, rgba(252,163,17,0.05) 100%)",
-                                  border: "1px solid var(--admin-border)",
-                                  display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "800", color: "var(--admin-accent)"
-                                }}>
-                                  {s.guild_name?.charAt(0).toUpperCase() || 'V'}
-                                </div>
-                                <div>
-                                  <div style={{ fontWeight: "700", fontSize: "0.95rem" }}>{s.guild_name}</div>
-                                  <div style={{ fontSize: "0.75rem", color: "var(--admin-text-muted)", fontFamily: "monospace" }}>{s.guild_id}</div>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="hide-on-tablet" data-label="SAHİP ID">
-                              <code style={{ fontSize: "0.85rem", color: "var(--admin-text-muted)", background: 'rgba(255,255,255,0.03)', padding: '0.3rem 0.6rem', borderRadius: '6px' }}>{s.owner_id}</code>
-                            </td>
-                            <td data-label="DURUM">
-                              {isPassive ? (
-                                <span className="admin-badge badge-passive">Pasif</span>
-                              ) : (
-                                <span className="admin-badge badge-active">Aktif</span>
-                              )}
-                              {s.unlimited_party && (
-                                <span className="admin-badge" style={{background: 'rgba(252,163,17,0.12)', color: '#fca311', border: '1px solid rgba(252,163,17,0.3)', marginLeft: '0.4rem', fontSize: '0.62rem'}}>🎮 Party ∞</span>
-                              )}
-                            </td>
-                            <td data-label="PLAN">
-                              {/* PLAN column: Freemium / Premium / Unlimited */}
-                              <div style={{display: 'flex', flexDirection: 'column', gap: '0.4rem', alignItems: 'flex-start'}}>
-                                {s.is_unlimited ? (
-                                  <span className="admin-badge badge-unlimited" style={{fontSize:'0.8rem'}}>♾️ Sınırsız</span>
-                                ) : !isExpired ? (
-                                  <>
-                                    <span className="admin-badge badge-active" style={{fontSize:'0.8rem'}}>💎 Premium</span>
-                                    <span style={{fontSize: '0.7rem', color: 'var(--admin-text-muted)', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '4px'}}>
-                                      <Clock size={12} /> {Math.ceil((new Date(s.expires_at) - new Date()) / (1000 * 60 * 60 * 24))} Gün Kaldı
-                                    </span>
-                                  </>
-                                ) : (
-                                  <span className="admin-badge badge-expired" style={{fontSize:'0.8rem'}}>🆓 Freemium</span>
-                                )}
-                              </div>
-                            </td>
-                            <td data-label="İŞLEMLER">
-                              <div className="table-actions">
-                                <button 
-                                  className="admin-action-btn" 
-                                  title="+30 Gün Ekle" 
-                                  disabled={savingId === s.guild_id}
-                                  onClick={() => handleServerAction(s.guild_id, 'add_days', 30)}
-                                  style={{color: 'var(--admin-success)', borderColor: 'rgba(46, 204, 113, 0.3)'}}
-                                >
-                                  {savingId === s.guild_id ? <Loader2 size={18} className="spin" /> : <Plus size={18} />}
-                                </button>
-                                
-                                <button 
-                                  className="admin-action-btn danger" 
-                                  title="-30 Gün Çıkar" 
-                                  disabled={savingId === s.guild_id}
-                                  onClick={() => handleServerAction(s.guild_id, 'remove_days', 30)}
-                                >
-                                  {savingId === s.guild_id ? <Loader2 size={18} className="spin" /> : <Clock size={18} />}
-                                </button>
-
-                                <button 
-                                  className={`admin-action-btn ${s.unlimited_party ? 'party-unlimited' : ''}`}
-                                  title={s.unlimited_party ? 'Sınırsız Party Aç: AÇIK — Kapat' : 'Sınırsız Party Aç: KAPALI — Aç'}
-                                  disabled={savingId === s.guild_id}
-                                  onClick={() => handleServerAction(s.guild_id, 'toggle_unlimited_party', !s.unlimited_party)}
-                                >
-                                  {savingId === s.guild_id ? <Loader2 size={18} className="spin" /> : <Gamepad2 size={18} />}
-                                </button>
-                                
-                                <button 
-                                  className={`admin-action-btn ${s.is_unlimited ? 'active' : ''}`} 
-                                  title={!s.is_active ? "Önce aktif etmelisiniz" : "Sınırsız Yap"} 
-                                  disabled={!s.is_active || savingId === s.guild_id}
-                                  style={{ opacity: !s.is_active ? 0.3 : 1, cursor: !s.is_active ? 'not-allowed' : 'pointer' }}
-                                  onClick={() => handleServerAction(s.guild_id, 'toggle_unlimited', !s.is_unlimited)}
-                                >
-                                  {savingId === s.guild_id ? <Loader2 size={18} className="spin" /> : <Infinity size={18} />}
-                                </button>
-                                
-                                <button 
-                                  className={`admin-action-btn ${!s.is_active ? 'danger' : ''}`} 
-                                  title={s.is_unlimited ? "Süresiz sunucu devre dışı bırakılamaz" : (s.is_active ? "Devre Dışı Bırak" : "Etkinleştir")} 
-                                  disabled={s.is_unlimited || savingId === s.guild_id}
-                                  style={{ opacity: s.is_unlimited ? 0.3 : 1, cursor: s.is_unlimited ? 'not-allowed' : 'pointer' }}
-                                  onClick={() => handleServerAction(s.guild_id, 'toggle_active', !s.is_active)}
-                                >
-                                  {savingId === s.guild_id ? <Loader2 size={18} className="spin" /> : <Power size={18} />}
-                                </button>
-                              </div>
-                            </td>
+                    <div className="admin-card">
+                      <table className="admin-table">
+                        <thead>
+                          <tr>
+                            <th>SUNUCU BİLGİSİ</th>
+                            <th className="hide-on-tablet">SAHİP ID</th>
+                            <th>DURUM</th>
+                            <th>PLAN</th>
+                            <th style={{textAlign: "right"}}>İŞLEMLER</th>
                           </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
+                        </thead>
+                        <tbody>
+                          {filteredServers.map(s => {
+                            const isExpired = !s.is_unlimited && new Date(s.expires_at) < new Date();
+                            const isPassive = !s.is_active;
+                            
+                            return (
+                              <tr key={s.id} className="admin-tr-hover" style={{opacity: isPassive ? 0.5 : 1}}>
+                                <td data-label="SUNUCU BİLGİSİ">
+                                  <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                                    <div style={{ 
+                                      width: "42px", height: "42px", borderRadius: "12px", 
+                                      background: "linear-gradient(135deg, rgba(252,163,17,0.2) 0%, rgba(252,163,17,0.05) 100%)",
+                                      border: "1px solid var(--admin-border)",
+                                      display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "800", color: "var(--admin-accent)"
+                                    }}>
+                                      {s.guild_name?.charAt(0).toUpperCase() || 'V'}
+                                    </div>
+                                    <div>
+                                      <div style={{ fontWeight: "700", fontSize: "0.95rem" }}>{s.guild_name}</div>
+                                      <div style={{ fontSize: "0.75rem", color: "var(--admin-text-muted)", fontFamily: "monospace" }}>{s.guild_id}</div>
+                                    </div>
+                                  </div>
+                                </td>
+                                <td className="hide-on-tablet" data-label="SAHİP ID">
+                                  <code style={{ fontSize: "0.85rem", color: "var(--admin-text-muted)", background: 'rgba(255,255,255,0.03)', padding: '0.3rem 0.6rem', borderRadius: '6px' }}>{s.owner_id}</code>
+                                </td>
+                                <td data-label="DURUM">
+                                  {isPassive ? (
+                                    <span className="admin-badge badge-passive">Pasif</span>
+                                  ) : (
+                                    <span className="admin-badge badge-active">Aktif</span>
+                                  )}
+                                  {s.unlimited_party && (
+                                    <span className="admin-badge" style={{background: 'rgba(252,163,17,0.12)', color: '#fca311', border: '1px solid rgba(252,163,17,0.3)', marginLeft: '0.4rem', fontSize: '0.62rem'}}>🎮 Party ∞</span>
+                                  )}
+                                </td>
+                                <td data-label="PLAN">
+                                  <div style={{display: 'flex', flexDirection: 'column', gap: '0.4rem', alignItems: 'flex-start'}}>
+                                    {s.is_unlimited ? (
+                                      <span className="admin-badge badge-unlimited" style={{fontSize:'0.8rem'}}>♾️ Sınırsız</span>
+                                    ) : !isExpired ? (
+                                      <>
+                                        <span className="admin-badge badge-active" style={{fontSize:'0.8rem'}}>💎 Premium</span>
+                                        <span style={{fontSize: '0.7rem', color: 'var(--admin-text-muted)', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '4px'}}>
+                                          <Clock size={12} /> {Math.ceil((new Date(s.expires_at) - new Date()) / (1000 * 60 * 60 * 24))} Gün Kaldı
+                                        </span>
+                                      </>
+                                    ) : (
+                                      <span className="admin-badge badge-expired" style={{fontSize:'0.8rem'}}>🆓 Freemium</span>
+                                    )}
+                                  </div>
+                                </td>
+                                <td data-label="İŞLEMLER">
+                                  <div className="table-actions">
+                                    <button 
+                                      className="admin-action-btn" 
+                                      title="+30 Gün Ekle" 
+                                      disabled={savingId === s.guild_id}
+                                      onClick={() => handleServerAction(s.guild_id, 'add_days', 30)}
+                                      style={{color: 'var(--admin-success)', borderColor: 'rgba(46, 204, 113, 0.3)'}}
+                                    >
+                                      {savingId === s.guild_id ? <Loader2 size={18} className="spin" /> : <Plus size={18} />}
+                                    </button>
+                                    
+                                    <button 
+                                      className="admin-action-btn danger" 
+                                      title="-30 Gün Çıkar" 
+                                      disabled={savingId === s.guild_id}
+                                      onClick={() => handleServerAction(s.guild_id, 'remove_days', 30)}
+                                    >
+                                      {savingId === s.guild_id ? <Loader2 size={18} className="spin" /> : <Clock size={18} />}
+                                    </button>
+ 
+                                    <button 
+                                      className={`admin-action-btn ${s.unlimited_party ? 'party-unlimited' : ''}`}
+                                      title={s.unlimited_party ? 'Sınırsız Party Aç: AÇIK — Kapat' : 'Sınırsız Party Aç: KAPALI — Aç'}
+                                      disabled={savingId === s.guild_id}
+                                      onClick={() => handleServerAction(s.guild_id, 'toggle_unlimited_party', !s.unlimited_party)}
+                                    >
+                                      {savingId === s.guild_id ? <Loader2 size={18} className="spin" /> : <Gamepad2 size={18} />}
+                                    </button>
+                                    
+                                    <button 
+                                      className={`admin-action-btn ${s.is_unlimited ? 'active' : ''}`} 
+                                      title={!s.is_active ? "Önce aktif etmelisiniz" : "Sınırsız Yap"} 
+                                      disabled={!s.is_active || savingId === s.guild_id}
+                                      style={{ opacity: !s.is_active ? 0.3 : 1, cursor: !s.is_active ? 'not-allowed' : 'pointer' }}
+                                      onClick={() => handleServerAction(s.guild_id, 'toggle_unlimited', !s.is_unlimited)}
+                                    >
+                                      {savingId === s.guild_id ? <Loader2 size={18} className="spin" /> : <Infinity size={18} />}
+                                    </button>
+                                    
+                                    <button 
+                                      className={`admin-action-btn ${!s.is_active ? 'danger' : ''}`} 
+                                      title={s.is_unlimited ? "Süresiz sunucu devre dışı bırakılamaz" : (s.is_active ? "Devre Dışı Bırak" : "Etkinleştir")} 
+                                      disabled={s.is_unlimited || savingId === s.guild_id}
+                                      style={{ opacity: s.is_unlimited ? 0.3 : 1, cursor: s.is_unlimited ? 'not-allowed' : 'pointer' }}
+                                      onClick={() => handleServerAction(s.guild_id, 'toggle_active', !s.is_active)}
+                                    >
+                                      {savingId === s.guild_id ? <Loader2 size={18} className="spin" /> : <Power size={18} />}
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
+                ) : (
+                  <div className="admin-card">
+                    <table className="admin-table">
+                      <thead>
+                        <tr>
+                          <th>DISCORD KULLANICI BİLGİSİ / ID</th>
+                          <th>DURUM</th>
+                          <th>PLAN / SÜRE</th>
+                          <th style={{textAlign: "right"}}>İŞLEMLER</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {users.filter(u => !userSearchTerm || u.discord_id?.includes(userSearchTerm)).length === 0 ? (
+                          <tr><td colSpan={4} style={{textAlign: 'center', padding: '4rem', opacity: 0.5}}>Bireysel premium kullanan üye bulunamadı.</td></tr>
+                        ) : users.filter(u => !userSearchTerm || u.discord_id?.includes(userSearchTerm)).map(u => {
+                          const isExpired = !u.is_unlimited && u.premium_until && new Date(u.premium_until) < new Date();
+                          const isPremiumActive = u.is_unlimited || (u.premium_until && new Date(u.premium_until) >= new Date());
+                  
+                          return (
+                            <tr key={u.discord_id} className="admin-tr-hover">
+                              <td data-label="DISCORD KULLANICI BİLGİSİ / ID">
+                                <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                                  <div style={{ 
+                                    width: "42px", height: "42px", borderRadius: "12px", 
+                                    background: "linear-gradient(135deg, rgba(88, 101, 242, 0.2) 0%, rgba(88, 101, 242, 0.05) 100%)",
+                                    border: "1px solid var(--admin-border)",
+                                    display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "800", color: "#5865F2"
+                                  }}>
+                                    U
+                                  </div>
+                                  <div>
+                                    <div style={{ fontWeight: "700", fontSize: "0.95rem" }}>Discord Kullanıcısı</div>
+                                    <code style={{ fontSize: "0.75rem", color: "var(--admin-text-muted)", fontFamily: "monospace" }}>{u.discord_id}</code>
+                                  </div>
+                                </div>
+                              </td>
+                              <td data-label="DURUM">
+                                {u.is_unlimited ? (
+                                  <span className="admin-badge badge-unlimited">Sınırsız</span>
+                                ) : isPremiumActive ? (
+                                  <span className="admin-badge badge-active">Aktif</span>
+                                ) : (
+                                  <span className="admin-badge badge-passive">Süresi Dolan</span>
+                                )}
+                              </td>
+                              <td data-label="PLAN / SÜRE">
+                                <div style={{display: 'flex', flexDirection: 'column', gap: '0.4rem', alignItems: 'flex-start'}}>
+                                  {u.is_unlimited ? (
+                                    <span style={{fontSize: '0.85rem', fontWeight: '600'}}>♾️ Sınırsız Premium</span>
+                                  ) : u.premium_until ? (
+                                    <>
+                                      <span style={{fontSize: '0.85rem', fontWeight: '600'}}>
+                                        📅 {new Date(u.premium_until).toLocaleDateString('tr-TR')}
+                                      </span>
+                                      {isPremiumActive && (
+                                        <span style={{fontSize: '0.7rem', color: 'var(--admin-text-muted)', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '4px'}}>
+                                          <Clock size={12} /> {Math.ceil((new Date(u.premium_until) - new Date()) / (1000 * 60 * 60 * 24))} Gün Kaldı
+                                        </span>
+                                      )}
+                                    </>
+                                  ) : (
+                                    <span style={{fontSize: '0.85rem', color: 'var(--admin-text-muted)'}}>Tanımsız</span>
+                                  )}
+                                </div>
+                              </td>
+                              <td data-label="İŞLEMLER">
+                                <div className="table-actions">
+                                  <button 
+                                    className="admin-action-btn" 
+                                    title="+30 Gün Ekle" 
+                                    disabled={savingId === u.discord_id}
+                                    onClick={() => handleUserAction(u.discord_id, 'add_days', 30)}
+                                    style={{color: 'var(--admin-success)', borderColor: 'rgba(46, 204, 113, 0.3)'}}
+                                  >
+                                    {savingId === u.discord_id ? <Loader2 size={18} className="spin" /> : <Plus size={18} />}
+                                  </button>
+                                  
+                                  <button 
+                                    className="admin-action-btn danger" 
+                                    title="-30 Gün Çıkar" 
+                                    disabled={savingId === u.discord_id}
+                                    onClick={() => handleUserAction(u.discord_id, 'remove_days', 30)}
+                                  >
+                                    {savingId === u.discord_id ? <Loader2 size={18} className="spin" /> : <Clock size={18} />}
+                                  </button>
+                                  
+                                  <button 
+                                    className={`admin-action-btn ${u.is_unlimited ? 'active' : ''}`} 
+                                    title="Sınırsız Yap / Kapat" 
+                                    disabled={savingId === u.discord_id}
+                                    onClick={() => handleUserAction(u.discord_id, 'toggle_unlimited', !u.is_unlimited)}
+                                  >
+                                    {savingId === u.discord_id ? <Loader2 size={18} className="spin" /> : <Infinity size={18} />}
+                                  </button>
+                                  
+                                  <button 
+                                    className="admin-action-btn danger" 
+                                    title="Premium İptal Et / Sil" 
+                                    disabled={savingId === u.discord_id}
+                                    onClick={() => handleUserAction(u.discord_id, 'delete')}
+                                  >
+                                    {savingId === u.discord_id ? <Loader2 size={18} className="spin" /> : <Trash2 size={18} />}
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </>
             )}
 
@@ -1774,6 +2002,70 @@ export default function AdminPage() {
                   disabled={savingId === 'new_bank' || !newBankAccount.bank_name || !newBankAccount.account_holder || !newBankAccount.iban}
                 >
                   {savingId === 'new_bank' ? <Loader2 size={18} className="spin" /> : 'Kaydet'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Bireysel Premium Modal */}
+      {showUserModal && (
+        <div className="admin-modal-overlay" onClick={() => setShowUserModal(false)}>
+          <div className="admin-modal animate-slide-up" onClick={e => e.stopPropagation()}>
+            <div className="admin-modal-header border-b border-[var(--admin-border)] mb-4 pb-4">
+              <h3 className="admin-modal-title">Bireysel Premium Tanımla</h3>
+              <button className="admin-modal-close" onClick={() => setShowUserModal(false)}>
+                <X size={20} />
+              </button>
+            </div>
+            <form onSubmit={handleCreateUser}>
+              <div className="admin-modal-body space-y-4">
+                <div>
+                  <label className="admin-input-label">Discord Kullanıcı ID (discord_id)</label>
+                  <input 
+                    type="text" 
+                    className="admin-input-field font-mono" 
+                    placeholder="Örn: 407234961582587916" 
+                    value={newUser.discord_id} 
+                    onChange={e => setNewUser({...newUser, discord_id: e.target.value})} 
+                    required 
+                  />
+                </div>
+                
+                <div style={{display: 'flex', alignItems: 'center', gap: '0.75rem', margin: '1rem 0'}}>
+                  <input 
+                    type="checkbox" 
+                    id="userIsUnlimited" 
+                    checked={newUser.is_unlimited} 
+                    onChange={e => setNewUser({...newUser, is_unlimited: e.target.checked})} 
+                    style={{width: '20px', height: '20px', accentColor: 'var(--admin-accent)'}} 
+                  />
+                  <label htmlFor="userIsUnlimited" style={{fontWeight: '600', cursor: 'pointer', fontSize: '0.9rem'}}>Sınırsız Premium (Süre Muafiyeti)</label>
+                </div>
+
+                {!newUser.is_unlimited && (
+                  <div>
+                    <label className="admin-input-label">Süre (Gün)</label>
+                    <input 
+                      type="number" 
+                      className="admin-input-field" 
+                      value={newUser.duration_days} 
+                      onChange={e => setNewUser({...newUser, duration_days: parseInt(e.target.value) || 0})} 
+                      min="1"
+                      required 
+                    />
+                  </div>
+                )}
+              </div>
+              <div className="admin-modal-footer mt-6 pt-4 border-t border-[var(--admin-border)]">
+                <button type="button" className="admin-btn-secondary" onClick={() => setShowUserModal(false)}>İptal</button>
+                <button 
+                  type="submit"
+                  className="admin-btn-primary"
+                  disabled={savingId === 'new_user' || !newUser.discord_id}
+                >
+                  {savingId === 'new_user' ? <Loader2 size={18} className="spin" /> : 'Tanımla'}
                 </button>
               </div>
             </form>

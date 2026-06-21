@@ -64,7 +64,7 @@ async function handlePartiModal(interaction) {
         const partyCount = getActivePartyCount(userId);
         let limit = 1;
         if (whitelisted) limit = 3;
-        if (isDeveloper) limit = 999;
+        if (isDeveloper || userPremium) limit = 999;
 
         if (partyCount >= limit) {
             let errorMsg = whitelisted
