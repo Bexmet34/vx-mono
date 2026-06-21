@@ -10,6 +10,43 @@ const ADMIN_ID_2 = process.env.NEXT_PUBLIC_ADMIN_ID_2 || "407234961582587916";
 
 const isAdminUser = (id) => id && (id === ADMIN_ID || id === ADMIN_ID_2);
 
+async function getDiscordUser(discordId) {
+  const token = process.env.DISCORD_BOT_TOKEN;
+  if (!token) return { username: "Bilinmeyen", avatar_url: null };
+
+  try {
+    const res = await fetch(`https://discord.com/api/v10/users/${discordId}`, {
+      headers: {
+        'Authorization': `Bot ${token}`
+      },
+      next: { revalidate: 3600 } // cache for 1 hour
+    });
+
+    if (!res.ok) {
+      return { username: "Bilinmeyen", avatar_url: null };
+    }
+
+    const data = await res.json();
+    let avatarUrl = null;
+    if (data.avatar) {
+      const isGif = data.avatar.startsWith('a_');
+      avatarUrl = `https://cdn.discordapp.com/avatars/${discordId}/${data.avatar}.${isGif ? 'gif' : 'png'}`;
+    } else {
+      // New system default avatar
+      const defaultIdx = Number((BigInt(discordId) >> 22n) % 6n);
+      avatarUrl = `https://cdn.discordapp.com/embed/avatars/${defaultIdx}.png`;
+    }
+
+    return {
+      username: data.global_name || data.username || "Bilinmeyen",
+      avatar_url: avatarUrl
+    };
+  } catch (error) {
+    console.error(`Error fetching Discord user ${discordId}:`, error);
+    return { username: "Bilinmeyen", avatar_url: null };
+  }
+}
+
 export async function GET() {
   const session = await getServerSession(authOptions);
   if (!session || !isAdminUser(session.user?.id)) {
@@ -22,7 +59,18 @@ export async function GET() {
     .order('discord_id', { ascending: true });
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json(data);
+
+  // Fetch discord profile details for each user in parallel
+  const usersWithProfiles = await Promise.all((data || []).map(async (u) => {
+    const discordProfile = await getDiscordUser(u.discord_id);
+    return {
+      ...u,
+      username: discordProfile.username,
+      avatar_url: discordProfile.avatar_url
+    };
+  }));
+
+  return NextResponse.json(usersWithProfiles);
 }
 
 export async function POST(req) {

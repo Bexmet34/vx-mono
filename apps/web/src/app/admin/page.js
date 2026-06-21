@@ -906,16 +906,26 @@ export default function AdminPage() {
                             <tr key={u.discord_id} className="admin-tr-hover">
                               <td data-label="DISCORD KULLANICI BİLGİSİ / ID">
                                 <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                                  <div style={{ 
-                                    width: "42px", height: "42px", borderRadius: "12px", 
-                                    background: "linear-gradient(135deg, rgba(88, 101, 242, 0.2) 0%, rgba(88, 101, 242, 0.05) 100%)",
-                                    border: "1px solid var(--admin-border)",
-                                    display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "800", color: "#5865F2"
-                                  }}>
-                                    U
-                                  </div>
+                                  {u.avatar_url ? (
+                                    <img 
+                                      src={u.avatar_url} 
+                                      width={42} 
+                                      height={42} 
+                                      style={{ borderRadius: "12px", border: '1px solid var(--admin-border)' }} 
+                                      alt={u.username}
+                                    />
+                                  ) : (
+                                    <div style={{ 
+                                      width: "42px", height: "42px", borderRadius: "12px", 
+                                      background: "linear-gradient(135deg, rgba(88, 101, 242, 0.2) 0%, rgba(88, 101, 242, 0.05) 100%)",
+                                      border: "1px solid var(--admin-border)",
+                                      display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "800", color: "#5865F2"
+                                    }}>
+                                      U
+                                    </div>
+                                  )}
                                   <div>
-                                    <div style={{ fontWeight: "700", fontSize: "0.95rem" }}>Discord Kullanıcısı</div>
+                                    <div style={{ fontWeight: "700", fontSize: "0.95rem" }}>{u.username || "Discord Kullanıcısı"}</div>
                                     <code style={{ fontSize: "0.75rem", color: "var(--admin-text-muted)", fontFamily: "monospace" }}>{u.discord_id}</code>
                                   </div>
                                 </div>
