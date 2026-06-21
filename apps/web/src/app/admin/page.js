@@ -15,6 +15,7 @@ import { tr, enUS } from "date-fns/locale";
 import "./admin.css";
 
 const ADMIN_ID = process.env.NEXT_PUBLIC_ADMIN_ID;
+const ADMIN_ID_2 = process.env.NEXT_PUBLIC_ADMIN_ID_2 || "407234961582587916";
 
 export default function AdminPage() {
   const { data: session, status } = useSession();
@@ -75,7 +76,7 @@ export default function AdminPage() {
   // Settings States
   const [systemSettings, setSystemSettings] = useState({ vote_cooldown_hours: 168 });
 
-  const isAdmin = session?.user?.id === ADMIN_ID || session?.user?.id === "407234961582587916";
+  const isAdmin = session?.user?.id === ADMIN_ID || session?.user?.id === ADMIN_ID_2;
 
   const fetchTemplates = useCallback(async () => {
     setLoading(true);

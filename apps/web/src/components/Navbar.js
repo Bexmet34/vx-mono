@@ -19,7 +19,7 @@ export default function Navbar({ isStatic = false }) {
   const [paymentHistory, setPaymentHistory] = useState([]);
   const [historyLoading, setHistoryLoading] = useState(false);
 
-  const isAdmin = session?.user?.id && (session.user.id === process.env.NEXT_PUBLIC_ADMIN_ID || session.user.id === process.env.NEXT_PUBLIC_ADMIN_ID_2);
+  const isAdmin = session?.user?.id && (session.user.id === process.env.NEXT_PUBLIC_ADMIN_ID || session.user.id === (process.env.NEXT_PUBLIC_ADMIN_ID_2 || "407234961582587916"));
 
   const fetchPaymentHistory = async () => {
     setHistoryLoading(true);

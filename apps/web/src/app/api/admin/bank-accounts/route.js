@@ -4,7 +4,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { supabase } from "@veyronix/database";
 
 const ADMIN_ID = process.env.NEXT_PUBLIC_ADMIN_ID;
-const ADMIN_ID_2 = process.env.NEXT_PUBLIC_ADMIN_ID_2;
+const ADMIN_ID_2 = process.env.NEXT_PUBLIC_ADMIN_ID_2 || "407234961582587916";
 const isAdminUser = (id) => id && (id === ADMIN_ID || id === ADMIN_ID_2);
 
 export const dynamic = 'force-dynamic';
