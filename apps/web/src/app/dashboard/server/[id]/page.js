@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
-import { ArrowLeft, Loader2, Image as ImageIcon, Layout, Shield, X, Crop, Users, Copy, Lock, Home, Save, AlertTriangle, Swords } from "lucide-react";
+import { ArrowLeft, Loader2, Image as ImageIcon, Layout, Shield, X, Crop, Users, Copy, Lock, Home, Save, AlertTriangle, Swords, Crown } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 import { useToast, ToastContainer } from "@/components/Toast";
@@ -22,6 +22,33 @@ import KillBoardTab from "./components/KillBoardTab";
 import RegistrationTab from "./components/RegistrationTab";
 import RoleMenuTab from "./components/RoleMenuTab";
 
+function PremiumLock({ lang, t }) {
+  return (
+    <div className="glass-panel p-12 text-center border border-primary-container/30 bg-primary-container/5 relative overflow-hidden animate-slide-up flex flex-col items-center justify-center min-h-[400px]">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-primary-container/10 rounded-full blur-[80px] pointer-events-none"></div>
+      <Crown size={64} className="text-primary-container mb-6 animate-pulse" />
+      <h2 className="font-headline-xl text-3xl text-on-surface mb-4 uppercase tracking-tight font-bold">
+        {lang === 'tr' ? '👑 SUNUCU PREMİUM GEREKLİ' : '👑 GUILD PREMIUM REQUIRED'}
+      </h2>
+      <p className="font-body-lg text-on-surface-variant max-w-lg mb-8 leading-relaxed">
+        {lang === 'tr' 
+          ? 'Bu özellik sunucu bazlı Premium paket gerektirmektedir. Bireysel oylama muafiyeti (Individual) bu özelliği kapsamaz. Sunucu Premium satın alarak bu özelliği ve diğer gelişmiş özellikleri sunucunuzda aktifleştirebilirsiniz.'
+          : 'This feature requires a server-level Guild Premium package. Individual vote bypass (Individual) does not cover this feature. Purchase Guild Premium to unlock this and other advanced features for your server.'}
+      </p>
+      <div className="flex gap-4">
+        <a 
+          href="https://veyronix.com.tr" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="px-8 py-3 bg-primary-container text-on-primary border border-primary-container rounded-sm font-label-bold uppercase tracking-widest text-sm transition-all hover:brightness-110 active:scale-95 tactical-glow"
+        >
+          {lang === 'tr' ? 'Satın Al / Web Sitesi' : 'Buy / Website'}
+        </a>
+      </div>
+    </div>
+  );
+}
+
 export default function ServerSettings() {
   const { data: session, status } = useSession();
   const { id: guildId } = useParams();
@@ -33,6 +60,10 @@ export default function ServerSettings() {
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
   const [subscription, setSubscription] = useState(null);
+  const isPremium = !!(subscription && (
+    subscription.is_unlimited || 
+    (subscription.trial_used === false && subscription.is_active && new Date(subscription.expires_at) > new Date())
+  ));
   const [isOwner, setIsOwner] = useState(false);
   const [selectedTemplateId, setSelectedTemplateId] = useState(null);
   const [initialSettings, setInitialSettings] = useState(null);
@@ -91,46 +122,44 @@ export default function ServerSettings() {
         const { settings: s, subscription: sub, isOwner: ownerStatus } = data;
         setSubscription(sub);
         setIsOwner(ownerStatus);
-        if (s) {
-          const loadedSettings = {
-            language: s.language || "tr",
-            embed_thumbnail_url: s.embed_thumbnail_url || "",
-            whitelist: s.whitelist || [],
-            party_templates: s.party_templates || [],
-            albion_guild_id: s.albion_guild_id || "",
-            albion_guild_name: s.albion_guild_name || "",
-            killboard_channel_id: s.killboard_channel_id || "",
-            killboard_time: s.killboard_time || "06:00",
-            registration_enabled: s.registration_enabled || false,
-            registration_channel_id: s.registration_channel_id || "",
-            registration_staff_role_ids: s.registration_staff_role_ids || "",
-            registration_category_id: s.registration_category_id || "",
-            registration_welcome_message: s.registration_welcome_message || "",
-            registration_given_role_id: s.registration_given_role_id || "",
-            registration_given_role_id_2: s.registration_given_role_id_2 || "",
-            registration_given_role_id_3: s.registration_given_role_id_3 || "",
-            registration_unregistered_role_id: s.registration_unregistered_role_id || "",
-            registration_log_channel_id: s.registration_log_channel_id || "",
-            registration_welcome_channel_id: s.registration_welcome_channel_id || "",
-            registration_welcome_message_text: s.registration_welcome_message_text || "",
-            auto_role_on_join_id: s.auto_role_on_join_id || "",
-            auto_check_enabled: s.auto_check_enabled || false,
-            auto_check_interval: s.auto_check_interval || 3,
-            auto_check_custom_role_id: s.auto_check_custom_role_id || "",
-            auto_check_guild_tag: s.auto_check_guild_tag || "",
-            auto_check_log_channel_id: s.auto_check_log_channel_id || "",
-            registered_count: s.registered_count || 0,
-            is_syncing: s.is_syncing || false,
-            last_sync_result: s.last_sync_result || null,
-          };
-          setSettings(loadedSettings);
-          setInitialSettings(loadedSettings);
-          if (s.embed_thumbnail_url) {
-             const img = new Image();
-             img.onload = () => setThumbError(null);
-             img.onerror = () => setThumbError("invalid");
-             img.src = s.embed_thumbnail_url;
-          }
+        const loadedSettings = {
+          language: s?.language || "tr",
+          embed_thumbnail_url: s?.embed_thumbnail_url || "",
+          whitelist: s?.whitelist || [],
+          party_templates: s?.party_templates || [],
+          albion_guild_id: s?.albion_guild_id || "",
+          albion_guild_name: s?.albion_guild_name || "",
+          killboard_channel_id: s?.killboard_channel_id || "",
+          killboard_time: s?.killboard_time || "06:00",
+          registration_enabled: s?.registration_enabled || false,
+          registration_channel_id: s?.registration_channel_id || "",
+          registration_staff_role_ids: s?.registration_staff_role_ids || "",
+          registration_category_id: s?.registration_category_id || "",
+          registration_welcome_message: s?.registration_welcome_message || "",
+          registration_given_role_id: s?.registration_given_role_id || "",
+          registration_given_role_id_2: s?.registration_given_role_id_2 || "",
+          registration_given_role_id_3: s?.registration_given_role_id_3 || "",
+          registration_unregistered_role_id: s?.registration_unregistered_role_id || "",
+          registration_log_channel_id: s?.registration_log_channel_id || "",
+          registration_welcome_channel_id: s?.registration_welcome_channel_id || "",
+          registration_welcome_message_text: s?.registration_welcome_message_text || "",
+          auto_role_on_join_id: s?.auto_role_on_join_id || "",
+          auto_check_enabled: s?.auto_check_enabled || false,
+          auto_check_interval: s?.auto_check_interval || 3,
+          auto_check_custom_role_id: s?.auto_check_custom_role_id || "",
+          auto_check_guild_tag: s?.auto_check_guild_tag || "",
+          auto_check_log_channel_id: s?.auto_check_log_channel_id || "",
+          registered_count: s?.registered_count || 0,
+          is_syncing: s?.is_syncing || false,
+          last_sync_result: s?.last_sync_result || null,
+        };
+        setSettings(loadedSettings);
+        setInitialSettings(loadedSettings);
+        if (s?.embed_thumbnail_url) {
+           const img = new Image();
+           img.onload = () => setThumbError(null);
+           img.onerror = () => setThumbError("invalid");
+           img.src = s.embed_thumbnail_url;
         }
       }
     } catch (err) { console.error(err); }
@@ -435,7 +464,11 @@ export default function ServerSettings() {
         )}
 
         {activeTab === 'embed' && (
-          <VisualTab t={t} settings={settings} setSettings={setSettings} uploadingThumb={uploadingThumb} checkImage={checkImage} handleFileSelect={handleFileSelect} thumbError={thumbError} renderStatus={renderStatus} handleSave={handleSave} saving={saving} />
+          isPremium ? (
+            <VisualTab t={t} settings={settings} setSettings={setSettings} uploadingThumb={uploadingThumb} checkImage={checkImage} handleFileSelect={handleFileSelect} thumbError={thumbError} renderStatus={renderStatus} handleSave={handleSave} saving={saving} />
+          ) : (
+            <PremiumLock lang={lang} t={t} />
+          )
         )}
 
         {activeTab === 'whitelist' && (
@@ -447,11 +480,15 @@ export default function ServerSettings() {
         )}
 
         {activeTab === 'killboard' && (
-          <KillBoardTab t={t} lang={lang} settings={settings} setSettings={setSettings} discordChannels={discordChannels} guildSearchQuery={guildSearchQuery} setGuildSearchQuery={setGuildSearchQuery} searchGuilds={searchGuilds} searchingGuild={searchingGuild} guildSearchResults={guildSearchResults} setGuildSearchResults={setGuildSearchResults} guildDetail={guildDetail} setGuildDetail={setGuildDetail} killboardPreview={killboardPreview} loadingPreview={loadingPreview} handlePreviewKillBoard={handlePreviewKillBoard} handleTriggerKillBoard={handleTriggerKillBoard} triggeringKillBoard={triggeringKillBoard} handleSave={handleSave} saving={saving} setActiveTab={setActiveTab} />
+          isPremium ? (
+            <KillBoardTab t={t} lang={lang} settings={settings} setSettings={setSettings} discordChannels={discordChannels} guildSearchQuery={guildSearchQuery} setGuildSearchQuery={setGuildSearchQuery} searchGuilds={searchGuilds} searchingGuild={searchingGuild} guildSearchResults={guildSearchResults} setGuildSearchResults={setGuildSearchResults} guildDetail={guildDetail} setGuildDetail={setGuildDetail} killboardPreview={killboardPreview} loadingPreview={loadingPreview} handlePreviewKillBoard={handlePreviewKillBoard} handleTriggerKillBoard={handleTriggerKillBoard} triggeringKillBoard={triggeringKillBoard} handleSave={handleSave} saving={saving} setActiveTab={setActiveTab} />
+          ) : (
+            <PremiumLock lang={lang} t={t} />
+          )
         )}
 
         {activeTab === 'registration' && (
-          <RegistrationTab t={t} lang={lang} settings={settings} setSettings={setSettings} discordChannels={discordChannels} discordRoles={discordRoles} handleSave={handleSave} saving={saving} guildId={guildId} registeredCount={settings.registered_count || 0} setActiveTab={setActiveTab} />
+          <RegistrationTab t={t} lang={lang} settings={settings} setSettings={setSettings} discordChannels={discordChannels} discordRoles={discordRoles} handleSave={handleSave} saving={saving} guildId={guildId} registeredCount={settings.registered_count || 0} setActiveTab={setActiveTab} isPremium={isPremium} />
         )}
 
         {activeTab === 'rolemenu' && (

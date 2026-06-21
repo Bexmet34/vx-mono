@@ -1,10 +1,15 @@
 -- ==============================================================
--- VEYRONIX PREMİUM BİLDİRİM ŞABLONLARI SQL GÜNCELLEMESİ
+-- VEYRONIX VERİTABANI GÜNCELLEMESİ (BİLDİRİM VE KUYRUK SİSTEMİ)
 -- ==============================================================
 -- Bu kodların tamamını Supabase -> SQL Editor kısmına yapıştırıp 
--- tek seferde çalıştırarak bildirim şablonlarınızı oluşturabilirsiniz.
+-- tek seferde çalıştırarak veritabanınızı güncelleyebilirsiniz.
 
--- 1. Admin tarafından manuel Premium eklendiğinde gönderilen DM Bildirimi
+-- 1. message_queue tablosuna eksik olan owner_id ve guild_id alanlarını ekleme
+ALTER TABLE public.message_queue 
+ADD COLUMN IF NOT EXISTS owner_id TEXT,
+ADD COLUMN IF NOT EXISTS guild_id TEXT;
+
+-- 2. Admin tarafından manuel Premium eklendiğinde gönderilen DM Bildirimi
 INSERT INTO public.notification_templates (id, title_tr, title_en, content_tr, content_en, color, is_embed)
 VALUES (
   'user_premium_admin',
@@ -51,7 +56,7 @@ ON CONFLICT (id) DO UPDATE SET
   color = EXCLUDED.color,
   is_embed = EXCLUDED.is_embed;
 
--- 2. Otomatik satın alım onaylandığında gönderilen DM Bildirimi
+-- 3. Otomatik satın alım onaylandığında gönderilen DM Bildirimi
 INSERT INTO public.notification_templates (id, title_tr, title_en, content_tr, content_en, color, is_embed)
 VALUES (
   'user_premium_bought',

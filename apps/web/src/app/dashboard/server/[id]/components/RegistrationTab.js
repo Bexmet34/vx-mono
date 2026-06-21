@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Settings, MessageSquare, Tag, Users, Send, Loader2 } from "lucide-react";
 import InfoTooltip from "@/components/InfoTooltip";
 
-export default function RegistrationTab({ t, lang, settings, setSettings, discordChannels, discordRoles, handleSave, saving, guildId, registeredCount = 0, setActiveTab }) {
+export default function RegistrationTab({ t, lang, settings, setSettings, discordChannels, discordRoles, handleSave, saving, guildId, registeredCount = 0, setActiveTab, isPremium }) {
   const [sendingSetup, setSendingSetup] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const textChannels = (discordChannels || []).filter(c => c.type === 0);
@@ -387,185 +387,210 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
             : 'Kayıtlı kullanıcıları Albion guild listenizle otomatik karşılaştırır. Ayrılanların yetkilerini alır.'}
         </p>
 
-        {!settings.albion_guild_id && (
-          <div className="glass-panel p-6 relative overflow-visible border border-error/50 bg-error/5 flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+        {!isPremium ? (
+          <div className="bg-primary-container/5 border border-primary-container/30 rounded-sm p-6 flex flex-col md:flex-row items-center justify-between gap-4 mt-6">
             <div>
-              <h3 className="font-headline-md text-lg text-error mb-2 flex items-center gap-2 uppercase tracking-tight">
-                <Users size={20} /> {lang === 'en' ? 'Action Required' : 'İşlem Gerekiyor'}
+              <h3 className="font-headline-md text-lg text-primary-container mb-2 flex items-center gap-2 uppercase tracking-tight font-bold">
+                👑 {lang === 'en' ? 'Guild Premium Required' : 'Sunucu Premium Gerekli'}
               </h3>
-              <p className="font-body-md text-error/80">
+              <p className="font-body-md text-on-surface-variant">
                 {lang === 'en' 
-                  ? 'You must set your Albion Guild in General Settings to use the Auto-Check and Sync systems.' 
-                  : 'Otomatik kontrol ve Senkronizasyon sistemlerini kullanabilmek için Genel ayarlardan Albion Guildinizi seçmelisiniz.'}
+                  ? 'The automatic leave-check system is a premium feature. Please upgrade your server subscription to unlock it.' 
+                  : 'Otomatik ayrılık kontrol sistemi premium bir özelliktir. Aktifleştirmek için lütfen sunucu aboneliğinizi yükseltin.'}
               </p>
             </div>
-            <button onClick={() => setActiveTab && setActiveTab('general')} className="px-6 py-3 bg-error hover:bg-error/80 text-white border border-error rounded-sm font-label-bold uppercase tracking-widest transition-colors whitespace-nowrap">
-              {lang === 'en' ? 'Go to General Settings' : 'Genel Ayarlara Git'}
-            </button>
+            <a 
+              href="https://veyronix.com.tr" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="px-6 py-3 bg-primary-container text-on-primary font-label-bold uppercase tracking-widest tactical-glow rounded-sm transition-all hover:brightness-110 whitespace-nowrap text-xs md:text-sm"
+            >
+              {lang === 'en' ? 'Get Premium' : 'Premium Satın Al'}
+            </a>
           </div>
-        )}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="space-y-6">
-            <div>
-              <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
-                {lang === 'en' ? 'Enable Auto-Check' : 'Sistemi Aktif Et'}
-                <InfoTooltip text={lang === 'en' ? 'Turn on the automatic guild roster checking system.' : 'Otomatik lonca oyuncu kontrol sistemini açıp kapatır.'} />
-              </label>
-              <div className="flex items-center gap-4 mt-2">
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    className="sr-only peer"
-                    checked={settings.auto_check_enabled || false}
-                    onChange={(e) => setSettings({ ...settings, auto_check_enabled: e.target.checked })}
-                  />
-                  <div className="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
-                </label>
-                <span className="text-sm font-label-bold uppercase tracking-widest text-on-surface-variant">
-                  {settings.auto_check_enabled 
-                    ? (lang === 'en' ? 'Enabled' : 'Aktif') 
-                    : (lang === 'en' ? 'Disabled' : 'Kapalı')}
-                </span>
+        ) : (
+          <>
+            {!settings.albion_guild_id && (
+              <div className="glass-panel p-6 relative overflow-visible border border-error/50 bg-error/5 flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+                <div>
+                  <h3 className="font-headline-md text-lg text-error mb-2 flex items-center gap-2 uppercase tracking-tight">
+                    <Users size={20} /> {lang === 'en' ? 'Action Required' : 'İşlem Gerekiyor'}
+                  </h3>
+                  <p className="font-body-md text-error/80">
+                    {lang === 'en' 
+                      ? 'You must set your Albion Guild in General Settings to use the Auto-Check and Sync systems.' 
+                      : 'Otomatik kontrol ve Senkronizasyon sistemlerini kullanabilmek için Genel ayarlardan Albion Guildinizi seçmelisiniz.'}
+                  </p>
+                </div>
+                <button onClick={() => setActiveTab && setActiveTab('general')} className="px-6 py-3 bg-error hover:bg-error/80 text-white border border-error rounded-sm font-label-bold uppercase tracking-widest transition-colors whitespace-nowrap">
+                  {lang === 'en' ? 'Go to General Settings' : 'Genel Ayarlara Git'}
+                </button>
               </div>
-            </div>
+            )}
 
-            <div className={`space-y-6 transition-all ${settings.auto_check_enabled ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
-              <div>
-                <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
-                  {lang === 'en' ? 'Check Interval (Days, Min 3)' : 'Kontrol Aralığı (Gün, Min 3)'}
-                </label>
-                <input
-                  type="number"
-                  min="3"
-                  className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
-                  value={settings.auto_check_interval || 3}
-                  onChange={(e) => {
-                    let val = parseInt(e.target.value);
-                    if (isNaN(val)) val = 3;
-                    if (val < 3) val = 3;
-                    setSettings({ ...settings, auto_check_interval: val });
-                  }}
-                />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-6">
+                <div>
+                  <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+                    {lang === 'en' ? 'Enable Auto-Check' : 'Sistemi Aktif Et'}
+                    <InfoTooltip text={lang === 'en' ? 'Turn on the automatic guild roster checking system.' : 'Otomatik lonca oyuncu kontrol sistemini açıp kapatır.'} />
+                  </label>
+                  <div className="flex items-center gap-4 mt-2">
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        className="sr-only peer"
+                        checked={settings.auto_check_enabled || false}
+                        onChange={(e) => setSettings({ ...settings, auto_check_enabled: e.target.checked })}
+                      />
+                      <div className="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+                    </label>
+                    <span className="text-sm font-label-bold uppercase tracking-widest text-on-surface-variant">
+                      {settings.auto_check_enabled 
+                        ? (lang === 'en' ? 'Enabled' : 'Aktif') 
+                        : (lang === 'en' ? 'Disabled' : 'Kapalı')}
+                    </span>
+                  </div>
+                </div>
+
+                <div className={`space-y-6 transition-all ${settings.auto_check_enabled ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
+                  <div>
+                    <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+                      {lang === 'en' ? 'Check Interval (Days, Min 3)' : 'Kontrol Aralığı (Gün, Min 3)'}
+                    </label>
+                    <input
+                      type="number"
+                      min="3"
+                      className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+                      value={settings.auto_check_interval || 3}
+                      onChange={(e) => {
+                        let val = parseInt(e.target.value);
+                        if (isNaN(val)) val = 3;
+                        if (val < 3) val = 3;
+                        setSettings({ ...settings, auto_check_interval: val });
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+                      {lang === 'en' ? 'Guild Tag (Optional, Max 5 chars)' : 'Guild Tagi (İsteğe Bağlı, Max 5 harf)'}
+                    </label>
+                    <input
+                      type="text"
+                      maxLength="5"
+                      className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md uppercase"
+                      placeholder={lang === 'en' ? 'e.g. ABCDE' : 'Örn: TAG'}
+                      value={settings.auto_check_guild_tag || ""}
+                      onChange={(e) => setSettings({ ...settings, auto_check_guild_tag: e.target.value })}
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
-                  {lang === 'en' ? 'Guild Tag (Optional, Max 5 chars)' : 'Guild Tagi (İsteğe Bağlı, Max 5 harf)'}
-                </label>
-                <input
-                  type="text"
-                  maxLength="5"
-                  className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md uppercase"
-                  placeholder={lang === 'en' ? 'e.g. ABCDE' : 'Örn: TAG'}
-                  value={settings.auto_check_guild_tag || ""}
-                  onChange={(e) => setSettings({ ...settings, auto_check_guild_tag: e.target.value })}
-                />
-              </div>
-            </div>
-          </div>
+              <div className={`space-y-6 transition-all ${settings.auto_check_enabled ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
+                <div>
+                  <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+                    {lang === 'en' ? 'Role for Leavers' : "Guild'den Çıkanlara Verilecek Rol"}
+                    <InfoTooltip text={lang === 'en' ? 'The role to give someone when they are detected as leaving the guild.' : 'Bir kişi loncadan ayrıldığında veya atıldığında ona verilecek Discord rolü.'} />
+                  </label>
+                  <div className="flex items-center gap-4 mt-2">
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        className="sr-only peer"
+                        checked={!settings.auto_check_custom_role_id}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSettings({ ...settings, auto_check_custom_role_id: "" });
+                          } else {
+                            setSettings({ ...settings, auto_check_custom_role_id: discordRoles?.[0]?.id || "none" });
+                          }
+                        }}
+                      />
+                      <div className="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+                    </label>
+                    <span className="text-sm font-label-bold uppercase tracking-widest text-on-surface-variant">
+                      {!settings.auto_check_custom_role_id 
+                        ? (lang === 'en' ? 'Default Unregistered Role' : 'Kayıtsız Rolü Verilsin') 
+                        : (lang === 'en' ? 'Custom Role' : 'Özel Rol Verilsin')}
+                    </span>
+                  </div>
+                  
+                  {settings.auto_check_custom_role_id && (
+                    <div className="mt-4 animate-slide-up">
+                      <select
+                        className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+                        value={settings.auto_check_custom_role_id === "none" ? "" : settings.auto_check_custom_role_id}
+                        onChange={(e) => setSettings({ ...settings, auto_check_custom_role_id: e.target.value })}
+                      >
+                        <option value="" disabled>{lang === 'en' ? 'Select Role...' : 'Rol Seçin...'}</option>
+                        {(discordRoles || []).map(r => (
+                          <option key={r.id} value={r.id}>@{r.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                </div>
 
-          <div className={`space-y-6 transition-all ${settings.auto_check_enabled ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
-            <div>
-              <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
-                {lang === 'en' ? 'Role for Leavers' : "Guild'den Çıkanlara Verilecek Rol"}
-                <InfoTooltip text={lang === 'en' ? 'The role to give someone when they are detected as leaving the guild.' : 'Bir kişi loncadan ayrıldığında veya atıldığında ona verilecek Discord rolü.'} />
-              </label>
-              <div className="flex items-center gap-4 mt-2">
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    className="sr-only peer"
-                    checked={!settings.auto_check_custom_role_id}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setSettings({ ...settings, auto_check_custom_role_id: "" });
-                      } else {
-                        setSettings({ ...settings, auto_check_custom_role_id: discordRoles?.[0]?.id || "none" });
-                      }
-                    }}
-                  />
-                  <div className="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
-                </label>
-                <span className="text-sm font-label-bold uppercase tracking-widest text-on-surface-variant">
-                  {!settings.auto_check_custom_role_id 
-                    ? (lang === 'en' ? 'Default Unregistered Role' : 'Kayıtsız Rolü Verilsin') 
-                    : (lang === 'en' ? 'Custom Role' : 'Özel Rol Verilsin')}
-                </span>
-              </div>
-              
-              {settings.auto_check_custom_role_id && (
-                <div className="mt-4 animate-slide-up">
+                <div>
+                  <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+                    {lang === 'en' ? 'Report Log Channel' : 'Rapor/Log Kanalı'}
+                    <InfoTooltip text={lang === 'en' ? 'The channel where auto-check removal notifications will be sent.' : 'Otomatik sistemin loncadan çıkanları tespit edip yetkilerini aldığına dair atacağı raporların kanalı.'} />
+                  </label>
                   <select
                     className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
-                    value={settings.auto_check_custom_role_id === "none" ? "" : settings.auto_check_custom_role_id}
-                    onChange={(e) => setSettings({ ...settings, auto_check_custom_role_id: e.target.value })}
+                    value={settings.auto_check_log_channel_id || ""}
+                    onChange={(e) => setSettings({ ...settings, auto_check_log_channel_id: e.target.value })}
                   >
-                    <option value="" disabled>{lang === 'en' ? 'Select Role...' : 'Rol Seçin...'}</option>
-                    {(discordRoles || []).map(r => (
-                      <option key={r.id} value={r.id}>@{r.name}</option>
+                    <option value="">{lang === 'en' ? 'Select Channel' : 'Kanal Seçin'}</option>
+                    {textChannels.map(c => (
+                      <option key={c.id} value={c.id}>#{c.name}</option>
                     ))}
                   </select>
                 </div>
-              )}
-            </div>
 
-            <div>
-              <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
-                {lang === 'en' ? 'Report Log Channel' : 'Rapor/Log Kanalı'}
-                <InfoTooltip text={lang === 'en' ? 'The channel where auto-check removal notifications will be sent.' : 'Otomatik sistemin loncadan çıkanları tespit edip yetkilerini aldığına dair atacağı raporların kanalı.'} />
-              </label>
-              <select
-                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
-                value={settings.auto_check_log_channel_id || ""}
-                onChange={(e) => setSettings({ ...settings, auto_check_log_channel_id: e.target.value })}
-              >
-                <option value="">{lang === 'en' ? 'Select Channel' : 'Kanal Seçin'}</option>
-                {textChannels.map(c => (
-                  <option key={c.id} value={c.id}>#{c.name}</option>
-                ))}
-              </select>
-            </div>
+                <div className="mt-8 pt-6 border-t border-outline-variant/50">
+                  <label className="block text-sm font-label-bold text-primary-container uppercase tracking-widest mb-2">
+                    {lang === 'en' ? 'Backward Compatibility Sync' : 'Geriye Dönük Senkronizasyon (Sync)'}
+                  </label>
+                  <p className="text-xs font-body-md text-on-surface-variant mb-4 flex flex-col gap-1">
+                    <span>{lang === 'en' 
+                      ? 'Adds existing old members to the database safely. (Requires Guild to be set in General Settings)' 
+                      : 'Eski kayıtlı üyelerinizi sisteme güvenle dahil eder. (Genel ayarlardan guild seçilmiş olması zorunludur)'}</span>
+                    <strong className="text-error/90 mt-1 font-label-bold">{lang === 'en'
+                      ? '⚠️ Note: This process may take up to 15 minutes. It runs in the background, so you can safely close this website once it starts.'
+                      : '⚠️ Not: Bu işlem 15 dakikaya kadar sürebilir. İşlem tamamen arka planda çalışır, başlattıktan sonra bu web sayfasını güvenle kapatabilirsiniz.'}</strong>
+                  </p>
+                  <button 
+                    className={`w-full px-6 py-4 font-label-bold uppercase tracking-widest rounded-sm transition-all flex items-center justify-center gap-2 ${settings.albion_guild_id ? ((syncing || settings.is_syncing) ? 'bg-primary-container/20 border border-primary-container/50 text-primary-container cursor-not-allowed' : 'bg-primary-container text-on-primary hover:brightness-110 tactical-glow cursor-pointer') : 'bg-surface-container border border-outline-variant text-on-surface-variant cursor-not-allowed'}`} 
+                    onClick={handleSync} 
+                    disabled={syncing || settings.is_syncing || !settings.albion_guild_id}
+                  >
+                    {(syncing || settings.is_syncing) ? <Loader2 size={18} className="animate-spin"/> : <Users size={18}/>} 
+                    {lang === 'en' 
+                      ? (settings.albion_guild_id ? ((syncing || settings.is_syncing) ? `Syncing... ${settings.last_sync_result?.scanned || 0} / ${settings.last_sync_result?.total || '?'}` : 'Start Sync Process') : 'Set Guild in General Settings First') 
+                      : (settings.albion_guild_id ? ((syncing || settings.is_syncing) ? `Şu an Taranıyor: ${settings.last_sync_result?.scanned || 0} / ${settings.last_sync_result?.total || '?'}` : 'Senkronizasyon İşlemini Başlat') : 'Önce Genel Ayarlardan Guild Seçin')}
+                  </button>
 
-            <div className="mt-8 pt-6 border-t border-outline-variant/50">
-              <label className="block text-sm font-label-bold text-primary-container uppercase tracking-widest mb-2">
-                {lang === 'en' ? 'Backward Compatibility Sync' : 'Geriye Dönük Senkronizasyon (Sync)'}
-              </label>
-              <p className="text-xs font-body-md text-on-surface-variant mb-4 flex flex-col gap-1">
-                <span>{lang === 'en' 
-                  ? 'Adds existing old members to the database safely. (Requires Guild to be set in General Settings)' 
-                  : 'Eski kayıtlı üyelerinizi sisteme güvenle dahil eder. (Genel ayarlardan guild seçilmiş olması zorunludur)'}</span>
-                <strong className="text-error/90 mt-1 font-label-bold">{lang === 'en'
-                  ? '⚠️ Note: This process may take up to 15 minutes. It runs in the background, so you can safely close this website once it starts.'
-                  : '⚠️ Not: Bu işlem 15 dakikaya kadar sürebilir. İşlem tamamen arka planda çalışır, başlattıktan sonra bu web sayfasını güvenle kapatabilirsiniz.'}</strong>
-              </p>
-              <button 
-                className={`w-full px-6 py-4 font-label-bold uppercase tracking-widest rounded-sm transition-all flex items-center justify-center gap-2 ${settings.albion_guild_id ? ((syncing || settings.is_syncing) ? 'bg-primary-container/20 border border-primary-container/50 text-primary-container cursor-not-allowed' : 'bg-primary-container text-on-primary hover:brightness-110 tactical-glow cursor-pointer') : 'bg-surface-container border border-outline-variant text-on-surface-variant cursor-not-allowed'}`} 
-                onClick={handleSync} 
-                disabled={syncing || settings.is_syncing || !settings.albion_guild_id}
-              >
-                {(syncing || settings.is_syncing) ? <Loader2 size={18} className="animate-spin"/> : <Users size={18}/>} 
-                {lang === 'en' 
-                  ? (settings.albion_guild_id ? ((syncing || settings.is_syncing) ? `Syncing... ${settings.last_sync_result?.scanned || 0} / ${settings.last_sync_result?.total || '?'}` : 'Start Sync Process') : 'Set Guild in General Settings First') 
-                  : (settings.albion_guild_id ? ((syncing || settings.is_syncing) ? `Şu an Taranıyor: ${settings.last_sync_result?.scanned || 0} / ${settings.last_sync_result?.total || '?'}` : 'Senkronizasyon İşlemini Başlat') : 'Önce Genel Ayarlardan Guild Seçin')}
-              </button>
-
-              {settings.last_sync_result && (
-                <div className="mt-6 p-4 bg-primary-container/5 border border-primary-container/30 rounded-sm animate-slide-up">
-                  <h4 className="text-sm font-label-bold text-primary-container uppercase tracking-widest mb-2">{(syncing || settings.is_syncing) ? (lang === 'en' ? 'Live Progress' : 'Canlı Tarama İlerlemesi') : (lang === 'en' ? 'Last Sync Result' : 'Son Senkronizasyon Çıktısı')}</h4>
-                  <div className="grid grid-cols-3 gap-2 text-sm font-body-md">
-                    <div className="text-on-surface-variant">{lang === 'en' ? 'Scanned:' : 'Taranan:'} <strong className="text-on-surface ml-1">{settings.last_sync_result.scanned || 0} {settings.last_sync_result.total ? `/ ${settings.last_sync_result.total}` : ''}</strong></div>
-                    <div className="text-on-surface-variant">{lang === 'en' ? 'Synced:' : 'Eklenen:'} <strong className="text-success ml-1">{settings.last_sync_result.synced || 0}</strong></div>
-                    <div className="text-on-surface-variant">{lang === 'en' ? 'Skipped:' : 'Atlanan:'} <strong className="text-error ml-1">{settings.last_sync_result.skipped || 0}</strong></div>
-                  </div>
-                  <div className="mt-3 text-xs font-label-sm text-on-surface-variant/70">
-                    {new Date(settings.last_sync_result.timestamp).toLocaleString(lang === 'en' ? 'en-US' : 'tr-TR')}
-                  </div>
+                  {settings.last_sync_result && (
+                    <div className="mt-6 p-4 bg-primary-container/5 border border-primary-container/30 rounded-sm animate-slide-up">
+                      <h4 className="text-sm font-label-bold text-primary-container uppercase tracking-widest mb-2">{(syncing || settings.is_syncing) ? (lang === 'en' ? 'Live Progress' : 'Canlı Tarama İlerlemesi') : (lang === 'en' ? 'Last Sync Result' : 'Son Senkronizasyon Çıktısı')}</h4>
+                      <div className="grid grid-cols-3 gap-2 text-sm font-body-md">
+                        <div className="text-on-surface-variant">{lang === 'en' ? 'Scanned:' : 'Taranan:'} <strong className="text-on-surface ml-1">{settings.last_sync_result.scanned || 0} {settings.last_sync_result.total ? `/ ${settings.last_sync_result.total}` : ''}</strong></div>
+                        <div className="text-on-surface-variant">{lang === 'en' ? 'Synced:' : 'Eklenen:'} <strong className="text-success ml-1">{settings.last_sync_result.synced || 0}</strong></div>
+                        <div className="text-on-surface-variant">{lang === 'en' ? 'Skipped:' : 'Atlanan:'} <strong className="text-error ml-1">{settings.last_sync_result.skipped || 0}</strong></div>
+                      </div>
+                      <div className="mt-3 text-xs font-label-sm text-on-surface-variant/70">
+                        {new Date(settings.last_sync_result.timestamp).toLocaleString(lang === 'en' ? 'en-US' : 'tr-TR')}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
             </div>
-          </div>
-        </div>
+          </>
+        )}
       </div>
     </div>
   );
