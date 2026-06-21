@@ -112,11 +112,13 @@ export async function POST(req) {
 
       console.log(`[Cryptomus Webhook] Order ${order_id} processed. Guild ${payment.guild_id} extended by ${payment.duration_days} days.`);
 
-      // Send Discord notification to Support Server (1490798764427051088)
+      // Send Discord notification to Support Server
       const botToken = process.env.DISCORD_BOT_TOKEN;
       if (botToken) {
          try {
             const planName = payment.duration_days >= 365 ? '1 Yıllık Paket' : (payment.duration_days >= 90 ? '3 Aylık Paket' : (payment.duration_days >= 30 ? '1 Aylık Paket' : '7 Günlük Paket'));
+            // #6 — subscription null olabilir, payment.guild_name'i fallback olarak kullan
+            const guildNameSafe = subscription?.guild_name || payment.guild_name || 'Sunucu';
             await fetch('https://discord.com/api/v10/channels/1490798764427051088/messages', {
                method: 'POST',
                headers: {
@@ -124,7 +126,7 @@ export async function POST(req) {
                   'Content-Type': 'application/json'
                },
                body: JSON.stringify({
-                  content: `🎉 <@${payment.user_id}>, **${subscription.guild_name || 'Sunucu'}** sunucusu için **${planName}** satın aldı! Bizi tercih ettiğiniz için teşekkür ederiz. Destek taleplerinize artık öncelikli olarak bakılacaktır.`
+                  content: `🎉 <@${payment.user_id}>, **${guildNameSafe}** sunucusu için **${planName}** satın aldı! Bizi tercih ettiğiniz için teşekkür ederiz. Destek taleplerinize artık öncelikli olarak bakılacaktır.`
                })
             });
          } catch(e) {

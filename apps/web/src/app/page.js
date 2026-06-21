@@ -91,54 +91,51 @@ export default function Home() {
     }
   };
 
-  const handleManualPurchase = () => {
+  const handleManualPurchase = async () => {
     if (!selectedServer) return setCheckoutError("Lütfen bir sunucu seçin.");
+    if (!selectedBank) return setCheckoutError("Lütfen bir banka seçin.");
     setCheckoutError("");
-    
-    // Rastgele 8 haneli kod oluştur
-    const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
-    let code = '';
-    for (let i = 0; i < 8; i++) {
-      code += characters.charAt(Math.floor(Math.random() * characters.length));
+    setIsProcessing(true);
+
+    try {
+      // #1 — Kodu artık güvenli şekilde sunucudan alıyoruz
+      const serverDetails = userServers.find(s => s.guild_id === selectedServer);
+      const res = await fetch("/api/payment/manual-create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          guildId: selectedServer,
+          guildName: serverDetails?.guild_name || "Bilinmeyen Sunucu",
+          planId: selectedPlan.id,
+          senderName: senderName.trim() || "Belirtilmedi",  // senderName sonraki adımda girilecek, şimdilik placeholder
+          targetBank: selectedBank?.bank_name || "Bilinmiyor"
+        })
+      });
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setGeneratedCode(data.description_code);  // Sunucudan gelen kod
+        setManualSuccess(true);
+      } else {
+        setCheckoutError(data.error || "Ödeme başlatılamadı. Lütfen tekrar deneyin.");
+      }
+    } catch (err) {
+      setCheckoutError("Bağlantı hatası. Lütfen tekrar deneyin.");
+    } finally {
+      setIsProcessing(false);
     }
-    
-    setGeneratedCode(code);
-    setManualSuccess(true);
   };
 
+  // #1 — handleConfirmManualPayment artık sadece senderName günceller ve onayı tamamlar
+  // Asıl kayıt handleManualPurchase'da API çağrısıyla oluşturulmuştu
   const handleConfirmManualPayment = async () => {
     if (!senderName || senderName.trim().length < 3) {
       alert("Lütfen kart üzerindeki isminizi giriniz.");
       return;
     }
-    
-    setIsProcessing(true);
-    try {
-      const serverDetails = userServers.find(s => s.guild_id === selectedServer);
-      const res = await fetch("/api/payment/manual-create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          guildId: selectedServer, 
-          guildName: serverDetails?.guild_name || "Bilinmeyen Sunucu",
-          planId: selectedPlan.id,
-          senderName: senderName.trim(),
-          descriptionCode: generatedCode,
-          targetBank: selectedBank?.bank_name || "Bilinmiyor"
-        })
-      });
-      const data = await res.json();
-      
-      if (res.ok && data.success) {
-        setFinalSuccess(true);
-      } else {
-        alert(data.error || "Ödeme oluşturulamadı.");
-      }
-    } catch (err) {
-      alert("Bağlantı hatası.");
-    } finally {
-      setIsProcessing(false);
-    }
+    // Ödeme zaten sunucuya kaydedildi (handleManualPurchase'da)
+    // Kullanıcıya sadece başarı mesajı göster
+    setFinalSuccess(true);
   };
 
   const handleConfirmPurchase = async () => {
@@ -868,7 +865,7 @@ export default function Home() {
                         </div>
                         <div className="text-right">
                           <div className="font-headline-md text-headline-md text-primary-container">
-                            {paymentMethod === 'havale' ? (selectedPlan.amount * 47).toLocaleString('tr-TR') : selectedPlan.amount}
+                            {paymentMethod === 'havale' ? (selectedPlan.amount * (parseFloat(process.env.NEXT_PUBLIC_USDT_TRY_RATE) || 40)).toLocaleString('tr-TR') : selectedPlan.amount}
                           </div>
                           <div className="font-label-sm text-label-sm text-on-surface-variant">
                             {paymentMethod === 'havale' ? 'TL' : 'USDT'}

@@ -4,6 +4,9 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { supabase } from "@veyronix/database";
 
 const ADMIN_ID = process.env.NEXT_PUBLIC_ADMIN_ID;
+const ADMIN_ID_2 = process.env.NEXT_PUBLIC_ADMIN_ID_2;
+
+const isAdminUser = (id) => id && (id === ADMIN_ID || id === ADMIN_ID_2);
 
 // Helper to fetch notification template
 async function getParsedTemplate(templateId, placeholders = {}) {
@@ -32,7 +35,7 @@ export const dynamic = 'force-dynamic';
 export async function GET(req) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session || (session.user.id !== ADMIN_ID && session.user.id !== "407234961582587916")) {
+    if (!session || !isAdminUser(session.user?.id)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -54,7 +57,7 @@ export async function GET(req) {
 export async function PATCH(req) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session || (session.user.id !== ADMIN_ID && session.user.id !== "407234961582587916")) {
+    if (!session || !isAdminUser(session.user?.id)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -79,8 +82,8 @@ export async function PATCH(req) {
        return NextResponse.json({ error: "Already approved" }, { status: 400 });
     }
 
-    // Map 'rejected' to 'cancel' to match Cryptomus potential enum if any
-    const dbStatus = status === 'rejected' ? 'cancel' : status;
+    // Durum tutarlılığı: rejected/cancel → 'rejected' olarak kaydet
+    const dbStatus = status === 'cancel' ? 'rejected' : status;
 
     // 2. Durumu güncelle
     const { error: updateError } = await supabase
@@ -136,7 +139,7 @@ export async function PATCH(req) {
         console.log(`[Admin Manual Payment] Order ${payment.order_id} approved. Guild ${payment.guild_id} NEW subscription created for ${payment.duration_days} days.`);
       }
 
-      // Queue Approval Notification
+      // Queue Approval Notification (Bot DM)
       const parsed = await getParsedTemplate('manual_payment_approved', { 
         sunucu: payment.guild_name || 'Sunucu',
         gun: payment.duration_days 
@@ -156,20 +159,39 @@ export async function PATCH(req) {
           status: 'pending'
         });
       }
-    } else if (status === 'rejected' || status === 'cancel') {
-      // Queue Rejection Notification
-      const parsed = await getParsedTemplate('manual_payment_rejected', { 
+
+      // #8 — Discord Destek Kanalına Admin Bildirimi
+      const botToken = process.env.DISCORD_BOT_TOKEN;
+      if (botToken) {
+        try {
+          await fetch('https://discord.com/api/v10/channels/1490798764427051088/messages', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bot ${botToken}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              content: `✅ **Havale/EFT Onaylandı!**\n<@${payment.user_id}> — **${payment.guild_name || 'Sunucu'}** için ${payment.duration_days} günlük paket onaylandı.\n📋 Kod: \`${payment.description_code}\` | 🏦 Banka: ${payment.target_bank || 'Bilinmiyor'}`
+            })
+          });
+        } catch (e) {
+          console.error("[Admin Manual Payment] Discord notification error:", e);
+        }
+      }
+    } else if (status === 'rejected') {
+      // Queue Rejection Notification (Bot DM)
+      const parsedRej = await getParsedTemplate('manual_payment_rejected', { 
         sunucu: payment.guild_name || 'Sunucu'
       });
-      if (parsed && payment.user_id) {
+      if (parsedRej && payment.user_id) {
         await supabase.from('message_queue').insert({
           guild_id: payment.guild_id,
           owner_id: payment.user_id,
           message_content: JSON.stringify({
             embeds: [{
-              title: parsed.title,
-              description: parsed.content,
-              color: parsed.color ? parseInt(parsed.color.replace('#', ''), 16) : 0xe74c3c,
+              title: parsedRej.title,
+              description: parsedRej.content,
+              color: parsedRej.color ? parseInt(parsedRej.color.replace('#', ''), 16) : 0xe74c3c,
               timestamp: new Date().toISOString()
             }]
           }),

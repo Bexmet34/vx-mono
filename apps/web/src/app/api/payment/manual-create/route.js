@@ -13,10 +13,34 @@ export async function POST(req) {
       return NextResponse.json({ error: "Lütfen Discord ile giriş yapın." }, { status: 401 });
     }
 
-    const { guildId, guildName, planId, senderName, descriptionCode } = await req.json();
+    const { guildId, guildName, planId, senderName, targetBank } = await req.json();
 
-    if (!guildId || !planId || !senderName || !descriptionCode) {
+    // Önce input kontrolü
+    if (!guildId || !planId || !senderName) {
       return NextResponse.json({ error: "Eksik bilgi gönderdiniz. Lütfen tüm alanları doldurun." }, { status: 400 });
+    }
+
+    // #3 — Çifte pending ödeme koruması (aynı sunucu için)
+    const { data: existingPending } = await supabase
+      .from('crypto_payments')
+      .select('id')
+      .eq('user_id', session.user.id)
+      .eq('guild_id', guildId)
+      .eq('payment_method', 'havale')
+      .eq('status', 'pending')
+      .maybeSingle();
+
+    if (existingPending) {
+      return NextResponse.json({ 
+        error: "Bu sunucu için zaten bekleyen bir Havale/EFT başvurunuz var. Lütfen mevcut başvurunuzun onaylanmasını bekleyin veya destek ekibiyle iletişime geçin." 
+      }, { status: 409 });
+    }
+
+    // #1 — Açıklama kodunu güvenli biçimde SERVER SIDE üret (8 karakter, küçük harf + rakam)
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    let descriptionCode = '';
+    for (let i = 0; i < 8; i++) {
+      descriptionCode += chars.charAt(Math.floor(Math.random() * chars.length));
     }
 
     // Paketin güncel verisini veritabanından çek
@@ -43,11 +67,12 @@ export async function POST(req) {
         guild_id: guildId,
         guild_name: guildName || "Bilinmeyen Sunucu",
         amount: plan.amount,
-        currency: 'USDT',
+        currency: 'TRY',
         duration_days: plan.duration_days,
         status: 'pending',
         payment_method: 'havale',
         sender_name: senderName,
+        target_bank: targetBank,
         description_code: descriptionCode
       });
 

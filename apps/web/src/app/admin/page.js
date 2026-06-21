@@ -38,6 +38,8 @@ export default function AdminPage() {
   const [showConfirmModal, setShowConfirmModal] = useState(null);
   const [showBankModal, setShowBankModal] = useState(false);
   const [newBankAccount, setNewBankAccount] = useState({ bank_name: "", account_holder: "", iban: "", is_active: true });
+  const [showEditBankModal, setShowEditBankModal] = useState(null); // null veya düzenlenen banka objesi
+  const [editBankData, setEditBankData] = useState({ bank_name: "", account_holder: "", iban: "" });
   const [daysToAdd, setDaysToAdd] = useState(30);
   const [expiryDate, setExpiryDate] = useState("");
   const [statusFilter, setStatusFilter] = useState("all"); // all, active, unlimited, passive
@@ -392,6 +394,32 @@ export default function AdminPage() {
       if (res.ok) {
         showToast("Banka hesabı silindi!", "success");
         fetchBankAccounts();
+      }
+    } catch (err) {
+      showToast(err.message, "error");
+    } finally {
+      setSavingId(null);
+    }
+  };
+
+  // #16 — Banka hesabı düzenleme handler
+  const handleEditBankAccount = async (e) => {
+    e.preventDefault();
+    if (!showEditBankModal) return;
+    setSavingId(showEditBankModal.id);
+    try {
+      const res = await fetch("/api/admin/bank-accounts", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: showEditBankModal.id, ...editBankData }),
+      });
+      if (res.ok) {
+        showToast("Banka hesabı güncellendi!", "success");
+        setShowEditBankModal(null);
+        fetchBankAccounts();
+      } else {
+        const err = await res.json();
+        showToast(err.error || "Güncelleme başarısız", "error");
       }
     } catch (err) {
       showToast(err.message, "error");
@@ -1074,6 +1102,16 @@ export default function AdminPage() {
                           </td>
                           <td data-label="İŞLEMLER">
                             <div style={{display: 'flex', gap: '0.5rem', justifyContent: 'flex-end'}}>
+                              {/* #16 — Düzenleme Butonu */}
+                              <button 
+                                className="admin-action-btn" 
+                                title="Düzenle"
+                                onClick={() => { setShowEditBankModal(b); setEditBankData({ bank_name: b.bank_name, account_holder: b.account_holder, iban: b.iban }); }}
+                                disabled={savingId === b.id}
+                                style={{color: 'var(--admin-accent)', borderColor: 'rgba(252,163,17,0.3)'}}
+                              >
+                                <Edit3 size={18} />
+                              </button>
                               <button 
                                 className="admin-action-btn" 
                                 title={b.is_active ? "Pasife Al" : "Aktife Al"}
@@ -1097,6 +1135,35 @@ export default function AdminPage() {
                       ))}
                     </tbody>
                   </table>
+                </div>
+              </div>
+            )}
+
+            {/* #16 — Banka Hesabı Düzenleme Modalı */}
+            {showEditBankModal && (
+              <div style={{position:'fixed',inset:0,zIndex:100,background:'rgba(0,0,0,0.7)',backdropFilter:'blur(8px)',display:'flex',alignItems:'center',justifyContent:'center',padding:'1rem'}} onClick={() => setShowEditBankModal(null)}>
+                <div style={{background:'var(--admin-card)',border:'1px solid var(--admin-border)',borderRadius:'20px',padding:'2.5rem',width:'100%',maxWidth:'480px',position:'relative'}} onClick={e => e.stopPropagation()}>
+                  <h2 style={{fontSize:'1.3rem',fontWeight:'800',marginBottom:'2rem'}}>Banka Hesabını Düzenle</h2>
+                  <form onSubmit={handleEditBankAccount} style={{display:'flex',flexDirection:'column',gap:'1.2rem'}}>
+                    <div>
+                      <label className="admin-label">Banka Adı</label>
+                      <input className="admin-input-field" value={editBankData.bank_name} onChange={e => setEditBankData({...editBankData, bank_name: e.target.value})} required />
+                    </div>
+                    <div>
+                      <label className="admin-label">Hesap Sahibi</label>
+                      <input className="admin-input-field" value={editBankData.account_holder} onChange={e => setEditBankData({...editBankData, account_holder: e.target.value})} required />
+                    </div>
+                    <div>
+                      <label className="admin-label">IBAN / Hesap No</label>
+                      <input className="admin-input-field" value={editBankData.iban} onChange={e => setEditBankData({...editBankData, iban: e.target.value})} required />
+                    </div>
+                    <div style={{display:'flex',gap:'1rem',marginTop:'1rem'}}>
+                      <button type="button" className="admin-btn-secondary" style={{flex:1}} onClick={() => setShowEditBankModal(null)}>İptal</button>
+                      <button type="submit" className="btn-primary" style={{flex:2,padding:'0.9rem'}} disabled={savingId === showEditBankModal?.id}>
+                        {savingId === showEditBankModal?.id ? <Loader2 size={18} className="spin" /> : <><Save size={18}/> Kaydet</>}
+                      </button>
+                    </div>
+                  </form>
                 </div>
               </div>
             )}

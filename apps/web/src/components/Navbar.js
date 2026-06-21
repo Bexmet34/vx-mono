@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSession, signIn, signOut } from "next-auth/react";
 import Image from "next/image";
-import { LogIn, LogOut, LayoutDashboard, Globe, Menu, X, ChevronRight, Shield } from "lucide-react";
+import { LogIn, LogOut, LayoutDashboard, Globe, Menu, X, ChevronRight, Shield, CreditCard, Clock, CheckCircle, XCircle, Loader2, AlertCircle } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useState, useEffect, useRef } from "react";
 import Logo from "@/components/Logo";
@@ -14,7 +14,31 @@ export default function Navbar({ isStatic = false }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
-  const isAdmin = session?.user?.id && (session.user.id === process.env.NEXT_PUBLIC_ADMIN_ID || session.user.id === "407234961582587916");
+  // #14 — Ödeme geçmişi state
+  const [showPaymentHistory, setShowPaymentHistory] = useState(false);
+  const [paymentHistory, setPaymentHistory] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
+
+  const isAdmin = session?.user?.id && (session.user.id === process.env.NEXT_PUBLIC_ADMIN_ID || session.user.id === process.env.NEXT_PUBLIC_ADMIN_ID_2);
+
+  const fetchPaymentHistory = async () => {
+    setHistoryLoading(true);
+    try {
+      const res = await fetch('/api/payment/history');
+      const data = await res.json();
+      if (res.ok) setPaymentHistory(data);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  const openPaymentHistory = () => {
+    setIsProfileOpen(false);
+    setShowPaymentHistory(true);
+    fetchPaymentHistory();
+  };
 
   useEffect(() => {
     if (isMenuOpen) {
@@ -34,6 +58,13 @@ export default function Navbar({ isStatic = false }) {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const getStatusBadge = (status) => {
+    if (status === 'paid') return { label: lang === 'tr' ? 'Onaylandi' : 'Approved', color: '#2ecc71' };
+    if (status === 'pending') return { label: lang === 'tr' ? 'Bekliyor' : 'Pending', color: '#fca311' };
+    if (status === 'rejected' || status === 'cancel') return { label: lang === 'tr' ? 'Reddedildi' : 'Rejected', color: '#e74c3c' };
+    return { label: status, color: '#888' };
+  };
 
   return (
     <>
@@ -104,7 +135,7 @@ export default function Navbar({ isStatic = false }) {
                     </button>
 
                     {isProfileOpen && (
-                        <div className="absolute top-full right-0 mt-4 w-56 bg-surface-container border border-outline-variant/50 p-2 z-50 shadow-[0_10px_40px_rgba(0,0,0,0.8)] animate-in fade-in slide-in-from-top-2 rounded-sm">
+                        <div className="absolute top-full right-0 mt-4 w-64 bg-surface-container border border-outline-variant/50 p-2 z-50 shadow-[0_10px_40px_rgba(0,0,0,0.8)] animate-in fade-in slide-in-from-top-2 rounded-sm">
                           <div className="flex flex-col gap-1">
                             <Link 
                               href="/dashboard" 
@@ -114,6 +145,17 @@ export default function Navbar({ isStatic = false }) {
                               <LayoutDashboard size={16} />
                               <span className="font-label-bold text-xs uppercase tracking-wider">{t.dashboard}</span>
                             </Link>
+
+                            {/* #14 — Odeme Gecmisi Butonu */}
+                            <button
+                              onClick={openPaymentHistory}
+                              className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm w-full text-left"
+                            >
+                              <CreditCard size={16} />
+                              <span className="font-label-bold text-xs uppercase tracking-wider">
+                                {lang === 'tr' ? 'Odeme Gecmisim' : 'Payment History'}
+                              </span>
+                            </button>
                             
                             {isAdmin && (
                               <Link 
@@ -164,6 +206,123 @@ export default function Navbar({ isStatic = false }) {
         </div>
       </nav>
 
+      {/* #14 — Odeme Gecmisi Full-Screen Modal */}
+      {showPaymentHistory && (
+        <div 
+          style={{position:'fixed',inset:0,zIndex:9999,background:'rgba(0,0,0,0.85)',backdropFilter:'blur(12px)',display:'flex',alignItems:'center',justifyContent:'center',padding:'1rem',overflowY:'auto'}}
+          onClick={() => setShowPaymentHistory(false)}
+        >
+          <div 
+            style={{position:'relative',width:'100%',maxWidth:'760px',margin:'auto'}}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{background:'#0f1117',border:'1px solid rgba(255,215,0,0.15)',borderRadius:'20px',padding:'2rem',maxHeight:'85vh',overflow:'hidden',display:'flex',flexDirection:'column'}}>
+              
+              {/* Header */}
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1.5rem',paddingBottom:'1rem',borderBottom:'1px solid rgba(255,255,255,0.07)'}}>
+                <div style={{display:'flex',alignItems:'center',gap:'1rem'}}>
+                  <div style={{width:44,height:44,borderRadius:'12px',background:'rgba(255,215,0,0.1)',border:'1px solid rgba(255,215,0,0.3)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                    <CreditCard size={22} color="#fca311" />
+                  </div>
+                  <div>
+                    <h2 style={{fontSize:'1.3rem',fontWeight:'800',color:'#fff',margin:0}}>
+                      {lang === 'tr' ? 'Odeme Gecmisim' : 'Payment History'}
+                    </h2>
+                    <p style={{fontSize:'0.8rem',color:'rgba(255,255,255,0.4)',margin:0}}>
+                      {lang === 'tr' ? 'Tum kripto ve havale/EFT islemleriniz' : 'All your crypto & bank transfer transactions'}
+                    </p>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setShowPaymentHistory(false)} 
+                  style={{padding:'0.5rem',borderRadius:'8px',border:'1px solid rgba(255,255,255,0.1)',background:'rgba(255,255,255,0.05)',color:'rgba(255,255,255,0.6)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              {/* Content */}
+              <div style={{overflowY:'auto',flex:1,paddingRight:'4px'}}>
+                {historyLoading ? (
+                  <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'4rem',gap:'1rem',color:'#fca311'}}>
+                    <Loader2 size={40} style={{animation:'spin 1s linear infinite'}} />
+                    <span style={{fontWeight:'600',letterSpacing:'2px',fontSize:'0.85rem',textTransform:'uppercase',opacity:0.7}}>
+                      {lang === 'tr' ? 'Yukleniyor...' : 'Loading...'}
+                    </span>
+                  </div>
+                ) : paymentHistory.length === 0 ? (
+                  <div style={{textAlign:'center',padding:'4rem',color:'rgba(255,255,255,0.3)'}}>
+                    <AlertCircle size={48} style={{margin:'0 auto 1rem',opacity:0.4}} />
+                    <p style={{fontSize:'1rem',fontWeight:'600'}}>
+                      {lang === 'tr' ? 'Henuz islem gecmisiniz bulunmuyor.' : 'No payment history found.'}
+                    </p>
+                  </div>
+                ) : (
+                  <div style={{display:'flex',flexDirection:'column',gap:'0.75rem'}}>
+                    {paymentHistory.map((p) => {
+                      const badge = getStatusBadge(p.status);
+                      const date = new Date(p.created_at).toLocaleDateString(
+                        lang === 'tr' ? 'tr-TR' : 'en-US', 
+                        { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }
+                      );
+                      const isHavale = p.payment_method === 'havale';
+
+                      return (
+                        <div key={p.id} style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.07)',borderRadius:'14px',padding:'1.2rem 1.5rem',display:'flex',alignItems:'center',gap:'1rem',flexWrap:'wrap'}}>
+                          {/* Icon */}
+                          <div style={{width:40,height:40,borderRadius:'10px',background:isHavale?'rgba(46,204,113,0.1)':'rgba(252,163,17,0.1)',border:`1px solid ${isHavale?'rgba(46,204,113,0.3)':'rgba(252,163,17,0.3)'}`,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                            <CreditCard size={18} color={isHavale?'#2ecc71':'#fca311'} />
+                          </div>
+
+                          {/* Info */}
+                          <div style={{flex:1,minWidth:'180px'}}>
+                            <div style={{fontWeight:'700',fontSize:'0.95rem',color:'#fff',marginBottom:'0.2rem'}}>
+                              {p.guild_name || (lang === 'tr' ? 'Bilinmeyen Sunucu' : 'Unknown Server')}
+                            </div>
+                            <div style={{fontSize:'0.75rem',color:'rgba(255,255,255,0.4)',display:'flex',gap:'0.75rem',flexWrap:'wrap',alignItems:'center'}}>
+                              <span style={{display:'flex',alignItems:'center',gap:'0.3rem'}}>
+                                <Clock size={12} /> {date}
+                              </span>
+                              <span style={{background:isHavale?'rgba(46,204,113,0.1)':'rgba(252,163,17,0.1)',color:isHavale?'#2ecc71':'#fca311',padding:'0.1rem 0.5rem',borderRadius:'4px',fontSize:'0.65rem',fontWeight:'700',textTransform:'uppercase',letterSpacing:'1px'}}>
+                                {isHavale ? (lang === 'tr' ? 'Havale/EFT' : 'Bank Transfer') : 'Crypto'}
+                              </span>
+                              {p.description_code && (
+                                <span style={{fontFamily:'monospace',fontSize:'0.7rem',letterSpacing:'2px',color:'rgba(255,255,255,0.45)'}}>
+                                  #{p.description_code}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Amount */}
+                          <div style={{textAlign:'right',flexShrink:0}}>
+                            <div style={{fontWeight:'800',color:'#fca311',fontSize:'1rem'}}>
+                              {p.amount} <span style={{fontSize:'0.7rem',fontWeight:'600',color:'rgba(255,215,0,0.6)'}}>{p.currency}</span>
+                            </div>
+                            <div style={{fontSize:'0.75rem',color:'rgba(255,255,255,0.4)'}}>
+                              {p.duration_days} {lang === 'tr' ? 'Gun' : 'Days'}
+                            </div>
+                          </div>
+
+                          {/* Status */}
+                          <div style={{flexShrink:0}}>
+                            <span style={{background:`${badge.color}18`,color:badge.color,border:`1px solid ${badge.color}44`,padding:'0.3rem 0.8rem',borderRadius:'20px',fontSize:'0.7rem',fontWeight:'700',textTransform:'uppercase',letterSpacing:'1px',display:'flex',alignItems:'center',gap:'0.4rem',whiteSpace:'nowrap'}}>
+                              {p.status === 'paid' ? <CheckCircle size={13}/> : p.status === 'pending' ? <Clock size={13}/> : <XCircle size={13}/>}
+                              {badge.label}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Mobile Navigation Overlay */}
       <div className={`fixed inset-0 z-50 transform ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'} transition-transform duration-500 ease-out flex`}>
         {/* Backdrop */}
@@ -174,10 +333,8 @@ export default function Navbar({ isStatic = false }) {
         
         {/* Sliding Content Area */}
         <div className="w-[85%] max-w-sm glass-panel flex flex-col relative h-full">
-          {/* Decorative Glow Top */}
           <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-right from-transparent via-primary-container/30 to-transparent"></div>
           
-          {/* Header */}
           <div className="flex justify-between items-center px-6 py-6 border-b border-on-surface/">
             <span className="flex items-center gap-2 font-headline-md text-headline-md font-bold tracking-tighter text-primary-container">
               <Logo className="w-8 h-8" />
@@ -191,7 +348,6 @@ export default function Navbar({ isStatic = false }) {
             </button>
           </div>
           
-          {/* Navigation Links */}
           <nav className="flex-grow px-6 py-8 flex flex-col gap-y-6 overflow-y-auto">
             <div className="menu-item-group">
               <span className="text-[10px] font-label-bold text-outline uppercase tracking-[0.2em] mb-4 block">Central Hub</span>
@@ -206,6 +362,22 @@ export default function Navbar({ isStatic = false }) {
                 <ChevronRight className="text-primary-container/0 group-hover:text-primary-container transition-colors" />
               </Link>
               <div className="indicator"></div>
+
+              {/* #14 Mobile - Payment History */}
+              {session && (
+                <>
+                  <button
+                    className="menu-item-hover group flex items-center justify-between py-2 mt-4 w-full text-left"
+                    onClick={() => { setIsMenuOpen(false); openPaymentHistory(); }}
+                  >
+                    <span className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant hover:text-primary-container transition-all group-active:translate-x-2">
+                      {lang === 'tr' ? 'Odeme Gecmisim' : 'Payment History'}
+                    </span>
+                    <ChevronRight className="text-primary-container/0 group-hover:text-primary-container transition-colors" />
+                  </button>
+                  <div className="indicator"></div>
+                </>
+              )}
             </div>
 
             <div className="menu-item-group">
@@ -241,7 +413,6 @@ export default function Navbar({ isStatic = false }) {
             )}
           </nav>
           
-          {/* Bottom Action */}
           <div className="px-6 py-10 bg-surface-container-low border-t border-on-surface/ space-y-8">
             {session ? (
               <button 
@@ -263,12 +434,11 @@ export default function Navbar({ isStatic = false }) {
             
             <div className="flex flex-col gap-6">
               <p className="font-label-sm text-label-sm text-on-surface-variant/40 max-w-[200px]">
-                © 2024 Veyronix Tactical Command. All rights reserved.
+                &copy; 2024 Veyronix Tactical Command. All rights reserved.
               </p>
             </div>
           </div>
           
-          {/* Scanline Effect Overlay */}
           <div className="absolute inset-0 pointer-events-none opacity-10">
             <div className="scanline"></div>
           </div>
