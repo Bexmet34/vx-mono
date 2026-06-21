@@ -42,6 +42,7 @@ export default function Home() {
   const [generatedCode, setGeneratedCode] = useState("");
   const [bankAccounts, setBankAccounts] = useState([]);
   const [selectedBank, setSelectedBank] = useState(null);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   const handleBuyClick = (plan) => {
     if (status !== "authenticated") {
@@ -54,6 +55,7 @@ export default function Home() {
     setManualSuccess(false);
     setFinalSuccess(false);
     setGeneratedCode("");
+    setTermsAccepted(false);
     setShowCheckout(true);
     fetchUserServers();
     fetchBankAccounts();
