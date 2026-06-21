@@ -82,10 +82,10 @@ export default function SystemStatusWidget() {
   };
 
   return (
-    <div className="fixed bottom-24 right-4 md:bottom-8 md:right-8 z-[9999] flex flex-col items-end">
+    <div className="fixed bottom-6 left-6 z-[9999] flex flex-col items-start">
       {/* Açılır Kart (Orta Boy) */}
       <div 
-        className={`mb-4 bg-[#0B0F19] border border-outline-variant rounded-xl shadow-[0_0_40px_rgba(0,0,0,0.5)] w-80 overflow-hidden origin-bottom-right transition-all duration-300 ease-out ${
+        className={`mb-4 bg-[#0B0F19] border border-outline-variant rounded-xl shadow-[0_0_40px_rgba(0,0,0,0.5)] w-80 overflow-hidden origin-bottom-left transition-all duration-300 ease-out ${
           isOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-8 pointer-events-none'
         }`}
       >
@@ -170,19 +170,19 @@ export default function SystemStatusWidget() {
       {/* Sol Alt Tetikleyici İkon (Floating Button) */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="w-14 h-14 bg-surface border border-outline-variant rounded-full flex items-center justify-center text-primary-container hover:bg-surface-container-high hover:border-primary-container hover:shadow-[0_0_25px_rgba(255,215,0,0.25)] transition-all duration-300 relative group"
+        className="w-12 h-12 bg-surface border border-outline-variant rounded-full flex items-center justify-center text-primary-container hover:bg-surface-container-high hover:border-primary-container hover:shadow-[0_0_20px_rgba(255,215,0,0.25)] transition-all duration-300 relative group"
       >
-        <Activity size={24} className={`transition-transform duration-500 ${isOpen ? "rotate-180 scale-90 opacity-70" : "scale-100"}`} />
+        <Activity size={20} className={`transition-transform duration-500 ${isOpen ? "rotate-180 scale-90 opacity-70" : "scale-100"}`} />
         
         {/* Yeşil Yanıp Sönen Online Işığı */}
-        <span className="absolute top-0 right-0 flex h-4 w-4">
+        <span className="absolute top-0 right-0 flex h-3 w-3">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-4 w-4 bg-green-500 border-2 border-surface"></span>
+          <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500 border-2 border-surface"></span>
         </span>
         
         {/* İpucu (Tooltip) */}
         {!isOpen && (
-          <div className="absolute right-full mr-4 whitespace-nowrap bg-surface-container-high border border-outline-variant px-3 py-2 rounded text-xs font-label-bold tracking-widest uppercase text-on-surface opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none shadow-lg hidden md:block">
+          <div className="absolute left-full ml-3 whitespace-nowrap bg-surface-container-high border border-outline-variant px-3 py-1.5 rounded text-[10px] font-label-bold tracking-widest uppercase text-on-surface opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none shadow-lg">
             Canlı Sistem
           </div>
         )}
