@@ -30,8 +30,8 @@ VALUES
   2.99,
   30,
   'user',
-  ARRAY['Haftalık Top.gg oylamasından muafiyet', 'Tüm sunucularda geçerlidir', 'Kesintisiz parti katılımı'],
-  ARRAY['Bypass weekly Top.gg voting', 'Valid across all servers', 'Uninterrupted party participation'],
+  to_jsonb(ARRAY['Haftalık Top.gg oylamasından muafiyet', 'Tüm sunucularda geçerlidir', 'Kesintisiz parti katılımı']),
+  to_jsonb(ARRAY['Bypass weekly Top.gg voting', 'Valid across all servers', 'Uninterrupted party participation']),
   10,
   true
 ),
@@ -42,8 +42,8 @@ VALUES
   19.99,
   365,
   'user',
-  ARRAY['Haftalık Top.gg oylamasından muafiyet', 'Tüm sunucularda geçerlidir', 'Kesintisiz parti katılımı', 'Ekonomik yıllık paket'],
-  ARRAY['Bypass weekly Top.gg voting', 'Valid across all servers', 'Uninterrupted party participation', 'Economic yearly plan'],
+  to_jsonb(ARRAY['Haftalık Top.gg oylamasından muafiyet', 'Tüm sunucularda geçerlidir', 'Kesintisiz parti katılımı', 'Ekonomik yıllık paket']),
+  to_jsonb(ARRAY['Bypass weekly Top.gg voting', 'Valid across all servers', 'Uninterrupted party participation', 'Economic yearly plan']),
   20,
   true
 );
@@ -58,8 +58,8 @@ VALUES
   8.00,
   30,
   'server',
-  ARRAY['Gelişmiş Otomatik Rol Eşitleme (Loncadan Çıkışta Temizleme)', 'Günlük Otomatik KillBoard Özet Raporları', 'Objektif ve Timer Takip Sistemi', 'Özelleştirilmiş Embed Rengi ve Logosu'],
-  ARRAY['Advanced Auto-Role Sync (Cleanup on Guild Leave)', 'Daily Automatic KillBoard Summaries', 'Objective and Timer Tracking System', 'Customized Embed Colors and Logo'],
+  to_jsonb(ARRAY['Gelişmiş Otomatik Rol Eşitleme (Loncadan Çıkışta Temizleme)', 'Günlük Otomatik KillBoard Özet Raporları', 'Objektif ve Timer Takip Sistemi', 'Özelleştirilmiş Embed Rengi ve Logosu']),
+  to_jsonb(ARRAY['Advanced Auto-Role Sync (Cleanup on Guild Leave)', 'Daily Automatic KillBoard Summaries', 'Objective and Timer Tracking System', 'Customized Embed Colors and Logo']),
   30,
   true
 ),
@@ -70,8 +70,8 @@ VALUES
   17.99,
   90,
   'server',
-  ARRAY['Gelişmiş Otomatik Rol Eşitleme (Loncadan Çıkışta Temizleme)', 'Günlük Otomatik KillBoard Özet Raporları', 'Objektif ve Timer Takip Sistemi', 'Özelleştirilmiş Embed Rengi ve Logosu', 'Öncelikli Destek'],
-  ARRAY['Advanced Auto-Role Sync (Cleanup on Guild Leave)', 'Daily Automatic KillBoard Summaries', 'Objective and Timer Tracking System', 'Customized Embed Colors and Logo', 'Priority Support'],
+  to_jsonb(ARRAY['Gelişmiş Otomatik Rol Eşitleme (Loncadan Çıkışta Temizleme)', 'Günlük Otomatik KillBoard Özet Raporları', 'Objektif ve Timer Takip Sistemi', 'Özelleştirilmiş Embed Rengi ve Logosu', 'Öncelikli Destek']),
+  to_jsonb(ARRAY['Advanced Auto-Role Sync (Cleanup on Guild Leave)', 'Daily Automatic KillBoard Summaries', 'Objective and Timer Tracking System', 'Customized Embed Colors and Logo', 'Priority Support']),
   40,
   true
 ),
@@ -82,8 +82,8 @@ VALUES
   65.00,
   365,
   'server',
-  ARRAY['Gelişmiş Otomatik Rol Eşitleme (Loncadan Çıkışta Temizleme)', 'Günlük Otomatik KillBoard Özet Raporları', 'Objektif ve Timer Takip Sistemi', 'Özelleştirilmiş Embed Rengi ve Logosu', 'Öncelikli Destek (1 Yıl)'],
-  ARRAY['Advanced Auto-Role Sync (Cleanup on Guild Leave)', 'Daily Automatic KillBoard Summaries', 'Objective and Timer Tracking System', 'Customized Embed Colors and Logo', 'Priority Support (1 Year)'],
+  to_jsonb(ARRAY['Gelişmiş Otomatik Rol Eşitleme (Loncadan Çıkışta Temizleme)', 'Günlük Otomatik KillBoard Özet Raporları', 'Objektif ve Timer Takip Sistemi', 'Özelleştirilmiş Embed Rengi ve Logosu', 'Öncelikli Destek (1 Yıl)']),
+  to_jsonb(ARRAY['Advanced Auto-Role Sync (Cleanup on Guild Leave)', 'Daily Automatic KillBoard Summaries', 'Objective and Timer Tracking System', 'Customized Embed Colors and Logo', 'Priority Support (1 Year)']),
   50,
   true
 );
