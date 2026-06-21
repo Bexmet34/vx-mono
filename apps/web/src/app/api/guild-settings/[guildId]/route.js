@@ -60,6 +60,8 @@ export async function POST(req, { params }) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const body = await req.json();
+
     const { 
       language, auto_role_sync, embed_thumbnail_url, whitelist, party_templates,
       albion_guild_id, albion_guild_name, albion_server, killboard_channel_id, killboard_time,
