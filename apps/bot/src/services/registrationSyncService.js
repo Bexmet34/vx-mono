@@ -75,7 +75,7 @@ async function syncRegistrations(client, guildId) {
 
                 // Call Albion API to search for player
                 const { getPlayerInfo } = require('./albionService');
-                const playerData = await getPlayerInfo(ign);
+                const playerData = await getPlayerInfo(ign, settings.albion_server || 'Europe');
                 
                 if (playerData && playerData.Id) {
                     // Strictly check if player belongs to the Ana Guild

@@ -32,6 +32,7 @@ async function updateGuildConfig(guildId, data) {
         guild_name, 
         albion_guild_id, 
         albion_guild_name,
+        albion_server,
         log_channel_id, 
         objective_channel_id, 
         objective_notify_channel_id, 
@@ -54,6 +55,7 @@ async function updateGuildConfig(guildId, data) {
         const sbData = {};
         if (albion_guild_id) sbData.albion_guild_id = albion_guild_id;
         if (albion_guild_name) sbData.albion_guild_name = albion_guild_name;
+        if (albion_server) sbData.albion_server = albion_server;
         if (killboard_channel_id) sbData.killboard_channel_id = killboard_channel_id;
         if (killboard_time) sbData.killboard_time = killboard_time;
         if (log_channel_id) sbData.log_channel_id = log_channel_id;
@@ -66,16 +68,17 @@ async function updateGuildConfig(guildId, data) {
         // 2. Update Local SQLite (For fast access by bot)
         await db.run(
             `INSERT INTO guild_configs (
-                guild_id, guild_name, albion_guild_id, albion_guild_name, 
+                guild_id, guild_name, albion_guild_id, albion_guild_name, albion_server,
                 log_channel_id, objective_channel_id, objective_notify_channel_id, 
                 killboard_channel_id, killboard_time,
                 language, welcome_message, embed_thumbnail_url, setup_completed
             ) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1) 
              ON CONFLICT(guild_id) DO UPDATE SET 
                 guild_name = COALESCE(excluded.guild_name, guild_name), 
                 albion_guild_id = COALESCE(excluded.albion_guild_id, albion_guild_id), 
                 albion_guild_name = COALESCE(excluded.albion_guild_name, albion_guild_name),
+                albion_server = COALESCE(excluded.albion_server, albion_server),
                 log_channel_id = COALESCE(excluded.log_channel_id, log_channel_id),
                 objective_channel_id = COALESCE(excluded.objective_channel_id, objective_channel_id),
                 objective_notify_channel_id = COALESCE(excluded.objective_notify_channel_id, objective_notify_channel_id),
@@ -85,7 +88,7 @@ async function updateGuildConfig(guildId, data) {
                 welcome_message = COALESCE(excluded.welcome_message, welcome_message),
                 embed_thumbnail_url = COALESCE(excluded.embed_thumbnail_url, embed_thumbnail_url)`,
             [
-                guildId, guild_name, albion_guild_id, albion_guild_name, 
+                guildId, guild_name, albion_guild_id, albion_guild_name, albion_server || 'Europe',
                 log_channel_id, objective_channel_id, objective_notify_channel_id, 
                 killboard_channel_id, killboard_time || '06:00',
                 language || 'tr', welcome_message || 'Selam, Hoşgeldiniz!',

@@ -26,9 +26,15 @@ function fetchAlbionEvents(url) {
 /**
  * Fetches recent events for a guild (both kills and deaths)
  */
-function fetchAllGuildEvents(guildId) {
+function fetchAllGuildEvents(guildId, server = 'Europe') {
+    const REGIONS = {
+        'Europe': 'https://gameinfo-ams.albiononline.com/api/gameinfo',
+        'Americas': 'https://gameinfo.albiononline.com/api/gameinfo',
+        'Asia': 'https://gameinfo-sgp.albiononline.com/api/gameinfo'
+    };
+    const baseUrl = REGIONS[server] || REGIONS.Europe;
     return fetchAlbionEvents(
-        `https://gameinfo-ams.albiononline.com/api/gameinfo/events?offset=0&limit=51&guildId=${guildId}`
+        `${baseUrl}/events?offset=0&limit=51&guildId=${guildId}`
     );
 }
 
@@ -116,7 +122,7 @@ async function sendKillBoardSummary(client, guildCfg) {
         console.log(`[KillBoard] Period: ${sinceDate.toISOString()} → ${now.toISOString()}`);
 
         // Fetch all recent events
-        const allEvents = await fetchAllGuildEvents(guildCfg.albion_guild_id);
+        const allEvents = await fetchAllGuildEvents(guildCfg.albion_guild_id, guildCfg.albion_server || 'Europe');
         
         const allKills = [];
         const allDeaths = [];

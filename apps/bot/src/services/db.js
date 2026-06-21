@@ -77,6 +77,7 @@ function initDb() {
                 guild_id TEXT PRIMARY KEY,
                 guild_name TEXT,
                 albion_guild_id TEXT,
+                albion_server TEXT DEFAULT 'Europe',
                 log_channel_id TEXT,
                 objective_channel_id TEXT,
                 objective_notify_channel_id TEXT,
@@ -161,6 +162,7 @@ function initDb() {
             safeAlter("ALTER TABLE guild_configs ADD COLUMN auto_check_guild_tag TEXT");
             safeAlter("ALTER TABLE guild_configs ADD COLUMN auto_check_log_channel_id TEXT");
             safeAlter("ALTER TABLE guild_configs ADD COLUMN last_auto_check_date TEXT");
+            safeAlter("ALTER TABLE guild_configs ADD COLUMN albion_server TEXT DEFAULT 'Europe'");
 
             // Set default settings if not exists
             try {

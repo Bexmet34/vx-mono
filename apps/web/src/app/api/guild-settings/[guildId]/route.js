@@ -60,10 +60,9 @@ export async function POST(req, { params }) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const body = await req.json();
     const { 
       language, auto_role_sync, embed_thumbnail_url, whitelist, party_templates,
-      albion_guild_id, albion_guild_name, killboard_channel_id, killboard_time,
+      albion_guild_id, albion_guild_name, albion_server, killboard_channel_id, killboard_time,
       registration_enabled, registration_channel_id, registration_staff_role_ids,
       registration_category_id, registration_welcome_message, registration_given_role_id,
       registration_given_role_id_2, registration_given_role_id_3,
@@ -87,6 +86,7 @@ export async function POST(req, { params }) {
           party_templates: Array.isArray(party_templates) ? party_templates : [],
           albion_guild_id: albion_guild_id || null,
           albion_guild_name: albion_guild_name || null,
+          albion_server: albion_server || 'Europe',
           killboard_channel_id: killboard_channel_id || null,
           killboard_time: killboard_time || '06:00',
           registration_enabled: registration_enabled ?? false,

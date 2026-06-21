@@ -4,7 +4,7 @@ import { Copy, Plus, Trash2 } from "lucide-react";
 import InfoTooltip from "@/components/InfoTooltip";
 import { useState, useEffect } from "react";
 
-export default function TemplateTab({ t, lang, settings, setSettings, selectedTemplateId, setSelectedTemplateId }) {
+export default function TemplateTab({ t, lang, settings, setSettings, selectedTemplateId, setSelectedTemplateId, isPremium, showToast }) {
   const selectedTemplate = settings.party_templates?.find(tpl => tpl.id === selectedTemplateId) || null;
 
   const [localReq, setLocalReq] = useState("");
@@ -18,6 +18,15 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
   }, [selectedTemplateId]);
 
   const handleCreateTemplate = () => {
+    if (!isPremium && (settings.party_templates || []).length >= 5) {
+      showToast(
+        lang === 'tr' 
+          ? "Freemium sunucular en fazla 5 şablon oluşturabilir! Fazlası için lütfen Premium pakete geçin." 
+          : "Freemium servers can create a maximum of 5 templates! Upgrade to Premium for unlimited templates.", 
+        "error"
+      );
+      return;
+    }
     const newTemplate = { id: `tpl_${Date.now()}`, name: "New Template", required_roles: [], optional_roles: [] };
     setSettings({ ...settings, party_templates: [...(settings.party_templates || []), newTemplate] });
     setSelectedTemplateId(newTemplate.id);
@@ -57,7 +66,11 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
             <Copy className="text-primary-container" /> {lang === 'en' ? 'Templates' : 'Şablonlar'}
             <InfoTooltip text={lang === 'en' ? 'Create reusable party setups. Use the /temp command in Discord to quickly start a party using these templates.' : 'Tekrar kullanılabilir parti ayarları oluşturun. Discord\'da /temp komutunu kullanarak bu şablonlarla saniyeler içinde parti kurabilirsiniz.'} />
           </h2>
-          <button className="p-2 bg-surface-container border border-outline-variant hover:border-primary-container hover:text-primary-container rounded-sm transition-colors text-on-surface-variant" onClick={handleCreateTemplate}>
+          <button 
+            className={`p-2 bg-surface-container border border-outline-variant rounded-sm transition-colors text-on-surface-variant ${(!isPremium && (settings.party_templates || []).length >= 5) ? 'opacity-50 cursor-not-allowed' : 'hover:border-primary-container hover:text-primary-container'}`} 
+            onClick={handleCreateTemplate}
+            title={!isPremium && (settings.party_templates || []).length >= 5 ? (lang === 'tr' ? 'Yeni şablonlar eklemek için Premium pakete geçin.' : 'Upgrade to Premium to add more templates.') : ''}
+          >
              <Plus size={18} />
           </button>
         </div>

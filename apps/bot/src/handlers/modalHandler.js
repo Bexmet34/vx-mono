@@ -240,7 +240,7 @@ async function handleRegisterModal(interaction) {
 
         try {
             // 1. Fetch Albion Info
-            const playerData = await getPlayerInfo(ign);
+            const playerData = await getPlayerInfo(ign, guildConfig?.albion_server || 'Europe');
             if (!playerData) {
                 return await interaction.editReply({
                     content: `❌ **${lang === 'tr' ? 'Oyuncu bulunamadı! Lütfen ismin büyük/küçük harf duyarlı olduğuna dikkat edin.' : 'Player not found! Please ensure the name is case-sensitive.'}**`

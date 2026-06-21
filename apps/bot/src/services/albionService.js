@@ -3,23 +3,29 @@
  * Handles fetching player data from Albion Online Gameinfo API
  */
 
-// Default to Europe server (AMS) for Turkish communities, but can be configured
+// Mapping of Albion regions: Europe (AMS), Americas (West), Asia (East/SGP)
 const REGIONS = {
     EUROPE: 'https://gameinfo-ams.albiononline.com/api/gameinfo',
     WEST: 'https://gameinfo.albiononline.com/api/gameinfo',
-    EAST: 'https://gameinfo-sgp.albiononline.com/api/gameinfo'
-};
+    EAST: 'https://gameinfo-sgp.albiononline.com/api/gameinfo',
 
-const BASE_URL = REGIONS.EUROPE; // Varsayılanı Avrupa yaptık
+    // Friendly mappings matching dashboard settings
+    'Europe': 'https://gameinfo-ams.albiononline.com/api/gameinfo',
+    'Americas': 'https://gameinfo.albiononline.com/api/gameinfo',
+    'Asia': 'https://gameinfo-sgp.albiononline.com/api/gameinfo'
+};
 
 /**
  * Searches for a player by name and returns their full data
  * @param {string} playerName 
+ * @param {string} server 'Europe' | 'Americas' | 'Asia'
  */
-async function getPlayerInfo(playerName) {
+async function getPlayerInfo(playerName, server = 'Europe') {
     try {
+        const baseUrl = REGIONS[server] || REGIONS.Europe;
+        
         // 1. Search for the player to get the ID
-        const searchUrl = `${BASE_URL}/search?q=${encodeURIComponent(playerName)}`;
+        const searchUrl = `${baseUrl}/search?q=${encodeURIComponent(playerName)}`;
         const searchResponse = await fetch(searchUrl);
         
         if (!searchResponse.ok) throw new Error('API_ERROR');
@@ -27,7 +33,7 @@ async function getPlayerInfo(playerName) {
         const searchData = await searchResponse.json();
         
         if (!searchData.players || searchData.players.length === 0) {
-            console.log(`[AlbionService] No players found for "${playerName}" in ${BASE_URL}`);
+            console.log(`[AlbionService] No players found for "${playerName}" in ${baseUrl}`);
             return null;
         }
 
@@ -38,17 +44,17 @@ async function getPlayerInfo(playerName) {
         if (!player) return null;
         
         // 2. Get detailed player info
-        const detailUrl = `${BASE_URL}/players/${player.Id}`;
+        const detailUrl = `${baseUrl}/players/${player.Id}`;
         const detailResponse = await fetch(detailUrl);
         
         if (!detailResponse.ok) throw new Error('API_ERROR');
         
         const detailedData = await detailResponse.json();
         
-        console.log(`[AlbionService] Successfully fetched data for: ${detailedData.Name}`);
+        console.log(`[AlbionService] Successfully fetched data for: ${detailedData.Name} on ${server}`);
         return detailedData;
     } catch (error) {
-        console.error('[AlbionService] Error:', error.message);
+        console.error(`[AlbionService] Error fetching on server ${server}:`, error.message);
         throw error;
     }
 }

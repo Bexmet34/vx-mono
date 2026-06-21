@@ -33,7 +33,16 @@ export async function GET(req, { params }) {
             return NextResponse.json({ error: "Missing albionGuildId" }, { status: 400 });
         }
 
-        const BASE = 'https://gameinfo-ams.albiononline.com/api/gameinfo';
+        const { searchParams } = new URL(req.url);
+        const server = searchParams.get('server') || 'Europe';
+
+        const REGIONS = {
+            'Europe': 'https://gameinfo-ams.albiononline.com/api/gameinfo',
+            'Americas': 'https://gameinfo.albiononline.com/api/gameinfo',
+            'Asia': 'https://gameinfo-sgp.albiononline.com/api/gameinfo'
+        };
+
+        const BASE = REGIONS[server] || REGIONS.Europe;
 
         // Fetch recent events for the guild
         const events = await fetchAlbion(`${BASE}/events?offset=0&limit=51&guildId=${albionGuildId}`);
@@ -51,7 +60,7 @@ export async function GET(req, { params }) {
             }
         }
 
-        console.log(`[KillBoard Preview] ${albionGuildId}: ${killEvents.length} kills, ${deathEvents.length} deaths from ${events.length} events`);
+        console.log(`[KillBoard Preview] ${albionGuildId} (${server}): ${killEvents.length} kills, ${deathEvents.length} deaths from ${events.length} events`);
 
         // Top killers: aggregate by killer name
         const killerMap = {};

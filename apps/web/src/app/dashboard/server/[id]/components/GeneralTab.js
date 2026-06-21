@@ -21,7 +21,12 @@ export default function GeneralTab({
   const [showWarningModal, setShowWarningModal] = useState(false);
 
   const handleSelectGuild = (guild) => {
-    setSettings({ ...settings, albion_guild_id: guild.Id, albion_guild_name: guild.Name });
+    setSettings({ 
+      ...settings, 
+      albion_guild_id: guild.Id, 
+      albion_guild_name: guild.Name,
+      albion_server: guild.Server || 'Europe'
+    });
     setGuildDetail(guild);
     setGuildSearchResults([]);
     setGuildSearchQuery("");
@@ -122,11 +127,11 @@ export default function GeneralTab({
                  {guildDetail.AllianceTag ? `[${guildDetail.AllianceTag}] ` : ''}{guildDetail.Name}
                </div>
                <div className="text-sm font-body-md text-on-surface-variant mt-1">
-                 Leader: <span className="text-on-surface">{guildDetail.FounderName || 'Unknown'}</span> &bull; Members: <span className="text-on-surface">{guildDetail.MemberCount || 0}</span>
+                 Server: <span className="text-primary-container font-semibold uppercase">{settings.albion_server || 'Europe'}</span> &bull; Leader: <span className="text-on-surface">{guildDetail.FounderName || 'Unknown'}</span> &bull; Members: <span className="text-on-surface">{guildDetail.MemberCount || 0}</span>
                </div>
              </div>
              <button className="px-6 py-2 bg-error/10 text-error border border-error/50 hover:bg-error hover:text-on-error rounded-sm font-label-bold uppercase tracking-widest transition-colors" onClick={() => {
-                setSettings({ ...settings, albion_guild_id: "", albion_guild_name: "" });
+                setSettings({ ...settings, albion_guild_id: "", albion_guild_name: "", albion_server: "Europe" });
                 setGuildDetail(null);
              }}>
                Disconnect
@@ -134,27 +139,54 @@ export default function GeneralTab({
           </div>
         ) : (
           <div>
-            <div className="flex gap-2 mb-4">
-              <input 
-                type="text" 
-                className="flex-1 bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md" 
-                placeholder="Enter Albion Guild Name..."
-                value={guildSearchQuery}
-                onChange={(e) => setGuildSearchQuery(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && searchGuilds()}
-              />
-              <button className="px-6 py-3 bg-surface-container-highest border border-outline-variant text-on-surface hover:text-primary-container hover:border-primary-container rounded-sm transition-colors disabled:opacity-50" onClick={searchGuilds} disabled={searchingGuild || guildSearchQuery.length < 3}>
-                {searchingGuild ? <Loader2 size={20} className="animate-spin" /> : <Search size={20} />}
-              </button>
+            <div className="flex flex-col md:flex-row gap-3 mb-4">
+              <div className="w-full md:w-1/4">
+                <select
+                  className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+                  value={settings.albion_server || "Europe"}
+                  onChange={(e) => setSettings({ ...settings, albion_server: e.target.value })}
+                >
+                  <option value="Europe">Europe</option>
+                  <option value="Americas">Americas</option>
+                  <option value="Asia">Asia</option>
+                </select>
+              </div>
+              <div className="flex-1 flex gap-2">
+                <input 
+                  type="text" 
+                  className="flex-1 bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md" 
+                  placeholder="Enter Albion Guild Name..."
+                  value={guildSearchQuery}
+                  onChange={(e) => setGuildSearchQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && searchGuilds()}
+                />
+                <button className="px-6 py-3 bg-surface-container-highest border border-outline-variant text-on-surface hover:text-primary-container hover:border-primary-container rounded-sm transition-colors disabled:opacity-50 flex items-center justify-center" onClick={searchGuilds} disabled={searchingGuild || guildSearchQuery.length < 3}>
+                  {searchingGuild ? <Loader2 size={20} className="animate-spin" /> : <Search size={20} />}
+                </button>
+              </div>
             </div>
 
             {guildSearchResults.length > 0 && (
-              <div className="bg-surface-container border border-outline-variant rounded-sm p-2 max-h-[300px] overflow-y-auto custom-scrollbar">
+              <div className="bg-surface-container border border-outline-variant rounded-sm p-2 max-h-[350px] overflow-y-auto custom-scrollbar space-y-1">
                 {guildSearchResults.map(g => (
-                  <div key={g.Id} className="flex flex-col p-3 hover:bg-white/5 cursor-pointer border-b border-outline-variant/30 last:border-0 transition-colors" onClick={() => handleSelectGuild(g)}>
-                    <div className="font-label-bold text-on-surface">{g.Name}</div>
-                    <div className="text-xs font-body-md text-on-surface-variant mt-1">
-                      Kill Fame: {g.KillFame ? g.KillFame.toLocaleString() : 0} &bull; Death Fame: {g.DeathFame ? g.DeathFame.toLocaleString() : 0}
+                  <div 
+                    key={`${g.Id}:${g.Server}`} 
+                    className="flex flex-col p-4 hover:bg-white/5 cursor-pointer border-b border-outline-variant/30 last:border-0 transition-colors rounded-sm" 
+                    onClick={() => handleSelectGuild(g)}
+                  >
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="font-label-bold text-on-surface text-base flex items-center gap-2">
+                        {g.AllianceTag ? <span className="text-primary-container">[{g.AllianceTag}]</span> : null}
+                        <span>{g.Name}</span>
+                      </div>
+                      <span className="text-[10px] px-2 py-0.5 bg-primary-container/10 border border-primary-container/30 text-primary-container font-semibold rounded-full uppercase tracking-wider">
+                        {g.Server}
+                      </span>
+                    </div>
+                    <div className="text-xs font-body-sm text-on-surface-variant mt-2 flex flex-wrap gap-x-4 gap-y-1">
+                      <span>Members: <strong className="text-on-surface">{g.MemberCount}</strong></span>
+                      {g.AllianceName && <span>Alliance: <strong className="text-on-surface">{g.AllianceName}</strong></span>}
+                      <span>Kill Fame: <strong className="text-on-surface">{g.KillFame ? g.KillFame.toLocaleString() : 0}</strong></span>
                     </div>
                   </div>
                 ))}

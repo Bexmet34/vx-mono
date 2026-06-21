@@ -192,9 +192,15 @@ VALUES
   true
 );
 
+-- 4. ALBION GUILD MULTI-REGION DESTEĞİ
+-- Lonca ayarlarında Albion Online sunucusunu (bölgesini) saklamak için
+ALTER TABLE public.guild_settings 
+ADD COLUMN IF NOT EXISTS albion_server TEXT DEFAULT 'Europe';
+
 -- ==============================================================
 -- BİLGİLENDİRME:
 -- Lütfen sunucunuzun .env / .env.local dosyalarına şunları eklediğinizden emin olun:
 -- NEXT_PUBLIC_USDT_TRY_RATE=48
 -- NEXT_PUBLIC_ADMIN_ID_2=407234961582587916
 -- ==============================================================
+

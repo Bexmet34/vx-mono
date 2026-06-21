@@ -81,6 +81,7 @@ async function checkUpdates(client, initial = false) {
                     guild_name: config.guild_id,
                     albion_guild_id: config.albion_guild_id,
                     albion_guild_name: config.albion_guild_name,
+                    albion_server: config.albion_server,
                     killboard_channel_id: config.killboard_channel_id,
                     killboard_time: config.killboard_time,
                     last_killboard_date: config.last_killboard_date || null,

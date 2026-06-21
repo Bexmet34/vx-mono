@@ -74,6 +74,7 @@ export default function ServerSettings() {
     party_templates: [],
     albion_guild_id: "",
     albion_guild_name: "",
+    albion_server: "Europe",
     killboard_channel_id: "",
     killboard_time: "06:00",
     registration_enabled: false,
@@ -129,6 +130,7 @@ export default function ServerSettings() {
           party_templates: s?.party_templates || [],
           albion_guild_id: s?.albion_guild_id || "",
           albion_guild_name: s?.albion_guild_name || "",
+          albion_server: s?.albion_server || "Europe",
           killboard_channel_id: s?.killboard_channel_id || "",
           killboard_time: s?.killboard_time || "06:00",
           registration_enabled: s?.registration_enabled || false,
@@ -184,12 +186,12 @@ export default function ServerSettings() {
     if (guildSearchQuery.length < 3) return;
     setSearchingGuild(true);
     try {
-      const res = await fetch(`/api/albion/search?q=${encodeURIComponent(guildSearchQuery)}`);
+      const res = await fetch(`/api/albion/search?q=${encodeURIComponent(guildSearchQuery)}&server=${encodeURIComponent(settings.albion_server || 'Europe')}`);
       const data = await res.json();
       setGuildSearchResults(data || []);
     } catch (err) { console.error(err); }
     finally { setSearchingGuild(false); }
-  }, [guildSearchQuery]);
+  }, [guildSearchQuery, settings.albion_server]);
 
   useEffect(() => {
     setMounted(true);
@@ -224,13 +226,44 @@ export default function ServerSettings() {
       setTimeout(() => setGuildDetail(null), 0);
       return; 
     }
-    fetch(`/api/albion/guild/${settings.albion_guild_id}`)
+    fetch(`/api/albion/guild/${settings.albion_guild_id}?server=${settings.albion_server || 'Europe'}`)
       .then(r => r.json())
       .then(d => { if (!d.error) setGuildDetail(d); })
       .catch(() => setGuildDetail(null));
-  }, [settings.albion_guild_id]);
+  }, [settings.albion_guild_id, settings.albion_server]);
 
   const handleSave = async () => {
+    // Template validation
+    if (settings.party_templates && settings.party_templates.length > 0) {
+      for (const tpl of settings.party_templates) {
+        if (!tpl.name || !tpl.name.trim()) {
+          showToast(lang === "en" ? "Template name cannot be empty!" : "Şablon adı boş bırakılamaz!", "error");
+          return;
+        }
+        const reqCount = (tpl.required_roles || []).filter(r => r && r.trim()).length;
+        const optCount = (tpl.optional_roles || []).filter(r => r && r.trim()).length;
+        if (reqCount + optCount === 0) {
+          showToast(
+            lang === "en" 
+              ? `Template "${tpl.name}" must have at least one role!` 
+              : `"${tpl.name}" şablonunda en az bir rol bulunmalıdır!`, 
+            "error"
+          );
+          return;
+        }
+      }
+    }
+
+    if (!isPremium && settings.party_templates && settings.party_templates.length > 5) {
+      showToast(
+        lang === "en"
+          ? "Freemium servers are limited to 5 templates. Please delete extra templates before saving."
+          : "Freemium sunucular en fazla 5 şablon kaydedebilir. Lütfen fazla şablonları silin.",
+        "error"
+      );
+      return;
+    }
+
     setSaving(true);
     try {
       const res = await fetch(`/api/guild-settings/${guildId}`, {
@@ -301,7 +334,7 @@ export default function ServerSettings() {
     setLoadingPreview(true);
     setKillboardPreview(null);
     try {
-      const res = await fetch(`/api/killboard/preview/${settings.albion_guild_id}`);
+      const res = await fetch(`/api/killboard/preview/${settings.albion_guild_id}?server=${settings.albion_server || 'Europe'}`);
       const data = await res.json();
       if (res.ok) setKillboardPreview(data);
       else throw new Error(data.error || "Veri çekilemedi");
@@ -476,7 +509,7 @@ export default function ServerSettings() {
         )}
 
         {activeTab === 'templates' && (
-          <TemplateTab t={t} lang={lang} settings={settings} setSettings={setSettings} selectedTemplateId={selectedTemplateId} setSelectedTemplateId={setSelectedTemplateId} handleSave={handleSave} saving={saving} />
+          <TemplateTab t={t} lang={lang} settings={settings} setSettings={setSettings} selectedTemplateId={selectedTemplateId} setSelectedTemplateId={setSelectedTemplateId} handleSave={handleSave} saving={saving} isPremium={isPremium} showToast={showToast} />
         )}
 
         {activeTab === 'killboard' && (

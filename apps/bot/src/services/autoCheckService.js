@@ -68,7 +68,7 @@ async function processGuild(client, config) {
         if (!discordGuild) return;
 
         // 1. Fetch Albion Guild Roster
-        const albionMembers = await getGuildMembers(config.albion_guild_id);
+        const albionMembers = await getGuildMembers(config.albion_guild_id, config.albion_server || 'Europe');
         if (!albionMembers || albionMembers.length === 0) {
             console.log(`[AutoCheckService] Could not fetch albion members for ${config.albion_guild_id}. Skipping.`);
             return;

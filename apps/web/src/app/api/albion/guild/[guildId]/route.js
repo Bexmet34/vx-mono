@@ -5,9 +5,19 @@ export const dynamic = 'force-dynamic';
 export async function GET(req, { params }) {
   try {
     const { guildId } = await params;
+    const { searchParams } = new URL(req.url);
+    const server = searchParams.get('server') || 'Europe';
+
+    const REGIONS = {
+      'Europe': 'https://gameinfo-ams.albiononline.com/api/gameinfo',
+      'Americas': 'https://gameinfo.albiononline.com/api/gameinfo',
+      'Asia': 'https://gameinfo-sgp.albiononline.com/api/gameinfo'
+    };
+
+    const baseUrl = REGIONS[server] || REGIONS.Europe;
 
     const res = await fetch(
-      `https://gameinfo-ams.albiononline.com/api/gameinfo/guilds/${guildId}`,
+      `${baseUrl}/guilds/${guildId}`,
       {
         headers: { 'Accept': 'application/json' },
         next: { revalidate: 0 }

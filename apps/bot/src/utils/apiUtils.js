@@ -6,17 +6,29 @@
 /**
  * Fetches members of an Albion Online guild.
  * @param {string} guildId 
+ * @param {string} server 'Europe' | 'Americas' | 'Asia'
  * @returns {Promise<Array>} Array of member objects or empty array if failed
  */
-async function getGuildMembers(guildId) {
+async function getGuildMembers(guildId, server = 'Europe') {
     if (!guildId) return [];
     
-    // Try multiple Albion regions: Europe (AMS), Americas (West), Asia (East/SGP)
-    const urls = [
+    const REGIONS = {
+        'Europe': 'https://gameinfo-ams.albiononline.com/api/gameinfo',
+        'Americas': 'https://gameinfo.albiononline.com/api/gameinfo',
+        'Asia': 'https://gameinfo-sgp.albiononline.com/api/gameinfo'
+    };
+
+    // Prioritize the configured server
+    const targetUrl = `${REGIONS[server] || REGIONS.Europe}/guilds/${guildId}/members`;
+    
+    // Fill other regions as fallbacks
+    const fallbackUrls = [
         `https://gameinfo-ams.albiononline.com/api/gameinfo/guilds/${guildId}/members`,
         `https://gameinfo.albiononline.com/api/gameinfo/guilds/${guildId}/members`,
         `https://gameinfo-sgp.albiononline.com/api/gameinfo/guilds/${guildId}/members`
-    ];
+    ].filter(url => url !== targetUrl);
+
+    const urls = [targetUrl, ...fallbackUrls];
 
     for (const url of urls) {
         try {
