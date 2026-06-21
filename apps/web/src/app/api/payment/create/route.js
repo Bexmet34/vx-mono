@@ -42,6 +42,7 @@ export async function POST(req) {
         amount: plan.amount,
         currency: 'USDT',
         duration_days: plan.duration_days,
+        plan_type: plan.plan_type || 'server',
         status: 'pending'
       });
 

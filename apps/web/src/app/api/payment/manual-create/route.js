@@ -69,6 +69,7 @@ export async function POST(req) {
         amount: plan.amount,
         currency: 'TRY',
         duration_days: plan.duration_days,
+        plan_type: plan.plan_type || 'server',
         status: 'pending',
         payment_method: 'havale',
         sender_name: senderName,

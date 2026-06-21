@@ -713,84 +713,148 @@ export default function Home() {
                      </button>
                 </div>
               ) : manualSuccess ? (
-                <div className="flex flex-col items-center justify-center py-8 px-4 text-center animate-slide-up">
-                     <div className="relative mb-8 mt-4">
-                       <div className="absolute inset-0 bg-primary-container/20 blur-xl rounded-full scale-150"></div>
-                       <CreditCard size={80} className="text-primary-container relative z-10 drop-shadow-[0_0_15px_rgba(255,215,0,0.8)]" />
-                     </div>
-                     <h3 className="font-headline-xl text-3xl md:text-4xl text-on-surface uppercase tracking-tight mb-4">Banka Bilgileri</h3>
-                     <p className="text-on-surface-variant font-body-lg mb-8 max-w-md">Aşağıdaki IBAN adresine havale/EFT yaparken açıklama kısmına kesinlikle sistemin ürettiği bu kodu yazın.</p>
-                     
-                     <div className="bg-[#0B0F19] p-6 border border-primary-container/50 rounded-xl mb-8 w-full max-w-md shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
-                        <div className="font-label-bold text-xs text-primary-container uppercase tracking-widest mb-2 opacity-80">Açıklama Kodu (Kesinlikle Yazılmalı)</div>
-                        <div className="flex items-center justify-between gap-4">
-                          <div className="font-mono text-3xl md:text-4xl font-bold text-on-surface tracking-[0.2em] break-all">{generatedCode}</div>
-                          <button 
-                             onClick={() => navigator.clipboard.writeText(generatedCode)}
-                             className="p-3 bg-primary-container/10 hover:bg-primary-container text-primary-container hover:text-on-primary transition-all border border-primary-container/30 rounded-lg shrink-0 group"
-                             title="Kodu Kopyala"
-                          >
-                             <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:scale-110 transition-transform"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                          </button>
-                        </div>
-                     </div>
-
-                     <div className="bg-error/10 border border-error/50 p-5 rounded-lg text-left mb-8 w-full max-w-md relative overflow-hidden">
-                        <div className="absolute left-0 top-0 w-1 h-full bg-error"></div>
-                        <strong className="text-error font-headline-md uppercase text-lg mb-2 tracking-widest flex items-center gap-2">
-                           <AlertCircle size={20} /> DİKKAT!
-                        </strong>
-                        <span className="text-on-surface font-body-md text-sm leading-relaxed opacity-90">
-                           Lütfen havale açıklamasına bu kodu yazmayı <strong className="text-error font-bold">kesinlikle unutmayın!</strong> Aksi takdirde otomatik sistemimiz ödemenizi eşleştiremez ve hesabınız onaylanmaz.
-                        </span>
-                     </div>
-
-                     <div className="w-full max-w-md text-left font-body-md text-sm text-on-surface-variant space-y-3 bg-surface-container-high p-5 rounded-xl border border-outline-variant shadow-inner">
-                        <div className="flex justify-between items-center border-b border-outline-variant/50 pb-3">
-                           <strong className="text-on-surface uppercase tracking-widest text-xs opacity-70">Banka</strong> 
-                           <span className="text-on-surface font-semibold">{selectedBank?.bank_name || "Bilinmiyor"}</span>
-                        </div>
-                        <div className="flex justify-between items-center border-b border-outline-variant/50 pb-3 pt-1">
-                           <strong className="text-on-surface uppercase tracking-widest text-xs opacity-70">Alıcı</strong> 
-                           <span className="text-on-surface font-semibold">{selectedBank?.account_holder || "Bilinmiyor"}</span>
-                        </div>
-                        <div className="pt-2">
-                           <strong className="text-on-surface uppercase tracking-widest text-xs opacity-70 block mb-2">IBAN Adresi</strong>
-                           <div className="font-mono bg-[#0B0F19] p-3 rounded-lg border border-outline-variant text-on-surface flex justify-between items-center group hover:border-primary-container/50 transition-colors">
-                              <span className="tracking-widest text-xs sm:text-sm">{selectedBank?.iban || "TR00 0000 0000 0000 0000 0000 00"}</span>
-                              <button onClick={() => navigator.clipboard.writeText(selectedBank?.iban || "")} className="text-primary-container text-xs hover:underline uppercase font-label-bold tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Kopyala</button>
+                <div className="flex flex-col items-center justify-center py-6 px-4 text-center animate-slide-up w-full max-w-lg mx-auto">
+                      <div className="relative mb-6">
+                        <div className="absolute inset-0 bg-primary-container/20 blur-xl rounded-full scale-150"></div>
+                        <Shield size={60} className="text-primary-container relative z-10 drop-shadow-[0_0_15px_rgba(255,215,0,0.8)]" />
+                      </div>
+                      <h3 className="font-headline-xl text-2xl md:text-3xl text-on-surface uppercase tracking-tight mb-2">Güvenli Havale / EFT Akışı</h3>
+                      <p className="text-on-surface-variant font-body-md text-sm mb-6 max-w-md">Ödemenizin güvenle onaylanması için lütfen aşağıdaki talimatları eksiksiz takip edin.</p>
+                      
+                      {/* Step-by-Step Progress Tracker */}
+                      <div className="w-full max-w-md bg-[#0B0F19]/60 border border-outline-variant/40 p-4 rounded-xl mb-6 text-left">
+                         <div className="text-xs font-label-bold text-primary-container uppercase tracking-wider mb-3 pb-2 border-b border-outline-variant/30 flex justify-between">
+                           <span>ÖDEME ADIMLARI</span>
+                           <span className="flex items-center gap-1"><Lock size={12} /> SSL Korumalı</span>
+                         </div>
+                         <div className="space-y-3">
+                           <div className="flex items-start gap-3">
+                             <div className="w-5 h-5 rounded-full bg-primary-container text-on-primary text-xs font-bold flex items-center justify-center shrink-0">1</div>
+                             <span className="text-xs text-on-surface font-body-md">Seçtiğiniz bankaya ait IBAN adresine paket tutarını gönderin.</span>
                            </div>
-                        </div>
-                     </div>
-                     
-                     <div className="w-full max-w-md mt-6 text-left space-y-2">
-                        <label className="font-label-bold text-xs text-on-surface uppercase tracking-widest opacity-70">Ödemeyi Yapan (Kart Üzerindeki İsim)</label>
-                        <input 
-                          type="text" 
-                          placeholder="Örn: Ahmet Yılmaz" 
-                          className="w-full bg-[#0B0F19] border border-outline-variant p-4 text-on-surface font-body-md focus:border-primary-container outline-none transition-colors"
-                          value={senderName}
-                          onChange={(e) => setSenderName(e.target.value)}
-                        />
-                     </div>
-                     
-                     <div className="flex gap-4 w-full max-w-md mt-6">
-                       <button 
-                         onClick={() => setShowCheckout(false)}
-                         className="flex-1 px-4 py-3 border border-outline-variant text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface rounded-lg font-label-bold uppercase tracking-widest transition-all"
-                       >
-                         İptal
-                       </button>
-                       <button 
-                         onClick={handleConfirmManualPayment}
-                         disabled={isProcessing || senderName.trim().length < 3}
-                         className="flex-[2] px-4 py-3 bg-primary-container text-on-primary rounded-lg font-label-bold uppercase tracking-widest transition-all shadow-[0_10px_20px_rgba(255,215,0,0.2)] hover:brightness-110 active:scale-95 disabled:opacity-50"
-                       >
-                         {isProcessing ? <Loader2 className="animate-spin inline mr-2" size={20} /> : null}
-                         Ödemeyi Yaptım
-                       </button>
-                     </div>
+                           <div className="flex items-start gap-3">
+                             <div className="w-5 h-5 rounded-full bg-primary-container text-on-primary text-xs font-bold flex items-center justify-center shrink-0">2</div>
+                             <span className="text-xs text-on-surface font-body-md">Havale açıklama alanına <strong>sadece</strong> aşağıdaki 8 haneli kodu yazın.</span>
+                           </div>
+                           <div className="flex items-start gap-3">
+                             <div className="w-5 h-5 rounded-full bg-primary-container text-on-primary text-xs font-bold flex items-center justify-center shrink-0">3</div>
+                             <span className="text-xs text-on-surface font-body-md">Ödeyen kişinin ismini yazın, yasal sözleşmeleri onaylayıp bildirin.</span>
+                           </div>
+                         </div>
+                      </div>
+
+                      {/* Order Summary */}
+                      <div className="w-full max-w-md bg-surface-container p-4 rounded-xl border border-outline-variant mb-6 text-left">
+                         <div className="text-xs font-label-bold text-on-surface-variant uppercase tracking-widest mb-2 opacity-70">Sipariş Özeti</div>
+                         <div className="flex justify-between items-center">
+                            <span className="font-bold text-sm text-on-surface">{selectedPlan?.name_tr || "Premium Paket"}</span>
+                            <span className="text-primary-container font-headline-md text-lg">
+                              {(selectedPlan?.amount * (parseFloat(process.env.NEXT_PUBLIC_USDT_TRY_RATE) || 40)).toLocaleString('tr-TR')} TL
+                            </span>
+                         </div>
+                      </div>
+
+                      {/* Code Display */}
+                      <div className="bg-[#0B0F19] p-5 border border-primary-container/40 rounded-xl mb-6 w-full max-w-md shadow-2xl">
+                         <div className="font-label-bold text-xs text-primary-container uppercase tracking-widest mb-2 opacity-80">Açıklama Kodu (Kesinlikle Yazılmalı)</div>
+                         <div className="flex items-center justify-between gap-4">
+                           <div className="font-mono text-2xl md:text-3xl font-bold text-on-surface tracking-[0.2em] break-all">{generatedCode}</div>
+                           <button 
+                              onClick={() => navigator.clipboard.writeText(generatedCode)}
+                              className="p-3 bg-primary-container/10 hover:bg-primary-container text-primary-container hover:text-on-primary transition-all border border-primary-container/30 rounded-lg shrink-0 group"
+                              title="Kodu Kopyala"
+                           >
+                              <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:scale-110 transition-transform"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                           </button>
+                         </div>
+                      </div>
+
+                      {/* Warning Section */}
+                      <div className="bg-error/10 border border-error/40 p-4 rounded-lg text-left mb-6 w-full max-w-md relative overflow-hidden">
+                         <div className="absolute left-0 top-0 w-1 h-full bg-error"></div>
+                         <strong className="text-error font-headline-md uppercase text-xs mb-1 tracking-widest flex items-center gap-2">
+                            <AlertCircle size={16} /> ÖNEMLİ UYARI
+                         </strong>
+                         <span className="text-on-surface font-body-md text-xs leading-relaxed opacity-90">
+                            Açıklama kısmına bu kod dışında hiçbir şey (ad soyad, paket adı vb.) <strong>yazmayınız</strong>. Aksi halde ödemeniz otomatik sistem tarafından eşleştirilemez.
+                         </span>
+                      </div>
+
+                      {/* Bank Details Table */}
+                      <div className="w-full max-w-md text-left font-body-md text-xs text-on-surface-variant space-y-3 bg-surface-container-high p-4 rounded-xl border border-outline-variant shadow-inner mb-6">
+                         <div className="flex justify-between items-center border-b border-outline-variant/50 pb-2">
+                            <strong className="text-on-surface uppercase tracking-widest text-2xs opacity-70">Banka</strong> 
+                            <span className="text-on-surface font-semibold">{selectedBank?.bank_name || "Bilinmiyor"}</span>
+                         </div>
+                         <div className="flex justify-between items-center border-b border-outline-variant/50 pb-2 pt-1">
+                            <strong className="text-on-surface uppercase tracking-widest text-2xs opacity-70">Alıcı</strong> 
+                            <span className="text-on-surface font-semibold">{selectedBank?.account_holder || "Bilinmiyor"}</span>
+                         </div>
+                         <div className="pt-1">
+                            <strong className="text-on-surface uppercase tracking-widest text-2xs opacity-70 block mb-2">IBAN Adresi</strong>
+                            <div className="font-mono bg-[#0B0F19] p-3 rounded-lg border border-outline-variant text-on-surface flex justify-between items-center group hover:border-primary-container/50 transition-colors">
+                               <span className="tracking-wider text-xs">{selectedBank?.iban || "TR00 0000 0000 0000 0000 0000 00"}</span>
+                               <button onClick={() => navigator.clipboard.writeText(selectedBank?.iban || "")} className="text-primary-container text-xs hover:underline uppercase font-label-bold tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Kopyala</button>
+                            </div>
+                         </div>
+                      </div>
+                      
+                      {/* Sender Name */}
+                      <div className="w-full max-w-md text-left space-y-2 mb-6">
+                         <label className="font-label-bold text-xs text-on-surface uppercase tracking-widest opacity-70">Ödemeyi Yapan (Kart Üzerindeki İsim)</label>
+                         <input 
+                           type="text" 
+                           placeholder="Örn: Ahmet Yılmaz" 
+                           className="w-full bg-[#0B0F19] border border-outline-variant p-3 text-on-surface font-body-md text-sm focus:border-primary-container outline-none transition-colors rounded-lg"
+                           value={senderName}
+                           onChange={(e) => setSenderName(e.target.value)}
+                         />
+                      </div>
+
+                      {/* Estimated Confirmation Duration & Support Links */}
+                      <div className="w-full max-w-md bg-[#0B0F19]/30 border border-outline-variant/20 p-4 rounded-xl mb-6 text-left text-xs space-y-2">
+                         <div className="flex items-center gap-2 text-on-surface">
+                           <span className="text-primary-container">⚡</span>
+                           <span><strong>Ortalama Onay Süresi:</strong> Ödemeleriniz 5-15 dakika içinde (gece saatlerinde en geç 1 saat) doğrulanır.</span>
+                         </div>
+                         <div className="flex items-center gap-2 text-on-surface-variant">
+                           <MessageCircle size={14} className="text-primary-container shrink-0" />
+                           <span>Sorularınız için <a href="https://discord.gg/veyronix" target="_blank" rel="noopener noreferrer" className="text-primary-container hover:underline font-semibold">Destek Sunucumuza</a> katılarak bizimle 7/24 iletişim kurabilirsiniz.</span>
+                         </div>
+                      </div>
+
+                      {/* Yasal Sözleşmeler Checkbox */}
+                      <label className="flex items-start gap-3 w-full max-w-md text-left mb-6 cursor-pointer select-none">
+                         <input 
+                           type="checkbox" 
+                           className="mt-1 w-4 h-4 rounded border-outline text-primary-container focus:ring-primary-container bg-surface shrink-0"
+                           checked={termsAccepted}
+                           onChange={(e) => setTermsAccepted(e.target.checked)}
+                         />
+                         <span className="text-2xs text-on-surface-variant leading-relaxed">
+                           <a href="/mesafeli-satis-sozlesmesi" target="_blank" className="text-primary-container hover:underline font-semibold">Mesafeli Satış Sözleşmesi</a> ve <a href="/iptal-ve-iade-kosullari" target="_blank" className="text-primary-container hover:underline font-semibold">İptal/İade Koşullarını</a> okudum, kabul ediyorum. Verilerimin KVKK kapsamında işlenmesine rıza gösteriyorum.
+                         </span>
+                      </label>
+                      
+                      {/* Action Buttons */}
+                      <div className="flex gap-4 w-full max-w-md">
+                        <button 
+                          onClick={() => setShowCheckout(false)}
+                          className="flex-1 px-4 py-3 border border-outline-variant text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface rounded-lg font-label-bold uppercase tracking-widest text-xs transition-all"
+                        >
+                          İptal
+                        </button>
+                        <button 
+                          onClick={handleConfirmManualPayment}
+                          disabled={isProcessing || senderName.trim().length < 3 || !termsAccepted}
+                          className="flex-[2] px-4 py-3 bg-primary-container text-on-primary rounded-lg font-label-bold uppercase tracking-widest text-xs transition-all shadow-[0_10px_20px_rgba(255,215,0,0.2)] hover:brightness-110 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                        >
+                          {isProcessing ? <Loader2 className="animate-spin inline mr-2" size={16} /> : null}
+                          Ödemeyi Yaptım
+                        </button>
+                      </div>
                 </div>
+              
               ) : (
                 <>
                   <div className="mb-10 text-center mt-4">

@@ -50,6 +50,19 @@ async function processGuild(client, config) {
     const guildId = config.guild_id;
     console.log(`[AutoCheckService] Processing guild ${guildId}`);
 
+    const { isSubscriptionActive } = require('@veyronix/database');
+    const isPremium = await isSubscriptionActive(guildId);
+
+    if (!isPremium) {
+        console.log(`[AutoCheckService] Guild ${guildId} is not Premium. Skipping auto-role roster check (premium feature).`);
+        const { supabase } = require('@veyronix/database');
+        await supabase
+            .from('guild_settings')
+            .update({ last_auto_check_date: new Date().toISOString() })
+            .eq('guild_id', guildId);
+        return;
+    }
+
     try {
         const discordGuild = client.guilds.cache.get(guildId);
         if (!discordGuild) return;

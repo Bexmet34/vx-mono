@@ -173,6 +173,38 @@ async function setSubscriptionActive(guildId, value = true) {
 
 
 
+/**
+ * Checks if a user has active global premium (Vote Bypass).
+ * @param {string} userId 
+ */
+async function isUserPremium(userId) {
+    try {
+        const { data, error } = await supabase
+            .from('users')
+            .select('premium_until, is_unlimited')
+            .eq('discord_id', userId)
+            .single();
+
+        if (error) {
+            if (error.code !== 'PGRST116') {
+                console.error('[SubscriptionService] User Fetch Error:', error.message);
+            }
+            return false;
+        }
+
+        if (!data) return false;
+        if (data.is_unlimited) return true;
+        if (!data.premium_until) return false;
+
+        const expiresAt = new Date(data.premium_until);
+        const now = new Date();
+        return expiresAt > now;
+    } catch (err) {
+        console.error('[SubscriptionService] isUserPremium Error:', err.message);
+        return false;
+    }
+}
+
 module.exports = {
     getSubscription,
     isSubscriptionActive,
@@ -180,4 +212,5 @@ module.exports = {
     removeSubscriptionDays,
     setUnlimitedSubscription,
     setSubscriptionActive,
+    isUserPremium,
 };

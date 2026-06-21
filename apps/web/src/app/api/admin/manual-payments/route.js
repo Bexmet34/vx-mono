@@ -95,48 +95,81 @@ export async function PATCH(req) {
 
     // 3. Eğer onaylandıysa aboneliği uzat
     if (status === 'paid') {
-      const { data: subscription, error: subError } = await supabase
-        .from('subscriptions')
-        .select('*')
-        .eq('guild_id', payment.guild_id)
-        .single();
+      const isUserPlan = payment.plan_type === 'user';
 
-      if (!subError && subscription) {
+      if (isUserPlan) {
+        // Bireysel Oylama Muafiyeti (User Premium)
+        const { data: userProfile, error: userError } = await supabase
+          .from('users')
+          .select('*')
+          .eq('discord_id', payment.user_id)
+          .single();
+
         const now = new Date();
-        let currentExpiry = new Date(subscription.expires_at);
-
-        if (currentExpiry < now) {
-          currentExpiry = now;
+        let currentExpiry = now;
+        if (!userError && userProfile && userProfile.premium_until) {
+          const profileExpiry = new Date(userProfile.premium_until);
+          if (profileExpiry > now) {
+            currentExpiry = profileExpiry;
+          }
         }
 
         currentExpiry.setDate(currentExpiry.getDate() + payment.duration_days);
 
         await supabase
-          .from('subscriptions')
-          .update({ 
-            expires_at: currentExpiry.toISOString(),
-            is_active: true,
-            is_unlimited: subscription.is_unlimited || false
-          })
-          .eq('id', subscription.id);
+          .from('users')
+          .upsert({
+            discord_id: payment.user_id,
+            premium_until: currentExpiry.toISOString(),
+            is_unlimited: userProfile?.is_unlimited || false
+          }, { onConflict: 'discord_id' });
 
-        console.log(`[Admin Manual Payment] Order ${payment.order_id} approved. Guild ${payment.guild_id} extended by ${payment.duration_days} days.`);
+        console.log(`[Admin Manual Payment] Approved User plan for ${payment.user_id} (+${payment.duration_days} days).`);
       } else {
-        // Abonelik hiç yoksa yeni oluştur
-        const now = new Date();
-        now.setDate(now.getDate() + payment.duration_days);
-
-        await supabase
+        // Sunucu Premium (Server/Guild Premium)
+        const { data: subscription, error: subError } = await supabase
           .from('subscriptions')
-          .insert({
-            guild_id: payment.guild_id,
-            guild_name: payment.guild_name || 'Bilinmeyen Sunucu',
-            expires_at: now.toISOString(),
-            is_active: true,
-            is_unlimited: false
-          });
-        
-        console.log(`[Admin Manual Payment] Order ${payment.order_id} approved. Guild ${payment.guild_id} NEW subscription created for ${payment.duration_days} days.`);
+          .select('*')
+          .eq('guild_id', payment.guild_id)
+          .single();
+
+        if (!subError && subscription) {
+          const now = new Date();
+          let currentExpiry = new Date(subscription.expires_at);
+
+          if (currentExpiry < now) {
+            currentExpiry = now;
+          }
+
+          currentExpiry.setDate(currentExpiry.getDate() + payment.duration_days);
+
+          await supabase
+            .from('subscriptions')
+            .update({ 
+              expires_at: currentExpiry.toISOString(),
+              is_active: true,
+              is_unlimited: subscription.is_unlimited || false
+            })
+            .eq('id', subscription.id);
+
+          console.log(`[Admin Manual Payment] Order ${payment.order_id} approved. Guild ${payment.guild_id} extended by ${payment.duration_days} days.`);
+        } else {
+          // Abonelik hiç yoksa yeni oluştur
+          const now = new Date();
+          now.setDate(now.getDate() + payment.duration_days);
+
+          await supabase
+            .from('subscriptions')
+            .insert({
+              guild_id: payment.guild_id,
+              guild_name: payment.guild_name || 'Bilinmeyen Sunucu',
+              expires_at: now.toISOString(),
+              is_active: true,
+              is_unlimited: false
+            });
+          
+          console.log(`[Admin Manual Payment] Order ${payment.order_id} approved. Guild ${payment.guild_id} NEW subscription created for ${payment.duration_days} days.`);
+        }
       }
 
       // Queue Approval Notification (Bot DM)

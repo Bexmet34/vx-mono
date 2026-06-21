@@ -252,7 +252,7 @@ async function handleServersCommand(interaction) {
     });
 }
 
-const { addSubscriptionDays, removeSubscriptionDays, setUnlimitedSubscription, setSubscriptionActive, getSubscription } = require('@veyronix/database');
+const { addSubscriptionDays, removeSubscriptionDays, setUnlimitedSubscription, setSubscriptionActive, getSubscription, isSubscriptionActive } = require('@veyronix/database');
 
 /**
  * Handles /subscription command (Owner Only)
@@ -468,6 +468,15 @@ async function handleSetupObjectiveSystemCommand(interaction) {
     const guildConfig = await getGuildConfig(interaction.guildId);
     const lang = guildConfig?.language || 'tr';
     
+    // Check Subscription
+    const isPremium = await isSubscriptionActive(interaction.guildId, interaction.guild.name, interaction.guild.ownerId);
+    if (!isPremium) {
+        return await safeReply(interaction, {
+            content: `❌ **Bu özellik Veyronix Premium gerektirir!**\n\nObjektif ve Timer takip sistemini sunucunuzda kurmak için web panelimiz üzerinden sunucunuzu premium pakete yükseltin.`,
+            flags: [MessageFlags.Ephemeral]
+        });
+    }
+    
     const setupChannel = interaction.options.getChannel('setup_kanal');
     const notifyChannel = interaction.options.getChannel('bildirim_kanal');
 
@@ -542,6 +551,15 @@ async function handleSetupGuildCommand(interaction) {
 async function handleSetupKillBoardCommand(interaction) {
     const guildConfig = await getGuildConfig(interaction.guildId);
     const lang = guildConfig?.language || 'tr';
+    
+    // Check Subscription
+    const isPremium = await isSubscriptionActive(interaction.guildId, interaction.guild.name, interaction.guild.ownerId);
+    if (!isPremium) {
+        return await safeReply(interaction, {
+            content: `❌ **Bu özellik Veyronix Premium gerektirir!**\n\nGünlük otomatik KillBoard özet raporlarını aktifleştirmek için web panelimiz üzerinden sunucunuzu premium pakete yükseltin.`,
+            flags: [MessageFlags.Ephemeral]
+        });
+    }
     
     const channel = interaction.options.getChannel('kanal');
     const time = interaction.options.getString('saat') || '06:00'; // Default 06:00 UTC

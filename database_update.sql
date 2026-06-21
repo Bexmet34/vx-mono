@@ -1,20 +1,26 @@
--- Mevcut 'crypto_payments' tablosunu Havale/EFT ödemelerini de destekleyecek şekilde genişletiyoruz.
--- Böylece gereksiz yere fazladan tablo açmamış oluyoruz.
+-- ==============================================================
+-- VEYRONIX BİRLEŞTİRİLMİŞ VERİTABANI GÜNCELLEME VE LİSANS SİSTEMİ SQL
+-- ==============================================================
+-- Bu kodların tamamını Supabase -> SQL Editor kısmına yapıştırıp 
+-- tek seferde çalıştırarak veritabanınızı otomatik olarak güncelleyebilirsiniz.
 
--- 1. Hangi ödeme yöntemi olduğunu anlamak için 'payment_method' sütunu ekliyoruz
+-- --------------------------------------------------------------
+-- 1. YENİ TABLOLAR VE MEVCUT TABLOLARIN ALANLARININ GENİŞLETİLMESİ
+-- --------------------------------------------------------------
+
+-- Hangi ödeme yöntemi olduğunu anlamak için 'payment_method' sütunu ekliyoruz
 ALTER TABLE public.crypto_payments 
 ADD COLUMN IF NOT EXISTS payment_method TEXT DEFAULT 'crypto';
 
--- 2. Havale/EFT işlemi için Gönderen (Kart Üzerindeki) İsmi
+-- Havale/EFT işlemi için Gönderen (Kart Üzerindeki) İsmi
 ALTER TABLE public.crypto_payments 
 ADD COLUMN IF NOT EXISTS sender_name TEXT;
 
--- 3. Havale/EFT açıklamasında yer alacak 8 haneli benzersiz kod (Örn: h1rqe31v)
+-- Havale/EFT açıklamasında yer alacak 8 haneli benzersiz kod (Örn: h1rqe31v)
 ALTER TABLE public.crypto_payments 
 ADD COLUMN IF NOT EXISTS description_code TEXT;
 
--- #4 FIX: description_code UNIQUE kisiti (cakisma onleme)
--- UNIQUE kisiti NULL degerlere toleranslidir, sadece dolu degerlerde cakismayi onler
+-- description_code UNIQUE kısıtı (Çakışma önleme)
 DO $$
 BEGIN
   IF NOT EXISTS (
@@ -26,15 +32,15 @@ BEGIN
   END IF;
 END $$;
 
--- 4. Admin panelinde rahat görebilmeniz için Sunucu Adı
+-- Admin panelinde rahat görebilmeniz için Sunucu Adı
 ALTER TABLE public.crypto_payments 
 ADD COLUMN IF NOT EXISTS guild_name TEXT;
 
--- 5. Kullanıcının hangi bankaya ödeme yaptığını takip etmek için (#2 FIX)
+-- Kullanıcının hangi bankaya ödeme yaptığını takip etmek için target_bank
 ALTER TABLE public.crypto_payments 
 ADD COLUMN IF NOT EXISTS target_bank TEXT;
 
--- #12 FIX: Ödeme zaman asimi — 7 gün sonra otomatik iptal için expires_at
+-- Ödeme zaman aşımı — 7 gün sonra otomatik iptal için expires_at
 ALTER TABLE public.crypto_payments 
 ADD COLUMN IF NOT EXISTS expires_at TIMESTAMP WITH TIME ZONE;
 
@@ -49,7 +55,19 @@ WHERE expires_at IS NULL
   AND payment_method = 'havale' 
   AND status = 'pending';
 
--- 6. Dinamik Banka Hesapları Tablosu
+-- pricing_plans tablosuna 'plan_type' kolonu ekleme
+ALTER TABLE public.pricing_plans 
+ADD COLUMN IF NOT EXISTS plan_type TEXT DEFAULT 'server';
+
+-- crypto_payments tablosuna 'plan_type' kolonu ekleme
+ALTER TABLE public.crypto_payments 
+ADD COLUMN IF NOT EXISTS plan_type TEXT DEFAULT 'server';
+
+-- pricing_plans tablosuna 'duration_days' kolonu yoksa ekleme
+ALTER TABLE public.pricing_plans 
+ADD COLUMN IF NOT EXISTS duration_days INTEGER DEFAULT 30;
+
+-- Dinamik Banka Hesapları Tablosu
 CREATE TABLE IF NOT EXISTS public.bank_accounts (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   bank_name TEXT NOT NULL,
@@ -59,7 +77,17 @@ CREATE TABLE IF NOT EXISTS public.bank_accounts (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
 
--- 7. Havale/EFT Ödeme Bildirim Sablonları (Onaylandı / Reddedildi)
+-- Users (Kullanıcılar) tablosuna global premium durumları için alanlar (Yoksa eklenir)
+ALTER TABLE public.users 
+ADD COLUMN IF NOT EXISTS premium_until TIMESTAMP WITH TIME ZONE;
+
+ALTER TABLE public.users 
+ADD COLUMN IF NOT EXISTS is_unlimited BOOLEAN DEFAULT false;
+
+-- --------------------------------------------------------------
+-- 2. HAVA/EFT ÖDEME BİLDİRİM ŞABLONLARI
+-- --------------------------------------------------------------
+
 INSERT INTO public.notification_templates (id, title_tr, title_en, content_tr, content_en, color, is_embed)
 VALUES 
 (
@@ -87,9 +115,86 @@ ON CONFLICT (id) DO UPDATE SET
   content_en = EXCLUDED.content_en,
   color = EXCLUDED.color;
 
--- =============================================
--- ZORUNLU: Asagidaki degiskenleri apps/web/.env.local dosyasına ekleyin:
---
--- NEXT_PUBLIC_USDT_TRY_RATE=40
+-- --------------------------------------------------------------
+-- 3. YENİ MONETİZASYON VE LİSANS PAKETLERİ (ÜÇ PAKET SİSTEMİ)
+-- --------------------------------------------------------------
+
+-- Eski plan kayıtlarını temizleyip yenilerini ekliyoruz
+DELETE FROM public.pricing_plans;
+
+-- A. BİREYSEL OYLAMA MUAFİYETİ (plan_type: user)
+-- Botun bulunduğu tüm sunucularda oylama yapma zorunluluğunu kaldırır.
+INSERT INTO public.pricing_plans (id, name_tr, name_en, amount, duration_days, plan_type, features_tr, features_en, sort_order, is_active)
+VALUES 
+(
+  'vote_bypass_1m',
+  'Bireysel Oylama Muafiyeti (1 Ay)',
+  'Individual Vote Bypass (1 Month)',
+  2.99,
+  30,
+  'user',
+  ARRAY['Haftalık Top.gg oylamasından muafiyet', 'Tüm sunucularda geçerlidir', 'Kesintisiz parti katılımı'],
+  ARRAY['Bypass weekly Top.gg voting', 'Valid across all servers', 'Uninterrupted party participation'],
+  10,
+  true
+),
+(
+  'vote_bypass_1y',
+  'Bireysel Oylama Muafiyeti (1 Yıl)',
+  'Individual Vote Bypass (1 Year)',
+  19.99,
+  365,
+  'user',
+  ARRAY['Haftalık Top.gg oylamasından muafiyet', 'Tüm sunucularda geçerlidir', 'Kesintisiz parti katılımı', 'Ekonomik yıllık paket'],
+  ARRAY['Bypass weekly Top.gg voting', 'Valid across all servers', 'Uninterrupted party participation', 'Economic yearly plan'],
+  20,
+  true
+);
+
+-- B. SUNUCU PREMİUM PAKETLERİ (plan_type: server)
+-- Sunucu bazlı gelişmiş özellikleri aktifleştirir.
+INSERT INTO public.pricing_plans (id, name_tr, name_en, amount, duration_days, plan_type, features_tr, features_en, sort_order, is_active)
+VALUES 
+(
+  'guild_premium_1m',
+  'Sunucu Premium (1 Ay)',
+  'Guild Premium (1 Month)',
+  8.00,
+  30,
+  'server',
+  ARRAY['Gelişmiş Otomatik Rol Eşitleme (Loncadan Çıkışta Temizleme)', 'Günlük Otomatik KillBoard Özet Raporları', 'Objektif ve Timer Takip Sistemi', 'Özelleştirilmiş Embed Rengi ve Logosu'],
+  ARRAY['Advanced Auto-Role Sync (Cleanup on Guild Leave)', 'Daily Automatic KillBoard Summaries', 'Objective and Timer Tracking System', 'Customized Embed Colors and Logo'],
+  30,
+  true
+),
+(
+  'guild_premium_3m',
+  'Sunucu Premium (3 Ay)',
+  'Guild Premium (3 Month)',
+  17.99,
+  90,
+  'server',
+  ARRAY['Gelişmiş Otomatik Rol Eşitleme (Loncadan Çıkışta Temizleme)', 'Günlük Otomatik KillBoard Özet Raporları', 'Objektif ve Timer Takip Sistemi', 'Özelleştirilmiş Embed Rengi ve Logosu', 'Öncelikli Destek'],
+  ARRAY['Advanced Auto-Role Sync (Cleanup on Guild Leave)', 'Daily Automatic KillBoard Summaries', 'Objective and Timer Tracking System', 'Customized Embed Colors and Logo', 'Priority Support'],
+  40,
+  true
+),
+(
+  'guild_premium_1y',
+  'Sunucu Premium (1 Yıl)',
+  'Guild Premium (1 Year)',
+  65.00,
+  365,
+  'server',
+  ARRAY['Gelişmiş Otomatik Rol Eşitleme (Loncadan Çıkışta Temizleme)', 'Günlük Otomatik KillBoard Özet Raporları', 'Objektif ve Timer Takip Sistemi', 'Özelleştirilmiş Embed Rengi ve Logosu', 'Öncelikli Destek (1 Yıl)'],
+  ARRAY['Advanced Auto-Role Sync (Cleanup on Guild Leave)', 'Daily Automatic KillBoard Summaries', 'Objective and Timer Tracking System', 'Customized Embed Colors and Logo', 'Priority Support (1 Year)'],
+  50,
+  true
+);
+
+-- ==============================================================
+-- BİLGİLENDİRME:
+-- Lütfen sunucunuzun .env / .env.local dosyalarına şunları eklediğinizden emin olun:
+-- NEXT_PUBLIC_USDT_TRY_RATE=48
 -- NEXT_PUBLIC_ADMIN_ID_2=407234961582587916
--- =============================================
+-- ==============================================================

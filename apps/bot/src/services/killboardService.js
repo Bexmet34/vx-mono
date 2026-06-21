@@ -2,6 +2,7 @@ const db = require('./db');
 const { EmbedBuilder } = require('discord.js');
 const https = require('https');
 const { t } = require('./i18n');
+const { isSubscriptionActive } = require('@veyronix/database');
 
 /**
  * Fetches events from Albion API (returns array or [])
@@ -57,6 +58,13 @@ async function processKillBoards(client) {
     const todayStr = now.toISOString().split('T')[0]; // e.g. "2026-05-01"
 
     for (const guildCfg of guilds) {
+        // 0. Subscription Check
+        const isPremium = await isSubscriptionActive(guildCfg.guild_id, guildCfg.guild_name);
+        if (!isPremium) {
+            console.log(`[KillBoard] Guild ${guildCfg.guild_id} is not Premium. Skipping daily summary.`);
+            continue;
+        }
+
         // If we already sent today's summary, skip
         let isSentToday = false;
         if (guildCfg.last_killboard_date) {

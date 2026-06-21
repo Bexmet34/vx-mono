@@ -14,7 +14,7 @@ if (config.TOPGG_TOKEN) {
     console.warn('[PartikurHandler] WARNING: TOPGG_TOKEN is missing! Vote checks will BLOCK all users.');
 }
 
-const { isSubscriptionActive, getSubscription, supabase } = require('@veyronix/database');
+const { isSubscriptionActive, getSubscription, supabase, isUserPremium } = require('@veyronix/database');
 const { createPartikurEmbed, buildRolesFields, addFooterFields } = require('../builders/embedBuilder');
 const { createCustomPartyComponents } = require('../builders/componentBuilder');
 const db = require('../services/db');
@@ -98,14 +98,10 @@ async function handleCreatePartyCommand(interaction) {
 
     const whitelisted = isOwner || isDeveloper || await isWhitelisted(userId, interaction.guildId);
 
-    const sub = await getSubscription(interaction.guildId, interaction.guild.name, interaction.guild.ownerId);
-    const isUnlimited = sub && sub.is_unlimited;
-    const hasUnlimitedParty = sub && sub.unlimited_party;
-
     const partyCount = getActivePartyCount(userId);
     let limit = 1;
     if (whitelisted) limit = 3;
-    if ((isUnlimited || hasUnlimitedParty) && (isOwner || isDeveloper)) limit = 999;
+    if (isDeveloper) limit = 999;
 
     if (partyCount >= limit) {
         let errorMsg = whitelisted
@@ -184,10 +180,10 @@ async function handleTempCommand(interaction) {
 
     await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
     // 0. Subscription & Vote Check
-    const active = await isSubscriptionActive(interaction.guildId, interaction.guild.name, interaction.guild.ownerId);
+    const userPremium = await isUserPremium(userId);
 
-    // Everyone must vote, EXCEPT developers or the OWNER of a premium (active) server.
-    const needsVote = !(isDeveloper || (active && isOwner));
+    // Everyone must vote, EXCEPT developers or global premium users.
+    const needsVote = !(isDeveloper || userPremium);
 
     if (needsVote) {
         let hasVoted = false;
@@ -232,14 +228,10 @@ async function handleTempCommand(interaction) {
     // Check Limits
     const whitelisted = isOwner || isDeveloper || await isWhitelisted(userId, interaction.guildId);
 
-    const sub = await getSubscription(interaction.guildId, interaction.guild.name, interaction.guild.ownerId);
-    const isUnlimited = sub && sub.is_unlimited;
-    const hasUnlimitedParty = sub && sub.unlimited_party;
-
     const partyCount = getActivePartyCount(userId);
     let limit = 1;
     if (whitelisted) limit = 3;
-    if ((isUnlimited || hasUnlimitedParty) && (isOwner || isDeveloper)) limit = 999;
+    if (isDeveloper) limit = 999;
 
     if (partyCount >= limit) {
         let errorMsg = whitelisted

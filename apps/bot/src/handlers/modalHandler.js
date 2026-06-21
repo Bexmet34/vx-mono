@@ -15,7 +15,7 @@ const { EMPTY_SLOT } = require('../constants/constants');
 const { buildRolesFields, addFooterFields, createObjectiveEmbed, createPlayerCardEmbed } = require('../builders/embedBuilder');
 const { createObjectiveButtons } = require('../builders/componentBuilder');
 const { parseTimeToMs, getNow } = require('../utils/timeUtils');
-const { getSubscription } = require('@veyronix/database');
+const { getSubscription, isUserPremium } = require('@veyronix/database');
 const config = require('../config/config');
 
 async function handlePartiModal(interaction) {
@@ -31,13 +31,9 @@ async function handlePartiModal(interaction) {
         const isDeveloper = config.WHITELIST_USERS?.includes(userId);
         const whitelisted = isOwner || isDeveloper || await isWhitelisted(userId, interaction.guildId);
         
-        const sub = await getSubscription(interaction.guildId, interaction.guild.name, interaction.guild.ownerId);
-        const isUnlimited = sub && sub.is_unlimited;
-        const hasUnlimitedParty = sub && sub.unlimited_party;
-
         // 0. Subscription & Vote Check
-        const active = await getSubscription(interaction.guildId, interaction.guild.name, interaction.guild.ownerId).then(s => s?.is_active);
-        const needsVote = !(isDeveloper || (active && isOwner));
+        const userPremium = await isUserPremium(userId);
+        const needsVote = !(isDeveloper || userPremium);
 
         await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
 
@@ -68,7 +64,7 @@ async function handlePartiModal(interaction) {
         const partyCount = getActivePartyCount(userId);
         let limit = 1;
         if (whitelisted) limit = 3;
-        if ((isUnlimited || hasUnlimitedParty) && (isOwner || isDeveloper)) limit = 999;
+        if (isDeveloper) limit = 999;
 
         if (partyCount >= limit) {
             let errorMsg = whitelisted
