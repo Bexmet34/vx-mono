@@ -184,7 +184,8 @@ export default function GeneralTab({
                       </span>
                     </div>
                     <div className="text-xs font-body-sm text-on-surface-variant mt-2 flex flex-wrap gap-x-4 gap-y-1">
-                      <span>Members: <strong className="text-on-surface">{g.MemberCount}</strong></span>
+                      <span>Members: <strong className="text-on-surface">{g.MemberCount ?? '...'}</strong></span>
+                      {g.FounderName && <span>Leader: <strong className="text-on-surface">{g.FounderName}</strong></span>}
                       {g.AllianceName && <span>Alliance: <strong className="text-on-surface">{g.AllianceName}</strong></span>}
                       <span>Kill Fame: <strong className="text-on-surface">{g.KillFame ? g.KillFame.toLocaleString() : 0}</strong></span>
                     </div>
