@@ -138,7 +138,7 @@ module.exports = {
         expired_desc: 'The bot usage period for this server has expired.\n\nTo extend the period and continue using the bot, please join our support server using the button below.',
         support_button: 'Support & Extend Subscription',
         vote_required_title: '🗳️ Vote Required',
-        vote_required_desc: 'To continue using the bot for free, please vote for us on Top.gg.\n\nYou can use commands immediately after voting. (Premium servers do not have this requirement).',
+        vote_required_desc: 'To continue using the bot, you can either continue by voting on Top.gg, or you can purchase an individual or server-based subscription on our website. Premium completely removes the vote requirement and increases your limits:\n🌐 https://veyronix.com.tr',
         vote_button: 'Vote (Top.gg)',
         trial_started_title: '🎉 Trial Period Started!',
         trial_started_desc: 'Our bot has been successfully added to your server! A **3-day free trial** has been assigned.\n\nDuring this period, you can use all features (/createparty etc.) without limits.',

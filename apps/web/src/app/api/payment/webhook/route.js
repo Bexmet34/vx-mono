@@ -4,6 +4,27 @@ import crypto from 'crypto';
 
 export const dynamic = 'force-dynamic';
 
+async function getParsedTemplate(templateId, placeholders = {}) {
+  const { data: template } = await supabase
+    .from('notification_templates')
+    .select('*')
+    .eq('id', templateId)
+    .single();
+
+  if (!template) return null;
+
+  let title = template.title_tr; 
+  let content = template.content_tr;
+
+  Object.keys(placeholders).forEach(key => {
+    const regex = new RegExp(`{${key}}`, 'g');
+    title = title?.replace(regex, placeholders[key]);
+    content = content?.replace(regex, placeholders[key]);
+  });
+
+  return { title, content, color: template.color, is_embed: template.is_embed };
+}
+
 export async function POST(req) {
   try {
     const rawBody = await req.text();
@@ -93,6 +114,29 @@ export async function POST(req) {
             premium_until: currentExpiry.toISOString(),
             is_unlimited: userProfile?.is_unlimited || false
           }, { onConflict: 'discord_id' });
+
+        // Queue DM notification to User
+        try {
+          const parsed = await getParsedTemplate('user_premium_bought', {
+            gun: payment.duration_days
+          });
+          if (parsed && payment.user_id) {
+            await supabase.from('message_queue').insert({
+              owner_id: payment.user_id,
+              message_content: JSON.stringify({
+                embeds: [{
+                  title: parsed.title,
+                  description: parsed.content,
+                  color: parsed.color ? parseInt(parsed.color.replace('#', ''), 16) : 0x2ecc71,
+                  timestamp: new Date().toISOString()
+                }]
+              }),
+              status: 'pending'
+            });
+          }
+        } catch (queueErr) {
+          console.error("[Cryptomus Webhook] Error queueing bought DM notification:", queueErr.message);
+        }
 
         console.log(`[Cryptomus Webhook] Order ${order_id} processed. User ${payment.user_id} global premium extended by ${payment.duration_days} days.`);
       } else {

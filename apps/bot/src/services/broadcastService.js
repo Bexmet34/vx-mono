@@ -9,12 +9,14 @@ function startBroadcastWorker(client) {
 
     setInterval(async () => {
         try {
-            // 1. Durumu 'pending' olan 1 adet mesajı çek ve subscriptions tablosuyla BİRLEŞTİR (JOIN)
+            // 1. Durumu 'pending' olan 1 adet mesajı çek
             const { data: messages, error } = await supabase
                 .from('message_queue')
                 .select(`
                     id,
                     message_content,
+                    owner_id,
+                    guild_id,
                     subscriptions (
                         owner_id,
                         guild_name,
@@ -35,18 +37,16 @@ function startBroadcastWorker(client) {
 
             const msg = messages[0];
             
-            // Subscriptions tablosundan gelen veriler (JOIN sayesinde)
-            const subscription = msg.subscriptions;
-            if (!subscription) {
-                // Eğer bağlı subscription bulunamazsa (silinmişse vb.) failed yap
+            const ownerId = msg.owner_id || msg.subscriptions?.owner_id;
+            const guildName = msg.subscriptions?.guild_name || 'Veyronix';
+
+            if (!ownerId) {
+                // Eğer alıcı ID'si bulunamazsa failed yap
                 await supabase.from('message_queue')
-                    .update({ status: 'failed', error_message: 'Bağlı sunucu kaydı bulunamadı.' })
+                    .update({ status: 'failed', error_message: 'Alıcı Discord ID (owner_id) bulunamadı.' })
                     .eq('id', msg.id);
                 return;
             }
-
-            const ownerId = subscription.owner_id;
-            const guildName = subscription.guild_name;
 
             // 2. Başka bir bot/worker aynı mesajı almasın diye durumu 'processing' yap
             await supabase.from('message_queue')

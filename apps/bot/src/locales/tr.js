@@ -138,7 +138,7 @@ module.exports = {
         expired_desc: 'Bu sunucu için bot kullanım süresi sona ermiştir.\n\nSüreyi uzatmak ve botu kullanmaya devam etmek için aşağıdaki buton ile destek sunucumuza katılabilirsiniz.',
         support_button: 'Destek & Süre Uzat',
         vote_required_title: '🗳️ Oy Verme Gerekli',
-        vote_required_desc: 'Botu ücretsiz kullanmaya devam etmek için lütfen Top.gg üzerinden oy verin.\n\nOy verdikten hemen sonra komutları kullanmaya devam edebilirsiniz. (Premium sunucularda bu zorunluluk yoktur).',
+        vote_required_desc: 'Botu kullanmaya devam etmek için ya Top.gg üzerinden oy vererek kullanmaya devam edin ya da web sitemiz üzerinden bireysel veya sunucu bazlı premium satın alım yapabilirsiniz. Premium ile oy verme zorunluluğu tamamen kalkar ve limitleriniz artar:\n🌐 https://veyronix.com.tr',
         vote_button: 'Oy Ver (Top.gg)',
         trial_started_title: '🎉 Deneme Sürümü Başladı!',
         trial_started_desc: 'Botumuz sunucunuza başarıyla eklendi! **3 günlük ücretsiz deneme** süreniz tanımlanmıştır.\n\nBu süre boyunca tüm özellikleri (/createparty vb.) sınırsız kullanabilirsiniz.',

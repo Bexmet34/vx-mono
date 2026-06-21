@@ -215,13 +215,16 @@ async function handleTempCommand(interaction) {
                 new ButtonBuilder()
                     .setLabel(t('subscription.vote_button', lang))
                     .setURL(config.TOPGG_LINK || 'https://top.gg/bot/1082239904169336902')
+                    .setStyle(ButtonStyle.Link),
+                new ButtonBuilder()
+                    .setLabel(lang === 'tr' ? 'Satın Al / Web Sitesi' : 'Buy Premium / Website')
+                    .setURL(config.WEBSITE_LINK || 'https://veyronix.com.tr')
                     .setStyle(ButtonStyle.Link)
             );
 
-            return await interaction.reply({
+            return await interaction.editReply({
                 embeds: [voteEmbed],
-                components: [row],
-                flags: [MessageFlags.Ephemeral]
+                components: [row]
             });
         }
     }

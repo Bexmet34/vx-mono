@@ -47,6 +47,27 @@ async function getDiscordUser(discordId) {
   }
 }
 
+async function getParsedTemplate(templateId, placeholders = {}) {
+  const { data: template } = await supabase
+    .from('notification_templates')
+    .select('*')
+    .eq('id', templateId)
+    .single();
+
+  if (!template) return null;
+
+  let title = template.title_tr; 
+  let content = template.content_tr;
+
+  Object.keys(placeholders).forEach(key => {
+    const regex = new RegExp(`{${key}}`, 'g');
+    title = title?.replace(regex, placeholders[key]);
+    content = content?.replace(regex, placeholders[key]);
+  });
+
+  return { title, content, color: template.color, is_embed: template.is_embed };
+}
+
 export async function GET() {
   const session = await getServerSession(authOptions);
   if (!session || !isAdminUser(session.user?.id)) {
@@ -121,6 +142,30 @@ export async function POST(req) {
 
     if (upsertError) throw upsertError;
 
+    // Queue DM notification to User
+    try {
+      const durationText = is_unlimited ? "Sınırsız" : `${duration_days} Günlük`;
+      const parsed = await getParsedTemplate('user_premium_admin', {
+        sure: durationText
+      });
+      if (parsed && discord_id) {
+        await supabase.from('message_queue').insert({
+          owner_id: discord_id,
+          message_content: JSON.stringify({
+            embeds: [{
+              title: parsed.title,
+              description: parsed.content,
+              color: parsed.color ? parseInt(parsed.color.replace('#', ''), 16) : 0xfca311,
+              timestamp: new Date().toISOString()
+            }]
+          }),
+          status: 'pending'
+        });
+      }
+    } catch (queueErr) {
+      console.error("[Admin Users POST] Error queueing bought DM notification:", queueErr.message);
+    }
+
     return NextResponse.json({ success: true, user: updateData });
   } catch (error) {
     console.error("Admin Users POST Error:", error);
@@ -187,6 +232,38 @@ export async function PATCH(req) {
       .eq('discord_id', discord_id);
 
     if (updateError) throw updateError;
+
+    // Queue DM notification to User
+    try {
+      let durationText = "Güncellendi";
+      if (action === 'toggle_unlimited') {
+        durationText = value ? "Sınırsız" : "Süreli Paket";
+      } else if (action === 'add_days') {
+        durationText = `+${value} Gün (Uzatıldı)`;
+      } else if (action === 'remove_days') {
+        durationText = `-${value} Gün (Düşürüldü)`;
+      }
+      
+      const parsed = await getParsedTemplate('user_premium_admin', {
+        sure: durationText
+      });
+      if (parsed && discord_id) {
+        await supabase.from('message_queue').insert({
+          owner_id: discord_id,
+          message_content: JSON.stringify({
+            embeds: [{
+              title: parsed.title,
+              description: parsed.content,
+              color: parsed.color ? parseInt(parsed.color.replace('#', ''), 16) : 0xfca311,
+              timestamp: new Date().toISOString()
+            }]
+          }),
+          status: 'pending'
+        });
+      }
+    } catch (queueErr) {
+      console.error("[Admin Users PATCH] Error queueing bought DM notification:", queueErr.message);
+    }
 
     return NextResponse.json({ success: true, updatedData: updateData });
   } catch (error) {
