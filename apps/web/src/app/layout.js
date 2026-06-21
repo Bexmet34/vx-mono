@@ -4,6 +4,7 @@ import { LanguageProvider } from "@/context/LanguageContext";
 import { cookies } from "next/headers";
 
 import Footer from "@/components/Footer";
+import SystemStatusWidget from "@/components/SystemStatusWidget";
 
 export const metadata = {
   metadataBase: new URL("https://veyronix.com.tr"),
@@ -110,6 +111,7 @@ export default async function RootLayout({ children }) {
                 {children}
               </div>
               <Footer />
+              <SystemStatusWidget />
             </div>
           </NextAuthProvider>
         </LanguageProvider>
