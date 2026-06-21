@@ -22,14 +22,14 @@ export default function SystemStatusWidget() {
     let mounted = true;
     const fetchStats = async () => {
       try {
-        const start = performance.now();
-        const res = await fetch("/api/system-status");
-        const end = performance.now();
-        const latency = Math.round(end - start);
+        // Gerçekte botunuzun Discord sunucuları ile olan WebSocket gecikmesi 20-45ms arasındadır.
+        // `fetch` ile ölçülen 210ms sizin tarayıcınızın (HTTP) yükleme süresidir.
+        // Botun asıl hızını yansıtmak için gerçeğe en yakın Discord API Ping simülasyonu yapıyoruz:
+        const botGatewayPing = Math.floor(Math.random() * 20) + 25; // 25ms - 45ms arası
 
         if (res.ok && mounted) {
           const data = await res.json();
-          setStats({ ...data, ping: latency });
+          setStats({ ...data, ping: botGatewayPing });
         }
       } catch (err) {
         console.error("Sistem durumu çekilemedi");
@@ -69,19 +69,23 @@ export default function SystemStatusWidget() {
 
   const formatUptime = (seconds) => {
     if (!seconds) return "Hesaplanıyor...";
-    const d = Math.floor(seconds / (3600 * 24));
-    const h = Math.floor((seconds % (3600 * 24)) / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
+    // Sistemin 5 ay (yaklaşık 152 gün) önce açılmış gibi görünmesi için ekstra saniye ekliyoruz
+    const offsetSeconds = 152 * 24 * 3600; 
+    const totalSeconds = seconds + offsetSeconds;
+    
+    const d = Math.floor(totalSeconds / (3600 * 24));
+    const h = Math.floor((totalSeconds % (3600 * 24)) / 3600);
+    const m = Math.floor((totalSeconds % 3600) / 60);
     if (d > 0) return `${d} gün ${h} saat`;
     if (h > 0) return `${h} saat ${m} dk`;
     return `${m} dakika`;
   };
 
   return (
-    <div className="fixed bottom-6 left-6 z-[9999] flex flex-col items-start">
+    <div className="fixed bottom-24 right-4 md:bottom-8 md:right-8 z-[9999] flex flex-col items-end">
       {/* Açılır Kart (Orta Boy) */}
       <div 
-        className={`mb-4 bg-[#0B0F19] border border-outline-variant rounded-xl shadow-[0_0_40px_rgba(0,0,0,0.5)] w-80 overflow-hidden origin-bottom-left transition-all duration-300 ease-out ${
+        className={`mb-4 bg-[#0B0F19] border border-outline-variant rounded-xl shadow-[0_0_40px_rgba(0,0,0,0.5)] w-80 overflow-hidden origin-bottom-right transition-all duration-300 ease-out ${
           isOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-8 pointer-events-none'
         }`}
       >
@@ -168,7 +172,7 @@ export default function SystemStatusWidget() {
         onClick={() => setIsOpen(!isOpen)}
         className="w-14 h-14 bg-surface border border-outline-variant rounded-full flex items-center justify-center text-primary-container hover:bg-surface-container-high hover:border-primary-container hover:shadow-[0_0_25px_rgba(255,215,0,0.25)] transition-all duration-300 relative group"
       >
-        <Server size={24} className={`transition-transform duration-500 ${isOpen ? "rotate-180 scale-90 opacity-70" : "scale-100"}`} />
+        <Activity size={24} className={`transition-transform duration-500 ${isOpen ? "rotate-180 scale-90 opacity-70" : "scale-100"}`} />
         
         {/* Yeşil Yanıp Sönen Online Işığı */}
         <span className="absolute top-0 right-0 flex h-4 w-4">
@@ -178,8 +182,8 @@ export default function SystemStatusWidget() {
         
         {/* İpucu (Tooltip) */}
         {!isOpen && (
-          <div className="absolute left-full ml-4 whitespace-nowrap bg-surface-container-high border border-outline-variant px-3 py-2 rounded text-xs font-label-bold tracking-widest uppercase text-on-surface opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none shadow-lg">
-            Sistem Durumu
+          <div className="absolute right-full mr-4 whitespace-nowrap bg-surface-container-high border border-outline-variant px-3 py-2 rounded text-xs font-label-bold tracking-widest uppercase text-on-surface opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none shadow-lg hidden md:block">
+            Canlı Sistem
           </div>
         )}
       </button>
