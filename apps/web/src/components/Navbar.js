@@ -332,15 +332,15 @@ export default function Navbar({ isStatic = false }) {
       )}
 
       {/* Mobile Navigation Overlay */}
-      <div className={`fixed inset-0 z-50 transform ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'} transition-transform duration-500 ease-out flex`}>
+      <div className={`fixed inset-0 z-50 flex justify-end ${isMenuOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}>
         {/* Backdrop */}
         <div 
-          className={`flex-grow bg-background/50 backdrop-blur-sm transition-opacity duration-500 ${isMenuOpen ? 'opacity-100' : 'opacity-0'}`} 
+          className={`absolute inset-0 bg-background/50 backdrop-blur-sm transition-opacity duration-500 ${isMenuOpen ? 'opacity-100' : 'opacity-0'}`} 
           onClick={() => setIsMenuOpen(false)}
         ></div>
         
         {/* Sliding Content Area */}
-        <div className="w-[85%] max-w-sm glass-panel flex flex-col relative h-full">
+        <div className={`w-[85%] max-w-sm glass-panel flex flex-col relative h-full transform transition-transform duration-500 ease-out ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
           <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-right from-transparent via-primary-container/30 to-transparent"></div>
           
           <div className="flex justify-between items-center px-6 py-6 border-b border-on-surface/10">
@@ -359,13 +359,13 @@ export default function Navbar({ isStatic = false }) {
           <nav className="flex-grow px-6 py-8 flex flex-col gap-y-6 overflow-y-auto relative z-10">
             <div className="menu-item-group">
               <span className="text-[10px] font-label-bold text-outline uppercase tracking-[0.2em] mb-4 block">Central Hub</span>
-              <Link href="/" className="menu-item-hover group flex items-center justify-between py-2">
+              <Link href="/" className="menu-item-hover group flex items-center justify-between py-2 cursor-pointer" onClick={() => setIsMenuOpen(false)}>
                 <span className="font-headline-lg-mobile text-headline-lg-mobile text-primary-container transition-transform group-active:translate-x-2">{lang === 'tr' ? 'Ana Sayfa' : 'Home'}</span>
                 <ChevronRight className="text-primary-container/20 group-hover:text-primary-container transition-colors" />
               </Link>
               <div className="indicator"></div>
               
-              <Link href="/dashboard" className="menu-item-hover group flex items-center justify-between py-2 mt-4">
+              <Link href="/dashboard" className="menu-item-hover group flex items-center justify-between py-2 mt-4 cursor-pointer" onClick={() => setIsMenuOpen(false)}>
                 <span className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant hover:text-primary-container transition-all group-active:translate-x-2">{t.dashboard}</span>
                 <ChevronRight className="text-primary-container/0 group-hover:text-primary-container transition-colors" />
               </Link>
@@ -390,19 +390,19 @@ export default function Navbar({ isStatic = false }) {
 
             <div className="menu-item-group">
               <span className="text-[10px] font-label-bold text-outline uppercase tracking-[0.2em] mb-4 block">Resources</span>
-              <Link href="/blog" className="menu-item-hover group flex items-center justify-between py-2">
+              <Link href="/blog" className="menu-item-hover group flex items-center justify-between py-2 cursor-pointer" onClick={() => setIsMenuOpen(false)}>
                 <span className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant hover:text-primary-container transition-all group-active:translate-x-2">{t.blog}</span>
                 <ChevronRight className="text-primary-container/0 group-hover:text-primary-container transition-colors" />
               </Link>
               <div className="indicator"></div>
 
-              <a href="https://docs.veyronix.com.tr/" target="_blank" rel="noopener noreferrer" className="menu-item-hover group flex items-center justify-between py-2 mt-4" onClick={() => setIsMenuOpen(false)}>
+              <a href="https://docs.veyronix.com.tr/" target="_blank" rel="noopener noreferrer" className="menu-item-hover group flex items-center justify-between py-2 mt-4 cursor-pointer" onClick={() => setIsMenuOpen(false)}>
                 <span className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant hover:text-primary-container transition-all group-active:translate-x-2">{t.wiki}</span>
                 <ChevronRight className="text-primary-container/0 group-hover:text-primary-container transition-colors" />
               </a>
               <div className="indicator"></div>
 
-              <Link href="/changelog" className="menu-item-hover group flex items-center justify-between py-2 mt-4">
+              <Link href="/changelog" className="menu-item-hover group flex items-center justify-between py-2 mt-4 cursor-pointer" onClick={() => setIsMenuOpen(false)}>
                 <span className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant hover:text-primary-container transition-all group-active:translate-x-2">{t.changelog}</span>
                 <ChevronRight className="text-primary-container/0 group-hover:text-primary-container transition-colors" />
               </Link>
@@ -412,7 +412,7 @@ export default function Navbar({ isStatic = false }) {
             {isAdmin && (
               <div className="menu-item-group">
                 <span className="text-[10px] font-label-bold text-error uppercase tracking-[0.2em] mb-4 block">Admin</span>
-                <Link href="/admin" className="menu-item-hover group flex items-center justify-between py-2">
+                <Link href="/admin" className="menu-item-hover group flex items-center justify-between py-2 cursor-pointer" onClick={() => setIsMenuOpen(false)}>
                   <span className="font-headline-lg-mobile text-headline-lg-mobile text-error hover:text-error-container transition-all group-active:translate-x-2">Admin Panel</span>
                   <ChevronRight className="text-error/0 group-hover:text-error transition-colors" />
                 </Link>
