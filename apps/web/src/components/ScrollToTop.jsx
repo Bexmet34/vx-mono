@@ -38,7 +38,7 @@ export default function ScrollToTop() {
   return (
     <button
       onClick={scrollToTop}
-      className={`fixed bottom-6 right-6 md:bottom-8 md:right-8 z-[9998] w-12 h-12 bg-surface-container-high border border-outline-variant rounded-full flex items-center justify-center text-primary-container hover:bg-primary-container hover:text-on-primary hover:shadow-[0_0_20px_rgba(255,215,0,0.3)] transition-all duration-300 overflow-hidden ${
+      className={`fixed bottom-6 right-6 md:bottom-8 md:right-8 z-40 w-12 h-12 bg-surface-container-high border border-outline-variant rounded-full flex items-center justify-center text-primary-container hover:bg-primary-container hover:text-on-primary hover:shadow-[0_0_20px_rgba(255,215,0,0.3)] transition-all duration-300 overflow-hidden ${
         isVisible && !isAtBottom ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10 pointer-events-none"
       }`}
       style={{ borderRadius: '50%' }}

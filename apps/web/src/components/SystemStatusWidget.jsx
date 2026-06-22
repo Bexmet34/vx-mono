@@ -120,14 +120,14 @@ export default function SystemStatusWidget() {
   return (
     <div 
       ref={widgetRef}
-      className={`fixed bottom-6 left-6 z-[9999] flex flex-col items-start transition-all duration-300 ${
-        isAtBottom ? 'opacity-0 translate-y-10 pointer-events-none' : 'opacity-100 translate-y-0'
+      className={`fixed bottom-6 left-6 z-40 flex flex-col items-start transition-all duration-300 pointer-events-none ${
+        isAtBottom ? 'opacity-0 translate-y-10' : 'opacity-100 translate-y-0'
       }`}
     >
       {/* Açılır Kart (Orta Boy) */}
       <div 
-        className={`mb-4 bg-[#0B0F19] border border-outline-variant rounded-xl shadow-[0_0_40px_rgba(0,0,0,0.5)] w-80 overflow-hidden origin-bottom-left transition-all duration-300 ease-out ${
-          isOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-8 pointer-events-none'
+        className={`mb-4 bg-[#0B0F19] border border-outline-variant rounded-xl shadow-[0_0_40px_rgba(0,0,0,0.5)] w-80 overflow-hidden origin-bottom-left transition-all duration-300 ease-out pointer-events-auto ${
+          isOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-8 !pointer-events-none'
         }`}
       >
         {/* Üst Kısım (Header) */}
@@ -211,7 +211,7 @@ export default function SystemStatusWidget() {
       {/* Sol Alt Tetikleyici İkon (Floating Button) */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="w-12 h-12 bg-surface border border-outline-variant rounded-full flex items-center justify-center text-primary-container hover:bg-surface-container-high hover:border-primary-container hover:shadow-[0_0_20px_rgba(255,215,0,0.25)] transition-all duration-300 relative group"
+        className="w-12 h-12 bg-surface border border-outline-variant rounded-full flex items-center justify-center text-primary-container hover:bg-surface-container-high hover:border-primary-container hover:shadow-[0_0_20px_rgba(255,215,0,0.25)] transition-all duration-300 relative group pointer-events-auto"
       >
         <Activity size={20} className={`transition-transform duration-500 ${isOpen ? "rotate-180 scale-90 opacity-70" : "scale-100"}`} />
         
