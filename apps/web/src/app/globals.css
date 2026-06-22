@@ -42,7 +42,7 @@
     0% { top: -2%; }
     100% { top: 100%; }
   }
-  .menu-item-hover:hover .indicator {
+  .menu-item-hover:hover + .indicator, .menu-item-hover:active + .indicator {
     width: 100%;
   }
   .indicator {

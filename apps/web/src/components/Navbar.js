@@ -6,6 +6,7 @@ import Image from "next/image";
 import { LogIn, LogOut, LayoutDashboard, Globe, Menu, X, ChevronRight, Shield, CreditCard, Clock, CheckCircle, XCircle, Loader2, AlertCircle } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useState, useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import Logo from "@/components/Logo";
 
 export default function Navbar({ isStatic = false }) {
@@ -13,6 +14,13 @@ export default function Navbar({ isStatic = false }) {
   const { lang, toggleLanguage, t } = useLanguage();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (isMenuOpen) {
+      setIsMenuOpen(false);
+    }
+  }, [pathname]);
 
   // #14 — Ödeme geçmişi state
   const [showPaymentHistory, setShowPaymentHistory] = useState(false);
@@ -68,7 +76,7 @@ export default function Navbar({ isStatic = false }) {
 
   return (
     <>
-      <nav className={`${isStatic ? 'absolute' : 'fixed'} top-0 w-full z-40 bg-surface/80 backdrop-blur-md border-b border-on-surface/ shadow-[0_0_15px_rgba(255,215,0,0.15)] transition-all`}>
+      <nav className={`${isStatic ? 'absolute' : 'fixed'} top-0 w-full z-40 bg-surface/80 backdrop-blur-md border-b border-on-surface/10 shadow-[0_0_15px_rgba(255,215,0,0.15)] transition-all`}>
         <div className="flex justify-between items-center px-4 md:px-margin-desktop py-4 max-w-container-max mx-auto">
           <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center gap-2 font-headline-md text-headline-md font-bold tracking-tighter text-primary-container">
@@ -76,7 +84,7 @@ export default function Navbar({ isStatic = false }) {
               Veyronix
             </Link>
             
-            <div className="hidden md:flex space-x-6 lg:space-x-8 items-center border-l border-on-surface/ pl-6">
+            <div className="hidden md:flex space-x-6 lg:space-x-8 items-center border-l border-on-surface/10 pl-6">
               <Link href="/blog" className="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors">
                 {t.blog}
               </Link>
@@ -327,7 +335,7 @@ export default function Navbar({ isStatic = false }) {
       <div className={`fixed inset-0 z-50 transform ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'} transition-transform duration-500 ease-out flex`}>
         {/* Backdrop */}
         <div 
-          className={`flex-grow bg-background/ backdrop-blur-sm transition-opacity duration-500 ${isMenuOpen ? 'opacity-100' : 'opacity-0'}`} 
+          className={`flex-grow bg-background/50 backdrop-blur-sm transition-opacity duration-500 ${isMenuOpen ? 'opacity-100' : 'opacity-0'}`} 
           onClick={() => setIsMenuOpen(false)}
         ></div>
         
@@ -335,7 +343,7 @@ export default function Navbar({ isStatic = false }) {
         <div className="w-[85%] max-w-sm glass-panel flex flex-col relative h-full">
           <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-right from-transparent via-primary-container/30 to-transparent"></div>
           
-          <div className="flex justify-between items-center px-6 py-6 border-b border-on-surface/">
+          <div className="flex justify-between items-center px-6 py-6 border-b border-on-surface/10">
             <span className="flex items-center gap-2 font-headline-md text-headline-md font-bold tracking-tighter text-primary-container">
               <Logo className="w-8 h-8" />
               Veyronix
@@ -348,16 +356,16 @@ export default function Navbar({ isStatic = false }) {
             </button>
           </div>
           
-          <nav className="flex-grow px-6 py-8 flex flex-col gap-y-6 overflow-y-auto">
+          <nav className="flex-grow px-6 py-8 flex flex-col gap-y-6 overflow-y-auto relative z-10">
             <div className="menu-item-group">
               <span className="text-[10px] font-label-bold text-outline uppercase tracking-[0.2em] mb-4 block">Central Hub</span>
-              <Link href="/" className="menu-item-hover group flex items-center justify-between py-2" onClick={() => setIsMenuOpen(false)}>
+              <Link href="/" className="menu-item-hover group flex items-center justify-between py-2">
                 <span className="font-headline-lg-mobile text-headline-lg-mobile text-primary-container transition-transform group-active:translate-x-2">{lang === 'tr' ? 'Ana Sayfa' : 'Home'}</span>
                 <ChevronRight className="text-primary-container/20 group-hover:text-primary-container transition-colors" />
               </Link>
               <div className="indicator"></div>
               
-              <Link href="/dashboard" className="menu-item-hover group flex items-center justify-between py-2 mt-4" onClick={() => setIsMenuOpen(false)}>
+              <Link href="/dashboard" className="menu-item-hover group flex items-center justify-between py-2 mt-4">
                 <span className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant hover:text-primary-container transition-all group-active:translate-x-2">{t.dashboard}</span>
                 <ChevronRight className="text-primary-container/0 group-hover:text-primary-container transition-colors" />
               </Link>
@@ -382,7 +390,7 @@ export default function Navbar({ isStatic = false }) {
 
             <div className="menu-item-group">
               <span className="text-[10px] font-label-bold text-outline uppercase tracking-[0.2em] mb-4 block">Resources</span>
-              <Link href="/blog" className="menu-item-hover group flex items-center justify-between py-2" onClick={() => setIsMenuOpen(false)}>
+              <Link href="/blog" className="menu-item-hover group flex items-center justify-between py-2">
                 <span className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant hover:text-primary-container transition-all group-active:translate-x-2">{t.blog}</span>
                 <ChevronRight className="text-primary-container/0 group-hover:text-primary-container transition-colors" />
               </Link>
@@ -394,7 +402,7 @@ export default function Navbar({ isStatic = false }) {
               </a>
               <div className="indicator"></div>
 
-              <Link href="/changelog" className="menu-item-hover group flex items-center justify-between py-2 mt-4" onClick={() => setIsMenuOpen(false)}>
+              <Link href="/changelog" className="menu-item-hover group flex items-center justify-between py-2 mt-4">
                 <span className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant hover:text-primary-container transition-all group-active:translate-x-2">{t.changelog}</span>
                 <ChevronRight className="text-primary-container/0 group-hover:text-primary-container transition-colors" />
               </Link>
@@ -404,7 +412,7 @@ export default function Navbar({ isStatic = false }) {
             {isAdmin && (
               <div className="menu-item-group">
                 <span className="text-[10px] font-label-bold text-error uppercase tracking-[0.2em] mb-4 block">Admin</span>
-                <Link href="/admin" className="menu-item-hover group flex items-center justify-between py-2" onClick={() => setIsMenuOpen(false)}>
+                <Link href="/admin" className="menu-item-hover group flex items-center justify-between py-2">
                   <span className="font-headline-lg-mobile text-headline-lg-mobile text-error hover:text-error-container transition-all group-active:translate-x-2">Admin Panel</span>
                   <ChevronRight className="text-error/0 group-hover:text-error transition-colors" />
                 </Link>
@@ -413,7 +421,7 @@ export default function Navbar({ isStatic = false }) {
             )}
           </nav>
           
-          <div className="px-6 py-10 bg-surface-container-low border-t border-on-surface/ space-y-8">
+          <div className="px-6 py-10 bg-surface-container-low border-t border-on-surface/10 space-y-8 relative z-10">
             {session ? (
               <button 
                 onClick={() => { signOut(); setIsMenuOpen(false); }} 
