@@ -332,15 +332,15 @@ export default function Navbar({ isStatic = false }) {
       )}
 
       {/* Mobile Navigation Overlay */}
-      <div className={`fixed inset-0 z-50 flex justify-end ${isMenuOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}>
+      <div className={`fixed inset-0 z-50 transform ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'} transition-transform duration-500 ease-out flex`}>
         {/* Backdrop */}
         <div 
-          className={`absolute inset-0 bg-background/50 backdrop-blur-sm transition-opacity duration-500 ${isMenuOpen ? 'opacity-100' : 'opacity-0'}`} 
+          className={`flex-grow bg-background/50 backdrop-blur-sm transition-opacity duration-500 ${isMenuOpen ? 'opacity-100' : 'opacity-0'}`} 
           onClick={() => setIsMenuOpen(false)}
         ></div>
         
         {/* Sliding Content Area */}
-        <div className={`w-[85%] max-w-sm glass-panel flex flex-col relative h-full transform transition-transform duration-500 ease-out ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+        <div className="w-[85%] max-w-sm glass-panel flex flex-col relative h-full">
           <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-right from-transparent via-primary-container/30 to-transparent"></div>
           
           <div className="flex justify-between items-center px-6 py-6 border-b border-on-surface/10">
