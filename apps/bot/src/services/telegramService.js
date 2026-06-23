@@ -20,7 +20,8 @@ function initTelegramBot() {
             const chatId = msg.chat.id;
             // Sadece text mesajlarına cevap ver
             if (msg.text) {
-                bot.sendMessage(chatId, `Merhaba! Sizin Telegram Chat ID'niz: \`${chatId}\`\n\nBu ID'yi .env dosyanızdaki TELEGRAM_ADMIN_CHAT_ID değişkenine yazabilirsiniz.`, { parse_mode: 'Markdown' });
+                bot.sendMessage(chatId, `Merhaba! Sizin Telegram Chat ID'niz: ${chatId}\n\nBu numarayi .env dosyanizdaki TELEGRAM_ADMIN_CHAT_ID degiskenine yazabilirsiniz.`)
+                    .catch(err => console.error('[TelegramService] Mesaj gonderilemedi:', err));
             }
         });
 
