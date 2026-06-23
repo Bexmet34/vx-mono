@@ -2,6 +2,7 @@ const { supabase } = require('@veyronix/database');
 const { sendSubscriptionNotification } = require('../utils/notificationUtils');
 
 let lastKnownSubs = new Map();
+let lastKnownPending = new Set();
 
 /**
  * Periodically checks the database for changes (Polling).
@@ -63,6 +64,24 @@ async function checkUpdates(client, initial = false) {
 
             // Update the memory map with the latest record
             lastKnownSubs.set(guildId, sub);
+        }
+
+        // --- NEW: Check Pending Manual Payments ---
+        const { data: pendingPayments, error: pendingError } = await supabase
+            .from('crypto_payments')
+            .select('*')
+            .eq('status', 'pending')
+            .eq('payment_method', 'havale');
+
+        if (!pendingError && pendingPayments) {
+            const { sendPaymentNotificationToTelegram } = require('./telegramService');
+            for (const payment of pendingPayments) {
+                if (!initial && !lastKnownPending.has(payment.id)) {
+                    console.log(`[DbListener] New manual payment found: ${payment.id}`);
+                    await sendPaymentNotificationToTelegram(payment);
+                }
+                lastKnownPending.add(payment.id);
+            }
         }
 
         // --- NEW: Check KillBoard Manual Triggers ---
