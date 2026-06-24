@@ -66,7 +66,7 @@ export async function POST(req) {
         user_id: session.user.id,
         guild_id: guildId,
         guild_name: guildName || "Bilinmeyen Sunucu",
-        amount: plan.amount,
+        amount: plan.amount * (parseFloat(process.env.NEXT_PUBLIC_USDT_TRY_RATE) || 40),
         currency: 'TRY',
         duration_days: plan.duration_days,
         plan_type: plan.plan_type || 'server',
