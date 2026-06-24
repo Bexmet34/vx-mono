@@ -16,7 +16,7 @@ async function sendPaymentNotificationToNtfy(payment) {
         method: 'POST',
         body: message,
         headers: {
-            'Title': 'Yeni Ödeme Talebi! 💰',
+            'Title': 'Yeni Odeme Talebi!',
             'Priority': 'high',
             'Tags': 'moneybag,bell'
         }
