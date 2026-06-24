@@ -128,16 +128,34 @@ export default function Home() {
     }
   };
 
-  // #1 — handleConfirmManualPayment artık sadece senderName günceller ve onayı tamamlar
-  // Asıl kayıt handleManualPurchase'da API çağrısıyla oluşturulmuştu
   const handleConfirmManualPayment = async () => {
     if (!senderName || senderName.trim().length < 3) {
       alert("Lütfen kart üzerindeki isminizi giriniz.");
       return;
     }
-    // Ödeme zaten sunucuya kaydedildi (handleManualPurchase'da)
-    // Kullanıcıya sadece başarı mesajı göster
-    setFinalSuccess(true);
+    
+    setIsProcessing(true);
+    try {
+      const res = await fetch("/api/payment/manual-confirm", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          descriptionCode: generatedCode,
+          senderName: senderName.trim()
+        })
+      });
+      
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setFinalSuccess(true);
+      } else {
+        alert(data.error || "Onay işlemi başarısız oldu. Lütfen tekrar deneyin.");
+      }
+    } catch (err) {
+      alert("Bağlantı hatası.");
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const handleConfirmPurchase = async () => {
