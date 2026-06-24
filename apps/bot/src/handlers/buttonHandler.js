@@ -636,6 +636,7 @@ async function handleRegisterButtons(interaction) {
 
                 let roleStatus = '';
                 let unregRoleStatus = '';
+                let finalGivenRoleId = null;
 
                 // Identify the fallback (unregistered) role
                 const fallbackRoleId = guildConfig?.auto_role_on_join_id;
@@ -651,6 +652,7 @@ async function handleRegisterButtons(interaction) {
                     if (roleIndex === 5) givenRoleId = guildConfig?.registration_given_role_id_5;
 
                     if (givenRoleId) {
+                        finalGivenRoleId = givenRoleId;
                         try {
                             await targetMember.roles.add(givenRoleId);
                             roleStatus = `\n✅ **Rol Verildi:** <@&${givenRoleId}>`;
@@ -675,6 +677,7 @@ async function handleRegisterButtons(interaction) {
                 } else if (action === 'temp') {
                     // Give Temp Role
                     if (tempRoleId) {
+                        finalGivenRoleId = tempRoleId;
                         try {
                             await targetMember.roles.add(tempRoleId);
                             roleStatus = `\n✅ **Geçici Rol Verildi:** <@&${tempRoleId}>`;
@@ -771,14 +774,22 @@ async function handleRegisterButtons(interaction) {
                 if (logChannelId) {
                     const logChannel = interaction.guild.channels.cache.get(logChannelId);
                     if (logChannel) {
+                        const logTitle = action === 'temp' ? '⏳ Geçici Kayıt Onaylandı' : '✅ Kayıt Onaylandı';
+                        const logColor = action === 'temp' ? '#ff9f43' : '#2ed573';
+                        const logFields = [
+                            { name: '👤 Kullanıcı', value: `<@${targetUserId}>`, inline: true },
+                            { name: '🎮 Yeni İsim', value: newNickname, inline: true },
+                            { name: '👮 Yetkili', value: `<@${interaction.user.id}>`, inline: true }
+                        ];
+
+                        if (finalGivenRoleId) {
+                            logFields.push({ name: '🛡️ Verilen Rol', value: `<@&${finalGivenRoleId}>`, inline: true });
+                        }
+
                         const logEmbed = new EmbedBuilder()
-                            .setTitle('✅ Kayıt Onaylandı')
-                            .setColor('#2ed573')
-                            .addFields(
-                                { name: '👤 Kullanıcı', value: `<@${targetUserId}>`, inline: true },
-                                { name: '🎮 Yeni İsim', value: newNickname, inline: true },
-                                { name: '👮 Yetkili', value: `<@${interaction.user.id}>`, inline: true }
-                            )
+                            .setTitle(logTitle)
+                            .setColor(logColor)
+                            .addFields(logFields)
                             .setTimestamp();
                         await logChannel.send({ embeds: [logEmbed] }).catch(()=>{});
                     }
