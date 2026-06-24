@@ -1206,12 +1206,18 @@ export default function AdminPage() {
                    </div>
                 </div>
 
-                <div className="server-filter-row" style={{marginBottom: '2rem'}}>
+                <div style={{display: 'flex', gap: '0.5rem', marginBottom: '2rem', padding: '0.5rem', background: 'var(--admin-card)', borderRadius: '12px', border: '1px solid var(--admin-border)', flexWrap: 'wrap'}}>
                    {['all', 'pending', 'paid', 'rejected'].map(f => (
                      <button 
                        key={f}
                        onClick={() => setPaymentStatusFilter(f)}
-                       className={`filter-btn ${paymentStatusFilter === f ? 'active' : ''}`}
+                       style={{
+                         flex: '1', minWidth: '120px', padding: '0.75rem 1rem', borderRadius: '8px',
+                         background: paymentStatusFilter === f ? 'var(--admin-accent)' : 'transparent',
+                         color: paymentStatusFilter === f ? '#000' : 'var(--admin-text-muted)',
+                         fontWeight: 'bold', border: 'none', cursor: 'pointer', transition: 'all 0.3s ease',
+                         textAlign: 'center'
+                       }}
                      >
                        {f === 'all' && 'Tüm Kayıtlar'}
                        {f === 'pending' && 'Bekleyenler'}
@@ -1221,70 +1227,93 @@ export default function AdminPage() {
                    ))}
                 </div>
 
-                <div className="admin-card">
-                  <table className="admin-table">
-                    <thead>
-                      <tr>
-                        <th>SUNUCU / KULLANICI</th>
-                        <th>GÖNDEREN & MİKTAR</th>
-                        <th>AÇIKLAMA KODU</th>
-                        <th>DURUM</th>
-                        <th style={{textAlign: "right"}}>İŞLEMLER</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredPayments.length === 0 ? (
-                        <tr><td colSpan={5} style={{textAlign: 'center', padding: '4rem', opacity: 0.5}}>Arama kriterlerine uygun ödeme kaydı bulunamadı.</td></tr>
-                      ) : filteredPayments.map(p => (
-                        <tr key={p.id}>
-                          <td data-label="SUNUCU / KULLANICI">
-                            <div style={{fontWeight: '700', fontSize: '0.95rem'}}>{p.guild_name}</div>
-                            <div style={{fontSize: '0.75rem', color: 'var(--admin-text-muted)', fontFamily: 'monospace'}}>{p.guild_id}</div>
-                            <div style={{fontSize: '0.75rem', color: 'var(--admin-accent)', marginTop: '0.2rem'}}>User ID: {p.user_id}</div>
-                          </td>
-                          <td data-label="GÖNDEREN & MİKTAR">
-                            <div style={{fontWeight: '700'}}>{p.sender_name}</div>
-                            {p.target_bank && (
-                              <div style={{fontSize: '0.75rem', color: 'var(--admin-text-muted)', marginBottom: '0.2rem'}}>Banka: {p.target_bank}</div>
-                            )}
-                            <div style={{color: 'var(--admin-accent)', fontWeight: '600'}}>{p.amount} {p.currency}</div>
-                            <div style={{fontSize: '0.75rem', color: 'var(--admin-text-muted)'}}>{p.duration_days} Günlük Paket</div>
-                          </td>
-                          <td data-label="AÇIKLAMA KODU">
-                            <code style={{fontSize: '0.9rem', color: 'var(--admin-text-muted)', background: 'rgba(255,255,255,0.05)', padding: '0.3rem 0.6rem', borderRadius: '4px', letterSpacing: '2px', fontWeight: 'bold'}}>
-                              {p.description_code}
-                            </code>
-                          </td>
-                          <td data-label="DURUM">
-                            {p.status === 'pending' && <span className="admin-badge" style={{background: 'rgba(252,163,17,0.15)', color: '#fca311'}}>Bekliyor</span>}
-                            {p.status === 'paid' && <span className="admin-badge badge-active">Onaylandı</span>}
-                            {(p.status === 'rejected' || p.status === 'cancel') && <span className="admin-badge badge-passive">Reddedildi</span>}
-                          </td>
-                          <td data-label="İŞLEMLER">
-                            {p.status === 'pending' && (
-                              <div style={{display: 'flex', gap: '0.5rem', justifyContent: 'flex-end'}}>
-                                <button 
-                                  className="admin-action-btn" 
-                                  style={{color: 'var(--admin-success)', borderColor: 'rgba(46, 204, 113, 0.3)'}}
-                                  onClick={() => handleManualPaymentAction(p.id, 'paid')}
-                                  disabled={savingId === p.id}
-                                >
-                                  {savingId === p.id ? <Loader2 size={18} className="spin" /> : <Check size={18} />}
-                                </button>
-                                <button 
-                                  className="admin-action-btn danger" 
-                                  onClick={() => handleManualPaymentAction(p.id, 'rejected')}
-                                  disabled={savingId === p.id}
-                                >
-                                  {savingId === p.id ? <Loader2 size={18} className="spin" /> : <X size={18} />}
-                                </button>
-                              </div>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
+                  {filteredPayments.length === 0 ? (
+                    <div style={{gridColumn: '1 / -1', textAlign: 'center', padding: '4rem', background: 'var(--admin-card)', borderRadius: '12px', border: '1px solid var(--admin-border)', color: 'var(--admin-text-muted)'}}>
+                      Arama kriterlerine uygun ödeme kaydı bulunamadı.
+                    </div>
+                  ) : filteredPayments.map(p => (
+                    <div key={p.id} style={{
+                      background: 'var(--admin-card)', 
+                      borderRadius: '16px', 
+                      border: `1px solid ${p.status === 'pending' ? 'rgba(252,163,17,0.3)' : 'var(--admin-border)'}`, 
+                      overflow: 'hidden',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      boxShadow: p.status === 'pending' ? '0 0 20px rgba(252,163,17,0.05)' : 'none',
+                      transition: 'transform 0.3s ease',
+                    }}>
+                      {/* HEADER */}
+                      <div style={{ padding: '1.2rem', borderBottom: '1px solid var(--admin-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.2)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <Server size={18} style={{ color: 'var(--admin-text-muted)' }} />
+                          <div style={{ fontWeight: '800', fontSize: '1rem', color: 'var(--admin-text)' }}>{p.guild_name}</div>
+                        </div>
+                        <div>
+                          {p.status === 'pending' && <span className="admin-badge" style={{background: 'rgba(252,163,17,0.15)', color: '#fca311', padding: '0.4rem 0.8rem', borderRadius: '20px'}}>Bekliyor</span>}
+                          {p.status === 'paid' && <span className="admin-badge badge-active" style={{padding: '0.4rem 0.8rem', borderRadius: '20px'}}>Onaylandı</span>}
+                          {(p.status === 'rejected' || p.status === 'cancel') && <span className="admin-badge badge-passive" style={{padding: '0.4rem 0.8rem', borderRadius: '20px'}}>Reddedildi</span>}
+                        </div>
+                      </div>
+
+                      {/* BODY */}
+                      <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                           <div>
+                             <div style={{ fontSize: '0.75rem', color: 'var(--admin-text-muted)', marginBottom: '0.2rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Kullanıcı ID</div>
+                             <div style={{ fontSize: '0.85rem', fontFamily: 'monospace', color: 'var(--admin-text)' }}>{p.user_id}</div>
+                           </div>
+                           <div>
+                             <div style={{ fontSize: '0.75rem', color: 'var(--admin-text-muted)', marginBottom: '0.2rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Gönderen & Banka</div>
+                             <div style={{ fontWeight: '700', color: 'var(--admin-text)' }}>{p.sender_name}</div>
+                             <div style={{ fontSize: '0.8rem', color: 'var(--admin-text-muted)' }}>{p.target_bank}</div>
+                           </div>
+                        </div>
+
+                        <div style={{ background: 'rgba(255,215,0,0.05)', border: '1px solid rgba(255,215,0,0.2)', padding: '1rem', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <div>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--admin-accent)', marginBottom: '0.2rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Tutar</div>
+                            <div style={{ fontSize: '1.2rem', fontWeight: '800', color: 'var(--admin-text)' }}>{p.amount} <span style={{fontSize: '0.9rem', color: 'var(--admin-text-muted)'}}>{p.currency}</span></div>
+                          </div>
+                          <div style={{ textAlign: 'right' }}>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--admin-accent)', marginBottom: '0.2rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Süre</div>
+                            <div style={{ fontSize: '1rem', fontWeight: '600', color: 'var(--admin-text)' }}>{p.duration_days} Günlük</div>
+                          </div>
+                        </div>
+
+                        <div>
+                           <div style={{ fontSize: '0.75rem', color: 'var(--admin-text-muted)', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Açıklama Kodu (Dekont İçin)</div>
+                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--admin-border)', padding: '0.8rem 1rem', borderRadius: '8px' }}>
+                             <code style={{ fontSize: '1.1rem', letterSpacing: '3px', fontWeight: 'bold', color: '#fff' }}>{p.description_code}</code>
+                           </div>
+                        </div>
+
+                      </div>
+
+                      {/* FOOTER ACTIONS */}
+                      {p.status === 'pending' && (
+                        <div style={{ padding: '1rem', borderTop: '1px solid var(--admin-border)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem', background: 'rgba(0,0,0,0.2)' }}>
+                           <button 
+                             className="admin-btn" 
+                             style={{ background: 'rgba(46, 204, 113, 0.1)', color: '#2ecc71', border: '1px solid rgba(46, 204, 113, 0.3)', padding: '0.8rem', fontWeight: 'bold', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}
+                             onClick={() => handleManualPaymentAction(p.id, 'paid')}
+                             disabled={savingId === p.id}
+                           >
+                             {savingId === p.id ? <Loader2 size={18} className="spin" /> : <><Check size={18} /> ONAYLA</>}
+                           </button>
+                           <button 
+                             className="admin-action-btn danger" 
+                             style={{ padding: '0.8rem', fontWeight: 'bold', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', width: '100%', borderRadius: '8px' }}
+                             onClick={() => handleManualPaymentAction(p.id, 'rejected')}
+                             disabled={savingId === p.id}
+                           >
+                             {savingId === p.id ? <Loader2 size={18} className="spin" /> : <><X size={18} /> REDDET</>}
+                           </button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
