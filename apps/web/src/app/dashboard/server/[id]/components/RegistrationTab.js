@@ -200,7 +200,22 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
             </select>
           </div>
 
-          {/* Dynamic Roles */}
+          </div>
+        </div>
+
+        {/* ----- SECTION: Given Roles ----- */}
+        <div className="mt-8 pt-8 border-t border-outline-variant/30">
+          <h3 className="font-headline-md text-lg text-on-surface mb-4 flex items-center gap-2">
+            <Tag className="w-5 h-5 text-primary-container" />
+            {lang === 'en' ? 'Registration Approval Roles' : 'Kayıt Onay Rolleri'}
+          </h3>
+          <p className="text-sm text-on-surface-variant mb-6">
+            {lang === 'en' 
+              ? 'Select up to 5 roles to be given upon registration. These will appear as buttons.' 
+              : 'Kayıt onayı verildiğinde kullanıcıya eklenecek rolleri seçin (en fazla 5 rol).'}
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Dynamic Roles */}
           {[...Array(visibleRoleCount)].map((_, i) => {
             const roleKey = i === 0 ? 'registration_given_role_id' : `registration_given_role_id_${i + 1}`;
             return (
@@ -240,16 +255,27 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
             );
           })}
 
-          {visibleRoleCount < 5 && (
-            <button
-              onClick={() => setVisibleRoleCount(prev => prev + 1)}
-              className="w-full py-3 border border-dashed border-outline-variant rounded-sm text-on-surface-variant hover:text-primary-container hover:border-primary-container transition-colors text-sm uppercase tracking-widest font-label-bold flex items-center justify-center gap-2"
-            >
-              + {lang === 'en' ? 'Add Another Role' : 'Yeni Rol Ekle'}
-            </button>
-          )}
+            {visibleRoleCount < 5 && (
+              <div className="col-span-1 md:col-span-2 mt-2">
+                <button
+                  onClick={() => setVisibleRoleCount(prev => prev + 1)}
+                  className="w-full py-3 border border-dashed border-outline-variant rounded-sm text-on-surface-variant hover:text-primary-container hover:border-primary-container transition-colors text-sm uppercase tracking-widest font-label-bold flex items-center justify-center gap-2"
+                >
+                  + {lang === 'en' ? 'Add Another Role' : 'Yeni Rol Ekle'}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
 
-          <div className="border-t border-outline-variant my-4 pt-4">
+        {/* ----- SECTION: Guest & Fallback Roles ----- */}
+        <div className="mt-8 pt-8 border-t border-outline-variant/30">
+          <h3 className="font-headline-md text-lg text-on-surface mb-4 flex items-center gap-2">
+            <Users className="w-5 h-5 text-secondary" />
+            {lang === 'en' ? 'Guest & Unregistered Roles' : 'Misafir ve Kayıtsız Rolleri'}
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+            <div className="bg-surface-container/30 p-5 rounded-lg border border-outline-variant/50">
             <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2 flex items-center gap-2">
               <span className="text-secondary">{lang === 'en' ? 'Temporary Guest Role' : 'Geçici Misafir Rolü'}</span>
             </label>
@@ -286,7 +312,9 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
             )}
           </div>
 
-          <div>
+            </div>
+
+            <div className="bg-surface-container/30 p-5 rounded-lg border border-outline-variant/50">
             <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
               {lang === 'en' ? 'Auto Role on Join' : 'Otomatik Rol (Girişte)'}
             </label>
@@ -300,7 +328,9 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                 <option key={r.id} value={r.id}>@{r.name}</option>
               ))}
             </select>
+              </div>
           </div>
+        </div>
         </div>
       </div>
 
