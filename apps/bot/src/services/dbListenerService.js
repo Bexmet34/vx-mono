@@ -74,11 +74,10 @@ async function checkUpdates(client, initial = false) {
             .eq('payment_method', 'havale');
 
         if (!pendingError && pendingPayments) {
-            const { sendPaymentNotificationToTelegram } = require('./telegramService');
             for (const payment of pendingPayments) {
                 if (!initial && !lastKnownPending.has(payment.id)) {
                     console.log(`[DbListener] New manual payment found: ${payment.id}`);
-                    await sendPaymentNotificationToTelegram(payment);
+                    // TODO: Bildirimler yeni sisteme eklenecek
                 }
                 lastKnownPending.add(payment.id);
             }
