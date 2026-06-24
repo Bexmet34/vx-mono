@@ -694,7 +694,7 @@ async function handleRegisterButtons(interaction) {
 
                     // Insert to temp_roles table via Supabase client
                     const durationDays = guildConfig?.registration_guest_role_duration || 7;
-                    const { supabase } = require('../../packages/database');
+                    const { supabase } = require('@veyronix/database');
                     const expiresAt = new Date();
                     expiresAt.setDate(expiresAt.getDate() + durationDays);
                     

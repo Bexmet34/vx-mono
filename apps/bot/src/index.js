@@ -251,7 +251,7 @@ client.on('interactionCreate', async interaction => {
                 await handleVoteCommand(interaction);
             } else if (interaction.customId === 'obj_open_modal' || interaction.customId.startsWith('obj_join_')) {
                 await handleObjectiveButtons(interaction);
-            } else if (interaction.customId === 'register_start' || interaction.customId === 'register_btn' || interaction.customId.startsWith('reg_approve_') || interaction.customId.startsWith('reg_reject_')) {
+            } else if (interaction.customId === 'register_start' || interaction.customId === 'register_btn' || interaction.customId.startsWith('reg_approve_') || interaction.customId.startsWith('reg_reject_') || interaction.customId.startsWith('reg_temp_')) {
                 await handleRegisterButtons(interaction);
             } else {
                 await handlePartyButtons(interaction);
