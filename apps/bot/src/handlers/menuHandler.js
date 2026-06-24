@@ -377,10 +377,12 @@ async function handleJoinRoleSelect(interaction) {
         // Check if selected slot exists
         if (selectedIndex < 0 || selectedIndex >= rolesWithMembers.length) {
             release();
-            return await interaction.followUp({
-                content: `❌ ${t('common.error', lang)}`,
-                flags: [MessageFlags.Ephemeral]
-            });
+            const msgObj = { content: `❌ ${t('common.error', lang)}`, flags: [MessageFlags.Ephemeral] };
+            if (interaction.deferred || interaction.replied) {
+                return await interaction.followUp(msgObj).catch(() => {});
+            } else {
+                return await interaction.reply(msgObj).catch(() => {});
+            }
         }
 
         // Check if the selected slot is already filled
@@ -397,7 +399,12 @@ async function handleJoinRoleSelect(interaction) {
                     ? `❌ **${roleName}** rolüne geçmek istediniz fakat <@${occupierId}> isimli oyuncunun geçebileceği herhangi bir Yedek rolü (Swap) yok.`
                     : `❌ You tried to join **${roleName}** but player <@${occupierId}> has no available Swap roles.`;
                 release();
-                return await interaction.followUp({ content: failMsg, flags: [MessageFlags.Ephemeral] });
+                const msgObj = { content: failMsg, flags: [MessageFlags.Ephemeral] };
+                if (interaction.deferred || interaction.replied) {
+                    return await interaction.followUp(msgObj).catch(() => {});
+                } else {
+                    return await interaction.reply(msgObj).catch(() => {});
+                }
             }
 
             // Simulate the swap using Bipartite Algorithm
@@ -436,7 +443,12 @@ async function handleJoinRoleSelect(interaction) {
                     ? `❌ **${roleName}** rolüne geçmek istediniz fakat <@${occupierId}> isimli oyuncunun geçebileceği uygun (boş) bir Yedek rol kalmamış.`
                     : `❌ You tried to join **${roleName}** but player <@${occupierId}> has no empty Swap positions left.`;
                 release();
-                return await interaction.followUp({ content: failMsg, flags: [MessageFlags.Ephemeral] });
+                const msgObj = { content: failMsg, flags: [MessageFlags.Ephemeral] };
+                if (interaction.deferred || interaction.replied) {
+                    return await interaction.followUp(msgObj).catch(() => {});
+                } else {
+                    return await interaction.reply(msgObj).catch(() => {});
+                }
             }
 
             // SWAP SUCCESSFUL! Apply the assignments
@@ -472,10 +484,17 @@ async function handleJoinRoleSelect(interaction) {
             multiRoleWaitlist = multiRoleWaitlist.filter(u => u.userId !== userId); // clicker's swap is erased
 
             const allocationResult = await finalizeRoleUpdate(freshMessage, rolesWithMembers, multiRoleWaitlist, data, lang, guildName);
-            await interaction.editReply({ 
-                embeds: [allocationResult.newEmbed], 
-                components: allocationResult.newComponents
-            });
+            if (interaction.deferred || interaction.replied) {
+                await interaction.editReply({ 
+                    embeds: [allocationResult.newEmbed], 
+                    components: allocationResult.newComponents
+                }).catch(e => {
+                    console.error('editReply error:', e.message);
+                    freshMessage.edit({ embeds: [allocationResult.newEmbed], components: allocationResult.newComponents }).catch(() => {});
+                });
+            } else {
+                await freshMessage.edit({ embeds: [allocationResult.newEmbed], components: allocationResult.newComponents }).catch(() => {});
+            }
 
 
             return;
@@ -500,10 +519,17 @@ async function handleJoinRoleSelect(interaction) {
         multiRoleWaitlist = multiRoleWaitlist.filter(u => u.userId !== userId);
 
         const allocationResult = await finalizeRoleUpdate(freshMessage, rolesWithMembers, multiRoleWaitlist, data, lang, guildName);
-        await interaction.editReply({ 
-            embeds: [allocationResult.newEmbed], 
-            components: allocationResult.newComponents
-        });
+        if (interaction.deferred || interaction.replied) {
+            await interaction.editReply({ 
+                embeds: [allocationResult.newEmbed], 
+                components: allocationResult.newComponents
+            }).catch(e => {
+                console.error('editReply error:', e.message);
+                freshMessage.edit({ embeds: [allocationResult.newEmbed], components: allocationResult.newComponents }).catch(() => {});
+            });
+        } else {
+            await freshMessage.edit({ embeds: [allocationResult.newEmbed], components: allocationResult.newComponents }).catch(() => {});
+        }
 
 
     } catch (e) {
@@ -525,7 +551,7 @@ async function handleJoinMultiRoleSelect(interaction) {
         const freshMessage = await channel.messages.fetch(partyMessageId).catch(() => null);
         if (!freshMessage || !freshMessage.embeds[0]) {
             release();
-            return await interaction.followUp({ content: '❌ Parti mesajı bulunamadı.', flags: [MessageFlags.Ephemeral] });
+            return await interaction.followUp({ content: '❌ Parti mesajı bulunamadı.', flags: [MessageFlags.Ephemeral] }).catch(() => {});
         }
 
         const { getGuildConfig } = require('../services/guildConfig');
@@ -551,7 +577,11 @@ async function handleJoinMultiRoleSelect(interaction) {
             embeds: [allocationResult.newEmbed], 
             components: allocationResult.newComponents
         });
-        await interaction.editReply({ content: lang === 'tr' ? '✅ Yedek rolleriniz başarıyla kaydedildi.' : '✅ Swap roles successfully saved.', embeds: [], components: [] });
+        if (interaction.deferred || interaction.replied) {
+            await interaction.editReply({ content: lang === 'tr' ? '✅ Yedek rolleriniz başarıyla kaydedildi.' : '✅ Swap roles successfully saved.', embeds: [], components: [] }).catch(() => {});
+        } else {
+            await interaction.update({ content: lang === 'tr' ? '✅ Yedek rolleriniz başarıyla kaydedildi.' : '✅ Swap roles successfully saved.', embeds: [], components: [] }).catch(() => {});
+        }
     } catch (e) {
         console.error('Error in handleJoinMultiRoleSelect:', e);
     } finally {

@@ -87,12 +87,22 @@ async function handlePartyButtons(interaction) {
         removeActiveParty(ownerId, message.id);
 
 
-        const response = await interaction.editReply({
-            embeds: [closedEmbed],
-            components: [closedRow]
-        });
+        if (interaction.deferred || interaction.replied) {
+            await interaction.editReply({
+                embeds: [closedEmbed],
+                components: [closedRow]
+            }).catch(e => {
+                console.error('editReply error in close:', e.message);
+                message.edit({ embeds: [closedEmbed], components: [closedRow] }).catch(() => {});
+            });
+        } else {
+            await message.edit({
+                embeds: [closedEmbed],
+                components: [closedRow]
+            }).catch(() => {});
+        }
 
-        return response;
+        return;
     }
 
 
@@ -147,7 +157,7 @@ async function handlePartyButtons(interaction) {
                     await db.run('INSERT INTO party_members (party_id, user_id, role, status) SELECT id, ?, ?, \'joined\' FROM parties WHERE message_id = ?', [userId, roleName, message.id]).catch(e => console.error(e));
                 } else if (joinIndex !== -1 && rolesWithMembers[joinIndex].userId) {
                     release();
-                    return await interaction.followUp({ content: `❌ ${t('common.error', lang)}`, flags: [MessageFlags.Ephemeral] });
+                    return await interaction.followUp({ content: `❌ ${t('common.error', lang)}`, flags: [MessageFlags.Ephemeral] }).catch(() => {});
                 }
             }
 
@@ -160,10 +170,20 @@ async function handlePartyButtons(interaction) {
 
             const { newEmbed, newComponents } = await finalizeRoleUpdate(freshMessage, rolesWithMembers, multiRoleWaitlist, data, lang, guildName);
 
-            await interaction.editReply({
-                embeds: [newEmbed],
-                components: newComponents
-            });
+            if (interaction.deferred || interaction.replied) {
+                await interaction.editReply({
+                    embeds: [newEmbed],
+                    components: newComponents
+                }).catch(e => {
+                    console.error('editReply error in join/leave:', e.message);
+                    freshMessage.edit({ embeds: [newEmbed], components: newComponents }).catch(() => {});
+                });
+            } else {
+                await freshMessage.edit({
+                    embeds: [newEmbed],
+                    components: newComponents
+                }).catch(() => {});
+            }
         } catch (e) {
             console.error('Error in handlePartyButtons join/leave:', e);
         } finally {
