@@ -74,10 +74,11 @@ async function checkUpdates(client, initial = false) {
             .eq('payment_method', 'havale');
 
         if (!pendingError && pendingPayments) {
+            const { sendPaymentNotificationToNtfy } = require('./ntfyService');
             for (const payment of pendingPayments) {
                 if (!initial && !lastKnownPending.has(payment.id)) {
                     console.log(`[DbListener] New manual payment found: ${payment.id}`);
-                    // TODO: Bildirimler yeni sisteme eklenecek
+                    await sendPaymentNotificationToNtfy(payment);
                 }
                 lastKnownPending.add(payment.id);
             }
