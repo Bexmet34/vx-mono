@@ -76,6 +76,11 @@ async function checkUpdates(client, initial = false) {
         if (!pendingError && pendingPayments) {
             const { sendPaymentNotificationToNtfy } = require('./ntfyService');
             for (const payment of pendingPayments) {
+                // İsim henüz girilmediyse (kullanıcı modalda bekliyorsa) atla
+                if (payment.sender_name === 'Belirtilmedi') {
+                    continue; 
+                }
+
                 if (!initial && !lastKnownPending.has(payment.id)) {
                     console.log(`[DbListener] New manual payment found: ${payment.id}`);
                     await sendPaymentNotificationToNtfy(payment);

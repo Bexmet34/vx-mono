@@ -19,24 +19,23 @@ export async function POST(req) {
       return NextResponse.json({ error: "Eksik bilgi gönderdiniz." }, { status: 400 });
     }
 
-    // İlgili draft ödemeyi bul
+    // İlgili ödemeyi bul (status pending ve isim Belirtilmedi olan)
     const { data: payment, error: fetchError } = await supabase
       .from('crypto_payments')
       .select('id, status, user_id')
       .eq('description_code', descriptionCode)
       .eq('user_id', session.user.id)
-      .eq('status', 'draft')
+      .eq('status', 'pending')
       .single();
 
     if (fetchError || !payment) {
-      return NextResponse.json({ error: "Geçerli bir taslak ödeme bulunamadı veya süresi geçmiş." }, { status: 404 });
+      return NextResponse.json({ error: "Geçerli bir ödeme bulunamadı veya süresi geçmiş." }, { status: 404 });
     }
 
-    // Ödemenin statüsünü pending yap ve ismi güncelle
+    // İsmi güncelle (artık Belirtilmedi olmayacak, böylece bot bildirim atacak)
     const { error: updateError } = await supabase
       .from('crypto_payments')
       .update({
-        status: 'pending',
         sender_name: senderName
       })
       .eq('id', payment.id);
