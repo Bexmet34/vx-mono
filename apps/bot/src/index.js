@@ -97,6 +97,7 @@ client.once('clientReady', async (c) => {
     const { initObjectiveService } = require('./services/objectiveService');
     const { initKillBoardService } = require('./services/killboardService');
     const { startScheduledMessageService } = require('./services/scheduledMessageService');
+    const { initTempRoleService } = require('./services/tempRoleService');
 
     
     startCronService(client);
@@ -105,6 +106,7 @@ client.once('clientReady', async (c) => {
     initObjectiveService(client);
     initKillBoardService(client);
     startScheduledMessageService(client);
+    initTempRoleService(client);
 
 
     // Auto-Poster for Top.gg (initialized after ready to avoid deprecated 'ready' event warning)

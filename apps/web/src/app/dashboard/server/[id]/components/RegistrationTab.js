@@ -7,8 +7,23 @@ import InfoTooltip from "@/components/InfoTooltip";
 export default function RegistrationTab({ t, lang, settings, setSettings, discordChannels, discordRoles, handleSave, saving, guildId, registeredCount = 0, setActiveTab, isPremium }) {
   const [sendingSetup, setSendingSetup] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const [visibleRoleCount, setVisibleRoleCount] = useState(1);
   const textChannels = (discordChannels || []).filter(c => c.type === 0);
   const categories = (discordChannels || []).filter(c => c.type === 4);
+
+  useEffect(() => {
+    let count = 1;
+    if (settings.registration_given_role_id_5) count = 5;
+    else if (settings.registration_given_role_id_4) count = 4;
+    else if (settings.registration_given_role_id_3) count = 3;
+    else if (settings.registration_given_role_id_2) count = 2;
+    setVisibleRoleCount(count);
+  }, [
+    settings.registration_given_role_id_2,
+    settings.registration_given_role_id_3,
+    settings.registration_given_role_id_4,
+    settings.registration_given_role_id_5
+  ]);
 
   // Poll for sync status if syncing is true locally or in settings
   useEffect(() => {
@@ -185,60 +200,66 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
-              {lang === 'en' ? 'Given Role 1' : 'Verilecek Rol 1'}
-            </label>
-            <select
-              className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
-              value={settings.registration_given_role_id || ""}
-              onChange={(e) => setSettings({ ...settings, registration_given_role_id: e.target.value })}
-            >
-              <option value="">{lang === 'en' ? 'Select Role' : 'Rol Seçin'}</option>
-              {(discordRoles || []).map(r => (
-                <option key={r.id} value={r.id}>@{r.name}</option>
-              ))}
-            </select>
-          </div>
+          {/* Dynamic Roles */}
+          {[...Array(visibleRoleCount)].map((_, i) => {
+            const roleKey = i === 0 ? 'registration_given_role_id' : `registration_given_role_id_${i + 1}`;
+            return (
+              <div key={roleKey} className="relative">
+                <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2 flex items-center justify-between">
+                  <span>{lang === 'en' ? `Given Role ${i + 1}` : `Verilecek Rol ${i + 1}`}</span>
+                  {i > 0 && i === visibleRoleCount - 1 && (
+                    <button 
+                      onClick={() => {
+                        setVisibleRoleCount(prev => prev - 1);
+                        setSettings({ ...settings, [roleKey]: "" });
+                      }}
+                      className="text-xs text-error hover:text-error/80 transition-colors"
+                    >
+                      {lang === 'en' ? 'Remove' : 'Kaldır'}
+                    </button>
+                  )}
+                </label>
+                <select
+                  className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+                  value={settings[roleKey] || ""}
+                  onChange={(e) => setSettings({ ...settings, [roleKey]: e.target.value })}
+                >
+                  <option value="">{lang === 'en' ? 'Select Role' : 'Rol Seçin'}</option>
+                  {(discordRoles || []).map(r => (
+                    <option key={r.id} value={r.id}>@{r.name}</option>
+                  ))}
+                </select>
+                {i === 0 && (
+                  <p className="mt-2 text-xs text-primary-container flex items-center gap-1">
+                    ℹ️ {lang === 'en' 
+                      ? 'Ensure this is set as the Guild Role. The guild departure system will check this role.' 
+                      : 'Lütfen 1. rolün "Guild Rolü" olarak seçildiğinden emin olun. Guild ayrılık kontrol sistemi bu rolü baz alacaktır.'}
+                  </p>
+                )}
+              </div>
+            );
+          })}
 
-          <div>
-            <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
-              {lang === 'en' ? 'Given Role 2' : 'Verilecek Rol 2'}
-            </label>
-            <select
-              className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
-              value={settings.registration_given_role_id_2 || ""}
-              onChange={(e) => setSettings({ ...settings, registration_given_role_id_2: e.target.value })}
+          {visibleRoleCount < 5 && (
+            <button
+              onClick={() => setVisibleRoleCount(prev => prev + 1)}
+              className="w-full py-3 border border-dashed border-outline-variant rounded-sm text-on-surface-variant hover:text-primary-container hover:border-primary-container transition-colors text-sm uppercase tracking-widest font-label-bold flex items-center justify-center gap-2"
             >
-              <option value="">{lang === 'en' ? 'Select Role' : 'Rol Seçin'}</option>
-              {(discordRoles || []).map(r => (
-                <option key={r.id} value={r.id}>@{r.name}</option>
-              ))}
-            </select>
-          </div>
+              + {lang === 'en' ? 'Add Another Role' : 'Yeni Rol Ekle'}
+            </button>
+          )}
 
-          <div>
-            <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
-              {lang === 'en' ? 'Given Role 3' : 'Verilecek Rol 3'}
+          <div className="border-t border-outline-variant my-4 pt-4">
+            <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2 flex items-center gap-2">
+              <span className="text-secondary">{lang === 'en' ? 'Temporary Guest Role' : 'Geçici Misafir Rolü'}</span>
             </label>
+            <p className="text-xs text-on-surface-variant mb-3">
+              {lang === 'en' 
+                ? 'If selected, the user will receive this role temporarily. After the duration expires, they will be given the Auto Role below.' 
+                : 'Seçilirse kullanıcı bu rolü geçici olarak alır. Süre dolduğunda bu rol alınır ve aşağıdaki Otomatik Rol geri verilir.'}
+            </p>
             <select
-              className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
-              value={settings.registration_given_role_id_3 || ""}
-              onChange={(e) => setSettings({ ...settings, registration_given_role_id_3: e.target.value })}
-            >
-              <option value="">{lang === 'en' ? 'Select Role' : 'Rol Seçin'}</option>
-              {(discordRoles || []).map(r => (
-                <option key={r.id} value={r.id}>@{r.name}</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
-              {lang === 'en' ? 'Unregistered Role' : 'Kayıtsız Rolü'}
-            </label>
-            <select
-              className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+              className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md mb-4"
               value={settings.registration_unregistered_role_id || ""}
               onChange={(e) => setSettings({ ...settings, registration_unregistered_role_id: e.target.value })}
             >
@@ -247,6 +268,22 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                 <option key={r.id} value={r.id}>@{r.name}</option>
               ))}
             </select>
+
+            {settings.registration_unregistered_role_id && (
+              <div className="pl-4 border-l-2 border-secondary/30 mt-2 animate-fade-in">
+                <label className="block text-xs font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+                  {lang === 'en' ? 'Duration (Days)' : 'Süre (Gün)'}
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="365"
+                  className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+                  value={settings.registration_guest_role_duration || 7}
+                  onChange={(e) => setSettings({ ...settings, registration_guest_role_duration: parseInt(e.target.value) || 7 })}
+                />
+              </div>
+            )}
           </div>
 
           <div>

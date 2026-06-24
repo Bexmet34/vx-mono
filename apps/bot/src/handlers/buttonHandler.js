@@ -498,9 +498,12 @@ async function handleRegisterButtons(interaction) {
         return await interaction.showModal(modal);
     }
 
-    // 2. Staff clicks "Approve" or "Reject"
-    if (customId.startsWith('reg_approve_') || customId.startsWith('reg_reject_')) {
-        const action = customId.startsWith('reg_approve_') ? 'approve' : 'reject';
+    // 2. Staff clicks "Approve", "Reject" or "Temp"
+    if (customId.startsWith('reg_approve_') || customId.startsWith('reg_reject_') || customId.startsWith('reg_temp_')) {
+        let action = 'reject';
+        if (customId.startsWith('reg_approve_')) action = 'approve';
+        else if (customId.startsWith('reg_temp_')) action = 'temp';
+
         const parts = customId.split('_');
         
         let targetUserId;
@@ -516,7 +519,7 @@ async function handleRegisterButtons(interaction) {
                 targetUserId = parts[2];
             }
         } else {
-            // reg_reject_{userid}
+            // reg_reject_{userid} or reg_temp_{userid}
             targetUserId = parts[2];
         }
 
@@ -590,7 +593,7 @@ async function handleRegisterButtons(interaction) {
             return;
         }
 
-        if (action === 'approve') {
+        if (action === 'approve' || action === 'temp') {
             await interaction.deferReply();
 
             try {
@@ -631,34 +634,81 @@ async function handleRegisterButtons(interaction) {
                     newNickname = newNickname.substring(0, 32);
                 }
 
-                // Assign given role if configured
-                let givenRoleId = guildConfig?.registration_given_role_id;
-                if (roleIndex === 2) givenRoleId = guildConfig?.registration_given_role_id_2;
-                if (roleIndex === 3) givenRoleId = guildConfig?.registration_given_role_id_3;
-
                 let roleStatus = '';
-                if (givenRoleId) {
-                    try {
-                        await targetMember.roles.add(givenRoleId);
-                        roleStatus = `\n✅ **Rol Verildi:** <@&${givenRoleId}>`;
-                    } catch (e) {
-                        console.error('Role add error:', e);
-                        roleStatus = `\n⚠️ **Rol Verilemedi:** Botun yetkisi bu rolü vermeye yetmiyor olabilir. (Rolü botun rolünün altına taşıyın)`;
-                    }
-                }
-
-                // Remove unregistered role if configured
-                const unregisteredRoleId = guildConfig?.registration_unregistered_role_id;
                 let unregRoleStatus = '';
-                if (unregisteredRoleId) {
-                    try {
-                        if (targetMember.roles.cache.has(unregisteredRoleId)) {
-                            await targetMember.roles.remove(unregisteredRoleId);
-                            unregRoleStatus = `\n✅ **Kayıtsız Rolü Alındı:** <@&${unregisteredRoleId}>`;
+
+                // Identify the fallback (unregistered) role
+                const fallbackRoleId = guildConfig?.auto_role_on_join_id;
+                // Identify the temp guest role
+                const tempRoleId = guildConfig?.registration_unregistered_role_id;
+
+                if (action === 'approve') {
+                    // Assign given role if configured
+                    let givenRoleId = guildConfig?.registration_given_role_id;
+                    if (roleIndex === 2) givenRoleId = guildConfig?.registration_given_role_id_2;
+                    if (roleIndex === 3) givenRoleId = guildConfig?.registration_given_role_id_3;
+                    if (roleIndex === 4) givenRoleId = guildConfig?.registration_given_role_id_4;
+                    if (roleIndex === 5) givenRoleId = guildConfig?.registration_given_role_id_5;
+
+                    if (givenRoleId) {
+                        try {
+                            await targetMember.roles.add(givenRoleId);
+                            roleStatus = `\n✅ **Rol Verildi:** <@&${givenRoleId}>`;
+                        } catch (e) {
+                            console.error('Role add error:', e);
+                            roleStatus = `\n⚠️ **Rol Verilemedi:** Botun yetkisi bu rolü vermeye yetmiyor olabilir. (Rolü botun rolünün altına taşıyın)`;
                         }
+                    }
+
+                    // Remove BOTH fallback and temp roles when fully approved
+                    if (fallbackRoleId && targetMember.roles.cache.has(fallbackRoleId)) {
+                        try {
+                            await targetMember.roles.remove(fallbackRoleId);
+                            unregRoleStatus += `\n✅ **Otomatik Kayıtsız Rolü Alındı:** <@&${fallbackRoleId}>`;
+                        } catch (e) { console.error('Role remove error:', e); }
+                    }
+                    if (tempRoleId && targetMember.roles.cache.has(tempRoleId)) {
+                        try {
+                            await targetMember.roles.remove(tempRoleId);
+                        } catch (e) { console.error('Role remove error:', e); }
+                    }
+                } else if (action === 'temp') {
+                    // Give Temp Role
+                    if (tempRoleId) {
+                        try {
+                            await targetMember.roles.add(tempRoleId);
+                            roleStatus = `\n✅ **Geçici Rol Verildi:** <@&${tempRoleId}>`;
+                        } catch (e) {
+                            console.error('Role add error:', e);
+                            roleStatus = `\n⚠️ **Rol Verilemedi:** Botun yetkisi bu rolü vermeye yetmiyor olabilir.`;
+                        }
+                    }
+
+                    // Remove Fallback role
+                    if (fallbackRoleId && targetMember.roles.cache.has(fallbackRoleId)) {
+                        try {
+                            await targetMember.roles.remove(fallbackRoleId);
+                            unregRoleStatus = `\n✅ **Otomatik Kayıtsız Rolü Alındı:** <@&${fallbackRoleId}>`;
+                        } catch (e) { console.error('Role remove error:', e); }
+                    }
+
+                    // Insert to temp_roles table via Supabase client
+                    const durationDays = guildConfig?.registration_guest_role_duration || 7;
+                    const { supabase } = require('../../packages/database');
+                    const expiresAt = new Date();
+                    expiresAt.setDate(expiresAt.getDate() + durationDays);
+                    
+                    try {
+                        await supabase.from('temp_roles').insert({
+                            guild_id: interaction.guildId,
+                            user_id: targetUserId,
+                            temp_role_id: tempRoleId,
+                            fallback_role_id: fallbackRoleId,
+                            expires_at: expiresAt.toISOString()
+                        });
+                        roleStatus += `\n⏳ **Süre:** ${durationDays} Gün`;
                     } catch (e) {
-                        console.error('Role remove error:', e);
-                        unregRoleStatus = `\n⚠️ **Kayıtsız Rolü Alınamadı:** Yetki yetersiz.`;
+                        console.error('Temp role save error:', e);
                     }
                 }
 

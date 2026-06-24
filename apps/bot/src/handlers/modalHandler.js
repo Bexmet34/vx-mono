@@ -319,31 +319,59 @@ async function handleRegisterModal(interaction) {
             const role1 = guildConfig?.registration_given_role_id;
             const role2 = guildConfig?.registration_given_role_id_2;
             const role3 = guildConfig?.registration_given_role_id_3;
+            const role4 = guildConfig?.registration_given_role_id_4;
+            const role5 = guildConfig?.registration_given_role_id_5;
+            const tempRole = guildConfig?.registration_unregistered_role_id;
             
-            const row = new ActionRowBuilder();
-            let addedButtons = 0;
+            const rows = [];
+            let currentRow = new ActionRowBuilder();
+            let buttonCountInRow = 0;
+
+            const addButtonToRow = (btn) => {
+                if (buttonCountInRow === 5) {
+                    rows.push(currentRow);
+                    currentRow = new ActionRowBuilder();
+                    buttonCountInRow = 0;
+                }
+                currentRow.addComponents(btn);
+                buttonCountInRow++;
+            };
 
             const addApproveButton = (roleId, index) => {
                 if (!roleId) return;
                 const role = interaction.guild.roles.cache.get(roleId);
                 const roleName = role ? role.name : `Rol ${index}`;
                 const labelText = lang === 'tr' ? `Onayla (${roleName})` : `Approve (${roleName})`;
-                row.addComponents(
+                
+                addButtonToRow(
                     new ButtonBuilder()
                         .setCustomId(`reg_approve_${index}_${interaction.user.id}`)
                         .setLabel(labelText.substring(0, 80))
                         .setStyle(ButtonStyle.Success)
                 );
-                addedButtons++;
             };
 
             addApproveButton(role1, 1);
             addApproveButton(role2, 2);
             addApproveButton(role3, 3);
+            addApproveButton(role4, 4);
+            addApproveButton(role5, 5);
+
+            // Add Temp Role Button
+            if (tempRole) {
+                const tr = interaction.guild.roles.cache.get(tempRole);
+                const trName = tr ? tr.name : 'Misafir';
+                addButtonToRow(
+                    new ButtonBuilder()
+                        .setCustomId(`reg_temp_${interaction.user.id}`)
+                        .setLabel(lang === 'tr' ? `Süreli (${trName})` : `Temp (${trName})`)
+                        .setStyle(ButtonStyle.Primary)
+                );
+            }
 
             // If no roles are configured, provide a generic fallback button
-            if (addedButtons === 0) {
-                row.addComponents(
+            if (buttonCountInRow === 0 && rows.length === 0) {
+                addButtonToRow(
                     new ButtonBuilder()
                         .setCustomId(`reg_approve_1_${interaction.user.id}`)
                         .setLabel(lang === 'tr' ? 'Onayla' : 'Approve')
@@ -351,12 +379,14 @@ async function handleRegisterModal(interaction) {
                 );
             }
 
-            row.addComponents(
+            addButtonToRow(
                 new ButtonBuilder()
                     .setCustomId(`reg_reject_${interaction.user.id}`)
                     .setLabel(lang === 'tr' ? 'Reddet' : 'Reject')
                     .setStyle(ButtonStyle.Danger)
             );
+
+            rows.push(currentRow);
 
             // Ping staff if configured
             const staffPings = staffRoles.filter(r => r).map(r => `<@&${r}>`).join(' ');
@@ -364,7 +394,7 @@ async function handleRegisterModal(interaction) {
             await channel.send({
                 content: `🔔 **${lang === 'tr' ? 'Yeni Kayıt Başvurusu!' : 'New Registration Application!'}** <@${interaction.user.id}> ${staffPings}`,
                 embeds: [embed],
-                components: [row]
+                components: rows
             });
 
             return await interaction.editReply({
