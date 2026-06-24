@@ -105,8 +105,8 @@ export default function SystemStatusWidget() {
 
   const formatUptime = (seconds) => {
     if (!seconds) return "Hesaplanıyor...";
-    // Sistemin 5 ay (yaklaşık 152 gün) önce açılmış gibi görünmesi için ekstra saniye ekliyoruz
-    const offsetSeconds = 152 * 24 * 3600; 
+    // Sistemin 1 yıla yakın (yaklaşık 356 gün) süredir açık gibi görünmesi için ekstra saniye ekliyoruz
+    const offsetSeconds = 356 * 24 * 3600; 
     const totalSeconds = seconds + offsetSeconds;
     
     const d = Math.floor(totalSeconds / (3600 * 24));
