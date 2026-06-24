@@ -199,9 +199,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
               ))}
             </select>
           </div>
-
           </div>
-        </div>
 
         {/* ----- SECTION: Given Roles ----- */}
         <div className="mt-8 pt-8 border-t border-outline-variant/30">
@@ -312,8 +310,6 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
             )}
           </div>
 
-            </div>
-
             <div className="bg-surface-container/30 p-5 rounded-lg border border-outline-variant/50">
             <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
               {lang === 'en' ? 'Auto Role on Join' : 'Otomatik Rol (Girişte)'}
@@ -330,7 +326,6 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
             </select>
               </div>
           </div>
-        </div>
         </div>
       </div>
 
