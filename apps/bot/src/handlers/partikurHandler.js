@@ -390,7 +390,7 @@ async function handleMyTempsCommand(interaction) {
 
     if (!templates || templates.length === 0) {
         return await interaction.editReply({
-            content: `ℹ️ **${lang === 'tr' ? 'Hiç kayıtlı bireysel şablonunuz bulunmuyor.' : 'You have no saved personal templates.'}**\n${lang === 'tr' ? '`/createparty` komutunu kullanarak yeni bir parti açıp, başarı mesajındaki "Kaydet" butonu ile şablon oluşturabilirsiniz.' : 'Create a party using `/createparty` and click the "Save" button to create a template.'}`
+            content: `ℹ️ **Henüz kayıtlı bireysel şablonunuz yok.**\n\n📌 Şablon kaydetmek için:\n1. \`/createparty\` komutu ile yeni bir parti oluşturun\n2. Embedin altındaki **⚙️ Ayarlar** butonuna tıklayın\n3. Açılan panelde **💾 Şablonu Kaydet** butonuna basın`
         });
     }
 
