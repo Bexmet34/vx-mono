@@ -108,9 +108,7 @@ async function handlePartiModal(interaction) {
 
         if (msgId) {
             setActiveParty(userId, msgId, chanId);
-            await interaction.editReply({ 
-                content: lang === 'tr' ? '✅ Parti başarıyla oluşturuldu! Kaydetmek için embedin altındaki **⚙️ Ayarlar** butonuna tıklayın.' : '✅ Party created! Click **⚙️ Settings** to save as a template.',
-            }).catch(()=>{});
+            await interaction.deleteReply().catch(()=>{});
 
             // SAVE TO DB (Async/Non-blocking for the interaction response)
             (async () => {
