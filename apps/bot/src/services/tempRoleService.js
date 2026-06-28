@@ -119,7 +119,12 @@ async function processRoleExpiration(record) {
 }
 
 async function removeRecord(id) {
-    await supabase.from('temp_roles').delete().eq('id', id).catch(console.error);
+    try {
+        const { error } = await supabase.from('temp_roles').delete().eq('id', id);
+        if (error) console.error('[TempRoleService] Supabase delete error:', error.message);
+    } catch (e) {
+        console.error('[TempRoleService] Exception in removeRecord:', e);
+    }
 }
 
 module.exports = { initTempRoleService };
