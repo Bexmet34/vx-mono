@@ -147,8 +147,6 @@ async function handlePartiModal(interaction) {
     }
 }
 
-}
-
 /**
  * Handles save_temp_modal submission
  */
