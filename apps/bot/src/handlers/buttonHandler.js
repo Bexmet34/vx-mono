@@ -464,7 +464,8 @@ async function handleOpenSettings(interaction, lang) {
     );
 
     const row2 = new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setCustomId(`settings_close_${interaction.message.id}`).setLabel(t('manage.close_party', lang)).setStyle(ButtonStyle.Danger).setEmoji('🔒')
+        new ButtonBuilder().setCustomId(`settings_close_${interaction.message.id}`).setLabel(t('manage.close_party', lang)).setStyle(ButtonStyle.Danger).setEmoji('🔒'),
+        new ButtonBuilder().setCustomId(`save_temp_init:${interaction.message.id}`).setLabel(lang === 'tr' ? '💾 Şablon Kaydet' : '💾 Save as Template').setStyle(ButtonStyle.Secondary)
     );
 
     await interaction.reply({

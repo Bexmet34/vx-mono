@@ -107,20 +107,10 @@ async function handlePartiModal(interaction) {
         const chanId = msg?.channelId || interaction.channelId;
 
         if (msgId) {
-            const saveTempRow = new ActionRowBuilder().addComponents(
-                new ButtonBuilder()
-                    .setCustomId(`save_temp_init:${msgId}`)
-                    .setLabel(lang === 'tr' ? 'Bireysel Şablon Olarak Kaydet' : 'Save as Personal Template')
-                    .setStyle(ButtonStyle.Secondary)
-            );
-            await interaction.deleteReply().catch(()=>{});
-            await interaction.followUp({ 
-                content: lang === 'tr' ? '✅ Başarıyla oluşturuldu!' : '✅ Successfully created!',
-                components: [saveTempRow],
-                flags: [MessageFlags.Ephemeral]
-            }).catch(()=>{});
-
             setActiveParty(userId, msgId, chanId);
+            await interaction.editReply({ 
+                content: lang === 'tr' ? '✅ Parti başarıyla oluşturuldu! Kaydetmek için embedin altındaki **⚙️ Ayarlar** butonuna tıklayın.' : '✅ Party created! Click **⚙️ Settings** to save as a template.',
+            }).catch(()=>{});
 
             // SAVE TO DB (Async/Non-blocking for the interaction response)
             (async () => {
