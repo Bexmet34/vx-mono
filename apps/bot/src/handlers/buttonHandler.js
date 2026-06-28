@@ -458,19 +458,22 @@ async function handleOpenSettings(interaction, lang) {
         .setColor('#2F3136');
 
     const row1 = new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setCustomId(`settings_edit_${interaction.message.id}`).setLabel(t('manage.edit_party', lang)).setStyle(ButtonStyle.Primary).setEmoji('📝'),
         new ButtonBuilder().setCustomId(`settings_add_member_${interaction.message.id}`).setLabel(t('manage.add_member', lang)).setStyle(ButtonStyle.Success).setEmoji('➕'),
         new ButtonBuilder().setCustomId(`settings_kick_${interaction.message.id}`).setLabel(t('manage.manage_members', lang)).setStyle(ButtonStyle.Danger).setEmoji('👥')
     );
 
     const row2 = new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setCustomId(`settings_close_${interaction.message.id}`).setLabel(t('manage.close_party', lang)).setStyle(ButtonStyle.Danger).setEmoji('🔒'),
-        new ButtonBuilder().setCustomId(`save_temp_init:${interaction.message.id}`).setLabel(lang === 'tr' ? '💾 Şablon Kaydet' : '💾 Save as Template').setStyle(ButtonStyle.Secondary)
+        new ButtonBuilder().setCustomId(`settings_edit_${interaction.message.id}`).setLabel(t('manage.edit_party', lang)).setStyle(ButtonStyle.Primary).setEmoji('📝'),
+        new ButtonBuilder().setCustomId(`save_temp_init:${interaction.message.id}`).setLabel(lang === 'tr' ? '💾 Şablonu Kaydet' : '💾 Save Template').setStyle(ButtonStyle.Secondary)
+    );
+
+    const row3 = new ActionRowBuilder().addComponents(
+        new ButtonBuilder().setCustomId(`settings_close_${interaction.message.id}`).setLabel(t('manage.close_party', lang)).setStyle(ButtonStyle.Danger).setEmoji('🔒')
     );
 
     await interaction.reply({
         embeds: [embed],
-        components: [row1, row2],
+        components: [row1, row2, row3],
         flags: [MessageFlags.Ephemeral]
     });
 }
