@@ -5,8 +5,9 @@ const { getSupabaseGuildSettings, updateGuildLanguage, updateSupabaseGuildSettin
  * Gets configuration for a specific guild
  */
 async function getGuildConfig(guildId) {
+    let row = null;
     try {
-        const row = await db.get('SELECT * FROM guild_configs WHERE guild_id = ?', [guildId]);
+        row = await db.get('SELECT * FROM guild_configs WHERE guild_id = ?', [guildId]);
         let configResult = row || {};
         
         const sbSettings = await getSupabaseGuildSettings(guildId);
