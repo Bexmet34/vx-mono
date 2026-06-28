@@ -11,6 +11,7 @@ const db = require('../services/db');
 const { t } = require('../services/i18n');
 const { ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
 const { acquireLock } = require('../utils/partyLock');
+const { deleteUserTemplate } = require('@veyronix/database');
 
 
 
@@ -105,7 +106,138 @@ async function handlePartyButtons(interaction) {
         return;
     }
 
+    if (customId.startsWith('save_temp_init:')) {
+        const msgId = customId.split(':')[1];
+        
+        const partyMessage = await interaction.channel.messages.fetch(msgId).catch(() => null);
+        if (!partyMessage || !partyMessage.embeds[0]) {
+            return await interaction.reply({
+                content: `❌ ${t('common.error', lang) || 'Mesaj bulunamadı!'}`,
+                flags: [MessageFlags.Ephemeral]
+            });
+        }
 
+        const data = parseEmbedData(partyMessage.embeds[0], lang);
+        
+        const modal = new ModalBuilder()
+            .setCustomId(`save_temp_modal:${msgId}`)
+            .setTitle(lang === 'tr' ? 'Şablon Olarak Kaydet' : 'Save as Template');
+
+        const nameInput = new TextInputBuilder()
+            .setCustomId('template_name')
+            .setLabel(lang === 'tr' ? 'Şablon Adı' : 'Template Name')
+            .setPlaceholder('Örn: Ganking Party 1')
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true);
+
+        const headerInput = new TextInputBuilder()
+            .setCustomId('party_header')
+            .setLabel(lang === 'tr' ? 'Parti Başlığı' : 'Party Header')
+            .setValue(data.content || '')
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true);
+
+        const descInput = new TextInputBuilder()
+            .setCustomId('party_description')
+            .setLabel(lang === 'tr' ? 'Açıklama' : 'Description')
+            .setValue(data.description || '')
+            .setStyle(TextInputStyle.Paragraph)
+            .setRequired(false);
+
+        const rolesInput = new TextInputBuilder()
+            .setCustomId('party_roles')
+            .setLabel(lang === 'tr' ? 'Roller (Satır satır)' : 'Roles (Line by line)')
+            .setValue(data.rolesWithMembers.map(r => r.role).join('\n') || '')
+            .setStyle(TextInputStyle.Paragraph)
+            .setRequired(true);
+
+        modal.addComponents(
+            new ActionRowBuilder().addComponents(nameInput),
+            new ActionRowBuilder().addComponents(headerInput),
+            new ActionRowBuilder().addComponents(descInput),
+            new ActionRowBuilder().addComponents(rolesInput)
+        );
+
+        return await interaction.showModal(modal);
+    }
+    
+    if (customId.startsWith('mytemps_delete:')) {
+        const templateId = customId.split(':')[1];
+        const userId = interaction.user.id;
+        
+        await interaction.deferUpdate();
+        
+        const success = await deleteUserTemplate(templateId, userId);
+        if (success) {
+            await interaction.editReply({
+                content: `✅ **${lang === 'tr' ? 'Şablon silindi!' : 'Template deleted!'}**`,
+                components: [],
+                embeds: []
+            });
+        } else {
+            await interaction.followUp({
+                content: `❌ **${lang === 'tr' ? 'Şablon silinirken hata oluştu.' : 'Error deleting template.'}**`,
+                flags: [MessageFlags.Ephemeral]
+            });
+        }
+        return;
+    }
+    
+    if (customId.startsWith('mytemps_edit:')) {
+        const templateId = customId.split(':')[1];
+        const userId = interaction.user.id;
+        
+        const { getUserTemplateById } = require('@veyronix/database');
+        const template = await getUserTemplateById(templateId, userId);
+        
+        if (!template) {
+            return await interaction.reply({
+                content: `❌ **${lang === 'tr' ? 'Şablon bulunamadı.' : 'Template not found.'}**`,
+                flags: [MessageFlags.Ephemeral]
+            });
+        }
+
+        const modal = new ModalBuilder()
+            .setCustomId(`edit_temp_modal:${templateId}`)
+            .setTitle(lang === 'tr' ? 'Şablonu Düzenle' : 'Edit Template');
+
+        const nameInput = new TextInputBuilder()
+            .setCustomId('template_name')
+            .setLabel(lang === 'tr' ? 'Şablon Adı' : 'Template Name')
+            .setValue(template.template_name || '')
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true);
+
+        const headerInput = new TextInputBuilder()
+            .setCustomId('party_header')
+            .setLabel(lang === 'tr' ? 'Parti Başlığı' : 'Party Header')
+            .setValue(template.party_header || '')
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true);
+
+        const descInput = new TextInputBuilder()
+            .setCustomId('party_description')
+            .setLabel(lang === 'tr' ? 'Açıklama' : 'Description')
+            .setValue(template.party_description || '')
+            .setStyle(TextInputStyle.Paragraph)
+            .setRequired(false);
+
+        const rolesInput = new TextInputBuilder()
+            .setCustomId('party_roles')
+            .setLabel(lang === 'tr' ? 'Roller (Satır satır)' : 'Roles (Line by line)')
+            .setValue(template.party_roles || '')
+            .setStyle(TextInputStyle.Paragraph)
+            .setRequired(true);
+
+        modal.addComponents(
+            new ActionRowBuilder().addComponents(nameInput),
+            new ActionRowBuilder().addComponents(headerInput),
+            new ActionRowBuilder().addComponents(descInput),
+            new ActionRowBuilder().addComponents(rolesInput)
+        );
+
+        return await interaction.showModal(modal);
+    }
 
     if (customId === 'leave' || customId.startsWith('join_')) {
         await interaction.deferUpdate().catch(() => {});

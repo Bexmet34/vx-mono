@@ -14,7 +14,7 @@ if (config.TOPGG_TOKEN) {
     console.warn('[PartikurHandler] WARNING: TOPGG_TOKEN is missing! Vote checks will BLOCK all users.');
 }
 
-const { isSubscriptionActive, getSubscription, supabase, isUserPremium } = require('@veyronix/database');
+const { isSubscriptionActive, getSubscription, supabase, isUserPremium, getUserTemplates, getUserTemplateById } = require('@veyronix/database');
 const { createPartikurEmbed, buildRolesFields, addFooterFields } = require('../builders/embedBuilder');
 const { createCustomPartyComponents } = require('../builders/componentBuilder');
 const db = require('../services/db');
@@ -152,21 +152,44 @@ async function handleCreatePartyCommand(interaction) {
 async function handleTempAutocomplete(interaction) {
     const focusedValue = interaction.options.getFocused();
     const guildConfig = await getGuildConfig(interaction.guildId);
-    
-    // 0. Subscription Check (optional but good idea, wait, discord doesn't need it on autocomplete, just return templates)
-    const templatesStr = guildConfig?.party_templates;
-    let templates = [];
+    const userId = interaction.user.id;
+    const lang = guildConfig?.language || 'tr';
+
+    let userTemplates = [];
     try {
-        if (templatesStr) templates = typeof templatesStr === 'string' ? JSON.parse(templatesStr) : templatesStr;
+        userTemplates = await getUserTemplates(userId);
     } catch(e) {}
 
-    // Safe fallback if templates is not an array somehow
-    if (!Array.isArray(templates)) templates = [];
+    const templatesStr = guildConfig?.party_templates;
+    let serverTemplates = [];
+    try {
+        if (templatesStr) serverTemplates = typeof templatesStr === 'string' ? JSON.parse(templatesStr) : templatesStr;
+    } catch(e) {}
 
-    const choices = templates.map((t, index) => ({
-        name: (t.name || t.header || `Template ${index + 1}`).substring(0, 100),
-        value: index.toString()
-    }));
+    if (!Array.isArray(serverTemplates)) serverTemplates = [];
+
+    const choices = [];
+
+    userTemplates.forEach(t => {
+        choices.push({
+            name: `👤 ${t.template_name}`.substring(0, 100),
+            value: `user:${t.id}`
+        });
+    });
+
+    if (serverTemplates.length > 0) {
+        choices.push({
+            name: lang === 'tr' ? '--- Sunucu Şablonları ---' : '--- Server Templates ---',
+            value: 'separator'
+        });
+    }
+
+    serverTemplates.forEach((t, index) => {
+        choices.push({
+            name: `🌐 ${(t.name || t.header || `Template ${index + 1}`)}`.substring(0, 100),
+            value: `guild:${index}`
+        });
+    });
     
     const filtered = choices.filter(choice => choice.name.toLowerCase().includes(focusedValue.toLowerCase())).slice(0, 25);
     await interaction.respond(filtered);
@@ -258,8 +281,30 @@ function getTemplateByIndex(templatesStr, indexStr) {
     }
 }
 
-    const templateIndex = interaction.options.getString('template');
-    const template = getTemplateByIndex(guildConfig?.party_templates, templateIndex);
+    const templateValue = interaction.options.getString('template');
+    
+    if (templateValue === 'separator') {
+        return await interaction.editReply({ content: '❌ Lütfen geçerli bir şablon seçin.' });
+    }
+
+    let template = null;
+
+    if (templateValue.startsWith('user:')) {
+        const templateId = templateValue.split(':')[1];
+        const userTemplate = await getUserTemplateById(templateId, userId);
+        if (userTemplate) {
+            template = {
+                header: userTemplate.party_header,
+                description: userTemplate.party_description,
+                rolesRaw: userTemplate.party_roles
+            };
+        }
+    } else if (templateValue.startsWith('guild:')) {
+        const indexStr = templateValue.split(':')[1];
+        template = getTemplateByIndex(guildConfig?.party_templates, indexStr);
+    } else {
+        template = getTemplateByIndex(guildConfig?.party_templates, templateValue);
+    }
     
     if (!template) {
         return await interaction.editReply({ content: '❌ Hata: Şablon bulunamadı!' });
@@ -334,10 +379,48 @@ function getTemplateByIndex(templatesStr, indexStr) {
     }
 }
 
+async function handleMyTempsCommand(interaction) {
+    const guildConfig = await getGuildConfig(interaction.guildId);
+    const lang = guildConfig?.language || 'tr';
+    const userId = interaction.user.id;
+
+    await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
+
+    const templates = await getUserTemplates(userId);
+
+    if (!templates || templates.length === 0) {
+        return await interaction.editReply({
+            content: `ℹ️ **${lang === 'tr' ? 'Hiç kayıtlı bireysel şablonunuz bulunmuyor.' : 'You have no saved personal templates.'}**\n${lang === 'tr' ? '`/createparty` komutunu kullanarak yeni bir parti açıp, başarı mesajındaki "Kaydet" butonu ile şablon oluşturabilirsiniz.' : 'Create a party using `/createparty` and click the "Save" button to create a template.'}`
+        });
+    }
+
+    const { StringSelectMenuBuilder, StringSelectMenuOptionBuilder } = require('discord.js');
+    
+    const selectMenu = new StringSelectMenuBuilder()
+        .setCustomId('mytemps_select')
+        .setPlaceholder(lang === 'tr' ? 'Şablon Seçin' : 'Select a Template')
+        .addOptions(
+            templates.map(t => new StringSelectMenuOptionBuilder()
+                .setLabel(t.template_name)
+                .setValue(t.id)
+                .setDescription(t.party_header.substring(0, 100))
+                .setEmoji('📝')
+            )
+        );
+
+    const row = new ActionRowBuilder().addComponents(selectMenu);
+
+    await interaction.editReply({
+        content: `**${lang === 'tr' ? 'Bireysel Şablon Yönetimi' : 'Personal Template Management'}**\n${lang === 'tr' ? 'Silmek veya düzenlemek istediğiniz şablonu seçin:' : 'Select the template you want to delete or edit:'}`,
+        components: [row]
+    });
+}
+
 module.exports = {
     handleCreatePartyCommand,
     handleTempCommand,
     handleTempAutocomplete,
+    handleMyTempsCommand,
     checkWeeklyVote,
     topggApi
 };

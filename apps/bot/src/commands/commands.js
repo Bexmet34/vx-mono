@@ -43,6 +43,10 @@ const commands = [
         .setDescription('Botu desteklemek için oy verin (Top.gg).'),
 
     new SlashCommandBuilder()
+        .setName('mytemps')
+        .setDescription('Bireysel parti şablonlarınızı yönetin (Sil / Düzenle).'),
+
+    new SlashCommandBuilder()
         .setName('subscription')
         .setDescription('Manage server subscription (Owner only).')
         .addStringOption(option =>

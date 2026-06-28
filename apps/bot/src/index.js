@@ -9,7 +9,7 @@ const path = require('path');
 const { registerCommands } = require('./services/commandRegistration');
 const { handleHelpCommand, handleVoteCommand, handleClosePartyCommand, handleWhitelistAddCommand, handleWhitelistRemoveCommand, handleSettingsCommand, handleServersCommand, handleSubscriptionCommand, handleSubscriptionSelect, handleSubscriptionModal, handleSetupObjectiveSystemCommand, handleSetupGuildCommand, handleSetupKillBoardCommand } = require('./handlers/commandHandler');
 
-const { handleCreatePartyCommand, handleTempCommand, handleTempAutocomplete } = require('./handlers/partikurHandler');
+const { handleCreatePartyCommand, handleTempCommand, handleTempAutocomplete, handleMyTempsCommand } = require('./handlers/partikurHandler');
 
 const { handlePartyButtons, handleObjectiveButtons, handleRegisterButtons } = require('./handlers/buttonHandler');
 const { handlePartiModal, handleObjectiveModal, handleRegisterModal } = require('./handlers/modalHandler');
@@ -216,6 +216,8 @@ client.on('interactionCreate', async interaction => {
                 await handleVoteCommand(interaction);
             } else if (interaction.commandName === 'createparty') {
                 await handleCreatePartyCommand(interaction);
+            } else if (interaction.commandName === 'mytemps') {
+                await handleMyTempsCommand(interaction);
             } else if (interaction.commandName === 'temp') {
                 await handleTempCommand(interaction);
             } else if (interaction.commandName === 'closeparty') {
@@ -257,7 +259,10 @@ client.on('interactionCreate', async interaction => {
                 await handlePartyButtons(interaction);
             }
         } else if (interaction.isStringSelectMenu()) {
-            if (interaction.customId.startsWith('manage_party_')) {
+            if (interaction.customId === 'mytemps_select') {
+                const { handleMyTempsSelect } = require('./handlers/menuHandler');
+                await handleMyTempsSelect(interaction);
+            } else if (interaction.customId.startsWith('manage_party_')) {
                 await handleManageMenu(interaction);
             } else if (interaction.customId.startsWith('join_role_')) {
                 await handleJoinRoleSelect(interaction);

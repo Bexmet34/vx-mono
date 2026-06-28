@@ -667,6 +667,30 @@ async function handleAddMemberUserSelect(interaction) {
     }
 }
 
+async function handleMyTempsSelect(interaction) {
+    const templateId = interaction.values[0];
+    const guildConfig = await getGuildConfig(interaction.guildId);
+    const lang = guildConfig?.language || 'tr';
+
+    const row = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId(`mytemps_edit:${templateId}`)
+            .setLabel(lang === 'tr' ? 'Düzenle' : 'Edit')
+            .setStyle(ButtonStyle.Primary)
+            .setEmoji('📝'),
+        new ButtonBuilder()
+            .setCustomId(`mytemps_delete:${templateId}`)
+            .setLabel(lang === 'tr' ? 'Sil' : 'Delete')
+            .setStyle(ButtonStyle.Danger)
+            .setEmoji('🗑️')
+    );
+
+    await interaction.update({
+        content: `**${lang === 'tr' ? 'Seçilen Şablon İçin İşlem Yapın:' : 'Action for Selected Template:'}**`,
+        components: [row]
+    });
+}
+
 module.exports = {
     handleManageMenu,
     handleEditModal,
@@ -678,5 +702,6 @@ module.exports = {
     handleEditOption,
     handleManageMembersOption,
     handleCloseOption,
-    finalizeRoleUpdate
+    finalizeRoleUpdate,
+    handleMyTempsSelect
 };

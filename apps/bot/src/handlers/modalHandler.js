@@ -16,6 +16,7 @@ const { buildRolesFields, addFooterFields, createObjectiveEmbed, createPlayerCar
 const { createObjectiveButtons } = require('../builders/componentBuilder');
 const { parseTimeToMs, getNow } = require('../utils/timeUtils');
 const { getSubscription, isUserPremium } = require('@veyronix/database');
+const { addUserTemplate, updateUserTemplate, getUserTemplates } = require('@veyronix/database');
 const config = require('../config/config');
 
 async function handlePartiModal(interaction) {
@@ -102,12 +103,21 @@ async function handlePartiModal(interaction) {
 
         const msg = await interaction.channel.send({ content: '@everyone', embeds: [embed], components: components });
         
-        await interaction.editReply({ content: '✅ Başarıyla oluşturuldu!' }).catch(()=>{});
-
         const msgId = msg?.id;
         const chanId = msg?.channelId || interaction.channelId;
 
         if (msgId) {
+            const saveTempRow = new ActionRowBuilder().addComponents(
+                new ButtonBuilder()
+                    .setCustomId(`save_temp_init:${msgId}`)
+                    .setLabel(lang === 'tr' ? 'Bireysel Şablon Olarak Kaydet' : 'Save as Personal Template')
+                    .setStyle(ButtonStyle.Secondary)
+            );
+            await interaction.editReply({ 
+                content: lang === 'tr' ? '✅ Başarıyla oluşturuldu!' : '✅ Successfully created!',
+                components: [saveTempRow]
+            }).catch(()=>{});
+
             setActiveParty(userId, msgId, chanId);
 
             // SAVE TO DB (Async/Non-blocking for the interaction response)
@@ -133,6 +143,78 @@ async function handlePartiModal(interaction) {
                     console.error('[ModalHandler] DB Error:', err.message);
                 }
             })();
+        }
+    }
+}
+
+}
+
+/**
+ * Handles save_temp_modal submission
+ */
+async function handleSaveTempModal(interaction) {
+    if (interaction.customId.startsWith('save_temp_modal:')) {
+        const guildConfig = await getGuildConfig(interaction.guildId);
+        const lang = guildConfig?.language || 'tr';
+        const userId = interaction.user.id;
+
+        await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
+
+        const isDeveloper = config.WHITELIST_USERS?.includes(userId);
+        const userPremium = await isUserPremium(userId);
+        const limit = (isDeveloper || userPremium) ? 999 : 5;
+
+        const currentTemplates = await getUserTemplates(userId);
+        if (currentTemplates.length >= limit) {
+            return await interaction.editReply({
+                content: `❌ **${lang === 'tr' ? 'Şablon sınırına ulaştınız!' : 'Template limit reached!'}**\n${lang === 'tr' ? 'Premium alarak sınırsız şablon kaydedebilirsiniz.' : 'Get Premium to save unlimited templates.'}`
+            });
+        }
+
+        const templateName = interaction.fields.getTextInputValue('template_name');
+        const header = interaction.fields.getTextInputValue('party_header');
+        const description = interaction.fields.getTextInputValue('party_description') || '';
+        const roles = interaction.fields.getTextInputValue('party_roles');
+
+        const result = await addUserTemplate(userId, templateName, header, description, roles);
+        
+        if (result) {
+            await interaction.editReply({
+                content: `✅ **${lang === 'tr' ? 'Şablon başarıyla kaydedildi!' : 'Template saved successfully!'}**`
+            });
+        } else {
+            await interaction.editReply({
+                content: `❌ **${lang === 'tr' ? 'Şablon kaydedilirken bir hata oluştu.' : 'An error occurred while saving the template.'}**`
+            });
+        }
+    } else if (interaction.customId.startsWith('edit_temp_modal:')) {
+        const templateId = interaction.customId.split(':')[1];
+        const guildConfig = await getGuildConfig(interaction.guildId);
+        const lang = guildConfig?.language || 'tr';
+        const userId = interaction.user.id;
+
+        await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
+
+        const templateName = interaction.fields.getTextInputValue('template_name');
+        const header = interaction.fields.getTextInputValue('party_header');
+        const description = interaction.fields.getTextInputValue('party_description') || '';
+        const roles = interaction.fields.getTextInputValue('party_roles');
+
+        const result = await updateUserTemplate(templateId, userId, {
+            templateName,
+            header,
+            description,
+            rolesText: roles
+        });
+
+        if (result) {
+            await interaction.editReply({
+                content: `✅ **${lang === 'tr' ? 'Şablon başarıyla güncellendi!' : 'Template updated successfully!'}**`
+            });
+        } else {
+            await interaction.editReply({
+                content: `❌ **${lang === 'tr' ? 'Şablon güncellenirken bir hata oluştu.' : 'An error occurred while updating the template.'}**`
+            });
         }
     }
 }
@@ -413,5 +495,6 @@ async function handleRegisterModal(interaction) {
 module.exports = {
     handlePartiModal,
     handleObjectiveModal,
-    handleRegisterModal
+    handleRegisterModal,
+    handleSaveTempModal
 };
