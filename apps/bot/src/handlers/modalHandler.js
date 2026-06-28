@@ -113,9 +113,11 @@ async function handlePartiModal(interaction) {
                     .setLabel(lang === 'tr' ? 'Bireysel Şablon Olarak Kaydet' : 'Save as Personal Template')
                     .setStyle(ButtonStyle.Secondary)
             );
-            await interaction.editReply({ 
+            await interaction.deleteReply().catch(()=>{});
+            await interaction.followUp({ 
                 content: lang === 'tr' ? '✅ Başarıyla oluşturuldu!' : '✅ Successfully created!',
-                components: [saveTempRow]
+                components: [saveTempRow],
+                flags: [MessageFlags.Ephemeral]
             }).catch(()=>{});
 
             setActiveParty(userId, msgId, chanId);

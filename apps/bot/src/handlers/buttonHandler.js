@@ -133,16 +133,17 @@ async function handlePartyButtons(interaction) {
         const headerInput = new TextInputBuilder()
             .setCustomId('party_header')
             .setLabel(lang === 'tr' ? 'Parti Başlığı' : 'Party Header')
-            .setValue(data.content || '')
+            .setValue(data.title || 'Party')
             .setStyle(TextInputStyle.Short)
             .setRequired(true);
 
         const descInput = new TextInputBuilder()
             .setCustomId('party_description')
             .setLabel(lang === 'tr' ? 'Açıklama' : 'Description')
-            .setValue(data.description || '')
             .setStyle(TextInputStyle.Paragraph)
             .setRequired(false);
+            
+        if (data.description) descInput.setValue(data.description);
 
         const rolesInput = new TextInputBuilder()
             .setCustomId('party_roles')
@@ -211,16 +212,17 @@ async function handlePartyButtons(interaction) {
         const headerInput = new TextInputBuilder()
             .setCustomId('party_header')
             .setLabel(lang === 'tr' ? 'Parti Başlığı' : 'Party Header')
-            .setValue(template.party_header || '')
+            .setValue(template.party_header || 'Party')
             .setStyle(TextInputStyle.Short)
             .setRequired(true);
 
         const descInput = new TextInputBuilder()
             .setCustomId('party_description')
             .setLabel(lang === 'tr' ? 'Açıklama' : 'Description')
-            .setValue(template.party_description || '')
             .setStyle(TextInputStyle.Paragraph)
             .setRequired(false);
+            
+        if (template.party_description) descInput.setValue(template.party_description);
 
         const rolesInput = new TextInputBuilder()
             .setCustomId('party_roles')
