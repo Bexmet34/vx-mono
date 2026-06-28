@@ -296,6 +296,9 @@ client.on('interactionCreate', async interaction => {
                 await handleObjectiveModal(interaction);
             } else if (interaction.customId === 'register_modal') {
                 await handleRegisterModal(interaction);
+            } else if (interaction.customId.startsWith('save_temp_modal:') || interaction.customId.startsWith('edit_temp_modal:')) {
+                const { handleSaveTempModal } = require('./handlers/modalHandler');
+                await handleSaveTempModal(interaction);
             } else {
                 await handlePartiModal(interaction);
             }
