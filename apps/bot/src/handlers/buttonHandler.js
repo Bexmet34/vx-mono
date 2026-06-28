@@ -24,7 +24,7 @@ async function handlePartyButtons(interaction) {
     const { finalizeRoleUpdate } = require('./menuHandler');
     const customId = interaction.customId;
     const message = interaction.message;
-    if (!message.embeds[0]) return;
+    if (!message.embeds[0] && !customId.startsWith('mytemps_')) return;
 
     const guildConfig = await getGuildConfig(interaction.guildId);
     const lang = guildConfig?.language || 'tr';
