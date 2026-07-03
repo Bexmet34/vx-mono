@@ -16,8 +16,8 @@ export async function POST(req) {
 
     const { guildId, planId } = await req.json();
 
-    if (!guildId || !planId) {
-      return NextResponse.json({ error: "Geçersiz sunucu veya paket seçimi." }, { status: 400 });
+    if (!planId) {
+      return NextResponse.json({ error: "Geçersiz paket seçimi." }, { status: 400 });
     }
 
     const { data: plan, error: planError } = await supabase
@@ -30,6 +30,14 @@ export async function POST(req) {
     if (planError || !plan) {
       return NextResponse.json({ error: "Geçersiz veya pasif paket seçimi." }, { status: 400 });
     }
+
+    if (plan.plan_type !== 'user' && !guildId) {
+      return NextResponse.json({ error: "Lütfen bir sunucu seçin." }, { status: 400 });
+    }
+
+    const finalGuildId = guildId || 'USER_PLAN';
+
+
     const orderId = `VX_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
     // 1. Veritabanına bekleyen (pending) ödemeyi kaydet
@@ -38,7 +46,7 @@ export async function POST(req) {
       .insert({
         order_id: orderId,
         user_id: session.user.id,
-        guild_id: guildId,
+        guild_id: finalGuildId,
         amount: plan.amount,
         currency: 'USDT',
         duration_days: plan.duration_days,

@@ -94,7 +94,7 @@ export default function Home() {
   };
 
   const handleManualPurchase = async () => {
-    if (!selectedServer) return setCheckoutError("Lütfen bir sunucu seçin.");
+    if (selectedPlan?.plan_type !== 'user' && !selectedServer) return setCheckoutError("Lütfen bir sunucu seçin.");
     if (!selectedBank) return setCheckoutError("Lütfen bir banka seçin.");
     setCheckoutError("");
     setIsProcessing(true);
@@ -159,7 +159,7 @@ export default function Home() {
   };
 
   const handleConfirmPurchase = async () => {
-    if (!selectedServer) return setCheckoutError("Lütfen bir sunucu seçin.");
+    if (selectedPlan?.plan_type !== 'user' && !selectedServer) return setCheckoutError("Lütfen bir sunucu seçin.");
     setCheckoutError("");
     setIsProcessing(true);
 
@@ -892,6 +892,7 @@ export default function Home() {
 
                   <div className="space-y-4">
                     {/* Section: Server Selection */}
+                    {selectedPlan?.plan_type !== 'user' && (
                     <div className="space-y-4">
                       <div className="flex justify-between items-end flex-wrap gap-2">
                         <h2 className="font-label-bold text-label-bold text-primary-container uppercase tracking-widest">Target Servers</h2>
@@ -939,7 +940,7 @@ export default function Home() {
                           ))
                         )}
                       </div>
-                    </div>
+                    )}
 
                     {/* Section: Plan Summary */}
                     <div className="bg-surface-container p-4 border-l-4 border-primary-container">
@@ -986,7 +987,7 @@ export default function Home() {
                       {paymentMethod === 'crypto' ? (
                         <button 
                           onClick={handleConfirmPurchase}
-                          disabled={isProcessing || !selectedServer}
+                          disabled={isProcessing || (selectedPlan?.plan_type !== 'user' && !selectedServer)}
                           className="w-full py-5 px-4 bg-primary-container text-on-primary font-label-bold text-body-md flex items-center justify-center gap-3 transition-all duration-300 hover:brightness-110 active:scale-[0.98] shadow-[0_10px_20px_rgba(255,215,0,0.1)] disabled:opacity-50 disabled:cursor-not-allowed uppercase text-center"
                         >
                           {isProcessing ? (
@@ -1018,7 +1019,7 @@ export default function Home() {
 
                                <button 
                                  onClick={handleManualPurchase}
-                                 disabled={isProcessing || !selectedServer || !selectedBank}
+                                 disabled={isProcessing || (selectedPlan?.plan_type !== 'user' && !selectedServer) || !selectedBank}
                                  className="w-full py-5 px-4 bg-primary-container text-on-primary font-label-bold text-body-md flex items-center justify-center gap-3 transition-all duration-300 hover:brightness-110 active:scale-[0.98] shadow-[0_10px_20px_rgba(255,215,0,0.1)] disabled:opacity-50 disabled:cursor-not-allowed uppercase text-center mt-2"
                                >
                                  {isProcessing ? (

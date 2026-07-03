@@ -15,32 +15,9 @@ export async function POST(req) {
 
     const { guildId, guildName, planId, senderName, targetBank } = await req.json();
 
-    // Önce input kontrolü
-    if (!guildId || !planId || !senderName) {
+    // Önce plan ID ve senderName kontrolü
+    if (!planId || !senderName) {
       return NextResponse.json({ error: "Eksik bilgi gönderdiniz. Lütfen tüm alanları doldurun." }, { status: 400 });
-    }
-
-    // #3 — Çifte pending ödeme koruması (aynı sunucu için)
-    const { data: existingPending } = await supabase
-      .from('crypto_payments')
-      .select('id')
-      .eq('user_id', session.user.id)
-      .eq('guild_id', guildId)
-      .eq('payment_method', 'havale')
-      .eq('status', 'pending')
-      .maybeSingle();
-
-    if (existingPending) {
-      return NextResponse.json({ 
-        error: "Bu sunucu için zaten bekleyen bir Havale/EFT başvurunuz var. Lütfen mevcut başvurunuzun onaylanmasını bekleyin veya destek ekibiyle iletişime geçin." 
-      }, { status: 409 });
-    }
-
-    // #1 — Açıklama kodunu güvenli biçimde SERVER SIDE üret (8 karakter, küçük harf + rakam)
-    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-    let descriptionCode = '';
-    for (let i = 0; i < 8; i++) {
-      descriptionCode += chars.charAt(Math.floor(Math.random() * chars.length));
     }
 
     // Paketin güncel verisini veritabanından çek
@@ -55,6 +32,39 @@ export async function POST(req) {
       return NextResponse.json({ error: "Geçersiz veya pasif paket seçimi." }, { status: 400 });
     }
 
+    // Eğer paket sunucu paketiyse guildId zorunludur
+    if (plan.plan_type !== 'user' && !guildId) {
+      return NextResponse.json({ error: "Lütfen bir sunucu seçin." }, { status: 400 });
+    }
+
+    const finalGuildId = guildId || 'USER_PLAN';
+    const finalGuildName = guildName || (plan.plan_type === 'user' ? 'Bireysel Kullanıcı' : 'Bilinmeyen Sunucu');
+
+    // #3 — Çifte pending ödeme koruması (aynı sunucu/kullanıcı için)
+    const { data: existingPending } = await supabase
+      .from('crypto_payments')
+      .select('id')
+      .eq('user_id', session.user.id)
+      .eq('guild_id', finalGuildId)
+      .eq('payment_method', 'havale')
+      .eq('status', 'pending')
+      .maybeSingle();
+
+    if (existingPending) {
+      return NextResponse.json({ 
+        error: "Bu işlem için zaten bekleyen bir Havale/EFT başvurunuz var. Lütfen mevcut başvurunuzun onaylanmasını bekleyin veya destek ekibiyle iletişime geçin." 
+      }, { status: 409 });
+    }
+
+    // #1 — Açıklama kodunu güvenli biçimde SERVER SIDE üret (8 karakter, küçük harf + rakam)
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    let descriptionCode = '';
+    for (let i = 0; i < 8; i++) {
+      descriptionCode += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+
+
+
     // Benzersiz order_id üret
     const orderId = `VX_HV_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
@@ -64,8 +74,8 @@ export async function POST(req) {
       .insert({
         order_id: orderId,
         user_id: session.user.id,
-        guild_id: guildId,
-        guild_name: guildName || "Bilinmeyen Sunucu",
+        guild_id: finalGuildId,
+        guild_name: finalGuildName,
         amount: plan.amount * (parseFloat(process.env.NEXT_PUBLIC_USDT_TRY_RATE) || 40),
         currency: 'TRY',
         duration_days: plan.duration_days,
