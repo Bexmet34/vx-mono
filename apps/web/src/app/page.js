@@ -878,10 +878,10 @@ export default function Home() {
               
               ) : (
                 <>
-                  <div className="mb-10 text-center mt-4">
-                    <span className="inline-block py-1 px-3 mb-4 bg-primary-container text-on-primary font-label-bold text-label-sm tracking-widest uppercase">Premium Deployment</span>
-                    <h2 className="font-headline-xl text-3xl md:text-5xl text-on-surface mb-2 uppercase tracking-tight">Upgrade Infrastructure</h2>
-                    <p className="font-body-md text-body-md text-on-surface-variant">Select the strategic asset for {lang === 'tr' ? selectedPlan.name_tr : selectedPlan.name_en} integration.</p>
+                  <div className="mb-4 text-center mt-2">
+                    <span className="inline-block py-0.5 px-2 mb-2 bg-primary-container text-on-primary font-label-bold text-[10px] tracking-widest uppercase">Premium Deployment</span>
+                    <h2 className="font-headline-xl text-2xl md:text-3xl text-on-surface mb-1 uppercase tracking-tight">Upgrade Infrastructure</h2>
+                    <p className="font-body-md text-sm text-on-surface-variant">Select the strategic asset for {lang === 'tr' ? selectedPlan.name_tr : selectedPlan.name_en} integration.</p>
                   </div>
 
                   {checkoutError && (
@@ -890,7 +890,7 @@ export default function Home() {
                     </div>
                   )}
 
-                  <div className="space-y-8">
+                  <div className="space-y-4">
                     {/* Section: Server Selection */}
                     <div className="space-y-4">
                       <div className="flex justify-between items-end flex-wrap gap-2">
@@ -902,7 +902,7 @@ export default function Home() {
                       </div>
                       
                       {/* Server List Grid */}
-                      <div className="space-y-2 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+                      <div className="space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
                         {isLoadingServers ? (
                           <div className="flex items-center justify-center p-8 text-primary-container">
                             <Loader2 className="animate-spin mr-3" size={24} />
@@ -914,18 +914,18 @@ export default function Home() {
                           </div>
                         ) : (
                           userServers.map(s => (
-                            <label key={s.guild_id} className={`server-row flex items-center justify-between p-4 border cursor-pointer transition-all ${selectedServer === s.guild_id ? 'border-primary-container/50 bg-primary-container/10' : 'border-outline-variant hover:border-outline'}`}>
-                              <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 bg-surface-container-high border border-outline flex items-center justify-center overflow-hidden">
+                            <label key={s.guild_id} className={`server-row flex items-center justify-between p-3 border cursor-pointer transition-all ${selectedServer === s.guild_id ? 'border-primary-container/50 bg-primary-container/10' : 'border-outline-variant hover:border-outline'}`}>
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-surface-container-high border border-outline flex items-center justify-center overflow-hidden">
                                   {s.icon ? (
                                     <img alt={s.guild_name} className="w-full h-full object-cover" src={`https://cdn.discordapp.com/icons/${s.guild_id}/${s.icon}.png`} />
                                   ) : (
-                                    <Server size={20} className="text-on-surface-variant" />
+                                    <Server size={18} className="text-on-surface-variant" />
                                   )}
                                 </div>
                                 <div>
-                                  <div className="font-body-md text-body-md font-bold text-on-surface">{s.guild_name}</div>
-                                  <div className="font-label-sm text-label-sm text-on-surface-variant">ID: {s.guild_id}</div>
+                                  <div className="font-body-md text-sm font-bold text-on-surface">{s.guild_name}</div>
+                                  <div className="font-label-sm text-xs text-on-surface-variant">ID: {s.guild_id}</div>
                                 </div>
                               </div>
                               <input 
@@ -942,11 +942,11 @@ export default function Home() {
                     </div>
 
                     {/* Section: Plan Summary */}
-                    <div className="bg-surface-container p-6 border-l-4 border-primary-container">
-                      <div className="flex justify-between items-start mb-4">
+                    <div className="bg-surface-container p-4 border-l-4 border-primary-container">
+                      <div className="flex justify-between items-start mb-2">
                         <div>
-                          <h3 className="font-label-bold text-label-bold text-on-surface mb-1 uppercase tracking-tight">{lang === 'tr' ? selectedPlan.name_tr : `${selectedPlan.name_en} Package`}</h3>
-                          <p className="font-label-sm text-label-sm text-on-surface-variant">Tactical Deployment Tier</p>
+                          <h3 className="font-label-bold text-sm text-on-surface mb-1 uppercase tracking-tight">{lang === 'tr' ? selectedPlan.name_tr : `${selectedPlan.name_en} Package`}</h3>
+                          <p className="font-label-sm text-xs text-on-surface-variant">Tactical Deployment Tier</p>
                         </div>
                         <div className="text-right">
                           <div className="font-headline-md text-headline-md text-primary-container">
