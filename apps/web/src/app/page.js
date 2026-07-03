@@ -45,10 +45,6 @@ export default function Home() {
   const [termsAccepted, setTermsAccepted] = useState(false);
 
   const handleBuyClick = (plan) => {
-    if (status !== "authenticated") {
-      signIn("discord");
-      return;
-    }
     setSelectedPlan(plan);
     setPaymentMethod("crypto");
     setSenderName("");
@@ -833,7 +829,7 @@ export default function Home() {
                       {/* Info */}
                       <div className="bg-[#0B0F19]/30 border border-outline-variant/20 p-3 rounded-xl text-left text-xs text-on-surface-variant space-y-1">
                          <p>⚡ <strong>Onay Süresi:</strong> 5-15 dakika (gece saatlerinde 1 saat).</p>
-                         <p>💬 Destek için <a href="https://discord.gg/veyronix" target="_blank" rel="noopener noreferrer" className="text-primary-container hover:underline">Discord'a katılın</a>.</p>
+                         <p>💬 Destek için <a href="https://discord.gg/veyronix" target="_blank" rel="noopener noreferrer" className="text-primary-container hover:underline">Discord&apos;a katılın</a>.</p>
                       </div>
                     </div>
 
@@ -890,10 +886,10 @@ export default function Home() {
                     </div>
                   )}
 
-                  <div className="space-y-4">
+                  <div className={selectedPlan?.plan_type !== 'user' ? "grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch" : "space-y-4"}>
                     {/* Section: Server Selection */}
                     {selectedPlan?.plan_type !== 'user' && (
-                    <div className="space-y-4">
+                    <div className="flex flex-col h-full space-y-4">
                       <div className="flex justify-between items-end flex-wrap gap-2">
                         <h2 className="font-label-bold text-label-bold text-primary-container uppercase tracking-widest">Target Servers</h2>
                         <a className="font-label-sm text-label-sm text-secondary-fixed hover:text-primary-fixed-dim transition-colors flex items-center gap-1" href="https://discord.com/oauth2/authorize?client_id=1082239904169336902&permissions=510977&scope=bot+applications.commands" target="_blank" rel="noopener noreferrer">
@@ -903,14 +899,19 @@ export default function Home() {
                       </div>
                       
                       {/* Server List Grid */}
-                      <div className="space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
-                        {isLoadingServers ? (
-                          <div className="flex items-center justify-center p-8 text-primary-container">
+                      <div className="space-y-2 max-h-64 md:max-h-full overflow-y-auto pr-2 custom-scrollbar flex-grow bg-surface/30 p-2 rounded border border-outline-variant/30">
+                        {status !== "authenticated" ? (
+                          <div className="flex flex-col items-center justify-center h-full p-8 text-center">
+                            <p className="text-on-surface-variant font-body-md mb-4 text-sm">Sunucularınızı görmek için giriş yapmalısınız.</p>
+                            <button onClick={() => signIn("discord")} className="py-2 px-6 bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold rounded transition-colors text-sm uppercase">Discord ile Giriş Yap</button>
+                          </div>
+                        ) : isLoadingServers ? (
+                          <div className="flex items-center justify-center h-full p-8 text-primary-container">
                             <Loader2 className="animate-spin mr-3" size={24} />
                             <span className="font-label-bold tracking-widest uppercase">Scanning Assets...</span>
                           </div>
                         ) : userServers.length === 0 ? (
-                          <div className="p-8 text-center border border-dashed border-outline-variant text-on-surface-variant">
+                          <div className="p-8 text-center h-full flex items-center justify-center border border-dashed border-outline-variant text-on-surface-variant">
                             {t.checkoutNoServerText || "No active servers found. Add bot to a server first."}
                           </div>
                         ) : (
@@ -940,10 +941,13 @@ export default function Home() {
                           ))
                         )}
                       </div>
+                    </div>
                     )}
 
                     {/* Section: Plan Summary */}
-                    <div className="bg-surface-container p-4 border-l-4 border-primary-container">
+                    <div className="flex flex-col justify-between h-full space-y-4">
+                      <div>
+                        <div className="bg-surface-container p-4 border-l-4 border-primary-container mb-4">
                       <div className="flex justify-between items-start mb-2">
                         <div>
                           <h3 className="font-label-bold text-sm text-on-surface mb-1 uppercase tracking-tight">{lang === 'tr' ? selectedPlan.name_tr : `${selectedPlan.name_en} Package`}</h3>
@@ -965,10 +969,12 @@ export default function Home() {
                           </li>
                         ))}
                       </ul>
-                    </div>
+                        </div>
+                      </div>
 
-                    {/* Payment Method Tabs & Action */}
-                    <div className="flex gap-4 mb-6">
+                      <div className="flex flex-col space-y-4">
+                        {/* Payment Method Tabs & Action */}
+                        <div className="flex gap-4">
                       <button 
                         onClick={() => setPaymentMethod('crypto')} 
                         className={`flex-1 py-3 font-label-bold text-sm uppercase transition-all ${paymentMethod === 'crypto' ? 'bg-primary-container text-on-primary shadow-[0_0_15px_rgba(255,215,0,0.2)]' : 'bg-surface border border-outline text-on-surface hover:border-primary-container/50'}`}
@@ -984,7 +990,14 @@ export default function Home() {
                     </div>
 
                     <div className="space-y-4">
-                      {paymentMethod === 'crypto' ? (
+                      {status !== "authenticated" ? (
+                        <button 
+                          onClick={() => signIn("discord")}
+                          className="w-full py-5 px-4 bg-[#5865F2] hover:bg-[#4752C4] text-white font-label-bold text-body-md flex items-center justify-center gap-3 transition-all duration-300 shadow-[0_10px_20px_rgba(88,101,242,0.2)] uppercase text-center"
+                        >
+                          <span>Discord İle Giriş Yap</span>
+                        </button>
+                      ) : paymentMethod === 'crypto' ? (
                         <button 
                           onClick={handleConfirmPurchase}
                           disabled={isProcessing || (selectedPlan?.plan_type !== 'user' && !selectedServer)}
@@ -1033,14 +1046,14 @@ export default function Home() {
                         </div>
                       )}
                       {paymentMethod === 'crypto' && (
-                        <p className="text-center font-label-sm text-label-sm text-on-tertiary-container">
+                        <p className="text-center font-label-sm text-label-sm text-on-tertiary-container mt-2">
                           Secure cryptographic transaction processed via Cryptomus Terminal.
                         </p>
                       )}
+                        </div>
+                      </div>
                     </div>
                   </div>
-
-                  {/* Trust Badges */}
                   <div className="mt-8 flex justify-center gap-8 opacity-60 flex-wrap">
                     <div className="flex items-center gap-2">
                       <Lock size={18} className="text-on-surface-variant" />
