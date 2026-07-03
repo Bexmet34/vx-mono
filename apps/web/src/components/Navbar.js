@@ -137,6 +137,8 @@ export default function Navbar({ isStatic = false }) {
                         <img 
                           src={session.user?.image || 'https://cdn.discordapp.com/embed/avatars/0.png'} 
                           alt="Avatar" 
+                          width="40"
+                          height="40"
                           className="w-10 h-10 rounded-full border-2 border-outline-variant group-hover:border-primary-container relative z-10 transition-colors duration-300 object-cover" 
                         />
                       </div>
@@ -207,6 +209,7 @@ export default function Navbar({ isStatic = false }) {
             <button 
               className="md:hidden p-2 text-primary-container active:scale-95 transition-transform" 
               onClick={() => setIsMenuOpen(true)}
+              aria-label="Open menu"
             >
               <Menu size={32} />
             </button>

@@ -6,6 +6,9 @@ import { cookies } from "next/headers";
 import Footer from "@/components/Footer";
 import SystemStatusWidget from "@/components/SystemStatusWidget";
 import ScrollToTop from "@/components/ScrollToTop";
+import { Sora } from "next/font/google";
+
+const sora = Sora({ subsets: ["latin"], variable: "--font-sora", display: "swap" });
 
 export const metadata = {
   metadataBase: new URL("https://veyronix.com.tr"),
@@ -93,8 +96,11 @@ export default async function RootLayout({ children }) {
   const lang = cookieStore.get("NEXT_LOCALE")?.value || "tr";
 
   return (
-    <html lang={lang} className="dark">
+    <html lang={lang} className={`dark ${sora.variable}`}>
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

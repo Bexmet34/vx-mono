@@ -75,15 +75,15 @@ export default {
         "gutter": "24px"
       },
       fontFamily: {
-        "body-lg": ["Sora", "sans-serif"],
-        "headline-lg": ["Sora", "sans-serif"],
-        "body-md": ["Sora", "sans-serif"],
-        "headline-xl": ["Sora", "sans-serif"],
-        "label-bold": ["Sora", "sans-serif"],
-        "headline-md": ["Sora", "sans-serif"],
-        "label-sm": ["Sora", "sans-serif"],
-        "headline-lg-mobile": ["Sora", "sans-serif"],
-        "sora": ["Sora", "sans-serif"]
+        "body-lg": ["var(--font-sora)", "sans-serif"],
+        "headline-lg": ["var(--font-sora)", "sans-serif"],
+        "body-md": ["var(--font-sora)", "sans-serif"],
+        "headline-xl": ["var(--font-sora)", "sans-serif"],
+        "label-bold": ["var(--font-sora)", "sans-serif"],
+        "headline-md": ["var(--font-sora)", "sans-serif"],
+        "label-sm": ["var(--font-sora)", "sans-serif"],
+        "headline-lg-mobile": ["var(--font-sora)", "sans-serif"],
+        "sora": ["var(--font-sora)", "sans-serif"]
       },
       fontSize: {
         "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],

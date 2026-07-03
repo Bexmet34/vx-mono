@@ -237,7 +237,7 @@ export default function GeneralTab({
                       >
                         <div className="flex items-center gap-3">
                            {m.avatar ? (
-                             <img src={`https://cdn.discordapp.com/avatars/${m.id}/${m.avatar}.png`} className="w-8 h-8 rounded-full" />
+                             <img src={`https://cdn.discordapp.com/avatars/${m.id}/${m.avatar}.png`} width="32" height="32" alt="Avatar" className="w-8 h-8 rounded-full" />
                            ) : (
                              <div className="w-8 h-8 rounded-full bg-primary-container/20 flex items-center justify-center text-primary-container">
                                {m.username.charAt(0).toUpperCase()}
@@ -274,7 +274,7 @@ export default function GeneralTab({
                         <div key={adminId} className="flex items-center justify-between p-3 bg-surface border border-outline rounded-sm">
                           <div className="flex items-center gap-3">
                              {member?.avatar ? (
-                               <img src={`https://cdn.discordapp.com/avatars/${member.id}/${member.avatar}.png`} className="w-8 h-8 rounded-full" />
+                               <img src={`https://cdn.discordapp.com/avatars/${member.id}/${member.avatar}.png`} width="32" height="32" alt="Avatar" className="w-8 h-8 rounded-full" />
                              ) : (
                                <div className="w-8 h-8 rounded-full bg-primary-container/20 flex items-center justify-center text-primary-container text-xs">
                                  {member ? member.username.charAt(0).toUpperCase() : '?'}

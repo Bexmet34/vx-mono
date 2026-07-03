@@ -284,9 +284,9 @@ export default function Home() {
         {/* --- MARQUEE SOCIAL PROOF --- */}
         {publicServers.length > 0 && (
           <section className="py-12 border-y border-on-surface/ bg-surface-container-low overflow-hidden">
-            <h3 className="text-center font-label-bold text-label-sm text-on-surface-variant uppercase tracking-[0.2em] mb-8">
+            <h2 className="text-center font-label-bold text-label-sm text-on-surface-variant uppercase tracking-[0.2em] mb-8">
               {t.marqueeTitle}
-            </h3>
+            </h2>
             <div className="relative flex overflow-x-hidden w-full group">
               <div className="animate-marquee flex whitespace-nowrap items-center gap-12 px-6">
                 {[...publicServers, ...publicServers, ...publicServers].map((server, idx) => (
@@ -368,6 +368,7 @@ export default function Home() {
               className="w-full h-auto object-cover"
             >
               <source src="/videos/tanitim.mp4" type="video/mp4" />
+              <track kind="captions" src="/placeholder.vtt" srcLang="tr" label="Türkçe" />
               Tarayıcınız video etiketini desteklemiyor.
             </video>
           </div>
@@ -945,7 +946,7 @@ export default function Home() {
                 <>
                   <div className="mb-10 text-center mt-4">
                     <span className="inline-block py-1 px-3 mb-4 bg-primary-container text-on-primary font-label-bold text-label-sm tracking-widest uppercase">Premium Deployment</span>
-                    <h1 className="font-headline-xl text-3xl md:text-5xl text-on-surface mb-2 uppercase tracking-tight">Upgrade Infrastructure</h1>
+                    <h2 className="font-headline-xl text-3xl md:text-5xl text-on-surface mb-2 uppercase tracking-tight">Upgrade Infrastructure</h2>
                     <p className="font-body-md text-body-md text-on-surface-variant">Select the strategic asset for {lang === 'tr' ? selectedPlan.name_tr : selectedPlan.name_en} integration.</p>
                   </div>
 
