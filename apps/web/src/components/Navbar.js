@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSession, signIn, signOut } from "next-auth/react";
 import Image from "next/image";
-import { LogIn, LogOut, LayoutDashboard, Globe, Menu, X, ChevronRight, Shield, CreditCard, Clock, CheckCircle, XCircle, Loader2, AlertCircle } from "lucide-react";
+import { LogIn, LogOut, LayoutDashboard, Globe, Menu, X, ChevronRight, ChevronDown, Shield, CreditCard, Clock, CheckCircle, XCircle, Loader2, AlertCircle } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
@@ -14,6 +14,7 @@ export default function Navbar({ isStatic = false }) {
   const { lang, toggleLanguage, t } = useLanguage();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isMobileExploreOpen, setIsMobileExploreOpen] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -85,6 +86,34 @@ export default function Navbar({ isStatic = false }) {
             </Link>
             
             <div className="hidden md:flex space-x-6 lg:space-x-8 items-center border-l border-on-surface/10 pl-6">
+              
+              {/* Dropdown for Page Sections */}
+              <div className="relative group cursor-pointer">
+                <div className="flex items-center gap-1 font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors py-2">
+                  {lang === 'tr' ? 'Keşfet' : 'Explore'}
+                  <ChevronDown size={14} className="text-on-surface-variant group-hover:text-primary transition-transform group-hover:rotate-180" />
+                </div>
+                <div className="absolute top-[100%] left-0 mt-0 w-48 bg-surface-container border border-outline-variant/50 p-2 shadow-[0_10px_40px_rgba(0,0,0,0.8)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 rounded-md">
+                  <div className="flex flex-col gap-1">
+                    <Link href="/#features" className="px-4 py-2 text-sm text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm">
+                      {lang === 'tr' ? 'Özellikler' : 'Features'}
+                    </Link>
+                    <Link href="/#dashboard" className="px-4 py-2 text-sm text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm">
+                      Dashboard
+                    </Link>
+                    <Link href="/#commands" className="px-4 py-2 text-sm text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm">
+                      {lang === 'tr' ? 'Komuta Merkezi' : 'Commands'}
+                    </Link>
+                    <Link href="/#pricing" className="px-4 py-2 text-sm text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm">
+                      {lang === 'tr' ? 'Fiyatlar' : 'Pricing'}
+                    </Link>
+                    <Link href="/#faq" className="px-4 py-2 text-sm text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm">
+                      {lang === 'tr' ? 'SSS' : 'FAQ'}
+                    </Link>
+                  </div>
+                </div>
+              </div>
+
               <Link href="/blog" className="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors">
                 {t.blog}
               </Link>
@@ -393,7 +422,38 @@ export default function Navbar({ isStatic = false }) {
 
             <div className="menu-item-group">
               <span className="text-[10px] font-label-bold text-outline uppercase tracking-[0.2em] mb-4 block">Resources</span>
-              <Link href="/blog" className="menu-item-hover group flex items-center justify-between py-2 cursor-pointer" onClick={() => setIsMenuOpen(false)}>
+              
+              {/* Mobile Accordion for Page Sections */}
+              <button 
+                className="menu-item-hover w-full group flex items-center justify-between py-2 cursor-pointer" 
+                onClick={() => setIsMobileExploreOpen(!isMobileExploreOpen)}
+              >
+                <span className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant group-hover:text-primary-container transition-all">
+                  {lang === 'tr' ? 'Sayfa Bölümleri' : 'Page Sections'}
+                </span>
+                <ChevronDown className={`text-primary-container/50 transition-transform duration-300 ${isMobileExploreOpen ? 'rotate-180' : ''}`} size={20} />
+              </button>
+              
+              <div className={`overflow-hidden transition-all duration-300 ease-in-out flex flex-col gap-2 ${isMobileExploreOpen ? 'max-h-[350px] mt-2 opacity-100' : 'max-h-0 opacity-0'}`}>
+                <Link href="/#features" className="pl-4 py-2 text-sm text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
+                  {lang === 'tr' ? 'Özellikler' : 'Features'}
+                </Link>
+                <Link href="/#dashboard" className="pl-4 py-2 text-sm text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
+                  Dashboard
+                </Link>
+                <Link href="/#commands" className="pl-4 py-2 text-sm text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
+                  {lang === 'tr' ? 'Komuta Merkezi' : 'Command Center'}
+                </Link>
+                <Link href="/#pricing" className="pl-4 py-2 text-sm text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
+                  {lang === 'tr' ? 'Fiyatlandırma' : 'Pricing'}
+                </Link>
+                <Link href="/#faq" className="pl-4 py-2 text-sm text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
+                  {lang === 'tr' ? 'SSS' : 'FAQ'}
+                </Link>
+              </div>
+              <div className="indicator mt-2"></div>
+
+              <Link href="/blog" className="menu-item-hover group flex items-center justify-between py-2 mt-4 cursor-pointer" onClick={() => setIsMenuOpen(false)}>
                 <span className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant hover:text-primary-container transition-all group-active:translate-x-2 pointer-events-none">{t.blog}</span>
                 <ChevronRight className="text-primary-container/0 group-hover:text-primary-container transition-colors pointer-events-none" />
               </Link>

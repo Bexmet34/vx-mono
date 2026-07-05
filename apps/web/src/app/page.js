@@ -483,7 +483,7 @@ export default function Home() {
         </section>
 
 {/* --- DASHBOARD SHOWCASE SECTION --- */}
-        <section className="px-margin-mobile md:px-margin-desktop py-24 bg-surface-container-lowest border-t border-on-surface/20">
+        <section id="dashboard" className="px-margin-mobile md:px-margin-desktop py-24 bg-surface-container-lowest border-t border-on-surface/20">
           <div className="max-w-container-max mx-auto">
             <div className="text-center mb-16">
               <h2 className="font-headline-lg text-headline-lg text-on-surface uppercase tracking-tight mb-4">
@@ -528,7 +528,7 @@ export default function Home() {
         </section>
 
                 {/* --- FAQ SECTION --- */}
-        <section className="px-margin-mobile md:px-margin-desktop py-20 bg-surface-container-low border-y border-on-surface/">
+        <section id="faq" className="px-margin-mobile md:px-margin-desktop py-20 bg-surface-container-low border-y border-on-surface/">
           <div className="max-w-container-max mx-auto">
             <div className="text-center mb-12">
               <h2 className="font-headline-lg text-headline-lg text-on-surface uppercase tracking-tight">{t.faqTitle2}</h2>
@@ -557,7 +557,7 @@ export default function Home() {
         </section>
 
         {/* --- COMMANDS SECTION (Komuta Merkezi) --- */}
-        <section className="px-margin-mobile md:px-margin-desktop py-24 max-w-container-max mx-auto">
+        <section id="commands" className="px-margin-mobile md:px-margin-desktop py-24 max-w-container-max mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             {/* Left Column: Text */}
             <div className="space-y-8">
