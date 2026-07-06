@@ -243,38 +243,38 @@ export default function PremiumPage() {
               </div>
             </div>
 
-            {/* Accordion 2: One-Time Payment */}
-            <div className={`glass-panel border rounded-lg transition-all duration-300 overflow-hidden ${openAccordion === 'onetime' ? 'border-[#009cde] shadow-[0_0_20px_rgba(0,156,222,0.15)] bg-surface-container-high' : 'border-outline-variant bg-surface-container-low hover:border-outline-variant/80 hover:bg-surface-container-high'}`}>
+            {/* Accordion 2: Individual Packages */}
+            <div className={`glass-panel border rounded-lg transition-all duration-300 overflow-hidden ${openAccordion === 'individual' ? 'border-[#009cde] shadow-[0_0_20px_rgba(0,156,222,0.15)] bg-surface-container-high' : 'border-outline-variant bg-surface-container-low hover:border-outline-variant/80 hover:bg-surface-container-high'}`}>
               <button 
                 className="w-full p-6 flex items-center justify-between focus:outline-none group"
-                onClick={() => toggleAccordion('onetime')}
+                onClick={() => toggleAccordion('individual')}
               >
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-md bg-[#009cde]/10 border border-[#009cde]/30 flex items-center justify-center transition-transform group-hover:scale-105">
-                    <CreditCard className="text-[#009cde]" size={20} />
+                    <Wallet className="text-[#009cde]" size={20} />
                   </div>
                   <div className="text-left">
-                    <h3 className="font-headline-md text-lg text-on-surface font-bold">{t.premiumOneTimeTitle}</h3>
-                    <p className="text-xs text-on-surface-variant mt-1">{t.premiumOneTimeSubtitle}</p>
+                    <h3 className="font-headline-md text-lg text-on-surface font-bold">{t.premiumIndividualTitle}</h3>
+                    <p className="text-xs text-on-surface-variant mt-1">{t.premiumIndividualSubtitle}</p>
                   </div>
                 </div>
-                {openAccordion === 'onetime' ? <ChevronUp className="text-on-surface-variant" /> : <ChevronDown className="text-on-surface-variant" />}
+                {openAccordion === 'individual' ? <ChevronUp className="text-on-surface-variant" /> : <ChevronDown className="text-on-surface-variant" />}
               </button>
               
-              <div className={`px-6 transition-all duration-300 ease-in-out ${openAccordion === 'onetime' ? 'max-h-[1500px] pb-6 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
+              <div className={`px-6 transition-all duration-300 ease-in-out ${openAccordion === 'individual' ? 'max-h-[1500px] pb-6 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
                 <div className="pt-4 border-t border-outline-variant/50">
                   {loadingPlans ? (
                     <div className="w-full flex flex-col items-center justify-center py-10 text-primary-container">
                       <Loader2 className="animate-spin mb-2" size={32} />
                       <span className="font-label-bold text-xs uppercase tracking-widest">Yükleniyor...</span>
                     </div>
-                  ) : plans.length === 0 ? (
+                  ) : plans.filter(p => p.plan_type === 'user').length === 0 ? (
                     <div className="w-full text-center py-10 text-on-surface-variant font-body-sm border border-dashed border-outline-variant rounded-md bg-surface/30">
                       Şu anda aktif paket bulunmamaktadır.
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                      {plans.map((plan) => {
+                      {plans.filter(p => p.plan_type === 'user').map((plan) => {
                         const features = lang === 'tr' ? (plan.features_tr || []) : (plan.features_en || []);
                         return (
                           <div key={plan.id} className={`w-full flex flex-col p-5 rounded-md relative overflow-hidden border ${plan.is_featured ? 'border-primary-container shadow-[0_0_15px_rgba(255,215,0,0.05)] bg-primary-container/5' : 'border-outline-variant bg-surface-container-low'} transition-all hover:border-primary-container/30`}>
@@ -313,30 +313,72 @@ export default function PremiumPage() {
               </div>
             </div>
 
-            {/* Accordion 3: Subscription */}
-            <div className={`glass-panel border rounded-lg transition-all duration-300 overflow-hidden ${openAccordion === 'sub' ? 'border-[#ff424d] shadow-[0_0_20px_rgba(255,66,77,0.15)] bg-surface-container-high' : 'border-outline-variant bg-surface-container-low hover:border-outline-variant/80 hover:bg-surface-container-high'}`}>
+            {/* Accordion 3: Server Packages */}
+            <div className={`glass-panel border rounded-lg transition-all duration-300 overflow-hidden ${openAccordion === 'server' ? 'border-[#ffbd2e] shadow-[0_0_20px_rgba(255,189,46,0.15)] bg-surface-container-high' : 'border-outline-variant bg-surface-container-low hover:border-outline-variant/80 hover:bg-surface-container-high'}`}>
               <button 
                 className="w-full p-6 flex items-center justify-between focus:outline-none group"
-                onClick={() => toggleAccordion('sub')}
+                onClick={() => toggleAccordion('server')}
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-md bg-[#ff424d]/10 border border-[#ff424d]/30 flex items-center justify-center transition-transform group-hover:scale-105">
-                    <Heart className="text-[#ff424d]" size={20} />
+                  <div className="w-10 h-10 rounded-md bg-[#ffbd2e]/10 border border-[#ffbd2e]/30 flex items-center justify-center transition-transform group-hover:scale-105">
+                    <Server className="text-[#ffbd2e]" size={20} />
                   </div>
                   <div className="text-left">
-                    <h3 className="font-headline-md text-lg text-on-surface font-bold">{t.premiumSubTitle}</h3>
-                    <p className="text-xs text-on-surface-variant mt-1">{t.premiumSubSubtitle}</p>
+                    <h3 className="font-headline-md text-lg text-on-surface font-bold">{t.premiumServerTitle}</h3>
+                    <p className="text-xs text-on-surface-variant mt-1">{t.premiumServerSubtitle}</p>
                   </div>
                 </div>
-                {openAccordion === 'sub' ? <ChevronUp className="text-on-surface-variant" /> : <ChevronDown className="text-on-surface-variant" />}
+                {openAccordion === 'server' ? <ChevronUp className="text-on-surface-variant" /> : <ChevronDown className="text-on-surface-variant" />}
               </button>
               
-              <div className={`px-6 transition-all duration-300 ease-in-out ${openAccordion === 'sub' ? 'max-h-[500px] pb-6 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
+              <div className={`px-6 transition-all duration-300 ease-in-out ${openAccordion === 'server' ? 'max-h-[1500px] pb-6 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
                 <div className="pt-4 border-t border-outline-variant/50">
-                  <p className="text-sm text-on-surface-variant mb-6">{t.premiumSubDesc}</p>
-                  <a href="https://patreon.com/veyronix" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-3 bg-[#ff424d] hover:bg-[#e03a44] text-white rounded-md font-bold text-sm transition-all shadow-lg hover:shadow-xl active:scale-95">
-                    <Heart size={18} className="fill-current" /> Patreon
-                  </a>
+                  {loadingPlans ? (
+                    <div className="w-full flex flex-col items-center justify-center py-10 text-primary-container">
+                      <Loader2 className="animate-spin mb-2" size={32} />
+                      <span className="font-label-bold text-xs uppercase tracking-widest">Yükleniyor...</span>
+                    </div>
+                  ) : plans.filter(p => p.plan_type === 'server' || !p.plan_type).length === 0 ? (
+                    <div className="w-full text-center py-10 text-on-surface-variant font-body-sm border border-dashed border-outline-variant rounded-md bg-surface/30">
+                      Şu anda aktif paket bulunmamaktadır.
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                      {plans.filter(p => p.plan_type === 'server' || !p.plan_type).map((plan) => {
+                        const features = lang === 'tr' ? (plan.features_tr || []) : (plan.features_en || []);
+                        return (
+                          <div key={plan.id} className={`w-full flex flex-col p-5 rounded-md relative overflow-hidden border ${plan.is_featured ? 'border-primary-container shadow-[0_0_15px_rgba(255,215,0,0.05)] bg-primary-container/5' : 'border-outline-variant bg-surface-container-low'} transition-all hover:border-primary-container/30`}>
+                            {plan.is_featured && (
+                              <div className="absolute top-0 right-0 bg-primary-container text-on-primary font-label-bold text-[9px] uppercase tracking-widest px-2 py-0.5 rounded-bl">
+                                {t.bestSeller}
+                              </div>
+                            )}
+                            
+                            <h3 className="font-headline-md text-base text-on-surface mb-1 uppercase">{lang === 'tr' ? plan.name_tr : plan.name_en}</h3>
+                            <div className="font-headline-md text-primary-container mb-4 flex items-baseline gap-1">
+                              {plan.amount} <span className="font-label-bold text-[10px] text-on-surface-variant">USDT</span>
+                            </div>
+                            
+                            <ul className="flex-grow space-y-2 mb-6">
+                              {features.map((feat, idx) => (
+                                <li key={idx} className="flex items-start gap-2 font-body-md text-xs text-on-surface-variant">
+                                  <div className="w-1.5 h-1.5 rounded-full bg-primary-container shrink-0 mt-1.5 shadow-[0_0_5px_rgba(255,215,0,0.5)]"></div> 
+                                  <span>{feat}</span>
+                                </li>
+                              ))}
+                            </ul>
+                            
+                            <button 
+                              className={`w-full py-2.5 rounded font-label-bold text-xs uppercase tracking-widest transition-all active:scale-95 ${plan.is_featured ? 'bg-primary-container text-on-primary tactical-glow hover:brightness-110' : 'bg-surface-container-highest border border-outline text-on-surface hover:border-primary-container hover:text-primary-container'}`}
+                              onClick={() => handleBuyClick(plan)}
+                            >
+                              {t.buyNow}
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

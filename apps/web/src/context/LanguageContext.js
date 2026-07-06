@@ -279,11 +279,10 @@ Email: hakkibsknn@gmail.com
   premiumVoteDesc2: "You can get all Premium features for free as we don't want to exclude anyone from enjoying Premium features. All you have to do is vote for the bot!",
   premiumVoteHowTo: "How do I get gears?",
   premiumVoteHowToDesc: "You can get gears by voting for the bot on these platforms:",
-  premiumOneTimeTitle: "One-Time Payment",
-  premiumOneTimeSubtitle: "Crypto, Bank Transfer and more",
-  premiumSubTitle: "Subscription",
-  premiumSubSubtitle: "Monthly Patreon membership",
-  premiumSubDesc: "You can support our project continuously by becoming a patron. You will automatically receive premium features on your server."
+  premiumIndividualTitle: "Individual Packages",
+  premiumIndividualSubtitle: "Personal boosts and benefits",
+  premiumServerTitle: "Server Packages",
+  premiumServerSubtitle: "Guild-wide premium features",
 };
 
 const tr = {
@@ -568,11 +567,10 @@ E-Posta: hakkibsknn@gmail.com
   premiumVoteDesc2: "Kimsenin Premium özelliklerden mahrum kalmasını istemediğimiz için tüm Premium özellikleri ücretsiz alabilirsiniz. Tek yapmanız gereken bota oy vermek!",
   premiumVoteHowTo: "Nasıl gear elde ederim?",
   premiumVoteHowToDesc: "Bu platformlarda bota oy vererek gear elde edebilirsiniz:",
-  premiumOneTimeTitle: "Tek Seferlik Ödeme",
-  premiumOneTimeSubtitle: "Kripto, Havale/EFT ve daha fazlası",
-  premiumSubTitle: "Abonelik",
-  premiumSubSubtitle: "Aylık Patreon üyeliği",
-  premiumSubDesc: "Projemizi Patreon üzerinden destekleyerek kesintisiz Premium özelliklere sahip olabilirsiniz."
+  premiumIndividualTitle: "Bireysel Paketler",
+  premiumIndividualSubtitle: "Kişisel avantajlar ve destekler",
+  premiumServerTitle: "Sunucu Paketleri",
+  premiumServerSubtitle: "Loncanız için özel premium özellikler",
 };
 
 
