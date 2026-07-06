@@ -161,7 +161,7 @@ export default function Navbar({ isStatic = false }) {
                       onClick={() => setIsProfileOpen(!isProfileOpen)}
                       className="flex items-center gap-3 group focus:outline-none"
                     >
-                      <div className="flex flex-col items-end hidden md:flex">
+                      <div className="hidden md:flex flex-col items-end">
                         <span className="font-label-bold text-sm text-on-surface group-hover:text-primary-container transition-colors">
                           {session.user?.name || 'Commander'}
                         </span>
