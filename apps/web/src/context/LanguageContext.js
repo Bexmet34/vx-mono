@@ -268,7 +268,22 @@ Email: hakkibsknn@gmail.com
     templateUpdated: "Template updated successfully!",
     actionSuccess: "Action completed successfully!",
     confirmDeleteMsg: "Are you sure you want to delete this message?"
-  }
+  },
+  
+  premiumTitle: "Veyronix",
+  premiumSubtitle: "Unlock the full potential of Veyronix with Premium features. Choose the method that works best for you.",
+  premiumBtnNavbar: "Premium",
+  premiumVoteTitle: "Via Voting (Gears)",
+  premiumVoteSubtitle: "Free Premium through community support",
+  premiumVoteDesc1: "Get Premium features for free by voting for Veyronix on bot listing sites.",
+  premiumVoteDesc2: "You can get all Premium features for free as we don't want to exclude anyone from enjoying Premium features. All you have to do is vote for the bot!",
+  premiumVoteHowTo: "How do I get gears?",
+  premiumVoteHowToDesc: "You can get gears by voting for the bot on these platforms:",
+  premiumOneTimeTitle: "One-Time Payment",
+  premiumOneTimeSubtitle: "Crypto, Bank Transfer and more",
+  premiumSubTitle: "Subscription",
+  premiumSubSubtitle: "Monthly Patreon membership",
+  premiumSubDesc: "You can support our project continuously by becoming a patron. You will automatically receive premium features on your server."
 };
 
 const tr = {
@@ -542,7 +557,22 @@ E-Posta: hakkibsknn@gmail.com
     templateUpdated: "Şablon başarıyla güncellendi!",
     actionSuccess: "İşlem başarıyla gerçekleşti!",
     confirmDeleteMsg: "Emin misiniz?"
-  }
+  },
+  
+  premiumTitle: "Veyronix",
+  premiumSubtitle: "Veyronix'in tam potansiyelini Premium özelliklerle açın. Sizin için en uygun yöntemi seçin.",
+  premiumBtnNavbar: "Premium",
+  premiumVoteTitle: "Oylama Yoluyla (Gears)",
+  premiumVoteSubtitle: "Topluluk desteği sayesinde ücretsiz Premium içerik.",
+  premiumVoteDesc1: "Bot listeleme sitelerinde Veyronix'e oy vererek Premium özellikleri ücretsiz edinin.",
+  premiumVoteDesc2: "Kimsenin Premium özelliklerden mahrum kalmasını istemediğimiz için tüm Premium özellikleri ücretsiz alabilirsiniz. Tek yapmanız gereken bota oy vermek!",
+  premiumVoteHowTo: "Nasıl gear elde ederim?",
+  premiumVoteHowToDesc: "Bu platformlarda bota oy vererek gear elde edebilirsiniz:",
+  premiumOneTimeTitle: "Tek Seferlik Ödeme",
+  premiumOneTimeSubtitle: "Kripto, Havale/EFT ve daha fazlası",
+  premiumSubTitle: "Abonelik",
+  premiumSubSubtitle: "Aylık Patreon üyeliği",
+  premiumSubDesc: "Projemizi Patreon üzerinden destekleyerek kesintisiz Premium özelliklere sahip olabilirsiniz."
 };
 
 

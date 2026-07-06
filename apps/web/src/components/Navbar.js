@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSession, signIn, signOut } from "next-auth/react";
 import Image from "next/image";
-import { LogIn, LogOut, LayoutDashboard, Globe, Menu, X, ChevronRight, ChevronDown, Shield, CreditCard, Clock, CheckCircle, XCircle, Loader2, AlertCircle } from "lucide-react";
+import { LogIn, LogOut, LayoutDashboard, Globe, Menu, X, ChevronRight, ChevronDown, Shield, CreditCard, Clock, CheckCircle, XCircle, Loader2, AlertCircle, Sparkles } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
@@ -127,6 +127,15 @@ export default function Navbar({ isStatic = false }) {
           </div>
           
           <div className="flex items-center gap-3 md:gap-4">
+            {/* Premium Button */}
+            <Link 
+              href="/premium" 
+              className="hidden md:flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary-container/50 bg-primary-container/10 text-primary-container hover:bg-primary-container hover:text-on-primary transition-all font-label-bold shadow-[0_0_15px_rgba(255,215,0,0.1)] hover:shadow-[0_0_20px_rgba(255,215,0,0.3)]"
+            >
+              <span>{t.premiumBtnNavbar}</span>
+              <Sparkles size={16} />
+            </Link>
+
             {/* Language Toggle */}
             <button 
               onClick={toggleLanguage} 
@@ -399,6 +408,15 @@ export default function Navbar({ isStatic = false }) {
               
               <Link href="/dashboard" className="menu-item-hover group flex items-center justify-between py-2 mt-4 cursor-pointer" onClick={() => setIsMenuOpen(false)}>
                 <span className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant hover:text-primary-container transition-all group-active:translate-x-2 pointer-events-none">{t.dashboard}</span>
+                <ChevronRight className="text-primary-container/0 group-hover:text-primary-container transition-colors pointer-events-none" />
+              </Link>
+              <div className="indicator"></div>
+
+              {/* Premium Button Mobile */}
+              <Link href="/premium" className="menu-item-hover group flex items-center justify-between py-2 mt-4 cursor-pointer" onClick={() => setIsMenuOpen(false)}>
+                <span className="font-headline-lg-mobile text-headline-lg-mobile text-primary-container hover:brightness-110 transition-all group-active:translate-x-2 pointer-events-none flex items-center gap-2">
+                  {t.premiumBtnNavbar} <Sparkles size={18} />
+                </span>
                 <ChevronRight className="text-primary-container/0 group-hover:text-primary-container transition-colors pointer-events-none" />
               </Link>
               <div className="indicator"></div>
