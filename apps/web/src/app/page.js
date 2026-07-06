@@ -22,7 +22,8 @@ export default function Home() {
   const [gifs, setGifs] = useState([]);
   const [serverCount, setServerCount] = useState(0);
   const [activeCampaigns, setActiveCampaigns] = useState([]);
-
+  const [publicServers, setPublicServers] = useState([]);
+  const [blogs, setBlogs] = useState([]);
 
   useEffect(() => {
     fetch('/api/gifs')
