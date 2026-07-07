@@ -268,6 +268,9 @@ client.on('interactionCreate', async interaction => {
             if (interaction.customId === 'mytemps_select') {
                 const { handleMyTempsSelect } = require('./handlers/menuHandler');
                 await handleMyTempsSelect(interaction);
+            } else if (interaction.customId === 'fc_temp_select') {
+                const { handleFixedContentButtons } = require('./handlers/fixedContentHandler');
+                await handleFixedContentButtons(interaction);
             } else if (interaction.customId.startsWith('manage_party_')) {
                 await handleManageMenu(interaction);
             } else if (interaction.customId.startsWith('join_role_')) {

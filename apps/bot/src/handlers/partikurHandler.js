@@ -281,10 +281,71 @@ function getTemplateByIndex(templatesStr, indexStr) {
     }
 }
 
-    const templateValue = interaction.options.getString('template');
-    
-    if (templateValue === 'separator') {
-        return await interaction.editReply({ content: '❌ Lütfen geçerli bir şablon seçin.' });
+    let templateValue = null;
+
+    if (interaction.isChatInputCommand && interaction.isChatInputCommand()) {
+        templateValue = interaction.options.getString('template');
+    } else if (interaction.isStringSelectMenu && interaction.isStringSelectMenu()) {
+        templateValue = interaction.values[0];
+        await interaction.update({ content: '⏳ Şablon yükleniyor ve parti oluşturuluyor...', components: [] }).catch(()=>{});
+    } else if (interaction.isButton && interaction.isButton()) {
+        await interaction.deferReply({ flags: [MessageFlags.Ephemeral] }).catch(()=>{});
+        
+        const { getUserTemplates } = require('../services/userTemplateService');
+        const userTemplates = await getUserTemplates(userId) || [];
+        const guildTemplates = guildConfig?.party_templates || [];
+
+        if (userTemplates.length === 0 && guildTemplates.length === 0) {
+            return await interaction.editReply({
+                content: lang === 'tr' ? '❌ Hiç şablon bulunamadı.' : '❌ No templates found.'
+            });
+        }
+
+        const { StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ActionRowBuilder } = require('discord.js');
+        const selectMenu = new StringSelectMenuBuilder()
+            .setCustomId('fc_temp_select')
+            .setPlaceholder(lang === 'tr' ? 'Oluşturmak istediğiniz şablonu seçin...' : 'Select a template to create...');
+
+        if (guildTemplates.length > 0) {
+            guildTemplates.slice(0, 12).forEach((t, i) => {
+                selectMenu.addOptions(new StringSelectMenuOptionBuilder()
+                    .setLabel(`[Sunucu] ${t.name || t.header || 'Şablon'}`.substring(0, 100))
+                    .setValue(`guild:${i}`)
+                    .setDescription((t.description || t.header || 'Sunucu Şablonu').substring(0, 100))
+                    .setEmoji('🏢')
+                );
+            });
+        }
+
+        if (userTemplates.length > 0) {
+            userTemplates.slice(0, 12).forEach(t => {
+                selectMenu.addOptions(new StringSelectMenuOptionBuilder()
+                    .setLabel(`[Kişisel] ${t.template_name || t.party_header || 'Şablon'}`.substring(0, 100))
+                    .setValue(`user:${t.id}`)
+                    .setDescription((t.party_header || 'Kişisel Şablon').substring(0, 100))
+                    .setEmoji('👤')
+                );
+            });
+        }
+
+        const row = new ActionRowBuilder().addComponents(selectMenu);
+        return await interaction.editReply({
+            content: `**${lang === 'tr' ? 'Şablon Seçimi' : 'Select Template'}**\n${lang === 'tr' ? 'Aşağıdaki listeden bir şablon seçerek partiyi oluşturun:' : 'Select a template below to create the party:'}`,
+            components: [row]
+        });
+    }
+
+    if (!templateValue || templateValue === 'separator') {
+        const msg = '❌ Lütfen geçerli bir şablon seçin.';
+        if (interaction.deferred || interaction.replied) {
+            return await interaction.editReply({ content: msg }).catch(()=>{});
+        } else {
+            return await interaction.reply({ content: msg, flags: [MessageFlags.Ephemeral] }).catch(()=>{});
+        }
+    }
+
+    if (!interaction.deferred && !interaction.replied) {
+        await interaction.deferReply({ flags: [MessageFlags.Ephemeral] }).catch(()=>{});
     }
 
     let template = null;

@@ -16,7 +16,7 @@ async function handleFixedContentButtons(interaction) {
             await handleCreatePartyCommand(interaction);
         } else if (customId === 'fc_closeparty') {
             await handleClosePartyCommand(interaction);
-        } else if (customId === 'fc_temp') {
+        } else if (customId === 'fc_temp' || customId === 'fc_temp_select') {
             await handleTempCommand(interaction);
         } else if (customId === 'fc_mytemps') {
             await handleMyTempsCommand(interaction);

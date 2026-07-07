@@ -75,6 +75,23 @@ async function handleCloseOption(interaction, ownerId, lang) {
         const closedRow = createClosedButton(lang);
         removeActiveParty(ownerId, message.id);
 
+        if (guildConfig?.system_mode === 'fixed_channel' && channel.id !== guildConfig?.fixed_message_channel_id) {
+            try {
+                const closingMsg = `⏳ **${lang === 'tr' ? 'Bu kanal 5 saniye içinde silinecek...' : 'This channel will be deleted in 5 seconds...'}**`;
+                if (interaction.deferred || interaction.replied) {
+                    await interaction.editReply({ content: closingMsg, embeds: [], components: [] }).catch(()=>{});
+                } else {
+                    await interaction.reply({ content: closingMsg, flags: [MessageFlags.Ephemeral] }).catch(()=>{});
+                }
+                await channel.send({ content: closingMsg }).catch(() => {});
+                setTimeout(async () => {
+                    await channel.delete().catch(() => {});
+                }, 5000);
+            } catch (err) {}
+            release();
+            return;
+        }
+
         // If it's a settings button, update the settings message to say "Closed" and edit the main message
         if (interaction.customId.startsWith('settings_close_')) {
             await freshMessage.edit({ 
