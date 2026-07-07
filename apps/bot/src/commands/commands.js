@@ -125,7 +125,7 @@ const commands = [
         
     new SlashCommandBuilder()
         .setName('kayitsizlari-belirle')
-        .setDescription('Bot üzerinden kayıt olmayan herkesin ismini [Kayıt Bekliyor] yapıp, tüm rollerini alıp seçtiğiniz rolü verir.')
+        .setDescription('Kayıtsız üyelerin tüm rollerini siler, ismini [Kayıt Bekliyor] yapar ve seçili rolü verir.')
         .addRoleOption(option => 
             option.setName('rol')
                 .setDescription('Kayıtsız kullanıcılara verilecek rol')
