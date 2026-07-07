@@ -92,28 +92,37 @@ async function handleClosePartyCommand(interaction) {
                 try {
                     const channel = await interaction.client.channels.fetch(channelId).catch(() => null);
                     if (channel) {
-                        const message = await channel.messages.fetch(messageId).catch(() => null);
+                        if (guildConfig?.system_mode === 'fixed_channel' && channelId !== guildConfig?.fixed_message_channel_id) {
+                            try {
+                                await channel.send({ content: `⏳ **${lang === 'tr' ? 'Bu kanal 5 saniye içinde silinecek...' : 'This channel will be deleted in 5 seconds...'}**` });
+                                setTimeout(async () => {
+                                    await channel.delete().catch(() => {});
+                                }, 5000);
+                                totalClosed++;
+                            } catch (err) { }
+                        } else {
+                            const message = await channel.messages.fetch(messageId).catch(() => null);
 
-                        if (message && message.embeds && message.embeds[0]) {
-                            const oldEmbed = message.embeds[0];
-                            const fields = oldEmbed.fields || [];
-                            const newFields = fields.filter(f => f.name && !f.name.includes('📌') && !f.name.includes('KURALLAR'));
+                            if (message && message.embeds && message.embeds[0]) {
+                                const oldEmbed = message.embeds[0];
+                                const fields = oldEmbed.fields || [];
+                                const newFields = fields.filter(f => f.name && !f.name.includes('📌') && !f.name.includes('KURALLAR'));
 
-                            const closedEmbed = EmbedBuilder.from(oldEmbed)
-                                .setTitle(`${oldEmbed.title || 'Party'} [${t('common.closed', lang)}]`)
-                                .setColor('#808080')
-                                .setFields(newFields)
-                                .setFooter(null)
-                                .setTimestamp(null);
+                                const closedEmbed = EmbedBuilder.from(oldEmbed)
+                                    .setTitle(`${oldEmbed.title || 'Party'} [${t('common.closed', lang)}]`)
+                                    .setColor('#808080')
+                                    .setFields(newFields)
+                                    .setFooter(null)
+                                    .setTimestamp(null);
 
-                            const closedRow = createClosedButton(lang);
-                            const { AttachmentBuilder } = require('discord.js');
-                            const { LOGO_PATH } = require('../constants/constants');
-                            await message.edit({ 
-                                embeds: [closedEmbed], 
-                                components: [closedRow]
-                            }).catch(() => { });
-                            totalClosed++;
+                                const { createClosedButton } = require('../builders/componentBuilder');
+                                const closedRow = createClosedButton(lang);
+                                await message.edit({ 
+                                    embeds: [closedEmbed], 
+                                    components: [closedRow]
+                                }).catch(() => { });
+                                totalClosed++;
+                            }
                         }
                     }
                 } catch (err) { }

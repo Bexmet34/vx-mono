@@ -24,6 +24,12 @@ Her sunucuya özel yapılandırmaları saklar.
 - `whitelist` (jsonb): Aynı anda birden fazla parti kurabilen rol/kullanıcı ID listesi.
 - `party_templates` (jsonb): Sunucuya özel kaydedilmiş parti şablonları.
 - `auto_role_sync` (boolean): Kayıtlı üyelerin rollerini otomatik eşitleme ayarı.
+- `system_mode` (text): Sunucudaki content sistemi (`command` veya `fixed_channel`).
+- `fixed_message_channel_id` (text): Sabit mesajın atıldığı metin kanalı ID'si.
+- `target_category_id` (text): Sabit kanaldan açılan içeriklerin düşeceği kategori ID'si.
+- `channel_name_format` (text): Oluşturulacak yeni kanalların isim formatı (`name_title` vb.).
+- `fixed_message_content` (text): Sabit mesajın açıklaması.
+- `fixed_message_id` (text): Gönderilen sabit mesajın Discord Message ID'si.
 
 ### 3. `support_rewards`
 Destek sunucusuna katılan kullanıcılara verilen tek seferlik ödülleri takip eder.
