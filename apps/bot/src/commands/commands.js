@@ -122,6 +122,15 @@ const commands = [
         .setName('setup-registration')
         .setDescription('Kayıt sistemini bu kanalda başlatır | Starts the registration system in this channel.')
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+        
+    new SlashCommandBuilder()
+        .setName('kayitsizlari-belirle')
+        .setDescription('Bot üzerinden kayıt olmayan herkesin ismini [Kayıt Bekliyor] yapıp, tüm rollerini alıp seçtiğiniz rolü verir.')
+        .addRoleOption(option => 
+            option.setName('rol')
+                .setDescription('Kayıtsız kullanıcılara verilecek rol')
+                .setRequired(true))
+        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 ];
 
 module.exports = commands.map(command => command.toJSON());

@@ -245,6 +245,9 @@ client.on('interactionCreate', async interaction => {
             } else if (interaction.commandName === 'setup-registration') {
                 const { handleSetupRegistrationCommand } = require('./handlers/commandHandler');
                 await handleSetupRegistrationCommand(interaction);
+            } else if (interaction.commandName === 'kayitsizlari-belirle') {
+                const { handleForceRegistrationCommand } = require('./handlers/commandHandler');
+                await handleForceRegistrationCommand(interaction);
             }
         } else if (interaction.isAutocomplete()) {
             await handleAutocomplete(interaction);

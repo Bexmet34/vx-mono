@@ -626,6 +626,71 @@ async function handleSetupRegistrationCommand(interaction) {
     });
 }
 
+/**
+ * Handles /kayitsizlari-belirle command
+ */
+async function handleForceRegistrationCommand(interaction) {
+    const guildConfig = await getGuildConfig(interaction.guildId);
+    const lang = guildConfig?.language || 'tr';
+
+    if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator)) {
+        return await safeReply(interaction, {
+            content: `⛔ **${lang === 'tr' ? 'Bu komutu sadece yöneticiler kullanabilir!' : 'Only administrators can use this command!'}**`,
+            flags: [MessageFlags.Ephemeral]
+        });
+    }
+
+    const unregRole = interaction.options.getRole('rol');
+
+    await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
+
+    try {
+        // Fetch registered users from DB
+        const dbRows = await db.all(`SELECT user_id FROM guild_registrations WHERE guild_id = ?`, [interaction.guildId]);
+        const registeredIds = new Set(dbRows.map(r => r.user_id));
+
+        // Fetch all members
+        const members = await interaction.guild.members.fetch();
+        let affectedCount = 0;
+
+        for (const [memberId, member] of members) {
+            // Skip bots and the owner
+            if (member.user.bot) continue;
+            if (memberId === interaction.guild.ownerId) continue;
+            
+            // Skip users higher than or equal to the bot's highest role to avoid permission errors
+            if (interaction.guild.members.me.roles.highest.position <= member.roles.highest.position) continue;
+
+            if (!registeredIds.has(memberId)) {
+                // Change nickname
+                try {
+                    let oldNick = member.nickname || member.user.username;
+                    oldNick = oldNick.replace(/^\[.*?\]\s*/, '');
+                    const newNick = `[Kayıt Bekliyor] ${oldNick}`.substring(0, 32);
+                    await member.setNickname(newNick).catch(()=>{});
+                } catch (nickErr) {}
+
+                // Update roles (removes all existing roles and gives the unregistered role)
+                try {
+                    await member.roles.set([unregRole.id]).catch(()=>{});
+                } catch (roleErr) {}
+
+                affectedCount++;
+                
+                // Wait slightly to avoid discord API rate limit (4-5 requests per second is safe)
+                await new Promise(r => setTimeout(r, 400));
+            }
+        }
+
+        await interaction.editReply({
+            content: `✅ İşlem tamamlandı! Toplam **${affectedCount}** kayıtlı olmayan kullanıcının tüm rolleri alındı, <@&${unregRole.id}> rolü verildi ve isimleri güncellendi.`
+        });
+    } catch (err) {
+        console.error('[CommandHandler] Error in handleForceRegistrationCommand:', err);
+        await interaction.editReply({ content: `❌ Bir hata oluştu: ${err.message}` });
+    }
+}
+
 module.exports = {
     handleHelpCommand,
     handleVoteCommand,
@@ -642,5 +707,6 @@ module.exports = {
     handleSetupObjectiveSystemCommand,
     handleSetupGuildCommand,
     handleSetupKillBoardCommand,
-    handleSetupRegistrationCommand
+    handleSetupRegistrationCommand,
+    handleForceRegistrationCommand
 };
