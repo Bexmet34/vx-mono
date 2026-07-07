@@ -93,6 +93,11 @@ export default function ServerSettings() {
     auto_role_on_join_id: "",
     registration_category_id: "",
     registration_welcome_message: "",
+    system_mode: "command",
+    fixed_message_channel_id: "",
+    target_category_id: "",
+    channel_name_format: "name_title",
+    fixed_message_content: "",
   });
   
   const [guildSearchQuery, setGuildSearchQuery] = useState("");
@@ -160,6 +165,11 @@ export default function ServerSettings() {
           registered_count: s?.registered_count || 0,
           is_syncing: s?.is_syncing || false,
           last_sync_result: s?.last_sync_result || null,
+          system_mode: s?.system_mode || "command",
+          fixed_message_channel_id: s?.fixed_message_channel_id || "",
+          target_category_id: s?.target_category_id || "",
+          channel_name_format: s?.channel_name_format || "name_title",
+          fixed_message_content: s?.fixed_message_content || "",
         };
         setSettings(loadedSettings);
         setInitialSettings(loadedSettings);
