@@ -11,7 +11,7 @@ export default function GeneralTab({
   searchGuilds, searchingGuild, 
   guildSearchResults, setGuildSearchResults, 
   guildDetail, setGuildDetail,
-  isOwner, discordMembers, guildId, subscription, showToast
+  isOwner, discordMembers, guildId, subscription, showToast, discordChannels
 }) {
   const { lang } = useLanguage();
 
