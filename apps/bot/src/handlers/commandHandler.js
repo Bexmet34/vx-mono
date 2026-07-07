@@ -664,9 +664,7 @@ async function handleForceRegistrationCommand(interaction) {
             if (!registeredIds.has(memberId)) {
                 // Change nickname
                 try {
-                    let oldNick = member.nickname || member.user.username;
-                    oldNick = oldNick.replace(/^\[.*?\]\s*/, '');
-                    const newNick = `[Kayıt Bekliyor] ${oldNick}`.substring(0, 32);
+                    const newNick = `[Kayıt Bekliyor]`;
                     await member.setNickname(newNick).catch(()=>{});
                 } catch (nickErr) {}
 
