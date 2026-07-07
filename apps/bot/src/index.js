@@ -258,6 +258,9 @@ client.on('interactionCreate', async interaction => {
                 await handleObjectiveButtons(interaction);
             } else if (interaction.customId === 'register_start' || interaction.customId === 'register_btn' || interaction.customId.startsWith('reg_approve_') || interaction.customId.startsWith('reg_reject_') || interaction.customId.startsWith('reg_temp_')) {
                 await handleRegisterButtons(interaction);
+            } else if (interaction.customId.startsWith('fc_')) {
+                const { handleFixedContentButtons } = require('./handlers/fixedContentHandler');
+                await handleFixedContentButtons(interaction);
             } else {
                 await handlePartyButtons(interaction);
             }

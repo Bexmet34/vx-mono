@@ -101,10 +101,34 @@ async function handlePartiModal(interaction) {
         const actualRoles = rolesList.filter(r => !r.startsWith('#HEADER:') && !r.startsWith('#'));
         addFooterFields(embed, 0, actualRoles.length, lang);
 
-        const msg = await interaction.channel.send({ content: '@everyone', embeds: [embed], components: components });
+        let targetChannel = interaction.channel;
+        if (guildConfig?.system_mode === 'fixed_channel' && guildConfig?.target_category_id) {
+            try {
+                let channelName = 'content';
+                const userName = interaction.user.username.replace(/[^a-zA-Z0-9]/g, '').toLowerCase() || 'user';
+                const safeHeader = header.replace(/[^a-zA-Z0-9ğüşıöçĞÜŞİÖÇ ]/g, '').replace(/\s+/g, '-').toLowerCase() || 'content';
+                const format = guildConfig.channel_name_format || 'name_title';
+
+                if (format === 'name_title') channelName = `${userName}-${safeHeader}`;
+                else if (format === 'title_only') channelName = safeHeader;
+                else if (format === 'title_name') channelName = `${safeHeader}-${userName}`;
+                else if (format === 'type_title') channelName = `party-${safeHeader}`;
+
+                targetChannel = await interaction.guild.channels.create({
+                    name: channelName.substring(0, 100),
+                    type: ChannelType.GuildText,
+                    parent: guildConfig.target_category_id,
+                });
+            } catch (err) {
+                console.error('[ModalHandler] Error creating fixed channel:', err);
+                targetChannel = interaction.channel;
+            }
+        }
+
+        const msg = await targetChannel.send({ content: '@everyone', embeds: [embed], components: components });
         
         const msgId = msg?.id;
-        const chanId = msg?.channelId || interaction.channelId;
+        const chanId = msg?.channelId || targetChannel.id;
 
         if (msgId) {
             setActiveParty(userId, msgId, chanId);

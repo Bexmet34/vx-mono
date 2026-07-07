@@ -111,6 +111,109 @@ export default function GeneralTab({
         </div>
       </div>
 
+      {/* Content System Settings */}
+      <div className="glass-panel p-8 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors mt-4">
+        <h2 className="font-headline-lg text-2xl text-on-surface mb-6 flex items-center gap-3 uppercase tracking-tight">
+          <Layout className="text-primary-container" /> {lang === 'tr' ? 'Content Sistemi Ayarları' : 'Content System Settings'}
+        </h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+              {lang === 'tr' ? 'Sistem Modu Seçimi' : 'System Mode Selection'}
+            </label>
+            <select
+              className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+              value={settings.system_mode || "command"}
+              onChange={(e) => setSettings({ ...settings, system_mode: e.target.value })}
+            >
+              <option value="command">{lang === 'tr' ? 'Sadece Komut Modu (Mevcut)' : 'Command Only Mode (Default)'}</option>
+              <option value="fixed_channel">{lang === 'tr' ? 'Sabit Kanal ve Buton Modu' : 'Fixed Channel & Button Mode'}</option>
+            </select>
+          </div>
+        </div>
+
+        {settings.system_mode === 'fixed_channel' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-slide-down">
+            <div>
+              <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+                {lang === 'tr' ? 'Sabit Mesaj Kanalı' : 'Fixed Message Channel'}
+                <InfoTooltip text={lang === 'tr' ? 'Sabit butonlu mesajın atılacağı kanal.' : 'The channel where the fixed message will be sent.'} />
+              </label>
+              <select
+                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+                value={settings.fixed_message_channel_id || ""}
+                onChange={(e) => setSettings({ ...settings, fixed_message_channel_id: e.target.value })}
+              >
+                <option value="">{lang === 'tr' ? 'Kanal Seçin...' : 'Select Channel...'}</option>
+                {(discordChannels || []).filter(c => c.type === 0 || c.type === 5).map(c => (
+                  <option key={c.id} value={c.id}>#{c.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+                {lang === 'tr' ? 'Hedef Kategori' : 'Target Category'}
+                <InfoTooltip text={lang === 'tr' ? 'Yeni açılacak content kanallarının konulacağı kategori.' : 'Category where new content channels will be created.'} />
+              </label>
+              <select
+                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+                value={settings.target_category_id || ""}
+                onChange={(e) => setSettings({ ...settings, target_category_id: e.target.value })}
+              >
+                <option value="">{lang === 'tr' ? 'Kategori Seçin...' : 'Select Category...'}</option>
+                {(discordChannels || []).filter(c => c.type === 4).map(c => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+                {lang === 'tr' ? 'Kanal İsim Formatı' : 'Channel Name Format'}
+              </label>
+              <select
+                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+                value={settings.channel_name_format || "name_title"}
+                onChange={(e) => setSettings({ ...settings, channel_name_format: e.target.value })}
+              >
+                <option value="name_title">{lang === 'tr' ? 'İsim - Başlık (Örn: ali-zvz)' : 'Name - Title (e.g. ali-zvz)'}</option>
+                <option value="title_only">{lang === 'tr' ? 'Sadece Başlık (Örn: zvz)' : 'Title Only (e.g. zvz)'}</option>
+                <option value="title_name">{lang === 'tr' ? 'Başlık - İsim (Örn: zvz-ali)' : 'Title - Name (e.g. zvz-ali)'}</option>
+                <option value="type_title">{lang === 'tr' ? 'Kategori/Tür - Başlık (Örn: zvz-avalonda-zvz)' : 'Type - Title (e.g. zvz-avalonda-zvz)'}</option>
+              </select>
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+                {lang === 'tr' ? 'Sabit Mesaj İçeriği' : 'Fixed Message Content'}
+              </label>
+              <textarea
+                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md h-24 custom-scrollbar"
+                placeholder={lang === 'tr' ? "Lütfen bir parti oluşturmak için aşağıdaki butonları kullanın..." : "Please use the buttons below to create a party..."}
+                value={settings.fixed_message_content || ""}
+                onChange={(e) => setSettings({ ...settings, fixed_message_content: e.target.value })}
+              />
+            </div>
+            
+            <div className="md:col-span-2 mt-2">
+              <button
+                className="px-6 py-3 bg-primary-container text-on-primary border border-primary-container rounded-sm font-label-bold text-sm uppercase tracking-widest flex items-center justify-center gap-2 transition-all hover:brightness-110 active:scale-95 tactical-glow"
+                onClick={async () => {
+                   if(!settings.fixed_message_channel_id) return showToast(lang === 'tr' ? "Lütfen kanal seçin!" : "Please select a channel!", "error");
+                   const res = await fetch(`/api/guild-settings/${guildId}/send-fixed-message`, { method: "POST" });
+                   if (res.ok) showToast(lang === 'tr' ? "Sabit mesaj gönderildi!" : "Fixed message sent!", "success");
+                   else showToast(lang === 'tr' ? "Mesaj gönderilirken hata oluştu." : "Error sending message.", "error");
+                }}
+              >
+                {lang === 'tr' ? 'Sabit Mesajı Gönder/Güncelle' : 'Send/Update Fixed Message'}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Search & Select Guild - Moved from Killboard */}
       <div className="glass-panel p-8 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
         <h2 className="font-headline-lg text-2xl text-on-surface mb-2 flex items-center gap-3 uppercase tracking-tight">
