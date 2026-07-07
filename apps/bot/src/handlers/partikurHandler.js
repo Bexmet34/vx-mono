@@ -291,7 +291,7 @@ function getTemplateByIndex(templatesStr, indexStr) {
     } else if (interaction.isButton && interaction.isButton()) {
         await interaction.deferReply({ flags: [MessageFlags.Ephemeral] }).catch(()=>{});
         
-        const { getUserTemplates } = require('../services/userTemplateService');
+        const { getUserTemplates } = require('@veyronix/database');
         const userTemplates = await getUserTemplates(userId) || [];
         const guildTemplates = guildConfig?.party_templates || [];
 
