@@ -87,7 +87,11 @@ async function checkWeeklyVote(userId) {
  * Handles /createparty command
  */
 async function handleCreatePartyCommand(interaction) {
-    const guildConfig = await getGuildConfig(interaction.guildId);
+    const [guildConfig, userPremium] = await Promise.all([
+        getGuildConfig(interaction.guildId).catch(() => null),
+        isUserPremium(interaction.user.id).catch(() => false)
+    ]);
+
     const lang = guildConfig?.language || 'tr';
     const userId = interaction.user.id;
     const isOwner = userId === interaction.guild.ownerId;
@@ -95,7 +99,6 @@ async function handleCreatePartyCommand(interaction) {
 
     // Vote check is moved to Modal Submit (modalHandler) to prevent Discord 3-second timeout!
 
-    const userPremium = await isUserPremium(userId);
     
     const partyCount = getActivePartyCount(userId);
     let limit = 1;

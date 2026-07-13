@@ -127,6 +127,17 @@ function initDb() {
                 UNIQUE(guild_id, user_id)
             )`);
 
+            // Tickets (Active tickets)
+            db.exec(`CREATE TABLE IF NOT EXISTS tickets (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                guild_id TEXT,
+                channel_id TEXT UNIQUE,
+                owner_id TEXT,
+                topic TEXT,
+                status TEXT DEFAULT 'open',
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )`);
+
             // Migrations for existing tables (safe to run multiple times)
             const safeAlter = (sql) => {
                 try { db.exec(sql); } catch (e) { /* column already exists */ }

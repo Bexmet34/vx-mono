@@ -21,6 +21,8 @@ import TemplateTab from "./components/TemplateTab";
 import KillBoardTab from "./components/KillBoardTab";
 import RegistrationTab from "./components/RegistrationTab";
 import RoleMenuTab from "./components/RoleMenuTab";
+import TicketTab from "./components/TicketTab";
+import TicketHistoryTab from "./components/TicketHistoryTab";
 
 function PremiumLock({ lang, t }) {
   return (
@@ -108,6 +110,13 @@ export default function ServerSettings() {
     target_category_id: "",
     channel_name_format: "name_title",
     fixed_message_content: "",
+    ticket_system_enabled: false,
+    ticket_category_id: "",
+    ticket_channel_id: "",
+    ticket_staff_roles: "",
+    ticket_message_title: "Destek Talebi",
+    ticket_message_desc: "Lütfen aşağıdaki menüden bir konu seçerek destek talebinizi oluşturun.",
+    ticket_options: [{"label": "Genel Destek", "value": "genel", "description": "Genel konular hakkında destek alın", "emoji": "📩"}],
   });
   
   const [guildSearchQuery, setGuildSearchQuery] = useState("");
@@ -189,6 +198,13 @@ export default function ServerSettings() {
           target_category_id: s?.target_category_id || "",
           channel_name_format: s?.channel_name_format || "name_title",
           fixed_message_content: s?.fixed_message_content || "",
+          ticket_system_enabled: s?.ticket_system_enabled === true || s?.ticket_system_enabled === 'true',
+          ticket_category_id: s?.ticket_category_id || "",
+          ticket_channel_id: s?.ticket_channel_id || "",
+          ticket_staff_roles: s?.ticket_staff_roles || "",
+          ticket_message_title: s?.ticket_message_title || "Destek Talebi",
+          ticket_message_desc: s?.ticket_message_desc || "Lütfen aşağıdaki menüden bir konu seçerek destek talebinizi oluşturun.",
+          ticket_options: Array.isArray(s?.ticket_options) ? s?.ticket_options : [{"label": "Genel Destek", "value": "genel", "description": "Genel konular hakkında destek alın", "emoji": "📩"}],
         };
         setSettings(loadedSettings);
         setInitialSettings(loadedSettings);
@@ -502,6 +518,12 @@ export default function ServerSettings() {
           <button className={`flex items-center gap-2 px-4 py-2 rounded-full font-label-bold text-sm transition-all whitespace-nowrap ${activeTab === 'rolemenu' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('rolemenu')}>
             <Users size={16} /> Roles
           </button>
+          <button className={`flex items-center gap-2 px-4 py-2 rounded-full font-label-bold text-sm transition-all whitespace-nowrap ${activeTab === 'ticket' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('ticket')}>
+            <Shield size={16} /> Ticket
+          </button>
+          <button className={`flex items-center gap-2 px-4 py-2 rounded-full font-label-bold text-sm transition-all whitespace-nowrap ${activeTab === 'ticket_history' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('ticket_history')}>
+            <Copy size={16} /> Ticket History
+          </button>
         </nav>
       </div>
 
@@ -557,6 +579,14 @@ export default function ServerSettings() {
 
         {activeTab === 'rolemenu' && (
           <RoleMenuTab t={t} lang={lang} guildId={guildId} discordChannels={discordChannels} discordRoles={discordRoles} showToast={showToast} />
+        )}
+
+        {activeTab === 'ticket' && (
+          <TicketTab t={t} lang={lang} settings={settings} setSettings={setSettings} discordChannels={discordChannels} discordRoles={discordRoles} discordMembers={discordMembers} handleSave={handleSave} saving={saving} guildId={guildId} showToast={showToast} isPremium={isPremium} />
+        )}
+
+        {activeTab === 'ticket_history' && (
+          <TicketHistoryTab t={t} lang={lang} guildId={guildId} showToast={showToast} isPremium={isPremium} />
         )}
 
       </main>

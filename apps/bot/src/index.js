@@ -261,6 +261,9 @@ client.on('interactionCreate', async interaction => {
             } else if (interaction.customId.startsWith('fc_')) {
                 const { handleFixedContentButtons } = require('./handlers/fixedContentHandler');
                 await handleFixedContentButtons(interaction);
+            } else if (interaction.customId.startsWith('ticket_')) {
+                const { handleTicketInteraction } = require('./handlers/ticketHandler');
+                await handleTicketInteraction(interaction);
             } else {
                 await handlePartyButtons(interaction);
             }
@@ -288,6 +291,9 @@ client.on('interactionCreate', async interaction => {
             } else if (interaction.customId.startsWith('role_menu_') || interaction.customId.startsWith('custom_role_select_')) {
                 const { handleRoleMenuSelect } = require('./handlers/roleMenuHandler');
                 await handleRoleMenuSelect(interaction);
+            } else if (interaction.customId === 'ticket_topic_select') {
+                const { handleTicketInteraction } = require('./handlers/ticketHandler');
+                await handleTicketInteraction(interaction);
             }
         } else if (interaction.isUserSelectMenu()) {
             if (interaction.customId.startsWith('add_member_user_select_')) {
