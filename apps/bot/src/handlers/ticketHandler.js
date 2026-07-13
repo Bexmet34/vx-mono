@@ -52,9 +52,10 @@ async function handleTicketInteraction(interaction) {
 
         await interaction.update({ content: '⏳ Ticket kanalınız oluşturuluyor...', components: [] });
 
-        const rawName = interaction.member?.displayName || interaction.user.username;
-        const safeName = rawName.replace(/[^a-zA-Z0-9]/g, '').toLowerCase() || 'user';
-        const safeTopic = topicValue.replace(/[^a-zA-Z0-9]/g, '').toLowerCase() || 'ticket';
+        const trMap = { 'ç': 'c', 'ğ': 'g', 'ı': 'i', 'ö': 'o', 'ş': 's', 'ü': 'u', 'Ç': 'c', 'Ğ': 'g', 'İ': 'i', 'Ö': 'o', 'Ş': 's', 'Ü': 'u' };
+        const rawName = (interaction.member?.nickname || interaction.member?.displayName || interaction.user.username).replace(/[çğıöşüÇĞİÖŞÜ]/g, m => trMap[m]);
+        const safeName = rawName.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '').toLowerCase() || 'user';
+        const safeTopic = topicValue.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '').toLowerCase() || 'ticket';
         const channelName = `${safeTopic}-${safeName}`;
 
         const staffRoles = (guildConfig.ticket_staff_roles || "").split(',').map(r => r.trim()).filter(Boolean);
