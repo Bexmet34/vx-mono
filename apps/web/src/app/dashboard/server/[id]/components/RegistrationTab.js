@@ -355,11 +355,27 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
           />
         </div>
         
-        <div className="border-t border-outline-variant/50 my-6"></div>
-        
-        <h3 className="font-headline-md text-xl text-primary-container mb-6 uppercase tracking-tight">
+        <button 
+          className="w-full px-6 py-4 bg-primary-container text-on-primary font-label-bold uppercase tracking-widest tactical-glow rounded-sm transition-all hover:brightness-110 flex items-center justify-center gap-2 mt-4 disabled:opacity-50" 
+          onClick={handleSendSetup} 
+          disabled={!settings.registration_channel_id || sendingSetup}
+        >
+          {sendingSetup ? <Loader2 size={18} className="animate-spin"/> : <Send size={18}/>} 
+          {lang === 'en' ? 'Send Setup Message to Channel' : 'Kurulum Mesajını Kanala Gönder'}
+        </button>
+        <p className="text-center text-xs font-body-md text-on-surface-variant mt-2">
+          {lang === 'en' 
+            ? 'Save your settings first, then click this button to send the persistent message with the Register button.' 
+            : 'Önce ayarları kaydedin, ardından butonu içeren sabit mesajı göndermek için buraya tıklayın.'}
+        </p>
+      </div>
+
+      {/* Post Registration Settings Section */}
+      <div className="glass-panel p-8 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
+        <h2 className="font-headline-lg text-2xl text-on-surface mb-6 flex items-center gap-3 uppercase tracking-tight">
+          <Settings className="text-primary-container" />
           {lang === 'en' ? 'Post-Registration Settings' : 'Kayıt Sonrası İşlemler'}
-        </h3>
+        </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div>
@@ -413,20 +429,6 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
             {lang === 'en' ? 'Variables: {user}, {gamenickname}, {realname}, {age}' : 'Değişkenler: {user}, {gamenickname}, {realname}, {age}'}
           </p>
         </div>
-
-        <button 
-          className="w-full px-6 py-4 bg-primary-container text-on-primary font-label-bold uppercase tracking-widest tactical-glow rounded-sm transition-all hover:brightness-110 flex items-center justify-center gap-2 mt-4 disabled:opacity-50" 
-          onClick={handleSendSetup} 
-          disabled={!settings.registration_channel_id || sendingSetup}
-        >
-          {sendingSetup ? <Loader2 size={18} className="animate-spin"/> : <Send size={18}/>} 
-          {lang === 'en' ? 'Send Setup Message to Channel' : 'Kurulum Mesajını Kanala Gönder'}
-        </button>
-        <p className="text-center text-xs font-body-md text-on-surface-variant mt-2">
-          {lang === 'en' 
-            ? 'Save your settings first, then click this button to send the persistent message with the Register button.' 
-            : 'Önce ayarları kaydedin, ardından butonu içeren sabit mesajı göndermek için buraya tıklayın.'}
-        </p>
 
         {/* Total Registered Count */}
         <div className="mt-8 p-4 bg-surface-container-highest border border-outline-variant text-center rounded-sm">
