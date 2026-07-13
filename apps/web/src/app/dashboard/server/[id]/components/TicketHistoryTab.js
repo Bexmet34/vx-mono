@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Loader2, Trash2, Eye, Calendar, User, MessageSquare, AlertTriangle, X } from "lucide-react";
+import { Loader2, Trash2, Eye, Calendar, User, MessageSquare, AlertTriangle, X, Hash } from "lucide-react";
 
 export default function TicketHistoryTab({ t, lang, guildId, showToast, isPremium }) {
   const [tickets, setTickets] = useState([]);
