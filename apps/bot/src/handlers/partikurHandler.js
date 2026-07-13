@@ -402,7 +402,8 @@ function getTemplateByIndex(templatesStr, indexStr) {
     if (guildConfig?.system_mode === 'fixed_channel' && guildConfig?.target_category_id) {
         try {
             let channelName = 'content';
-            const userName = interaction.user.username.replace(/[^a-zA-Z0-9]/g, '').toLowerCase() || 'user';
+            const rawName = interaction.member?.displayName || interaction.user.globalName || interaction.user.username;
+            const userName = rawName.replace(/[^a-zA-Z0-9]/g, '').toLowerCase() || 'user';
             const safeHeader = header.replace(/[^a-zA-Z0-9ğüşıöçĞÜŞİÖÇ ]/g, '').replace(/\s+/g, '-').toLowerCase() || 'content';
             const format = guildConfig.channel_name_format || 'name_title';
 
