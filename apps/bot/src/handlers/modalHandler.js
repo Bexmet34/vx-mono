@@ -101,7 +101,14 @@ async function handlePartiModal(interaction) {
         if (guildConfig?.system_mode === 'fixed_channel' && guildConfig?.target_category_id) {
             try {
                 let channelName = 'content';
-                const userName = interaction.user.username.replace(/[^a-zA-Z0-9]/g, '').toLowerCase() || 'user';
+                let rawName = (interaction.member?.nickname || interaction.member?.displayName || interaction.user.globalName || interaction.user.username);
+                let extractedName = rawName.replace(/^[\[\(].*?[\]\)]\s*/, '');
+                extractedName = extractedName.split(/[-|/]/)[0].trim();
+                if (!extractedName) extractedName = rawName;
+                
+                const trMap = { 'ç': 'c', 'ğ': 'g', 'ı': 'i', 'ö': 'o', 'ş': 's', 'ü': 'u', 'Ç': 'c', 'Ğ': 'g', 'İ': 'i', 'Ö': 'o', 'Ş': 's', 'Ü': 'u' };
+                extractedName = extractedName.replace(/[çğıöşüÇĞİÖŞÜ]/g, m => trMap[m]);
+                const userName = extractedName.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '').toLowerCase() || 'user';
                 const safeHeader = header.replace(/[^a-zA-Z0-9ğüşıöçĞÜŞİÖÇ ]/g, '').replace(/\s+/g, '-').toLowerCase() || 'content';
                 const format = guildConfig.channel_name_format || 'name_title';
 
