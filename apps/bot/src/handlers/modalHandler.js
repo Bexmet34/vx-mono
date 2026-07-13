@@ -109,7 +109,10 @@ async function handlePartiModal(interaction) {
                 const trMap = { 'ç': 'c', 'ğ': 'g', 'ı': 'i', 'ö': 'o', 'ş': 's', 'ü': 'u', 'Ç': 'c', 'Ğ': 'g', 'İ': 'i', 'Ö': 'o', 'Ş': 's', 'Ü': 'u' };
                 extractedName = extractedName.replace(/[çğıöşüÇĞİÖŞÜ]/g, m => trMap[m]);
                 const userName = extractedName.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '').toLowerCase() || 'user';
-                const safeHeader = header.replace(/[^a-zA-Z0-9ğüşıöçĞÜŞİÖÇ ]/g, '').replace(/\s+/g, '-').toLowerCase() || 'content';
+                let safeHeader = header.replace(/[^a-zA-Z0-9ğüşıöçĞÜŞİÖÇ ]/g, '').replace(/\s+/g, '-').toLowerCase() || 'content';
+                if (safeHeader.length > 25) {
+                    safeHeader = safeHeader.substring(0, 25).replace(/-+$/, '');
+                }
                 const format = guildConfig.channel_name_format || 'name_title';
 
                 if (format === 'name_title') channelName = `${userName}-${safeHeader}`;
