@@ -140,10 +140,11 @@ export default function ServerSettings() {
         const loadedSettings = {
           language: s?.language || "tr",
           embed_thumbnail_url: s?.embed_thumbnail_url || "",
-          log_system_enabled: s?.log_system_enabled || false,
+          log_system_enabled: s?.log_system_enabled === true || s?.log_system_enabled === 'true',
           log_channel_id: s?.log_channel_id || "",
-          log_events: s?.log_events || {
-            message_delete: true, message_edit: true, channel_create: true, channel_delete: true, bot_add: true, member_ban: true
+          log_events: {
+            message_delete: true, message_edit: true, channel_create: true, channel_delete: true, bot_add: true, member_ban: true,
+            ...(typeof s?.log_events === 'string' && s.log_events !== '[object Object]' ? JSON.parse(s.log_events) : (s?.log_events || {}))
           },
           party_templates: s?.party_templates || [],
           albion_guild_id: s?.albion_guild_id || "",

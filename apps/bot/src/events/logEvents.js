@@ -1,8 +1,18 @@
 const { EmbedBuilder, AuditLogEvent, Events } = require('discord.js');
 const { getGuildConfig } = require('../services/guildConfig');
 
+function getLogEvents(settings) {
+    if (!settings) return {};
+    let ev = settings.log_events;
+    if (typeof ev === 'string' && ev !== '[object Object]') {
+        try { ev = JSON.parse(ev); } catch(e) { ev = {}; }
+    }
+    return ev || {};
+}
+
 async function sendLog(guild, settings, embed) {
-    if (!settings?.log_system_enabled || !settings?.log_channel_id) return;
+    const isEnabled = settings?.log_system_enabled === true || settings?.log_system_enabled === 'true';
+    if (!isEnabled || !settings?.log_channel_id) return;
     try {
         const channel = await guild.channels.fetch(settings.log_channel_id).catch(() => null);
         if (channel) {
@@ -16,9 +26,9 @@ async function sendLog(guild, settings, embed) {
 module.exports = (client) => {
     // 1. Message Delete
     client.on(Events.MessageDelete, async (message) => {
-        if (!message.guild || message.author?.bot) return;
+        if (!message.guild || !message.author || message.author.bot) return;
         const settings = await getGuildConfig(message.guild.id);
-        if (!settings?.log_events?.message_delete) return;
+        if (!getLogEvents(settings)?.message_delete) return;
 
         const embed = new EmbedBuilder()
             .setTitle('🗑️ Mesaj Silindi')
@@ -33,11 +43,11 @@ module.exports = (client) => {
 
     // 2. Message Update
     client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
-        if (!oldMessage.guild || oldMessage.author?.bot) return;
+        if (!oldMessage.guild || !oldMessage.author || oldMessage.author.bot) return;
         if (oldMessage.content === newMessage.content) return; // Ignore embed updates
 
         const settings = await getGuildConfig(oldMessage.guild.id);
-        if (!settings?.log_events?.message_edit) return;
+        if (!getLogEvents(settings)?.message_edit) return;
 
         const embed = new EmbedBuilder()
             .setTitle('📝 Mesaj Düzenlendi')
@@ -57,7 +67,7 @@ module.exports = (client) => {
     client.on(Events.ChannelCreate, async (channel) => {
         if (!channel.guild) return;
         const settings = await getGuildConfig(channel.guild.id);
-        if (!settings?.log_events?.channel_create) return;
+        if (!getLogEvents(settings)?.channel_create) return;
 
         let executor = 'Bilinmiyor';
         try {
@@ -85,7 +95,7 @@ module.exports = (client) => {
     client.on(Events.ChannelDelete, async (channel) => {
         if (!channel.guild) return;
         const settings = await getGuildConfig(channel.guild.id);
-        if (!settings?.log_events?.channel_delete) return;
+        if (!getLogEvents(settings)?.channel_delete) return;
 
         let executor = 'Bilinmiyor';
         try {
@@ -114,7 +124,7 @@ module.exports = (client) => {
         if (!member.user.bot) return; // Sadece botları izle
         
         const settings = await getGuildConfig(member.guild.id);
-        if (!settings?.log_events?.bot_add) return;
+        if (!getLogEvents(settings)?.bot_add) return;
 
         let executor = 'Bilinmiyor';
         try {
@@ -142,7 +152,7 @@ module.exports = (client) => {
     // 6. Member Ban Add
     client.on(Events.GuildBanAdd, async (ban) => {
         const settings = await getGuildConfig(ban.guild.id);
-        if (!settings?.log_events?.member_ban) return;
+        if (!getLogEvents(settings)?.member_ban) return;
 
         let executor = 'Bilinmiyor';
         let reason = ban.reason || 'Belirtilmedi';
