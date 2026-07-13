@@ -133,8 +133,8 @@ export default function LogSettingsTab({ t, lang, settings, setSettings, discord
             </div>
           </div>
 
-          <div className="bg-surface-variant p-5 rounded-md border border-white/5 shadow-sm relative group overflow-hidden">
-            <div className="absolute -inset-0.5 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+          <div className="bg-surface-variant p-5 rounded-md border border-white/5 shadow-sm relative group">
+            <div className="absolute -inset-0.5 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none rounded-md"></div>
             <label className="flex items-center gap-2 font-label-bold text-on-surface mb-3 uppercase tracking-wider text-xs">
               <Shield className="w-4 h-4 text-primary" />
               {lang === 'tr' ? 'Muaf Tutulan Kişiler, Botlar ve Roller' : 'Exempted Users, Bots, and Roles'}
