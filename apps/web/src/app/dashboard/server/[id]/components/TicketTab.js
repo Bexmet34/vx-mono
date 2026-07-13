@@ -1,6 +1,7 @@
 import { Save, Info, Hash, Shield, Search, X as XIcon, Users, Plus, Trash2, Send } from "lucide-react";
 import InfoTooltip from "@/components/InfoTooltip";
 import { useState, useRef, useEffect } from "react";
+import TicketHistoryTab from "./TicketHistoryTab";
 
 export default function TicketTab({ t, lang, settings, setSettings, discordChannels, discordRoles = [], discordMembers = [], handleSave, saving, guildId, showToast, isPremium }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -319,6 +320,10 @@ export default function TicketTab({ t, lang, settings, setSettings, discordChann
                 )}
             </div>
         </div>
+      </div>
+
+      <div className="col-span-1 lg:col-span-12 mt-4 border-t border-white/5 pt-8">
+        <TicketHistoryTab t={t} lang={lang} guildId={guildId} showToast={showToast} isPremium={isPremium} />
       </div>
     </div>
   );

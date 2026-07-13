@@ -106,6 +106,7 @@ async function handleTicketInteraction(interaction) {
             const staffMentions = staffRoles.map(id => `<@&${id}>`).join(' ');
             await ticketChannel.send({
                 content: `<@${interaction.user.id}> ${staffMentions}`,
+                allowedMentions: { parse: ['users', 'roles'] },
                 embeds: [welcomeEmbed],
                 components: [closeRow]
             });
@@ -162,6 +163,7 @@ async function handleTicketInteraction(interaction) {
             // Save to Supabase
             const { error: sbError } = await supabase.from('tickets').insert({
                 guild_id: interaction.guildId,
+                channel_id: interaction.channelId,
                 owner_id: ticketRow.owner_id,
                 owner_name: ownerName,
                 topic: ticketRow.topic,

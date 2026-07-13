@@ -521,9 +521,6 @@ export default function ServerSettings() {
           <button className={`flex items-center gap-2 px-4 py-2 rounded-full font-label-bold text-sm transition-all whitespace-nowrap ${activeTab === 'ticket' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('ticket')}>
             <Shield size={16} /> Ticket
           </button>
-          <button className={`flex items-center gap-2 px-4 py-2 rounded-full font-label-bold text-sm transition-all whitespace-nowrap ${activeTab === 'ticket_history' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('ticket_history')}>
-            <Copy size={16} /> Ticket History
-          </button>
         </nav>
       </div>
 
@@ -583,10 +580,6 @@ export default function ServerSettings() {
 
         {activeTab === 'ticket' && (
           <TicketTab t={t} lang={lang} settings={settings} setSettings={setSettings} discordChannels={discordChannels} discordRoles={discordRoles} discordMembers={discordMembers} handleSave={handleSave} saving={saving} guildId={guildId} showToast={showToast} isPremium={isPremium} />
-        )}
-
-        {activeTab === 'ticket_history' && (
-          <TicketHistoryTab t={t} lang={lang} guildId={guildId} showToast={showToast} isPremium={isPremium} />
         )}
 
       </main>
