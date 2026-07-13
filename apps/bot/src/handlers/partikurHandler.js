@@ -414,8 +414,8 @@ function getTemplateByIndex(templatesStr, indexStr) {
             extractedName = extractedName.replace(/[çğıöşüÇĞİÖŞÜ]/g, m => trMap[m]);
             const userName = extractedName.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '').toLowerCase() || 'user';
             let safeHeader = header.replace(/[^a-zA-Z0-9ğüşıöçĞÜŞİÖÇ ]/g, '').replace(/\s+/g, '-').toLowerCase() || 'content';
-            if (safeHeader.length > 25) {
-                safeHeader = safeHeader.substring(0, 25).replace(/-+$/, '');
+            if (safeHeader.length > 15) {
+                safeHeader = safeHeader.substring(0, 15).replace(/-+$/, '');
             }
             const format = guildConfig.channel_name_format || 'name_title';
 
