@@ -218,7 +218,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
             const roleKey = i === 0 ? 'registration_given_role_id' : `registration_given_role_id_${i + 1}`;
             return (
               <div key={roleKey} className="relative">
-                <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2 flex items-center justify-between">
+                <label className="flex items-center justify-between text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
                   <span>{lang === 'en' ? `Given Role ${i + 1}` : `Verilecek Rol ${i + 1}`}</span>
                   {i > 0 && i === visibleRoleCount - 1 && (
                     <button 
@@ -274,7 +274,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
             <div className="bg-surface-container/30 p-5 rounded-lg border border-outline-variant/50">
-            <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2 flex items-center gap-2">
+            <label className="flex items-center gap-2 text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
               <span className="text-secondary">{lang === 'en' ? 'Temporary Guest Role' : 'Geçici Misafir Rolü'}</span>
             </label>
             <p className="text-xs text-on-surface-variant mb-3">

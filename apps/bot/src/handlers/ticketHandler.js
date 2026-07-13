@@ -54,7 +54,8 @@ async function handleTicketInteraction(interaction) {
 
         const rawName = interaction.member?.displayName || interaction.user.username;
         const safeName = rawName.replace(/[^a-zA-Z0-9]/g, '').toLowerCase() || 'user';
-        const channelName = `ticket-${safeName}`;
+        const safeTopic = topicValue.replace(/[^a-zA-Z0-9]/g, '').toLowerCase() || 'ticket';
+        const channelName = `${safeTopic}-${safeName}`;
 
         const staffRoles = (guildConfig.ticket_staff_roles || "").split(',').map(r => r.trim()).filter(Boolean);
 
@@ -90,8 +91,9 @@ async function handleTicketInteraction(interaction) {
             ]);
 
             const welcomeEmbed = new EmbedBuilder()
-                .setTitle(`🎫 ${topicLabel}`)
+                .setTitle(`🎫 Destek Talebi`)
                 .setDescription(`Merhaba <@${interaction.user.id}>, destek talebiniz oluşturuldu.\nLütfen sorununuzu detaylı bir şekilde açıklayın. Yetkililerimiz en kısa sürede size yardımcı olacaktır.`)
+                .addFields({ name: '📌 Konu (Başlık)', value: `**${topicLabel}**`, inline: true })
                 .setColor('#2ecc71')
                 .setTimestamp();
 
@@ -163,7 +165,7 @@ async function handleTicketInteraction(interaction) {
             // Save to Supabase
             const { error: sbError } = await supabase.from('tickets').insert({
                 guild_id: interaction.guildId,
-                channel_id: interaction.channelId,
+                channel_id: ticketRow.channel_id,
                 owner_id: ticketRow.owner_id,
                 owner_name: ownerName,
                 topic: ticketRow.topic,
