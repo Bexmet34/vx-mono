@@ -1,5 +1,5 @@
 import { Save, Info, Hash, Shield } from "lucide-react";
-import InfoTooltip from "./InfoTooltip";
+import InfoTooltip from "@/components/InfoTooltip";
 
 export default function LogSettingsTab({ t, lang, settings, setSettings, discordChannels, handleSave, saving }) {
   const handleToggleEvent = (eventName) => {
