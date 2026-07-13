@@ -82,7 +82,7 @@ export default function LogSettingsTab({ t, lang, settings, setSettings, discord
                 onChange={(e) => setSettings({ ...settings, log_channel_id: e.target.value })}
               >
                 <option value="">{lang === 'tr' ? '-- Kanal Seçin --' : '-- Select Channel --'}</option>
-                {discordChannels?.filter(c => c.type === 0).map((channel) => (
+                {(discordChannels || []).filter(c => c.type === 0).map((channel) => (
                   <option key={channel.id} value={channel.id}>
                     #{channel.name}
                   </option>
@@ -139,12 +139,12 @@ export default function LogSettingsTab({ t, lang, settings, setSettings, discord
           {saving ? (
             <>
               <div className="w-4 h-4 border-2 border-on-primary border-t-transparent rounded-full animate-spin" />
-              {t('common.saving', lang)}
+              {t.dSaving || (lang === 'en' ? 'Saving...' : 'Kaydediliyor...')}
             </>
           ) : (
             <>
               <Save className="w-4 h-4" />
-              {t('common.save', lang)}
+              {t.dSave || (lang === 'en' ? 'Save Settings' : 'Ayarları Kaydet')}
             </>
           )}
         </button>
