@@ -95,6 +95,8 @@ async function handleCreatePartyCommand(interaction) {
 
     // Vote check is moved to Modal Submit (modalHandler) to prevent Discord 3-second timeout!
 
+    const userPremium = await isUserPremium(userId);
+    
     const partyCount = getActivePartyCount(userId);
     let limit = 1;
     if (isOwner || isDeveloper || userPremium) limit = 999;
