@@ -72,6 +72,7 @@ export default function ServerSettings() {
     embed_thumbnail_url: "",
     log_system_enabled: false,
     log_channel_id: "",
+    log_exempts: "",
     log_events: {
       message_delete: true,
       message_edit: true,
@@ -146,6 +147,13 @@ export default function ServerSettings() {
             message_delete: true, message_edit: true, channel_create: true, channel_delete: true, bot_add: true, member_ban: true,
             ...(typeof s?.log_events === 'string' && s.log_events !== '[object Object]' ? JSON.parse(s.log_events) : (s?.log_events || {}))
           },
+          log_exempts: (() => {
+            let ev = s?.log_events;
+            if (typeof ev === 'string' && ev !== '[object Object]') {
+                try { ev = JSON.parse(ev); } catch(e) { ev = {}; }
+            }
+            return (ev && ev.exempts) ? ev.exempts : "";
+          })(),
           party_templates: s?.party_templates || [],
           albion_guild_id: s?.albion_guild_id || "",
           albion_guild_name: s?.albion_guild_name || "",

@@ -93,6 +93,23 @@ export default function LogSettingsTab({ t, lang, settings, setSettings, discord
               </div>
             </div>
           </div>
+
+          <div className="bg-surface-variant p-5 rounded-md border border-white/5 shadow-sm relative group overflow-hidden">
+            <div className="absolute -inset-0.5 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+            <label className="flex items-center gap-2 font-label-bold text-on-surface mb-3 uppercase tracking-wider text-xs">
+              <Shield className="w-4 h-4 text-primary" />
+              {lang === 'tr' ? 'Muaf Tutulan IDler' : 'Exempted IDs'}
+              <InfoTooltip text={lang === 'tr' ? 'Loglanmasını istemediğiniz kişi veya botların IDlerini virgül veya boşluk ile ayırarak yazın.' : 'Enter IDs of users or bots you want to exclude from logs, separated by commas or spaces.'} />
+            </label>
+            <div className="relative">
+              <textarea
+                className="w-full bg-surface text-on-surface p-3 rounded-sm outline-none border border-white/10 focus:border-primary/50 transition-colors resize-y min-h-[100px]"
+                placeholder={lang === 'tr' ? "123456789012345678, 987654321098765432" : "123456789012345678, 987654321098765432"}
+                value={settings?.log_exempts || ""}
+                onChange={(e) => setSettings({ ...settings, log_exempts: e.target.value })}
+              ></textarea>
+            </div>
+          </div>
         </div>
 
         {/* Sağ Kolon: Event Seçimi */}

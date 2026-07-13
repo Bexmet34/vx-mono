@@ -10,6 +10,22 @@ function getLogEvents(settings) {
     return ev || {};
 }
 
+function isExempt(settings, user, member) {
+    let ev = getLogEvents(settings);
+    if (!ev || !ev.exempts) return false;
+    let exempts = ev.exempts;
+    if (typeof exempts === 'string') {
+        exempts = exempts.split(/[\s,]+/).filter(Boolean);
+    }
+    if (Array.isArray(exempts)) {
+        if (user && exempts.includes(user.id)) return true;
+        if (member && member.roles && member.roles.cache) {
+            return member.roles.cache.some(role => exempts.includes(role.id));
+        }
+    }
+    return false;
+}
+
 async function sendLog(guild, settings, embed) {
     const isEnabled = settings?.log_system_enabled === true || settings?.log_system_enabled === 'true';
     if (!isEnabled || !settings?.log_channel_id) return;
@@ -29,11 +45,12 @@ module.exports = (client) => {
         if (!message.guild || !message.author || message.author.bot) return;
         const settings = await getGuildConfig(message.guild.id);
         if (!getLogEvents(settings)?.message_delete) return;
+        if (isExempt(settings, message.author, message.member)) return;
 
         const embed = new EmbedBuilder()
             .setTitle('🗑️ Mesaj Silindi')
             .setColor('#EF4444')
-            .setDescription(`**${message.author.tag}** adlı kullanıcının mesajı <#${message.channel.id}> kanalında silindi.`)
+            .setDescription(`<@${message.author.id}> adlı kullanıcının mesajı <#${message.channel.id}> kanalında silindi.`)
             .addFields({ name: 'Mesaj İçeriği', value: message.content || '*İçerik yok veya resim*', inline: false })
             .setFooter({ text: `Kullanıcı ID: ${message.author.id}` })
             .setTimestamp();
@@ -48,11 +65,12 @@ module.exports = (client) => {
 
         const settings = await getGuildConfig(oldMessage.guild.id);
         if (!getLogEvents(settings)?.message_edit) return;
+        if (isExempt(settings, oldMessage.author, oldMessage.member)) return;
 
         const embed = new EmbedBuilder()
             .setTitle('📝 Mesaj Düzenlendi')
             .setColor('#F59E0B')
-            .setDescription(`**${oldMessage.author.tag}** mesajını <#${oldMessage.channel.id}> kanalında düzenledi.`)
+            .setDescription(`<@${oldMessage.author.id}> mesajını <#${oldMessage.channel.id}> kanalında düzenledi.`)
             .addFields(
                 { name: 'Eski Mesaj', value: oldMessage.content?.substring(0, 1024) || '*İçerik yok*', inline: false },
                 { name: 'Yeni Mesaj', value: newMessage.content?.substring(0, 1024) || '*İçerik yok*', inline: false }
