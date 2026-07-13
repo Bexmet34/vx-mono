@@ -1,7 +1,46 @@
-import { Save, Info, Hash, Shield } from "lucide-react";
+import { Save, Info, Hash, Shield, Search, X as XIcon, User, Bot, Users } from "lucide-react";
 import InfoTooltip from "@/components/InfoTooltip";
+import { useState, useRef, useEffect } from "react";
 
-export default function LogSettingsTab({ t, lang, settings, setSettings, discordChannels, handleSave, saving }) {
+export default function LogSettingsTab({ t, lang, settings, setSettings, discordChannels, discordRoles = [], discordMembers = [], handleSave, saving }) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const selectedIds = (settings?.log_exempts || "").split(/[\s,]+/).filter(Boolean);
+
+  const handleAddId = (id) => {
+    if (!selectedIds.includes(id)) {
+      const newIds = [...selectedIds, id];
+      setSettings({ ...settings, log_exempts: newIds.join(", ") });
+    }
+    setSearchQuery("");
+    setIsDropdownOpen(false);
+  };
+
+  const handleRemoveId = (id) => {
+    const newIds = selectedIds.filter(sid => sid !== id);
+    setSettings({ ...settings, log_exempts: newIds.join(", ") });
+  };
+
+  const options = [
+    ...discordRoles.map(r => ({ id: r.id, name: r.name, type: 'role', icon: <Users size={14} /> })),
+    ...discordMembers.map(m => ({ id: m.id, name: m.username || m.global_name, type: m.bot ? 'bot' : 'user', icon: m.bot ? <Bot size={14} /> : <User size={14} /> }))
+  ];
+
+  const filteredOptions = options.filter(opt => 
+    opt.name.toLowerCase().includes(searchQuery.toLowerCase()) || opt.id.includes(searchQuery)
+  );
   const handleToggleEvent = (eventName) => {
     const currentEvents = settings?.log_events || {};
     const newValue = !currentEvents[eventName];
@@ -98,16 +137,64 @@ export default function LogSettingsTab({ t, lang, settings, setSettings, discord
             <div className="absolute -inset-0.5 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
             <label className="flex items-center gap-2 font-label-bold text-on-surface mb-3 uppercase tracking-wider text-xs">
               <Shield className="w-4 h-4 text-primary" />
-              {lang === 'tr' ? 'Muaf Tutulan IDler' : 'Exempted IDs'}
-              <InfoTooltip text={lang === 'tr' ? 'Loglanmasını istemediğiniz kişi veya botların IDlerini virgül veya boşluk ile ayırarak yazın.' : 'Enter IDs of users or bots you want to exclude from logs, separated by commas or spaces.'} />
+              {lang === 'tr' ? 'Muaf Tutulan Kişiler, Botlar ve Roller' : 'Exempted Users, Bots, and Roles'}
+              <InfoTooltip text={lang === 'tr' ? 'Loglanmasını istemediğiniz kişi, bot veya rolleri seçin.' : 'Select users, bots, or roles you want to exclude from logs.'} />
             </label>
-            <div className="relative">
-              <textarea
-                className="w-full bg-surface text-on-surface p-3 rounded-sm outline-none border border-white/10 focus:border-primary/50 transition-colors resize-y min-h-[100px]"
-                placeholder={lang === 'tr' ? "123456789012345678, 987654321098765432" : "123456789012345678, 987654321098765432"}
-                value={settings?.log_exempts || ""}
-                onChange={(e) => setSettings({ ...settings, log_exempts: e.target.value })}
-              ></textarea>
+            <div className="relative" ref={dropdownRef}>
+              <div className="min-h-[50px] w-full bg-surface text-on-surface p-2 rounded-sm border border-white/10 focus-within:border-primary/50 transition-colors flex flex-wrap gap-2 items-center">
+                {selectedIds.map(id => {
+                  const opt = options.find(o => o.id === id);
+                  return (
+                    <div key={id} className="flex items-center gap-1 bg-surface-variant border border-white/10 px-2 py-1 rounded-sm text-xs font-medium">
+                      {opt ? opt.icon : <Hash size={14} />}
+                      <span className="max-w-[120px] truncate">{opt ? opt.name : id}</span>
+                      <button onClick={() => handleRemoveId(id)} className="ml-1 text-on-surface-variant hover:text-red-400 transition-colors">
+                        <XIcon size={12} />
+                      </button>
+                    </div>
+                  );
+                })}
+                <input
+                  type="text"
+                  className="flex-1 bg-transparent outline-none min-w-[150px] text-sm py-1"
+                  placeholder={lang === 'tr' ? "Aramak için yazın..." : "Type to search..."}
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setIsDropdownOpen(true);
+                  }}
+                  onFocus={() => setIsDropdownOpen(true)}
+                />
+              </div>
+
+              {isDropdownOpen && (
+                <div className="absolute z-50 mt-1 w-full max-h-[250px] overflow-y-auto bg-surface-variant border border-white/10 rounded-sm shadow-xl custom-scrollbar">
+                  {filteredOptions.length > 0 ? (
+                    filteredOptions.map(opt => (
+                      <button
+                        key={opt.id}
+                        onClick={() => handleAddId(opt.id)}
+                        disabled={selectedIds.includes(opt.id)}
+                        className={`w-full text-left px-3 py-2 flex items-center justify-between text-sm transition-colors ${selectedIds.includes(opt.id) ? 'opacity-50 cursor-not-allowed bg-surface/30' : 'hover:bg-surface'}`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className={`${opt.type === 'role' ? 'text-purple-400' : opt.type === 'bot' ? 'text-blue-400' : 'text-gray-300'}`}>
+                            {opt.icon}
+                          </span>
+                          <span className="truncate max-w-[200px]">{opt.name}</span>
+                        </div>
+                        <span className="text-[10px] text-on-surface-variant bg-surface px-1.5 py-0.5 rounded border border-white/5 uppercase">
+                          {opt.type}
+                        </span>
+                      </button>
+                    ))
+                  ) : (
+                    <div className="p-3 text-sm text-on-surface-variant text-center">
+                      {lang === 'tr' ? 'Sonuç bulunamadı.' : 'No results found.'}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>

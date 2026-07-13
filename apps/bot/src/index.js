@@ -36,7 +36,7 @@ const client = new Client({
         GatewayIntentBits.DirectMessages,
         GatewayIntentBits.GuildEmojisAndStickers,
         GatewayIntentBits.GuildMessageReactions,
-        GatewayIntentBits.MessageContent
+        // GatewayIntentBits.MessageContent // BUNDAN DOLAYI ÇÖKÜYOR! DISCORD DEVELOPER PORTAL'DAN "MESSAGE CONTENT INTENT" AÇILANA KADAR KAPALI KALMALI
     ],
     partials: [Partials.Channel, Partials.Message, Partials.Reaction],
 });

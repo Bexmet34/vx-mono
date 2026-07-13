@@ -536,7 +536,7 @@ export default function ServerSettings() {
         )}
 
         {activeTab === 'log' && (
-          <LogSettingsTab t={t} lang={lang} settings={settings} setSettings={setSettings} discordChannels={discordChannels} handleSave={handleSave} saving={saving} />
+          <LogSettingsTab t={t} lang={lang} settings={settings} setSettings={setSettings} discordChannels={discordChannels} discordRoles={discordRoles} discordMembers={discordMembers} handleSave={handleSave} saving={saving} />
         )}
 
         {activeTab === 'templates' && (

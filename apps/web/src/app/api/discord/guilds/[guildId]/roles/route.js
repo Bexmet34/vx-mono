@@ -58,7 +58,8 @@ export async function GET(req, { params }) {
           id: m.user.id,
           username: m.user.username,
           global_name: m.user.global_name,
-          avatar: m.user.avatar
+          avatar: m.user.avatar,
+          bot: m.user.bot || false
         }));
       } else {
         console.warn(`[API] Could not fetch members for ${guildId}: ${memRes.status}`);
