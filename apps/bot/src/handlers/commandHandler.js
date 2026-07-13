@@ -5,7 +5,6 @@ const config = require('../config/config');
 const { createHelpEmbed } = require('../builders/embedBuilder');
 const { safeReply } = require('../utils/interactionUtils');
 const { hasActiveParty, setActiveParty, getActiveParties, removeActiveParty, getActivePartyCount } = require('../services/partyManager');
-const { addToWhitelist, removeFromWhitelist, isWhitelisted } = require('../services/whitelistManager');
 const db = require('../services/db');
 const { getGuildConfig, updateGuildConfig } = require('../services/guildConfig');
 
@@ -150,62 +149,7 @@ async function handleClosePartyCommand(interaction) {
     }
 }
 
-/**
- * Handles /whitelistadd command
- */
-async function handleWhitelistAddCommand(interaction) {
-    const guildConfig = await getGuildConfig(interaction.guildId);
-    const lang = guildConfig?.language || 'tr';
 
-    const userId = interaction.user.id;
-    const isBotOwner = userId === config.OWNER_ID;
-    const isGuildOwner = interaction.guild && userId === interaction.guild.ownerId;
-    const isAdmin = interaction.member.permissions.has(PermissionFlagsBits.Administrator);
-
-    if (!isBotOwner && !isGuildOwner && !isAdmin) {
-        return await safeReply(interaction, { content: `❌ ${t('common.owner_only', lang)}`, flags: [MessageFlags.Ephemeral] });
-    }
-
-    const targetUser = interaction.options.getUser('user');
-
-    if (await addToWhitelist(targetUser.id, interaction.guildId)) {
-        return await safeReply(interaction, {
-            content: `✅ **${targetUser.tag}** ${t('whitelist.added', lang)}`,
-            flags: [MessageFlags.Ephemeral]
-        });
-    } else {
-        return await safeReply(interaction, {
-            content: `❌ **${targetUser.tag}** ${t('whitelist.already_in', lang)}`,
-            flags: [MessageFlags.Ephemeral]
-        });
-    }
-}
-
-/**
- * Handles /whitelistremove command
- */
-async function handleWhitelistRemoveCommand(interaction) {
-    const guildConfig = await getGuildConfig(interaction.guildId);
-    const lang = guildConfig?.language || 'tr';
-
-    const userId = interaction.user.id;
-    const isBotOwner = userId === config.OWNER_ID;
-    const isGuildOwner = interaction.guild && userId === interaction.guild.ownerId;
-    const isAdmin = interaction.member.permissions.has(PermissionFlagsBits.Administrator);
-
-    if (!isBotOwner && !isGuildOwner && !isAdmin) {
-        return await safeReply(interaction, { content: `❌ ${t('common.owner_only', lang)}`, flags: [MessageFlags.Ephemeral] });
-    }
-
-    const targetUser = interaction.options.getUser('user');
-
-    if (await removeFromWhitelist(targetUser.id, interaction.guildId)) {
-        return await safeReply(interaction, {
-            content: `✅ **${targetUser.tag}** ${t('whitelist.removed', lang)}`,
-            flags: [MessageFlags.Ephemeral]
-        });
-    }
-}
 
 /**
  * Handles /settings command
@@ -702,8 +646,7 @@ module.exports = {
     handleHelpCommand,
     handleVoteCommand,
     handleClosePartyCommand,
-    handleWhitelistAddCommand,
-    handleWhitelistRemoveCommand,
+
     handleSettingsCommand,
     handleServersCommand,
     handleSubscriptionCommand,

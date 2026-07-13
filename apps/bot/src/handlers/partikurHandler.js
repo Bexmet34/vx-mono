@@ -1,6 +1,5 @@
 const { MessageFlags, ActionRowBuilder, TextInputBuilder, TextInputStyle, ModalBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, ChannelType } = require('discord.js');
 const { getActivePartyCount, setActiveParty } = require('../services/partyManager');
-const { isWhitelisted } = require('../services/whitelistManager');
 const { getGuildConfig } = require('../services/guildConfig');
 const { t } = require('../services/i18n');
 const config = require('../config/config');
@@ -96,18 +95,12 @@ async function handleCreatePartyCommand(interaction) {
 
     // Vote check is moved to Modal Submit (modalHandler) to prevent Discord 3-second timeout!
 
-    const whitelisted = isOwner || isDeveloper || await isWhitelisted(userId, interaction.guildId);
-    const userPremium = await isUserPremium(userId);
-
     const partyCount = getActivePartyCount(userId);
     let limit = 1;
-    if (whitelisted) limit = 3;
-    if (isDeveloper || userPremium) limit = 999;
+    if (isOwner || isDeveloper || userPremium) limit = 999;
 
     if (partyCount >= limit) {
-        let errorMsg = whitelisted
-            ? `❌ **${t('party.limit_reached', lang)}**\n\n${t('party.limit_desc_whitelisted', lang)}`
-            : `❌ **${t('party.already_active', lang)}**\n\n${t('party.limit_desc_normal', lang)}`;
+        let errorMsg = `❌ **${t('party.already_active', lang)}**\n\n${t('party.limit_desc_normal', lang)}`;
 
         return await interaction.reply({
             content: errorMsg,
@@ -252,18 +245,12 @@ async function handleTempCommand(interaction) {
         }
     }
 
-    // Check Limits
-    const whitelisted = isOwner || isDeveloper || await isWhitelisted(userId, interaction.guildId);
-
     const partyCount = getActivePartyCount(userId);
     let limit = 1;
-    if (whitelisted) limit = 3;
-    if (isDeveloper || userPremium) limit = 999;
+    if (isOwner || isDeveloper || userPremium) limit = 999;
 
     if (partyCount >= limit) {
-        let errorMsg = whitelisted
-            ? `❌ **${t('party.limit_reached', lang)}**\n\n${t('party.limit_desc_whitelisted', lang)}`
-            : `❌ **${t('party.already_active', lang)}**\n\n${t('party.limit_desc_normal', lang)}`;
+        let errorMsg = `❌ **${t('party.already_active', lang)}**\n\n${t('party.limit_desc_normal', lang)}`;
 
         return await interaction.reply({
             content: errorMsg,

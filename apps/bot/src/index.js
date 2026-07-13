@@ -7,7 +7,7 @@ const config = require('./config/config');
 const fs = require('fs');
 const path = require('path');
 const { registerCommands } = require('./services/commandRegistration');
-const { handleHelpCommand, handleVoteCommand, handleClosePartyCommand, handleWhitelistAddCommand, handleWhitelistRemoveCommand, handleSettingsCommand, handleServersCommand, handleSubscriptionCommand, handleSubscriptionSelect, handleSubscriptionModal, handleSetupObjectiveSystemCommand, handleSetupGuildCommand, handleSetupKillBoardCommand } = require('./handlers/commandHandler');
+const { handleHelpCommand, handleVoteCommand, handleClosePartyCommand, handleSettingsCommand, handleServersCommand, handleSubscriptionCommand, handleSubscriptionSelect, handleSubscriptionModal, handleSetupObjectiveSystemCommand, handleSetupGuildCommand, handleSetupKillBoardCommand } = require('./handlers/commandHandler');
 
 const { handleCreatePartyCommand, handleTempCommand, handleTempAutocomplete, handleMyTempsCommand } = require('./handlers/partikurHandler');
 
@@ -39,6 +39,9 @@ const client = new Client({
     ],
     partials: [Partials.Channel, Partials.Message, Partials.Reaction],
 });
+
+// Register log events
+require('./events/logEvents')(client);
 
 // Error handling to prevent crashes
 client.on('error', async error => {
@@ -222,10 +225,6 @@ client.on('interactionCreate', async interaction => {
                 await handleTempCommand(interaction);
             } else if (interaction.commandName === 'closeparty') {
                 await handleClosePartyCommand(interaction);
-            } else if (interaction.commandName === 'whitelistadd') {
-                await handleWhitelistAddCommand(interaction);
-            } else if (interaction.commandName === 'whitelistremove') {
-                await handleWhitelistRemoveCommand(interaction);
             } else if (interaction.commandName === 'settings') {
                 await handleSettingsCommand(interaction);
             } else if (interaction.commandName === 'servers') {

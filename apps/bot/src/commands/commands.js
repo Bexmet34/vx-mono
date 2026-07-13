@@ -14,22 +14,6 @@ const commands = [
         .setDescription('Manually end your active parties.'),
 
     new SlashCommandBuilder()
-        .setName('whitelistadd')
-        .setDescription('Add a user to the whitelist (Can create up to 3 parties).')
-        .addUserOption(option =>
-            option.setName('user')
-                .setDescription('User to add')
-                .setRequired(true)),
-
-    new SlashCommandBuilder()
-        .setName('whitelistremove')
-        .setDescription('Remove a user from the whitelist.')
-        .addUserOption(option =>
-            option.setName('user')
-                .setDescription('User to remove')
-                .setRequired(true)),
-
-    new SlashCommandBuilder()
         .setName('temp')
         .setDescription('Web dashboard üzerinden kaydettiğiniz şablonları kullanarak hızlı parti kurar.')
         .addStringOption(option =>

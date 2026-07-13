@@ -113,12 +113,8 @@ function initDb() {
                 FOREIGN KEY(objective_id) REFERENCES objectives(id) ON DELETE CASCADE
             )`);
 
-            // Per-guild whitelist for party limit bypass
-            db.exec(`CREATE TABLE IF NOT EXISTS guild_whitelist (
-                guild_id TEXT,
-                user_id TEXT,
-                PRIMARY KEY (guild_id, user_id)
-            )`);
+            // Remove old per-guild whitelist table
+            db.exec(`DROP TABLE IF EXISTS guild_whitelist`);
 
             // Guild Registrations
             db.exec(`CREATE TABLE IF NOT EXISTS guild_registrations (

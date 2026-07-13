@@ -63,7 +63,8 @@ export async function POST(req, { params }) {
     const body = await req.json();
 
     const { 
-      language, auto_role_sync, embed_thumbnail_url, whitelist, party_templates,
+      language, auto_role_sync, embed_thumbnail_url, party_templates,
+      log_system_enabled, log_channel_id, log_events,
       albion_guild_id, albion_guild_name, albion_server, killboard_channel_id, killboard_time,
       registration_enabled, registration_channel_id, registration_staff_role_ids,
       registration_category_id, registration_welcome_message, registration_given_role_id,
@@ -88,7 +89,9 @@ export async function POST(req, { params }) {
           language: language ?? 'tr',
           auto_role_sync: auto_role_sync ?? false,
           embed_thumbnail_url: embed_thumbnail_url || null,
-          whitelist: Array.isArray(whitelist) ? whitelist : [],
+          log_system_enabled: log_system_enabled ?? false,
+          log_channel_id: log_channel_id || null,
+          log_events: log_events || {"message_delete": true, "message_edit": true, "channel_create": true, "channel_delete": true, "bot_add": true, "member_ban": true},
           party_templates: Array.isArray(party_templates) ? party_templates : [],
           albion_guild_id: albion_guild_id || null,
           albion_guild_name: albion_guild_name || null,

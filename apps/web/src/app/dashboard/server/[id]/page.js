@@ -16,7 +16,7 @@ import Logo from "@/components/Logo";
 import OverviewTab from "./components/OverviewTab";
 import GeneralTab from "./components/GeneralTab";
 import VisualTab from "./components/VisualTab";
-import WhitelistTab from "./components/WhitelistTab";
+import LogSettingsTab from "./components/LogSettingsTab";
 import TemplateTab from "./components/TemplateTab";
 import KillBoardTab from "./components/KillBoardTab";
 import RegistrationTab from "./components/RegistrationTab";
@@ -70,7 +70,16 @@ export default function ServerSettings() {
   const [settings, setSettings] = useState({
     language: "tr",
     embed_thumbnail_url: "",
-    whitelist: [],
+    log_system_enabled: false,
+    log_channel_id: "",
+    log_events: {
+      message_delete: true,
+      message_edit: true,
+      channel_create: true,
+      channel_delete: true,
+      bot_add: true,
+      member_ban: true
+    },
     party_templates: [],
     albion_guild_id: "",
     albion_guild_name: "",
@@ -108,9 +117,6 @@ export default function ServerSettings() {
   const [killboardPreview, setKillboardPreview] = useState(null);
   const [loadingPreview, setLoadingPreview] = useState(false);
   const [guildDetail, setGuildDetail] = useState(null);
-  
-  const [whitelistSearch, setWhitelistSearch] = useState("");
-  const [whitelistAddTab, setWhitelistAddTab] = useState("roles");
   const [thumbError, setThumbError] = useState(null);
   const [uploadingThumb, setUploadingThumb] = useState(false);
   const [discordRoles, setDiscordRoles] = useState([]);
@@ -134,7 +140,11 @@ export default function ServerSettings() {
         const loadedSettings = {
           language: s?.language || "tr",
           embed_thumbnail_url: s?.embed_thumbnail_url || "",
-          whitelist: s?.whitelist || [],
+          log_system_enabled: s?.log_system_enabled || false,
+          log_channel_id: s?.log_channel_id || "",
+          log_events: s?.log_events || {
+            message_delete: true, message_edit: true, channel_create: true, channel_delete: true, bot_add: true, member_ban: true
+          },
           party_templates: s?.party_templates || [],
           albion_guild_id: s?.albion_guild_id || "",
           albion_guild_name: s?.albion_guild_name || "",
@@ -410,10 +420,6 @@ export default function ServerSettings() {
     }
   };
 
-  const removeWhitelistId = (id) => {
-    setSettings(prev => ({ ...prev, whitelist: prev.whitelist.filter(item => item !== id) }));
-  };
-
   const renderStatus = (err) => {
     if (!err) return null;
     return (
@@ -472,8 +478,8 @@ export default function ServerSettings() {
           <button className={`flex items-center gap-2 px-4 py-2 rounded-full font-label-bold text-sm transition-all whitespace-nowrap ${activeTab === 'embed' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('embed')}>
             <ImageIcon size={18} /> Branding
           </button>
-          <button className={`flex items-center gap-2 px-4 py-2 rounded-full font-label-bold text-sm transition-all whitespace-nowrap ${activeTab === 'whitelist' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('whitelist')}>
-            <Users size={18} /> Access
+          <button className={`flex items-center gap-2 px-4 py-2 rounded-full font-label-bold text-sm transition-all whitespace-nowrap ${activeTab === 'log' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('log')}>
+            <Shield size={18} /> Logs
           </button>
           <button className={`flex items-center gap-2 px-4 py-2 rounded-full font-label-bold text-sm transition-all whitespace-nowrap ${activeTab === 'templates' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('templates')}>
             <Copy size={18} /> Templates
@@ -520,8 +526,8 @@ export default function ServerSettings() {
           )
         )}
 
-        {activeTab === 'whitelist' && (
-          <WhitelistTab t={t} settings={settings} setSettings={setSettings} whitelistAddTab={whitelistAddTab} setWhitelistAddTab={setWhitelistAddTab} searchQuery={whitelistSearch} setSearchQuery={setWhitelistSearch} discordRoles={discordRoles} discordMembers={discordMembers} removeWhitelistId={removeWhitelistId} handleSave={handleSave} saving={saving} />
+        {activeTab === 'log' && (
+          <LogSettingsTab t={t} lang={lang} settings={settings} setSettings={setSettings} discordChannels={discordChannels} handleSave={handleSave} saving={saving} />
         )}
 
         {activeTab === 'templates' && (

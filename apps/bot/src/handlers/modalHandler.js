@@ -2,7 +2,7 @@ const { createPartikurEmbed } = require('../builders/embedBuilder');
 const { createCustomPartyComponents } = require('../builders/componentBuilder');
 const { safeReply } = require('../utils/interactionUtils');
 const { getActivePartyCount, setActiveParty } = require('../services/partyManager');
-const { isWhitelisted } = require('../services/whitelistManager');
+
 const { getPlayerInfo, formatFame } = require('../services/albionService');
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, PermissionFlagsBits, MessageFlags } = require('discord.js');
 const { checkWeeklyVote } = require('./partikurHandler');
@@ -30,8 +30,7 @@ async function handlePartiModal(interaction) {
         const userId = interaction.user.id;
         const isOwner = userId === interaction.guild?.ownerId;
         const isDeveloper = config.WHITELIST_USERS?.includes(userId);
-        const whitelisted = isOwner || isDeveloper || await isWhitelisted(userId, interaction.guildId);
-        
+
         // 0. Subscription & Vote Check
         const userPremium = await isUserPremium(userId);
         const needsVote = !(isDeveloper || userPremium);
@@ -68,13 +67,10 @@ async function handlePartiModal(interaction) {
 
         const partyCount = getActivePartyCount(userId);
         let limit = 1;
-        if (whitelisted) limit = 3;
-        if (isDeveloper || userPremium) limit = 999;
+        if (isOwner || isDeveloper || userPremium) limit = 999;
 
         if (partyCount >= limit) {
-            let errorMsg = whitelisted
-                ? `❌ **${t('party.limit_reached', lang)}**\n\n${t('party.limit_desc_whitelisted', lang)}`
-                : `❌ **${t('party.already_active', lang)}**\n\n${t('party.limit_desc_normal', lang)}`;
+            let errorMsg = `❌ **${t('party.already_active', lang)}**\n\n${t('party.limit_desc_normal', lang)}`;
 
             return await interaction.editReply({
                 content: errorMsg
