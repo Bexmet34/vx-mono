@@ -477,7 +477,15 @@ export default function ServerSettings() {
               <span className="w-1.5 h-1.5 bg-primary-container rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
               <span className="w-1.5 h-1.5 bg-primary-container rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
               <span className="w-1.5 h-1.5 bg-primary-container rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
-            </span    <div className="min-h-screen flex flex-col pt-24 bg-background relative overflow-x-hidden" suppressHydrationWarning>
+            </span>
+          </h2>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen flex flex-col pt-24 bg-background relative overflow-x-hidden" suppressHydrationWarning>
       <ToastContainer toasts={toasts} />
       
       <div className="flex-1 w-full max-w-[1400px] mx-auto flex flex-col md:flex-row gap-8 px-4 md:px-8 py-10 pb-32">
