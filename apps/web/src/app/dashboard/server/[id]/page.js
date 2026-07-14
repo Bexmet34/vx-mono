@@ -485,7 +485,7 @@ export default function ServerSettings() {
   );
 
   return (
-    <div className="min-h-screen flex flex-col pt-24 bg-background relative overflow-x-hidden" suppressHydrationWarning>
+    <div className="min-h-screen flex flex-col pt-24 bg-background relative" suppressHydrationWarning>
       <ToastContainer toasts={toasts} />
       
       <div className="flex-1 w-full max-w-[1400px] mx-auto flex flex-col md:flex-row gap-8 px-4 md:px-8 py-10 pb-32">
