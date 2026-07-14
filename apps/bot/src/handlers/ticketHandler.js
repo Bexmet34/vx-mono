@@ -132,8 +132,8 @@ async function handleTicketInteraction(interaction) {
         const staffRoles = (guildConfig.ticket_staff_roles || "").split(',').map(r => r.trim()).filter(Boolean);
         const isStaff = interaction.member.roles.cache.some(r => staffRoles.includes(r.id)) || interaction.member.permissions.has('Administrator');
         
-        if (!isStaff && interaction.user.id !== ticketRow.owner_id) {
-            return interaction.reply({ content: 'Bu ticketı sadece sahibi veya yetkililer kapatabilir.', flags: [MessageFlags.Ephemeral] });
+        if (!isStaff) {
+            return interaction.reply({ content: 'Bu ticketı sadece yetkililer kapatabilir.', flags: [MessageFlags.Ephemeral] });
         }
 
         await interaction.reply({ content: '⏳ Ticket kapatılıyor, döküm alınıyor ve kanal siliniyor...' });
