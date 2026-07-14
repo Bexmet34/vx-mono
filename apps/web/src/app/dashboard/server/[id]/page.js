@@ -477,67 +477,78 @@ export default function ServerSettings() {
               <span className="w-1.5 h-1.5 bg-primary-container rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
               <span className="w-1.5 h-1.5 bg-primary-container rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
               <span className="w-1.5 h-1.5 bg-primary-container rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
-            </span>
-          </h2>
-        </div>
-      </div>
-    </div>
-  );
-
-  return (
-    <div className="min-h-screen flex flex-col pt-24 bg-background relative overflow-x-hidden" suppressHydrationWarning>
+            </span    <div className="min-h-screen flex flex-col pt-24 bg-background relative overflow-x-hidden" suppressHydrationWarning>
       <ToastContainer toasts={toasts} />
       
-      {/* Floating Dock Navigation */}
-      <div className="relative z-50 flex justify-center px-4 pt-12 pb-4 pointer-events-none">
-        <nav className="flex items-center gap-2 bg-surface-container-high/80 backdrop-blur-xl border border-outline-variant p-2 rounded-full pointer-events-auto shadow-2xl overflow-x-auto max-w-full custom-scrollbar">
-          <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2 rounded-full text-on-surface-variant font-label-bold text-sm transition-all hover:text-on-surface hover:bg-white/5 mr-4 border border-transparent">
-             <ArrowLeft size={18} />
-          </Link>
-          <button className={`flex items-center gap-2 px-4 py-2 rounded-full font-label-bold text-sm transition-all whitespace-nowrap ${activeTab === 'overview' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('overview')}>
-            <Home size={18} /> Overview
-          </button>
-          <button className={`flex items-center gap-2 px-4 py-2 rounded-full font-label-bold text-sm transition-all whitespace-nowrap ${activeTab === 'general' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('general')}>
-            <Layout size={18} /> General
-          </button>
-          <button className={`flex items-center gap-2 px-4 py-2 rounded-full font-label-bold text-sm transition-all whitespace-nowrap ${activeTab === 'embed' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('embed')}>
-            <ImageIcon size={18} /> Branding
-          </button>
-          <button className={`flex items-center gap-2 px-4 py-2 rounded-full font-label-bold text-sm transition-all whitespace-nowrap ${activeTab === 'log' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('log')}>
-            <Shield size={18} /> Logs
-          </button>
-          <button className={`flex items-center gap-2 px-4 py-2 rounded-full font-label-bold text-sm transition-all whitespace-nowrap ${activeTab === 'templates' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('templates')}>
-            <Copy size={18} /> Templates
-          </button>
-          <button className={`flex items-center gap-2 px-4 py-2 rounded-full font-label-bold text-sm transition-all whitespace-nowrap ${activeTab === 'killboard' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('killboard')}>
-            <Lock size={16} /> KillBoard <span className="bg-primary-container text-on-primary text-[10px] px-2 py-0.5 rounded font-black ml-1 uppercase tracking-widest">BETA</span>
-          </button>
-          <button className={`flex items-center gap-2 px-4 py-2 rounded-full font-label-bold text-sm transition-all whitespace-nowrap ${activeTab === 'registration' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('registration')}>
-            <Users size={16} /> Reg <span className="bg-primary-container text-on-primary text-[10px] px-2 py-0.5 rounded font-black ml-1 uppercase tracking-widest">BETA</span>
-          </button>
-          <button className={`flex items-center gap-2 px-4 py-2 rounded-full font-label-bold text-sm transition-all whitespace-nowrap ${activeTab === 'rolemenu' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('rolemenu')}>
-            <Users size={16} /> Roles
-          </button>
-          <button className={`flex items-center gap-2 px-4 py-2 rounded-full font-label-bold text-sm transition-all whitespace-nowrap ${activeTab === 'ticket' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('ticket')}>
-            <Shield size={16} /> Ticket
-          </button>
-        </nav>
-      </div>
-
-      <main className="flex-1 w-full max-w-[1200px] mx-auto px-4 md:px-8 py-10 pb-32 flex flex-col">
-        <header className="flex flex-col md:flex-row items-center md:items-end justify-between mb-12 pb-8 border-b border-outline-variant/50">
-          <div className="flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
-            <div className="w-24 h-24 rounded-2xl bg-surface border border-outline-variant flex items-center justify-center text-3xl font-headline-xl text-primary-container shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
-              {guildDetail?.Name?.charAt(0) || guildId.charAt(0).toUpperCase()}
+      <div className="flex-1 w-full max-w-[1400px] mx-auto flex flex-col md:flex-row gap-8 px-4 md:px-8 py-10 pb-32">
+        {/* Sidebar Navigation */}
+        <aside className="w-full md:w-64 shrink-0 flex flex-col gap-2 relative z-50">
+          <div className="md:sticky md:top-28 bg-surface-container-high/50 backdrop-blur-xl border border-outline-variant p-4 rounded-3xl shadow-2xl flex flex-col gap-2">
+            <Link href="/dashboard" className="flex items-center gap-3 px-4 py-3 rounded-2xl text-on-surface-variant font-label-bold text-sm transition-all hover:text-on-surface hover:bg-white/5 mb-2 border border-transparent hover:border-outline-variant/50">
+               <ArrowLeft size={18} />
+               <span>{lang === 'tr' ? 'Sunuculara Dön' : 'Back to Servers'}</span>
+            </Link>
+            
+            <div className="h-px bg-outline-variant/30 my-2 mx-2"></div>
+            
+            <div className="text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest px-4 mb-1">
+               {lang === 'tr' ? 'AYARLAR' : 'SETTINGS'}
             </div>
-            <div>
-              <h1 className="font-headline-xl text-3xl md:text-5xl text-on-surface mb-2 uppercase tracking-tight">{guildDetail?.Name || 'Server Settings'}</h1>
-              <div className="flex items-center justify-center md:justify-start gap-2 text-on-surface-variant font-label-bold uppercase tracking-widest text-sm">
-                 <Shield size={16} className="text-primary-container" /> Administrator Access
+
+            <button className={`flex items-center gap-3 px-4 py-3 rounded-2xl font-label-bold text-sm transition-all text-left ${activeTab === 'overview' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('overview')}>
+              <Home size={18} /> Overview
+            </button>
+            <button className={`flex items-center gap-3 px-4 py-3 rounded-2xl font-label-bold text-sm transition-all text-left ${activeTab === 'general' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('general')}>
+              <Layout size={18} /> General
+            </button>
+            <button className={`flex items-center gap-3 px-4 py-3 rounded-2xl font-label-bold text-sm transition-all text-left ${activeTab === 'embed' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('embed')}>
+              <ImageIcon size={18} /> Branding
+            </button>
+            <button className={`flex items-center gap-3 px-4 py-3 rounded-2xl font-label-bold text-sm transition-all text-left ${activeTab === 'log' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('log')}>
+              <Shield size={18} /> Logs
+            </button>
+            <button className={`flex items-center gap-3 px-4 py-3 rounded-2xl font-label-bold text-sm transition-all text-left ${activeTab === 'templates' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('templates')}>
+              <Copy size={18} /> Templates
+            </button>
+            
+            <div className="h-px bg-outline-variant/30 my-2 mx-2"></div>
+            
+            <div className="text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest px-4 mb-1">
+               {lang === 'tr' ? 'SİSTEMLER' : 'SYSTEMS'}
+            </div>
+
+            <button className={`flex items-center justify-between px-4 py-3 rounded-2xl font-label-bold text-sm transition-all text-left ${activeTab === 'killboard' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('killboard')}>
+              <div className="flex items-center gap-3"><Lock size={18} /> KillBoard</div>
+              <span className={`text-[10px] px-2 py-0.5 rounded font-black uppercase tracking-widest border ${activeTab === 'killboard' ? 'bg-white/20 text-white border-white/30' : 'bg-primary-container/20 text-primary-container border-primary-container/30'}`}>BETA</span>
+            </button>
+            <button className={`flex items-center justify-between px-4 py-3 rounded-2xl font-label-bold text-sm transition-all text-left ${activeTab === 'registration' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('registration')}>
+              <div className="flex items-center gap-3"><Users size={18} /> Reg</div>
+              <span className={`text-[10px] px-2 py-0.5 rounded font-black uppercase tracking-widest border ${activeTab === 'registration' ? 'bg-white/20 text-white border-white/30' : 'bg-primary-container/20 text-primary-container border-primary-container/30'}`}>BETA</span>
+            </button>
+            <button className={`flex items-center gap-3 px-4 py-3 rounded-2xl font-label-bold text-sm transition-all text-left ${activeTab === 'rolemenu' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('rolemenu')}>
+              <Users size={18} /> Roles
+            </button>
+            <button className={`flex items-center gap-3 px-4 py-3 rounded-2xl font-label-bold text-sm transition-all text-left ${activeTab === 'ticket' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('ticket')}>
+              <Shield size={18} /> Ticket
+            </button>
+          </div>
+        </aside>
+
+        {/* Main Content */}
+        <main className="flex-1 min-w-0 flex flex-col">
+          <header className="flex flex-col md:flex-row items-center md:items-end justify-between mb-8 pb-8 border-b border-outline-variant/50">
+            <div className="flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
+              <div className="w-24 h-24 rounded-3xl bg-surface border border-outline-variant flex items-center justify-center text-4xl font-headline-xl text-primary-container shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
+                {guildDetail?.Name?.charAt(0) || guildId.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <h1 className="font-headline-xl text-3xl md:text-4xl text-on-surface mb-2 uppercase tracking-tight">{guildDetail?.Name || 'Server Settings'}</h1>
+                <div className="flex items-center justify-center md:justify-start gap-2 text-on-surface-variant font-label-bold uppercase tracking-widest text-sm">
+                   <Shield size={16} className="text-primary-container" /> Administrator Access
+                </div>
               </div>
             </div>
-          </div>
-        </header>
+          </header>
 
         {/* Tab Content Rendering with Bento Grids */}
         {activeTab === 'overview' && <OverviewTab t={t} lang={lang} subscription={subscription} setActiveTab={setActiveTab} showToast={showToast} settings={settings} />}
@@ -583,6 +594,7 @@ export default function ServerSettings() {
         )}
 
       </main>
+      </div>
 
 
 
