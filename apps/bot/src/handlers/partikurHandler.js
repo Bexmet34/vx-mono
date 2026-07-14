@@ -149,6 +149,7 @@ async function handleCreatePartyCommand(interaction) {
     } catch (err) {
         console.error(`[PartikurHandler] Failed to show modal (Interaction expired): ${err.message}`);
     }
+}
 
 async function handleTempAutocomplete(interaction) {
     const focusedValue = interaction.options.getFocused();
