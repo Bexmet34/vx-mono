@@ -56,9 +56,22 @@ async function initKillBoardService(client) {
  * Checks all guilds and sends summaries at the configured time
  */
 async function processKillBoards(client) {
-    const guilds = await db.all(
-        'SELECT * FROM guild_configs WHERE killboard_channel_id IS NOT NULL AND albion_guild_id IS NOT NULL'
-    );
+    const { supabase } = require('@veyronix/database');
+    const { getGuildConfig } = require('./guildConfig');
+
+    const { data: activeConfigs } = await supabase
+        .from('guild_settings')
+        .select('guild_id')
+        .not('killboard_channel_id', 'is', null)
+        .not('albion_guild_id', 'is', null);
+
+    if (!activeConfigs) return;
+
+    const guilds = [];
+    for (const row of activeConfigs) {
+        const fullConfig = await getGuildConfig(row.guild_id);
+        if (fullConfig) guilds.push(fullConfig);
+    }
 
     const now = new Date();
     const todayStr = now.toISOString().split('T')[0]; // e.g. "2026-05-01"
@@ -256,6 +269,9 @@ async function sendKillBoardSummary(client, guildCfg) {
                 'UPDATE guild_configs SET last_killboard_date = ? WHERE guild_id = ?',
                 [nowIso, guildCfg.guild_id]
             );
+            
+            const { supabase } = require('@veyronix/database');
+            await supabase.from('guild_settings').update({ last_killboard_date: nowIso }).eq('guild_id', guildCfg.guild_id);
         } else {
             console.error(`[KillBoard] ❌ Channel not found: ${guildCfg.killboard_channel_id}`);
         }

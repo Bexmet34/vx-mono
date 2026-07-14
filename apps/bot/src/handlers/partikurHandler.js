@@ -144,8 +144,11 @@ async function handleCreatePartyCommand(interaction) {
         new ActionRowBuilder().addComponents(rolesInput)
     );
 
-    await interaction.showModal(modal);
-}
+    try {
+        await interaction.showModal(modal);
+    } catch (err) {
+        console.error(`[PartikurHandler] Failed to show modal (Interaction expired): ${err.message}`);
+    }
 
 async function handleTempAutocomplete(interaction) {
     const focusedValue = interaction.options.getFocused();
