@@ -112,7 +112,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
   };
 
   return (
-    <div className="grid grid-cols-1 gap-6 animate-slide-up">
+    <div className="flex flex-col gap-6 animate-slide-up">
       {/* Settings Section */}
       <div className="glass-panel p-8 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
         <h2 className="font-headline-lg text-2xl text-on-surface mb-2 flex items-center gap-3 uppercase tracking-tight">
@@ -440,7 +440,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
       </div>
 
       {/* Auto Check System Section */}
-      <div className="glass-panel p-8 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors md:col-span-2">
+      <div className="glass-panel p-8 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
         <h2 className="font-headline-lg text-2xl text-on-surface mb-2 flex items-center gap-3 uppercase tracking-tight">
           <Users className="text-primary-container" />
           {lang === 'en' ? 'Guild Leave Auto-Check System' : 'Guild Ayrılık Kontrol Sistemi'}
