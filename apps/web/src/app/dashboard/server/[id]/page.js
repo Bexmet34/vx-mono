@@ -491,7 +491,7 @@ export default function ServerSettings() {
       <div className="flex-1 w-full max-w-[1400px] mx-auto flex flex-col md:flex-row gap-8 px-4 md:px-8 py-10 pb-32">
         {/* Sidebar Navigation */}
         <aside className="w-full md:w-64 shrink-0 flex flex-col gap-2 relative z-50">
-          <div className="md:sticky md:top-28 bg-surface-container-high/50 backdrop-blur-xl border border-outline-variant p-4 rounded-3xl shadow-2xl flex flex-col gap-2">
+          <div className="md:sticky md:top-28 max-h-[calc(100vh-8rem)] overflow-y-auto custom-scrollbar bg-surface-container-high/50 backdrop-blur-xl border border-outline-variant p-4 rounded-3xl shadow-2xl flex flex-col gap-2">
             <Link href="/dashboard" className="flex items-center gap-3 px-4 py-3 rounded-2xl text-on-surface-variant font-label-bold text-sm transition-all hover:text-on-surface hover:bg-white/5 mb-2 border border-transparent hover:border-outline-variant/50">
                <ArrowLeft size={18} />
                <span>{lang === 'tr' ? 'Sunuculara Dön' : 'Back to Servers'}</span>
