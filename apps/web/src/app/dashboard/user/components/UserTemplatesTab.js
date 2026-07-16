@@ -2,7 +2,7 @@
 
 import { Copy, Plus, Trash2, GripVertical, PlusCircle } from "lucide-react";
 import InfoTooltip from "@/components/InfoTooltip";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { 
   albionWeapons, 
   albionHeads, 
@@ -20,45 +20,50 @@ export default function UserTemplatesTab({ t, lang, templates, setTemplates, isP
   const [dragInfo, setDragInfo] = useState(null);
   const [dragOverIndex, setDragOverIndex] = useState(null);
 
+  const prevTemplateIdRef = useRef(null);
+
   // Yalnızca şablon DEĞİŞTİĞİNDE blokları parse et.
   useEffect(() => {
-    if (selectedTemplate) {
-      // party_roles is a \n separated string
-      const allRoles = selectedTemplate.party_roles ? selectedTemplate.party_roles.split('\n') : [];
-      const parsedBlocks = [];
-      allRoles.forEach((line, index) => {
-        const trimmed = line.trim();
-        if(!trimmed) return;
-        if (trimmed.startsWith("#HEADER:") || trimmed.startsWith("#")) {
-          const text = trimmed.startsWith("#HEADER:") ? trimmed.substring(8).trim() : trimmed.substring(1).trim();
-          parsedBlocks.push({ id: `blk_${index}_${Date.now()}`, type: "header", text });
-        } else if (trimmed.includes(">")) {
-          const [weaponPart, gearPart] = trimmed.split(">");
-          const gears = gearPart ? gearPart.split("-").map(s => s.trim()) : [];
-          parsedBlocks.push({
-            id: `blk_${index}_${Date.now()}`,
-            type: "role",
-            weapon: weaponPart.trim(),
-            head: gears[0] || "",
-            chest: gears[1] || "",
-            shoes: gears[2] || "",
-            potion: gears[3] || "",
-            food: gears[4] || ""
-          });
-        } else {
-          parsedBlocks.push({
-            id: `blk_${index}_${Date.now()}`,
-            type: "role",
-            weapon: trimmed,
-            head: "", chest: "", shoes: "", potion: "", food: ""
-          });
-        }
-      });
-      setBlocks(parsedBlocks);
-    } else {
-      setBlocks([]);
+    if (selectedTemplateId !== prevTemplateIdRef.current) {
+      prevTemplateIdRef.current = selectedTemplateId;
+      if (selectedTemplate) {
+        // party_roles is a \n separated string
+        const allRoles = selectedTemplate.party_roles ? selectedTemplate.party_roles.split('\n') : [];
+        const parsedBlocks = [];
+        allRoles.forEach((line, index) => {
+          const trimmed = line.trim();
+          if(!trimmed) return;
+          if (trimmed.startsWith("#HEADER:") || trimmed.startsWith("#")) {
+            const text = trimmed.startsWith("#HEADER:") ? trimmed.substring(8).trim() : trimmed.substring(1).trim();
+            parsedBlocks.push({ id: `blk_${index}_${Date.now()}`, type: "header", text });
+          } else if (trimmed.includes(">")) {
+            const [weaponPart, gearPart] = trimmed.split(">");
+            const gears = gearPart ? gearPart.split("-").map(s => s.trim()) : [];
+            parsedBlocks.push({
+              id: `blk_${index}_${Date.now()}`,
+              type: "role",
+              weapon: weaponPart.trim(),
+              head: gears[0] || "",
+              chest: gears[1] || "",
+              shoes: gears[2] || "",
+              potion: gears[3] || "",
+              food: gears[4] || ""
+            });
+          } else {
+            parsedBlocks.push({
+              id: `blk_${index}_${Date.now()}`,
+              type: "role",
+              weapon: trimmed,
+              head: "", chest: "", shoes: "", potion: "", food: ""
+            });
+          }
+        });
+        setBlocks(parsedBlocks);
+      } else {
+        setBlocks([]);
+      }
     }
-  }, [selectedTemplateId, templates]);
+  }, [selectedTemplateId, selectedTemplate]);
 
   const saveToBackend = async (method, body, successMsg, errMsg) => {
     try {
