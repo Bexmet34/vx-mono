@@ -131,6 +131,25 @@ export default function GeneralTab({
               <option value="fixed_channel">{lang === 'tr' ? 'Sabit Kanal ve Buton Modu' : 'Fixed Channel & Button Mode'}</option>
             </select>
           </div>
+
+          <div>
+            <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+              {lang === 'tr' ? 'Kanal Otomatik Temizleme (Boş Kanallar)' : 'Auto-Delete Party Channels'}
+              <InfoTooltip text={lang === 'tr' ? 'Oluşturulma tarihinin üzerinden bu süre geçen Content kanalları otomatik silinir.' : 'Party channels older than this duration will be deleted automatically.'} />
+            </label>
+            <select
+              className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+              value={settings.auto_delete_party_hours || 0}
+              onChange={(e) => setSettings({ ...settings, auto_delete_party_hours: parseInt(e.target.value) })}
+            >
+              <option value={0}>{lang === 'tr' ? 'Kapalı' : 'Disabled'}</option>
+              <option value={1}>{lang === 'tr' ? '1 Saat Sonra Sil' : 'Delete after 1 Hour'}</option>
+              <option value={3}>{lang === 'tr' ? '3 Saat Sonra Sil' : 'Delete after 3 Hours'}</option>
+              <option value={6}>{lang === 'tr' ? '6 Saat Sonra Sil' : 'Delete after 6 Hours'}</option>
+              <option value={12}>{lang === 'tr' ? '12 Saat Sonra Sil' : 'Delete after 12 Hours'}</option>
+              <option value={24}>{lang === 'tr' ? '24 Saat Sonra Sil' : 'Delete after 24 Hours'}</option>
+            </select>
+          </div>
         </div>
 
         {settings.system_mode === 'fixed_channel' && (

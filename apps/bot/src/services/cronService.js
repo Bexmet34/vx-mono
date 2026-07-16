@@ -107,6 +107,63 @@ function startCronService(client) {
         const { runAutoCheck } = require('./autoCheckService');
         await runAutoCheck(client);
     }, { timezone: "UTC" });
+
+    // --- Auto Party Cleanup (Every 30 minutes) ---
+    cron.schedule('*/30 * * * *', async () => {
+        console.log('[CronService] Auto Party Cleanup running...');
+        try {
+            const db = require('./db');
+            // Fetch all active parties
+            const parties = await db.all(`SELECT id, guild_id, channel_id, created_at FROM parties WHERE status = 'active'`);
+            if (!parties || parties.length === 0) return;
+
+            // Group by guild to minimize config fetching
+            const guildParties = {};
+            for (const p of parties) {
+                if (!guildParties[p.guild_id]) guildParties[p.guild_id] = [];
+                guildParties[p.guild_id].push(p);
+            }
+
+            for (const guildId of Object.keys(guildParties)) {
+                try {
+                    const guildConfig = await getGuildConfig(guildId);
+                    const autoDeleteHours = guildConfig?.auto_delete_party_hours || 0;
+                    
+                    if (autoDeleteHours > 0) {
+                        const now = new Date();
+                        for (const party of guildParties[guildId]) {
+                            const partyTime = new Date(party.created_at);
+                            const hoursPassed = (now - partyTime) / (1000 * 60 * 60);
+
+                            if (hoursPassed >= autoDeleteHours) {
+                                // Time to delete
+                                try {
+                                    const guild = client.guilds.cache.get(guildId);
+                                    if (guild) {
+                                        const channel = guild.channels.cache.get(party.channel_id) || await guild.channels.fetch(party.channel_id).catch(() => null);
+                                        if (channel) {
+                                            await channel.delete('Auto Party Cleanup - Inactive').catch(() => null);
+                                        }
+                                    }
+                                    // Mark as closed
+                                    await db.run(`UPDATE parties SET status = 'closed' WHERE id = ?`, [party.id]);
+                                    
+                                    // Add a small delay to avoid rate limiting
+                                    await new Promise(r => setTimeout(r, 2000));
+                                } catch (e) {
+                                    console.error(`[CronService] Error cleaning up party ${party.id}:`, e.message);
+                                }
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.error(`[CronService] Error processing guild ${guildId} for cleanup:`, e.message);
+                }
+            }
+        } catch (e) {
+            console.error('[CronService] Auto Party Cleanup Error:', e.message);
+        }
+    });
 }
 
 /**

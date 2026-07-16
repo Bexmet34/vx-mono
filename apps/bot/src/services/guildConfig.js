@@ -72,9 +72,9 @@ async function updateGuildConfig(guildId, data) {
                 guild_id, guild_name, albion_guild_id, albion_guild_name, albion_server,
                 log_channel_id, objective_channel_id, objective_notify_channel_id, 
                 killboard_channel_id, killboard_time,
-                language, welcome_message, embed_thumbnail_url, setup_completed
+                language, welcome_message, embed_thumbnail_url, setup_completed, auto_delete_party_hours
             ) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?) 
              ON CONFLICT(guild_id) DO UPDATE SET 
                 guild_name = COALESCE(excluded.guild_name, guild_name), 
                 albion_guild_id = COALESCE(excluded.albion_guild_id, albion_guild_id), 
@@ -87,13 +87,14 @@ async function updateGuildConfig(guildId, data) {
                 killboard_time = COALESCE(excluded.killboard_time, killboard_time),
                 language = COALESCE(excluded.language, language),
                 welcome_message = COALESCE(excluded.welcome_message, welcome_message),
-                embed_thumbnail_url = COALESCE(excluded.embed_thumbnail_url, embed_thumbnail_url)`,
+                embed_thumbnail_url = COALESCE(excluded.embed_thumbnail_url, embed_thumbnail_url),
+                auto_delete_party_hours = COALESCE(excluded.auto_delete_party_hours, auto_delete_party_hours)`,
             [
                 guildId, guild_name, albion_guild_id, albion_guild_name, albion_server || 'Europe',
                 log_channel_id, objective_channel_id, objective_notify_channel_id, 
                 killboard_channel_id, killboard_time || '06:00',
                 language || 'tr', welcome_message || 'Selam, Hoşgeldiniz!',
-                embed_thumbnail_url || null
+                embed_thumbnail_url || null, data.auto_delete_party_hours || 0
             ]
         );
         return true;

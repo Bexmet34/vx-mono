@@ -205,6 +205,7 @@ export default function ServerSettings() {
           ticket_message_title: s?.ticket_message_title || "Destek Talebi",
           ticket_message_desc: s?.ticket_message_desc || "Lütfen aşağıdaki menüden bir konu seçerek destek talebinizi oluşturun.",
           ticket_options: Array.isArray(s?.ticket_options) ? s?.ticket_options : [{"label": "Genel Destek", "value": "genel", "description": "Genel konular hakkında destek alın", "emoji": "📩"}],
+          auto_delete_party_hours: s?.auto_delete_party_hours || 0,
         };
         setSettings(loadedSettings);
         setInitialSettings(loadedSettings);

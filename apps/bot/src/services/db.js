@@ -170,6 +170,7 @@ function initDb() {
             safeAlter("ALTER TABLE guild_configs ADD COLUMN auto_check_log_channel_id TEXT");
             safeAlter("ALTER TABLE guild_configs ADD COLUMN last_auto_check_date TEXT");
             safeAlter("ALTER TABLE guild_configs ADD COLUMN albion_server TEXT DEFAULT 'Europe'");
+            safeAlter("ALTER TABLE guild_configs ADD COLUMN auto_delete_party_hours INTEGER DEFAULT 0");
 
             // Set default settings if not exists
             try {
