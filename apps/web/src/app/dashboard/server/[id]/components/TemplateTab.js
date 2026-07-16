@@ -16,6 +16,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
   const selectedTemplate = settings.party_templates?.find(tpl => tpl.id === selectedTemplateId) || null;
 
   const [blocks, setBlocks] = useState([]);
+  const [draggedIndex, setDraggedIndex] = useState(null);
 
   // Yalnızca şablon DEĞİŞTİĞİNDE blokları parse et.
   // selectedTemplate'i dependency olarak verirsek her harfte useEffect tetiklenir ve focus kaybolur.
@@ -234,10 +235,38 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
                   <div className="p-8 text-center text-on-surface-variant font-body-md border border-dashed border-outline-variant/50 bg-surface-container-lowest/30 rounded-sm">
                     {lang === 'en' ? 'No roles added yet. Start by adding a header or a role.' : 'Henüz rol eklenmedi. Başlık veya rol ekleyerek başlayın.'}
                   </div>
-                ) : blocks.map((block) => (
-                  <div key={block.id} className="relative group flex items-start gap-2 bg-surface-container-high border border-outline-variant rounded-sm p-3 hover:border-primary-container/50 transition-colors">
+                ) : blocks.map((block, index) => (
+                  <div 
+                    key={block.id} 
+                    draggable
+                    onDragStart={(e) => {
+                      setDraggedIndex(index);
+                      // Firefox requires dataTransfer data to be set to allow drag
+                      e.dataTransfer.setData("text/plain", index);
+                      e.dataTransfer.effectAllowed = "move";
+                    }}
+                    onDragOver={(e) => {
+                      e.preventDefault(); // Necessary to allow dropping
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      if (draggedIndex === null || draggedIndex === index) return;
+                      
+                      const newBlocks = [...blocks];
+                      const draggedItem = newBlocks[draggedIndex];
+                      newBlocks.splice(draggedIndex, 1);
+                      newBlocks.splice(index, 0, draggedItem);
+                      
+                      handleUpdateBlocks(newBlocks);
+                      setDraggedIndex(null);
+                    }}
+                    onDragEnd={() => {
+                      setDraggedIndex(null);
+                    }}
+                    className={`relative group flex items-start gap-2 bg-surface-container-high border border-outline-variant rounded-sm p-3 transition-all duration-200 ${draggedIndex === index ? 'opacity-40 border-primary-container' : 'hover:border-primary-container/50'}`}
+                  >
                     
-                    <div className="mt-2 text-on-surface-variant/50 cursor-grab active:cursor-grabbing hidden md:block">
+                    <div className="mt-2 text-on-surface-variant/50 cursor-grab active:cursor-grabbing hidden md:block" title={lang === 'en' ? 'Drag to reorder' : 'Sürükleyip bırakarak sırala'}>
                       <GripVertical size={18} />
                     </div>
 
