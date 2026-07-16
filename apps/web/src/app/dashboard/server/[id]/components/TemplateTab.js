@@ -16,7 +16,8 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
   const selectedTemplate = settings.party_templates?.find(tpl => tpl.id === selectedTemplateId) || null;
 
   const [blocks, setBlocks] = useState([]);
-  const [draggedIndex, setDraggedIndex] = useState(null);
+  const [dragInfo, setDragInfo] = useState(null);
+  const [dragOverIndex, setDragOverIndex] = useState(null);
 
   // Yalnızca şablon DEĞİŞTİĞİNDE blokları parse et.
   // selectedTemplate'i dependency olarak verirsek her harfte useEffect tetiklenir ve focus kaybolur.
