@@ -1,21 +1,95 @@
 "use client";
 
-import { Copy, Plus, Trash2 } from "lucide-react";
+import { Copy, Plus, Trash2, GripVertical, PlusCircle } from "lucide-react";
 import InfoTooltip from "@/components/InfoTooltip";
 import { useState, useEffect } from "react";
+import { 
+  albionWeapons, 
+  albionHeads, 
+  albionChests, 
+  albionShoes, 
+  albionPotions, 
+  albionFoods 
+} from "@/data/albionItems";
 
 export default function TemplateTab({ t, lang, settings, setSettings, selectedTemplateId, setSelectedTemplateId, isPremium, showToast }) {
   const selectedTemplate = settings.party_templates?.find(tpl => tpl.id === selectedTemplateId) || null;
 
-  const [localReq, setLocalReq] = useState("");
-  const [localOpt, setLocalOpt] = useState("");
+  const [blocks, setBlocks] = useState([]);
 
   useEffect(() => {
     if (selectedTemplate) {
-      setLocalReq((selectedTemplate.required_roles || []).join("\n"));
-      setLocalOpt((selectedTemplate.optional_roles || []).join("\n"));
+      const allRoles = [...(selectedTemplate.required_roles || []), ...(selectedTemplate.optional_roles || [])];
+      const parsedBlocks = [];
+      allRoles.forEach((line, index) => {
+        const trimmed = line.trim();
+        if(!trimmed) return;
+        if (trimmed.startsWith("#HEADER:") || trimmed.startsWith("#")) {
+          const text = trimmed.startsWith("#HEADER:") ? trimmed.substring(8).trim() : trimmed.substring(1).trim();
+          parsedBlocks.push({ id: `blk_${index}_${Date.now()}`, type: "header", text });
+        } else if (trimmed.includes(">")) {
+          const [weaponPart, gearPart] = trimmed.split(">");
+          const gears = gearPart ? gearPart.split("-").map(s => s.trim()) : [];
+          parsedBlocks.push({
+            id: `blk_${index}_${Date.now()}`,
+            type: "role",
+            weapon: weaponPart.trim(),
+            head: gears[0] || "",
+            chest: gears[1] || "",
+            shoes: gears[2] || "",
+            potion: gears[3] || "",
+            food: gears[4] || ""
+          });
+        } else {
+          parsedBlocks.push({
+            id: `blk_${index}_${Date.now()}`,
+            type: "role",
+            weapon: trimmed,
+            head: "", chest: "", shoes: "", potion: "", food: ""
+          });
+        }
+      });
+      setBlocks(parsedBlocks);
     }
-  }, [selectedTemplateId]);
+  }, [selectedTemplateId, selectedTemplate]);
+
+  const handleUpdateBlocks = (newBlocks) => {
+    setBlocks(newBlocks);
+    const required_roles = newBlocks.map(b => {
+      if (b.type === "header") {
+        return `#${b.text}`;
+      } else {
+        const gearArr = [b.head, b.chest, b.shoes, b.potion, b.food].map(x => x || "");
+        const hasGear = gearArr.some(x => x !== "");
+        if (hasGear) {
+          return `${b.weapon || "Unknown"} > ${gearArr.map(g => g || " ").join(" - ")}`;
+        } else {
+          return b.weapon || "Unknown";
+        }
+      }
+    });
+    
+    if (!selectedTemplateId) return;
+    setSettings(prev => ({
+      ...prev,
+      party_templates: prev.party_templates.map(tpl => tpl.id === selectedTemplateId ? { ...tpl, required_roles, optional_roles: [] } : tpl)
+    }));
+  };
+
+  const addBlock = (type) => {
+    const newBlock = type === "header" 
+      ? { id: `blk_${Date.now()}_${Math.random()}`, type: "header", text: "Yeni Başlık" }
+      : { id: `blk_${Date.now()}_${Math.random()}`, type: "role", weapon: "", head: "", chest: "", shoes: "", potion: "", food: "" };
+    handleUpdateBlocks([...blocks, newBlock]);
+  };
+
+  const updateBlock = (id, updates) => {
+    handleUpdateBlocks(blocks.map(b => b.id === id ? { ...b, ...updates } : b));
+  };
+
+  const removeBlock = (id) => {
+    handleUpdateBlocks(blocks.filter(b => b.id !== id));
+  };
 
   const handleCreateTemplate = () => {
     if (!isPremium && (settings.party_templates || []).length >= 5) {
@@ -48,18 +122,16 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
     if (selectedTemplateId === id) setSelectedTemplateId(null);
   };
 
-  const handleReqChange = (e) => {
-    setLocalReq(e.target.value);
-    handleUpdateTemplate({ required_roles: e.target.value.split("\n").map(r => r.trim()).filter(Boolean) });
-  };
-
-  const handleOptChange = (e) => {
-    setLocalOpt(e.target.value);
-    handleUpdateTemplate({ optional_roles: e.target.value.split("\n").map(r => r.trim()).filter(Boolean) });
-  };
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-12 gap-6 animate-slide-up">
+      {/* Datalists for Autocomplete */}
+      <datalist id="weapons-list">{albionWeapons.map(w => <option key={w} value={w} />)}</datalist>
+      <datalist id="heads-list">{albionHeads.map(w => <option key={w} value={w} />)}</datalist>
+      <datalist id="chests-list">{albionChests.map(w => <option key={w} value={w} />)}</datalist>
+      <datalist id="shoes-list">{albionShoes.map(w => <option key={w} value={w} />)}</datalist>
+      <datalist id="potions-list">{albionPotions.map(w => <option key={w} value={w} />)}</datalist>
+      <datalist id="foods-list">{albionFoods.map(w => <option key={w} value={w} />)}</datalist>
+
       <div className="glass-panel relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors md:col-span-4 flex flex-col">
         <div className="p-6 border-b border-outline-variant/50 flex justify-between items-center bg-surface-container-highest/30">
           <h2 className="font-headline-md text-xl text-on-surface flex items-center gap-2 uppercase tracking-tight m-0">
@@ -128,32 +200,121 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
               />
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="mb-6">
-                <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
-                  {lang === 'en' ? 'Required Roles' : 'Gerekli Roller'}
-                  <InfoTooltip text={lang === 'en' ? 'Roles that are absolutely necessary for this party. Write one role per line.' : 'Bu parti için kesinlikle gerekli olan roller. Her satıra bir tane gelecek şekilde yazın.'} />
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest">
+                  {lang === 'en' ? 'Party Content Builder' : 'Parti İçerik Oluşturucu'}
+                  <InfoTooltip text={lang === 'en' ? 'Add headers and roles visually.' : 'Başlık ve roller ekleyerek partinizi görsel olarak kurun.'} />
                 </label>
-                <textarea 
-                  className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md resize-y" 
-                  rows={5}
-                  value={localReq} 
-                  onChange={handleReqChange} 
-                />
-                <p className="text-xs font-body-md text-on-surface-variant mt-2">{lang === 'en' ? 'One per line. E.g. Tank\nHealer\nDPS' : 'Her satıra bir tane. Örn: Tank\nHealer\nDPS'}</p>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => addBlock('header')}
+                    className="flex items-center gap-1 px-3 py-1.5 bg-surface-container border border-outline-variant rounded-sm text-sm font-label-bold text-on-surface hover:border-primary-container hover:text-primary-container transition-colors"
+                  >
+                    <PlusCircle size={14} /> {lang === 'en' ? 'Add Header' : 'Başlık Ekle'}
+                  </button>
+                  <button 
+                    onClick={() => addBlock('role')}
+                    className="flex items-center gap-1 px-3 py-1.5 bg-primary-container/20 border border-primary-container/50 rounded-sm text-sm font-label-bold text-primary-container hover:bg-primary-container hover:text-on-primary transition-colors"
+                  >
+                    <PlusCircle size={14} /> {lang === 'en' ? 'Add Role' : 'Rol Ekle'}
+                  </button>
+                </div>
               </div>
 
-              <div className="mb-6">
-                <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">{lang === 'en' ? 'Optional Roles' : 'İsteğe Bağlı Roller'}</label>
-                <textarea 
-                  className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md resize-y" 
-                  rows={5}
-                  value={localOpt} 
-                  onChange={handleOptChange} 
-                />
-                <p className="text-xs font-body-md text-on-surface-variant mt-2">{lang === 'en' ? 'One per line.' : 'Her satıra bir tane.'}</p>
+              <div className="flex flex-col gap-3">
+                {blocks.length === 0 ? (
+                  <div className="p-8 text-center text-on-surface-variant font-body-md border border-dashed border-outline-variant/50 bg-surface-container-lowest/30 rounded-sm">
+                    {lang === 'en' ? 'No roles added yet. Start by adding a header or a role.' : 'Henüz rol eklenmedi. Başlık veya rol ekleyerek başlayın.'}
+                  </div>
+                ) : blocks.map((block) => (
+                  <div key={block.id} className="relative group flex items-start gap-2 bg-surface-container-high border border-outline-variant rounded-sm p-3 hover:border-primary-container/50 transition-colors">
+                    
+                    <div className="mt-2 text-on-surface-variant/50 cursor-grab active:cursor-grabbing hidden md:block">
+                      <GripVertical size={18} />
+                    </div>
+
+                    <div className="flex-1 w-full">
+                      {block.type === 'header' ? (
+                        <input 
+                          type="text" 
+                          value={block.text}
+                          onChange={(e) => updateBlock(block.id, { text: e.target.value })}
+                          placeholder={lang === 'en' ? 'Header Name (e.g. Tank)' : 'Başlık Adı (Örn: Tank)'}
+                          className="w-full bg-transparent border-b border-primary-container/50 focus:border-primary-container px-2 py-1 text-lg font-headline-md text-primary-container outline-none transition-colors"
+                        />
+                      ) : (
+                        <div className="grid grid-cols-2 md:grid-cols-6 gap-2">
+                          <div>
+                            <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Weapon' : 'Silah'}</label>
+                            <input 
+                              list="weapons-list"
+                              value={block.weapon}
+                              onChange={(e) => updateBlock(block.id, { weapon: e.target.value })}
+                              placeholder={lang === 'en' ? 'Role/Weapon' : 'Rol/Silah'}
+                              className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Head' : 'Başlık'}</label>
+                            <input 
+                              list="heads-list"
+                              value={block.head}
+                              onChange={(e) => updateBlock(block.id, { head: e.target.value })}
+                              className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Chest' : 'Zırh'}</label>
+                            <input 
+                              list="chests-list"
+                              value={block.chest}
+                              onChange={(e) => updateBlock(block.id, { chest: e.target.value })}
+                              className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Shoes' : 'Ayakkabı'}</label>
+                            <input 
+                              list="shoes-list"
+                              value={block.shoes}
+                              onChange={(e) => updateBlock(block.id, { shoes: e.target.value })}
+                              className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Potion' : 'Pot'}</label>
+                            <input 
+                              list="potions-list"
+                              value={block.potion}
+                              onChange={(e) => updateBlock(block.id, { potion: e.target.value })}
+                              className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Food' : 'Yemek'}</label>
+                            <input 
+                              list="foods-list"
+                              value={block.food}
+                              onChange={(e) => updateBlock(block.id, { food: e.target.value })}
+                              className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <button 
+                      onClick={() => removeBlock(block.id)}
+                      className="mt-1 md:mt-2 p-1.5 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-sm transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
+            
           </div>
         )}
       </div>
