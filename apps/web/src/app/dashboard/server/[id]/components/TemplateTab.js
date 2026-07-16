@@ -236,116 +236,157 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
                     {lang === 'en' ? 'No roles added yet. Start by adding a header or a role.' : 'Henüz rol eklenmedi. Başlık veya rol ekleyerek başlayın.'}
                   </div>
                 ) : blocks.map((block, index) => (
-                  <div 
-                    key={block.id} 
-                    draggable
-                    onDragStart={(e) => {
-                      setDraggedIndex(index);
-                      // Firefox requires dataTransfer data to be set to allow drag
-                      e.dataTransfer.setData("text/plain", index);
-                      e.dataTransfer.effectAllowed = "move";
-                    }}
-                    onDragOver={(e) => {
-                      e.preventDefault(); // Necessary to allow dropping
-                    }}
-                    onDrop={(e) => {
-                      e.preventDefault();
-                      if (draggedIndex === null || draggedIndex === index) return;
-                      
-                      const newBlocks = [...blocks];
-                      const draggedItem = newBlocks[draggedIndex];
-                      newBlocks.splice(draggedIndex, 1);
-                      newBlocks.splice(index, 0, draggedItem);
-                      
-                      handleUpdateBlocks(newBlocks);
-                      setDraggedIndex(null);
-                    }}
-                    onDragEnd={() => {
-                      setDraggedIndex(null);
-                    }}
-                    className={`relative group flex items-start gap-2 bg-surface-container-high border border-outline-variant rounded-sm p-3 transition-all duration-200 ${draggedIndex === index ? 'opacity-40 border-primary-container' : 'hover:border-primary-container/50'}`}
-                  >
+                  <div key={block.id} className="relative">
+                    {/* Drop Indicator Before */}
+                    {dragOverIndex === index && (
+                      <div className="absolute -top-2 left-0 right-0 h-1 bg-primary-container z-10 rounded-full shadow-[0_0_8px_rgba(255,215,0,0.8)]"></div>
+                    )}
                     
-                    <div className="mt-2 text-on-surface-variant/50 cursor-grab active:cursor-grabbing hidden md:block" title={lang === 'en' ? 'Drag to reorder' : 'Sürükleyip bırakarak sırala'}>
-                      <GripVertical size={18} />
-                    </div>
-
-                    <div className="flex-1 w-full">
-                      {block.type === 'header' ? (
-                        <input 
-                          type="text" 
-                          value={block.text}
-                          onChange={(e) => updateBlock(block.id, { text: e.target.value })}
-                          placeholder={lang === 'en' ? 'Header Name (e.g. Tank)' : 'Başlık Adı (Örn: Tank)'}
-                          className="w-full bg-transparent border-b border-primary-container/50 focus:border-primary-container px-2 py-1 text-lg font-headline-md text-primary-container outline-none transition-colors"
-                        />
-                      ) : (
-                        <div className="grid grid-cols-2 md:grid-cols-6 gap-2">
-                          <div>
-                            <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Weapon' : 'Silah'}</label>
-                            <input 
-                              list="weapons-list"
-                              value={block.weapon}
-                              onChange={(e) => updateBlock(block.id, { weapon: e.target.value })}
-                              placeholder={lang === 'en' ? 'Role/Weapon' : 'Rol/Silah'}
-                              className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Head' : 'Başlık'}</label>
-                            <input 
-                              list="heads-list"
-                              value={block.head}
-                              onChange={(e) => updateBlock(block.id, { head: e.target.value })}
-                              className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Chest' : 'Zırh'}</label>
-                            <input 
-                              list="chests-list"
-                              value={block.chest}
-                              onChange={(e) => updateBlock(block.id, { chest: e.target.value })}
-                              className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Shoes' : 'Ayakkabı'}</label>
-                            <input 
-                              list="shoes-list"
-                              value={block.shoes}
-                              onChange={(e) => updateBlock(block.id, { shoes: e.target.value })}
-                              className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Potion' : 'Pot'}</label>
-                            <input 
-                              list="potions-list"
-                              value={block.potion}
-                              onChange={(e) => updateBlock(block.id, { potion: e.target.value })}
-                              className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Food' : 'Yemek'}</label>
-                            <input 
-                              list="foods-list"
-                              value={block.food}
-                              onChange={(e) => updateBlock(block.id, { food: e.target.value })}
-                              className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
-                            />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    <button 
-                      onClick={() => removeBlock(block.id)}
-                      className="mt-1 md:mt-2 p-1.5 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-sm transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100"
+                    <div 
+                      draggable
+                      onDragStart={(e) => {
+                        let count = 1;
+                        if (block.type === 'header') {
+                          for (let i = index + 1; i < blocks.length; i++) {
+                            if (blocks[i].type === 'header') break;
+                            count++;
+                          }
+                        }
+                        setDragInfo({ startIndex: index, count });
+                        e.dataTransfer.setData("text/plain", index);
+                        e.dataTransfer.effectAllowed = "move";
+                      }}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const isBottom = (e.clientY - rect.top) > (rect.height / 2);
+                        setDragOverIndex(isBottom ? index + 1 : index);
+                      }}
+                      onDragLeave={() => {
+                        // We don't strictly need to clear it on leave because dragOver on the container updates it continuously,
+                        // but it's good practice. We'll clear it onDragEnd instead to avoid flickering.
+                      }}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        if (!dragInfo || dragOverIndex === null) return;
+                        
+                        // Prevent dropping inside itself
+                        if (dragOverIndex >= dragInfo.startIndex && dragOverIndex <= dragInfo.startIndex + dragInfo.count) {
+                          setDragInfo(null);
+                          setDragOverIndex(null);
+                          return;
+                        }
+                        
+                        const newBlocks = [...blocks];
+                        const itemsToMove = newBlocks.splice(dragInfo.startIndex, dragInfo.count);
+                        
+                        let insertIndex = dragOverIndex;
+                        if (dragOverIndex > dragInfo.startIndex) {
+                          insertIndex -= dragInfo.count;
+                        }
+                        
+                        newBlocks.splice(insertIndex, 0, ...itemsToMove);
+                        
+                        handleUpdateBlocks(newBlocks);
+                        setDragInfo(null);
+                        setDragOverIndex(null);
+                      }}
+                      onDragEnd={() => {
+                        setDragInfo(null);
+                        setDragOverIndex(null);
+                      }}
+                      className={`relative group flex items-start gap-2 bg-surface-container-high border border-outline-variant rounded-sm p-3 transition-all duration-200 
+                        ${dragInfo?.startIndex === index ? 'opacity-40 border-primary-container' : 'hover:border-primary-container/50'}
+                        ${dragInfo && index > dragInfo.startIndex && index < dragInfo.startIndex + dragInfo.count ? 'opacity-40' : ''}
+                      `}
                     >
-                      <Trash2 size={16} />
-                    </button>
+                      
+                      <div className="mt-2 text-on-surface-variant/50 cursor-grab active:cursor-grabbing hidden md:block" title={lang === 'en' ? 'Drag to reorder' : 'Sürükleyip bırakarak sırala'}>
+                        <GripVertical size={18} />
+                      </div>
+
+                      <div className="flex-1 w-full">
+                        {block.type === 'header' ? (
+                          <input 
+                            type="text" 
+                            value={block.text}
+                            onChange={(e) => updateBlock(block.id, { text: e.target.value })}
+                            placeholder={lang === 'en' ? 'Header Name (e.g. Tank)' : 'Başlık Adı (Örn: Tank)'}
+                            className="w-full bg-transparent border-b border-primary-container/50 focus:border-primary-container px-2 py-1 text-lg font-headline-md text-primary-container outline-none transition-colors"
+                          />
+                        ) : (
+                          <div className="grid grid-cols-2 md:grid-cols-6 gap-2">
+                            <div>
+                              <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Weapon' : 'Silah'}</label>
+                              <input 
+                                list="weapons-list"
+                                value={block.weapon}
+                                onChange={(e) => updateBlock(block.id, { weapon: e.target.value })}
+                                placeholder={lang === 'en' ? 'Role/Weapon' : 'Rol/Silah'}
+                                className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Head' : 'Başlık'}</label>
+                              <input 
+                                list="heads-list"
+                                value={block.head}
+                                onChange={(e) => updateBlock(block.id, { head: e.target.value })}
+                                className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Chest' : 'Zırh'}</label>
+                              <input 
+                                list="chests-list"
+                                value={block.chest}
+                                onChange={(e) => updateBlock(block.id, { chest: e.target.value })}
+                                className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Shoes' : 'Ayakkabı'}</label>
+                              <input 
+                                list="shoes-list"
+                                value={block.shoes}
+                                onChange={(e) => updateBlock(block.id, { shoes: e.target.value })}
+                                className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Potion' : 'Pot'}</label>
+                              <input 
+                                list="potions-list"
+                                value={block.potion}
+                                onChange={(e) => updateBlock(block.id, { potion: e.target.value })}
+                                className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Food' : 'Yemek'}</label>
+                              <input 
+                                list="foods-list"
+                                value={block.food}
+                                onChange={(e) => updateBlock(block.id, { food: e.target.value })}
+                                className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      <button 
+                        onClick={() => removeBlock(block.id)}
+                        className="mt-1 md:mt-2 p-1.5 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-sm transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                    
+                    {/* Drop Indicator After Last Item */}
+                    {index === blocks.length - 1 && dragOverIndex === blocks.length && (
+                      <div className="absolute -bottom-2 left-0 right-0 h-1 bg-primary-container z-10 rounded-full shadow-[0_0_8px_rgba(255,215,0,0.8)]"></div>
+                    )}
                   </div>
                 ))}
               </div>
