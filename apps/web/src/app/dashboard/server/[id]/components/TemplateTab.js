@@ -17,9 +17,12 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
 
   const [blocks, setBlocks] = useState([]);
 
+  // Yalnızca şablon DEĞİŞTİĞİNDE blokları parse et.
+  // selectedTemplate'i dependency olarak verirsek her harfte useEffect tetiklenir ve focus kaybolur.
   useEffect(() => {
-    if (selectedTemplate) {
-      const allRoles = [...(selectedTemplate.required_roles || []), ...(selectedTemplate.optional_roles || [])];
+    const template = settings.party_templates?.find(tpl => tpl.id === selectedTemplateId) || null;
+    if (template) {
+      const allRoles = [...(template.required_roles || []), ...(template.optional_roles || [])];
       const parsedBlocks = [];
       allRoles.forEach((line, index) => {
         const trimmed = line.trim();
@@ -50,8 +53,10 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
         }
       });
       setBlocks(parsedBlocks);
+    } else {
+      setBlocks([]);
     }
-  }, [selectedTemplateId, selectedTemplate]);
+  }, [selectedTemplateId]);
 
   const handleUpdateBlocks = (newBlocks) => {
     setBlocks(newBlocks);
@@ -78,7 +83,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
 
   const addBlock = (type) => {
     const newBlock = type === "header" 
-      ? { id: `blk_${Date.now()}_${Math.random()}`, type: "header", text: "Yeni Başlık" }
+      ? { id: `blk_${Date.now()}_${Math.random()}`, type: "header", text: "" }
       : { id: `blk_${Date.now()}_${Math.random()}`, type: "role", weapon: "", head: "", chest: "", shoes: "", potion: "", food: "" };
     handleUpdateBlocks([...blocks, newBlock]);
   };
