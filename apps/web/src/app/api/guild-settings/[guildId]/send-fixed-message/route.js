@@ -41,11 +41,27 @@ export async function POST(req, { params }) {
       return NextResponse.json({ error: "Bot token not configured" }, { status: 500 });
     }
 
+    const descriptionText = `🇹🇷 **Parti ve İçerik Oluşturma Merkezi**
+Aşağıdaki butonları kullanarak sunucumuzdaki parti (content) sistemini hızlıca kullanabilirsiniz:
+🟢 **/createparty** : Sıfırdan, kendi kurallarınıza ve rollerinize göre yepyeni bir parti oluşturun.
+🔵 **/temp** : Önceden kaydedilmiş hazır şablonları kullanarak (sunucu veya kişisel) tek tıkla parti kurun.
+🟡 **/mytemps** : Kendi oluşturduğunuz bireysel parti şablonlarınızı web üzerinden görüntüleyin, düzenleyin veya silin.
+🔴 **/closeparty** : Şu anda aktif olan partinizi sonlandırın ve açılan kanalı temizleyin.
+*Not: Butonlara tıkladığınızda sizin için özel bir metin kanalı açılacaktır. Lütfen içerik oluştururken sunucu kurallarına dikkat ediniz.*
+
+🇬🇧 **Party and Content Creation Center**
+You can quickly use the party (content) system on our server using the buttons below:
+🟢 **/createparty** : Create a brand new party from scratch according to your own rules and roles.
+🔵 **/temp** : Create a party with one click using pre-saved templates.
+🟡 **/mytemps** : View, edit or delete your personal party templates via web.
+🔴 **/closeparty** : End your currently active party and clean up the created channel.
+*Note: A private text channel will be opened for you when you click the buttons. Please follow server rules.*`;
+
     const messagePayload = {
       embeds: [
         {
           title: "⚔️ Content / Parti Sistemi",
-          description: settings.fixed_message_content || "Lütfen bir parti oluşturmak veya yönetmek için aşağıdaki butonları kullanın.",
+          description: settings.fixed_message_content ? `${settings.fixed_message_content}\n\n${descriptionText}` : descriptionText,
           color: 0x2b2d31,
         }
       ],
@@ -62,6 +78,12 @@ export async function POST(req, { params }) {
           components: [
             { type: 2, style: 1, label: "/temp", custom_id: "fc_temp", emoji: { name: "🔵" } },
             { type: 2, style: 2, label: "/mytemps", custom_id: "fc_mytemps", emoji: { name: "🟡" } }
+          ]
+        },
+        {
+          type: 1, // ActionRow
+          components: [
+            { type: 2, style: 5, label: "Kişisel Şablonları Yönet (Web)", url: "https://veyronix.com.tr/dashboard/user" }
           ]
         }
       ]

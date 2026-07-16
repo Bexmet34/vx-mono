@@ -205,31 +205,33 @@ async function handlePartyButtons(interaction) {
         const nameInput = new TextInputBuilder()
             .setCustomId('template_name')
             .setLabel(lang === 'tr' ? 'Şablon Adı' : 'Template Name')
-            .setValue(template.template_name || '')
             .setStyle(TextInputStyle.Short)
             .setRequired(true);
+        if (template.template_name) nameInput.setValue(String(template.template_name));
 
         const headerInput = new TextInputBuilder()
             .setCustomId('party_header')
             .setLabel(lang === 'tr' ? 'Parti Başlığı' : 'Party Header')
-            .setValue(template.party_header || 'Party')
             .setStyle(TextInputStyle.Short)
             .setRequired(true);
+        if (template.party_header) headerInput.setValue(String(template.party_header));
 
         const descInput = new TextInputBuilder()
             .setCustomId('party_description')
             .setLabel(lang === 'tr' ? 'Açıklama' : 'Description')
             .setStyle(TextInputStyle.Paragraph)
             .setRequired(false);
-            
-        if (template.party_description) descInput.setValue(template.party_description);
+        if (template.party_description) descInput.setValue(String(template.party_description));
 
         const rolesInput = new TextInputBuilder()
             .setCustomId('party_roles')
             .setLabel(lang === 'tr' ? 'Roller (Satır satır)' : 'Roles (Line by line)')
-            .setValue(template.party_roles || '')
             .setStyle(TextInputStyle.Paragraph)
             .setRequired(true);
+        if (template.party_roles) {
+            const rolesVal = Array.isArray(template.party_roles) ? template.party_roles.join('\n') : String(template.party_roles);
+            if (rolesVal) rolesInput.setValue(rolesVal);
+        }
 
         modal.addComponents(
             new ActionRowBuilder().addComponents(nameInput),

@@ -302,24 +302,28 @@ function getTemplateByIndex(templatesStr, indexStr) {
             .setCustomId('fc_temp_select')
             .setPlaceholder(lang === 'tr' ? 'Oluşturmak istediğiniz şablonu seçin...' : 'Select a template to create...');
 
-        if (guildTemplates.length > 0) {
-            guildTemplates.slice(0, 12).forEach((t, i) => {
+        if (userTemplates.length > 0) {
+            userTemplates.slice(0, 12).forEach(t => {
                 selectMenu.addOptions(new StringSelectMenuOptionBuilder()
-                    .setLabel(`[Sunucu] ${t.name || t.header || 'Şablon'}`.substring(0, 100))
-                    .setValue(`guild:${i}`)
-                    .setDescription((t.description || t.header || 'Sunucu Şablonu').substring(0, 100))
-                    .setEmoji('🏢')
+                    .setLabel(`👤 ${t.template_name || t.party_header || 'Şablon'}`.substring(0, 100))
+                    .setValue(`user:${t.id}`)
+                    .setDescription((t.party_header || 'Kişisel Şablon').substring(0, 100))
                 );
             });
         }
 
-        if (userTemplates.length > 0) {
-            userTemplates.slice(0, 12).forEach(t => {
+        if (guildTemplates.length > 0) {
+            if (userTemplates.length > 0) {
                 selectMenu.addOptions(new StringSelectMenuOptionBuilder()
-                    .setLabel(`[Kişisel] ${t.template_name || t.party_header || 'Şablon'}`.substring(0, 100))
-                    .setValue(`user:${t.id}`)
-                    .setDescription((t.party_header || 'Kişisel Şablon').substring(0, 100))
-                    .setEmoji('👤')
+                    .setLabel(lang === 'tr' ? '--- Sunucu Şablonları ---' : '--- Server Templates ---')
+                    .setValue('separator')
+                );
+            }
+            guildTemplates.slice(0, 12).forEach((t, i) => {
+                selectMenu.addOptions(new StringSelectMenuOptionBuilder()
+                    .setLabel(`🌐 ${t.name || t.header || 'Şablon'}`.substring(0, 100))
+                    .setValue(`guild:${i}`)
+                    .setDescription((t.description || t.header || 'Sunucu Şablonu').substring(0, 100))
                 );
             });
         }
