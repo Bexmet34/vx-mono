@@ -106,7 +106,21 @@ export default function Dashboard() {
 
       <div className="flex flex-col items-center mb-16 text-center">
         <h1 className="font-headline-xl text-headline-xl text-on-surface mb-2 uppercase tracking-tight">{t.dashWelcome}</h1>
-        <p className="font-label-bold text-label-bold text-primary-container tracking-widest uppercase">{session.user?.name}</p>
+        <p className="font-label-bold text-label-bold text-primary-container tracking-widest uppercase mb-8">{session.user?.name}</p>
+
+        <Link 
+          href="/dashboard/user" 
+          className="bg-surface-variant text-on-surface-variant hover:text-primary-container hover:border-primary-container border border-outline-variant px-8 py-4 rounded-xl flex items-center justify-center gap-3 transition-all group max-w-sm w-full"
+        >
+          <div className="bg-surface-container-high p-2 rounded flex items-center justify-center group-hover:bg-primary-container/20 transition-colors">
+            <Settings size={20} className="group-hover:text-primary-container transition-colors" />
+          </div>
+          <div className="text-left flex-1">
+            <div className="font-headline-sm uppercase text-sm">{lang === 'tr' ? 'Bireysel Panel' : 'User Dashboard'}</div>
+            <div className="font-body-sm text-xs opacity-70">{lang === 'tr' ? 'Kişisel templerinizi yönetin' : 'Manage your personal templates'}</div>
+          </div>
+          <ChevronRight size={20} className="opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+        </Link>
       </div>
 
       {errorMsg && (
