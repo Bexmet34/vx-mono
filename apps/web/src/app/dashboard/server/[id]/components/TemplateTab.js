@@ -128,7 +128,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-12 gap-6 animate-slide-up">
+    <div className="flex flex-col gap-6 animate-slide-up">
       {/* Datalists for Autocomplete */}
       <datalist id="weapons-list">{albionWeapons.map(w => <option key={w} value={w} />)}</datalist>
       <datalist id="heads-list">{albionHeads.map(w => <option key={w} value={w} />)}</datalist>
@@ -137,7 +137,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
       <datalist id="potions-list">{albionPotions.map(w => <option key={w} value={w} />)}</datalist>
       <datalist id="foods-list">{albionFoods.map(w => <option key={w} value={w} />)}</datalist>
 
-      <div className="glass-panel relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors md:col-span-4 flex flex-col">
+      <div className="glass-panel relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors flex flex-col">
         <div className="p-6 border-b border-outline-variant/50 flex justify-between items-center bg-surface-container-highest/30">
           <h2 className="font-headline-md text-xl text-on-surface flex items-center gap-2 uppercase tracking-tight m-0">
             <Copy className="text-primary-container" /> {lang === 'en' ? 'Templates' : 'Şablonlar'}
@@ -152,27 +152,29 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
           </button>
         </div>
         
-        <div className="flex-1 overflow-y-auto custom-scrollbar min-h-[300px] max-h-[500px]">
+        <div className="flex-1 overflow-y-auto custom-scrollbar max-h-[300px]">
           {(!settings.party_templates || settings.party_templates.length === 0) ? (
             <div className="p-8 text-center text-on-surface-variant font-body-md">{lang === 'en' ? 'No templates yet.' : 'Henüz şablon yok.'}</div>
           ) : (
-            settings.party_templates.map(tpl => (
-              <div 
-                key={tpl.id} 
-                className={`flex justify-between items-center p-4 border-b border-outline-variant/30 cursor-pointer transition-colors group ${selectedTemplateId === tpl.id ? 'bg-primary-container/10 border-l-2 border-l-primary-container' : 'hover:bg-white/5 border-l-2 border-l-transparent'}`}
-                onClick={() => setSelectedTemplateId(tpl.id)}
-              >
-                <div className={`font-label-bold ${selectedTemplateId === tpl.id ? 'text-primary-container' : 'text-on-surface'}`}>{tpl.name}</div>
-                <button className="p-1.5 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-sm transition-colors opacity-0 group-hover:opacity-100" onClick={(e) => { e.stopPropagation(); handleDeleteTemplate(tpl.id); }}>
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            ))
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+              {settings.party_templates.map(tpl => (
+                <div 
+                  key={tpl.id} 
+                  className={`flex justify-between items-center p-4 border rounded-sm cursor-pointer transition-colors group ${selectedTemplateId === tpl.id ? 'bg-primary-container/10 border-primary-container' : 'border-outline-variant/30 hover:bg-white/5 hover:border-outline-variant'}`}
+                  onClick={() => setSelectedTemplateId(tpl.id)}
+                >
+                  <div className={`font-label-bold ${selectedTemplateId === tpl.id ? 'text-primary-container' : 'text-on-surface'}`}>{tpl.name}</div>
+                  <button className="p-1.5 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-sm transition-colors opacity-0 group-hover:opacity-100" onClick={(e) => { e.stopPropagation(); handleDeleteTemplate(tpl.id); }}>
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
           )}
         </div>
       </div>
 
-      <div className="glass-panel p-8 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors md:col-span-8">
+      <div className="glass-panel p-8 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
         {!selectedTemplate ? (
           <div className="h-full min-h-[400px] flex items-center justify-center text-on-surface-variant font-body-md bg-surface-container-lowest/50 border border-dashed border-outline-variant/50 rounded-sm">
             {lang === 'en' ? 'Select or create a template to edit.' : 'Düzenlemek için bir şablon seçin veya oluşturun.'}
@@ -249,7 +251,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
                           className="w-full bg-transparent border-b border-primary-container/50 focus:border-primary-container px-2 py-1 text-lg font-headline-md text-primary-container outline-none transition-colors"
                         />
                       ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-6 gap-2">
                           <div>
                             <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Weapon' : 'Silah'}</label>
                             <input 
@@ -257,7 +259,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
                               value={block.weapon}
                               onChange={(e) => updateBlock(block.id, { weapon: e.target.value })}
                               placeholder={lang === 'en' ? 'Role/Weapon' : 'Rol/Silah'}
-                              className="w-full bg-surface border border-outline-variant rounded-sm px-3 py-2 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                              className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
                             />
                           </div>
                           <div>
@@ -266,7 +268,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
                               list="heads-list"
                               value={block.head}
                               onChange={(e) => updateBlock(block.id, { head: e.target.value })}
-                              className="w-full bg-surface border border-outline-variant rounded-sm px-3 py-2 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                              className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
                             />
                           </div>
                           <div>
@@ -275,7 +277,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
                               list="chests-list"
                               value={block.chest}
                               onChange={(e) => updateBlock(block.id, { chest: e.target.value })}
-                              className="w-full bg-surface border border-outline-variant rounded-sm px-3 py-2 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                              className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
                             />
                           </div>
                           <div>
@@ -284,7 +286,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
                               list="shoes-list"
                               value={block.shoes}
                               onChange={(e) => updateBlock(block.id, { shoes: e.target.value })}
-                              className="w-full bg-surface border border-outline-variant rounded-sm px-3 py-2 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                              className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
                             />
                           </div>
                           <div>
@@ -293,7 +295,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
                               list="potions-list"
                               value={block.potion}
                               onChange={(e) => updateBlock(block.id, { potion: e.target.value })}
-                              className="w-full bg-surface border border-outline-variant rounded-sm px-3 py-2 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                              className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
                             />
                           </div>
                           <div>
@@ -302,7 +304,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
                               list="foods-list"
                               value={block.food}
                               onChange={(e) => updateBlock(block.id, { food: e.target.value })}
-                              className="w-full bg-surface border border-outline-variant rounded-sm px-3 py-2 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                              className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
                             />
                           </div>
                         </div>
