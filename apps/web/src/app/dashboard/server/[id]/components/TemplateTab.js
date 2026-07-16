@@ -249,7 +249,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
                           className="w-full bg-transparent border-b border-primary-container/50 focus:border-primary-container px-2 py-1 text-lg font-headline-md text-primary-container outline-none transition-colors"
                         />
                       ) : (
-                        <div className="grid grid-cols-2 md:grid-cols-6 gap-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div>
                             <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Weapon' : 'Silah'}</label>
                             <input 
@@ -257,7 +257,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
                               value={block.weapon}
                               onChange={(e) => updateBlock(block.id, { weapon: e.target.value })}
                               placeholder={lang === 'en' ? 'Role/Weapon' : 'Rol/Silah'}
-                              className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                              className="w-full bg-surface border border-outline-variant rounded-sm px-3 py-2 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
                             />
                           </div>
                           <div>
@@ -266,7 +266,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
                               list="heads-list"
                               value={block.head}
                               onChange={(e) => updateBlock(block.id, { head: e.target.value })}
-                              className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                              className="w-full bg-surface border border-outline-variant rounded-sm px-3 py-2 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
                             />
                           </div>
                           <div>
@@ -275,7 +275,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
                               list="chests-list"
                               value={block.chest}
                               onChange={(e) => updateBlock(block.id, { chest: e.target.value })}
-                              className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                              className="w-full bg-surface border border-outline-variant rounded-sm px-3 py-2 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
                             />
                           </div>
                           <div>
@@ -284,7 +284,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
                               list="shoes-list"
                               value={block.shoes}
                               onChange={(e) => updateBlock(block.id, { shoes: e.target.value })}
-                              className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                              className="w-full bg-surface border border-outline-variant rounded-sm px-3 py-2 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
                             />
                           </div>
                           <div>
@@ -293,7 +293,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
                               list="potions-list"
                               value={block.potion}
                               onChange={(e) => updateBlock(block.id, { potion: e.target.value })}
-                              className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                              className="w-full bg-surface border border-outline-variant rounded-sm px-3 py-2 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
                             />
                           </div>
                           <div>
@@ -302,7 +302,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
                               list="foods-list"
                               value={block.food}
                               onChange={(e) => updateBlock(block.id, { food: e.target.value })}
-                              className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                              className="w-full bg-surface border border-outline-variant rounded-sm px-3 py-2 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
                             />
                           </div>
                         </div>
