@@ -34,8 +34,8 @@ export async function POST(req) {
 
     const templates = await getUserTemplates(userId);
     
-    // Check limits (Free: 1, Premium: Unlimited)
-    if (!isPremium && templates.length >= 1) {
+    // Check limits (Free: 5, Premium: Unlimited)
+    if (!isPremium && templates.length >= 5) {
       return NextResponse.json({ error: 'You have reached the template limit for free users. Please upgrade to premium.' }, { status: 403 });
     }
 

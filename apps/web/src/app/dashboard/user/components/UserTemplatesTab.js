@@ -3,6 +3,7 @@
 import { Copy, Plus, Trash2, GripVertical, PlusCircle } from "lucide-react";
 import InfoTooltip from "@/components/InfoTooltip";
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { 
   albionWeapons, 
   albionHeads, 
@@ -13,6 +14,7 @@ import {
 } from "@/data/albionItems";
 
 export default function UserTemplatesTab({ t, lang, templates, setTemplates, isPremium, showToast }) {
+  const router = useRouter();
   const [selectedTemplateId, setSelectedTemplateId] = useState(null);
   const selectedTemplate = templates.find(tpl => tpl.id === selectedTemplateId) || null;
 
@@ -140,13 +142,8 @@ export default function UserTemplatesTab({ t, lang, templates, setTemplates, isP
   };
 
   const handleCreateTemplate = async () => {
-    if (!isPremium && templates.length >= 1) {
-      showToast(
-        lang === 'tr' 
-          ? "Freemium üyeler en fazla 1 adet kişisel şablon oluşturabilir! Sınırsız şablon için Premium satın alın." 
-          : "Free users can create a maximum of 1 personal template! Upgrade to Premium for unlimited templates.", 
-        "error"
-      );
+    if (!isPremium && templates.length >= 5) {
+      router.push('/premium');
       return;
     }
     
@@ -216,9 +213,9 @@ export default function UserTemplatesTab({ t, lang, templates, setTemplates, isP
             <InfoTooltip text={lang === 'en' ? 'Create personal reusable party setups. Use the /mytemps command in Discord.' : 'Kişisel, tekrar kullanılabilir parti ayarları oluşturun. Discord\'da /mytemps komutu ile görebilirsiniz.'} />
           </h2>
           <button 
-            className={`p-2 bg-surface-container border border-outline-variant rounded-sm transition-colors text-on-surface-variant ${(!isPremium && templates.length >= 1) ? 'opacity-50 cursor-not-allowed' : 'hover:border-primary-container hover:text-primary-container'}`} 
+            className="p-2 bg-surface-container border border-outline-variant rounded-sm transition-colors text-on-surface-variant hover:border-primary-container hover:text-primary-container"
             onClick={handleCreateTemplate}
-            title={!isPremium && templates.length >= 1 ? (lang === 'tr' ? 'Yeni şablonlar eklemek için Premium pakete geçin.' : 'Upgrade to Premium to add more templates.') : ''}
+            title={!isPremium && templates.length >= 5 ? (lang === 'tr' ? 'Daha fazla şablon eklemek için Premium pakete geçin.' : 'Upgrade to Premium to add more templates.') : ''}
           >
              <Plus size={18} />
           </button>
