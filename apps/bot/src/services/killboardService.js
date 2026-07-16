@@ -254,8 +254,19 @@ async function sendKillBoardSummary(client, guildCfg) {
         }
 
         // Send to channel
-        const channel = await client.channels.fetch(guildCfg.killboard_channel_id).catch((err) => {
-            console.error(`[KillBoard] Cannot fetch channel: ${err.message}`);
+        const channel = await client.channels.fetch(guildCfg.killboard_channel_id).catch(async (err) => {
+            console.warn(`[KillBoard] Cannot fetch channel (might be deleted): ${err.message}`);
+            try {
+                const { supabase } = require('@veyronix/database');
+                await db.run(
+                    'UPDATE guild_configs SET killboard_channel_id = NULL WHERE guild_id = ?',
+                    [guildCfg.guild_id]
+                );
+                await supabase.from('guild_settings').update({ killboard_channel_id: null }).eq('guild_id', guildCfg.guild_id);
+                console.log(`[KillBoard] Removed invalid channel configuration for guild ${guildCfg.guild_id}.`);
+            } catch(e) {
+                console.error(`[KillBoard] Failed to nullify killboard channel for ${guildCfg.guild_id}:`, e.message);
+            }
             return null;
         });
 
@@ -273,7 +284,7 @@ async function sendKillBoardSummary(client, guildCfg) {
             const { supabase } = require('@veyronix/database');
             await supabase.from('guild_settings').update({ last_killboard_date: nowIso }).eq('guild_id', guildCfg.guild_id);
         } else {
-            console.error(`[KillBoard] ❌ Channel not found: ${guildCfg.killboard_channel_id}`);
+            console.warn(`[KillBoard] ⚠️ Channel not found or invalid: ${guildCfg.killboard_channel_id}`);
         }
 
     } catch (error) {
