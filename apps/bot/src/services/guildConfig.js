@@ -14,6 +14,16 @@ async function getGuildConfig(guildId) {
         if (sbSettings) {
             // Merge SB settings into local config
             configResult = { ...configResult, ...sbSettings };
+            
+            // Extract auto_delete_party_hours from log_events JSON if it exists
+            if (sbSettings.log_events) {
+                try {
+                    const ev = typeof sbSettings.log_events === 'string' ? JSON.parse(sbSettings.log_events) : sbSettings.log_events;
+                    if (ev && typeof ev.auto_delete_party_hours !== 'undefined') {
+                        configResult.auto_delete_party_hours = ev.auto_delete_party_hours;
+                    }
+                } catch(e) {}
+            }
         }
 
         return Object.keys(configResult).length > 0 ? configResult : null;

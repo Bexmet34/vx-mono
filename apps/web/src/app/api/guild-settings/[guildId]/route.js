@@ -94,7 +94,7 @@ export async function POST(req, { params }) {
           embed_thumbnail_url: embed_thumbnail_url || null,
           log_system_enabled: log_system_enabled ?? false,
           log_channel_id: log_channel_id || null,
-          log_events: { ...(log_events || {"message_delete": true, "message_edit": true, "channel_create": true, "channel_delete": true, "bot_add": true, "member_ban": true}), exempts: log_exempts || null },
+          log_events: { ...(log_events || {"message_delete": true, "message_edit": true, "channel_create": true, "channel_delete": true, "bot_add": true, "member_ban": true}), exempts: log_exempts || null, auto_delete_party_hours: auto_delete_party_hours || 0 },
           party_templates: Array.isArray(party_templates) ? party_templates : [],
           albion_guild_id: albion_guild_id || null,
           albion_guild_name: albion_guild_name || null,
@@ -134,7 +134,6 @@ export async function POST(req, { params }) {
           ticket_message_title: ticket_message_title || 'Destek Talebi',
           ticket_message_desc: ticket_message_desc || 'Lütfen aşağıdaki menüden bir konu seçerek destek talebinizi oluşturun.',
           ticket_options: Array.isArray(ticket_options) ? ticket_options : [{"label": "Genel Destek", "value": "genel", "description": "Genel konular hakkında destek alın", "emoji": "📩"}],
-          auto_delete_party_hours: auto_delete_party_hours || 0,
         },
         { onConflict: 'guild_id' }
       )
