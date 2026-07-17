@@ -210,6 +210,12 @@ client.on('interactionCreate', async interaction => {
                 await handleTempAutocomplete(interaction);
             }
         } else if (interaction.isChatInputCommand()) {
+            try {
+                const db = require('./services/db');
+                db.logAnalyticsEvent('command_used', interaction.commandName, interaction.guildId || 'DM', interaction.user.id);
+            } catch (e) {
+                console.error('[Analytics] Error logging command:', e.message);
+            }
             if (interaction.commandName === 'help') {
                 await handleHelpCommand(interaction);
             } else if (interaction.commandName === 'vote') {

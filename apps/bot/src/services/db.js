@@ -138,6 +138,16 @@ function initDb() {
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )`);
 
+            // Bot Analytics
+            db.exec(`CREATE TABLE IF NOT EXISTS bot_analytics (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                event_type TEXT,
+                event_name TEXT,
+                guild_id TEXT,
+                user_id TEXT,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )`);
+
             // Migrations for existing tables (safe to run multiple times)
             const safeAlter = (sql) => {
                 try { db.exec(sql); } catch (e) { /* column already exists */ }
@@ -229,9 +239,23 @@ function all(sql, params = []) {
     });
 }
 
+/**
+ * Log an analytics event
+ */
+function logAnalyticsEvent(eventType, eventName, guildId, userId) {
+    try {
+        const sql = `INSERT INTO bot_analytics (event_type, event_name, guild_id, user_id) VALUES (?, ?, ?, ?)`;
+        const stmt = db.prepare(sql);
+        stmt.run(eventType, eventName, guildId, userId);
+    } catch (err) {
+        console.error('[Analytics] Failed to log event:', err.message);
+    }
+}
+
 module.exports = {
     initDb,
     run,
     get,
-    all
+    all,
+    logAnalyticsEvent
 };

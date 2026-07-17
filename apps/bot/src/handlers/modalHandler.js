@@ -159,6 +159,9 @@ async function handlePartiModal(interaction) {
                             );
                         }
                     }
+                    
+                    // Analytics: Party created
+                    db.logAnalyticsEvent('party_created', type, interaction.guildId || 'DM', userId);
                 } catch (err) {
                     console.error('[ModalHandler] DB Error:', err.message);
                 }
