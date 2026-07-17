@@ -240,15 +240,25 @@ function all(sql, params = []) {
 }
 
 /**
- * Log an analytics event
+ * Log an analytics event to Supabase
  */
-function logAnalyticsEvent(eventType, eventName, guildId, userId) {
+async function logAnalyticsEvent(eventType, eventName, guildId, userId) {
     try {
-        const sql = `INSERT INTO bot_analytics (event_type, event_name, guild_id, user_id) VALUES (?, ?, ?, ?)`;
-        const stmt = db.prepare(sql);
-        stmt.run(eventType, eventName, guildId, userId);
+        const { supabase } = require('@veyronix/database');
+        if (!supabase) return;
+        
+        const { error } = await supabase
+            .from('bot_analytics')
+            .insert([{
+                event_type: eventType,
+                event_name: eventName,
+                guild_id: guildId || null,
+                user_id: userId || null
+            }]);
+            
+        if (error) throw error;
     } catch (err) {
-        console.error('[Analytics] Failed to log event:', err.message);
+        console.error('[Analytics] Failed to log event to Supabase:', err.message);
     }
 }
 

@@ -1961,6 +1961,82 @@ export default function AdminPage() {
         </div>
       )}
 
+      {/* STATS TAB */}
+      {activeTab === "stats" && (
+        <div className="animate-slide-up">
+          <div className="server-tab-header">
+             <div>
+                <h2 style={{fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0.3rem'}}>Analitik & İstatistikler</h2>
+                <p style={{color: 'var(--admin-text-muted)'}}>Bot kullanım verilerini grafiklerle inceleyin.</p>
+             </div>
+             <button className="admin-btn-secondary" onClick={fetchStats}><Loader2 size={18} className={loading ? "spin" : ""} /> Yenile</button>
+          </div>
+
+          {!statsData ? (
+            <div style={{textAlign: 'center', padding: '3rem'}}>Veriler yükleniyor...</div>
+          ) : statsData.warning ? (
+            <div style={{textAlign: 'center', padding: '3rem', color: 'var(--admin-error)'}}>
+              <AlertCircle size={48} style={{margin: '0 auto 1rem'}} />
+              <h3>Geçici Olarak Devre Dışı</h3>
+              <p style={{marginTop: '0.5rem', opacity: 0.8}}>{statsData.warning}</p>
+            </div>
+          ) : (
+            <div style={{display: 'flex', flexDirection: 'column', gap: '2rem'}}>
+              
+              <div className="server-stats-row">
+                 <div className="stat-mini-card" style={{flex: 1}}>
+                    <div className="label">Toplam Parti</div>
+                    <div className="value">{statsData.stats?.totalParties || 0}</div>
+                 </div>
+                 <div className="stat-mini-card" style={{flex: 1}}>
+                    <div className="label">Kullanılan Komut</div>
+                    <div className="value">{statsData.stats?.totalCommands || 0}</div>
+                 </div>
+              </div>
+
+              <div style={{display: 'flex', gap: '2rem', flexWrap: 'wrap'}}>
+                {/* Hourly Activity */}
+                <div className="admin-card" style={{flex: '2 1 500px', minWidth: '300px'}}>
+                  <div className="admin-card-header border-b border-[var(--admin-border)]">
+                    <h3>Son 24 Saat Parti Aktivitesi</h3>
+                  </div>
+                  <div style={{height: 300, padding: '1rem'}}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={statsData.hourlyParties || []}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                        <XAxis dataKey="hour" stroke="#888" />
+                        <YAxis stroke="#888" allowDecimals={false} />
+                        <RechartsTooltip contentStyle={{backgroundColor: '#1a1a2e', borderColor: '#333', color: '#fff'}} />
+                        <Line type="monotone" dataKey="count" name="Parti Sayısı" stroke="#fca311" strokeWidth={3} activeDot={{ r: 8 }} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Top Commands */}
+                <div className="admin-card" style={{flex: '1 1 300px', minWidth: '300px'}}>
+                  <div className="admin-card-header border-b border-[var(--admin-border)]">
+                    <h3>Popüler Komutlar</h3>
+                  </div>
+                  <div style={{height: 300, padding: '1rem'}}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={statsData.topCommands || []} layout="vertical">
+                        <CartesianGrid strokeDasharray="3 3" stroke="#333" horizontal={true} vertical={false} />
+                        <XAxis type="number" stroke="#888" />
+                        <YAxis dataKey="name" type="category" stroke="#888" width={90} />
+                        <RechartsTooltip contentStyle={{backgroundColor: '#1a1a2e', borderColor: '#333', color: '#fff'}} />
+                        <Bar dataKey="count" name="Kullanım" fill="#3a86ff" radius={[0, 4, 4, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          )}
+        </div>
+      )}
+
     </main>
 
       {/* Confirm Action Modal */}
