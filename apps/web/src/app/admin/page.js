@@ -12,6 +12,10 @@ import {
 import { useCallback } from "react";
 import { format } from "date-fns";
 import { tr, enUS } from "date-fns/locale";
+import { 
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer,
+  PieChart, Pie, Cell, LineChart, Line
+} from 'recharts';
 import "./admin.css";
 
 const ADMIN_ID = process.env.NEXT_PUBLIC_ADMIN_ID;
@@ -81,6 +85,9 @@ export default function AdminPage() {
 
   // Settings States
   const [systemSettings, setSystemSettings] = useState({ vote_cooldown_hours: 168 });
+
+  // Analytics States
+  const [statsData, setStatsData] = useState(null);
 
   const isAdmin = session?.user?.id === ADMIN_ID || session?.user?.id === ADMIN_ID_2;
 
@@ -160,6 +167,16 @@ export default function AdminPage() {
       const res = await fetch("/api/admin/bank-accounts");
       const data = await res.json();
       if (res.ok) setBankAccounts(data);
+    } catch (err) { console.error(err); }
+    finally { setLoading(false); }
+  }, []);
+
+  const fetchStats = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/admin/analytics");
+      const data = await res.json();
+      if (res.ok) setStatsData(data);
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
   }, []);
@@ -251,9 +268,10 @@ export default function AdminPage() {
         if (activeTab === "settings") fetchSettings();
         if (activeTab === "manual-payments") fetchManualPayments();
         if (activeTab === "bank-accounts") fetchBankAccounts();
+        if (activeTab === "stats" && !statsData) fetchStats();
       }, 0);
     }
-  }, [status, isAdmin, activeTab, fetchTemplates, fetchServers, fetchUsers, fetchCampaigns, fetchScheduledMessages, fetchPlans, fetchSettings, fetchManualPayments, fetchBankAccounts]);
+  }, [activeTab, status, isAdmin, fetchTemplates, fetchServers, fetchUsers, fetchCampaigns, fetchScheduledMessages, fetchPlans, fetchSettings, fetchManualPayments, fetchBankAccounts, fetchStats, statsData]);
 
 
   const handleCreateCampaign = async () => {
