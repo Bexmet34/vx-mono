@@ -199,6 +199,21 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
               ))}
             </select>
           </div>
+
+          <div className="md:col-span-2">
+            <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+              {lang === 'en' ? 'Main Guild Tag (For 1st Role)' : 'Ana Guild Tagi (1. Rol İçin)'}
+              <InfoTooltip text={lang === 'en' ? 'This tag is automatically added with [ ] brackets when you approve with the 1st role.' : 'Kayıt onayında 1. role basıldığında oyuncunun isminin başına eklenecek olan tag. (Sistem otomatik olarak [] köşeli parantezleri ekler)'} />
+            </label>
+            <input
+              type="text"
+              maxLength="5"
+              className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md uppercase"
+              placeholder={lang === 'en' ? 'e.g. TAG (Brackets added automatically)' : 'Örn: TAG ([] parantezleri sistem ekler)'}
+              value={settings.auto_check_guild_tag || ""}
+              onChange={(e) => setSettings({ ...settings, auto_check_guild_tag: e.target.value.replace(/[\[\]]/g, '') })}
+            />
+          </div>
           </div>
 
         {/* ----- SECTION: Given Roles ----- */}
@@ -533,20 +548,6 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                         if (val < 3) val = 3;
                         setSettings({ ...settings, auto_check_interval: val });
                       }}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
-                      {lang === 'en' ? 'Guild Tag (Optional, Max 5 chars)' : 'Guild Tagi (İsteğe Bağlı, Max 5 harf)'}
-                    </label>
-                    <input
-                      type="text"
-                      maxLength="5"
-                      className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md uppercase"
-                      placeholder={lang === 'en' ? 'e.g. ABCDE' : 'Örn: TAG'}
-                      value={settings.auto_check_guild_tag || ""}
-                      onChange={(e) => setSettings({ ...settings, auto_check_guild_tag: e.target.value })}
                     />
                   </div>
                 </div>
