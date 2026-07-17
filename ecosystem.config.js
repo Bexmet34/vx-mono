@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       name: 'partikur',
-      script: 'src/index.js',
+      script: 'src/sharding.js',
       cwd: './apps/bot',
       watch: false,
       env: {
