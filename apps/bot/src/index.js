@@ -103,26 +103,22 @@ client.once('clientReady', async (c) => {
     const { startScheduledMessageService } = require('./services/scheduledMessageService');
     const { initTempRoleService } = require('./services/tempRoleService');
 
-    
-    startCronService(client);
-    initDbListeners(client);
-    startBroadcastWorker(client);
-    initObjectiveService(client);
-    initKillBoardService(client);
-    startScheduledMessageService(client);
-    initTempRoleService(client);
+    // Sadece ana (birinci) Shard üzerinde arka plan işlemlerini başlat
+    const isPrimaryShard = !client.shard || client.shard.ids[0] === 0;
 
-
-    // Auto-Poster for Top.gg (initialized after ready to avoid deprecated 'ready' event warning)
-    if (config.TOPGG_TOKEN) {
-        const ap = AutoPoster(config.TOPGG_TOKEN, client);
-        ap.on('posted', () => {
-            console.log(`[Top.gg] Server count posted! (${client.guilds.cache.size} servers)`);
-        });
-        ap.on('error', (err) => {
-            console.error('[Top.gg] AutoPoster Error:', err.message);
-        });
+    if (isPrimaryShard) {
+        startCronService(client);
+        initDbListeners(client);
+        startBroadcastWorker(client);
+        initObjectiveService(client);
+        initKillBoardService(client);
+        startScheduledMessageService(client);
+        initTempRoleService(client);
+        console.log('[PrimaryShard] Background services initialized.');
     }
+
+
+    // Auto-Poster for Top.gg is now handled in sharding.js
 
     console.log('-------------------------------------------');
     console.log(`🚀 ${c.user.tag} Online! (${new Date().toLocaleTimeString('tr-TR')})`);
