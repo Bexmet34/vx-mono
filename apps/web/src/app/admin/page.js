@@ -7,14 +7,15 @@ import {
   Save, Bell, Loader2, AlertCircle, CheckCircle,
   LayoutDashboard, Server, MessageSquare, Settings, 
   Users, BarChart3, Search, Clock, Infinity, Power, 
-  Calendar, Trash2, ChevronRight, ArrowLeft, Gift, Plus, Send, Edit3, Eye, EyeOff, DollarSign, Check, X, Gamepad2, CreditCard
+  Calendar, Trash2, ChevronRight, ArrowLeft, Gift, Plus, Send, Edit3, Eye, EyeOff, DollarSign, Check, X, Gamepad2, CreditCard,
+  Activity, TerminalSquare
 } from "lucide-react";
 import { useCallback } from "react";
 import { format } from "date-fns";
 import { tr, enUS } from "date-fns/locale";
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer,
-  PieChart, Pie, Cell, LineChart, Line
+  PieChart, Pie, Cell, LineChart, Line, AreaChart, Area
 } from 'recharts';
 import "./admin.css";
 
@@ -1983,49 +1984,103 @@ export default function AdminPage() {
           ) : (
             <div style={{display: 'flex', flexDirection: 'column', gap: '2rem'}}>
               
-              <div className="server-stats-row">
-                 <div className="stat-mini-card" style={{flex: 1}}>
-                    <div className="label">Toplam Parti</div>
-                    <div className="value">{statsData.stats?.totalParties || 0}</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>
+                 <div className="admin-card" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1.5rem', background: 'linear-gradient(145deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%)', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                    <div style={{ background: 'rgba(252, 163, 17, 0.1)', padding: '1rem', borderRadius: '16px' }}>
+                       <Gamepad2 size={28} color="#fca311" />
+                    </div>
+                    <div>
+                       <div style={{ fontSize: '0.85rem', color: 'var(--admin-text-muted)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Toplam Parti</div>
+                       <div style={{ fontSize: '1.8rem', fontWeight: '800', color: 'white', marginTop: '0.2rem' }}>{statsData.stats?.totalParties?.toLocaleString() || 0}</div>
+                    </div>
                  </div>
-                 <div className="stat-mini-card" style={{flex: 1}}>
-                    <div className="label">Kullanılan Komut</div>
-                    <div className="value">{statsData.stats?.totalCommands || 0}</div>
+                 
+                 <div className="admin-card" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1.5rem', background: 'linear-gradient(145deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%)', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                    <div style={{ background: 'rgba(58, 134, 255, 0.1)', padding: '1rem', borderRadius: '16px' }}>
+                       <TerminalSquare size={28} color="#3a86ff" />
+                    </div>
+                    <div>
+                       <div style={{ fontSize: '0.85rem', color: 'var(--admin-text-muted)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Kullanılan Komut</div>
+                       <div style={{ fontSize: '1.8rem', fontWeight: '800', color: 'white', marginTop: '0.2rem' }}>{statsData.stats?.totalCommands?.toLocaleString() || 0}</div>
+                    </div>
+                 </div>
+
+                 <div className="admin-card" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1.5rem', background: 'linear-gradient(145deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%)', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                    <div style={{ background: 'rgba(46, 204, 113, 0.1)', padding: '1rem', borderRadius: '16px' }}>
+                       <Server size={28} color="#2ecc71" />
+                    </div>
+                    <div>
+                       <div style={{ fontSize: '0.85rem', color: 'var(--admin-text-muted)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Aktif Premium Sunucu</div>
+                       <div style={{ fontSize: '1.8rem', fontWeight: '800', color: 'white', marginTop: '0.2rem' }}>{servers.filter(s => s.is_active).length}</div>
+                    </div>
+                 </div>
+
+                 <div className="admin-card" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1.5rem', background: 'linear-gradient(145deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%)', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                    <div style={{ background: 'rgba(155, 89, 182, 0.1)', padding: '1rem', borderRadius: '16px' }}>
+                       <Users size={28} color="#9b59b6" />
+                    </div>
+                    <div>
+                       <div style={{ fontSize: '0.85rem', color: 'var(--admin-text-muted)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Toplam Sunucu</div>
+                       <div style={{ fontSize: '1.8rem', fontWeight: '800', color: 'white', marginTop: '0.2rem' }}>{servers.length}</div>
+                    </div>
                  </div>
               </div>
 
-              <div style={{display: 'flex', gap: '2rem', flexWrap: 'wrap'}}>
+              <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem'}}>
                 {/* Hourly Activity */}
-                <div className="admin-card" style={{flex: '2 1 500px', minWidth: '300px'}}>
-                  <div className="admin-card-header border-b border-[var(--admin-border)]">
-                    <h3>Son 24 Saat Parti Aktivitesi</h3>
+                <div className="admin-card" style={{ overflow: 'hidden' }}>
+                  <div className="admin-card-header" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '1.5rem' }}>
+                    <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.1rem' }}>
+                       <Activity size={18} color="#fca311" /> Son 24 Saat Parti Aktivitesi
+                    </h3>
                   </div>
-                  <div style={{height: 300, padding: '1rem'}}>
+                  <div style={{height: 350, padding: '1.5rem 1.5rem 0 0'}}>
                     <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={statsData.hourlyParties || []}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                        <XAxis dataKey="hour" stroke="#888" />
-                        <YAxis stroke="#888" allowDecimals={false} />
-                        <RechartsTooltip contentStyle={{backgroundColor: '#1a1a2e', borderColor: '#333', color: '#fff'}} />
-                        <Line type="monotone" dataKey="count" name="Parti Sayısı" stroke="#fca311" strokeWidth={3} activeDot={{ r: 8 }} />
-                      </LineChart>
+                      <AreaChart data={statsData.hourlyParties || []}>
+                        <defs>
+                          <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#fca311" stopOpacity={0.3}/>
+                            <stop offset="95%" stopColor="#fca311" stopOpacity={0}/>
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                        <XAxis dataKey="hour" stroke="#64748b" tick={{fill: '#64748b', fontSize: 12}} axisLine={false} tickLine={false} dy={10} />
+                        <YAxis stroke="#64748b" allowDecimals={false} tick={{fill: '#64748b', fontSize: 12}} axisLine={false} tickLine={false} dx={-10} />
+                        <RechartsTooltip 
+                          contentStyle={{backgroundColor: 'rgba(15, 23, 42, 0.9)', borderColor: 'rgba(255,255,255,0.1)', color: '#fff', borderRadius: '8px', backdropFilter: 'blur(10px)'}} 
+                          itemStyle={{color: '#fca311', fontWeight: 'bold'}}
+                        />
+                        <Area type="monotone" dataKey="count" name="Parti Sayısı" stroke="#fca311" strokeWidth={3} fillOpacity={1} fill="url(#colorCount)" activeDot={{ r: 6, strokeWidth: 0, fill: '#fff' }} />
+                      </AreaChart>
                     </ResponsiveContainer>
                   </div>
                 </div>
 
                 {/* Top Commands */}
-                <div className="admin-card" style={{flex: '1 1 300px', minWidth: '300px'}}>
-                  <div className="admin-card-header border-b border-[var(--admin-border)]">
-                    <h3>Popüler Komutlar</h3>
+                <div className="admin-card" style={{ overflow: 'hidden' }}>
+                  <div className="admin-card-header" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '1.5rem' }}>
+                    <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.1rem' }}>
+                       <TerminalSquare size={18} color="#3a86ff" /> Popüler Komutlar
+                    </h3>
                   </div>
-                  <div style={{height: 300, padding: '1rem'}}>
+                  <div style={{height: 350, padding: '1.5rem 1.5rem 0 0'}}>
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={statsData.topCommands || []} layout="vertical">
-                        <CartesianGrid strokeDasharray="3 3" stroke="#333" horizontal={true} vertical={false} />
-                        <XAxis type="number" stroke="#888" />
-                        <YAxis dataKey="name" type="category" stroke="#888" width={90} />
-                        <RechartsTooltip contentStyle={{backgroundColor: '#1a1a2e', borderColor: '#333', color: '#fff'}} />
-                        <Bar dataKey="count" name="Kullanım" fill="#3a86ff" radius={[0, 4, 4, 0]} />
+                      <BarChart data={statsData.topCommands || []} layout="vertical" barSize={24}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" horizontal={true} vertical={false} />
+                        <XAxis type="number" stroke="#64748b" tick={{fill: '#64748b', fontSize: 12}} axisLine={false} tickLine={false} />
+                        <YAxis dataKey="name" type="category" stroke="#64748b" width={100} tick={{fill: '#e2e8f0', fontSize: 13, fontWeight: 500}} axisLine={false} tickLine={false} />
+                        <RechartsTooltip 
+                          cursor={{fill: 'rgba(255,255,255,0.05)'}}
+                          contentStyle={{backgroundColor: 'rgba(15, 23, 42, 0.9)', borderColor: 'rgba(255,255,255,0.1)', color: '#fff', borderRadius: '8px', backdropFilter: 'blur(10px)'}} 
+                          itemStyle={{color: '#3a86ff', fontWeight: 'bold'}}
+                        />
+                        <Bar dataKey="count" name="Kullanım" fill="#3a86ff" radius={[0, 6, 6, 0]}>
+                           {
+                             (statsData.topCommands || []).map((entry, index) => (
+                               <Cell key={`cell-${index}`} fill={index === 0 ? '#3a86ff' : index === 1 ? '#4cc9f0' : '#4895ef'} />
+                             ))
+                           }
+                        </Bar>
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
