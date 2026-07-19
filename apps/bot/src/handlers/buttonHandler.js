@@ -768,8 +768,33 @@ async function handleRegisterButtons(interaction) {
                 // Protect against empty age or realName
                 const safeAge = age ? ` ${age}` : '';
                 const safeRealName = capRealName ? ` - ${capRealName}` : '';
-                let newNickname = `${prefix}${capIgn}${safeRealName}${safeAge}`.trim();
                 
+                const fixedLength = prefix.length + safeRealName.length + safeAge.length;
+                let finalIgn = capIgn;
+                
+                if (fixedLength + finalIgn.length > 32) {
+                    let charsToRemove = (fixedLength + finalIgn.length) - 32;
+                    const vowels = 'aeıioöuüAEIİOÖUÜ';
+                    let ignArr = finalIgn.split('');
+                    
+                    for (let i = ignArr.length - 1; i >= 0 && charsToRemove > 0; i--) {
+                        if (vowels.includes(ignArr[i])) {
+                            ignArr.splice(i, 1);
+                            charsToRemove--;
+                        }
+                    }
+                    
+                    finalIgn = ignArr.join('');
+                    
+                    if (fixedLength + finalIgn.length > 32) {
+                        const maxIgnLength = Math.max(0, 32 - fixedLength);
+                        finalIgn = finalIgn.substring(0, maxIgnLength);
+                    }
+                }
+                
+                let newNickname = `${prefix}${finalIgn}${safeRealName}${safeAge}`.trim();
+                
+                // Absolute fallback in case safeRealName or safeAge was impossibly long
                 if (newNickname.length > 32) {
                     newNickname = newNickname.substring(0, 32);
                 }
@@ -862,7 +887,7 @@ async function handleRegisterButtons(interaction) {
                         await targetMember.setNickname(newNickname);
                         nickStatus = `\n✅ **Yeni İsim:** ${newNickname}`;
                     } catch (e) {
-                        console.error('Nickname error:', e);
+                        console.error(`[Nickname error] ${e.message} for user ${targetUserId}`);
                         nickStatus = `\n⚠️ **İsim Değiştirilemedi:** Botun yetkisi bu kişinin ismini değiştirmeye yetmiyor. (Kullanıcının rolü botun rolünden yüksek olabilir)`;
                     }
                 } else {
