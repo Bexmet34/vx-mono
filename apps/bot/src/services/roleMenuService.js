@@ -37,16 +37,50 @@ async function sendRoleMenu(client, menuId, guildId) {
         for (const menu of menus) {
             if (!menu.options || menu.options.length === 0) continue;
 
+            const validOptions = menu.options.filter(opt => opt && opt.value && opt.value.trim() !== '');
+            if (validOptions.length === 0) continue;
+
+            const safeOptions = validOptions.map((opt, index) => {
+                let safeLabel = (opt.label && opt.label.trim() !== '') ? opt.label.trim().substring(0, 100) : `Role ${index + 1}`;
+                let safeValue = opt.value.trim().substring(0, 100);
+                let safeEmoji = undefined;
+                
+                if (opt.emoji && opt.emoji.trim() !== '') {
+                    let e = opt.emoji.trim();
+                    // Extract ID if it's a custom emoji string like <:name:id> or <a:name:id>
+                    const match = e.match(/<a?:.+:(\d+)>/);
+                    if (match) {
+                        safeEmoji = match[1];
+                    } else {
+                        safeEmoji = e;
+                    }
+                }
+                
+                return {
+                    label: safeLabel,
+                    value: safeValue,
+                    emoji: safeEmoji
+                };
+            });
+            
+            // Deduplicate values (Discord requires unique values in select menus)
+            const uniqueOptions = [];
+            const seenValues = new Set();
+            for (const o of safeOptions) {
+                if (!seenValues.has(o.value)) {
+                    seenValues.add(o.value);
+                    uniqueOptions.push(o);
+                }
+            }
+
+            if (uniqueOptions.length === 0) continue;
+
             const selectMenu = new StringSelectMenuBuilder()
                 .setCustomId(menu.custom_id)
-                .setPlaceholder(menu.placeholder || 'Select Roles...')
+                .setPlaceholder(menu.placeholder ? menu.placeholder.trim().substring(0, 150) : 'Select Roles...')
                 .setMinValues(0)
-                .setMaxValues(Math.min(menu.options.length, 25))
-                .addOptions(menu.options.map(opt => ({
-                    label: opt.label || 'Role',
-                    value: opt.value,
-                    emoji: opt.emoji || undefined
-                })));
+                .setMaxValues(Math.min(uniqueOptions.length, 25))
+                .addOptions(uniqueOptions);
 
             components.push(new ActionRowBuilder().addComponents(selectMenu));
 
