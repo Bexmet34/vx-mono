@@ -437,7 +437,7 @@ async function handleJoinRoleSelect(interaction) {
             // Extract flexible users in slots (for existingMatches)
             const existingMatches = {};
             simRoles.forEach((r, idx) => {
-                if (r.userId && multiRoleWaitlist.some(u => u.userId === r.userId)) {
+                if (r.userId && r.userId !== userId && multiRoleWaitlist.some(u => u.userId === r.userId)) {
                     existingMatches[idx] = multiRoleWaitlist.find(u => u.userId === r.userId);
                 }
             });

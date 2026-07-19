@@ -448,7 +448,7 @@ function buildWaitlistField(multiRoleWaitlist, rolesWithMembers, lang = 'tr') {
     
     const lines = multiRoleWaitlist.map(u => {
         const roleNames = u.roleIndices.map(idx => rolesWithMembers[idx]?.role || 'Unknown').map(r => r.includes('>') ? r.split('>')[0].trim() : r);
-        return `<@${u.userId}> : ${roleNames.join(', ')}`;
+        return `<@${u.userId}> : [${u.roleIndices.join(',')}] ${roleNames.join(', ')}`;
     });
     
     return {
