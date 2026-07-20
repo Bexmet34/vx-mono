@@ -34,7 +34,7 @@ function fetchAllGuildEvents(guildId, server = 'Europe') {
     };
     const baseUrl = REGIONS[server] || REGIONS.Europe;
     return fetchAlbionEvents(
-        `${baseUrl}/events?offset=0&limit=51&guildId=${guildId}`
+        `${baseUrl}/events?offset=0&limit=50&guildId=${guildId}`
     );
 }
 
