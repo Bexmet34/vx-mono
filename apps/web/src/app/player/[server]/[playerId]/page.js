@@ -58,40 +58,39 @@ export default async function PlayerProfilePage({ params }) {
       </div>
 
       <div style={{ maxWidth: '800px', margin: '0 auto', marginBottom: '4rem' }}>
-        <div className={`${styles.playerCard} ${styles.killerCard}`} style={{ width: '100%' }}>
-          <div className={styles.playerTitle}>{player.Name}</div>
+        <div className={`${styles.playerCard} ${styles.killerCard}`} style={{ width: '100%', marginBottom: '1.5rem', padding: '3rem 1rem' }}>
+          <div className={styles.playerTitle} style={{ fontSize: '3rem' }}>{player.Name}</div>
           {player.GuildName && (
-            <div className={styles.guildName}>
+            <div className={styles.guildName} style={{ fontSize: '1.2rem', opacity: 0.8 }}>
               <Link href={`/guild/${server}/${player.GuildId}`} style={{ color: 'inherit', textDecoration: 'none' }} className="hover:text-white transition-colors">
                 [{player.AllianceName}] {player.GuildName}
               </Link>
             </div>
           )}
-          
-          <div style={{ marginTop: '2rem', padding: '1.5rem', background: 'rgba(252, 163, 17, 0.05)', borderRadius: '12px', border: '1px solid rgba(252, 163, 17, 0.2)', textAlign: 'center' }}>
-            <h3 style={{ color: '#fca311', marginBottom: '0.5rem', fontSize: '1.2rem' }}>Kendi Loncanız İçin Veyronix\'i Deneyin!</h3>
-            <p style={{ color: '#aaa', fontSize: '0.95rem', marginBottom: '1rem', maxWidth: '400px', margin: '0 auto 1rem auto' }}>
-              Discord sunucunuza Killboard, parti oluşturma ve gelişmiş üye yönetimi ekleyin. Üstelik kurulumu tamamen ücretsiz!
-            </p>
-            <Link 
-              href="https://discord.com/oauth2/authorize?client_id=1082239904169336902&permissions=510977&scope=bot+applications.commands"
-              target="_blank"
-              style={{
-                display: 'inline-block',
-                background: '#5865F2',
-                color: '#fff',
-                padding: '0.5rem 1.5rem',
-                borderRadius: '8px',
-                textDecoration: 'none',
-                fontWeight: 'bold',
-                fontSize: '0.9rem',
-                transition: 'opacity 0.2s'
-              }}
-              className="hover:opacity-80"
-            >
-              Hemen Discord\'a Ekle
-            </Link>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem 1.5rem', background: 'rgba(252, 163, 17, 0.05)', borderRadius: '12px', border: '1px solid rgba(252, 163, 17, 0.2)' }}>
+          <div>
+            <h4 style={{ color: '#fca311', margin: '0 0 0.2rem 0', fontSize: '1rem' }}>Veyronix Discord Bot</h4>
+            <p style={{ color: '#aaa', margin: 0, fontSize: '0.85rem' }}>Sunucunuza ücretsiz killboard ve parti sistemi ekleyin.</p>
           </div>
+          <Link 
+            href="https://discord.com/oauth2/authorize?client_id=1082239904169336902&permissions=510977&scope=bot+applications.commands"
+            target="_blank"
+            style={{
+              background: '#5865F2',
+              color: '#fff',
+              padding: '0.5rem 1rem',
+              borderRadius: '6px',
+              textDecoration: 'none',
+              fontWeight: 'bold',
+              fontSize: '0.85rem',
+              whiteSpace: 'nowrap'
+            }}
+            className="hover:opacity-80 transition-opacity"
+          >
+            Sunucuya Ekle
+          </Link>
         </div>
       </div>
 
