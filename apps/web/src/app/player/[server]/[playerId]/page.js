@@ -22,7 +22,7 @@ async function getPlayer(server, playerId) {
 }
 
 export default async function PlayerProfilePage({ params }) {
-  const { server, playerId } = params;
+  const { server, playerId } = await params;
   
   const player = await getPlayer(server, playerId);
   
@@ -68,7 +68,7 @@ export default async function PlayerProfilePage({ params }) {
 }
 
 export async function generateMetadata({ params }) {
-  const { server, playerId } = params;
+  const { server, playerId } = await params;
   const player = await getPlayer(server, playerId);
   
   if (!player) return { title: "Player Not Found" };

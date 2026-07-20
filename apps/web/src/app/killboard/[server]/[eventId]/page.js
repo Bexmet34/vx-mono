@@ -60,7 +60,7 @@ function PlayerEquipment({ equipment }) {
 }
 
 export default async function KillboardEventPage({ params }) {
-  const { server, eventId } = params;
+  const { server, eventId } = await params;
   
   const event = await getKillEvent(server, eventId);
   
@@ -109,7 +109,7 @@ export default async function KillboardEventPage({ params }) {
 }
 
 export async function generateMetadata({ params }) {
-  const { server, eventId } = params;
+  const { server, eventId } = await params;
   const event = await getKillEvent(server, eventId);
   
   if (!event) return { title: "Kill Not Found" };
