@@ -137,9 +137,6 @@ export default function Navbar({ isStatic = false }) {
               <Sparkles size={16} />
             </Link>
 
-            {/* Global Search Component */}
-            <GlobalSearch />
-
             {/* Language Toggle */}
             <button 
               onClick={toggleLanguage} 

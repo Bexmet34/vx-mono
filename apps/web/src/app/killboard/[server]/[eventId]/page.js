@@ -23,6 +23,8 @@ async function getKillEvent(server, eventId) {
   return res.json();
 }
 
+import GlobalSearch from "@/components/GlobalSearch";
+
 export default async function KillboardEventPage({ params }) {
   const { server, eventId } = await params;
   
@@ -34,6 +36,9 @@ export default async function KillboardEventPage({ params }) {
 
   return (
     <div className={styles.container} style={{ paddingTop: '2rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '2rem' }}>
+        <GlobalSearch />
+      </div>
       <KillMatch event={event} server={server} />
       <CtaBanner />
     </div>
