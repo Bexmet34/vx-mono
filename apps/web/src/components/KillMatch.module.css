@@ -157,7 +157,37 @@
 .slot-food { grid-column: 3; grid-row: 3; }
 .slot-mount { grid-column: 2; grid-row: 4; }
 
+.headerWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1rem;
+}
+
+.headerButtons {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 @media (max-width: 768px) {
+  .headerWrapper {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  .headerButtons {
+    flex-direction: column;
+    gap: 0.5rem;
+    justify-content: center;
+  }
+  .header h1, .header h2 {
+    font-size: 1.8rem;
+  }
+  .fame {
+    font-size: 1.2rem;
+    margin-top: 0;
+  }
   .versusContainer {
     flex-direction: column;
     gap: 1rem;

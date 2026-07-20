@@ -58,12 +58,12 @@ export default function KillMatch({ event, server }) {
 
   return (
     <div style={{ marginBottom: '3rem', position: 'relative' }}>
-      <div className={styles.header} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 1rem' }}>
+      <div className={`${styles.header} ${styles.headerWrapper}`}>
         <div>
           <h2>Kill Match</h2>
           <p style={{ margin: 0, fontSize: '0.9rem', color: '#aaa' }}>{date}</p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <div className={styles.headerButtons}>
           <div className={styles.fame}>
             {event.TotalVictimKillFame ? event.TotalVictimKillFame.toLocaleString() : 0} Fame
           </div>
