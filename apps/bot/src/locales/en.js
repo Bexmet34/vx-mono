@@ -169,8 +169,8 @@ module.exports = {
         joke_4: 'Did charity work today by giving out free gear.',
         joke_5: 'Eyes went bad from seeing the grey screen.',
         footer: 'Veyronix KillBoard System',
-        kill_format: '{medal} [**{name}**](https://albiononline.com/en/killboard/player/{id}) — `{kills}` kills | `{fame}M` fame',
-        death_format: '{medal} [**{name}**](https://albiononline.com/en/killboard/player/{id}) — `{deaths}` deaths | `{fame}M` lost fame',
+        kill_format: '{medal} [**{name}**]({webUrl}/player/{server}/{id}) — `{kills}` kills | `{fame}M` fame',
+        death_format: '{medal} [**{name}**]({webUrl}/player/{server}/{id}) — `{deaths}` deaths | `{fame}M` lost fame',
         fame: 'Fame'
     }
 };

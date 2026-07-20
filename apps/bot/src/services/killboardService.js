@@ -198,17 +198,20 @@ async function sendKillBoardSummary(client, guildCfg) {
             .setTimestamp()
             .setFooter({ text: t('killboard.footer', lang), iconURL: client.user.displayAvatarURL() });
 
+        const serverSlug = (guildCfg.albion_server || 'europe').toLowerCase();
+        const webUrl = process.env.NEXT_PUBLIC_WEB_URL || 'https://veyronix.com.tr';
+
         // Top killers list
         const medals = ['🥇', '🥈', '🥉', '🏅', '🏅', '🏅', '🏅', '🏅', '🏅', '🏅'];
         if (topKillers.length > 0) {
             const firstHalf = topKillers.slice(0, 5);
             const secondHalf = topKillers.slice(5, 10);
             
-            const killerText1 = firstHalf.map((k, i) => t('killboard.kill_format', lang, { medal: medals[i], name: k.Name, id: k.Id, kills: k.Kills, fame: (k.KillFame / 1000000).toFixed(2) })).join('\n');
+            const killerText1 = firstHalf.map((k, i) => t('killboard.kill_format', lang, { medal: medals[i], name: k.Name, id: k.Id, kills: k.Kills, fame: (k.KillFame / 1000000).toFixed(2), server: serverSlug, webUrl })).join('\n');
             embed.addFields({ name: t('killboard.top_killers_1', lang), value: killerText1, inline: false });
             
             if (secondHalf.length > 0) {
-                const killerText2 = secondHalf.map((k, i) => t('killboard.kill_format', lang, { medal: medals[i+5], name: k.Name, id: k.Id, kills: k.Kills, fame: (k.KillFame / 1000000).toFixed(2) })).join('\n');
+                const killerText2 = secondHalf.map((k, i) => t('killboard.kill_format', lang, { medal: medals[i+5], name: k.Name, id: k.Id, kills: k.Kills, fame: (k.KillFame / 1000000).toFixed(2), server: serverSlug, webUrl })).join('\n');
                 embed.addFields({ name: t('killboard.top_killers_2', lang), value: killerText2, inline: false });
             }
         }
@@ -227,11 +230,11 @@ async function sendKillBoardSummary(client, guildCfg) {
             const secondHalf = topDeaths.slice(5, 10);
             const randomJoke = jokes[Math.floor(Math.random() * jokes.length)];
 
-            const deathText1 = firstHalf.map((d, i) => t('killboard.death_format', lang, { medal: medals[i], name: d.Name, id: d.Id, deaths: d.Deaths, fame: (d.DeathFame / 1000000).toFixed(2) })).join('\n');
+            const deathText1 = firstHalf.map((d, i) => t('killboard.death_format', lang, { medal: medals[i], name: d.Name, id: d.Id, deaths: d.Deaths, fame: (d.DeathFame / 1000000).toFixed(2), server: serverSlug, webUrl })).join('\n');
             embed.addFields({ name: t('killboard.top_deaths_1', lang), value: `${deathText1}${secondHalf.length === 0 ? `\n\n*"${randomJoke}"*` : ''}`, inline: false });
 
             if (secondHalf.length > 0) {
-                const deathText2 = secondHalf.map((d, i) => t('killboard.death_format', lang, { medal: medals[i+5], name: d.Name, id: d.Id, deaths: d.Deaths, fame: (d.DeathFame / 1000000).toFixed(2) })).join('\n');
+                const deathText2 = secondHalf.map((d, i) => t('killboard.death_format', lang, { medal: medals[i+5], name: d.Name, id: d.Id, deaths: d.Deaths, fame: (d.DeathFame / 1000000).toFixed(2), server: serverSlug, webUrl })).join('\n');
                 embed.addFields({ name: t('killboard.top_deaths_2', lang), value: `${deathText2}\n\n*"${randomJoke}"*`, inline: false });
             }
         }
