@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import styles from "@/components/KillMatch.module.css";
 import KillMatch from "@/components/KillMatch";
+import CtaBanner from "@/components/CtaBanner";
+import Link from "next/link";
 
 // Fetch Player from Albion API
 async function getPlayer(server, playerId) {
@@ -58,7 +60,13 @@ export default async function PlayerProfilePage({ params }) {
       <div style={{ maxWidth: '800px', margin: '0 auto', marginBottom: '4rem' }}>
         <div className={`${styles.playerCard} ${styles.killerCard}`} style={{ width: '100%' }}>
           <div className={styles.playerTitle}>{player.Name}</div>
-          {player.GuildName && <div className={styles.guildName}>[{player.AllianceName}] {player.GuildName}</div>}
+          {player.GuildName && (
+            <div className={styles.guildName}>
+              <Link href={`/guild/${server}/${player.GuildId}`} style={{ color: 'inherit', textDecoration: 'none' }} className="hover:text-white transition-colors">
+                [{player.AllianceName}] {player.GuildName}
+              </Link>
+            </div>
+          )}
           
           <div style={{ display: 'flex', gap: '2rem', marginTop: '2rem', textAlign: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
             <div>
@@ -95,6 +103,8 @@ export default async function PlayerProfilePage({ params }) {
           <p style={{ textAlign: 'center', color: '#aaa' }}>No recent kills found.</p>
         )}
       </div>
+      
+      <CtaBanner />
     </div>
   );
 }
@@ -107,6 +117,12 @@ export async function generateMetadata({ params }) {
   
   return {
     title: `${player.Name} | Veyronix Player Profile`,
-    description: `Albion Online Player: ${player.Name}. Kill Fame: ${player.KillFame}, Death Fame: ${player.DeathFame} on ${server}.`
+    description: `Albion Online Player: ${player.Name}. Kill Fame: ${player.KillFame}, Death Fame: ${player.DeathFame} on ${server}.`,
+    openGraph: {
+      title: `${player.Name} | Player Profile`,
+      description: `Server: ${server.toUpperCase()} | Guild: ${player.GuildName || 'None'}\nKill Fame: ${player.KillFame?.toLocaleString()} | Death Fame: ${player.DeathFame?.toLocaleString()}`,
+      siteName: 'Veyronix',
+      type: 'website',
+    }
   };
 }

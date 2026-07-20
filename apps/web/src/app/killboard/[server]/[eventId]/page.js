@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import styles from "@/components/KillMatch.module.css";
 import KillMatch from "@/components/KillMatch";
+import CtaBanner from "@/components/CtaBanner";
 
 // Fetch Event from Albion API
 async function getKillEvent(server, eventId) {
@@ -34,6 +35,7 @@ export default async function KillboardEventPage({ params }) {
   return (
     <div className={styles.container} style={{ paddingTop: '2rem' }}>
       <KillMatch event={event} server={server} />
+      <CtaBanner />
     </div>
   );
 }
@@ -46,6 +48,12 @@ export async function generateMetadata({ params }) {
   
   return {
     title: `${event.Killer?.Name} killed ${event.Victim?.Name} | Veyronix Killboard`,
-    description: `Albion Online Killboard: ${event.Killer?.Name} killed ${event.Victim?.Name} for ${event.TotalVictimKillFame} Fame on ${server}.`
+    description: `Albion Online Killboard: ${event.Killer?.Name} killed ${event.Victim?.Name} for ${event.TotalVictimKillFame} Fame on ${server}.`,
+    openGraph: {
+      title: `${event.Killer?.Name} ⚔️ ${event.Victim?.Name}`,
+      description: `Fame: ${event.TotalVictimKillFame?.toLocaleString()} | Server: ${server.toUpperCase()}\n${event.Killer?.Name} killed ${event.Victim?.Name}.`,
+      siteName: 'Veyronix',
+      type: 'website',
+    }
   };
 }

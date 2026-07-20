@@ -8,6 +8,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import Logo from "@/components/Logo";
+import GlobalSearch from "@/components/GlobalSearch";
 
 export default function Navbar({ isStatic = false }) {
   const { data: session } = useSession();
@@ -135,6 +136,9 @@ export default function Navbar({ isStatic = false }) {
               <span>{t.premiumBtnNavbar}</span>
               <Sparkles size={16} />
             </Link>
+
+            {/* Global Search Component */}
+            <GlobalSearch />
 
             {/* Language Toggle */}
             <button 
