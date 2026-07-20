@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
-import styles from "../../../killboard/[server]/[eventId]/killboard.module.css";
+import styles from "@/components/KillMatch.module.css";
+import KillMatch from "@/components/KillMatch";
 
 // Fetch Player from Albion API
 async function getPlayer(server, playerId) {
@@ -11,20 +12,37 @@ async function getPlayer(server, playerId) {
 
   const baseUrl = REGIONS[server.toLowerCase()] || REGIONS.europe;
   const res = await fetch(`${baseUrl}/players/${playerId}`, {
-    next: { revalidate: 3600 }, // Cache for 1 hour
+    next: { revalidate: 3600 },
   });
 
-  if (!res.ok) {
-    return null;
-  }
+  if (!res.ok) return null;
+  return res.json();
+}
 
+// Fetch Player Kills from Albion API
+async function getPlayerKills(server, playerId) {
+  const REGIONS = {
+    europe: "https://gameinfo-ams.albiononline.com/api/gameinfo",
+    americas: "https://gameinfo.albiononline.com/api/gameinfo",
+    asia: "https://gameinfo-sgp.albiononline.com/api/gameinfo",
+  };
+
+  const baseUrl = REGIONS[server.toLowerCase()] || REGIONS.europe;
+  const res = await fetch(`${baseUrl}/players/${playerId}/kills`, {
+    next: { revalidate: 3600 },
+  });
+
+  if (!res.ok) return [];
   return res.json();
 }
 
 export default async function PlayerProfilePage({ params }) {
   const { server, playerId } = await params;
   
-  const player = await getPlayer(server, playerId);
+  const [player, kills] = await Promise.all([
+    getPlayer(server, playerId),
+    getPlayerKills(server, playerId)
+  ]);
   
   if (!player) {
     notFound();
@@ -37,7 +55,7 @@ export default async function PlayerProfilePage({ params }) {
         <p>Albion Online {server.toUpperCase()}</p>
       </div>
 
-      <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+      <div style={{ maxWidth: '800px', margin: '0 auto', marginBottom: '4rem' }}>
         <div className={`${styles.playerCard} ${styles.killerCard}`} style={{ width: '100%' }}>
           <div className={styles.playerTitle}>{player.Name}</div>
           {player.GuildName && <div className={styles.guildName}>[{player.AllianceName}] {player.GuildName}</div>}
@@ -62,6 +80,20 @@ export default async function PlayerProfilePage({ params }) {
             <div style={{ fontSize: '1.2rem', color: '#fff', fontWeight: 'bold' }}>{player.FameRatio?.toFixed(2) || 0}</div>
           </div>
         </div>
+      </div>
+
+      <div className={styles.header}>
+        <h2>Recent Kills</h2>
+      </div>
+
+      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+        {kills && kills.length > 0 ? (
+          kills.slice(0, 10).map((kill) => (
+            <KillMatch key={kill.EventId} event={kill} server={server} />
+          ))
+        ) : (
+          <p style={{ textAlign: 'center', color: '#aaa' }}>No recent kills found.</p>
+        )}
       </div>
     </div>
   );
