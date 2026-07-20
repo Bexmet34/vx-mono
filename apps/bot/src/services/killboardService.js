@@ -238,9 +238,12 @@ async function sendKillBoardSummary(client, guildCfg) {
 
         // Top fame kill
         if (topFameKill) {
+            const serverSlug = (guildCfg.albion_server || 'europe').toLowerCase();
+            const webUrl = process.env.NEXT_PUBLIC_WEB_URL || 'https://veyronix.com.tr';
+            
             embed.addFields({
                 name: t('killboard.top_fame_kill', lang),
-                value: `[**${topFameKill.Killer?.Name || '?'}**](https://albiononline.com/en/killboard/player/${topFameKill.Killer?.Id}) 🗡️ [**${topFameKill.Victim?.Name || '?'}**](https://albiononline.com/en/killboard/player/${topFameKill.Victim?.Id})\n\`${(topFameKill.TotalVictimKillFame || 0).toLocaleString(localeCode)}\` ${t('killboard.fame', lang)}`,
+                value: `[**${topFameKill.Killer?.Name || '?'}**](${webUrl}/killboard/${serverSlug}/${topFameKill.EventId}) 🗡️ [**${topFameKill.Victim?.Name || '?'}**](${webUrl}/killboard/${serverSlug}/${topFameKill.EventId})\n\`${(topFameKill.TotalVictimKillFame || 0).toLocaleString(localeCode)}\` ${t('killboard.fame', lang)}`,
                 inline: false
             });
         }
