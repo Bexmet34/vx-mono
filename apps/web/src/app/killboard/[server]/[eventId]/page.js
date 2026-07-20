@@ -46,6 +46,8 @@ export async function generateMetadata({ params }) {
   
   if (!event) return { title: "Kill Not Found" };
   
+  const ogImageUrl = `https://veyronix.com.tr/api/og/killboard?server=${server}&eventId=${eventId}`;
+  
   return {
     title: `${event.Killer?.Name} killed ${event.Victim?.Name} | Veyronix Killboard`,
     description: `Albion Online Killboard: ${event.Killer?.Name} killed ${event.Victim?.Name} for ${event.TotalVictimKillFame} Fame on ${server}.`,
@@ -54,6 +56,20 @@ export async function generateMetadata({ params }) {
       description: `Fame: ${event.TotalVictimKillFame?.toLocaleString()} | Server: ${server.toUpperCase()}\n${event.Killer?.Name} killed ${event.Victim?.Name}.`,
       siteName: 'Veyronix',
       type: 'website',
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: `${event.Killer?.Name} vs ${event.Victim?.Name}`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${event.Killer?.Name} ⚔️ ${event.Victim?.Name}`,
+      description: `Albion Online Killboard: ${event.Killer?.Name} killed ${event.Victim?.Name}`,
+      images: [ogImageUrl],
     }
   };
 }
