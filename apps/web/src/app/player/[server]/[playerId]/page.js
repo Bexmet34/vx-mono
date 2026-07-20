@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import styles from "../../killboard/[server]/[eventId]/killboard.module.css";
+import styles from "../../../killboard/[server]/[eventId]/killboard.module.css";
 
 // Fetch Player from Albion API
 async function getPlayer(server, playerId) {
