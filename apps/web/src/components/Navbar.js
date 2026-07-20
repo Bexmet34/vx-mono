@@ -111,19 +111,19 @@ export default function Navbar({ isStatic = false }) {
                     <Link href="/#faq" className="px-4 py-2 text-sm text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm">
                       {lang === 'tr' ? 'SSS' : 'FAQ'}
                     </Link>
+                    <div className="h-[1px] bg-outline-variant/30 my-1"></div>
+                    <Link href="/blog" className="px-4 py-2 text-sm text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm">
+                      {t.blog}
+                    </Link>
+                    <a href="https://docs.veyronix.com.tr/" target="_blank" rel="noopener noreferrer" className="px-4 py-2 text-sm text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm">
+                      Wiki
+                    </a>
+                    <Link href="/changelog" className="px-4 py-2 text-sm text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm">
+                      {t.changelog}
+                    </Link>
                   </div>
                 </div>
               </div>
-
-              <Link href="/blog" className="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors">
-                {t.blog}
-              </Link>
-              <a href="https://docs.veyronix.com.tr/" target="_blank" rel="noopener noreferrer" className="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors">
-                Wiki
-              </a>
-              <Link href="/changelog" className="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors">
-                {t.changelog}
-              </Link>
             </div>
           </div>
           
@@ -448,12 +448,12 @@ export default function Navbar({ isStatic = false }) {
                 onClick={() => setIsMobileExploreOpen(!isMobileExploreOpen)}
               >
                 <span className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant group-hover:text-primary-container transition-all">
-                  {lang === 'tr' ? 'Sayfa Bölümleri' : 'Page Sections'}
+                  {lang === 'tr' ? 'Keşfet' : 'Explore'}
                 </span>
                 <ChevronDown className={`text-primary-container/50 transition-transform duration-300 ${isMobileExploreOpen ? 'rotate-180' : ''}`} size={20} />
               </button>
               
-              <div className={`overflow-hidden transition-all duration-300 ease-in-out flex flex-col gap-2 ${isMobileExploreOpen ? 'max-h-[350px] mt-2 opacity-100' : 'max-h-0 opacity-0'}`}>
+              <div className={`overflow-hidden transition-all duration-300 ease-in-out flex flex-col gap-2 ${isMobileExploreOpen ? 'max-h-[500px] mt-2 opacity-100' : 'max-h-0 opacity-0'}`}>
                 <Link href="/#features" className="pl-4 py-2 text-sm text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
                   {lang === 'tr' ? 'Özellikler' : 'Features'}
                 </Link>
@@ -469,26 +469,17 @@ export default function Navbar({ isStatic = false }) {
                 <Link href="/#faq" className="pl-4 py-2 text-sm text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
                   {lang === 'tr' ? 'SSS' : 'FAQ'}
                 </Link>
+                <Link href="/blog" className="pl-4 py-2 text-sm text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
+                  {t.blog}
+                </Link>
+                <a href="https://docs.veyronix.com.tr/" target="_blank" rel="noopener noreferrer" className="pl-4 py-2 text-sm text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
+                  Wiki
+                </a>
+                <Link href="/changelog" className="pl-4 py-2 text-sm text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
+                  {t.changelog}
+                </Link>
               </div>
               <div className="indicator mt-2"></div>
-
-              <Link href="/blog" className="menu-item-hover group flex items-center justify-between py-2 mt-4 cursor-pointer" onClick={() => setIsMenuOpen(false)}>
-                <span className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant hover:text-primary-container transition-all group-active:translate-x-2 pointer-events-none">{t.blog}</span>
-                <ChevronRight className="text-primary-container/0 group-hover:text-primary-container transition-colors pointer-events-none" />
-              </Link>
-              <div className="indicator"></div>
-
-              <a href="https://docs.veyronix.com.tr/" target="_blank" rel="noopener noreferrer" className="menu-item-hover group flex items-center justify-between py-2 mt-4 cursor-pointer" onClick={() => setIsMenuOpen(false)}>
-                <span className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant hover:text-primary-container transition-all group-active:translate-x-2 pointer-events-none">{t.wiki}</span>
-                <ChevronRight className="text-primary-container/0 group-hover:text-primary-container transition-colors pointer-events-none" />
-              </a>
-              <div className="indicator"></div>
-
-              <Link href="/changelog" className="menu-item-hover group flex items-center justify-between py-2 mt-4 cursor-pointer" onClick={() => setIsMenuOpen(false)}>
-                <span className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant hover:text-primary-container transition-all group-active:translate-x-2 pointer-events-none">{t.changelog}</span>
-                <ChevronRight className="text-primary-container/0 group-hover:text-primary-container transition-colors pointer-events-none" />
-              </Link>
-              <div className="indicator"></div>
             </div>
             
             {isAdmin && (
