@@ -56,7 +56,7 @@ export default function GlobalSearch() {
   };
 
   return (
-    <div ref={wrapperRef} className="relative hidden lg:block" style={{ zIndex: 50 }}>
+    <div ref={wrapperRef} className="relative block" style={{ zIndex: 50 }}>
       <div className="relative">
         <input 
           type="text" 

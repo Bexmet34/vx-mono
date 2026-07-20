@@ -68,24 +68,29 @@ export default async function PlayerProfilePage({ params }) {
             </div>
           )}
           
-          <div style={{ display: 'flex', gap: '2rem', marginTop: '2rem', textAlign: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
-            <div>
-              <div style={{ color: '#aaa', fontSize: '0.9rem' }}>Kill Fame</div>
-              <div className={styles.fame} style={{ color: '#2ecc71', margin: '0.5rem 0' }}>{player.KillFame?.toLocaleString()}</div>
-            </div>
-            <div>
-              <div style={{ color: '#aaa', fontSize: '0.9rem' }}>Death Fame</div>
-              <div className={styles.fame} style={{ color: '#e74c3c', margin: '0.5rem 0' }}>{player.DeathFame?.toLocaleString()}</div>
-            </div>
-            <div>
-              <div style={{ color: '#aaa', fontSize: '0.9rem' }}>PvE Fame</div>
-              <div className={styles.fame} style={{ color: '#fca311', margin: '0.5rem 0' }}>{player.LifetimeStatistics?.PvE?.Total?.toLocaleString() || 0}</div>
-            </div>
-          </div>
-          
-          <div style={{ marginTop: '2rem', padding: '1rem', background: 'rgba(0,0,0,0.5)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}>
-            <p style={{ color: '#aaa', fontSize: '0.9rem', marginBottom: '0.5rem' }}>Fame Ratio</p>
-            <div style={{ fontSize: '1.2rem', color: '#fff', fontWeight: 'bold' }}>{player.FameRatio?.toFixed(2) || 0}</div>
+          <div style={{ marginTop: '2rem', padding: '1.5rem', background: 'rgba(252, 163, 17, 0.05)', borderRadius: '12px', border: '1px solid rgba(252, 163, 17, 0.2)', textAlign: 'center' }}>
+            <h3 style={{ color: '#fca311', marginBottom: '0.5rem', fontSize: '1.2rem' }}>Kendi Loncanız İçin Veyronix\'i Deneyin!</h3>
+            <p style={{ color: '#aaa', fontSize: '0.95rem', marginBottom: '1rem', maxWidth: '400px', margin: '0 auto 1rem auto' }}>
+              Discord sunucunuza Killboard, parti oluşturma ve gelişmiş üye yönetimi ekleyin. Üstelik kurulumu tamamen ücretsiz!
+            </p>
+            <Link 
+              href="https://discord.com/oauth2/authorize?client_id=1082239904169336902&permissions=510977&scope=bot+applications.commands"
+              target="_blank"
+              style={{
+                display: 'inline-block',
+                background: '#5865F2',
+                color: '#fff',
+                padding: '0.5rem 1.5rem',
+                borderRadius: '8px',
+                textDecoration: 'none',
+                fontWeight: 'bold',
+                fontSize: '0.9rem',
+                transition: 'opacity 0.2s'
+              }}
+              className="hover:opacity-80"
+            >
+              Hemen Discord\'a Ekle
+            </Link>
           </div>
         </div>
       </div>

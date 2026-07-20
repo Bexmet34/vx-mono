@@ -57,43 +57,44 @@ export default function KillMatch({ event, server }) {
   };
 
   return (
-    <div style={{ marginBottom: '3rem' }}>
-      <div className={styles.header}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', position: 'relative' }}>
-          <Link href={`/killboard/${server}/${event.EventId}`} style={{ textDecoration: 'none' }}>
-            <h2>Kill Match</h2>
-          </Link>
+    <div style={{ marginBottom: '3rem', position: 'relative' }}>
+      <div className={styles.header} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 1rem' }}>
+        <div>
+          <h2>Kill Match</h2>
+          <p style={{ margin: 0, fontSize: '0.9rem', color: '#aaa' }}>{date}</p>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div className={styles.fame}>
+            {event.TotalVictimKillFame ? event.TotalVictimKillFame.toLocaleString() : 0} Fame
+          </div>
           <button 
             onClick={handleShare}
             style={{
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: '50%',
-              width: '36px',
-              height: '36px',
+              background: copied ? 'rgba(46, 204, 113, 0.2)' : 'rgba(255,255,255,0.1)',
+              border: `1px solid ${copied ? '#2ecc71' : 'rgba(255,255,255,0.2)'}`,
+              borderRadius: '8px',
+              padding: '0.4rem 0.8rem',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
+              gap: '0.5rem',
               cursor: 'pointer',
-              color: copied ? '#2ecc71' : '#aaa',
+              color: copied ? '#2ecc71' : '#fff',
               transition: 'all 0.2s',
-              position: 'absolute',
-              right: 'calc(50% - 150px)'
+              fontSize: '0.85rem',
+              fontWeight: 'bold'
             }}
-            title="Copy Link"
+            title="Skoru Kopyala"
           >
-            {copied ? <Check size={16} /> : <Share2 size={16} />}
+            {copied ? <><Check size={14} /> Kopyalandı</> : <><Share2 size={14} /> Paylaş</>}
           </button>
-        </div>
-        <p>{date}</p>
-        <div className={styles.fame}>
-          {event.TotalVictimKillFame ? event.TotalVictimKillFame.toLocaleString() : 0} Fame
         </div>
       </div>
 
-      <div className={styles.versusContainer}>
+      <div className={styles.versusContainer} style={{ position: 'relative' }}>
+        <Link href={`/killboard/${server}/${event.EventId}`} style={{ position: 'absolute', inset: 0, zIndex: 1 }} />
+        
         {/* Killer Section */}
-        <div className={`${styles.playerCard} ${styles.killerCard}`}>
+        <div className={`${styles.playerCard} ${styles.killerCard}`} style={{ position: 'relative', zIndex: 2 }}>
           <div className={styles.playerTitle}>
             <Link href={`/player/${server}/${killer.Id}`} style={{ color: 'inherit', textDecoration: 'none' }} className="hover:text-[#2ecc71] transition-colors">
               {killer.Name}
@@ -111,12 +112,12 @@ export default function KillMatch({ event, server }) {
         </div>
 
         {/* VS Badge */}
-        <div className={styles.vsBadge}>
+        <div className={styles.vsBadge} style={{ position: 'relative', zIndex: 2 }}>
           VS
         </div>
 
         {/* Victim Section */}
-        <div className={`${styles.playerCard} ${styles.victimCard}`}>
+        <div className={`${styles.playerCard} ${styles.victimCard}`} style={{ position: 'relative', zIndex: 2 }}>
           <div className={styles.playerTitle}>
             <Link href={`/player/${server}/${victim.Id}`} style={{ color: 'inherit', textDecoration: 'none' }} className="hover:text-[#e74c3c] transition-colors">
               {victim.Name}

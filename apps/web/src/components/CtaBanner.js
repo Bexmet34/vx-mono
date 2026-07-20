@@ -36,19 +36,21 @@ export default function CtaBanner() {
         </p>
         
         <Link 
-          href="https://discord.com/api/oauth2/authorize?client_id=1006560411136544778&permissions=8&scope=bot%20applications.commands"
+          href="https://discord.com/oauth2/authorize?client_id=1082239904169336902&permissions=510977&scope=bot+applications.commands"
           target="_blank"
           style={{
-            display: 'inline-block',
-            background: 'var(--accent-color)',
-            color: '#000',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            background: '#5865F2',
+            color: '#fff',
             fontWeight: 'bold',
             padding: '0.8rem 2rem',
             borderRadius: '30px',
             textDecoration: 'none',
             fontSize: '1.1rem',
             transition: 'all 0.3s ease',
-            boxShadow: '0 4px 15px rgba(252, 163, 17, 0.4)'
+            boxShadow: '0 4px 15px rgba(88, 101, 242, 0.4)'
           }}
           onMouseOver={(e) => e.target.style.transform = 'scale(1.05)'}
           onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
