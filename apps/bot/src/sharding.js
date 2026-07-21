@@ -3,11 +3,15 @@ const { ShardingManager } = require('discord.js');
 const path = require('path');
 const { AutoPoster } = require('topgg-autoposter');
 const config = require('./config/config');
+const { startApiServer } = require('./api/server');
 
 const manager = new ShardingManager(path.join(__dirname, 'index.js'), {
     token: process.env.DISCORD_TOKEN,
     totalShards: 'auto'
 });
+
+// Start internal API for web dashboard communication
+startApiServer(manager);
 
 manager.on('shardCreate', shard => {
     console.log(`[ShardingManager] Launched shard ${shard.id}`);

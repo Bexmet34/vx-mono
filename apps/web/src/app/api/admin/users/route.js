@@ -81,13 +81,32 @@ export async function GET() {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  // Fetch discord profile details for each user in parallel
+  // Fetch discord profile details and mutual guilds for each user in parallel
   const usersWithProfiles = await Promise.all((data || []).map(async (u) => {
     const discordProfile = await getDiscordUser(u.discord_id);
+    
+    // Fetch mutual guilds from Bot API
+    let mutualGuilds = [];
+    try {
+      const botApiUrl = process.env.BOT_API_URL || 'http://localhost:3005';
+      const botRes = await fetch(`${botApiUrl}/api/mutual-guilds/${u.discord_id}`, {
+        next: { revalidate: 300 } // cache 5 min
+      });
+      if (botRes.ok) {
+        const botData = await botRes.json();
+        if (botData.success) {
+          mutualGuilds = botData.guilds;
+        }
+      }
+    } catch (botErr) {
+      console.warn(`[Admin Users API] Could not fetch mutual guilds for ${u.discord_id}:`, botErr.message);
+    }
+
     return {
       ...u,
       username: discordProfile.username,
-      avatar_url: discordProfile.avatar_url
+      avatar_url: discordProfile.avatar_url,
+      mutual_guilds: mutualGuilds
     };
   }));
 

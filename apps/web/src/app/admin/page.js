@@ -783,20 +783,22 @@ export default function AdminPage() {
                     </div>
 
                     <div className="admin-card">
-                      <table className="admin-table">
-                        <thead>
-                          <tr>
-                            <th>SUNUCU BİLGİSİ</th>
-                            <th className="hide-on-tablet">SAHİP ID</th>
-                            <th>DURUM</th>
-                            <th>PLAN</th>
-                            <th style={{textAlign: "right"}}>İŞLEMLER</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {filteredServers.map(s => {
-                            const isExpired = !s.is_unlimited && new Date(s.expires_at) < new Date();
-                            const isPassive = !s.is_active;
+                      <div className="table-responsive">
+                        <table className="admin-table">
+                          <thead>
+                            <tr>
+                              <th>SUNUCU BİLGİSİ</th>
+                              <th className="hide-on-tablet">SAHİP ID</th>
+                              <th>DURUM</th>
+                              <th>PLAN</th>
+                              <th className="sticky-action" style={{textAlign: "right"}}>İŞLEMLER</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {filteredServers.map(s => {
+                              const isExpired = !s.is_unlimited && new Date(s.expires_at) < new Date();
+                              const isPassive = !s.is_active;
+                              const createdAtDate = s.created_at ? new Date(s.created_at).toLocaleDateString('tr-TR') : 'Bilinmiyor';
                             
                             return (
                               <tr key={s.id} className="admin-tr-hover" style={{opacity: isPassive ? 0.5 : 1}}>
@@ -812,7 +814,11 @@ export default function AdminPage() {
                                     </div>
                                     <div>
                                       <div style={{ fontWeight: "700", fontSize: "0.95rem" }}>{s.guild_name}</div>
-                                      <div style={{ fontSize: "0.75rem", color: "var(--admin-text-muted)", fontFamily: "monospace" }}>{s.guild_id}</div>
+                                      <div style={{ fontSize: "0.75rem", color: "var(--admin-text-muted)", fontFamily: "monospace", display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                        <span>{s.guild_id}</span>
+                                        <span style={{opacity: 0.5}}>•</span>
+                                        <span>Katılım: {createdAtDate}</span>
+                                      </div>
                                     </div>
                                   </div>
                                 </td>
@@ -845,7 +851,7 @@ export default function AdminPage() {
                                     )}
                                   </div>
                                 </td>
-                                <td data-label="İŞLEMLER">
+                                <td className="sticky-action" data-label="İŞLEMLER">
                                   <div className="table-actions">
                                     <button 
                                       className="admin-action-btn" 
@@ -901,22 +907,25 @@ export default function AdminPage() {
                           })}
                         </tbody>
                       </table>
+                      </div>
                     </div>
                   </>
                 ) : (
                   <div className="admin-card">
+                    <div className="table-responsive">
                     <table className="admin-table">
                       <thead>
                         <tr>
                           <th>DISCORD KULLANICI BİLGİSİ / ID</th>
                           <th>DURUM</th>
                           <th>PLAN / SÜRE</th>
-                          <th style={{textAlign: "right"}}>İŞLEMLER</th>
+                          <th>ORTAK SUNUCULAR</th>
+                          <th className="sticky-action" style={{textAlign: "right"}}>İŞLEMLER</th>
                         </tr>
                       </thead>
                       <tbody>
                         {users.filter(u => !userSearchTerm || u.discord_id?.includes(userSearchTerm)).length === 0 ? (
-                          <tr><td colSpan={4} style={{textAlign: 'center', padding: '4rem', opacity: 0.5}}>Bireysel premium kullanan üye bulunamadı.</td></tr>
+                          <tr><td colSpan={5} style={{textAlign: 'center', padding: '4rem', opacity: 0.5}}>Bireysel premium kullanan üye bulunamadı.</td></tr>
                         ) : users.filter(u => !userSearchTerm || u.discord_id?.includes(userSearchTerm)).map(u => {
                           const isExpired = !u.is_unlimited && u.premium_until && new Date(u.premium_until) < new Date();
                           const isPremiumActive = u.is_unlimited || (u.premium_until && new Date(u.premium_until) >= new Date());
@@ -978,7 +987,35 @@ export default function AdminPage() {
                                   )}
                                 </div>
                               </td>
-                              <td data-label="İŞLEMLER">
+                              <td data-label="ORTAK SUNUCULAR">
+                                <div style={{display: 'flex', gap: '0.4rem', flexWrap: 'wrap', maxWidth: '250px'}}>
+                                  {u.mutual_guilds && u.mutual_guilds.length > 0 ? (
+                                    u.mutual_guilds.slice(0, 5).map(mg => (
+                                      <div key={mg.id} title={mg.name} style={{
+                                        width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', cursor: 'help'
+                                      }}>
+                                        {mg.icon ? (
+                                          <img src={mg.icon} alt={mg.name} style={{width: '100%', height: '100%', objectFit: 'cover'}} />
+                                        ) : (
+                                          <span style={{fontSize: '0.65rem', fontWeight: 'bold'}}>{mg.name.charAt(0)}</span>
+                                        )}
+                                      </div>
+                                    ))
+                                  ) : (
+                                    <span style={{fontSize: '0.8rem', color: 'var(--admin-text-muted)'}}>Sunucu bulunamadı</span>
+                                  )}
+                                  {u.mutual_guilds && u.mutual_guilds.length > 5 && (
+                                    <div style={{
+                                      width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)',
+                                      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.65rem', fontWeight: 'bold'
+                                    }}>
+                                      +{u.mutual_guilds.length - 5}
+                                    </div>
+                                  )}
+                                </div>
+                              </td>
+                              <td className="sticky-action" data-label="İŞLEMLER">
                                 <div className="table-actions">
                                   <button 
                                     className="admin-action-btn" 
@@ -1023,6 +1060,7 @@ export default function AdminPage() {
                         })}
                       </tbody>
                     </table>
+                    </div>
                   </div>
                 )}
               </>
