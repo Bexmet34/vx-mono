@@ -62,7 +62,6 @@ export default function GlobalSearch() {
           type="text" 
           value={query}
           onChange={handleSearch}
-          onFocus={() => { if(query.length >= 3) setIsOpen(true) }}
           placeholder="Search Player or Guild..." 
           style={{
             background: 'rgba(255, 255, 255, 0.05)',
@@ -75,7 +74,10 @@ export default function GlobalSearch() {
             width: '250px',
             transition: 'all 0.3s'
           }}
-          onFocus={(e) => e.target.style.borderColor = 'rgba(252, 163, 17, 0.5)'}
+          onFocus={(e) => {
+            if(query.length >= 3) setIsOpen(true);
+            e.target.style.borderColor = 'rgba(252, 163, 17, 0.5)';
+          }}
           onBlur={(e) => e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)'}
         />
         <Search size={16} color="#aaa" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />

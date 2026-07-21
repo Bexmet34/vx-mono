@@ -20,8 +20,10 @@ export default function Navbar({ isStatic = false }) {
 
   useEffect(() => {
     if (isMenuOpen) {
+      // eslint-disable-next-line
       setIsMenuOpen(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
   // #14 — Ödeme geçmişi state

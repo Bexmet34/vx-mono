@@ -29,7 +29,7 @@ export default function CtaBanner() {
       
       <div style={{ position: 'relative', zIndex: 1 }}>
         <h3 style={{ fontSize: '1.8rem', color: '#fff', marginBottom: '0.5rem', fontWeight: '800' }}>
-          Loncanızın Savaşlarını Discord'a Taşıyın!
+          Loncanızın Savaşlarını Discord&apos;a Taşıyın!
         </h3>
         <p style={{ color: '#aaa', fontSize: '1rem', marginBottom: '1.5rem', maxWidth: '600px', margin: '0 auto 1.5rem auto' }}>
           Veyronix Bot ile Albion Online Killboard, otomatik roller ve etkinlik yönetimini doğrudan Discord sunucunuzda ücretsiz olarak kullanın.

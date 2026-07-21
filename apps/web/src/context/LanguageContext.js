@@ -584,9 +584,11 @@ export function LanguageProvider({ children, initialLang = "tr" }) {
   useEffect(() => {
     const saved = localStorage.getItem("appLang");
     if (saved && saved !== lang) {
+      // eslint-disable-next-line
       setLang(saved);
       document.cookie = `NEXT_LOCALE=${saved}; path=/; max-age=31536000`;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const toggleLanguage = () => {
