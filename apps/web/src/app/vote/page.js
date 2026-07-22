@@ -1,61 +1,56 @@
 "use client";
 
 import { useSession, signIn } from "next-auth/react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Award, CheckCircle2, ShieldAlert, Sparkles, Tv, Clock } from "lucide-react";
+import { Award, CheckCircle2, ShieldAlert, Sparkles, Tv, Play, Volume2, VolumeX, Check } from "lucide-react";
 
 export default function VotePage() {
   const { data: session, status } = useSession();
-  const [countdown, setCountdown] = useState(15);
   const [canClaim, setCanClaim] = useState(false);
+  const [videoWatched, setVideoWatched] = useState(false);
+  const [videoPlaying, setVideoPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  const [progress, setProgress] = useState(0);
   const [voting, setVoting] = useState(false);
   const [voteSuccess, setVoteSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const adBannerRef = useRef(null);
 
-  // Adsterra 300x250 Banner Script Entegrasyonu
-  useEffect(() => {
-    if (!adBannerRef.current) return;
+  const videoRef = useRef(null);
 
-    adBannerRef.current.innerHTML = "";
+  // Tanıtım / Sponsor Video Bağlantısı (İstediğiniz MP4 video adresini buraya koyabilirsiniz)
+  const videoSrc = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4";
 
-    const atOptionsScript = document.createElement("script");
-    atOptionsScript.type = "text/javascript";
-    atOptionsScript.text = `
-      atOptions = {
-        'key' : '796280c12a863eece340164e11d3973c',
-        'format' : 'iframe',
-        'height' : 250,
-        'width' : 300,
-        'params' : {}
-      };
-    `;
+  // Video oynatılırken ilerlemeyi takip et
+  const handleTimeUpdate = () => {
+    if (!videoRef.current) return;
+    const current = videoRef.current.currentTime;
+    const duration = videoRef.current.duration || 1;
+    const percentage = Math.floor((current / duration) * 100);
+    setProgress(percentage);
+  };
 
-    const invokeScript = document.createElement("script");
-    invokeScript.type = "text/javascript";
-    invokeScript.src = "https://www.highperformanceformat.com/796280c12a863eece340164e11d3973c/invoke.js";
+  // Video Bittiğinde (onEnded) Çalışacak ve Oy Butonunu Açacak Fonksiyon
+  const handleVideoEnded = () => {
+    setVideoWatched(true);
+    setCanClaim(true);
+    setVideoPlaying(false);
+  };
 
-    adBannerRef.current.appendChild(atOptionsScript);
-    adBannerRef.current.appendChild(invokeScript);
-
-    return () => {
-      if (adBannerRef.current) {
-        adBannerRef.current.innerHTML = "";
-      }
-    };
-  }, []);
-
-  // 15 Second Timer effect
-  useEffect(() => {
-    if (countdown > 0) {
-      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-      return () => clearTimeout(timer);
-    } else {
-      setCanClaim(true);
+  const handlePlayVideo = () => {
+    if (videoRef.current) {
+      videoRef.current.play();
+      setVideoPlaying(true);
     }
-  }, [countdown]);
+  };
+
+  const toggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !isMuted;
+      setIsMuted(!isMuted);
+    }
+  };
 
   const handleRewardClaim = async () => {
     if (!session) {
@@ -96,10 +91,10 @@ export default function VotePage() {
             <span className="text-xs font-semibold">Veyronix Destek & Oy Alanı</span>
           </div>
           <h1 className="text-2xl md:text-4xl font-extrabold tracking-tight mb-2">
-            Bota Oy Ver, Premium Özellikleri Aç!
+            Videoyu İzle, Ücretsiz Oy Ver!
           </h1>
           <p className="text-gray-400 text-sm max-w-md mx-auto">
-            Sponsor içeriği yüklenirken bekleyin. Süre dolduğunda buton aktifleşecektir.
+            Aşağıdaki videoyu sonuna kadar izleyin. Video tamamlandığında oy butonunuz otomatik olarak aktifleştirecektir.
           </p>
         </div>
 
@@ -120,25 +115,85 @@ export default function VotePage() {
           </div>
         )}
 
-        {/* Compact Ad Container Box */}
-        <div className="w-full max-w-md bg-[#161a26] border border-gray-800 rounded-2xl p-4 mb-6 shadow-2xl flex flex-col items-center">
+        {/* Custom HTML5 Video Player Box */}
+        <div className="w-full max-w-lg bg-[#161a26] border border-gray-800 rounded-2xl p-4 mb-6 shadow-2xl flex flex-col items-center">
           <div className="flex items-center justify-between w-full text-gray-400 text-xs mb-3 px-1">
             <div className="flex items-center gap-1.5 font-medium">
               <Tv className="w-3.5 h-3.5 text-yellow-400" />
-              <span>Sponsor İçeriği</span>
+              <span>Sponsorlu Tanıtım Videosu</span>
             </div>
             
             <div className="flex items-center gap-1.5 font-mono text-xs bg-gray-900 px-2.5 py-1 rounded-full border border-gray-700 text-gray-300">
-              <Clock className="w-3 h-3 text-yellow-400 animate-spin" />
-              <span>{canClaim ? "Süre Doldu ✅" : `${countdown}s`}</span>
+              {videoWatched ? (
+                <span className="text-emerald-400 flex items-center gap-1 font-bold">
+                  <Check className="w-3.5 h-3.5" /> İzleme Tamamlandı
+                </span>
+              ) : (
+                <span>İlerleme: %{progress}</span>
+              )}
             </div>
           </div>
 
-          {/* Adsterra 300x250 Container */}
-          <div
-            ref={adBannerRef}
-            className="w-[300px] h-[250px] bg-[#0d0f17] rounded-xl flex items-center justify-center border border-dashed border-gray-800 overflow-hidden shadow-inner"
-          />
+          {/* Video Container */}
+          <div className="relative w-full aspect-video bg-[#0d0f17] rounded-xl overflow-hidden border border-gray-800 flex items-center justify-center group shadow-inner">
+            <video
+              ref={videoRef}
+              src={videoSrc}
+              playsInline
+              muted={isMuted}
+              onTimeUpdate={handleTimeUpdate}
+              onEnded={handleVideoEnded}
+              onPlay={() => setVideoPlaying(true)}
+              onPause={() => setVideoPlaying(false)}
+              className="w-full h-full object-cover"
+            />
+
+            {/* Initial Play Overlay Button */}
+            {!videoPlaying && !videoWatched && (
+              <button
+                onClick={handlePlayVideo}
+                className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-white transition-all hover:bg-black/50 cursor-pointer"
+              >
+                <div className="w-16 h-16 rounded-full bg-yellow-400 text-black flex items-center justify-center shadow-lg shadow-yellow-500/30 transform transition group-hover:scale-110">
+                  <Play className="w-8 h-8 fill-current ml-1" />
+                </div>
+                <span className="text-sm font-bold mt-3 tracking-wide text-yellow-400">
+                  Videoyu Başlatmak İçin Tıklayın
+                </span>
+              </button>
+            )}
+
+            {/* Mute/Unmute Controls Overlay */}
+            {videoPlaying && (
+              <button
+                onClick={toggleMute}
+                className="absolute top-3 right-3 bg-black/70 hover:bg-black/90 text-white p-2 rounded-full border border-gray-700 transition"
+              >
+                {isMuted ? <VolumeX className="w-4 h-4 text-red-400" /> : <Volume2 className="w-4 h-4 text-green-400" />}
+              </button>
+            )}
+
+            {/* Video Completed Overlay Banner */}
+            {videoWatched && (
+              <div className="absolute inset-0 bg-black/80 backdrop-blur-xs flex flex-col items-center justify-center p-4 text-center">
+                <CheckCircle2 className="w-12 h-12 text-emerald-400 mb-2 animate-bounce" />
+                <p className="text-emerald-400 font-extrabold text-base mb-1">
+                  Tebrikler! Video Tamamlandı
+                </p>
+                <p className="text-gray-300 text-xs max-w-xs">
+                  Aşağıdaki butona basarak oyunuzu onaylayabilir ve ayrıcalıklarınızı hemen aktif edebilirsiniz.
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Progress Bar Line */}
+          <div className="w-full bg-gray-800 h-1.5 rounded-full mt-3 overflow-hidden">
+            <div
+              className={`h-full transition-all duration-300 ${videoWatched ? "bg-emerald-500" : "bg-yellow-400"}`}
+              style={{ width: `${progress}%` }}
+            />
+          </div>
         </div>
 
         {/* Action Button */}
@@ -164,7 +219,7 @@ export default function VotePage() {
             {voting
               ? "Oy İşleniyor..."
               : !canClaim
-              ? `Süre Dolması Bekleniyor (${countdown}s)`
+              ? "Videoyu Sonuna Kadar İzleyin..."
               : "Oyu Onayla & Ücretsiz Kullan"}
           </button>
         )}
