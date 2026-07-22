@@ -5,12 +5,13 @@ import { useState, useEffect } from "react";
 import Script from "next/script";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Award, CheckCircle2, ShieldAlert, Sparkles, Tv } from "lucide-react";
+import { Award, CheckCircle2, ShieldAlert, Sparkles, Tv, Clock, Loader2 } from "lucide-react";
 
 export default function VotePage() {
   const { data: session, status } = useSession();
   const [adLoaded, setAdLoaded] = useState(false);
-  const [adCompleted, setAdCompleted] = useState(false);
+  const [countdown, setCountdown] = useState(15);
+  const [canClaim, setCanClaim] = useState(false);
   const [voting, setVoting] = useState(false);
   const [voteSuccess, setVoteSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -31,6 +32,16 @@ export default function VotePage() {
       });
     }
   }, []);
+
+  // 15 Second Timer effect
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    } else {
+      setCanClaim(true);
+    }
+  }, [countdown]);
 
   const handleRewardClaim = async () => {
     if (!session) {
@@ -79,7 +90,7 @@ export default function VotePage() {
             Bota Oy Ver, Premium Özellikleri Aç!
           </h1>
           <p className="text-gray-400 max-w-xl mx-auto">
-            Aşağıdaki sponsor içeriğini tamamlayarak Veyronix Discord botuna ücretsiz oy verebilir ve sunucunuzda parti kurmaya hemen devam edebilirsiniz.
+            Aşağıdaki sponsor içeriği yüklenirken lütfen bekleyin. Süre dolduğunda oy butonunuz otomatik olarak aktifleştirecektir.
           </p>
         </div>
 
@@ -102,15 +113,31 @@ export default function VotePage() {
 
         {/* Ad Container Box */}
         <div className="w-full bg-[#161a26] border border-gray-800 rounded-2xl p-6 mb-8 shadow-2xl flex flex-col items-center">
-          <div className="flex items-center gap-2 text-gray-400 text-sm mb-4">
-            <Tv className="w-4 h-4 text-primary-container" />
-            <span>Sponsor İçeriği / Ödüllü Reklam</span>
+          <div className="flex items-center justify-between w-full text-gray-400 text-sm mb-4 px-2">
+            <div className="flex items-center gap-2">
+              <Tv className="w-4 h-4 text-primary-container" />
+              <span>Sponsor İçeriği / Ödüllü Reklam</span>
+            </div>
+            
+            <div className="flex items-center gap-2 font-mono text-xs bg-gray-900/80 px-3 py-1 rounded-full border border-gray-700">
+              <Clock className="w-3.5 h-3.5 text-yellow-400 animate-spin" />
+              <span>{canClaim ? "Süre Doldu ✅" : `Kalan Süre: ${countdown}s`}</span>
+            </div>
           </div>
 
           <div
             id="div-gpt-ad-1784723369148-0"
-            className="min-w-[300px] min-h-[250px] bg-[#0d0f17] rounded-xl flex items-center justify-center border border-dashed border-gray-800 my-2"
+            className="min-w-[300px] min-h-[250px] bg-[#0d0f17] rounded-xl flex flex-col items-center justify-center border border-dashed border-gray-800 my-2 p-4 text-center"
           >
+            {!canClaim && (
+              <div className="flex flex-col items-center text-gray-500">
+                <Loader2 className="w-8 h-8 animate-spin text-primary-container mb-2" />
+                <p className="text-xs">Sponsor içeriği yükleniyor ({countdown}s)...</p>
+                <p className="text-[11px] text-gray-600 mt-1 max-w-xs">
+                  (Not: Google Ad Manager yeni reklam birimlerine video tanımlaması 24 saate kadar sürebilir.)
+                </p>
+              </div>
+            )}
             <Script id="gpt-display-script" strategy="afterInteractive">
               {`
                 googletag = window.googletag || {cmd: []};
@@ -134,15 +161,19 @@ export default function VotePage() {
         ) : (
           <button
             onClick={handleRewardClaim}
-            disabled={status !== "authenticated" || voting}
+            disabled={status !== "authenticated" || !canClaim || voting}
             className={`px-8 py-4 rounded-xl font-extrabold text-lg transition-all shadow-xl flex items-center gap-3 ${
-              status === "authenticated"
-                ? "bg-gradient-to-r from-primary to-primary-container text-white hover:scale-105 active:scale-95 cursor-pointer"
-                : "bg-gray-800 text-gray-500 cursor-not-allowed"
+              status === "authenticated" && canClaim
+                ? "bg-gradient-to-r from-primary to-primary-container text-white hover:scale-105 active:scale-95 cursor-pointer shadow-primary/20"
+                : "bg-gray-800 text-gray-500 cursor-not-allowed border border-gray-700"
             }`}
           >
             <Award className="w-6 h-6" />
-            {voting ? "Oy İşleniyor..." : "Oyu Onayla & Ücretsiz Kullan"}
+            {voting
+              ? "Oy İşleniyor..."
+              : !canClaim
+              ? `Süre Dolması Bekleniyor (${countdown}s)`
+              : "Oyu Onayla & Ücretsiz Kullan"}
           </button>
         )}
 
