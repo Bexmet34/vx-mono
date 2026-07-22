@@ -97,20 +97,12 @@ async function checkUpdates(client, initial = false) {
 
         if (!configError && configs) {
             const { sendKillBoardSummary } = require('./killboardService');
+            const { getGuildConfig } = require('./guildConfig');
             for (const config of configs) {
                 console.log(`[DbListener] Manual KillBoard trigger for guild: ${config.guild_id}`);
+                const fullConfig = (await getGuildConfig(config.guild_id)) || config;
                 
-                await sendKillBoardSummary(client, {
-                    guild_id: config.guild_id,
-                    guild_name: config.guild_id,
-                    albion_guild_id: config.albion_guild_id,
-                    albion_guild_name: config.albion_guild_name,
-                    albion_server: config.albion_server,
-                    killboard_channel_id: config.killboard_channel_id,
-                    killboard_time: config.killboard_time,
-                    last_killboard_date: config.last_killboard_date || null,
-                    language: config.language
-                });
+                await sendKillBoardSummary(client, fullConfig);
 
                 // Reset trigger flag + save ISO timestamp for next period
                 const nowIso = new Date().toISOString();
