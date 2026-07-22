@@ -20,6 +20,9 @@ export default function VotePage() {
     if (typeof window !== "undefined") {
       window.googletag = window.googletag || { cmd: [] };
       window.googletag.cmd.push(() => {
+        if (typeof window.googletag.destroySlots === "function") {
+          window.googletag.destroySlots();
+        }
         window.googletag
           .defineSlot(
             "/23362614874/Veyronix_Vote_Rewarded_Video",
@@ -29,6 +32,7 @@ export default function VotePage() {
           .addService(window.googletag.pubads());
         window.googletag.pubads().enableSingleRequest();
         window.googletag.enableServices();
+        window.googletag.display("div-gpt-ad-1784723369148-0");
       });
     }
   }, []);
@@ -138,14 +142,6 @@ export default function VotePage() {
                 </p>
               </div>
             )}
-            <Script id="gpt-display-script" strategy="afterInteractive">
-              {`
-                googletag = window.googletag || {cmd: []};
-                googletag.cmd.push(function() { 
-                  googletag.display('div-gpt-ad-1784723369148-0'); 
-                });
-              `}
-            </Script>
           </div>
         </div>
 
