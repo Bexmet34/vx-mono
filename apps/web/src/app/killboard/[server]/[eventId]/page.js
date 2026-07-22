@@ -112,8 +112,30 @@ export default async function KillboardEventPage({ params }) {
   const zoneText = getZoneName(event.KillArea);
   const ogImageUrl = `https://veyronix.com.tr/api/og/killboard?server=${server}&eventId=${eventId}`;
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: `${killer.Name} killed ${victim.Name} for ${event.TotalVictimKillFame} Fame`,
+    description: `Albion Online ${server.toUpperCase()} PvP Killboard: ${killer.Name} killed ${victim.Name} for ${event.TotalVictimKillFame} Fame.`,
+    image: [ogImageUrl],
+    datePublished: new Date(event.TimeStamp).toISOString(),
+    publisher: {
+      '@type': 'Organization',
+      name: 'Veyronix',
+      url: 'https://veyronix.com.tr',
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': `https://veyronix.com.tr/killboard/${server}/${eventId}`,
+    },
+  };
+
   return (
     <div className={styles.container} style={{ paddingTop: '2rem', paddingBottom: '4rem' }}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       
       {/* Top Navigation & Share Bar */}
       <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
