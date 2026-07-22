@@ -4,6 +4,7 @@ import { LanguageProvider } from "@/context/LanguageContext";
 import { cookies } from "next/headers";
 
 import Footer from "@/components/Footer";
+import Navbar from "@/components/Navbar";
 import SystemStatusWidget from "@/components/SystemStatusWidget";
 import ScrollToTop from "@/components/ScrollToTop";
 import { Sora } from "next/font/google";
@@ -121,7 +122,8 @@ export default async function RootLayout({ children }) {
         <LanguageProvider initialLang={lang}>
           <NextAuthProvider>
             <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-              <div style={{ flex: 1 }}>
+              <Navbar />
+              <div style={{ flex: 1, paddingTop: '80px' }}>
                 {children}
               </div>
               <Footer />

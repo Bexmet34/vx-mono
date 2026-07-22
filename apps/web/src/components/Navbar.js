@@ -90,6 +90,11 @@ export default function Navbar({ isStatic = false }) {
             
             <div className="hidden md:flex space-x-6 lg:space-x-8 items-center border-l border-on-surface/10 pl-6">
               
+              <Link href="/killboard" className="flex items-center gap-1.5 font-body-md text-body-md text-primary-container font-bold hover:brightness-110 transition-all py-2">
+                <Swords size={16} />
+                Killboard
+              </Link>
+
               {/* Dropdown for Page Sections */}
               <div className="relative group cursor-pointer">
                 <div className="flex items-center gap-1 font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors py-2">
@@ -98,6 +103,9 @@ export default function Navbar({ isStatic = false }) {
                 </div>
                 <div className="absolute top-[100%] left-0 mt-0 w-48 bg-surface-container border border-outline-variant/50 p-2 shadow-[0_10px_40px_rgba(0,0,0,0.8)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 rounded-md">
                   <div className="flex flex-col gap-1">
+                    <Link href="/killboard" className="px-4 py-2 text-sm text-primary-container font-bold hover:bg-primary-container/10 transition-colors rounded-sm flex items-center gap-2">
+                      <Swords size={14} /> Killboard
+                    </Link>
                     <Link href="/#features" className="px-4 py-2 text-sm text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm">
                       {lang === 'tr' ? 'Özellikler' : 'Features'}
                     </Link>
