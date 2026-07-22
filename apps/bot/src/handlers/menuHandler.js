@@ -623,12 +623,12 @@ async function handleAddMemberSelect(interaction) {
 
     await interaction.update({
         content: `👤 **${roleName}** rolüne eklenecek kullanıcıyı seçin:`,
-        components: [row],
-        flags: [MessageFlags.Ephemeral]
+        components: [row]
     });
 }
 
 async function handleAddMemberUserSelect(interaction) {
+    await interaction.deferUpdate().catch(() => {});
     const customId = interaction.customId;
     const parts = customId.split('_');
     const messageId = parts[4];
@@ -659,7 +659,7 @@ async function handleAddMemberUserSelect(interaction) {
 
         if (roleIndex < 0 || roleIndex >= rolesWithMembers.length) {
             release();
-            return await interaction.reply({ content: `❌ ${t('common.error', lang)}`, flags: [MessageFlags.Ephemeral] });
+            return await interaction.editReply({ content: `❌ ${t('common.error', lang)}`, components: [] });
         }
 
         rolesWithMembers[roleIndex].userId = targetUserId;
@@ -676,7 +676,7 @@ async function handleAddMemberUserSelect(interaction) {
             embeds: [allocationResult.newEmbed], 
             components: allocationResult.newComponents
         });
-        await interaction.update({ content: `✅ ${t('manage.member_added', lang)}`, components: [], flags: [MessageFlags.Ephemeral] });
+        await interaction.editReply({ content: `✅ ${t('manage.member_added', lang)}`, components: [] });
     } catch (e) {
         console.error('Error in handleAddMemberUserSelect:', e);
     } finally {
