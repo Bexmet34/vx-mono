@@ -3,7 +3,7 @@
 import Image from "next/image";
 import styles from "./KillMatch.module.css";
 import Link from "next/link";
-import { Share2, Check } from "lucide-react";
+import { Share2, Check, Eye } from "lucide-react";
 import { useState } from "react";
 
 function ItemSlot({ item, slotClass }) {
@@ -67,6 +67,29 @@ export default function KillMatch({ event, server }) {
           <div className={styles.fame}>
             {event.TotalVictimKillFame ? event.TotalVictimKillFame.toLocaleString() : 0} Fame
           </div>
+          <Link
+            href={`/killboard/${server}/${event.EventId}`}
+            style={{
+              background: 'linear-gradient(135deg, rgba(252, 163, 17, 0.25), rgba(255, 140, 0, 0.15))',
+              border: '1px solid rgba(252, 163, 17, 0.5)',
+              borderRadius: '8px',
+              padding: '0.4rem 0.9rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              color: '#fca311',
+              textDecoration: 'none',
+              fontSize: '0.85rem',
+              fontWeight: 'bold',
+              transition: 'all 0.2s ease',
+              boxShadow: '0 0 10px rgba(252, 163, 17, 0.15)',
+              zIndex: 10
+            }}
+            className="hover:brightness-125 hover:scale-105"
+            title="Detayları İncele"
+          >
+            <Eye size={14} /> İncele
+          </Link>
           <button 
             onClick={handleShare}
             style={{
@@ -81,7 +104,8 @@ export default function KillMatch({ event, server }) {
               color: copied ? '#2ecc71' : '#fff',
               transition: 'all 0.2s',
               fontSize: '0.85rem',
-              fontWeight: 'bold'
+              fontWeight: 'bold',
+              zIndex: 10
             }}
             title="Skoru Kopyala"
           >
