@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import Script from "next/script";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Award, CheckCircle2, ShieldAlert, Sparkles, Tv } = require("lucide-react");
+import { Award, CheckCircle2, ShieldAlert, Sparkles, Tv } from "lucide-react";
 
 export default function VotePage() {
   const { data: session, status } = useSession();
