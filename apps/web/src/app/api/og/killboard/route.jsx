@@ -9,7 +9,7 @@ export async function GET(request) {
     const eventId = searchParams.get('eventId');
 
     if (!eventId) {
-      return new Response('Missing eventId', { status: 400 });
+      return new Response('Missing eventId parameter', { status: 400 });
     }
 
     const REGIONS = {
@@ -26,7 +26,7 @@ export async function GET(request) {
     });
 
     if (!res.ok) {
-      return new Response('Event not found', { status: 404 });
+      return new Response('Event not found from Albion API', { status: 404 });
     }
     
     const event = await res.json();
@@ -47,10 +47,9 @@ export async function GET(request) {
             alignItems: 'center',
             justifyContent: 'space-between',
             backgroundColor: '#0f1117',
-            color: 'white',
+            color: '#ffffff',
             fontFamily: 'sans-serif',
             padding: '40px 60px',
-            position: 'relative',
           }}
         >
           {/* Top Brand Header */}
@@ -64,13 +63,14 @@ export async function GET(request) {
               paddingBottom: '20px',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
               <div
                 style={{
-                  fontSize: '36px',
+                  fontSize: '34px',
                   fontWeight: 'bold',
                   color: '#fca311',
                   letterSpacing: '1px',
+                  marginRight: '15px',
                 }}
               >
                 VEYRONIX KILLBOARD
@@ -90,7 +90,7 @@ export async function GET(request) {
               </div>
             </div>
 
-            <div style={{ fontSize: '24px', color: '#888', fontWeight: '600' }}>
+            <div style={{ fontSize: '22px', color: '#888888', fontWeight: '600' }}>
               {dateFormatted}
             </div>
           </div>
@@ -106,8 +106,8 @@ export async function GET(request) {
           >
             <div
               style={{
-                fontSize: '20px',
-                color: '#aaa',
+                fontSize: '18px',
+                color: '#aaaaaa',
                 textTransform: 'uppercase',
                 letterSpacing: '2px',
               }}
@@ -116,10 +116,10 @@ export async function GET(request) {
             </div>
             <div
               style={{
-                fontSize: '48px',
+                fontSize: '46px',
                 fontWeight: '900',
                 color: '#fca311',
-                textShadow: '0 0 20px rgba(252, 163, 17, 0.5)',
+                marginTop: '5px',
               }}
             >
               ⚡ {fameFormatted} FAME
@@ -148,12 +148,12 @@ export async function GET(request) {
                 padding: '25px',
               }}
             >
-              <div style={{ fontSize: '20px', color: '#2ecc71', fontWeight: 'bold', letterSpacing: '1px' }}>
+              <div style={{ fontSize: '18px', color: '#2ecc71', fontWeight: 'bold', letterSpacing: '1px' }}>
                 ⚔️ KATİL (KILLER)
               </div>
               <div
                 style={{
-                  fontSize: '36px',
+                  fontSize: '34px',
                   fontWeight: '900',
                   color: '#ffffff',
                   margin: '10px 0 5px 0',
@@ -161,7 +161,7 @@ export async function GET(request) {
               >
                 {killer.Name || 'Bilinmeyen'}
               </div>
-              <div style={{ fontSize: '20px', color: '#2ecc71', fontWeight: '600', margin: '0 0 15px 0' }}>
+              <div style={{ fontSize: '18px', color: '#2ecc71', fontWeight: '600', margin: '0 0 15px 0' }}>
                 {killer.GuildName ? `[${killer.AllianceName || ''}] ${killer.GuildName}` : 'Loncasız'}
               </div>
 
@@ -169,13 +169,12 @@ export async function GET(request) {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '10px',
                   background: 'rgba(0,0,0,0.4)',
-                  padding: '10px 20px',
+                  padding: '8px 20px',
                   borderRadius: '12px',
                 }}
               >
-                <span style={{ fontSize: '22px', color: '#fff', fontWeight: 'bold' }}>
+                <span style={{ fontSize: '20px', color: '#ffffff', fontWeight: 'bold' }}>
                   IP: {Math.round(killer.AverageItemPower || 0)}
                 </span>
               </div>
@@ -184,9 +183,9 @@ export async function GET(request) {
             {/* VS Badge */}
             <div
               style={{
-                fontSize: '52px',
+                fontSize: '48px',
                 fontWeight: '900',
-                color: '#fff',
+                color: '#ffffff',
                 fontStyle: 'italic',
                 opacity: 0.6,
               }}
@@ -207,12 +206,12 @@ export async function GET(request) {
                 padding: '25px',
               }}
             >
-              <div style={{ fontSize: '20px', color: '#e74c3c', fontWeight: 'bold', letterSpacing: '1px' }}>
+              <div style={{ fontSize: '18px', color: '#e74c3c', fontWeight: 'bold', letterSpacing: '1px' }}>
                 💀 KURBAN (VICTIM)
               </div>
               <div
                 style={{
-                  fontSize: '36px',
+                  fontSize: '34px',
                   fontWeight: '900',
                   color: '#ffffff',
                   margin: '10px 0 5px 0',
@@ -220,7 +219,7 @@ export async function GET(request) {
               >
                 {victim.Name || 'Bilinmeyen'}
               </div>
-              <div style={{ fontSize: '20px', color: '#e74c3c', fontWeight: '600', margin: '0 0 15px 0' }}>
+              <div style={{ fontSize: '18px', color: '#e74c3c', fontWeight: '600', margin: '0 0 15px 0' }}>
                 {victim.GuildName ? `[${victim.AllianceName || ''}] ${victim.GuildName}` : 'Loncasız'}
               </div>
 
@@ -228,13 +227,12 @@ export async function GET(request) {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '10px',
                   background: 'rgba(0,0,0,0.4)',
-                  padding: '10px 20px',
+                  padding: '8px 20px',
                   borderRadius: '12px',
                 }}
               >
-                <span style={{ fontSize: '22px', color: '#fff', fontWeight: 'bold' }}>
+                <span style={{ fontSize: '20px', color: '#ffffff', fontWeight: 'bold' }}>
                   IP: {Math.round(victim.AverageItemPower || 0)}
                 </span>
               </div>
@@ -242,7 +240,7 @@ export async function GET(request) {
           </div>
 
           {/* Footer Branding */}
-          <div style={{ fontSize: '18px', color: '#666', fontWeight: '500' }}>
+          <div style={{ fontSize: '16px', color: '#666666', fontWeight: '500' }}>
             veyronix.com.tr • Albion Online Tactical Command
           </div>
         </div>
@@ -254,6 +252,6 @@ export async function GET(request) {
     );
   } catch (e) {
     console.error('[OG Killboard Error]:', e);
-    return new Response(`Failed to generate OG image`, { status: 500 });
+    return new Response(`Failed to generate OG image: ${e.message}`, { status: 500 });
   }
 }
