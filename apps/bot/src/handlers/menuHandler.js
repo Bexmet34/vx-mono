@@ -152,7 +152,7 @@ async function handleEditOption(interaction, lang) {
         .setValue(data.rolesWithMembers.map(r => r.role).join('\n'))
         .setStyle(TextInputStyle.Paragraph)
         .setMinLength(2)
-        .setMaxLength(1000)
+        .setMaxLength(4000)
         .setRequired(true);
 
     const descriptionInput = new TextInputBuilder()

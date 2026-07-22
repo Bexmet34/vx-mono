@@ -132,7 +132,7 @@ async function handleCreatePartyCommand(interaction) {
         .setPlaceholder(t('party.party_roles_placeholder', lang))
         .setStyle(TextInputStyle.Paragraph)
         .setMinLength(2)
-        .setMaxLength(1000)
+        .setMaxLength(4000)
         .setRequired(true);
 
     const descriptionInput = new TextInputBuilder()
