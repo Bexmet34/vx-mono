@@ -5,37 +5,15 @@ import { useState, useEffect } from "react";
 import Script from "next/script";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Award, CheckCircle2, ShieldAlert, Sparkles, Tv, Clock, Loader2 } from "lucide-react";
+import { Award, CheckCircle2, ShieldAlert, Sparkles, Tv, Clock } from "lucide-react";
 
 export default function VotePage() {
   const { data: session, status } = useSession();
-  const [adLoaded, setAdLoaded] = useState(false);
   const [countdown, setCountdown] = useState(15);
   const [canClaim, setCanClaim] = useState(false);
   const [voting, setVoting] = useState(false);
   const [voteSuccess, setVoteSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      window.googletag = window.googletag || { cmd: [] };
-      window.googletag.cmd.push(() => {
-        if (typeof window.googletag.destroySlots === "function") {
-          window.googletag.destroySlots();
-        }
-        window.googletag
-          .defineSlot(
-            "/23362614874/Veyronix_Vote_Rewarded_Video",
-            [[320, 50], [300, 250], [480, 320]],
-            "div-gpt-ad-1784723369148-0"
-          )
-          .addService(window.googletag.pubads());
-        window.googletag.pubads().enableSingleRequest();
-        window.googletag.enableServices();
-        window.googletag.display("div-gpt-ad-1784723369148-0");
-      });
-    }
-  }, []);
 
   // 15 Second Timer effect
   useEffect(() => {
@@ -77,11 +55,12 @@ export default function VotePage() {
 
   return (
     <div className="min-h-screen bg-[#0d0f17] text-white flex flex-col font-sans">
+      {/* Adsterra Social Bar Test Script */}
       <Script
-        src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"
+        src="https://pl30489132.effectivecpmnetwork.com/a0/03/09/a00309c9dbe2b85ac1210cf18697ba76.js"
         strategy="afterInteractive"
-        onLoad={() => setAdLoaded(true)}
       />
+
       <Navbar />
 
       <main className="flex-1 container mx-auto px-4 py-12 flex flex-col items-center justify-center max-w-4xl">
@@ -94,7 +73,7 @@ export default function VotePage() {
             Bota Oy Ver, Premium Özellikleri Aç!
           </h1>
           <p className="text-gray-400 max-w-xl mx-auto">
-            Aşağıdaki sponsor içeriği yüklenirken lütfen bekleyin. Süre dolduğunda oy butonunuz otomatik olarak aktifleştirecektir.
+            Aşağıdaki sponsor içeriği ve reklamlar yüklenirken lütfen bekleyin. Süre dolduğunda oy butonunuz otomatik olarak aktifleştirecektir.
           </p>
         </div>
 
@@ -120,7 +99,7 @@ export default function VotePage() {
           <div className="flex items-center justify-between w-full text-gray-400 text-sm mb-4 px-2">
             <div className="flex items-center gap-2">
               <Tv className="w-4 h-4 text-primary-container" />
-              <span>Sponsor İçeriği / Ödüllü Reklam</span>
+              <span>Adsterra Sponsor İçeriği / Social Bar</span>
             </div>
             
             <div className="flex items-center gap-2 font-mono text-xs bg-gray-900/80 px-3 py-1 rounded-full border border-gray-700">
@@ -129,19 +108,11 @@ export default function VotePage() {
             </div>
           </div>
 
-          <div
-            id="div-gpt-ad-1784723369148-0"
-            className="min-w-[300px] min-h-[250px] bg-[#0d0f17] rounded-xl flex flex-col items-center justify-center border border-dashed border-gray-800 my-2 p-4 text-center"
-          >
-            {!canClaim && (
-              <div className="flex flex-col items-center text-gray-500">
-                <Loader2 className="w-8 h-8 animate-spin text-primary-container mb-2" />
-                <p className="text-xs">Sponsor içeriği yükleniyor ({countdown}s)...</p>
-                <p className="text-[11px] text-gray-600 mt-1 max-w-xs">
-                  (Not: Google Ad Manager yeni reklam birimlerine video tanımlaması 24 saate kadar sürebilir.)
-                </p>
-              </div>
-            )}
+          <div className="w-full py-8 text-center text-gray-400 border border-dashed border-gray-800 rounded-xl bg-[#0d0f17]">
+            <p className="text-sm font-medium text-gray-300">Social Bar Reklam Formatı Aktif</p>
+            <p className="text-xs text-gray-500 mt-1">
+              Reklamlar sayfanın altında / bildirim baloncuğu olarak görüntülenecektir.
+            </p>
           </div>
         </div>
 
