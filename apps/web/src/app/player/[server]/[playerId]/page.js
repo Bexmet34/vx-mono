@@ -25,58 +25,60 @@ async function getPlayer(server, playerId) {
   }
 }
 
-// Fetch Player Kills, Deaths & Guild/Server Assists from Albion API
+// Fetch Deep Player Kills, Deaths & Guild/Server Assists from Albion API
 async function getPlayerMatches(server, playerId, guildId, playerName) {
   const baseUrl = REGIONS[server.toLowerCase()] || REGIONS.europe;
   try {
-    const promises = [
-      fetch(`${baseUrl}/players/${playerId}/kills`, { cache: "no-store" }).catch(() => null),
-      fetch(`${baseUrl}/players/${playerId}/deaths`, { cache: "no-store" }).catch(() => null),
-      fetch(`${baseUrl}/events?offset=0&limit=51`, { cache: "no-store" }).catch(() => null),
+    const urls = [
+      // Kills Pages 1-3 (Up to 150 Kills)
+      `${baseUrl}/players/${playerId}/kills?offset=0&limit=51`,
+      `${baseUrl}/players/${playerId}/kills?offset=51&limit=51`,
+      `${baseUrl}/players/${playerId}/kills?offset=102&limit=51`,
+      // Deaths Pages 1-3 (Up to 150 Deaths)
+      `${baseUrl}/players/${playerId}/deaths?offset=0&limit=51`,
+      `${baseUrl}/players/${playerId}/deaths?offset=51&limit=51`,
+      `${baseUrl}/players/${playerId}/deaths?offset=102&limit=51`,
+      // Server Global Events
+      `${baseUrl}/events?offset=0&limit=51`,
+      `${baseUrl}/events?offset=51&limit=51`,
     ];
 
     if (guildId) {
-      promises.push(
-        fetch(`${baseUrl}/events?offset=0&limit=51&guildId=${guildId}`, { cache: "no-store" }).catch(() => null),
-        fetch(`${baseUrl}/events?offset=51&limit=51&guildId=${guildId}`, { cache: "no-store" }).catch(() => null)
+      // Guild Events Pages 1-3 for Assists
+      urls.push(
+        `${baseUrl}/events?offset=0&limit=51&guildId=${guildId}`,
+        `${baseUrl}/events?offset=51&limit=51&guildId=${guildId}`,
+        `${baseUrl}/events?offset=102&limit=51&guildId=${guildId}`
       );
     }
 
-    const responses = await Promise.all(promises);
-
-    const kills = responses[0] && responses[0].ok ? await responses[0].json().catch(() => []) : [];
-    const deaths = responses[1] && responses[1].ok ? await responses[1].json().catch(() => []) : [];
-    const globalEvents = responses[2] && responses[2].ok ? await responses[2].json().catch(() => []) : [];
-    const guildEvents1 = responses[3] && responses[3].ok ? await responses[3].json().catch(() => []) : [];
-    const guildEvents2 = responses[4] && responses[4].ok ? await responses[4].json().catch(() => []) : [];
-
-    const killsArr = Array.isArray(kills) ? kills : [];
-    const deathsArr = Array.isArray(deaths) ? deaths : [];
-    const globalArr = Array.isArray(globalEvents) ? globalEvents : [];
-    const guildArr1 = Array.isArray(guildEvents1) ? guildEvents1 : [];
-    const guildArr2 = Array.isArray(guildEvents2) ? guildEvents2 : [];
+    const responses = await Promise.all(
+      urls.map((url) => fetch(url, { cache: "no-store" }).catch(() => null))
+    );
 
     const eventsMap = new Map();
-
-    // 1. Kills
-    killsArr.forEach(e => { if (e && e.EventId) eventsMap.set(e.EventId, e); });
-    
-    // 2. Deaths
-    deathsArr.forEach(e => { if (e && e.EventId) eventsMap.set(e.EventId, e); });
-
-    // 3. Guild & Global Assists / Participations
     const targetName = (playerName || "").toLowerCase();
-    [...guildArr1, ...guildArr2, ...globalArr].forEach(e => {
-      if (!e || !e.EventId) return;
-      const isKiller = e.Killer?.Id === playerId || (e.Killer?.Name && e.Killer.Name.toLowerCase() === targetName);
-      const isVictim = e.Victim?.Id === playerId || (e.Victim?.Name && e.Victim.Name.toLowerCase() === targetName);
-      const isParticipant = e.Participants?.some(p => p.Id === playerId || (p.Name && p.Name.toLowerCase() === targetName));
-      const isGroupMember = e.GroupMembers?.some(p => p.Id === playerId || (p.Name && p.Name.toLowerCase() === targetName));
 
-      if (isKiller || isVictim || isParticipant || isGroupMember) {
-        eventsMap.set(e.EventId, e);
-      }
-    });
+    for (let i = 0; i < responses.length; i++) {
+      const res = responses[i];
+      if (!res || !res.ok) continue;
+
+      const data = await res.json().catch(() => []);
+      if (!Array.isArray(data)) continue;
+
+      data.forEach((e) => {
+        if (!e || !e.EventId) return;
+
+        const isKiller = e.Killer?.Id === playerId || (e.Killer?.Name && e.Killer.Name.toLowerCase() === targetName);
+        const isVictim = e.Victim?.Id === playerId || (e.Victim?.Name && e.Victim.Name.toLowerCase() === targetName);
+        const isParticipant = e.Participants?.some((p) => p.Id === playerId || (p.Name && p.Name.toLowerCase() === targetName));
+        const isGroupMember = e.GroupMembers?.some((p) => p.Id === playerId || (p.Name && p.Name.toLowerCase() === targetName));
+
+        if (isKiller || isVictim || isParticipant || isGroupMember) {
+          eventsMap.set(e.EventId, e);
+        }
+      });
+    }
 
     const combined = Array.from(eventsMap.values());
     // Sort descending by TimeStamp (newest events first)
