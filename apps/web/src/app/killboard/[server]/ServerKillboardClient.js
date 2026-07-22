@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search, User, Shield, Loader2, ArrowLeft, Swords, Globe } from "lucide-react";
+import { Search, User, Shield, Loader2, ArrowLeft, Swords, AlertCircle } from "lucide-react";
 import KillMatch from "@/components/KillMatch";
 import CtaBanner from "@/components/CtaBanner";
 import { useLanguage } from "@/context/LanguageContext";
@@ -16,6 +16,7 @@ export default function ServerKillboardClient({ serverKey, serverInfo, initialKi
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState(null);
   const [isSearching, setIsSearching] = useState(false);
+  const [searchError, setSearchError] = useState("");
 
   const ALL_SERVERS = [
     { id: "europe", serverParam: "Europe", name: isTr ? "Avrupa (Europe)" : "Europe", flag: "🌍" },
@@ -28,8 +29,9 @@ export default function ServerKillboardClient({ serverKey, serverInfo, initialKi
   const handleSearchChange = async (e) => {
     const value = e.target.value;
     setQuery(value);
+    setSearchError("");
 
-    if (value.length < 3) {
+    if (value.length < 2) {
       setSearchResults(null);
       setIsSearching(false);
       return;
@@ -37,18 +39,19 @@ export default function ServerKillboardClient({ serverKey, serverInfo, initialKi
 
     setIsSearching(true);
     try {
-      // Use internal proxy API to prevent browser CORS block
       const res = await fetch(`/api/albion/search?q=${encodeURIComponent(value)}&server=${currentServerObj.serverParam}`);
       if (res.ok) {
         const data = await res.json();
-        if (Array.isArray(data)) {
-          setSearchResults({ guilds: data, players: [] });
+        setSearchResults(data);
+        if ((!data.players || data.players.length === 0) && (!data.guilds || data.guilds.length === 0)) {
+          setSearchError(isTr ? `Aradığınız "${value}" ismi bulunamadı.` : `No match found for "${value}".`);
         } else {
-          setSearchResults(data);
+          setSearchError("");
         }
       }
     } catch (err) {
       console.error("Search API Error:", err);
+      setSearchError(isTr ? "Arama hatası oluştu." : "Search error occurred.");
     } finally {
       setIsSearching(false);
     }
@@ -57,12 +60,13 @@ export default function ServerKillboardClient({ serverKey, serverInfo, initialKi
   const handleSelectResult = (type, id) => {
     setSearchResults(null);
     setQuery("");
+    setSearchError("");
     router.push(`/${type}/${serverKey}/${id}`);
   };
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    if (!query || query.length < 3) return;
+    if (!query || query.length < 2) return;
 
     if (searchResults) {
       if (searchResults.players && searchResults.players.length > 0) {
@@ -71,10 +75,12 @@ export default function ServerKillboardClient({ serverKey, serverInfo, initialKi
       }
       if (searchResults.guilds && searchResults.guilds.length > 0) {
         const g = searchResults.guilds[0];
-        handleSelectResult("guild", g.Id || g._id);
+        handleSelectResult("guild", g.Id);
         return;
       }
     }
+
+    setSearchError(isTr ? `"${query}" adında oyuncu veya lonca bulunamadı.` : `No player or guild found with name "${query}".`);
   };
 
   return (
@@ -188,7 +194,7 @@ export default function ServerKillboardClient({ serverKey, serverInfo, initialKi
                 style={{
                   width: "100%",
                   background: "rgba(0, 0, 0, 0.5)",
-                  border: "1px solid rgba(252, 163, 17, 0.4)",
+                  border: searchError ? "1px solid rgba(231, 76, 60, 0.6)" : "1px solid rgba(252, 163, 17, 0.4)",
                   borderRadius: "10px",
                   padding: "0.9rem 1.2rem 0.9rem 3rem",
                   color: "#fff",
@@ -226,8 +232,26 @@ export default function ServerKillboardClient({ serverKey, serverInfo, initialKi
             </button>
           </div>
 
+          {searchError && !isSearching && (
+            <div style={{
+              marginTop: "0.75rem",
+              background: "rgba(231, 76, 60, 0.15)",
+              border: "1px solid rgba(231, 76, 60, 0.4)",
+              borderRadius: "8px",
+              padding: "0.6rem 1rem",
+              color: "#ff6b6b",
+              fontSize: "0.9rem",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem"
+            }}>
+              <AlertCircle size={16} />
+              <span>{searchError}</span>
+            </div>
+          )}
+
           {/* Search Dropdown */}
-          {searchResults && (
+          {searchResults && (searchResults.players?.length > 0 || searchResults.guilds?.length > 0) && (
             <div style={{
               position: "absolute",
               top: "100%",
@@ -281,8 +305,8 @@ export default function ServerKillboardClient({ serverKey, serverInfo, initialKi
                   </div>
                   {searchResults.guilds.slice(0, 6).map((g) => (
                     <div
-                      key={g.Id || g._id}
-                      onClick={() => handleSelectResult("guild", g.Id || g._id)}
+                      key={g.Id}
+                      onClick={() => handleSelectResult("guild", g.Id)}
                       style={{
                         padding: "0.8rem 1rem",
                         cursor: "pointer",
@@ -303,12 +327,6 @@ export default function ServerKillboardClient({ serverKey, serverInfo, initialKi
                       <span style={{ fontSize: "0.8rem", color: "#fca311", fontWeight: "bold" }}>{isTr ? "İncele" : "Inspect"} →</span>
                     </div>
                   ))}
-                </div>
-              )}
-
-              {(!searchResults.players?.length && !searchResults.guilds?.length) && (
-                <div style={{ padding: "1.5rem", textAlign: "center", color: "#888" }}>
-                  {isTr ? "Aramanızla eşleşen sonuç bulunamadı." : "No matching results found."}
                 </div>
               )}
             </div>

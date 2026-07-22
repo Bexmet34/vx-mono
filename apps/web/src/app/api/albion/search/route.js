@@ -8,121 +8,54 @@ const BASE_URLS = {
   'Asia':     'https://gameinfo-sgp.albiononline.com/api/gameinfo',
 };
 
-async function fetchGuildDetail(baseUrl, guildId) {
-  try {
-    const [dataRes, membersRes] = await Promise.all([
-      fetch(`${baseUrl}/guilds/${guildId}/data`, { headers: { 'Accept': 'application/json' }, next: { revalidate: 0 } }),
-      fetch(`${baseUrl}/guilds/${guildId}/members`, { headers: { 'Accept': 'application/json' }, next: { revalidate: 0 } }),
-    ]);
-
-    let killFame = 0;
-    let founderName = null;
-    let allianceTag = null;
-    let allianceName = null;
-
-    if (dataRes.ok) {
-      const d = await dataRes.json().catch(() => ({}));
-      killFame = d?.guild?.killFame || d?.guild?.KillFame || 0;
-      founderName = d?.guild?.FounderName || null;
-      allianceTag = d?.guild?.AllianceTag || null;
-      allianceName = d?.guild?.AllianceName || null;
-    }
-
-    let memberCount = 0;
-    if (membersRes.ok) {
-      const members = await membersRes.json().catch(() => []);
-      memberCount = Array.isArray(members) ? members.length : 0;
-    }
-
-    return { killFame, memberCount, founderName, allianceTag, allianceName };
-  } catch {
-    return { killFame: 0, memberCount: 0, founderName: null, allianceTag: null, allianceName: null };
-  }
-}
-
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const query = searchParams.get('q');
-  const serverParam = searchParams.get('server'); // 'Europe', 'Americas', 'Asia', or null
+  const serverParam = searchParams.get('server'); // 'Europe', 'Americas', 'Asia', or 'europe', 'americas', 'asia'
 
-  if (!query || query.length < 3) {
-    return NextResponse.json([]);
+  if (!query || query.length < 2) {
+    return NextResponse.json({ players: [], guilds: [] });
   }
 
   try {
-    const serverMapping = {
-      'Americas': { name: 'Americas', baseUrl: BASE_URLS['Americas'] },
-      'Europe':   { name: 'Europe',   baseUrl: BASE_URLS['Europe']   },
-      'Asia':     { name: 'Asia',     baseUrl: BASE_URLS['Asia']     },
-    };
+    const serverKey = serverParam ? serverParam.charAt(0).toUpperCase() + serverParam.slice(1).toLowerCase() : 'Europe';
+    const baseUrl = BASE_URLS[serverKey] || BASE_URLS['Europe'];
 
-    let targets = [];
-    if (serverParam && serverMapping[serverParam]) {
-      targets.push(serverMapping[serverParam]);
-    } else {
-      targets = Object.values(serverMapping);
-    }
-
-    const responses = await Promise.all(
-      targets.map(target =>
-        fetch(`${target.baseUrl}/search?q=${encodeURIComponent(query)}`, {
-          headers: { 'Accept': 'application/json' },
-          next: { revalidate: 0 }
-        })
-          .then(res => ({ ok: res.ok, server: target.name, baseUrl: target.baseUrl, res }))
-          .catch(e => ({ ok: false, server: target.name, baseUrl: target.baseUrl, error: e.message }))
-      )
-    );
-
-    let allGuilds = [];
-    for (const response of responses) {
-      if (response && response.ok) {
-        const data = await response.res.json().catch(() => ({}));
-        if (data.guilds) {
-          const guildsWithServer = data.guilds.map(g => ({
-            ...g,
-            _server: response.server,
-            _baseUrl: response.baseUrl,
-          }));
-          allGuilds = allGuilds.concat(guildsWithServer);
-        }
-      }
-    }
-
-    // Deduplicate by id + server
-    const uniqueMap = new Map();
-    allGuilds.forEach(g => {
-      const id = g.Id || g.id;
-      const server = g._server || 'Europe';
-      const key = `${id}:${server}`;
-      if (!uniqueMap.has(key)) {
-        uniqueMap.set(key, { ...g, _id: id, _server: server });
-      }
+    const res = await fetch(`${baseUrl}/search?q=${encodeURIComponent(query)}`, {
+      headers: { 'Accept': 'application/json' },
+      next: { revalidate: 0 }
     });
-    const uniqueGuilds = Array.from(uniqueMap.values());
 
-    // Fetch real details for up to 8 guilds in parallel (avoid hammering Albion API)
-    const limited = uniqueGuilds.slice(0, 8);
-    const details = await Promise.all(
-      limited.map(g => fetchGuildDetail(g._baseUrl, g._id))
-    );
+    if (!res.ok) {
+      return NextResponse.json({ players: [], guilds: [] });
+    }
 
-    const result = limited.map((g, i) => ({
-      Id: g._id,
+    const data = await res.json().catch(() => ({ players: [], guilds: [] }));
+
+    const players = Array.isArray(data.players) ? data.players.map(p => ({
+      Id: p.Id || p.id,
+      Name: p.Name || p.name,
+      GuildId: p.GuildId || p.guildId || '',
+      GuildName: p.GuildName || p.guildName || '',
+      AllianceName: p.AllianceName || p.allianceName || '',
+      Fame: p.KillFame || p.Fame || 0,
+      Server: serverKey,
+    })) : [];
+
+    const guilds = Array.isArray(data.guilds) ? data.guilds.map(g => ({
+      Id: g.Id || g.id,
       Name: g.Name || g.name,
       AllianceId: g.AllianceId || g.allianceId || '',
-      AllianceName: details[i].allianceName || g.AllianceName || g.allianceName || '',
-      AllianceTag: details[i].allianceTag || g.AllianceTag || g.allianceTag || '',
-      KillFame: details[i].killFame,
-      DeathFame: g.DeathFame || g.deathFame || 0,
-      MemberCount: details[i].memberCount,
-      FounderName: details[i].founderName || '',
-      Server: g._server,
-    }));
+      AllianceName: g.AllianceName || g.allianceName || '',
+      AllianceTag: g.AllianceTag || g.allianceTag || '',
+      KillFame: g.KillFame || 0,
+      DeathFame: g.DeathFame || 0,
+      Server: serverKey,
+    })) : [];
 
-    return NextResponse.json(result);
+    return NextResponse.json({ players, guilds });
   } catch (error) {
     console.error('[Albion Search API] Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ players: [], guilds: [], error: error.message }, { status: 500 });
   }
 }
