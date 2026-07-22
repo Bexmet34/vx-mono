@@ -4,10 +4,23 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export const dynamic = 'force-dynamic';
 
+function getBaseUrl(server = 'Europe') {
+    const s = String(server || 'Europe').trim().toLowerCase();
+    if (s.includes('america') || s.includes('west')) {
+        return 'https://gameinfo.albiononline.com/api/gameinfo';
+    } else if (s.includes('asia') || s.includes('east')) {
+        return 'https://gameinfo-sgp.albiononline.com/api/gameinfo';
+    }
+    return 'https://gameinfo-ams.albiononline.com/api/gameinfo';
+}
+
 async function fetchAlbion(url) {
     try {
         const res = await fetch(url, {
-            headers: { 'Accept': 'application/json' },
+            headers: { 
+                'Accept': 'application/json',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            },
             cache: 'no-store'
         });
         if (!res.ok) return [];
@@ -19,6 +32,29 @@ async function fetchAlbion(url) {
         console.error(`[KillBoard Preview] Error fetching ${url}:`, e.message);
         return [];
     }
+}
+
+async function fetchAllGuildEvents(guildId, server, sinceDate) {
+    const baseUrl = getBaseUrl(server);
+    const allEvents = [];
+    const maxPages = 6;
+
+    for (let page = 0; page < maxPages; page++) {
+        const offset = page * 50;
+        const url = `${baseUrl}/events?offset=${offset}&limit=51&guildId=${guildId}`;
+        const events = await fetchAlbion(url);
+        if (!events || events.length === 0) break;
+        allEvents.push(...events);
+
+        if (sinceDate && events.length > 0) {
+            const oldestInPage = new Date(events[events.length - 1].TimeStamp);
+            if (!isNaN(oldestInPage.getTime()) && oldestInPage < sinceDate) {
+                break;
+            }
+        }
+        if (events.length < 51) break;
+    }
+    return allEvents;
 }
 
 export async function GET(req, { params }) {
@@ -35,32 +71,31 @@ export async function GET(req, { params }) {
 
         const { searchParams } = new URL(req.url);
         const server = searchParams.get('server') || 'Europe';
+        const targetGuildId = String(albionGuildId).trim();
 
-        const REGIONS = {
-            'Europe': 'https://gameinfo-ams.albiononline.com/api/gameinfo',
-            'Americas': 'https://gameinfo.albiononline.com/api/gameinfo',
-            'Asia': 'https://gameinfo-sgp.albiononline.com/api/gameinfo'
-        };
+        const now = new Date();
+        const sinceDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
-        const BASE = REGIONS[server] || REGIONS.Europe;
+        // Fetch recent events for the guild with pagination
+        const events = await fetchAllGuildEvents(targetGuildId, server, sinceDate);
 
-        // Fetch recent events for the guild
-        const events = await fetchAlbion(`${BASE}/events?offset=0&limit=51&guildId=${albionGuildId}`);
-
-        // Separate into kills and deaths
+        // Separate into kills and deaths in the last 24 hours
         const killEvents = [];
         const deathEvents = [];
 
         for (const ev of events) {
-            if (ev.Killer?.GuildId === albionGuildId) {
+            const t = new Date(ev.TimeStamp);
+            if (isNaN(t.getTime()) || t < sinceDate) continue;
+
+            if (ev.Killer?.GuildId === targetGuildId) {
                 killEvents.push(ev);
             }
-            if (ev.Victim?.GuildId === albionGuildId) {
+            if (ev.Victim?.GuildId === targetGuildId) {
                 deathEvents.push(ev);
             }
         }
 
-        console.log(`[KillBoard Preview] ${albionGuildId} (${server}): ${killEvents.length} kills, ${deathEvents.length} deaths from ${events.length} events`);
+        console.log(`[KillBoard Preview] ${targetGuildId} (${server}): ${killEvents.length} kills, ${deathEvents.length} deaths from ${events.length} fetched events in 24h`);
 
         // Top killers: aggregate by killer name
         const killerMap = {};

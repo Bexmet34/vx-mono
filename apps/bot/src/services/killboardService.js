@@ -5,11 +5,30 @@ const { t } = require('./i18n');
 const { isSubscriptionActive } = require('@veyronix/database');
 
 /**
+ * Normalizes server name to Albion Gameinfo API base URL
+ */
+function getBaseUrl(server = 'Europe') {
+    const s = String(server || 'Europe').trim().toLowerCase();
+    if (s.includes('america') || s.includes('west')) {
+        return 'https://gameinfo.albiononline.com/api/gameinfo';
+    } else if (s.includes('asia') || s.includes('east')) {
+        return 'https://gameinfo-sgp.albiononline.com/api/gameinfo';
+    }
+    return 'https://gameinfo-ams.albiononline.com/api/gameinfo';
+}
+
+/**
  * Fetches events from Albion API (returns array or [])
  */
 function fetchAlbionEvents(url) {
     return new Promise((resolve) => {
-        https.get(url, { family: 4 }, (res) => {
+        const req = https.get(url, {
+            family: 4,
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'application/json'
+            }
+        }, (res) => {
             let data = '';
             res.on('data', (chunk) => data += chunk);
             res.on('end', () => {
@@ -19,23 +38,39 @@ function fetchAlbionEvents(url) {
                     resolve(Array.isArray(parsed) ? parsed : []);
                 } catch (e) { resolve([]); }
             });
-        }).on('error', () => resolve([]));
+        });
+        req.on('error', () => resolve([]));
+        req.setTimeout(8000, () => {
+            req.destroy();
+            resolve([]);
+        });
     });
 }
 
 /**
- * Fetches recent events for a guild (both kills and deaths)
+ * Fetches recent events for a guild with pagination up to 24 hours ago
  */
-function fetchAllGuildEvents(guildId, server = 'Europe') {
-    const REGIONS = {
-        'Europe': 'https://gameinfo-ams.albiononline.com/api/gameinfo',
-        'Americas': 'https://gameinfo.albiononline.com/api/gameinfo',
-        'Asia': 'https://gameinfo-sgp.albiononline.com/api/gameinfo'
-    };
-    const baseUrl = REGIONS[server] || REGIONS.Europe;
-    return fetchAlbionEvents(
-        `${baseUrl}/events?offset=0&limit=50&guildId=${guildId}`
-    );
+async function fetchAllGuildEvents(guildId, server = 'Europe', sinceDate = null) {
+    const baseUrl = getBaseUrl(server);
+    const allEvents = [];
+    const maxPages = 6;
+
+    for (let page = 0; page < maxPages; page++) {
+        const offset = page * 50;
+        const url = `${baseUrl}/events?offset=${offset}&limit=51&guildId=${guildId}`;
+        const events = await fetchAlbionEvents(url);
+        if (!events || events.length === 0) break;
+        allEvents.push(...events);
+
+        if (sinceDate && events.length > 0) {
+            const oldestInPage = new Date(events[events.length - 1].TimeStamp);
+            if (!isNaN(oldestInPage.getTime()) && oldestInPage < sinceDate) {
+                break;
+            }
+        }
+        if (events.length < 51) break;
+    }
+    return allEvents;
 }
 
 /**
@@ -106,7 +141,7 @@ async function processKillBoards(client) {
 }
 
 /**
- * Fetches data since last summary and sends the KillBoard embed
+ * Fetches data for the past 24 hours and sends the KillBoard embed
  */
 async function sendKillBoardSummary(client, guildCfg) {
     try {
@@ -117,45 +152,36 @@ async function sendKillBoardSummary(client, guildCfg) {
             return;
         }
 
-        // Calculate the period: from last_killboard_date (or 24h ago) to now
+        // Daily summary always covers the 24-hour period up to now
         const now = new Date();
-        let sinceDate;
-        if (guildCfg.last_killboard_date) {
-            // last_killboard_date can be "YYYY-MM-DD" (old format) or ISO timestamp
-            sinceDate = new Date(guildCfg.last_killboard_date);
-            if (isNaN(sinceDate.getTime())) {
-                // Fallback: 24 hours ago
-                sinceDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-            }
-        } else {
-            // First run: go back 24 hours
-            sinceDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-        }
+        const sinceDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
         console.log(`[KillBoard] Period: ${sinceDate.toISOString()} → ${now.toISOString()}`);
 
-        // Fetch all recent events
-        const allEvents = await fetchAllGuildEvents(guildCfg.albion_guild_id, guildCfg.albion_server || 'Europe');
+        const targetGuildId = String(guildCfg.albion_guild_id).trim();
+
+        // Fetch recent events for the guild with pagination
+        const allEvents = await fetchAllGuildEvents(targetGuildId, guildCfg.albion_server || 'Europe', sinceDate);
         
         const allKills = [];
         const allDeaths = [];
         
         for (const ev of allEvents) {
-            if (ev.Killer?.GuildId === guildCfg.albion_guild_id) allKills.push(ev);
-            if (ev.Victim?.GuildId === guildCfg.albion_guild_id) allDeaths.push(ev);
+            if (ev.Killer?.GuildId === targetGuildId) allKills.push(ev);
+            if (ev.Victim?.GuildId === targetGuildId) allDeaths.push(ev);
         }
 
-        // Filter to only events AFTER sinceDate
+        // Filter to events within the last 24 hours
         const killEvents = allKills.filter(ev => {
             const t = new Date(ev.TimeStamp);
-            return !isNaN(t.getTime()) && t > sinceDate;
+            return !isNaN(t.getTime()) && t >= sinceDate;
         });
         const deathEvents = allDeaths.filter(ev => {
             const t = new Date(ev.TimeStamp);
-            return !isNaN(t.getTime()) && t > sinceDate;
+            return !isNaN(t.getTime()) && t >= sinceDate;
         });
 
-        console.log(`[KillBoard] Filtered: ${killEvents.length}/${allKills.length} kills, ${deathEvents.length}/${allDeaths.length} deaths since ${sinceDate.toISOString()}`);
+        console.log(`[KillBoard] Filtered: ${killEvents.length}/${allKills.length} kills, ${deathEvents.length}/${allDeaths.length} deaths in 24h window`);
 
         // --- Build kill stats ---
         const killerMap = {};
