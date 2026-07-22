@@ -1,8 +1,7 @@
 "use client";
 
 import { useSession, signIn } from "next-auth/react";
-import { useState, useEffect } from "react";
-import Script from "next/script";
+import { useState, useEffect, useRef } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Award, CheckCircle2, ShieldAlert, Sparkles, Tv, Clock } from "lucide-react";
@@ -14,6 +13,40 @@ export default function VotePage() {
   const [voting, setVoting] = useState(false);
   const [voteSuccess, setVoteSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const adBannerRef = useRef(null);
+
+  // Adsterra 300x250 Banner Script Entegrasyonu
+  useEffect(() => {
+    if (!adBannerRef.current) return;
+
+    // Temizleme
+    adBannerRef.current.innerHTML = "";
+
+    const atOptionsScript = document.createElement("script");
+    atOptionsScript.type = "text/javascript";
+    atOptionsScript.text = `
+      atOptions = {
+        'key' : '796280c12a863eece340164e11d3973c',
+        'format' : 'iframe',
+        'height' : 250,
+        'width' : 300,
+        'params' : {}
+      };
+    `;
+
+    const invokeScript = document.createElement("script");
+    invokeScript.type = "text/javascript";
+    invokeScript.src = "https://www.highperformanceformat.com/796280c12a863eece340164e11d3973c/invoke.js";
+
+    adBannerRef.current.appendChild(atOptionsScript);
+    adBannerRef.current.appendChild(invokeScript);
+
+    return () => {
+      if (adBannerRef.current) {
+        adBannerRef.current.innerHTML = "";
+      }
+    };
+  }, []);
 
   // 15 Second Timer effect
   useEffect(() => {
@@ -55,12 +88,6 @@ export default function VotePage() {
 
   return (
     <div className="min-h-screen bg-[#0d0f17] text-white flex flex-col font-sans">
-      {/* Adsterra Social Bar Test Script */}
-      <Script
-        src="https://pl30489132.effectivecpmnetwork.com/a0/03/09/a00309c9dbe2b85ac1210cf18697ba76.js"
-        strategy="afterInteractive"
-      />
-
       <Navbar />
 
       <main className="flex-1 container mx-auto px-4 py-12 flex flex-col items-center justify-center max-w-4xl">
@@ -73,7 +100,7 @@ export default function VotePage() {
             Bota Oy Ver, Premium Özellikleri Aç!
           </h1>
           <p className="text-gray-400 max-w-xl mx-auto">
-            Aşağıdaki sponsor içeriği ve reklamlar yüklenirken lütfen bekleyin. Süre dolduğunda oy butonunuz otomatik olarak aktifleştirecektir.
+            Aşağıdaki sponsor içeriği yüklenirken lütfen bekleyin. Süre dolduğunda oy butonunuz otomatik olarak aktifleştirecektir.
           </p>
         </div>
 
@@ -99,7 +126,7 @@ export default function VotePage() {
           <div className="flex items-center justify-between w-full text-gray-400 text-sm mb-4 px-2">
             <div className="flex items-center gap-2">
               <Tv className="w-4 h-4 text-primary-container" />
-              <span>Adsterra Sponsor İçeriği / Social Bar</span>
+              <span>Sponsor İçeriği / 300x250 Banner</span>
             </div>
             
             <div className="flex items-center gap-2 font-mono text-xs bg-gray-900/80 px-3 py-1 rounded-full border border-gray-700">
@@ -108,11 +135,12 @@ export default function VotePage() {
             </div>
           </div>
 
-          <div className="w-full py-8 text-center text-gray-400 border border-dashed border-gray-800 rounded-xl bg-[#0d0f17]">
-            <p className="text-sm font-medium text-gray-300">Social Bar Reklam Formatı Aktif</p>
-            <p className="text-xs text-gray-500 mt-1">
-              Reklamlar sayfanın altında / bildirim baloncuğu olarak görüntülenecektir.
-            </p>
+          {/* Adsterra 300x250 Container */}
+          <div
+            ref={adBannerRef}
+            className="min-w-[300px] min-h-[250px] bg-[#0d0f17] rounded-xl flex items-center justify-center border border-dashed border-gray-800 my-2 overflow-hidden"
+          >
+            {/* Reklam buraya yüklenecektir */}
           </div>
         </div>
 
