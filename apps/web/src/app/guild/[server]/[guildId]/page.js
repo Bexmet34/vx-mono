@@ -4,38 +4,42 @@ import CtaBanner from "@/components/CtaBanner";
 import Link from "next/link";
 import { Shield, Users, Sword, Skull } from "lucide-react";
 
+export const dynamic = 'force-dynamic';
+
+const REGIONS = {
+  europe: "https://gameinfo-ams.albiononline.com/api/gameinfo",
+  americas: "https://gameinfo.albiononline.com/api/gameinfo",
+  asia: "https://gameinfo-sgp.albiononline.com/api/gameinfo",
+};
+
 // Fetch Guild from Albion API
 async function getGuild(server, guildId) {
-  const REGIONS = {
-    europe: "https://gameinfo-ams.albiononline.com/api/gameinfo",
-    americas: "https://gameinfo.albiononline.com/api/gameinfo",
-    asia: "https://gameinfo-sgp.albiononline.com/api/gameinfo",
-  };
-
   const baseUrl = REGIONS[server.toLowerCase()] || REGIONS.europe;
-  const res = await fetch(`${baseUrl}/guilds/${guildId}`, {
-    next: { revalidate: 3600 },
-  });
-
-  if (!res.ok) return null;
-  return res.json();
+  try {
+    const res = await fetch(`${baseUrl}/guilds/${guildId}`, {
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    return res.json();
+  } catch (err) {
+    console.error("Error fetching guild:", err);
+    return null;
+  }
 }
 
 // Fetch Guild Members from Albion API
 async function getGuildMembers(server, guildId) {
-  const REGIONS = {
-    europe: "https://gameinfo-ams.albiononline.com/api/gameinfo",
-    americas: "https://gameinfo.albiononline.com/api/gameinfo",
-    asia: "https://gameinfo-sgp.albiononline.com/api/gameinfo",
-  };
-
   const baseUrl = REGIONS[server.toLowerCase()] || REGIONS.europe;
-  const res = await fetch(`${baseUrl}/guilds/${guildId}/members`, {
-    next: { revalidate: 3600 },
-  });
-
-  if (!res.ok) return [];
-  return res.json();
+  try {
+    const res = await fetch(`${baseUrl}/guilds/${guildId}/members`, {
+      cache: "no-store",
+    });
+    if (!res.ok) return [];
+    return res.json();
+  } catch (err) {
+    console.error("Error fetching guild members:", err);
+    return [];
+  }
 }
 
 export default async function GuildProfilePage({ params }) {
@@ -51,13 +55,13 @@ export default async function GuildProfilePage({ params }) {
   }
 
   // Sort members by Kill Fame descending to get "Top Killers"
-  const topMembers = members ? members.sort((a, b) => (b.KillFame || 0) - (a.KillFame || 0)).slice(0, 10) : [];
+  const topMembers = members ? members.sort((a, b) => (b.KillFame || 0) - (a.KillFame || 0)).slice(0, 15) : [];
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h1>Guild Profile</h1>
-        <p>Albion Online {server.toUpperCase()}</p>
+        <h1>{guild.Name} Lonca Profili</h1>
+        <p>Albion Online {server.toUpperCase()} Sunucusu</p>
       </div>
 
       <div style={{ maxWidth: '800px', margin: '0 auto', marginBottom: '4rem' }}>
@@ -89,7 +93,7 @@ export default async function GuildProfilePage({ params }) {
           <div style={{ marginTop: '2rem', padding: '1rem 3rem', background: 'rgba(0,0,0,0.5)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', display: 'inline-flex', alignItems: 'center', gap: '1rem' }}>
             <Users size={24} color="#aaa" />
             <div>
-              <p style={{ color: '#aaa', fontSize: '0.9rem', marginBottom: '0.2rem', textAlign: 'left' }}>Members</p>
+              <p style={{ color: '#aaa', fontSize: '0.9rem', marginBottom: '0.2rem', textAlign: 'left' }}>Üye Sayısı</p>
               <div style={{ fontSize: '1.5rem', color: '#fff', fontWeight: 'bold' }}>{guild.MemberCount || members?.length || 0}</div>
             </div>
           </div>
@@ -97,7 +101,7 @@ export default async function GuildProfilePage({ params }) {
       </div>
 
       <div className={styles.header}>
-        <h2>Top 10 Killers</h2>
+        <h2>En Çok Kill Alan Üyeler (Top 15 Killers)</h2>
       </div>
 
       <div style={{ maxWidth: '800px', margin: '0 auto', marginBottom: '4rem' }}>
@@ -125,7 +129,7 @@ export default async function GuildProfilePage({ params }) {
                   </div>
                   <div>
                     <div style={{ fontWeight: 'bold', color: '#fff', fontSize: '1.1rem' }}>{member.Name}</div>
-                    <div style={{ fontSize: '0.8rem', color: '#aaa' }}>Ratio: {member.FameRatio?.toFixed(2) || 0}</div>
+                    <div style={{ fontSize: '0.8rem', color: '#aaa' }}>Fame Oranı: {member.FameRatio?.toFixed(2) || 0}</div>
                   </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
@@ -136,7 +140,7 @@ export default async function GuildProfilePage({ params }) {
             ))}
           </div>
         ) : (
-          <p style={{ textAlign: 'center', color: '#aaa' }}>No members found.</p>
+          <p style={{ textAlign: 'center', color: '#aaa' }}>Üye verisi bulunamadı.</p>
         )}
       </div>
 
@@ -152,8 +156,8 @@ export async function generateMetadata({ params }) {
   if (!guild) return { title: "Guild Not Found" };
   
   return {
-    title: `${guild.Name} | Veyronix Guild Profile`,
-    description: `Albion Online Guild: ${guild.Name}. Kill Fame: ${guild.killFame}, Members: ${guild.MemberCount} on ${server}.`,
+    title: `${guild.Name} | Albion Online Lonca Profili | Veyronix`,
+    description: `Albion Online Loncası: ${guild.Name}. Kill Fame: ${guild.killFame?.toLocaleString()}, Üye Sayısı: ${guild.MemberCount} on ${server}.`,
     openGraph: {
       title: `${guild.Name} | Guild Profile`,
       description: `Server: ${server.toUpperCase()} | Members: ${guild.MemberCount}\nKill Fame: ${guild.killFame?.toLocaleString()}`,

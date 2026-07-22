@@ -4,46 +4,69 @@ import KillMatch from "@/components/KillMatch";
 import CtaBanner from "@/components/CtaBanner";
 import Link from "next/link";
 
-// Fetch Player from Albion API
+export const dynamic = 'force-dynamic';
+
+const REGIONS = {
+  europe: "https://gameinfo-ams.albiononline.com/api/gameinfo",
+  americas: "https://gameinfo.albiononline.com/api/gameinfo",
+  asia: "https://gameinfo-sgp.albiononline.com/api/gameinfo",
+};
+
+// Fetch Player Info from Albion API
 async function getPlayer(server, playerId) {
-  const REGIONS = {
-    europe: "https://gameinfo-ams.albiononline.com/api/gameinfo",
-    americas: "https://gameinfo.albiononline.com/api/gameinfo",
-    asia: "https://gameinfo-sgp.albiononline.com/api/gameinfo",
-  };
-
   const baseUrl = REGIONS[server.toLowerCase()] || REGIONS.europe;
-  const res = await fetch(`${baseUrl}/players/${playerId}`, {
-    next: { revalidate: 3600 },
-  });
-
-  if (!res.ok) return null;
-  return res.json();
+  try {
+    const res = await fetch(`${baseUrl}/players/${playerId}`, {
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    return res.json();
+  } catch (err) {
+    console.error("Error fetching player:", err);
+    return null;
+  }
 }
 
-// Fetch Player Kills from Albion API
-async function getPlayerKills(server, playerId) {
-  const REGIONS = {
-    europe: "https://gameinfo-ams.albiononline.com/api/gameinfo",
-    americas: "https://gameinfo.albiononline.com/api/gameinfo",
-    asia: "https://gameinfo-sgp.albiononline.com/api/gameinfo",
-  };
-
+// Fetch Player Kills & Deaths from Albion API (Combined for complete recent history)
+async function getPlayerMatches(server, playerId) {
   const baseUrl = REGIONS[server.toLowerCase()] || REGIONS.europe;
-  const res = await fetch(`${baseUrl}/players/${playerId}/kills`, {
-    next: { revalidate: 3600 },
-  });
+  try {
+    const [killsRes, deathsRes] = await Promise.all([
+      fetch(`${baseUrl}/players/${playerId}/kills`, { cache: "no-store" }).catch(() => null),
+      fetch(`${baseUrl}/players/${playerId}/deaths`, { cache: "no-store" }).catch(() => null),
+    ]);
 
-  if (!res.ok) return [];
-  return res.json();
+    const kills = killsRes && killsRes.ok ? await killsRes.json().catch(() => []) : [];
+    const deaths = deathsRes && deathsRes.ok ? await deathsRes.json().catch(() => []) : [];
+
+    const killsArr = Array.isArray(kills) ? kills : [];
+    const deathsArr = Array.isArray(deaths) ? deaths : [];
+
+    // Merge and deduplicate by EventId
+    const eventsMap = new Map();
+    [...killsArr, ...deathsArr].forEach(event => {
+      if (event && event.EventId) {
+        eventsMap.set(event.EventId, event);
+      }
+    });
+
+    const combined = Array.from(eventsMap.values());
+    // Sort descending by TimeStamp (newest events first)
+    combined.sort((a, b) => new Date(b.TimeStamp).getTime() - new Date(a.TimeStamp).getTime());
+
+    return combined;
+  } catch (err) {
+    console.error("Error fetching player matches:", err);
+    return [];
+  }
 }
 
 export default async function PlayerProfilePage({ params }) {
   const { server, playerId } = await params;
   
-  const [player, kills] = await Promise.all([
+  const [player, matches] = await Promise.all([
     getPlayer(server, playerId),
-    getPlayerKills(server, playerId)
+    getPlayerMatches(server, playerId)
   ]);
   
   if (!player) {
@@ -53,20 +76,36 @@ export default async function PlayerProfilePage({ params }) {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h1>Player Profile</h1>
-        <p>Albion Online {server.toUpperCase()}</p>
+        <h1>{player.Name} Profil & PvP İstatistikleri</h1>
+        <p>Albion Online {server.toUpperCase()} Sunucusu</p>
       </div>
 
-      <div style={{ maxWidth: '800px', margin: '0 auto', marginBottom: '4rem' }}>
-        <div className={`${styles.playerCard} ${styles.killerCard}`} style={{ width: '100%', marginBottom: '1.5rem', padding: '3rem 1rem' }}>
-          <div className={styles.playerTitle} style={{ fontSize: '3rem' }}>{player.Name}</div>
+      <div style={{ maxWidth: '800px', margin: '0 auto', marginBottom: '3rem' }}>
+        <div className={`${styles.playerCard} ${styles.killerCard}`} style={{ width: '100%', marginBottom: '1.5rem', padding: '2.5rem 1rem' }}>
+          <div className={styles.playerTitle} style={{ fontSize: '2.8rem' }}>{player.Name}</div>
           {player.GuildName && (
-            <div className={styles.guildName} style={{ fontSize: '1.2rem', opacity: 0.8 }}>
+            <div className={styles.guildName} style={{ fontSize: '1.2rem', opacity: 0.9, marginTop: '0.5rem' }}>
               <Link href={`/guild/${server}/${player.GuildId}`} style={{ color: 'inherit', textDecoration: 'none' }} className="hover:text-white transition-colors">
-                [{player.AllianceName}] {player.GuildName}
+                [{player.AllianceTag || player.AllianceName || ''}] {player.GuildName}
               </Link>
             </div>
           )}
+
+          {/* Stats Bar */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginTop: '2rem', flexWrap: 'wrap' }}>
+            <div style={{ background: 'rgba(255,255,255,0.05)', padding: '0.75rem 1.5rem', borderRadius: '10px' }}>
+              <div style={{ color: '#aaa', fontSize: '0.85rem' }}>Kill Fame</div>
+              <div style={{ color: '#2ecc71', fontSize: '1.3rem', fontWeight: 'bold' }}>{(player.KillFame || 0).toLocaleString()}</div>
+            </div>
+            <div style={{ background: 'rgba(255,255,255,0.05)', padding: '0.75rem 1.5rem', borderRadius: '10px' }}>
+              <div style={{ color: '#aaa', fontSize: '0.85rem' }}>Death Fame</div>
+              <div style={{ color: '#e74c3c', fontSize: '1.3rem', fontWeight: 'bold' }}>{(player.DeathFame || 0).toLocaleString()}</div>
+            </div>
+            <div style={{ background: 'rgba(255,255,255,0.05)', padding: '0.75rem 1.5rem', borderRadius: '10px' }}>
+              <div style={{ color: '#aaa', fontSize: '0.85rem' }}>Fame Ratio</div>
+              <div style={{ color: '#fca311', fontSize: '1.3rem', fontWeight: 'bold' }}>{(player.FameRatio || 0).toFixed(2)}</div>
+            </div>
+          </div>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem 1.5rem', background: 'rgba(252, 163, 17, 0.05)', borderRadius: '12px', border: '1px solid rgba(252, 163, 17, 0.2)' }}>
@@ -95,16 +134,16 @@ export default async function PlayerProfilePage({ params }) {
       </div>
 
       <div className={styles.header}>
-        <h2>Recent Kills</h2>
+        <h2>Canlı Son Öldürme ve Ölümler (Son Maçlar)</h2>
       </div>
 
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        {kills && kills.length > 0 ? (
-          kills.slice(0, 10).map((kill) => (
+        {matches && matches.length > 0 ? (
+          matches.slice(0, 20).map((kill) => (
             <KillMatch key={kill.EventId} event={kill} server={server} />
           ))
         ) : (
-          <p style={{ textAlign: 'center', color: '#aaa' }}>No recent kills found.</p>
+          <p style={{ textAlign: 'center', color: '#aaa' }}>Bu oyuncu için son zamanlara ait canlı maç bulunamadı.</p>
         )}
       </div>
       
@@ -117,14 +156,14 @@ export async function generateMetadata({ params }) {
   const { server, playerId } = await params;
   const player = await getPlayer(server, playerId);
   
-  if (!player) return { title: "Player Not Found" };
+  if (!player) return { title: "Oyuncu Bulunamadı" };
   
   return {
-    title: `${player.Name} | Veyronix Player Profile`,
-    description: `Albion Online Player: ${player.Name}. Kill Fame: ${player.KillFame}, Death Fame: ${player.DeathFame} on ${server}.`,
+    title: `${player.Name} | Albion Online PvP Profil & Killboard | Veyronix`,
+    description: `Albion Online ${server.toUpperCase()} Oyuncusu: ${player.Name}. Kill Fame: ${player.KillFame?.toLocaleString()}, Death Fame: ${player.DeathFame?.toLocaleString()}.`,
     openGraph: {
-      title: `${player.Name} | Player Profile`,
-      description: `Server: ${server.toUpperCase()} | Guild: ${player.GuildName || 'None'}\nKill Fame: ${player.KillFame?.toLocaleString()} | Death Fame: ${player.DeathFame?.toLocaleString()}`,
+      title: `${player.Name} | Albion Online Oyuncu Profili`,
+      description: `Sunucu: ${server.toUpperCase()} | Lonca: ${player.GuildName || 'Yok'}\nKill Fame: ${player.KillFame?.toLocaleString()} | Death Fame: ${player.DeathFame?.toLocaleString()}`,
       siteName: 'Veyronix',
       type: 'website',
     }
