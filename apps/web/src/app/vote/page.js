@@ -14,10 +14,11 @@ export default function VotePage() {
   const [voteSuccess, setVoteSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Monetag (Zone 11374292) Script Entegrasyonu
+  // Monetag Multi-Tag Script Entegrasyonu (Zone 262662)
   useEffect(() => {
     const monetagScript = document.createElement("script");
-    monetagScript.src = "https://3nbf4.com/act/files/tag.min.js?z=11374292";
+    monetagScript.src = "https://quge5.com/88/tag.min.js";
+    monetagScript.setAttribute("data-zone", "262662");
     monetagScript.setAttribute("data-cfasync", "false");
     monetagScript.async = true;
     document.body.appendChild(monetagScript);
