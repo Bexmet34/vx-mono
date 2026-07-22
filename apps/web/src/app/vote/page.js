@@ -14,20 +14,15 @@ export default function VotePage() {
   const [voteSuccess, setVoteSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Monetag Multi-Tag Script Entegrasyonu (Zone 262662)
+  // Clean unregister of any background service worker or ad scripts
   useEffect(() => {
-    const monetagScript = document.createElement("script");
-    monetagScript.src = "https://quge5.com/88/tag.min.js";
-    monetagScript.setAttribute("data-zone", "262662");
-    monetagScript.setAttribute("data-cfasync", "false");
-    monetagScript.async = true;
-    document.body.appendChild(monetagScript);
-
-    return () => {
-      if (document.body.contains(monetagScript)) {
-        document.body.removeChild(monetagScript);
-      }
-    };
+    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        for (let registration of registrations) {
+          registration.unregister();
+        }
+      });
+    }
   }, []);
 
   // 15 Saniyelik Bekleme Süresi
@@ -115,9 +110,9 @@ export default function VotePage() {
           </div>
 
           <div className="w-full py-8 text-center text-gray-400 border border-dashed border-gray-800 rounded-xl bg-[#0d0f17]">
-            <p className="text-sm font-medium text-gray-300">Monetag Reklam & Sponsor Alanı Aktif</p>
+            <p className="text-sm font-medium text-gray-300">Veyronix Oy Doğrulama Alanı</p>
             <p className="text-xs text-gray-500 mt-1">
-              Monetag doğrulama ve bildirim servisleri çalışmaktadır.
+              Süre dolduğunda oy butonunuz otomatik olarak aktifleştirilecektir.
             </p>
           </div>
         </div>
