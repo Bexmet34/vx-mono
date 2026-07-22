@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { 
   Swords, Shield, Trophy, Skull, Flame, Filter, ChevronRight, 
@@ -19,10 +19,20 @@ function formatNumber(num) {
   return num.toString();
 }
 
+function parseAlbionDate(dateString) {
+  if (!dateString) return new Date();
+  try {
+    const cleaned = dateString.replace(/\.(\d{3})\d+Z$/, '.$1Z');
+    return new Date(cleaned);
+  } catch (e) {
+    return new Date(dateString);
+  }
+}
+
 function timeAgo(dateString, isTr) {
   if (!dateString) return "";
   const now = new Date();
-  const date = new Date(dateString);
+  const date = parseAlbionDate(dateString);
   const diffInSeconds = Math.floor((now - date) / 1000);
 
   if (diffInSeconds < 60) return isTr ? "Az önce" : "Just now";
@@ -74,11 +84,16 @@ export default function PlayerAnalyticsClient({ player, initialMatches, server }
   const { lang } = useLanguage();
   const isTr = lang === 'tr';
 
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const [weaponFilter, setWeaponFilter] = useState("Any");
   const [fightTypeFilter, setFightTypeFilter] = useState("Any");
   const [juicyOnly, setJuicyOnly] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 12;
+  const itemsPerPage = 10;
 
   // Process matches and add computed metadata
   const processedMatches = useMemo(() => {
@@ -126,9 +141,17 @@ export default function PlayerAnalyticsClient({ player, initialMatches, server }
     });
   }, [initialMatches, player]);
 
-  // Calculate Financial KPIs (Profit Today, Lost Today, Profit Yesterday, Lost Yesterday)
+  // Calculate Financial KPIs strictly for UTC Today & UTC Yesterday
   const financialStats = useMemo(() => {
-    const now = new Date().getTime();
+    const now = new Date();
+    const todayYear = now.getUTCFullYear();
+    const todayMonth = now.getUTCMonth();
+    const todayDate = now.getUTCDate();
+
+    const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    const yestYear = yesterday.getUTCFullYear();
+    const yestMonth = yesterday.getUTCMonth();
+    const yestDate = yesterday.getUTCDate();
 
     let profitToday = 0;
     let killsTodayCount = 0;
@@ -141,10 +164,15 @@ export default function PlayerAnalyticsClient({ player, initialMatches, server }
     let lossesYesterdayCount = 0;
 
     processedMatches.forEach((m) => {
-      const matchTime = new Date(m.TimeStamp).getTime();
-      const ageHours = (now - matchTime) / (1000 * 60 * 60);
+      const matchDate = parseAlbionDate(m.TimeStamp);
+      const mYear = matchDate.getUTCFullYear();
+      const mMonth = matchDate.getUTCMonth();
+      const mDate = matchDate.getUTCDate();
 
-      if (ageHours <= 24) {
+      const isToday = mYear === todayYear && mMonth === todayMonth && mDate === todayDate;
+      const isYesterday = mYear === yestYear && mMonth === yestMonth && mDate === yestDate;
+
+      if (isToday) {
         if (m.matchType === "KILL" || m.matchType === "ASSIST") {
           profitToday += m.estSilver;
           killsTodayCount++;
@@ -152,7 +180,7 @@ export default function PlayerAnalyticsClient({ player, initialMatches, server }
           lostToday += m.estSilver;
           lossesTodayCount++;
         }
-      } else if (ageHours > 24 && ageHours <= 48) {
+      } else if (isYesterday) {
         if (m.matchType === "KILL" || m.matchType === "ASSIST") {
           profitYesterday += m.estSilver;
           killsYesterdayCount++;
@@ -226,7 +254,7 @@ export default function PlayerAnalyticsClient({ player, initialMatches, server }
   const paginatedMatches = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
     return filteredMatches.slice(start, start + itemsPerPage);
-  }, [filteredMatches, currentPage]);
+  }, [filteredMatches, currentPage, itemsPerPage]);
 
   return (
     <div style={{ maxWidth: "1250px", margin: "0 auto", padding: "2rem 1rem", color: "#fff" }}>
@@ -457,8 +485,8 @@ export default function PlayerAnalyticsClient({ player, initialMatches, server }
         </div>
 
         {/* Pagination Navigation */}
-        <div style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
-          {Array.from({ length: Math.min(totalPages, 15) }, (_, i) => i + 1).map((pageNum) => (
+        <div style={{ display: "flex", alignItems: "center", gap: "0.35rem", flexWrap: "wrap" }}>
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
             <button
               key={pageNum}
               onClick={() => setCurrentPage(pageNum)}
@@ -467,8 +495,9 @@ export default function PlayerAnalyticsClient({ player, initialMatches, server }
                 color: currentPage === pageNum ? "#000" : "#aaa",
                 border: "none",
                 borderRadius: "4px",
-                width: "28px",
+                minWidth: "28px",
                 height: "28px",
+                padding: "0 0.4rem",
                 fontWeight: "bold",
                 fontSize: "0.8rem",
                 cursor: "pointer",
@@ -529,8 +558,8 @@ export default function PlayerAnalyticsClient({ player, initialMatches, server }
                   }}>
                     {badgeLabel}
                   </div>
-                  <div style={{ fontSize: "0.8rem", color: "#888", whiteSpace: "nowrap" }}>
-                    {timeAgo(m.TimeStamp, isTr)}
+                  <div style={{ fontSize: "0.8rem", color: "#888", whiteSpace: "nowrap" }} suppressHydrationWarning>
+                    {isMounted ? timeAgo(m.TimeStamp, isTr) : ""}
                   </div>
                 </div>
 

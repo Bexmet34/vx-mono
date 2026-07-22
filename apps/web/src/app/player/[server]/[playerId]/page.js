@@ -25,31 +25,25 @@ async function getPlayer(server, playerId) {
   }
 }
 
-// Fetch Deep Player Kills, Deaths & Guild/Server Assists from Albion API
+// Fetch Comprehensive Player Kills, Deaths & Guild/Server Assists (Up to 750+ events scanned)
 async function getPlayerMatches(server, playerId, guildId, playerName) {
   const baseUrl = REGIONS[server.toLowerCase()] || REGIONS.europe;
   try {
     const urls = [
-      // Kills Pages 1-3 (Up to 150 Kills)
-      `${baseUrl}/players/${playerId}/kills?offset=0&limit=51`,
-      `${baseUrl}/players/${playerId}/kills?offset=51&limit=51`,
-      `${baseUrl}/players/${playerId}/kills?offset=102&limit=51`,
-      // Deaths Pages 1-3 (Up to 150 Deaths)
-      `${baseUrl}/players/${playerId}/deaths?offset=0&limit=51`,
-      `${baseUrl}/players/${playerId}/deaths?offset=51&limit=51`,
-      `${baseUrl}/players/${playerId}/deaths?offset=102&limit=51`,
-      // Server Global Events
-      `${baseUrl}/events?offset=0&limit=51`,
-      `${baseUrl}/events?offset=51&limit=51`,
+      `${baseUrl}/players/${playerId}/kills`,
+      `${baseUrl}/players/${playerId}/deaths`,
     ];
 
+    // Fetch 11 pages of Guild Events (Offsets 0 to 500 = 550 events)
     if (guildId) {
-      // Guild Events Pages 1-3 for Assists
-      urls.push(
-        `${baseUrl}/events?offset=0&limit=51&guildId=${guildId}`,
-        `${baseUrl}/events?offset=51&limit=51&guildId=${guildId}`,
-        `${baseUrl}/events?offset=102&limit=51&guildId=${guildId}`
-      );
+      for (let offset = 0; offset <= 500; offset += 50) {
+        urls.push(`${baseUrl}/events?offset=${offset}&limit=50&guildId=${guildId}`);
+      }
+    }
+
+    // Fetch 5 pages of Global Server Events (Offsets 0 to 200 = 250 events)
+    for (let offset = 0; offset <= 200; offset += 50) {
+      urls.push(`${baseUrl}/events?offset=${offset}&limit=50`);
     }
 
     const responses = await Promise.all(
