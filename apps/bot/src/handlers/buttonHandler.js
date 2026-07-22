@@ -364,6 +364,13 @@ async function handlePartyButtons(interaction) {
             multiJoinMenu.addOptions(multiOption);
         });
 
+        if (optionCount === 0) {
+            return await interaction.reply({
+                content: lang === 'tr' ? '❌ Seçilebilecek herhangi bir yedek rol bulunmuyor.' : '❌ No swap roles available to select.',
+                flags: [MessageFlags.Ephemeral]
+            });
+        }
+
         multiJoinMenu.setMaxValues(Math.min(25, optionCount));
 
         await interaction.reply({
