@@ -5,9 +5,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Globe, Search, Shield, User, Loader2, Swords, Trophy, Sparkles, ExternalLink, ArrowRight } from "lucide-react";
 import KillMatch from "@/components/KillMatch";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function KillboardHubClient() {
   const router = useRouter();
+  const { lang } = useLanguage();
+  const isTr = lang === 'tr';
+
   const [selectedServer, setSelectedServer] = useState("europe");
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState(null);
@@ -19,35 +23,32 @@ export default function KillboardHubClient() {
   const SERVERS = [
     {
       id: "europe",
-      name: "Avrupa (Europe)",
+      serverParam: "Europe",
+      name: isTr ? "Avrupa (Europe)" : "Europe",
       flag: "🌍",
       code: "AMS",
       api: "https://gameinfo-ams.albiononline.com/api/gameinfo",
-      desc: "Amsterdam Veri Merkezi • Türkiye ve Avrupa topluluğunun ana sunucusu.",
-      gradient: "from-amber-500/20 via-orange-600/10 to-transparent",
-      borderColor: "rgba(252, 163, 17, 0.4)",
+      desc: isTr ? "Amsterdam Veri Merkezi • Türkiye ve Avrupa topluluğunun ana sunucusu." : "Amsterdam Data Center • Main server for Europe region.",
       badgeColor: "#fca311",
     },
     {
       id: "americas",
-      name: "Amerika (Americas)",
+      serverParam: "Americas",
+      name: isTr ? "Amerika (Americas)" : "Americas",
       flag: "🌎",
       code: "WUS",
       api: "https://gameinfo.albiononline.com/api/gameinfo",
-      desc: "Washington DC Veri Merkezi • Batı ve Kuzey/Güney Amerika topluluğu.",
-      gradient: "from-blue-500/20 via-indigo-600/10 to-transparent",
-      borderColor: "rgba(52, 152, 219, 0.4)",
+      desc: isTr ? "Washington DC Veri Merkezi • Batı ve Amerika topluluğu." : "Washington DC Data Center • Americas region server.",
       badgeColor: "#3498db",
     },
     {
       id: "asia",
-      name: "Asya (Asia)",
+      serverParam: "Asia",
+      name: isTr ? "Asya (Asia)" : "Asia",
       flag: "🌏",
       code: "SGP",
       api: "https://gameinfo-sgp.albiononline.com/api/gameinfo",
-      desc: "Singapur Veri Merkezi • Doğu Asya ve Avustralya topluluğu.",
-      gradient: "from-emerald-500/20 via-teal-600/10 to-transparent",
-      borderColor: "rgba(46, 204, 113, 0.4)",
+      desc: isTr ? "Singapur Veri Merkezi • Doğu Asya ve Avustralya topluluğu." : "Singapore Data Center • East Asia & Oceania server.",
       badgeColor: "#2ecc71",
     },
   ];
@@ -78,7 +79,7 @@ export default function KillboardHubClient() {
     loadRecentKills();
   }, [selectedServer]);
 
-  // Handle Search Input
+  // Handle Search Input via Next.js internal API route to bypass CORS
   const handleSearchChange = async (e) => {
     const value = e.target.value;
     setQuery(value);
@@ -93,10 +94,16 @@ export default function KillboardHubClient() {
     const sObj = SERVERS.find((s) => s.id === selectedServer) || SERVERS[0];
 
     try {
-      const res = await fetch(`${sObj.api}/search?q=${encodeURIComponent(value)}`);
+      // Use internal server-side API proxy to prevent browser CORS / Cloudflare block
+      const res = await fetch(`/api/albion/search?q=${encodeURIComponent(value)}&server=${sObj.serverParam}`);
       if (res.ok) {
         const data = await res.json();
-        setSearchResults(data);
+        // Format results cleanly
+        if (Array.isArray(data)) {
+          setSearchResults({ guilds: data, players: [] });
+        } else {
+          setSearchResults(data);
+        }
       }
     } catch (err) {
       console.error("Search API Error:", err);
@@ -109,6 +116,25 @@ export default function KillboardHubClient() {
     setSearchResults(null);
     setQuery("");
     router.push(`/${type}/${selectedServer}/${id}`);
+  };
+
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    if (!query || query.length < 3) return;
+
+    if (searchResults) {
+      if (searchResults.players && searchResults.players.length > 0) {
+        handleSelectResult("player", searchResults.players[0].Id);
+        return;
+      }
+      if (searchResults.guilds && searchResults.guilds.length > 0) {
+        const g = searchResults.guilds[0];
+        handleSelectResult("guild", g.Id || g._id);
+        return;
+      }
+    }
+    // Default fallback to server page with search query
+    router.push(`/killboard/${selectedServer}`);
   };
 
   return (
@@ -129,7 +155,7 @@ export default function KillboardHubClient() {
           fontWeight: "bold",
           marginBottom: "1rem"
         }}>
-          <Sparkles size={16} /> CANLI ALBION ONLINE PVP KILLBOARD & SAVAŞ PORTALI
+          <Sparkles size={16} /> {isTr ? "CANLI ALBION ONLINE PVP KILLBOARD & SAVAŞ PORTALI" : "LIVE ALBION ONLINE PVP KILLBOARD PORTAL"}
         </div>
 
         <h1 style={{
@@ -141,11 +167,13 @@ export default function KillboardHubClient() {
           WebkitTextFillColor: "transparent",
           marginBottom: "1rem"
         }}>
-          Sunucu Seçin & PvP Savaşlarını Canlı İnceleyin
+          {isTr ? "Sunucu Seçin & PvP Savaşlarını Canlı İnceleyin" : "Select Server & Track Live PvP Battles"}
         </h1>
 
         <p style={{ color: "#aaa", fontSize: "1.1rem", maxWidth: "750px", margin: "0 auto", lineHeight: "1.6" }}>
-          Albion Online Avrupa, Amerika ve Asya sunucularındaki en güncel PvP savaşlarını, oyuncu özetlerini, düşen envanter lootlarını ve lonca sıralamalarını inceleyin.
+          {isTr 
+            ? "Albion Online Avrupa, Amerika ve Asya sunucularındaki en güncel PvP savaşlarını, oyuncu özetlerini, düşen envanter lootlarını ve lonca sıralamalarını inceleyin."
+            : "Inspect live PvP battles, player summaries, dropped inventory loot, and guild rankings across Albion Europe, Americas, and Asia servers."}
         </p>
       </div>
 
@@ -162,7 +190,10 @@ export default function KillboardHubClient() {
           return (
             <div
               key={server.id}
-              onClick={() => setSelectedServer(server.id)}
+              onClick={() => {
+                setSelectedServer(server.id);
+                router.push(`/killboard/${server.id}`);
+              }}
               style={{
                 background: isSelected 
                   ? "linear-gradient(145deg, rgba(25, 25, 35, 0.95), rgba(15, 15, 22, 0.98))" 
@@ -175,7 +206,7 @@ export default function KillboardHubClient() {
                 cursor: "pointer",
                 position: "relative",
                 transition: "all 0.3s ease",
-                boxShadow: isSelected ? `0 10px 30px ${server.borderColor}` : "0 5px 15px rgba(0,0,0,0.3)"
+                boxShadow: isSelected ? `0 10px 30px rgba(252, 163, 17, 0.15)` : "0 5px 15px rgba(0,0,0,0.3)"
               }}
               className="hover:scale-[1.02] hover:border-amber-500/50"
             >
@@ -222,7 +253,7 @@ export default function KillboardHubClient() {
                     transition: "all 0.2s"
                   }}
                 >
-                  {server.name} Portalı <ArrowRight size={16} />
+                  {server.name} {isTr ? "Portalı" : "Portal"} <ArrowRight size={16} />
                 </Link>
               </div>
             </div>
@@ -230,7 +261,7 @@ export default function KillboardHubClient() {
         })}
       </div>
 
-      {/* Interactive Search Section */}
+      {/* Interactive Search Section with Form Submit */}
       <div style={{
         background: "rgba(18, 18, 26, 0.85)",
         border: "1px solid rgba(255, 255, 255, 0.1)",
@@ -242,39 +273,66 @@ export default function KillboardHubClient() {
         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1rem" }}>
           <Search size={22} style={{ color: "#fca311" }} />
           <h3 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 'bold', color: '#fff' }}>
-            Oyuncu veya Lonca Arama ({SERVERS.find(s => s.id === selectedServer)?.name})
+            {isTr ? "Oyuncu veya Lonca Arama" : "Search Player or Guild"} ({SERVERS.find(s => s.id === selectedServer)?.name})
           </h3>
         </div>
 
         <p style={{ color: '#aaa', fontSize: '0.95rem', marginBottom: '1.5rem' }}>
-          Seçili sunucudaki herhangi bir oyuncunun veya loncanın ismini girerek tüm geçmiş PvP istatistiklerine anında ulaşın.
+          {isTr 
+            ? "Seçili sunucudaki herhangi bir oyuncunun veya loncanın ismini girerek tüm geçmiş PvP istatistiklerine anında ulaşın."
+            : "Enter any player or guild name on the selected server to instantly access all past PvP stats."}
         </p>
 
-        <div style={{ position: "relative" }}>
-          <input
-            type="text"
-            value={query}
-            onChange={handleSearchChange}
-            placeholder={`Örn: chaelisa veya REKKA... (${selectedServer.toUpperCase()} sunucusunda ara)`}
-            style={{
-              width: "100%",
-              background: "rgba(0, 0, 0, 0.5)",
-              border: "1px solid rgba(252, 163, 17, 0.4)",
-              borderRadius: "10px",
-              padding: "1rem 1.2rem 1rem 3rem",
-              color: "#fff",
-              fontSize: "1rem",
-              outline: "none",
-              boxShadow: "0 4px 15px rgba(0,0,0,0.3)"
-            }}
-          />
-          <Search size={20} color="#fca311" style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)" }} />
+        <form onSubmit={handleFormSubmit} style={{ position: "relative" }}>
+          <div style={{ display: "flex", gap: "0.75rem" }}>
+            <div style={{ position: "relative", flex: 1 }}>
+              <input
+                type="text"
+                value={query}
+                onChange={handleSearchChange}
+                placeholder={isTr ? "Oyuncu veya lonca adı yazın..." : "Type player or guild name..."}
+                style={{
+                  width: "100%",
+                  background: "rgba(0, 0, 0, 0.5)",
+                  border: "1px solid rgba(252, 163, 17, 0.4)",
+                  borderRadius: "10px",
+                  padding: "1rem 1.2rem 1rem 3rem",
+                  color: "#fff",
+                  fontSize: "1rem",
+                  outline: "none",
+                  boxShadow: "0 4px 15px rgba(0,0,0,0.3)"
+                }}
+              />
+              <Search size={20} color="#fca311" style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)" }} />
 
-          {isSearching && (
-            <div style={{ position: "absolute", right: "1rem", top: "50%", transform: "translateY(-50%)", color: "#fca311" }}>
-              <Loader2 className="animate-spin" size={20} />
+              {isSearching && (
+                <div style={{ position: "absolute", right: "1rem", top: "50%", transform: "translateY(-50%)", color: "#fca311" }}>
+                  <Loader2 className="animate-spin" size={20} />
+                </div>
+              )}
             </div>
-          )}
+
+            <button
+              type="submit"
+              style={{
+                background: "#fca311",
+                color: "#000",
+                fontWeight: "bold",
+                padding: "0 1.75rem",
+                borderRadius: "10px",
+                border: "none",
+                fontSize: "1rem",
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                transition: "all 0.2s"
+              }}
+              className="hover:brightness-110"
+            >
+              <Search size={18} /> {isTr ? "Ara" : "Search"}
+            </button>
+          </div>
 
           {/* Search Dropdown Results */}
           {searchResults && (
@@ -296,7 +354,7 @@ export default function KillboardHubClient() {
               {searchResults.players && searchResults.players.length > 0 && (
                 <div>
                   <div style={{ padding: "0.5rem 1rem", background: "rgba(0,0,0,0.4)", fontSize: "0.75rem", fontWeight: "bold", color: "#2ecc71", textTransform: "uppercase", letterSpacing: "1px" }}>
-                    👤 Oyuncular ({searchResults.players.length})
+                    👤 {isTr ? "Oyuncular" : "Players"} ({searchResults.players.length})
                   </div>
                   {searchResults.players.slice(0, 6).map((p) => (
                     <div
@@ -320,7 +378,7 @@ export default function KillboardHubClient() {
                           {p.GuildName && <div style={{ color: "#aaa", fontSize: "0.8rem" }}>[{p.AllianceName || ''}] {p.GuildName}</div>}
                         </div>
                       </div>
-                      <span style={{ fontSize: "0.8rem", color: "#fca311", fontWeight: "bold" }}>İncele →</span>
+                      <span style={{ fontSize: "0.8rem", color: "#fca311", fontWeight: "bold" }}>{isTr ? "İncele" : "Inspect"} →</span>
                     </div>
                   ))}
                 </div>
@@ -330,12 +388,12 @@ export default function KillboardHubClient() {
               {searchResults.guilds && searchResults.guilds.length > 0 && (
                 <div>
                   <div style={{ padding: "0.5rem 1rem", background: "rgba(0,0,0,0.4)", fontSize: "0.75rem", fontWeight: "bold", color: "#e74c3c", textTransform: "uppercase", letterSpacing: "1px" }}>
-                    🛡️ Loncaya (Guild) Göre
+                    🛡️ {isTr ? "Loncaya (Guild) Göre" : "Guilds"} ({searchResults.guilds.length})
                   </div>
                   {searchResults.guilds.slice(0, 6).map((g) => (
                     <div
-                      key={g.Id}
-                      onClick={() => handleSelectResult("guild", g.Id)}
+                      key={g.Id || g._id}
+                      onClick={() => handleSelectResult("guild", g.Id || g._id)}
                       style={{
                         padding: "0.8rem 1rem",
                         cursor: "pointer",
@@ -351,23 +409,23 @@ export default function KillboardHubClient() {
                         <Shield size={18} color="#e74c3c" />
                         <div>
                           <div style={{ color: "#fff", fontWeight: "bold", fontSize: "0.95rem" }}>{g.Name}</div>
-                          {g.AllianceName && <div style={{ color: "#aaa", fontSize: "0.8rem" }}>İttifak: [{g.AllianceName}]</div>}
+                          {g.AllianceName && <div style={{ color: "#aaa", fontSize: "0.8rem" }}>[{g.AllianceName}]</div>}
                         </div>
                       </div>
-                      <span style={{ fontSize: "0.8rem", color: "#fca311", fontWeight: "bold" }}>İncele →</span>
+                      <span style={{ fontSize: "0.8rem", color: "#fca311", fontWeight: "bold" }}>{isTr ? "İncele" : "Inspect"} →</span>
                     </div>
                   ))}
                 </div>
               )}
 
-              {!searchResults.players?.length && !searchResults.guilds?.length && (
+              {(!searchResults.players?.length && !searchResults.guilds?.length) && (
                 <div style={{ padding: "1.5rem", textAlign: "center", color: "#888" }}>
-                  Aramanızla eşleşen sonuç bulunamadı.
+                  {isTr ? "Aramanızla eşleşen sonuç bulunamadı." : "No matching results found."}
                 </div>
               )}
             </div>
           )}
-        </div>
+        </form>
       </div>
 
       {/* Live Recent Kills Stream Section */}
@@ -376,7 +434,7 @@ export default function KillboardHubClient() {
           <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
             <Swords size={24} style={{ color: "#e74c3c" }} />
             <h2 style={{ margin: 0, fontSize: "1.6rem", fontWeight: "bold", color: "#fff" }}>
-              Canlı Savaş Akışı ({SERVERS.find(s => s.id === selectedServer)?.name})
+              {isTr ? "Canlı Savaş Akışı" : "Live Battle Stream"} ({SERVERS.find(s => s.id === selectedServer)?.name})
             </h2>
           </div>
           <Link
@@ -392,14 +450,14 @@ export default function KillboardHubClient() {
             }}
             className="hover:underline"
           >
-            Tüm {selectedServer.toUpperCase()} Savaşlarını Gör →
+            {isTr ? `Tüm ${selectedServer.toUpperCase()} Savaşlarını Gör` : `View All ${selectedServer.toUpperCase()} Battles`} →
           </Link>
         </div>
 
         {loadingKills ? (
           <div style={{ padding: "4rem", textAlign: "center", color: "#fca311" }}>
             <Loader2 className="animate-spin inline-block" size={32} />
-            <p style={{ marginTop: "1rem", color: "#aaa" }}>Canlı PvP savaşları çekiliyor...</p>
+            <p style={{ marginTop: "1rem", color: "#aaa" }}>{isTr ? "Canlı PvP savaşları çekiliyor..." : "Fetching live PvP battles..."}</p>
           </div>
         ) : recentKills.length > 0 ? (
           <div>
@@ -409,7 +467,7 @@ export default function KillboardHubClient() {
           </div>
         ) : (
           <div style={{ padding: "3rem", textAlign: "center", background: "rgba(0,0,0,0.3)", borderRadius: "10px", color: "#888" }}>
-            Bu sunucu için canlı veri alınamadı.
+            {isTr ? "Bu sunucu için canlı veri alınamadı." : "No live data available for this server."}
           </div>
         )}
       </div>

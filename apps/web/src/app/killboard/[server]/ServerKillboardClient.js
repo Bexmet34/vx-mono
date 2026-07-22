@@ -6,18 +6,24 @@ import { useRouter } from "next/navigation";
 import { Search, User, Shield, Loader2, ArrowLeft, Swords, Globe } from "lucide-react";
 import KillMatch from "@/components/KillMatch";
 import CtaBanner from "@/components/CtaBanner";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function ServerKillboardClient({ serverKey, serverInfo, initialKills }) {
   const router = useRouter();
+  const { lang } = useLanguage();
+  const isTr = lang === 'tr';
+
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState(null);
   const [isSearching, setIsSearching] = useState(false);
 
   const ALL_SERVERS = [
-    { id: "europe", name: "Avrupa (Europe)", flag: "🌍" },
-    { id: "americas", name: "Amerika (Americas)", flag: "🌎" },
-    { id: "asia", name: "Asya (Asia)", flag: "🌏" },
+    { id: "europe", serverParam: "Europe", name: isTr ? "Avrupa (Europe)" : "Europe", flag: "🌍" },
+    { id: "americas", serverParam: "Americas", name: isTr ? "Amerika (Americas)" : "Americas", flag: "🌎" },
+    { id: "asia", serverParam: "Asia", name: isTr ? "Asya (Asia)" : "Asia", flag: "🌏" },
   ];
+
+  const currentServerObj = ALL_SERVERS.find(s => s.id === serverKey) || ALL_SERVERS[0];
 
   const handleSearchChange = async (e) => {
     const value = e.target.value;
@@ -31,10 +37,15 @@ export default function ServerKillboardClient({ serverKey, serverInfo, initialKi
 
     setIsSearching(true);
     try {
-      const res = await fetch(`${serverInfo.baseUrl}/search?q=${encodeURIComponent(value)}`);
+      // Use internal proxy API to prevent browser CORS block
+      const res = await fetch(`/api/albion/search?q=${encodeURIComponent(value)}&server=${currentServerObj.serverParam}`);
       if (res.ok) {
         const data = await res.json();
-        setSearchResults(data);
+        if (Array.isArray(data)) {
+          setSearchResults({ guilds: data, players: [] });
+        } else {
+          setSearchResults(data);
+        }
       }
     } catch (err) {
       console.error("Search API Error:", err);
@@ -47,6 +58,23 @@ export default function ServerKillboardClient({ serverKey, serverInfo, initialKi
     setSearchResults(null);
     setQuery("");
     router.push(`/${type}/${serverKey}/${id}`);
+  };
+
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    if (!query || query.length < 3) return;
+
+    if (searchResults) {
+      if (searchResults.players && searchResults.players.length > 0) {
+        handleSelectResult("player", searchResults.players[0].Id);
+        return;
+      }
+      if (searchResults.guilds && searchResults.guilds.length > 0) {
+        const g = searchResults.guilds[0];
+        handleSelectResult("guild", g.Id || g._id);
+        return;
+      }
+    }
   };
 
   return (
@@ -67,7 +95,7 @@ export default function ServerKillboardClient({ serverKey, serverInfo, initialKi
           }}
           className="hover:text-white"
         >
-          <ArrowLeft size={16} /> Sunucu Seçimine Dön
+          <ArrowLeft size={16} /> {isTr ? "Sunucu Seçimine Dön" : "Back to Server Selection"}
         </Link>
 
         {/* Server Switcher Buttons */}
@@ -126,15 +154,17 @@ export default function ServerKillboardClient({ serverKey, serverInfo, initialKi
               </span>
             </div>
             <p style={{ color: "#aaa", fontSize: "0.95rem", margin: "0.3rem 0 0 0" }}>
-              Canlı PvP Savaşları, Oyuncu Arama ve Güncel Lonca Sıralaması
+              {isTr 
+                ? "Canlı PvP Savaşları, Oyuncu Arama ve Güncel Lonca Sıralaması"
+                : "Live PvP Battles, Player Search & Guild Rankings"}
             </p>
           </div>
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
           <div style={{ background: "rgba(0,0,0,0.4)", padding: "0.75rem 1.25rem", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.08)", textAlign: "right" }}>
-            <div style={{ fontSize: "0.75rem", color: "#888", textTransform: "uppercase" }}>Son Yüklenen Savaşlar</div>
-            <div style={{ fontSize: "1.2rem", fontWeight: "bold", color: "#2ecc71" }}>{initialKills.length} Canlı Maç</div>
+            <div style={{ fontSize: "0.75rem", color: "#888", textTransform: "uppercase" }}>{isTr ? "Son Savaşlar" : "Recent Battles"}</div>
+            <div style={{ fontSize: "1.2rem", fontWeight: "bold", color: "#2ecc71" }}>{initialKills.length} {isTr ? "Canlı Maç" : "Live Matches"}</div>
           </div>
         </div>
       </div>
@@ -147,30 +177,54 @@ export default function ServerKillboardClient({ serverKey, serverInfo, initialKi
         padding: "1.5rem 2rem",
         marginBottom: "3rem"
       }}>
-        <div style={{ position: "relative" }}>
-          <input
-            type="text"
-            value={query}
-            onChange={handleSearchChange}
-            placeholder={`${serverInfo.name} sunucusunda Oyuncu veya Lonca ara...`}
-            style={{
-              width: "100%",
-              background: "rgba(0, 0, 0, 0.5)",
-              border: "1px solid rgba(252, 163, 17, 0.4)",
-              borderRadius: "10px",
-              padding: "0.9rem 1.2rem 0.9rem 3rem",
-              color: "#fff",
-              fontSize: "0.95rem",
-              outline: "none"
-            }}
-          />
-          <Search size={18} color="#fca311" style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)" }} />
+        <form onSubmit={handleFormSubmit} style={{ position: "relative" }}>
+          <div style={{ display: "flex", gap: "0.75rem" }}>
+            <div style={{ position: "relative", flex: 1 }}>
+              <input
+                type="text"
+                value={query}
+                onChange={handleSearchChange}
+                placeholder={isTr ? `Oyuncu veya lonca adı yazın... (${serverInfo.name})` : `Type player or guild name... (${serverInfo.name})`}
+                style={{
+                  width: "100%",
+                  background: "rgba(0, 0, 0, 0.5)",
+                  border: "1px solid rgba(252, 163, 17, 0.4)",
+                  borderRadius: "10px",
+                  padding: "0.9rem 1.2rem 0.9rem 3rem",
+                  color: "#fff",
+                  fontSize: "0.95rem",
+                  outline: "none"
+                }}
+              />
+              <Search size={18} color="#fca311" style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)" }} />
 
-          {isSearching && (
-            <div style={{ position: "absolute", right: "1rem", top: "50%", transform: "translateY(-50%)", color: "#fca311" }}>
-              <Loader2 className="animate-spin" size={18} />
+              {isSearching && (
+                <div style={{ position: "absolute", right: "1rem", top: "50%", transform: "translateY(-50%)", color: "#fca311" }}>
+                  <Loader2 className="animate-spin" size={18} />
+                </div>
+              )}
             </div>
-          )}
+
+            <button
+              type="submit"
+              style={{
+                background: "#fca311",
+                color: "#000",
+                fontWeight: "bold",
+                padding: "0 1.5rem",
+                borderRadius: "10px",
+                border: "none",
+                fontSize: "0.95rem",
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.5rem"
+              }}
+              className="hover:brightness-110"
+            >
+              <Search size={16} /> {isTr ? "Ara" : "Search"}
+            </button>
+          </div>
 
           {/* Search Dropdown */}
           {searchResults && (
@@ -191,7 +245,7 @@ export default function ServerKillboardClient({ serverKey, serverInfo, initialKi
               {searchResults.players && searchResults.players.length > 0 && (
                 <div>
                   <div style={{ padding: "0.5rem 1rem", background: "rgba(0,0,0,0.4)", fontSize: "0.75rem", fontWeight: "bold", color: "#2ecc71", textTransform: "uppercase" }}>
-                    👤 Oyuncular ({searchResults.players.length})
+                    👤 {isTr ? "Oyuncular" : "Players"} ({searchResults.players.length})
                   </div>
                   {searchResults.players.slice(0, 6).map((p) => (
                     <div
@@ -214,7 +268,7 @@ export default function ServerKillboardClient({ serverKey, serverInfo, initialKi
                           {p.GuildName && <div style={{ color: "#aaa", fontSize: "0.8rem" }}>[{p.AllianceName || ''}] {p.GuildName}</div>}
                         </div>
                       </div>
-                      <span style={{ fontSize: "0.8rem", color: "#fca311", fontWeight: "bold" }}>İncele →</span>
+                      <span style={{ fontSize: "0.8rem", color: "#fca311", fontWeight: "bold" }}>{isTr ? "İncele" : "Inspect"} →</span>
                     </div>
                   ))}
                 </div>
@@ -223,12 +277,12 @@ export default function ServerKillboardClient({ serverKey, serverInfo, initialKi
               {searchResults.guilds && searchResults.guilds.length > 0 && (
                 <div>
                   <div style={{ padding: "0.5rem 1rem", background: "rgba(0,0,0,0.4)", fontSize: "0.75rem", fontWeight: "bold", color: "#e74c3c", textTransform: "uppercase" }}>
-                    🛡️ Loncaya (Guild) Göre
+                    🛡️ {isTr ? "Loncaya (Guild) Göre" : "Guilds"} ({searchResults.guilds.length})
                   </div>
                   {searchResults.guilds.slice(0, 6).map((g) => (
                     <div
-                      key={g.Id}
-                      onClick={() => handleSelectResult("guild", g.Id)}
+                      key={g.Id || g._id}
+                      onClick={() => handleSelectResult("guild", g.Id || g._id)}
                       style={{
                         padding: "0.8rem 1rem",
                         cursor: "pointer",
@@ -243,17 +297,23 @@ export default function ServerKillboardClient({ serverKey, serverInfo, initialKi
                         <Shield size={18} color="#e74c3c" />
                         <div>
                           <div style={{ color: "#fff", fontWeight: "bold", fontSize: "0.95rem" }}>{g.Name}</div>
-                          {g.AllianceName && <div style={{ color: "#aaa", fontSize: "0.8rem" }}>İttifak: [{g.AllianceName}]</div>}
+                          {g.AllianceName && <div style={{ color: "#aaa", fontSize: "0.8rem" }}>[{g.AllianceName}]</div>}
                         </div>
                       </div>
-                      <span style={{ fontSize: "0.8rem", color: "#fca311", fontWeight: "bold" }}>İncele →</span>
+                      <span style={{ fontSize: "0.8rem", color: "#fca311", fontWeight: "bold" }}>{isTr ? "İncele" : "Inspect"} →</span>
                     </div>
                   ))}
                 </div>
               )}
+
+              {(!searchResults.players?.length && !searchResults.guilds?.length) && (
+                <div style={{ padding: "1.5rem", textAlign: "center", color: "#888" }}>
+                  {isTr ? "Aramanızla eşleşen sonuç bulunamadı." : "No matching results found."}
+                </div>
+              )}
             </div>
           )}
-        </div>
+        </form>
       </div>
 
       {/* Kills List */}
@@ -261,7 +321,7 @@ export default function ServerKillboardClient({ serverKey, serverInfo, initialKi
         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1.5rem" }}>
           <Swords size={22} style={{ color: "#e74c3c" }} />
           <h2 style={{ margin: 0, fontSize: "1.5rem", fontWeight: "bold", color: "#fff" }}>
-            {serverInfo.name} Canlı Son Savaşlar
+            {serverInfo.name} {isTr ? "Canlı Son Savaşlar" : "Live Recent Battles"}
           </h2>
         </div>
 
@@ -273,7 +333,7 @@ export default function ServerKillboardClient({ serverKey, serverInfo, initialKi
           </div>
         ) : (
           <div style={{ padding: "3rem", textAlign: "center", background: "rgba(0,0,0,0.3)", borderRadius: "10px", color: "#888" }}>
-            Bu sunucu için henüz canlı veri bulunamadı.
+            {isTr ? "Bu sunucu için henüz canlı veri bulunamadı." : "No live battle data found for this server."}
           </div>
         )}
       </div>
