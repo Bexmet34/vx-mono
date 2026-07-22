@@ -25,26 +25,50 @@ async function getPlayer(server, playerId) {
   }
 }
 
-// Fetch Player Kills & Deaths from Albion API
-async function getPlayerMatches(server, playerId) {
+// Fetch Player Kills, Deaths & Guild Assists from Albion API
+async function getPlayerMatches(server, playerId, guildId, playerName) {
   const baseUrl = REGIONS[server.toLowerCase()] || REGIONS.europe;
   try {
-    const [killsRes, deathsRes] = await Promise.all([
+    const promises = [
       fetch(`${baseUrl}/players/${playerId}/kills`, { cache: "no-store" }).catch(() => null),
       fetch(`${baseUrl}/players/${playerId}/deaths`, { cache: "no-store" }).catch(() => null),
-    ]);
+    ];
 
-    const kills = killsRes && killsRes.ok ? await killsRes.json().catch(() => []) : [];
-    const deaths = deathsRes && deathsRes.ok ? await deathsRes.json().catch(() => []) : [];
+    if (guildId) {
+      promises.push(
+        fetch(`${baseUrl}/events?offset=0&limit=51&guildId=${guildId}`, { cache: "no-store" }).catch(() => null)
+      );
+    }
+
+    const responses = await Promise.all(promises);
+
+    const kills = responses[0] && responses[0].ok ? await responses[0].json().catch(() => []) : [];
+    const deaths = responses[1] && responses[1].ok ? await responses[1].json().catch(() => []) : [];
+    const guildEvents = responses[2] && responses[2].ok ? await responses[2].json().catch(() => []) : [];
 
     const killsArr = Array.isArray(kills) ? kills : [];
     const deathsArr = Array.isArray(deaths) ? deaths : [];
+    const guildArr = Array.isArray(guildEvents) ? guildEvents : [];
 
-    // Merge and deduplicate by EventId
     const eventsMap = new Map();
-    [...killsArr, ...deathsArr].forEach(event => {
-      if (event && event.EventId) {
-        eventsMap.set(event.EventId, event);
+
+    // 1. Kills
+    killsArr.forEach(e => { if (e && e.EventId) eventsMap.set(e.EventId, e); });
+    
+    // 2. Deaths
+    deathsArr.forEach(e => { if (e && e.EventId) eventsMap.set(e.EventId, e); });
+
+    // 3. Guild Assists & Participations
+    const targetName = (playerName || "").toLowerCase();
+    guildArr.forEach(e => {
+      if (!e || !e.EventId) return;
+      const isKiller = e.Killer?.Id === playerId || (e.Killer?.Name && e.Killer.Name.toLowerCase() === targetName);
+      const isVictim = e.Victim?.Id === playerId || (e.Victim?.Name && e.Victim.Name.toLowerCase() === targetName);
+      const isParticipant = e.Participants?.some(p => p.Id === playerId || (p.Name && p.Name.toLowerCase() === targetName));
+      const isGroupMember = e.GroupMembers?.some(p => p.Id === playerId || (p.Name && p.Name.toLowerCase() === targetName));
+
+      if (isKiller || isVictim || isParticipant || isGroupMember) {
+        eventsMap.set(e.EventId, e);
       }
     });
 
@@ -62,14 +86,13 @@ async function getPlayerMatches(server, playerId) {
 export default async function PlayerProfilePage({ params }) {
   const { server, playerId } = await params;
   
-  const [player, matches] = await Promise.all([
-    getPlayer(server, playerId),
-    getPlayerMatches(server, playerId)
-  ]);
+  const player = await getPlayer(server, playerId);
   
   if (!player) {
     notFound();
   }
+
+  const matches = await getPlayerMatches(server, playerId, player.GuildId, player.Name);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -114,7 +137,7 @@ export async function generateMetadata({ params }) {
   
   return {
     title: `${player.Name} | Albion Online PvP İstatistikleri & Killboard | Veyronix`,
-    description: `Albion Online ${server.toUpperCase()} Oyuncusu ${player.Name} için canlı PvP öldürmeleri, kaybettiği eşyalar, finansal kâr/zarar istatistikleri ve silah analizleri.`,
+    description: `Albion Online ${server.toUpperCase()} Oyuncusu ${player.Name} için canlı PvP öldürmeleri, asistleme maçları, kaybettiği eşyalar ve finansal kâr/zarar analizleri.`,
     openGraph: {
       title: `${player.Name} | Albion Online Oyuncu Analiz Portalı`,
       description: `Sunucu: ${server.toUpperCase()} | Lonca: ${player.GuildName || 'Yok'}\nKill Fame: ${player.KillFame?.toLocaleString()} | Death Fame: ${player.DeathFame?.toLocaleString()}`,
