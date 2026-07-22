@@ -142,14 +142,17 @@ async function handleEditOption(interaction, lang) {
         .setLabel(t('party.party_header_label', lang))
         .setValue(data.title || '')
         .setStyle(TextInputStyle.Short)
+        .setMinLength(2)
+        .setMaxLength(100)
         .setRequired(true);
-
 
     const rolesInput = new TextInputBuilder()
         .setCustomId('party_roles')
         .setLabel(t('party.party_roles_label', lang))
         .setValue(data.rolesWithMembers.map(r => r.role).join('\n'))
         .setStyle(TextInputStyle.Paragraph)
+        .setMinLength(2)
+        .setMaxLength(1000)
         .setRequired(true);
 
     const descriptionInput = new TextInputBuilder()
@@ -157,6 +160,7 @@ async function handleEditOption(interaction, lang) {
         .setLabel(lang === 'tr' ? 'Parti Açıklaması' : 'Description')
         .setValue(data.description)
         .setStyle(TextInputStyle.Paragraph)
+        .setMaxLength(1000)
         .setRequired(false);
 
     modal.addComponents(

@@ -122,6 +122,8 @@ async function handleCreatePartyCommand(interaction) {
         .setLabel(t('party.party_header_label', lang))
         .setPlaceholder(t('party.party_header_placeholder', lang))
         .setStyle(TextInputStyle.Short)
+        .setMinLength(2)
+        .setMaxLength(100)
         .setRequired(true);
 
     const rolesInput = new TextInputBuilder()
@@ -129,6 +131,8 @@ async function handleCreatePartyCommand(interaction) {
         .setLabel(t('party.party_roles_label', lang))
         .setPlaceholder(t('party.party_roles_placeholder', lang))
         .setStyle(TextInputStyle.Paragraph)
+        .setMinLength(2)
+        .setMaxLength(1000)
         .setRequired(true);
 
     const descriptionInput = new TextInputBuilder()
@@ -136,6 +140,7 @@ async function handleCreatePartyCommand(interaction) {
         .setLabel(t('party.party_desc_label', lang))
         .setPlaceholder(t('party.party_desc_placeholder', lang))
         .setStyle(TextInputStyle.Paragraph)
+        .setMaxLength(1000)
         .setRequired(false);
 
     modal.addComponents(

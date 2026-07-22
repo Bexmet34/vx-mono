@@ -128,6 +128,8 @@ async function handlePartyButtons(interaction) {
             .setLabel(lang === 'tr' ? 'Şablon Adı' : 'Template Name')
             .setPlaceholder('Örn: Ganking Party 1')
             .setStyle(TextInputStyle.Short)
+            .setMinLength(2)
+            .setMaxLength(50)
             .setRequired(true);
 
         const headerInput = new TextInputBuilder()
@@ -135,12 +137,15 @@ async function handlePartyButtons(interaction) {
             .setLabel(lang === 'tr' ? 'Parti Başlığı' : 'Party Header')
             .setValue(data.title || 'Party')
             .setStyle(TextInputStyle.Short)
+            .setMinLength(2)
+            .setMaxLength(100)
             .setRequired(true);
 
         const descInput = new TextInputBuilder()
             .setCustomId('party_description')
             .setLabel(lang === 'tr' ? 'Açıklama' : 'Description')
             .setStyle(TextInputStyle.Paragraph)
+            .setMaxLength(1000)
             .setRequired(false);
             
         if (data.description) descInput.setValue(data.description);
@@ -150,6 +155,8 @@ async function handlePartyButtons(interaction) {
             .setLabel(lang === 'tr' ? 'Roller (Satır satır)' : 'Roles (Line by line)')
             .setValue(data.rolesWithMembers.map(r => r.role).join('\n') || '')
             .setStyle(TextInputStyle.Paragraph)
+            .setMinLength(2)
+            .setMaxLength(1000)
             .setRequired(true);
 
         modal.addComponents(
