@@ -8,6 +8,8 @@ import SystemStatusWidget from "@/components/SystemStatusWidget";
 import ScrollToTop from "@/components/ScrollToTop";
 import { Sora } from "next/font/google";
 
+import Script from "next/script";
+
 const sora = Sora({ subsets: ["latin"], variable: "--font-sora", display: "swap" });
 
 export const metadata = {
@@ -39,6 +41,7 @@ export const metadata = {
   },
   other: {
     cryptomus: "7e16ba27",
+    "google-adsense-account": "ca-pub-1315540294941790",
   },
   verification: {
     google: "Sb34R-Xts1_g6mT_DiZvpXlRVD75T_uc-G2qp505mMQ",
@@ -100,6 +103,12 @@ export default async function RootLayout({ children }) {
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1315540294941790"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
