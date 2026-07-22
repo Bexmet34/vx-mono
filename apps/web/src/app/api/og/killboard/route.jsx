@@ -1,15 +1,15 @@
 import { ImageResponse } from 'next/og';
 
-export const runtime = 'edge';
+export const dynamic = 'force-dynamic';
 
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const server = searchParams.get('server');
+    const server = searchParams.get('server') || 'europe';
     const eventId = searchParams.get('eventId');
 
-    if (!server || !eventId) {
-      return new Response('Missing server or eventId', { status: 400 });
+    if (!eventId) {
+      return new Response('Missing eventId', { status: 400 });
     }
 
     const REGIONS = {
@@ -19,23 +19,22 @@ export async function GET(request) {
     };
     const baseUrl = REGIONS[server.toLowerCase()] || REGIONS.europe;
     
-    // Fetch event data
-    const res = await fetch(`${baseUrl}/events/${eventId}`);
+    // Fetch event data safely
+    const res = await fetch(`${baseUrl}/events/${eventId}`, {
+      headers: { 'Accept': 'application/json' },
+      cache: 'no-store',
+    });
+
     if (!res.ok) {
       return new Response('Event not found', { status: 404 });
     }
     
     const event = await res.json();
-    const killer = event.Killer;
-    const victim = event.Victim;
+    const killer = event.Killer || {};
+    const victim = event.Victim || {};
 
-    const killerImage = killer.Equipment?.MainHand?.Type 
-      ? `https://render.albiononline.com/v1/item/${killer.Equipment.MainHand.Type}.png` 
-      : 'https://render.albiononline.com/v1/item/T4_MAIN_SWORD.png'; 
-      
-    const victimImage = victim.Equipment?.MainHand?.Type 
-      ? `https://render.albiononline.com/v1/item/${victim.Equipment.MainHand.Type}.png` 
-      : 'https://render.albiononline.com/v1/item/T4_MAIN_SWORD.png';
+    const fameFormatted = (event.TotalVictimKillFame || 0).toLocaleString();
+    const dateFormatted = event.TimeStamp ? new Date(event.TimeStamp).toLocaleDateString('tr-TR') : '';
 
     return new ImageResponse(
       (
@@ -46,54 +45,205 @@ export async function GET(request) {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'center',
+            justifyContent: 'space-between',
             backgroundColor: '#0f1117',
             color: 'white',
             fontFamily: 'sans-serif',
-            padding: '40px',
+            padding: '40px 60px',
+            position: 'relative',
           }}
         >
-          {/* Header */}
-          <div style={{ display: 'flex', fontSize: 32, color: '#fca311', marginBottom: 10, fontWeight: 'bold' }}>
-            Veyronix Killboard
-          </div>
-          
-          <div style={{ display: 'flex', fontSize: 24, color: '#aaa', marginBottom: 40 }}>
-            {event.TotalVictimKillFame?.toLocaleString()} Fame
-          </div>
-
-          {/* Versus Container */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '900px' }}>
-            
-            {/* Killer */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '350px', background: 'rgba(46, 204, 113, 0.1)', border: '2px solid rgba(46, 204, 113, 0.3)', borderRadius: '16px', padding: '30px' }}>
-              <div style={{ fontSize: 36, fontWeight: 'bold', color: '#2ecc71', marginBottom: 10, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '300px' }}>
-                {killer.Name}
+          {/* Top Brand Header */}
+          <div
+            style={{
+              display: 'flex',
+              width: '100%',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              borderBottom: '2px solid rgba(255, 215, 0, 0.2)',
+              paddingBottom: '20px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+              <div
+                style={{
+                  fontSize: '36px',
+                  fontWeight: 'bold',
+                  color: '#fca311',
+                  letterSpacing: '1px',
+                }}
+              >
+                VEYRONIX KILLBOARD
               </div>
-              <div style={{ fontSize: 20, color: '#aaa', marginBottom: 20, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '300px' }}>
-                {killer.GuildName ? `[${killer.AllianceName || ''}] ${killer.GuildName}` : 'No Guild'}
+              <div
+                style={{
+                  background: 'rgba(252, 163, 17, 0.2)',
+                  color: '#fca311',
+                  padding: '4px 14px',
+                  borderRadius: '12px',
+                  fontSize: '18px',
+                  fontWeight: 'bold',
+                  textTransform: 'uppercase',
+                }}
+              >
+                {server.toUpperCase()}
               </div>
-              <img src={killerImage} alt="Killer Weapon" width={120} height={120} style={{ objectFit: 'contain' }} />
-              <div style={{ marginTop: 20, fontSize: 24, color: '#2ecc71' }}>IP: {Math.round(killer.AverageItemPower || 0)}</div>
             </div>
 
-            {/* VS */}
-            <div style={{ fontSize: 60, fontWeight: 'bold', color: '#fff', fontStyle: 'italic', opacity: 0.5 }}>
+            <div style={{ fontSize: '24px', color: '#888', fontWeight: '600' }}>
+              {dateFormatted}
+            </div>
+          </div>
+
+          {/* Center Battle Fame Badge */}
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              margin: '10px 0',
+            }}
+          >
+            <div
+              style={{
+                fontSize: '20px',
+                color: '#aaa',
+                textTransform: 'uppercase',
+                letterSpacing: '2px',
+              }}
+            >
+              TOPLAM ÖLDÜRME FAME
+            </div>
+            <div
+              style={{
+                fontSize: '48px',
+                fontWeight: '900',
+                color: '#fca311',
+                textShadow: '0 0 20px rgba(252, 163, 17, 0.5)',
+              }}
+            >
+              ⚡ {fameFormatted} FAME
+            </div>
+          </div>
+
+          {/* Versus Player Breakdown Cards */}
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              width: '100%',
+            }}
+          >
+            {/* Killer Side (Green) */}
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                width: '450px',
+                background: 'rgba(46, 204, 113, 0.12)',
+                border: '2px solid rgba(46, 204, 113, 0.5)',
+                borderRadius: '20px',
+                padding: '25px',
+              }}
+            >
+              <div style={{ fontSize: '20px', color: '#2ecc71', fontWeight: 'bold', letterSpacing: '1px' }}>
+                ⚔️ KATİL (KILLER)
+              </div>
+              <div
+                style={{
+                  fontSize: '36px',
+                  fontWeight: '900',
+                  color: '#ffffff',
+                  margin: '10px 0 5px 0',
+                }}
+              >
+                {killer.Name || 'Bilinmeyen'}
+              </div>
+              <div style={{ fontSize: '20px', color: '#2ecc71', fontWeight: '600', margin: '0 0 15px 0' }}>
+                {killer.GuildName ? `[${killer.AllianceName || ''}] ${killer.GuildName}` : 'Loncasız'}
+              </div>
+
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  background: 'rgba(0,0,0,0.4)',
+                  padding: '10px 20px',
+                  borderRadius: '12px',
+                }}
+              >
+                <span style={{ fontSize: '22px', color: '#fff', fontWeight: 'bold' }}>
+                  IP: {Math.round(killer.AverageItemPower || 0)}
+                </span>
+              </div>
+            </div>
+
+            {/* VS Badge */}
+            <div
+              style={{
+                fontSize: '52px',
+                fontWeight: '900',
+                color: '#fff',
+                fontStyle: 'italic',
+                opacity: 0.6,
+              }}
+            >
               VS
             </div>
 
-            {/* Victim */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '350px', background: 'rgba(231, 76, 60, 0.1)', border: '2px solid rgba(231, 76, 60, 0.3)', borderRadius: '16px', padding: '30px' }}>
-              <div style={{ fontSize: 36, fontWeight: 'bold', color: '#e74c3c', marginBottom: 10, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '300px' }}>
-                {victim.Name}
+            {/* Victim Side (Red) */}
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                width: '450px',
+                background: 'rgba(231, 76, 60, 0.12)',
+                border: '2px solid rgba(231, 76, 60, 0.5)',
+                borderRadius: '20px',
+                padding: '25px',
+              }}
+            >
+              <div style={{ fontSize: '20px', color: '#e74c3c', fontWeight: 'bold', letterSpacing: '1px' }}>
+                💀 KURBAN (VICTIM)
               </div>
-              <div style={{ fontSize: 20, color: '#aaa', marginBottom: 20, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '300px' }}>
-                {victim.GuildName ? `[${victim.AllianceName || ''}] ${victim.GuildName}` : 'No Guild'}
+              <div
+                style={{
+                  fontSize: '36px',
+                  fontWeight: '900',
+                  color: '#ffffff',
+                  margin: '10px 0 5px 0',
+                }}
+              >
+                {victim.Name || 'Bilinmeyen'}
               </div>
-              <img src={victimImage} alt="Victim Weapon" width={120} height={120} style={{ objectFit: 'contain' }} />
-              <div style={{ marginTop: 20, fontSize: 24, color: '#e74c3c' }}>IP: {Math.round(victim.AverageItemPower || 0)}</div>
-            </div>
+              <div style={{ fontSize: '20px', color: '#e74c3c', fontWeight: '600', margin: '0 0 15px 0' }}>
+                {victim.GuildName ? `[${victim.AllianceName || ''}] ${victim.GuildName}` : 'Loncasız'}
+              </div>
 
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  background: 'rgba(0,0,0,0.4)',
+                  padding: '10px 20px',
+                  borderRadius: '12px',
+                }}
+              >
+                <span style={{ fontSize: '22px', color: '#fff', fontWeight: 'bold' }}>
+                  IP: {Math.round(victim.AverageItemPower || 0)}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer Branding */}
+          <div style={{ fontSize: '18px', color: '#666', fontWeight: '500' }}>
+            veyronix.com.tr • Albion Online Tactical Command
           </div>
         </div>
       ),
@@ -103,9 +253,7 @@ export async function GET(request) {
       }
     );
   } catch (e) {
-    console.error(e);
-    return new Response(`Failed to generate the image`, {
-      status: 500,
-    });
+    console.error('[OG Killboard Error]:', e);
+    return new Response(`Failed to generate OG image`, { status: 500 });
   }
 }
