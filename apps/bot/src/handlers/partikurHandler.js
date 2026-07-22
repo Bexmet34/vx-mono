@@ -244,7 +244,7 @@ async function handleTempCommand(interaction) {
             const row = new ActionRowBuilder().addComponents(
                 new ButtonBuilder()
                     .setLabel(t('subscription.vote_button', lang))
-                    .setURL(config.TOPGG_LINK || 'https://top.gg/bot/816241059941646336')
+                    .setURL(config.TOPGG_LINK || 'https://top.gg/bot/1082239904169336902/vote')
                     .setStyle(ButtonStyle.Link),
                 new ButtonBuilder()
                     .setLabel(lang === 'tr' ? 'Satın Al / Web Sitesi' : 'Buy Premium / Website')

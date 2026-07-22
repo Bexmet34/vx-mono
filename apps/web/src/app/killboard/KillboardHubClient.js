@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search, Shield, User, Loader2, Sparkles, ArrowRight, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Search, Shield, User, Loader2, Sparkles, ArrowRight, AlertCircle } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function KillboardHubClient() {
@@ -105,7 +105,6 @@ export default function KillboardHubClient() {
       }
     }
 
-    // Do NOT navigate away if not found! Show error message on page
     setSearchError(isTr ? `"${query}" adında oyuncu veya lonca bulunamadı.` : `No player or guild found with name "${query}".`);
   };
 
@@ -113,7 +112,7 @@ export default function KillboardHubClient() {
     <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "2rem 1rem", color: "#fff" }}>
       
       {/* Hero Header Section */}
-      <div style={{ textAlign: "center", marginBottom: "3rem" }}>
+      <div style={{ textAlign: "center", marginBottom: "2.5rem" }}>
         <div style={{
           display: "inline-flex",
           alignItems: "center",
@@ -139,7 +138,7 @@ export default function KillboardHubClient() {
           WebkitTextFillColor: "transparent",
           marginBottom: "1rem"
         }}>
-          {isTr ? "Sunucu Seçin & Oyuncu / Lonca İnceleyin" : "Select Server & Search Player / Guild"}
+          {isTr ? "Oyuncu veya Lonca Arayın" : "Search Player or Guild"}
         </h1>
 
         <p style={{ color: "#aaa", fontSize: "1.1rem", maxWidth: "750px", margin: "0 auto", lineHeight: "1.6" }}>
@@ -149,101 +148,17 @@ export default function KillboardHubClient() {
         </p>
       </div>
 
-      {/* 3 Server Cards Section (Sunucu Seçim Kartları) */}
+      {/* 1. Interactive Search Section (ÜSTTE) */}
       <div style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-        gap: "1.5rem",
-        marginBottom: "3.5rem"
-      }}>
-        {SERVERS.map((server) => {
-          const isSelected = selectedServer === server.id;
-
-          return (
-            <div
-              key={server.id}
-              onClick={() => {
-                setSelectedServer(server.id);
-                setSearchError("");
-              }}
-              style={{
-                background: isSelected 
-                  ? "linear-gradient(145deg, rgba(25, 25, 35, 0.95), rgba(15, 15, 22, 0.98))" 
-                  : "rgba(18, 18, 26, 0.7)",
-                border: isSelected 
-                  ? `2px solid ${server.badgeColor}` 
-                  : "1px solid rgba(255, 255, 255, 0.08)",
-                borderRadius: "14px",
-                padding: "1.75rem",
-                cursor: "pointer",
-                position: "relative",
-                transition: "all 0.3s ease",
-                boxShadow: isSelected ? `0 10px 30px rgba(252, 163, 17, 0.15)` : "0 5px 15px rgba(0,0,0,0.3)"
-              }}
-              className="hover:scale-[1.02] hover:border-amber-500/50"
-            >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-                <span style={{ fontSize: "2.5rem" }}>{server.flag}</span>
-                <span style={{
-                  background: isSelected ? server.badgeColor : "rgba(255,255,255,0.08)",
-                  color: isSelected ? "#000" : "#aaa",
-                  padding: "0.25rem 0.75rem",
-                  borderRadius: "20px",
-                  fontSize: "0.75rem",
-                  fontWeight: "bold",
-                  textTransform: "uppercase"
-                }}>
-                  {server.code} API
-                </span>
-              </div>
-
-              <h2 style={{ fontSize: "1.5rem", fontWeight: "bold", color: "#fff", marginBottom: "0.5rem" }}>
-                {server.name}
-              </h2>
-
-              <p style={{ color: "#aaa", fontSize: "0.9rem", lineHeight: "1.5", marginBottom: "1.5rem" }}>
-                {server.desc}
-              </p>
-
-              <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
-                <Link
-                  href={`/killboard/${server.id}`}
-                  style={{
-                    flex: 1,
-                    background: isSelected ? server.badgeColor : "rgba(255,255,255,0.08)",
-                    color: isSelected ? "#000" : "#fff",
-                    textAlign: "center",
-                    padding: "0.6rem 1rem",
-                    borderRadius: "8px",
-                    fontWeight: "bold",
-                    fontSize: "0.9rem",
-                    textDecoration: "none",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "0.4rem",
-                    transition: "all 0.2s"
-                  }}
-                >
-                  {server.name} {isTr ? "Portalı" : "Portal"} <ArrowRight size={16} />
-                </Link>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Interactive Search Section */}
-      <div style={{
-        background: "rgba(18, 18, 26, 0.85)",
-        border: "1px solid rgba(255, 255, 255, 0.1)",
+        background: "rgba(18, 18, 26, 0.9)",
+        border: "1px solid rgba(252, 163, 17, 0.3)",
         borderRadius: "14px",
         padding: "2rem",
         marginBottom: "3rem",
         boxShadow: "0 10px 30px rgba(0,0,0,0.5)"
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1rem" }}>
-          <Search size={22} style={{ color: "#fca311" }} />
+          <Search size={24} style={{ color: "#fca311" }} />
           <h3 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 'bold', color: '#fff' }}>
             {isTr ? "Oyuncu veya Lonca Arama" : "Search Player or Guild"} ({currentServerObj.name})
           </h3>
@@ -265,7 +180,7 @@ export default function KillboardHubClient() {
                 placeholder={isTr ? "Oyuncu veya lonca adı yazın..." : "Type player or guild name..."}
                 style={{
                   width: "100%",
-                  background: "rgba(0, 0, 0, 0.5)",
+                  background: "rgba(0, 0, 0, 0.6)",
                   border: searchError ? "1px solid rgba(231, 76, 60, 0.6)" : "1px solid rgba(252, 163, 17, 0.4)",
                   borderRadius: "10px",
                   padding: "1rem 1.2rem 1rem 3rem",
@@ -411,6 +326,96 @@ export default function KillboardHubClient() {
             </div>
           )}
         </form>
+      </div>
+
+      {/* 2. 3 Server Cards Section (ALTTASINIZ) */}
+      <div style={{ marginBottom: "1.5rem" }}>
+        <h3 style={{ fontSize: "1.2rem", fontWeight: "bold", color: "#aaa", marginBottom: "1rem" }}>
+          🌐 {isTr ? "Veyronix Sunucu Portalları" : "Veyronix Server Portals"}
+        </h3>
+      </div>
+
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+        gap: "1.5rem",
+        marginBottom: "3.5rem"
+      }}>
+        {SERVERS.map((server) => {
+          const isSelected = selectedServer === server.id;
+
+          return (
+            <div
+              key={server.id}
+              onClick={() => {
+                setSelectedServer(server.id);
+                setSearchError("");
+              }}
+              style={{
+                background: isSelected 
+                  ? "linear-gradient(145deg, rgba(25, 25, 35, 0.95), rgba(15, 15, 22, 0.98))" 
+                  : "rgba(18, 18, 26, 0.7)",
+                border: isSelected 
+                  ? `2px solid ${server.badgeColor}` 
+                  : "1px solid rgba(255, 255, 255, 0.08)",
+                borderRadius: "14px",
+                padding: "1.75rem",
+                cursor: "pointer",
+                position: "relative",
+                transition: "all 0.3s ease",
+                boxShadow: isSelected ? `0 10px 30px rgba(252, 163, 17, 0.15)` : "0 5px 15px rgba(0,0,0,0.3)"
+              }}
+              className="hover:scale-[1.02] hover:border-amber-500/50"
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+                <span style={{ fontSize: "2.5rem" }}>{server.flag}</span>
+                <span style={{
+                  background: isSelected ? server.badgeColor : "rgba(255,255,255,0.08)",
+                  color: isSelected ? "#000" : "#aaa",
+                  padding: "0.25rem 0.75rem",
+                  borderRadius: "20px",
+                  fontSize: "0.75rem",
+                  fontWeight: "bold",
+                  textTransform: "uppercase"
+                }}>
+                  {server.code} API
+                </span>
+              </div>
+
+              <h2 style={{ fontSize: "1.5rem", fontWeight: "bold", color: "#fff", marginBottom: "0.5rem" }}>
+                {server.name}
+              </h2>
+
+              <p style={{ color: "#aaa", fontSize: "0.9rem", lineHeight: "1.5", marginBottom: "1.5rem" }}>
+                {server.desc}
+              </p>
+
+              <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+                <Link
+                  href={`/killboard/${server.id}`}
+                  style={{
+                    flex: 1,
+                    background: isSelected ? server.badgeColor : "rgba(255,255,255,0.08)",
+                    color: isSelected ? "#000" : "#fff",
+                    textAlign: "center",
+                    padding: "0.6rem 1rem",
+                    borderRadius: "8px",
+                    fontWeight: "bold",
+                    fontSize: "0.9rem",
+                    textDecoration: "none",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "0.4rem",
+                    transition: "all 0.2s"
+                  }}
+                >
+                  {server.name} {isTr ? "Portalı" : "Portal"} <ArrowRight size={16} />
+                </Link>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
     </div>

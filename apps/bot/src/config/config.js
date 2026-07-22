@@ -38,6 +38,6 @@ module.exports = {
     SUPPORT_SERVER_ID: '1477043179936284782',
     LOG_TRANSACTION_CHANNEL_ID: '1494808768813334680',
     WEBSITE_LINK: 'https://veyronix.com.tr',
-    TOPGG_LINK: 'https://top.gg/bot/816241059941646336',
+    TOPGG_LINK: 'https://top.gg/bot/1082239904169336902/vote',
 };
 

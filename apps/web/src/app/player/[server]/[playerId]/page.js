@@ -25,18 +25,20 @@ async function getPlayer(server, playerId) {
   }
 }
 
-// Fetch Player Kills, Deaths & Guild Assists from Albion API
+// Fetch Player Kills, Deaths & Guild/Server Assists from Albion API
 async function getPlayerMatches(server, playerId, guildId, playerName) {
   const baseUrl = REGIONS[server.toLowerCase()] || REGIONS.europe;
   try {
     const promises = [
       fetch(`${baseUrl}/players/${playerId}/kills`, { cache: "no-store" }).catch(() => null),
       fetch(`${baseUrl}/players/${playerId}/deaths`, { cache: "no-store" }).catch(() => null),
+      fetch(`${baseUrl}/events?offset=0&limit=51`, { cache: "no-store" }).catch(() => null),
     ];
 
     if (guildId) {
       promises.push(
-        fetch(`${baseUrl}/events?offset=0&limit=51&guildId=${guildId}`, { cache: "no-store" }).catch(() => null)
+        fetch(`${baseUrl}/events?offset=0&limit=51&guildId=${guildId}`, { cache: "no-store" }).catch(() => null),
+        fetch(`${baseUrl}/events?offset=51&limit=51&guildId=${guildId}`, { cache: "no-store" }).catch(() => null)
       );
     }
 
@@ -44,11 +46,15 @@ async function getPlayerMatches(server, playerId, guildId, playerName) {
 
     const kills = responses[0] && responses[0].ok ? await responses[0].json().catch(() => []) : [];
     const deaths = responses[1] && responses[1].ok ? await responses[1].json().catch(() => []) : [];
-    const guildEvents = responses[2] && responses[2].ok ? await responses[2].json().catch(() => []) : [];
+    const globalEvents = responses[2] && responses[2].ok ? await responses[2].json().catch(() => []) : [];
+    const guildEvents1 = responses[3] && responses[3].ok ? await responses[3].json().catch(() => []) : [];
+    const guildEvents2 = responses[4] && responses[4].ok ? await responses[4].json().catch(() => []) : [];
 
     const killsArr = Array.isArray(kills) ? kills : [];
     const deathsArr = Array.isArray(deaths) ? deaths : [];
-    const guildArr = Array.isArray(guildEvents) ? guildEvents : [];
+    const globalArr = Array.isArray(globalEvents) ? globalEvents : [];
+    const guildArr1 = Array.isArray(guildEvents1) ? guildEvents1 : [];
+    const guildArr2 = Array.isArray(guildEvents2) ? guildEvents2 : [];
 
     const eventsMap = new Map();
 
@@ -58,9 +64,9 @@ async function getPlayerMatches(server, playerId, guildId, playerName) {
     // 2. Deaths
     deathsArr.forEach(e => { if (e && e.EventId) eventsMap.set(e.EventId, e); });
 
-    // 3. Guild Assists & Participations
+    // 3. Guild & Global Assists / Participations
     const targetName = (playerName || "").toLowerCase();
-    guildArr.forEach(e => {
+    [...guildArr1, ...guildArr2, ...globalArr].forEach(e => {
       if (!e || !e.EventId) return;
       const isKiller = e.Killer?.Id === playerId || (e.Killer?.Name && e.Killer.Name.toLowerCase() === targetName);
       const isVictim = e.Victim?.Id === playerId || (e.Victim?.Name && e.Victim.Name.toLowerCase() === targetName);

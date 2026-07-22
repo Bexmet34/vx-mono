@@ -52,6 +52,24 @@ function getWeaponCategory(itemType) {
   return "Other";
 }
 
+// Calculate realistic Albion Silver loot value from Fame & Victim IP
+function calculateEstSilver(event, fame) {
+  const victim = event.Victim || {};
+  const ip = victim.AverageItemPower || 1000;
+  
+  // Base realistic market multiplier (~12.8x Fame)
+  let est = fame * 12.8;
+
+  // High IP gear multiplier
+  if (ip >= 1500) {
+    est *= 1.4;
+  } else if (ip >= 1350) {
+    est *= 1.2;
+  }
+
+  return Math.round(est);
+}
+
 export default function PlayerAnalyticsClient({ player, initialMatches, server }) {
   const { lang } = useLanguage();
   const isTr = lang === 'tr';
@@ -75,8 +93,7 @@ export default function PlayerAnalyticsClient({ player, initialMatches, server }
       const participants = event.Participants || event.GroupMembers || [];
       const fame = event.TotalVictimKillFame || 0;
       
-      // Estimated Silver value (approx ~3x Fame)
-      const estSilver = Math.round(fame * 3.2);
+      const estSilver = calculateEstSilver(event, fame);
 
       const isKiller = killer.Id === pId || (killer.Name && killer.Name.toLowerCase() === pName);
       const isVictim = victim.Id === pId || (victim.Name && victim.Name.toLowerCase() === pName);
@@ -112,7 +129,6 @@ export default function PlayerAnalyticsClient({ player, initialMatches, server }
   // Calculate Financial KPIs (Profit Today, Lost Today, Profit Yesterday, Lost Yesterday)
   const financialStats = useMemo(() => {
     const now = new Date().getTime();
-    const oneDay = 24 * 60 * 60 * 1000;
 
     let profitToday = 0;
     let killsTodayCount = 0;
@@ -442,7 +458,7 @@ export default function PlayerAnalyticsClient({ player, initialMatches, server }
 
         {/* Pagination Navigation */}
         <div style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
-          {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => i + 1).map((pageNum) => (
+          {Array.from({ length: Math.min(totalPages, 15) }, (_, i) => i + 1).map((pageNum) => (
             <button
               key={pageNum}
               onClick={() => setCurrentPage(pageNum)}
@@ -561,11 +577,11 @@ export default function PlayerAnalyticsClient({ player, initialMatches, server }
                   </div>
 
                   {/* Fame & Est. Silver Values */}
-                  <div style={{ textAlign: "right", minWidth: "80px" }}>
+                  <div style={{ textAlign: "right", minWidth: "90px" }}>
                     <div style={{ color: "#2ecc71", fontWeight: "bold", fontSize: "0.9rem" }}>
                       {formatNumber(m.fame)} <span style={{ fontSize: "0.75rem", color: "#888" }}>Fame</span>
                     </div>
-                    <div style={{ color: m.estSilver >= 1000000 ? "#fca311" : "#aaa", fontWeight: "bold", fontSize: "0.8rem" }}>
+                    <div style={{ color: m.estSilver >= 500000 ? "#fca311" : "#aaa", fontWeight: "bold", fontSize: "0.85rem" }}>
                       {formatNumber(m.estSilver)} <span style={{ fontSize: "0.7rem", color: "#666" }}>Silver</span>
                     </div>
                   </div>
