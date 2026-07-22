@@ -1,8 +1,6 @@
 import { notFound } from "next/navigation";
-import styles from "@/components/KillMatch.module.css";
-import KillMatch from "@/components/KillMatch";
 import CtaBanner from "@/components/CtaBanner";
-import Link from "next/link";
+import PlayerAnalyticsClient from "./PlayerAnalyticsClient";
 
 export const dynamic = 'force-dynamic';
 
@@ -27,7 +25,7 @@ async function getPlayer(server, playerId) {
   }
 }
 
-// Fetch Player Kills & Deaths from Albion API (Combined for complete recent history)
+// Fetch Player Kills & Deaths from Albion API
 async function getPlayerMatches(server, playerId) {
   const baseUrl = REGIONS[server.toLowerCase()] || REGIONS.europe;
   try {
@@ -73,82 +71,38 @@ export default async function PlayerProfilePage({ params }) {
     notFound();
   }
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    name: `${player.Name} Albion Online Profile`,
+    description: `Albion Online player statistics for ${player.Name} on ${server.toUpperCase()} server.`,
+    url: `https://veyronix.com.tr/player/${server}/${playerId}`,
+    mainEntity: {
+      "@type": "Person",
+      name: player.Name,
+      identifier: playerId,
+      memberOf: player.GuildName ? {
+        "@type": "Organization",
+        name: player.GuildName
+      } : undefined
+    }
+  };
+
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <h1>{player.Name} Profil & PvP İstatistikleri</h1>
-        <p>Albion Online {server.toUpperCase()} Sunucusu</p>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <PlayerAnalyticsClient 
+        player={player}
+        initialMatches={matches}
+        server={server}
+      />
+      <div style={{ maxWidth: "1250px", margin: "0 auto", padding: "0 1rem 3rem 1rem" }}>
+        <CtaBanner />
       </div>
-
-      <div style={{ maxWidth: '800px', margin: '0 auto', marginBottom: '3rem' }}>
-        <div className={`${styles.playerCard} ${styles.killerCard}`} style={{ width: '100%', marginBottom: '1.5rem', padding: '2.5rem 1rem' }}>
-          <div className={styles.playerTitle} style={{ fontSize: '2.8rem' }}>{player.Name}</div>
-          {player.GuildName && (
-            <div className={styles.guildName} style={{ fontSize: '1.2rem', opacity: 0.9, marginTop: '0.5rem' }}>
-              <Link href={`/guild/${server}/${player.GuildId}`} style={{ color: 'inherit', textDecoration: 'none' }} className="hover:text-white transition-colors">
-                [{player.AllianceTag || player.AllianceName || ''}] {player.GuildName}
-              </Link>
-            </div>
-          )}
-
-          {/* Stats Bar */}
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginTop: '2rem', flexWrap: 'wrap' }}>
-            <div style={{ background: 'rgba(255,255,255,0.05)', padding: '0.75rem 1.5rem', borderRadius: '10px' }}>
-              <div style={{ color: '#aaa', fontSize: '0.85rem' }}>Kill Fame</div>
-              <div style={{ color: '#2ecc71', fontSize: '1.3rem', fontWeight: 'bold' }}>{(player.KillFame || 0).toLocaleString()}</div>
-            </div>
-            <div style={{ background: 'rgba(255,255,255,0.05)', padding: '0.75rem 1.5rem', borderRadius: '10px' }}>
-              <div style={{ color: '#aaa', fontSize: '0.85rem' }}>Death Fame</div>
-              <div style={{ color: '#e74c3c', fontSize: '1.3rem', fontWeight: 'bold' }}>{(player.DeathFame || 0).toLocaleString()}</div>
-            </div>
-            <div style={{ background: 'rgba(255,255,255,0.05)', padding: '0.75rem 1.5rem', borderRadius: '10px' }}>
-              <div style={{ color: '#aaa', fontSize: '0.85rem' }}>Fame Ratio</div>
-              <div style={{ color: '#fca311', fontSize: '1.3rem', fontWeight: 'bold' }}>{(player.FameRatio || 0).toFixed(2)}</div>
-            </div>
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem 1.5rem', background: 'rgba(252, 163, 17, 0.05)', borderRadius: '12px', border: '1px solid rgba(252, 163, 17, 0.2)' }}>
-          <div>
-            <h4 style={{ color: '#fca311', margin: '0 0 0.2rem 0', fontSize: '1rem' }}>Veyronix Discord Bot</h4>
-            <p style={{ color: '#aaa', margin: 0, fontSize: '0.85rem' }}>Sunucunuza ücretsiz killboard ve parti sistemi ekleyin.</p>
-          </div>
-          <Link 
-            href="https://discord.com/oauth2/authorize?client_id=1082239904169336902&permissions=510977&scope=bot+applications.commands"
-            target="_blank"
-            style={{
-              background: '#5865F2',
-              color: '#fff',
-              padding: '0.5rem 1rem',
-              borderRadius: '6px',
-              textDecoration: 'none',
-              fontWeight: 'bold',
-              fontSize: '0.85rem',
-              whiteSpace: 'nowrap'
-            }}
-            className="hover:opacity-80 transition-opacity"
-          >
-            Sunucuya Ekle
-          </Link>
-        </div>
-      </div>
-
-      <div className={styles.header}>
-        <h2>Canlı Son Öldürme ve Ölümler (Son Maçlar)</h2>
-      </div>
-
-      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        {matches && matches.length > 0 ? (
-          matches.slice(0, 20).map((kill) => (
-            <KillMatch key={kill.EventId} event={kill} server={server} />
-          ))
-        ) : (
-          <p style={{ textAlign: 'center', color: '#aaa' }}>Bu oyuncu için son zamanlara ait canlı maç bulunamadı.</p>
-        )}
-      </div>
-      
-      <CtaBanner />
-    </div>
+    </>
   );
 }
 
@@ -159,13 +113,17 @@ export async function generateMetadata({ params }) {
   if (!player) return { title: "Oyuncu Bulunamadı" };
   
   return {
-    title: `${player.Name} | Albion Online PvP Profil & Killboard | Veyronix`,
-    description: `Albion Online ${server.toUpperCase()} Oyuncusu: ${player.Name}. Kill Fame: ${player.KillFame?.toLocaleString()}, Death Fame: ${player.DeathFame?.toLocaleString()}.`,
+    title: `${player.Name} | Albion Online PvP İstatistikleri & Killboard | Veyronix`,
+    description: `Albion Online ${server.toUpperCase()} Oyuncusu ${player.Name} için canlı PvP öldürmeleri, kaybettiği eşyalar, finansal kâr/zarar istatistikleri ve silah analizleri.`,
     openGraph: {
-      title: `${player.Name} | Albion Online Oyuncu Profili`,
+      title: `${player.Name} | Albion Online Oyuncu Analiz Portalı`,
       description: `Sunucu: ${server.toUpperCase()} | Lonca: ${player.GuildName || 'Yok'}\nKill Fame: ${player.KillFame?.toLocaleString()} | Death Fame: ${player.DeathFame?.toLocaleString()}`,
       siteName: 'Veyronix',
       type: 'website',
+      url: `https://veyronix.com.tr/player/${server}/${playerId}`,
+    },
+    alternates: {
+      canonical: `https://veyronix.com.tr/player/${server.toLowerCase()}/${playerId}`,
     }
   };
 }
