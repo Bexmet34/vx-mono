@@ -53,7 +53,7 @@ function fetchAlbionEvents(url) {
 async function fetchAllGuildEvents(guildId, server = 'Europe', sinceDate = null) {
     const baseUrl = getBaseUrl(server);
     const allEvents = [];
-    const maxPages = 6;
+    const maxPages = 30; // Increased from 6 to 30 (1500 events) to cover highly active ZvZ guilds over 24h
 
     for (let page = 0; page < maxPages; page++) {
         const offset = page * 50;
@@ -167,7 +167,12 @@ async function sendKillBoardSummary(client, guildCfg) {
         const allDeaths = [];
         
         for (const ev of allEvents) {
-            if (ev.Killer?.GuildId === targetGuildId) allKills.push(ev);
+            // Check if our guild is the killer OR a participant (assist)
+            const isKiller = ev.Killer?.GuildId === targetGuildId;
+            const isParticipant = ev.Participants?.some(p => p.GuildId === targetGuildId);
+            
+            if (isKiller || isParticipant) allKills.push(ev);
+            // Check if our guild is the victim
             if (ev.Victim?.GuildId === targetGuildId) allDeaths.push(ev);
         }
 
@@ -186,11 +191,20 @@ async function sendKillBoardSummary(client, guildCfg) {
         // --- Build kill stats ---
         const killerMap = {};
         for (const ev of killEvents) {
-            const name = ev.Killer?.Name;
-            const id = ev.Killer?.Id;
+            // Find the player from our guild who did the most damage, or fallback to the main Killer if they are from our guild
+            let memberParticipant = ev.Participants?.filter(p => p.GuildId === targetGuildId).sort((a, b) => b.DamageDone - a.DamageDone)[0];
+            
+            // If the actual killer is from our guild, prioritize them
+            if (ev.Killer?.GuildId === targetGuildId) {
+                memberParticipant = ev.Killer;
+            }
+
+            const name = memberParticipant?.Name;
+            const id = memberParticipant?.Id;
             if (!name) continue;
             if (!killerMap[name]) killerMap[name] = { Name: name, Id: id, Kills: 0, KillFame: 0 };
             killerMap[name].Kills++;
+            // Note: TotalVictimKillFame is the full fame of the victim. We can award it to the contributor.
             killerMap[name].KillFame += ev.TotalVictimKillFame || 0;
         }
         const topKillers = Object.values(killerMap).sort((a, b) => b.KillFame - a.KillFame).slice(0, 10);
