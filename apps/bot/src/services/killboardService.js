@@ -63,7 +63,11 @@ async function fetchAllGuildEvents(guildId, server = 'Europe', sinceDate = null)
         allEvents.push(...events);
 
         if (sinceDate && events.length > 0) {
-            const oldestInPage = new Date(events[events.length - 1].TimeStamp);
+            let oldestTs = events[events.length - 1].TimeStamp;
+            if (oldestTs) {
+                oldestTs = String(oldestTs).replace(/(\.\d{3})\d+Z$/, '$1Z');
+            }
+            const oldestInPage = new Date(oldestTs);
             if (!isNaN(oldestInPage.getTime()) && oldestInPage < sinceDate) {
                 break;
             }
@@ -176,14 +180,22 @@ async function sendKillBoardSummary(client, guildCfg) {
             if (ev.Victim?.GuildId === targetGuildId) allDeaths.push(ev);
         }
 
+        // Helper to safely parse Albion timestamps for older Node.js versions
+        const parseAlbionTime = (ts) => {
+            if (!ts) return NaN;
+            // Truncate fractional seconds to 3 digits (e.g. .123456789Z -> .123Z)
+            const fixedTs = String(ts).replace(/(\.\d{3})\d+Z$/, '$1Z');
+            return new Date(fixedTs).getTime();
+        };
+
         // Filter to events within the last 24 hours
         const killEvents = allKills.filter(ev => {
-            const t = new Date(ev.TimeStamp);
-            return !isNaN(t.getTime()) && t >= sinceDate;
+            const tTime = parseAlbionTime(ev.TimeStamp);
+            return !isNaN(tTime) && tTime >= sinceDate.getTime();
         });
         const deathEvents = allDeaths.filter(ev => {
-            const t = new Date(ev.TimeStamp);
-            return !isNaN(t.getTime()) && t >= sinceDate;
+            const tTime = parseAlbionTime(ev.TimeStamp);
+            return !isNaN(tTime) && tTime >= sinceDate.getTime();
         });
 
         console.log(`[KillBoard] Filtered: ${killEvents.length}/${allKills.length} kills, ${deathEvents.length}/${allDeaths.length} deaths in 24h window`);
