@@ -14,6 +14,18 @@ function getBaseUrl(server = 'Europe') {
     return 'https://gameinfo-ams.albiononline.com/api/gameinfo';
 }
 
+function parseAlbionTime(ts) {
+    if (!ts) return NaN;
+    let s = String(ts).trim();
+    s = s.replace(/(\.\d{3})\d+/, '$1');
+    let t = new Date(s).getTime();
+    if (!isNaN(t)) return t;
+    s = String(ts).trim().replace(/\.\d+/, '');
+    t = new Date(s).getTime();
+    if (!isNaN(t)) return t;
+    return NaN;
+}
+
 async function fetchAlbion(url) {
     try {
         const res = await fetch(url, {
@@ -37,7 +49,7 @@ async function fetchAlbion(url) {
 async function fetchAllGuildEvents(guildId, server, sinceDate) {
     const baseUrl = getBaseUrl(server);
     const allEvents = [];
-    const maxPages = 6;
+    const maxPages = 30;
 
     for (let page = 0; page < maxPages; page++) {
         const offset = page * 50;
@@ -47,8 +59,8 @@ async function fetchAllGuildEvents(guildId, server, sinceDate) {
         allEvents.push(...events);
 
         if (sinceDate && events.length > 0) {
-            const oldestInPage = new Date(events[events.length - 1].TimeStamp);
-            if (!isNaN(oldestInPage.getTime()) && oldestInPage < sinceDate) {
+            const oldestTs = parseAlbionTime(events[events.length - 1].TimeStamp);
+            if (!isNaN(oldestTs) && oldestTs < sinceDate.getTime()) {
                 break;
             }
         }
@@ -84,10 +96,13 @@ export async function GET(req, { params }) {
         const deathEvents = [];
 
         for (const ev of events) {
-            const t = new Date(ev.TimeStamp);
-            if (isNaN(t.getTime()) || t < sinceDate) continue;
+            const tTime = parseAlbionTime(ev.TimeStamp);
+            if (isNaN(tTime) || tTime < sinceDate.getTime()) continue;
 
-            if (ev.Killer?.GuildId === targetGuildId) {
+            const isKiller = ev.Killer?.GuildId === targetGuildId;
+            const isParticipant = ev.Participants?.some(p => p.GuildId === targetGuildId);
+
+            if (isKiller || isParticipant) {
                 killEvents.push(ev);
             }
             if (ev.Victim?.GuildId === targetGuildId) {
@@ -97,12 +112,16 @@ export async function GET(req, { params }) {
 
         console.log(`[KillBoard Preview] ${targetGuildId} (${server}): ${killEvents.length} kills, ${deathEvents.length} deaths from ${events.length} fetched events in 24h`);
 
-        // Top killers: aggregate by killer name
+        // Top killers: aggregate by member killer/participant
         const killerMap = {};
         let totalKillFame = 0;
         for (const ev of killEvents) {
-            const name = ev.Killer?.Name;
-            const id = ev.Killer?.Id;
+            let memberParticipant = ev.Participants?.filter(p => p.GuildId === targetGuildId).sort((a, b) => (b.DamageDone || 0) - (a.DamageDone || 0))[0];
+            if (ev.Killer?.GuildId === targetGuildId) {
+                memberParticipant = ev.Killer;
+            }
+            const name = memberParticipant?.Name;
+            const id = memberParticipant?.Id;
             if (!name) continue;
             totalKillFame += ev.TotalVictimKillFame || 0;
             if (!killerMap[name]) killerMap[name] = { name, id, kills: 0, killFame: 0 };

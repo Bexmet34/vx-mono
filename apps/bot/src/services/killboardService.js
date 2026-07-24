@@ -48,6 +48,21 @@ function fetchAlbionEvents(url) {
 }
 
 /**
+ * Helper to safely parse Albion timestamps for Node.js
+ */
+function parseAlbionTime(ts) {
+    if (!ts) return NaN;
+    let s = String(ts).trim();
+    s = s.replace(/(\.\d{3})\d+/, '$1');
+    let t = new Date(s).getTime();
+    if (!isNaN(t)) return t;
+    s = String(ts).trim().replace(/\.\d+/, '');
+    t = new Date(s).getTime();
+    if (!isNaN(t)) return t;
+    return NaN;
+}
+
+/**
  * Fetches recent events for a guild with pagination up to 24 hours ago
  */
 async function fetchAllGuildEvents(guildId, server = 'Europe', sinceDate = null) {
@@ -63,12 +78,8 @@ async function fetchAllGuildEvents(guildId, server = 'Europe', sinceDate = null)
         allEvents.push(...events);
 
         if (sinceDate && events.length > 0) {
-            let oldestTs = events[events.length - 1].TimeStamp;
-            if (oldestTs) {
-                oldestTs = String(oldestTs).replace(/(\.\d{3})\d+Z$/, '$1Z');
-            }
-            const oldestInPage = new Date(oldestTs);
-            if (!isNaN(oldestInPage.getTime()) && oldestInPage < sinceDate) {
+            const oldestTs = parseAlbionTime(events[events.length - 1].TimeStamp);
+            if (!isNaN(oldestTs) && oldestTs < sinceDate.getTime()) {
                 break;
             }
         }
@@ -100,7 +111,7 @@ async function processKillBoards(client) {
 
     const { data: activeConfigs } = await supabase
         .from('guild_settings')
-        .select('guild_id')
+        .select('guild_id, trigger_killboard')
         .not('killboard_channel_id', 'is', null)
         .not('albion_guild_id', 'is', null);
 
@@ -109,7 +120,10 @@ async function processKillBoards(client) {
     const guilds = [];
     for (const row of activeConfigs) {
         const fullConfig = await getGuildConfig(row.guild_id);
-        if (fullConfig) guilds.push(fullConfig);
+        if (fullConfig) {
+            fullConfig.trigger_killboard = row.trigger_killboard;
+            guilds.push(fullConfig);
+        }
     }
 
     const now = new Date();
@@ -120,6 +134,14 @@ async function processKillBoards(client) {
         const isPremium = await isSubscriptionActive(guildCfg.guild_id, guildCfg.guild_name);
         if (!isPremium) {
             console.log(`[KillBoard] Guild ${guildCfg.guild_id} is not Premium. Skipping daily summary.`);
+            continue;
+        }
+
+        // Manual trigger from web dashboard
+        if (guildCfg.trigger_killboard === true) {
+            console.log(`[KillBoard] Guild ${guildCfg.guild_id} manually triggered via dashboard. Sending summary now...`);
+            await sendKillBoardSummary(client, guildCfg);
+            await supabase.from('guild_settings').update({ trigger_killboard: false }).eq('guild_id', guildCfg.guild_id);
             continue;
         }
 
@@ -179,14 +201,6 @@ async function sendKillBoardSummary(client, guildCfg) {
             // Check if our guild is the victim
             if (ev.Victim?.GuildId === targetGuildId) allDeaths.push(ev);
         }
-
-        // Helper to safely parse Albion timestamps for older Node.js versions
-        const parseAlbionTime = (ts) => {
-            if (!ts) return NaN;
-            // Truncate fractional seconds to 3 digits (e.g. .123456789Z -> .123Z)
-            const fixedTs = String(ts).replace(/(\.\d{3})\d+Z$/, '$1Z');
-            return new Date(fixedTs).getTime();
-        };
 
         // Filter to events within the last 24 hours
         const killEvents = allKills.filter(ev => {
