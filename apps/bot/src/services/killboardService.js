@@ -20,44 +20,36 @@ function getBaseUrl(server = 'Europe') {
 /**
  * Helper to fetch JSON from Albion API with retries
  */
-function fetchAlbionJson(url, retries = 2) {
-    return new Promise((resolve) => {
-        const attempt = (remaining) => {
-            const req = https.get(url, {
-                family: 4,
-                headers: {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                    'Accept': 'application/json'
-                }
-            }, (res) => {
-                let data = '';
-                res.on('data', (chunk) => data += chunk);
-                res.on('end', () => {
-                    try {
-                        if (res.statusCode !== 200) {
-                            if (remaining > 0) return setTimeout(() => attempt(remaining - 1), 1000);
-                            resolve(null);
-                            return;
-                        }
-                        resolve(JSON.parse(data));
-                    } catch (e) {
-                        if (remaining > 0) return setTimeout(() => attempt(remaining - 1), 1000);
-                        resolve(null);
-                    }
-                });
+async function fetchAlbionJson(url, retries = 2) {
+    for (let attempt = 0; attempt <= retries; attempt++) {
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
+            const res = await fetch(url, {
+                headers: { 
+                    'Accept': 'application/json',
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                },
+                cache: 'no-store',
+                signal: controller.signal
             });
-            req.on('error', () => {
-                if (remaining > 0) return setTimeout(() => attempt(remaining - 1), 1000);
-                resolve(null);
-            });
-            req.setTimeout(10000, () => {
-                req.destroy();
-                if (remaining > 0) return setTimeout(() => attempt(remaining - 1), 1000);
-                resolve(null);
-            });
-        };
-        attempt(retries);
-    });
+            clearTimeout(timeoutId);
+            if (!res.ok) {
+                if (attempt < retries) continue;
+                return null;
+            }
+            const text = await res.text();
+            if (!text || text.trim() === '') return null;
+            return JSON.parse(text);
+        } catch (e) {
+            if (attempt === retries) {
+                console.error(`[KillBoard Service] Error fetching ${url}:`, e.message);
+                return null;
+            }
+            await new Promise(r => setTimeout(r, 1000));
+        }
+    }
+    return null;
 }
 
 /**
@@ -172,7 +164,7 @@ async function processKillBoards(client) {
 
     const { data: activeConfigs } = await supabase
         .from('guild_settings')
-        .select('guild_id, trigger_killboard')
+        .select('guild_id')
         .not('killboard_channel_id', 'is', null)
         .not('albion_guild_id', 'is', null);
 
@@ -182,7 +174,6 @@ async function processKillBoards(client) {
     for (const row of activeConfigs) {
         const fullConfig = await getGuildConfig(row.guild_id);
         if (fullConfig) {
-            fullConfig.trigger_killboard = row.trigger_killboard;
             guilds.push(fullConfig);
         }
     }
@@ -195,14 +186,6 @@ async function processKillBoards(client) {
         const isPremium = await isSubscriptionActive(guildCfg.guild_id, guildCfg.guild_name);
         if (!isPremium) {
             console.log(`[KillBoard] Guild ${guildCfg.guild_id} is not Premium. Skipping daily summary.`);
-            continue;
-        }
-
-        // Manual trigger from web dashboard
-        if (guildCfg.trigger_killboard === true) {
-            console.log(`[KillBoard] Guild ${guildCfg.guild_id} manually triggered via dashboard. Sending summary now...`);
-            await sendKillBoardSummary(client, guildCfg);
-            await supabase.from('guild_settings').update({ trigger_killboard: false }).eq('guild_id', guildCfg.guild_id);
             continue;
         }
 
@@ -250,7 +233,7 @@ async function sendKillBoardSummary(client, guildCfg) {
 
         // Resolve raw ID/Name to valid 22-char Albion Guild ID
         const resolvedGuildId = await resolveGuildId(targetGuildId, guildCfg.albion_server || 'Europe');
-        const matchesGuild = createGuildMatcher(resolvedGuildId || targetGuildId, targetGuildName);
+        const matchesGuild = createGuildMatcher(resolvedGuildId || targetGuildId, targetGuildName || targetGuildId);
 
         // Fetch recent events for the guild with pagination
         const allEvents = await fetchAllGuildEvents(resolvedGuildId || targetGuildId, guildCfg.albion_server || 'Europe', sinceDate);
