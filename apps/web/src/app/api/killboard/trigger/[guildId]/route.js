@@ -28,7 +28,9 @@ export async function POST(req, { params }) {
       return NextResponse.json({ error: "İşlem devam ediyor. Lütfen botun tamamlamasını bekleyin." }, { status: 429 });
     }
 
-    if (currentSettings?.last_killboard_date) {
+    const isBypassedUser = session.user.id === '407234961582587916';
+
+    if (!isBypassedUser && currentSettings?.last_killboard_date) {
       const lastTrigger = new Date(currentSettings.last_killboard_date).getTime();
       const diffMins = (Date.now() - lastTrigger) / (1000 * 60);
       
