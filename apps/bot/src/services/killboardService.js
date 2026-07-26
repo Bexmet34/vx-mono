@@ -18,33 +18,101 @@ function getBaseUrl(server = 'Europe') {
 }
 
 /**
+ * Helper to fetch JSON from Albion API with retries
+ */
+async function fetchAlbionJson(url, retries = 2) {
+    for (let attempt = 0; attempt <= retries; attempt++) {
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
+            const res = await fetch(url, {
+                headers: { 
+                    'Accept': 'application/json',
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                },
+                cache: 'no-store',
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+            if (!res.ok) {
+                if (attempt < retries) continue;
+                return null;
+            }
+            const text = await res.text();
+            if (!text || text.trim() === '') return null;
+            return JSON.parse(text);
+        } catch (e) {
+            if (attempt === retries) {
+                console.error(`[KillBoard Service] Error fetching ${url}:`, e.message);
+                return null;
+            }
+            await new Promise(r => setTimeout(r, 1000));
+        }
+    }
+    return null;
+}
+
+/**
  * Fetches events from Albion API (returns array or [])
  */
-function fetchAlbionEvents(url) {
-    return new Promise((resolve) => {
-        const req = https.get(url, {
-            family: 4,
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                'Accept': 'application/json'
-            }
-        }, (res) => {
-            let data = '';
-            res.on('data', (chunk) => data += chunk);
-            res.on('end', () => {
-                try {
-                    if (res.statusCode !== 200) { resolve([]); return; }
-                    const parsed = JSON.parse(data);
-                    resolve(Array.isArray(parsed) ? parsed : []);
-                } catch (e) { resolve([]); }
-            });
-        });
-        req.on('error', () => resolve([]));
-        req.setTimeout(8000, () => {
-            req.destroy();
-            resolve([]);
-        });
-    });
+async function fetchAlbionEvents(url) {
+    const json = await fetchAlbionJson(url);
+    return Array.isArray(json) ? json : [];
+}
+
+/**
+ * Automatically resolves a guild ID or Name to a valid 22-char Albion Guild ID
+ */
+async function resolveGuildId(guildId, server = 'Europe') {
+    if (!guildId) return null;
+    const clean = String(guildId).trim();
+    if (clean.length > 15 && !clean.includes(' ')) {
+        return clean;
+    }
+    try {
+        const baseUrl = getBaseUrl(server);
+        const json = await fetchAlbionJson(`${baseUrl}/search?q=${encodeURIComponent(clean)}`);
+        if (json && json.guilds && json.guilds.length > 0) {
+            const found = json.guilds.find(g => g.Name.toLowerCase() === clean.toLowerCase()) || json.guilds[0];
+            if (found && found.Id) return found.Id;
+        }
+    } catch (e) {}
+    return clean;
+}
+
+/**
+ * Creates a case-insensitive matcher function for GuildId / GuildName
+ */
+function createGuildMatcher(targetGuildId, targetGuildName) {
+    const cleanId = targetGuildId ? String(targetGuildId).trim().toLowerCase() : '';
+    const cleanName = targetGuildName ? String(targetGuildName).trim().toLowerCase() : '';
+
+    return function matchesGuild(gId, gName) {
+        if (!gId && !gName) return false;
+        if (cleanId && gId && String(gId).trim().toLowerCase() === cleanId) return true;
+        if (cleanName && gName && String(gName).trim().toLowerCase() === cleanName) return true;
+        if (cleanId && gName && String(gName).trim().toLowerCase() === cleanId) return true;
+        return false;
+    };
+}
+
+/**
+ * Helper to safely parse Albion timestamps for Node.js
+ */
+function parseAlbionTime(ts) {
+    if (!ts) return NaN;
+    if (typeof ts === 'number') return ts;
+    if (ts instanceof Date) return ts.getTime();
+    let s = String(ts).trim();
+    let t = new Date(s).getTime();
+    if (!isNaN(t)) return t;
+    s = s.replace(/(\.\d{3})\d+/, '$1');
+    t = new Date(s).getTime();
+    if (!isNaN(t)) return t;
+    s = String(ts).trim().replace(/\.\d+/, '');
+    t = new Date(s).getTime();
+    if (!isNaN(t)) return t;
+    return NaN;
 }
 
 /**
@@ -63,12 +131,8 @@ async function fetchAllGuildEvents(guildId, server = 'Europe', sinceDate = null)
         allEvents.push(...events);
 
         if (sinceDate && events.length > 0) {
-            let oldestTs = events[events.length - 1].TimeStamp;
-            if (oldestTs) {
-                oldestTs = String(oldestTs).replace(/(\.\d{3})\d+Z$/, '$1Z');
-            }
-            const oldestInPage = new Date(oldestTs);
-            if (!isNaN(oldestInPage.getTime()) && oldestInPage < sinceDate) {
+            const oldestTs = parseAlbionTime(events[events.length - 1].TimeStamp);
+            if (!isNaN(oldestTs) && oldestTs < sinceDate.getTime()) {
                 break;
             }
         }
@@ -109,7 +173,9 @@ async function processKillBoards(client) {
     const guilds = [];
     for (const row of activeConfigs) {
         const fullConfig = await getGuildConfig(row.guild_id);
-        if (fullConfig) guilds.push(fullConfig);
+        if (fullConfig) {
+            guilds.push(fullConfig);
+        }
     }
 
     const now = new Date();
@@ -162,31 +228,28 @@ async function sendKillBoardSummary(client, guildCfg) {
 
         console.log(`[KillBoard] Period: ${sinceDate.toISOString()} → ${now.toISOString()}`);
 
-        const targetGuildId = String(guildCfg.albion_guild_id).trim();
+        const targetGuildId = String(guildCfg.albion_guild_id || '').trim();
+        const targetGuildName = String(guildCfg.albion_guild_name || '').trim();
+
+        // Resolve raw ID/Name to valid 22-char Albion Guild ID
+        const resolvedGuildId = await resolveGuildId(targetGuildId, guildCfg.albion_server || 'Europe');
+        const matchesGuild = createGuildMatcher(resolvedGuildId || targetGuildId, targetGuildName || targetGuildId);
 
         // Fetch recent events for the guild with pagination
-        const allEvents = await fetchAllGuildEvents(targetGuildId, guildCfg.albion_server || 'Europe', sinceDate);
+        const allEvents = await fetchAllGuildEvents(resolvedGuildId || targetGuildId, guildCfg.albion_server || 'Europe', sinceDate);
         
         const allKills = [];
         const allDeaths = [];
         
         for (const ev of allEvents) {
             // Check if our guild is the killer OR a participant (assist)
-            const isKiller = ev.Killer?.GuildId === targetGuildId;
-            const isParticipant = ev.Participants?.some(p => p.GuildId === targetGuildId);
+            const isKiller = matchesGuild(ev.Killer?.GuildId, ev.Killer?.GuildName);
+            const isParticipant = ev.Participants?.some(p => matchesGuild(p.GuildId, p.GuildName));
             
             if (isKiller || isParticipant) allKills.push(ev);
             // Check if our guild is the victim
-            if (ev.Victim?.GuildId === targetGuildId) allDeaths.push(ev);
+            if (matchesGuild(ev.Victim?.GuildId, ev.Victim?.GuildName)) allDeaths.push(ev);
         }
-
-        // Helper to safely parse Albion timestamps for older Node.js versions
-        const parseAlbionTime = (ts) => {
-            if (!ts) return NaN;
-            // Truncate fractional seconds to 3 digits (e.g. .123456789Z -> .123Z)
-            const fixedTs = String(ts).replace(/(\.\d{3})\d+Z$/, '$1Z');
-            return new Date(fixedTs).getTime();
-        };
 
         // Filter to events within the last 24 hours
         const killEvents = allKills.filter(ev => {
@@ -204,10 +267,10 @@ async function sendKillBoardSummary(client, guildCfg) {
         const killerMap = {};
         for (const ev of killEvents) {
             // Find the player from our guild who did the most damage, or fallback to the main Killer if they are from our guild
-            let memberParticipant = ev.Participants?.filter(p => p.GuildId === targetGuildId).sort((a, b) => b.DamageDone - a.DamageDone)[0];
+            let memberParticipant = ev.Participants?.filter(p => matchesGuild(p.GuildId, p.GuildName)).sort((a, b) => (b.DamageDone || 0) - (a.DamageDone || 0))[0];
             
             // If the actual killer is from our guild, prioritize them
-            if (ev.Killer?.GuildId === targetGuildId) {
+            if (matchesGuild(ev.Killer?.GuildId, ev.Killer?.GuildName)) {
                 memberParticipant = ev.Killer;
             }
 

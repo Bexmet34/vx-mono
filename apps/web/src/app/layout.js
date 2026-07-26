@@ -102,13 +102,11 @@ export default async function RootLayout({ children }) {
   return (
     <html lang={lang} className={`dark ${sora.variable}`}>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <script
-          async
+        <Script
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1315540294941790"
           crossOrigin="anonymous"
-        ></script>
+          strategy="afterInteractive"
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
