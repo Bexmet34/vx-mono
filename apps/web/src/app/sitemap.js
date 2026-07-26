@@ -57,6 +57,24 @@ export default function sitemap() {
       priority: 0.5,
     },
     {
+      url: 'https://veyronix.com.tr/premium',
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    {
+      url: 'https://veyronix.com.tr/killboard',
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.8,
+    },
+    {
+      url: 'https://veyronix.com.tr/vote',
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
       url: 'https://veyronix.com.tr/changelog',
       lastModified: new Date(),
       changeFrequency: 'weekly',
