@@ -130,7 +130,7 @@ export default function CommandsSection({ gifs = [] }) {
             >
               <X size={20} />
             </button>
-            <h3 className="font-headline-md text-on-surface mb-3 uppercase text-primary-container">/{activeGifModal} Önizleme</h3>
+            <h3 className="font-headline-md mb-3 uppercase text-primary-container">/{activeGifModal} Önizleme</h3>
             <Image 
               src={`/gif/${activeGifModal}.gif`} 
               alt={`${activeGifModal} command demo`} 
