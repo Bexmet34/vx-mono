@@ -25,9 +25,54 @@ export const viewport = {
 
 export const metadata = {
   metadataBase: new URL("https://veyronix.com.tr"),
-  title: "Veyronix – #1 Albion Online Discord Botu | Otomatik Killboard & Parti Kurucu",
-  description: "Albion Online loncanızı otomatize edin! Gelişmiş ZvZ parti kurucu, canlı Killboard takibi, otomatik rol yönetimi ve Türkçe/İngilizce web panel desteği sunan #1 Discord botu. Hemen ücretsiz deneyin!",
-  keywords: "Albion Online Discord Bot, Albion Party Finder, Albion Killboard Bot, Discord ZvZ Builder, ZvZ Party, Albion Online Guild Management, Albion Discord, Türkçe Albion Botu",
+  title: {
+    default: "Veyronix – #1 Albion Online Discord Botu | Otomatik Killboard & Parti Kurucu",
+    template: "%s | Veyronix Albion Online Discord Bot",
+  },
+  description: "Albion Online loncanızı otomatize edin! Gelişmiş ZvZ parti kurucu, canlı Killboard takibi, otomatik rol yönetimi, oyuncu istatistikleri ve Türkçe/İngilizce web panel desteği sunan #1 Discord botu. Hemen ücretsiz deneyin!",
+  keywords: [
+    "Albion Online Discord Bot",
+    "Albion Online Bot",
+    "Albion Online Killboard Bot",
+    "Albion Online Party Finder",
+    "Albion Online ZvZ Builder",
+    "Albion ZvZ Party Maker",
+    "Albion Online Guild Management",
+    "Albion Discord Botu",
+    "Albion Online Türkçe Bot",
+    "Albion Online Otomatik Rol",
+    "Albion Online Discord Kayıt",
+    "Albion Online Player Tracker",
+    "Albion Online PvP Stats Bot",
+    "Veyronix Albion Bot",
+    "Veyronix Discord Bot",
+    "Albion Guild Bot",
+    "Albion Online Loot Split Bot",
+    "Albion Event Manager",
+    "Albion Discord Verification",
+    "Albion Online Kill Log"
+  ].join(", "),
+  authors: [{ name: "Veyronix Team", url: "https://veyronix.com.tr" }],
+  creator: "Veyronix",
+  publisher: "Veyronix",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  alternates: {
+    canonical: "https://veyronix.com.tr",
+    languages: {
+      "tr-TR": "https://veyronix.com.tr",
+      "en-US": "https://veyronix.com.tr",
+    },
+  },
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -48,6 +93,7 @@ export const metadata = {
       },
     ],
     locale: "tr_TR",
+    alternateLocale: ["en_US"],
     type: "website",
   },
   twitter: {
@@ -66,12 +112,13 @@ export const metadata = {
 };
 
 export default async function RootLayout({ children }) {
-  const jsonLd = {
+  const jsonLdSoftware = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'Veyronix',
+    name: 'Veyronix - Albion Online Discord Bot',
     operatingSystem: 'Discord, Web, iOS, Android',
     applicationCategory: 'GameApplication',
+    applicationSubCategory: 'Discord Bot',
     url: 'https://veyronix.com.tr',
     description: 'Albion Online loncanızı otomatize edin! Gelişmiş ZvZ parti kurucu, canlı Killboard takibi, otomatik rol yönetimi ve Türkçe/İngilizce web panel desteği sunan #1 Discord botu.',
     offers: {
@@ -84,6 +131,25 @@ export default async function RootLayout({ children }) {
       ratingValue: '4.9',
       reviewCount: '128',
     },
+    featureList: [
+      'Otomatik Killboard Takibi & Duyuru',
+      'ZvZ & PvE Parti Kurucu (Party Finder)',
+      'Otomatik Discord Rol Yönetimi & API Kayıt',
+      'Türkçe & İngilizce Web Kontrol Paneli',
+      'Lonca Başvuru & Ticket Yönetimi'
+    ]
+  };
+
+  const jsonLdOrg = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Veyronix',
+    url: 'https://veyronix.com.tr',
+    logo: 'https://veyronix.com.tr/og-image.png',
+    sameAs: [
+      'https://discord.gg/D6T3t4beqa',
+      'https://top.gg/bot/1082239904169336902'
+    ]
   };
 
   const jsonLdFaq = {
@@ -126,6 +192,7 @@ export default async function RootLayout({ children }) {
         <link rel="manifest" href="/manifest.json" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        {/* Google Analytics (GA4) */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-RZJEDGLGQY"
           strategy="afterInteractive"
@@ -138,14 +205,20 @@ export default async function RootLayout({ children }) {
             gtag('config', 'G-RZJEDGLGQY');
           `}
         </Script>
+        {/* Google AdSense */}
         <Script
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1315540294941790"
           crossOrigin="anonymous"
           strategy="afterInteractive"
         />
+        {/* Schema.org Structured Data */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdSoftware) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdOrg) }}
         />
         <script
           type="application/ld+json"

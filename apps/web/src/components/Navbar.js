@@ -194,6 +194,7 @@ export default function Navbar({ isStatic = false }) {
                           alt="Avatar" 
                           width="40"
                           height="40"
+                          onError={(e) => { e.currentTarget.src = 'https://cdn.discordapp.com/embed/avatars/0.png'; }}
                           className="w-10 h-10 rounded-full border-2 border-outline-variant group-hover:border-primary-container relative z-10 transition-colors duration-300 object-cover" 
                         />
                       </div>

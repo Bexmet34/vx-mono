@@ -2,7 +2,6 @@ import fs from 'fs';
 import path from 'path';
 import { supabase } from "@veyronix/database";
 
-import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/home/HeroSection";
 import FeaturesSection from "@/components/home/FeaturesSection";
 import CommandsSection from "@/components/home/CommandsSection";
@@ -98,9 +97,7 @@ export default async function Home() {
   const activeCampaigns = await getActiveCampaigns();
 
   return (
-    <>
-      <Navbar />
-      <main className="pt-24 min-h-screen">
+    <main className="min-h-screen">
         {/* HERO SECTION */}
         <HeroSection />
 
