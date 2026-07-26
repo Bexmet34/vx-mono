@@ -26,6 +26,12 @@ export default function Navbar({ isStatic = false }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
+  useEffect(() => {
+    const handleOpenMenu = () => setIsMenuOpen(true);
+    window.addEventListener("open-mobile-menu", handleOpenMenu);
+    return () => window.removeEventListener("open-mobile-menu", handleOpenMenu);
+  }, []);
+
   // #14 — Ödeme geçmişi state
   const [showPaymentHistory, setShowPaymentHistory] = useState(false);
   const [paymentHistory, setPaymentHistory] = useState([]);

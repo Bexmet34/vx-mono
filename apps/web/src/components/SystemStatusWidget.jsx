@@ -117,7 +117,7 @@ export default function SystemStatusWidget() {
   return (
     <div 
       ref={widgetRef}
-      className={`fixed bottom-6 left-6 z-40 flex flex-col items-start transition-all duration-300 pointer-events-none ${
+      className={`fixed bottom-24 left-4 md:bottom-6 md:left-6 z-40 flex flex-col items-start transition-all duration-300 pointer-events-none ${
         isAtBottom ? 'opacity-0 translate-y-10' : 'opacity-100 translate-y-0'
       }`}
     >
