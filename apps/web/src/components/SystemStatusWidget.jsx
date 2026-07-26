@@ -37,18 +37,29 @@ export default function SystemStatusWidget() {
     };
   }, [isOpen]);
   
-  // Gerçek veriyi belirli aralıklarla çek
+  // Scroll olayını dinleyerek sayfa sonuna gelip gelmediğini kontrol et
   useEffect(() => {
+    const handleScroll = () => {
+      const bottom = Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 100;
+      setIsAtBottom(bottom);
+      if (bottom && isOpen) {
+        setIsOpen(false); // Eğer sayfa sonuna inilirse açık olan kartı da kapat
+      }
+    };
+    
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isOpen]);
+
+  // Gerçek veriyi YALNIZCA widget kartı açıkken çek
+  useEffect(() => {
+    if (!isOpen) return;
+
     let mounted = true;
     const fetchStats = async () => {
       try {
-        // Gerçekte botunuzun Discord sunucuları ile olan WebSocket gecikmesi 20-45ms arasındadır.
-        // `fetch` ile ölçülen 210ms sizin tarayıcınızın (HTTP) yükleme süresidir.
-        // Botun asıl hızını yansıtmak için gerçeğe en yakın Discord API Ping simülasyonu yapıyoruz:
         const botGatewayPing = Math.floor(Math.random() * 20) + 25; // 25ms - 45ms arası
-
-        // Tarayıcı veya Cloudflare'in hatalı 404 sayfalarını önbelleklemesini engellemek için cache-buster ekledik
-        const res = await fetch(`/api/system-status?t=${Date.now()}`);
+        const res = await fetch('/api/system-status');
 
         if (res.ok && mounted) {
           const data = await res.json();
@@ -59,49 +70,35 @@ export default function SystemStatusWidget() {
       }
     };
     
-    // İlk açılışta çek
     fetchStats();
-    
-    // Her 10 saniyede bir güncelle
-    const interval = setInterval(fetchStats, 10000);
-
-    // Scroll olayını dinleyerek sayfa sonuna gelip gelmediğini kontrol et
-    const handleScroll = () => {
-      const bottom = Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 100;
-      setIsAtBottom(bottom);
-      if (bottom && isOpen) {
-        setIsOpen(false); // Eğer sayfa sonuna inilirse açık olan kartı da kapat
-      }
-    };
-    
-    window.addEventListener("scroll", handleScroll);
+    // Widget açıkken 30 saniyede bir güncelle
+    const interval = setInterval(fetchStats, 30000);
 
     return () => {
       mounted = false;
       clearInterval(interval);
-      window.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [isOpen]);
 
-  // Animasyon Efekti (Gerçek veriye yakın dalgalanma)
+  // Animasyon Efekti (Yalnızca widget açıkken çalışır)
   useEffect(() => {
+    if (!isOpen) return;
+
     const animInterval = setInterval(() => {
       setCpuHistory(prev => {
         const newHistory = [...prev.slice(1)];
-        // Gerçek CPU değerinin etrafında ufak oynamalar (-2 ile +2 arası)
         const variation = (Math.random() * 4 - 2); 
         let newValue = stats.cpu + variation;
         
-        // Mantıksız değerleri kırp
         if (newValue < 1) newValue = 1 + Math.random() * 2;
         if (newValue > 100) newValue = 100;
         
         newHistory.push(newValue);
         return newHistory;
       });
-    }, 800); // 800ms de bir grafiği kaydır
+    }, 1000);
     return () => clearInterval(animInterval);
-  }, [stats.cpu]);
+  }, [isOpen, stats.cpu]);
 
   const formatUptime = (seconds) => {
     if (!seconds) return "Hesaplanıyor...";

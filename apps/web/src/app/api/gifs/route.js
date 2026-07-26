@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // Cache for 1 hour
 
 export async function GET() {
   try {
@@ -19,7 +19,11 @@ export async function GET() {
       .filter(file => file.endsWith('.gif'))
       .map(file => file.replace('.gif', ''));
 
-    return NextResponse.json(gifs);
+    return NextResponse.json(gifs, {
+      headers: {
+        'Cache-Control': 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800',
+      },
+    });
   } catch (error) {
     console.error("Error reading gifs directory:", error);
     return NextResponse.json([]);

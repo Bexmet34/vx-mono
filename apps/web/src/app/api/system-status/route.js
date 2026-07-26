@@ -1,10 +1,7 @@
 import { NextResponse } from 'next/server';
 import os from 'os';
 
-export const revalidate = 5; // Cache for 5 seconds to prevent VPS exhaustion
-
-export const runtime = 'nodejs'; // Ensure Node.js runtime
-export const dynamic = 'force-dynamic'; // Ensure no static caching issues
+export const revalidate = 15; // Cache for 15 seconds
 
 export async function GET() {
   try {
@@ -31,13 +28,20 @@ export async function GET() {
 
     const cpuUsagePercent = Math.min(Math.max(rawCpuUsage, 0), 100);
 
-    return NextResponse.json({
-      cpu: parseFloat(cpuUsagePercent.toFixed(1)) || 0,
-      ram: parseFloat(memoryUsagePercent.toFixed(1)) || 0,
-      uptime: uptime,
-      usedMemMb: parseInt((usedMem / 1024 / 1024).toFixed(0)) || 0,
-      totalMemMb: parseInt((totalMem / 1024 / 1024).toFixed(0)) || 0,
-    });
+    return NextResponse.json(
+      {
+        cpu: parseFloat(cpuUsagePercent.toFixed(1)) || 0,
+        ram: parseFloat(memoryUsagePercent.toFixed(1)) || 0,
+        uptime: uptime,
+        usedMemMb: parseInt((usedMem / 1024 / 1024).toFixed(0)) || 0,
+        totalMemMb: parseInt((totalMem / 1024 / 1024).toFixed(0)) || 0,
+      },
+      {
+        headers: {
+          'Cache-Control': 'public, max-age=15, s-maxage=30, stale-while-revalidate=60',
+        },
+      }
+    );
   } catch (error) {
     console.error("System Status API Error:", error);
     return NextResponse.json({ error: "Failed to fetch stats", details: String(error) }, { status: 500 });

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // Cache for 1 hour
 
 export async function GET() {
   try {
@@ -30,7 +30,11 @@ export async function GET() {
         };
       });
 
-    return NextResponse.json(blogs);
+    return NextResponse.json(blogs, {
+      headers: {
+        'Cache-Control': 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800',
+      },
+    });
   } catch (error) {
     console.error("Blog API Error:", error);
     return NextResponse.json([]);

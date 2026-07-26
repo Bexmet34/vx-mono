@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabase } from "@veyronix/database";
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300; // Cache for 5 minutes
 
 export async function GET() {
   try {
@@ -26,7 +26,11 @@ export async function GET() {
       .map(g => g.guild_name)
       .filter(name => name && name.trim() !== '' && name.toLowerCase() !== 'unknown');
 
-    return NextResponse.json(serverNames);
+    return NextResponse.json(serverNames, {
+      headers: {
+        'Cache-Control': 'public, max-age=300, s-maxage=1800, stale-while-revalidate=3600',
+      },
+    });
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

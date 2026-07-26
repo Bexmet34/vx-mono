@@ -14,7 +14,14 @@ export async function GET() {
       return NextResponse.json({ count: 0 }, { status: 500 });
     }
 
-    return NextResponse.json({ count: count || 0 });
+    return NextResponse.json(
+      { count: count || 0 },
+      {
+        headers: {
+          'Cache-Control': 'public, max-age=60, s-maxage=300, stale-while-revalidate=600',
+        },
+      }
+    );
   } catch (err) {
     return NextResponse.json({ count: 0 }, { status: 500 });
   }
