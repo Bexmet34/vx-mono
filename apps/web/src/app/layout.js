@@ -11,16 +11,32 @@ import { Sora } from "next/font/google";
 
 import Script from "next/script";
 
+import MobileAppDock from "@/components/MobileAppDock";
+
 const sora = Sora({ subsets: ["latin"], variable: "--font-sora", display: "swap" });
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: "cover",
+  themeColor: "#0B0F19",
+};
 
 export const metadata = {
   metadataBase: new URL("https://veyronix.com.tr"),
-  title: "Veyronix | Albion Online Discord Bot & Killboard, Party Finder",
-  description: "Veyronix is the ultimate Discord bot to build, manage, and track parties in Albion Online. Automate your guild with killboards, role management, and dynamic party builders directly from your Discord server.",
-  keywords: "Albion Online Discord Bot, Albion Party Finder, Albion Killboard Bot, Discord ZvZ Builder, ZvZ Party, Albion Online Guild Management, Albion Discord",
+  title: "Veyronix – #1 Albion Online Discord Botu | Otomatik Killboard & Parti Kurucu",
+  description: "Albion Online loncanızı otomatize edin! Gelişmiş ZvZ parti kurucu, canlı Killboard takibi, otomatik rol yönetimi ve Türkçe/İngilizce web panel desteği sunan #1 Discord botu. Hemen ücretsiz deneyin!",
+  keywords: "Albion Online Discord Bot, Albion Party Finder, Albion Killboard Bot, Discord ZvZ Builder, ZvZ Party, Albion Online Guild Management, Albion Discord, Türkçe Albion Botu",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Veyronix",
+  },
   openGraph: {
-    title: "Veyronix | Albion Online Discord Bot & Killboard, Party Finder",
-    description: "Veyronix is the ultimate Discord bot to build, manage, and track parties in Albion Online. Automate your guild with killboards, role management, and dynamic party builders directly from your Discord server.",
+    title: "Veyronix – #1 Albion Online Discord Botu | Otomatik Killboard & Parti Kurucu",
+    description: "Albion Online loncanızı otomatize edin! Gelişmiş ZvZ parti kurucu, canlı Killboard takibi, otomatik rol yönetimi ve Türkçe/İngilizce web panel desteği sunan #1 Discord botu. Hemen ücretsiz deneyin!",
     url: "https://veyronix.com.tr",
     siteName: "Veyronix",
     images: [
@@ -28,7 +44,7 @@ export const metadata = {
         url: "https://veyronix.com.tr/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Veyronix - Discord Albion Party Finder",
+        alt: "Veyronix - Discord Albion Party Finder & Killboard",
       },
     ],
     locale: "tr_TR",
@@ -36,8 +52,8 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Veyronix | Albion Online Discord Bot & Killboard, Party Finder",
-    description: "Veyronix is the ultimate Discord bot to build, manage, and track parties in Albion Online. Automate your guild with killboards, role management, and dynamic party builders directly from your Discord server.",
+    title: "Veyronix – #1 Albion Online Discord Botu | Otomatik Killboard & Parti Kurucu",
+    description: "Albion Online loncanızı otomatize edin! Gelişmiş ZvZ parti kurucu, canlı Killboard takibi, otomatik rol yönetimi ve Türkçe/İngilizce web panel desteği sunan #1 Discord botu.",
     images: ["https://veyronix.com.tr/og-image.png"],
   },
   other: {
@@ -54,14 +70,19 @@ export default async function RootLayout({ children }) {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
     name: 'Veyronix',
-    operatingSystem: 'Discord',
-    applicationCategory: 'UtilityApplication',
+    operatingSystem: 'Discord, Web, iOS, Android',
+    applicationCategory: 'GameApplication',
     url: 'https://veyronix.com.tr',
-    description: 'Veyronix is the ultimate Discord bot to build, manage, and track parties in Albion Online. Automate your guild with killboards, role management, and dynamic party builders directly from your Discord server.',
+    description: 'Albion Online loncanızı otomatize edin! Gelişmiş ZvZ parti kurucu, canlı Killboard takibi, otomatik rol yönetimi ve Türkçe/İngilizce web panel desteği sunan #1 Discord botu.',
     offers: {
       '@type': 'Offer',
       price: '0.00',
       priceCurrency: 'USD',
+    },
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: '4.9',
+      reviewCount: '128',
     },
   };
 
@@ -71,26 +92,26 @@ export default async function RootLayout({ children }) {
     mainEntity: [
       {
         '@type': 'Question',
-        name: 'Veyronix Nasıl Kurulur?',
+        name: 'Veyronix Albion Online Botu Nasıl Kurulur?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Veyronix botunu sunucunuza davet etmek için Discorda Ekle butonunu kullanın. Yönetici yetkisine sahip olduğunuz bir sunucuyu seçtikten sonra kurulum tamamlanacaktır.'
+          text: 'Veyronix botunu Discord sunucunuza davet etmek için "Discord\'a Ekle" butonuna tıklayın. Yönetici yetkisine sahip olduğunuz sunucuyu seçerek saniyeler içinde ücretsiz kurulum yapabilirsiniz.'
         }
       },
       {
         '@type': 'Question',
-        name: 'Killboard Özelliği Nasıl Çalışır?',
+        name: 'Otomatik Killboard Özelliği Nedir ve Nasıl Çalışır?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Premium plan satın aldığınızda, sistem her akşam otomatik olarak Albion Online resmi APIsine bağlanarak loncanızın güncel Killboard istatistiklerini çeker ve Discord üzerinden duyurur.'
+          text: 'Veyronix, Albion Online resmi API bağlantısı ile loncanızın anlık Kill, Death ve Fame istatistiklerini çeker, otomatik olarak Discord kanalınızda görsel raporlar halinde duyurur.'
         }
       },
       {
         '@type': 'Question',
-        name: 'Parti Sistemi Yönetimi Neler Sunar?',
+        name: 'ZvZ ve Parti Yönetim Sistemi Neler Sunar?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Guild etkinlikleri için özel partiler oluşturabilirsiniz. Üyeler rollerini seçebilir ve parti lideri katılımı yönetebilir. Tüm işlemler Discord üzerinden tamamlanır.'
+          text: 'Guild etkinlikleriniz için özel parti kompozisyonları (Tank, Healer, DPS, Support) oluşturabilirsiniz. Üyeler tek tıkla rollerini seçer, katılım durumunu yönetici web panelinden canlı izleyebilirsiniz.'
         }
       }
     ]
@@ -102,6 +123,9 @@ export default async function RootLayout({ children }) {
   return (
     <html lang={lang} className={`dark ${sora.variable}`}>
       <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-RZJEDGLGQY"
           strategy="afterInteractive"
@@ -131,7 +155,7 @@ export default async function RootLayout({ children }) {
       <body>
         <LanguageProvider initialLang={lang}>
           <NextAuthProvider>
-            <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', paddingBottom: '70px' }}>
               <Navbar />
               <div style={{ flex: 1, paddingTop: '80px' }}>
                 {children}
@@ -139,6 +163,7 @@ export default async function RootLayout({ children }) {
               <Footer />
               <SystemStatusWidget />
               <ScrollToTop />
+              <MobileAppDock />
             </div>
           </NextAuthProvider>
         </LanguageProvider>

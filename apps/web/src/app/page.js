@@ -9,7 +9,27 @@ import { useSession, signIn } from "next-auth/react";
 export default function Home() {
   const { lang, t } = useLanguage();
   const [isVideoMuted, setIsVideoMuted] = useState(true);
+  const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
   const videoRef = useRef(null);
+  const videoContainerRef = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setShouldLoadVideo(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (videoContainerRef.current) {
+      observer.observe(videoContainerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
 
   const toggleMute = () => {
     if (videoRef.current) {
@@ -181,7 +201,7 @@ export default function Home() {
           </div>
           
           {/* Promotional Video */}
-          <div className="mb-16 max-w-4xl mx-auto rounded-xl overflow-hidden shadow-[0_0_50px_rgba(255,215,0,0.15)] border border-primary-container/30 relative group cursor-pointer" onClick={toggleMute}>
+          <div ref={videoContainerRef} className="mb-16 max-w-4xl mx-auto rounded-xl overflow-hidden shadow-[0_0_50px_rgba(255,215,0,0.15)] border border-primary-container/30 relative group cursor-pointer" onClick={toggleMute}>
             <div className="absolute inset-0 bg-primary-container/10 mix-blend-overlay pointer-events-none group-hover:opacity-0 transition-opacity duration-500"></div>
             
             {/* Custom Sound Toggle Overlay */}
@@ -190,18 +210,24 @@ export default function Home() {
               <span className="font-label-bold text-sm hidden md:block">{isVideoMuted ? (lang === 'tr' ? 'Sesi Aç' : 'Unmute') : (lang === 'tr' ? 'Sesi Kapat' : 'Mute')}</span>
             </div>
 
-            <video 
-              ref={videoRef}
-              autoPlay 
-              loop 
-              muted 
-              playsInline 
-              className="w-full h-auto object-cover"
-            >
-              <source src="/videos/tanitim.mp4" type="video/mp4" />
-              <track kind="captions" src="/placeholder.vtt" srcLang="tr" label="Türkçe" />
-              Tarayıcınız video etiketini desteklemiyor.
-            </video>
+            {shouldLoadVideo ? (
+              <video 
+                ref={videoRef}
+                autoPlay 
+                loop 
+                muted 
+                playsInline 
+                className="w-full h-auto object-cover"
+              >
+                <source src="/videos/tanitim.mp4" type="video/mp4" />
+                <track kind="captions" src="/placeholder.vtt" srcLang="tr" label="Türkçe" />
+                Tarayıcınız video etiketini desteklemiyor.
+              </video>
+            ) : (
+              <div className="w-full aspect-video bg-surface-container-highest flex items-center justify-center text-primary-container">
+                <Loader2 className="animate-spin text-primary-container" size={36} />
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 md:auto-rows-[minmax(220px,auto)] max-w-5xl mx-auto">
