@@ -103,6 +103,18 @@ export default async function RootLayout({ children }) {
     <html lang={lang} className={`dark ${sora.variable}`}>
       <head>
         <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-RZJEDGLGQY"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-RZJEDGLGQY');
+          `}
+        </Script>
+        <Script
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1315540294941790"
           crossOrigin="anonymous"
           strategy="afterInteractive"
