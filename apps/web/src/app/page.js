@@ -122,6 +122,5 @@ export default async function Home() {
         {/* HOW IT WORKS & FAQ */}
         <FaqSection />
       </main>
-    </>
   );
 }
