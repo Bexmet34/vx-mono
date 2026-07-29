@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import CtaBanner from "@/components/CtaBanner";
 import PlayerAnalyticsClient from "./PlayerAnalyticsClient";
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300; // Cache page for 5 minutes (ISR)
 
 const REGIONS = {
   europe: "https://gameinfo-ams.albiononline.com/api/gameinfo",
@@ -15,7 +15,7 @@ async function getPlayer(server, playerId) {
   const baseUrl = REGIONS[server.toLowerCase()] || REGIONS.europe;
   try {
     const res = await fetch(`${baseUrl}/players/${playerId}`, {
-      cache: "no-store",
+      next: { revalidate: 300 },
     });
     if (!res.ok) return null;
     return res.json();
@@ -25,7 +25,7 @@ async function getPlayer(server, playerId) {
   }
 }
 
-// Fetch Comprehensive Player Kills, Deaths & Guild/Server Assists (Up to 750+ events scanned)
+// Fetch Comprehensive Player Kills, Deaths & Guild/Server Assists (Optimized offsets)
 async function getPlayerMatches(server, playerId, guildId, playerName) {
   const baseUrl = REGIONS[server.toLowerCase()] || REGIONS.europe;
   try {
@@ -34,21 +34,22 @@ async function getPlayerMatches(server, playerId, guildId, playerName) {
       `${baseUrl}/players/${playerId}/deaths`,
     ];
 
-    // Fetch 11 pages of Guild Events (Offsets 0 to 500 = 550 events)
+    // Fetch 3 pages of Guild Events (Offsets 0 to 100)
     if (guildId) {
-      for (let offset = 0; offset <= 500; offset += 50) {
+      for (let offset = 0; offset <= 100; offset += 50) {
         urls.push(`${baseUrl}/events?offset=${offset}&limit=50&guildId=${guildId}`);
       }
     }
 
-    // Fetch 5 pages of Global Server Events (Offsets 0 to 200 = 250 events)
-    for (let offset = 0; offset <= 200; offset += 50) {
+    // Fetch 2 pages of Global Server Events (Offsets 0 to 50)
+    for (let offset = 0; offset <= 50; offset += 50) {
       urls.push(`${baseUrl}/events?offset=${offset}&limit=50`);
     }
 
     const responses = await Promise.all(
-      urls.map((url) => fetch(url, { cache: "no-store" }).catch(() => null))
+      urls.map((url) => fetch(url, { next: { revalidate: 300 } }).catch(() => null))
     );
+
 
     const eventsMap = new Map();
     const targetName = (playerName || "").toLowerCase();

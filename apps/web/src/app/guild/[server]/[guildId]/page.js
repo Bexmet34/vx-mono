@@ -4,7 +4,7 @@ import CtaBanner from "@/components/CtaBanner";
 import Link from "next/link";
 import { Shield, Users, Sword, Skull } from "lucide-react";
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 600; // Cache guild page for 10 minutes (ISR)
 
 const REGIONS = {
   europe: "https://gameinfo-ams.albiononline.com/api/gameinfo",
@@ -17,7 +17,7 @@ async function getGuild(server, guildId) {
   const baseUrl = REGIONS[server.toLowerCase()] || REGIONS.europe;
   try {
     const res = await fetch(`${baseUrl}/guilds/${guildId}`, {
-      cache: "no-store",
+      next: { revalidate: 600 },
     });
     if (!res.ok) return null;
     return res.json();
@@ -32,8 +32,9 @@ async function getGuildMembers(server, guildId) {
   const baseUrl = REGIONS[server.toLowerCase()] || REGIONS.europe;
   try {
     const res = await fetch(`${baseUrl}/guilds/${guildId}/members`, {
-      cache: "no-store",
+      next: { revalidate: 600 },
     });
+
     if (!res.ok) return [];
     return res.json();
   } catch (err) {
