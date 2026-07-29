@@ -690,7 +690,7 @@ async function handleRegisterButtons(interaction) {
 
         // Fetch the ticket's embed to get details
         const embed = message.embeds[0];
-        if (!embed) return interaction.reply({ content: '❌ Hata: Kayıt bilgileri bulunamadı.', flags: [MessageFlags.Ephemeral] });
+        if (!embed) return interaction.reply({ content: `❌ **${t('common.error', lang)}**`, flags: [MessageFlags.Ephemeral] });
 
         let realName = '';
         let ign = '';
@@ -700,9 +700,9 @@ async function handleRegisterButtons(interaction) {
 
         // Extract from embed fields
         embed.fields.forEach(field => {
-            if (field.name.includes('Gerçek İsim')) realName = field.value;
-            if (field.name.includes('Yaş')) age = field.value;
-            if (field.name.includes('Oyun İçi Nick')) ign = field.value;
+            if (field.name.includes('Gerçek İsim') || field.name.includes('Real Name')) realName = field.value;
+            if (field.name.includes('Yaş') || field.name.includes('Age')) age = field.value;
+            if (field.name.includes('Oyun İçi Nick') || field.name.includes('In-Game Nick')) ign = field.value;
             if (field.name.includes('Albion ID')) albionId = field.value;
 
             // Extract Guild from the "Diğer" / "Others" field
@@ -723,7 +723,7 @@ async function handleRegisterButtons(interaction) {
         }
 
         if (action === 'reject') {
-            await interaction.reply({ content: `❌ Kayıt reddedildi ve kanal siliniyor...` });
+            await interaction.reply({ content: t('registration.reject_success', lang) });
             
             // Log rejection
             const logChannelId = guildConfig?.registration_log_channel_id;
@@ -731,12 +731,12 @@ async function handleRegisterButtons(interaction) {
                 const logChannel = interaction.guild.channels.cache.get(logChannelId);
                 if (logChannel) {
                     const logEmbed = new EmbedBuilder()
-                        .setTitle('❌ Kayıt Reddedildi')
+                        .setTitle(t('registration.log_rejected_title', lang))
                         .setColor('#ff4757')
                         .addFields(
-                            { name: '👤 Kullanıcı', value: `<@${targetUserId}>`, inline: true },
-                            { name: '🛡️ İsim', value: `${ign || '-'} / ${realName || '-'}`, inline: true },
-                            { name: '👮 Yetkili', value: `<@${interaction.user.id}>`, inline: true }
+                            { name: lang === 'tr' ? '👤 Kullanıcı' : '👤 User', value: `<@${targetUserId}>`, inline: true },
+                            { name: lang === 'tr' ? '🛡️ İsim' : '🛡️ Name', value: `${ign || '-'} / ${realName || '-'}`, inline: true },
+                            { name: lang === 'tr' ? '👮 Yetkili' : '👮 Staff', value: `<@${interaction.user.id}>`, inline: true }
                         )
                         .setTimestamp();
                     await logChannel.send({ embeds: [logEmbed] }).catch(()=>{});
@@ -834,10 +834,10 @@ async function handleRegisterButtons(interaction) {
                         finalGivenRoleId = givenRoleId;
                         try {
                             await targetMember.roles.add(givenRoleId);
-                            roleStatus = `\n✅ **Rol Verildi:** <@&${givenRoleId}>`;
+                            roleStatus = t('registration.role_given', lang, { role: `<@&${givenRoleId}>` });
                         } catch (e) {
                             console.error('Role add error:', e);
-                            roleStatus = `\n⚠️ **Rol Verilemedi:** Botun yetkisi bu rolü vermeye yetmiyor olabilir. (Rolü botun rolünün altına taşıyın)`;
+                            roleStatus = t('registration.role_error', lang);
                         }
                     }
 
@@ -845,7 +845,7 @@ async function handleRegisterButtons(interaction) {
                     if (fallbackRoleId && targetMember.roles.cache.has(fallbackRoleId)) {
                         try {
                             await targetMember.roles.remove(fallbackRoleId);
-                            unregRoleStatus += `\n✅ **Otomatik Kayıtsız Rolü Alındı:** <@&${fallbackRoleId}>`;
+                            unregRoleStatus += t('registration.unreg_role_removed', lang, { role: `<@&${fallbackRoleId}>` });
                         } catch (e) { console.error('Role remove error:', e); }
                     }
                     if (tempRoleId && targetMember.roles.cache.has(tempRoleId)) {
@@ -859,10 +859,10 @@ async function handleRegisterButtons(interaction) {
                         finalGivenRoleId = tempRoleId;
                         try {
                             await targetMember.roles.add(tempRoleId);
-                            roleStatus = `\n✅ **Geçici Rol Verildi:** <@&${tempRoleId}>`;
+                            roleStatus = t('registration.temp_role_given', lang, { role: `<@&${tempRoleId}>` });
                         } catch (e) {
                             console.error('Role add error:', e);
-                            roleStatus = `\n⚠️ **Rol Verilemedi:** Botun yetkisi bu rolü vermeye yetmiyor olabilir.`;
+                            roleStatus = t('registration.temp_role_error', lang);
                         }
                     }
 
@@ -870,7 +870,7 @@ async function handleRegisterButtons(interaction) {
                     if (fallbackRoleId && targetMember.roles.cache.has(fallbackRoleId)) {
                         try {
                             await targetMember.roles.remove(fallbackRoleId);
-                            unregRoleStatus = `\n✅ **Otomatik Kayıtsız Rolü Alındı:** <@&${fallbackRoleId}>`;
+                            unregRoleStatus = t('registration.unreg_role_removed', lang, { role: `<@&${fallbackRoleId}>` });
                         } catch (e) { console.error('Role remove error:', e); }
                     }
 
@@ -888,7 +888,7 @@ async function handleRegisterButtons(interaction) {
                             fallback_role_id: fallbackRoleId,
                             expires_at: expiresAt.toISOString()
                         });
-                        roleStatus += `\n⏳ **Süre:** ${durationDays} Gün`;
+                        roleStatus += t('registration.duration', lang, { days: durationDays });
                     } catch (e) {
                         console.error('Temp role save error:', e);
                     }
@@ -899,16 +899,16 @@ async function handleRegisterButtons(interaction) {
                 if (interaction.guild.ownerId !== targetUserId) {
                     try {
                         await targetMember.setNickname(newNickname);
-                        nickStatus = `\n✅ **Yeni İsim:** ${newNickname}`;
+                        nickStatus = t('registration.new_nickname', lang, { nickname: newNickname });
                     } catch (e) {
                         console.error(`[Nickname error] ${e.message} for user ${targetUserId}`);
-                        nickStatus = `\n⚠️ **İsim Değiştirilemedi:** Botun yetkisi bu kişinin ismini değiştirmeye yetmiyor. (Kullanıcının rolü botun rolünden yüksek olabilir)`;
+                        nickStatus = t('registration.nick_error', lang);
                     }
                 } else {
-                    nickStatus = `\nℹ️ Sunucu sahibinin ismi bot tarafından değiştirilemez.`;
+                    nickStatus = t('registration.owner_nick_notice', lang);
                 }
 
-                await interaction.editReply({ content: `✅ <@${targetUserId}> adlı kullanıcının kaydı onaylandı!${nickStatus}${roleStatus}${unregRoleStatus}\n\nKanal 5 saniye içinde kapatılacak.` });
+                await interaction.editReply({ content: t('registration.approve_success', lang, { user: `<@${targetUserId}>`, nickStatus, roleStatus, unregRoleStatus }) });
 
                 // Save to guild_registrations ONLY IF they are given the MAIN guild role (roleIndex === 1)
                 // We do not save Guests/Alliance (roleIndex 2 or 3) to prevent Auto-Check from kicking them.

@@ -40,8 +40,13 @@ async function checkReminders(client) {
             if (channel) {
                 const message = await channel.messages.fetch(obj.message_id).catch(() => null);
                 if (message) {
+                    const { getGuildConfig } = require('./guildConfig');
+                    const { t } = require('./i18n');
+                    const guildConfig = await getGuildConfig(channel.guildId).catch(() => null);
+                    const lang = guildConfig?.language || 'tr';
+
                     await message.reply({
-                        content: `@everyone **${obj.event_name}** (${obj.map_name}) başlamasına 5 dakika kaldı!`
+                        content: t('objective.reminder', lang, { event: obj.event_name, map: obj.map_name })
                     });
                 }
             }
@@ -73,9 +78,13 @@ async function checkExpirations(client) {
             if (channel) {
                 const message = await channel.messages.fetch(obj.message_id).catch(() => null);
                 if (message) {
+                    const { getGuildConfig } = require('./guildConfig');
+                    const guildConfig = await getGuildConfig(channel.guildId).catch(() => null);
+                    const lang = guildConfig?.language || 'tr';
+
                     const expiresAt = new Date(obj.expires_at);
-                    const closedEmbed = createObjectiveEmbed(obj.map_name, obj.event_name, expiresAt.getTime(), true);
-                    const closedButtons = createClosedObjectiveButtons();
+                    const closedEmbed = createObjectiveEmbed(obj.map_name, obj.event_name, expiresAt.getTime(), true, lang);
+                    const closedButtons = createClosedObjectiveButtons(lang);
                     
                     await message.edit({
                         embeds: [closedEmbed],
@@ -92,6 +101,7 @@ async function checkExpirations(client) {
         }
     }
 }
+
 
 module.exports = {
     initObjectiveService

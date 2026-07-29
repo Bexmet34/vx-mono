@@ -159,14 +159,14 @@ async function handleSettingsCommand(interaction) {
     const lang = guildConfig.language || 'tr';
 
     const embed = new EmbedBuilder()
-        .setTitle('⚙️ Bot Ayarları')
-        .setDescription('Lütfen botun dilini aşağıdan seçin:')
+        .setTitle(lang === 'tr' ? '⚙️ Bot Ayarları' : '⚙️ Bot Settings')
+        .setDescription(lang === 'tr' ? 'Lütfen botun dilini aşağıdan seçin:' : 'Please select the bot language below:')
         .setColor(3447003)
-        .addFields({ name: `Mevcut Dil`, value: lang === 'tr' ? '🇹🇷 Türkçe' : '🇺🇸 English', inline: true });
+        .addFields({ name: lang === 'tr' ? 'Mevcut Dil' : 'Current Language', value: lang === 'tr' ? '🇹🇷 Türkçe' : '🇺🇸 English', inline: true });
 
     const selectMenu = new StringSelectMenuBuilder()
         .setCustomId('settings_lang_select')
-        .setPlaceholder('Bir dil seçin...')
+        .setPlaceholder(lang === 'tr' ? 'Bir dil seçin...' : 'Select a language...')
         .addOptions(
             new StringSelectMenuOptionBuilder().setLabel('Türkçe 🇹🇷').setValue('tr').setEmoji('🇹🇷'),
             new StringSelectMenuOptionBuilder().setLabel('English 🇺🇸').setValue('en').setEmoji('🇺🇸')
@@ -425,7 +425,9 @@ async function handleSetupObjectiveSystemCommand(interaction) {
     const isPremium = await isSubscriptionActive(interaction.guildId, interaction.guild.name, interaction.guild.ownerId);
     if (!isPremium) {
         return await safeReply(interaction, {
-            content: `❌ **Bu özellik Veyronix Premium gerektirir!**\n\nObjektif ve Timer takip sistemini sunucunuzda kurmak için web panelimiz üzerinden sunucunuzu premium pakete yükseltin.`,
+            content: lang === 'tr' 
+                ? `❌ **Bu özellik Veyronix Premium gerektirir!**\n\nObjektif ve Timer takip sistemini sunucunuzda kurmak için web panelimiz üzerinden sunucunuzu premium pakete yükseltin.`
+                : `❌ **This feature requires Veyronix Premium!**\n\nTo set up Objective and Timer tracking on your server, upgrade your server to premium via our web panel.`,
             flags: [MessageFlags.Ephemeral]
         });
     }
@@ -452,7 +454,9 @@ async function handleSetupObjectiveSystemCommand(interaction) {
         }
 
         return await safeReply(interaction, {
-            content: `✅ **Sistem başarıyla kuruldu!**\nSetup Kanalı: <#${setupChannel.id}>\nBildirim Kanalı: <#${notifyChannel.id}>`,
+            content: lang === 'tr' 
+                ? `✅ **Sistem başarıyla kuruldu!**\nSetup Kanalı: <#${setupChannel.id}>\nBildirim Kanalı: <#${notifyChannel.id}>`
+                : `✅ **System successfully set up!**\nSetup Channel: <#${setupChannel.id}>\nNotification Channel: <#${notifyChannel.id}>`,
             flags: [MessageFlags.Ephemeral]
         });
     } else {
@@ -509,7 +513,9 @@ async function handleSetupKillBoardCommand(interaction) {
     const isPremium = await isSubscriptionActive(interaction.guildId, interaction.guild.name, interaction.guild.ownerId);
     if (!isPremium) {
         return await safeReply(interaction, {
-            content: `❌ **Bu özellik Veyronix Premium gerektirir!**\n\nGünlük otomatik KillBoard özet raporlarını aktifleştirmek için web panelimiz üzerinden sunucunuzu premium pakete yükseltin.`,
+            content: lang === 'tr'
+                ? `❌ **Bu özellik Veyronix Premium gerektirir!**\n\nGünlük otomatik KillBoard özet raporlarını aktifleştirmek için web panelimiz üzerinden sunucunuzu premium pakete yükseltin.`
+                : `❌ **This feature requires Veyronix Premium!**\n\nTo activate daily automatic KillBoard summary reports, upgrade your server to premium via our web panel.`,
             flags: [MessageFlags.Ephemeral]
         });
     }
@@ -524,7 +530,9 @@ async function handleSetupKillBoardCommand(interaction) {
 
     if (success) {
         return await safeReply(interaction, {
-            content: `✅ **KillBoard ayarlandı!**\nKanal: <#${channel.id}>\nSaat: **${time} UTC**`,
+            content: lang === 'tr'
+                ? `✅ **KillBoard ayarlandı!**\nKanal: <#${channel.id}>\nSaat: **${time} UTC**`
+                : `✅ **KillBoard configured!**\nChannel: <#${channel.id}>\nTime: **${time} UTC**`,
             flags: [MessageFlags.Ephemeral]
         });
     } else {
@@ -617,7 +625,7 @@ async function handleForceRegistrationCommand(interaction) {
             if (!registeredIds.has(memberId)) {
                 // Change nickname
                 try {
-                    const newNick = `[Kayıt Bekliyor]`;
+                    const newNick = lang === 'tr' ? `[Kayıt Bekliyor]` : `[Pending Register]`;
                     await member.setNickname(newNick).catch(()=>{});
                 } catch (nickErr) {}
 
@@ -634,7 +642,7 @@ async function handleForceRegistrationCommand(interaction) {
         }
 
         await interaction.editReply({
-            content: `✅ İşlem tamamlandı! Toplam **${affectedCount}** kayıtlı olmayan kullanıcının tüm rolleri alındı, <@&${unregRole.id}> rolü verildi ve isimleri güncellendi.`
+            content: t('registration.force_reg_done', lang, { count: affectedCount, role: `<@&${unregRole.id}>` })
         });
     } catch (err) {
         console.error('[CommandHandler] Error in handleForceRegistrationCommand:', err);

@@ -281,8 +281,9 @@ function isSelectMenuMode(roleCount) {
 /**
  * Creates buttons for an objective report
  */
-function createObjectiveButtons(objectiveId, count = 0) {
-    const label = count > 0 ? `Geliyorum (${count})` : 'Geliyorum';
+function createObjectiveButtons(objectiveId, count = 0, lang = 'tr') {
+    const btnLabel = t('objective.btn_join', lang);
+    const label = count > 0 ? `${btnLabel} (${count})` : btnLabel;
     return [
         new ActionRowBuilder().addComponents(
             new ButtonBuilder()
@@ -312,17 +313,18 @@ function createObjectiveSetupButtons(lang = 'tr') {
 /**
  * Creates buttons for a closed objective
  */
-function createClosedObjectiveButtons() {
+function createClosedObjectiveButtons(lang = 'tr') {
     return [
         new ActionRowBuilder().addComponents(
             new ButtonBuilder()
                 .setCustomId('obj_closed')
-                .setLabel('Bitti/Kapandı')
+                .setLabel(t('objective.btn_closed', lang))
                 .setStyle(ButtonStyle.Secondary)
                 .setDisabled(true)
         )
     ];
 }
+
 
 module.exports = {
     createPveButtons,

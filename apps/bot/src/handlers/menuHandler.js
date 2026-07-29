@@ -626,9 +626,10 @@ async function handleAddMemberSelect(interaction) {
     const row = new ActionRowBuilder().addComponents(userSelect);
 
     await interaction.update({
-        content: `👤 **${roleName}** rolüne eklenecek kullanıcıyı seçin:`,
+        content: lang === 'tr' ? `👤 **${roleName}** rolüne eklenecek kullanıcıyı seçin:` : `👤 Select user to add to **${roleName}** role:`,
         components: [row]
     });
+
 }
 
 async function handleAddMemberUserSelect(interaction) {

@@ -1,9 +1,13 @@
 const { MessageFlags } = require('discord.js');
+const { getGuildConfig } = require('../services/guildConfig');
 
 async function handleRoleMenuSelect(interaction) {
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     try {
+        const guildConfig = await getGuildConfig(interaction.guildId);
+        const lang = guildConfig?.language || 'tr';
+
         const selectedRoleIds = interaction.values; // Array of selected discord role IDs
         const member = interaction.member;
         
@@ -56,23 +60,28 @@ async function handleRoleMenuSelect(interaction) {
         }
 
         if (hasError) {
-            return await interaction.editReply("❌ **Rolleriniz güncellenirken bir hata oluştu.** Botun yetkilerinin bu rollerin üzerinde olduğundan ve yönetici rolleri seçmeye çalışmadığınızdan emin olun.");
+            return await interaction.editReply(lang === 'tr' 
+                ? "❌ **Rolleriniz güncellenirken bir hata oluştu.** Botun yetkilerinin bu rollerin üzerinde olduğundan ve yönetici rolleri seçmeye çalışmadığınızdan emin olun."
+                : "❌ **An error occurred while updating your roles.** Ensure bot permissions are higher than these roles.");
         }
 
-        let responseMsg = "✅ **Rolleriniz başarıyla güncellendi!**\n";
-        if (addedNames.length > 0) responseMsg += `\n➕ **Eklenen Roller:** ${addedNames.join(', ')}`;
-        if (removedNames.length > 0) responseMsg += `\n➖ **Alınan Roller:** ${removedNames.join(', ')}`;
+        let responseMsg = lang === 'tr' ? "✅ **Rolleriniz başarıyla güncellendi!**\n" : "✅ **Your roles have been updated successfully!**\n";
+        if (addedNames.length > 0) responseMsg += lang === 'tr' ? `\n➕ **Eklenen Roller:** ${addedNames.join(', ')}` : `\n➕ **Added Roles:** ${addedNames.join(', ')}`;
+        if (removedNames.length > 0) responseMsg += lang === 'tr' ? `\n➖ **Alınan Roller:** ${removedNames.join(', ')}` : `\n➖ **Removed Roles:** ${removedNames.join(', ')}`;
         
         if (addedNames.length === 0 && removedNames.length === 0) {
-            responseMsg = "ℹ️ Rollerinizde bir değişiklik yapılmadı.";
+            responseMsg = lang === 'tr' ? "ℹ️ Rollerinizde bir değişiklik yapılmadı." : "ℹ️ No changes were made to your roles.";
         }
 
         await interaction.editReply(responseMsg);
 
     } catch (err) {
         console.error('[RoleMenuHandler] Error:', err);
-        await interaction.editReply("❌ İşlem sırasında beklenmedik bir hata oluştu.").catch(() => {});
+        const guildConfig = await getGuildConfig(interaction.guildId).catch(()=>null);
+        const lang = guildConfig?.language || 'tr';
+        await interaction.editReply(lang === 'tr' ? "❌ İşlem sırasında beklenmedik bir hata oluştu." : "❌ An unexpected error occurred.").catch(() => {});
     }
 }
+
 
 module.exports = { handleRoleMenuSelect };

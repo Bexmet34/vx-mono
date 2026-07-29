@@ -162,13 +162,14 @@ async function processGuild(client, config) {
                 const logChannel = discordGuild.channels.cache.get(config.auto_check_log_channel_id);
                 if (logChannel) {
                     const lang = config.language || 'tr';
-                    const listStr = removedNames.slice(0, 20).join(', ') + (removedNames.length > 20 ? ` ...ve ${removedNames.length - 20} kişi daha` : '');
+                    const listStr = removedNames.slice(0, 20).join(', ') + (removedNames.length > 20 ? (lang === 'en' ? ` ...and ${removedNames.length - 20} more` : ` ...ve ${removedNames.length - 20} kişi daha`) : '');
                     
                     const msg = lang === 'en'
                         ? `✅ **Automatic check completed!**\nDetected **${removedCount}** members who left the guild and roles/tags were updated.\n\n**Removed Users:**\n${listStr}`
                         : `✅ **Otomatik tarama tamamlandı!**\n**${removedCount}** kişinin guildden ayrıldığı tespit edilip rolleri/tagleri güncellendi.\n\n**İşlem Yapılan Kişiler:**\n${listStr}`;
                     
                     await logChannel.send({ content: msg }).catch(()=>{});
+
                 }
             }
         } else {

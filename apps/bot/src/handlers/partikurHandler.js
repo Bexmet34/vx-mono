@@ -373,7 +373,7 @@ function getTemplateByIndex(templatesStr, indexStr) {
     }
     
     if (!template) {
-        return await interaction.editReply({ content: '❌ Hata: Şablon bulunamadı!' });
+        return await interaction.editReply({ content: lang === 'tr' ? '❌ Hata: Şablon bulunamadı!' : '❌ Error: Template not found!' });
     }
 
     const header = template.header || template.name || 'Parti';
@@ -399,10 +399,10 @@ function getTemplateByIndex(templatesStr, indexStr) {
         .filter(r => r.length > 0);
 
     if (rolesList.length === 0) {
-        return await interaction.editReply({ content: '❌ Bu şablonda hiç rol tanımlanmamış.' });
+        return await interaction.editReply({ content: lang === 'tr' ? '❌ Bu şablonda hiç rol tanımlanmamış.' : '❌ No roles defined in this template.' });
     }
 
-    await interaction.editReply({ content: '⏳ Şablon yükleniyor ve parti oluşturuluyor...' });
+    await interaction.editReply({ content: lang === 'tr' ? '⏳ Şablon yükleniyor ve parti oluşturuluyor...' : '⏳ Loading template and creating party...' });
 
     // Use shared creation logic
     const embed = createPartikurEmbed(header, rolesList, description, '', 0, interaction.guild, lang, userId, guildConfig?.embed_thumbnail_url);
@@ -473,9 +473,9 @@ function getTemplateByIndex(templatesStr, indexStr) {
             console.error('[PartikurHandler] DB Error:', err.message);
         }
         
-        await interaction.editReply({ content: '✅ Başarıyla oluşturuldu!' }).catch(()=>{});
+        await interaction.editReply({ content: lang === 'tr' ? '✅ Başarıyla oluşturuldu!' : '✅ Created successfully!' }).catch(()=>{});
     } else {
-         await interaction.editReply({ content: '❌ Parti oluşturulamadı (Mesaj gönderilemedi)!' }).catch(()=>{});
+         await interaction.editReply({ content: lang === 'tr' ? '❌ Parti oluşturulamadı (Mesaj gönderilemedi)!' : '❌ Failed to create party (Message could not be sent)!' }).catch(()=>{});
     }
 }
 

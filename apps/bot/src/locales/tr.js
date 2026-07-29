@@ -172,5 +172,55 @@ module.exports = {
         kill_format: '{medal} [**{name}**]({webUrl}/player/{server}/{id}) — `{kills}` kill | `{fame}M` fame',
         death_format: '{medal} [**{name}**]({webUrl}/player/{server}/{id}) — `{deaths}` ölüm | `{fame}M` kayıp fame',
         fame: 'Fame'
+    },
+    ticket: {
+        not_enabled: 'Ticket sistemi bu sunucuda aktif değil.',
+        select_topic_placeholder: 'Destek konunuzu seçin...',
+        select_topic_prompt: 'Lütfen hangi konuda destek almak istediğinizi seçin:',
+        creating_channel: '⏳ Ticket kanalınız oluşturuluyor...',
+        welcome_title: '🎫 Destek Talebi',
+        welcome_desc: 'Merhaba {user}, destek talebiniz oluşturuldu.\nLütfen sorununuzu detaylı bir şekilde açıklayın. Yetkililerimiz en kısa sürede size yardımcı olacaktır.',
+        topic_field: '📌 Konu (Başlık)',
+        close_button: 'Ticketı Kapat',
+        created_success: '✅ Ticket kanalınız oluşturuldu: {channel}',
+        create_error: '❌ Kanal oluşturulamadı. Botun izinlerini kontrol edin.',
+        not_found: 'Bu kanal veritabanında ticket olarak bulunamadı. Lütfen kanalı manuel olarak silin.',
+        staff_only: 'Bu ticketı sadece yetkililer kapatabilir.',
+        closing: '⏳ Ticket kapatılıyor, döküm alınıyor ve kanal siliniyor...',
+        close_error: '❌ Ticket kapatılırken bir hata oluştu.'
+    },
+    objective: {
+        title_call: '⚔️ Objektif Çağrısı!',
+        title_closed: '🔒 Objektif Kapandı',
+        field_map: 'Harita',
+        field_event: 'Objektif',
+        field_start: 'Başlangıç',
+        btn_join: 'Geliyorum',
+        btn_closed: 'Bitti/Kapandı',
+        reminder: '@everyone **{event}** ({map}) başlamasına 5 dakika kaldı!'
+    },
+    registration: {
+        approve_success: '✅ {user} adlı kullanıcının kaydı onaylandı!{nickStatus}{roleStatus}{unregRoleStatus}\n\nKanal 5 saniye içinde kapatılacak.',
+        reject_success: '❌ Kayıt reddedildi ve kanal siliniyor...',
+        log_rejected_title: '❌ Kayıt Reddedildi',
+        role_given: '\n✅ **Rol Verildi:** {role}',
+        role_error: '\n⚠️ **Rol Verilemedi:** Botun yetkisi bu rolü vermeye yetmiyor olabilir. (Rolü botun rolünün altına taşıyın)',
+        temp_role_given: '\n✅ **Geçici Rol Verildi:** {role}',
+        temp_role_error: '\n⚠️ **Rol Verilemedi:** Botun yetkisi bu rolü vermeye yetmiyor olabilir.',
+        unreg_role_removed: '\n✅ **Otomatik Kayıtsız Rolü Alındı:** {role}',
+        duration: '\n⏳ **Süre:** {days} Gün',
+        new_nickname: '\n✅ **Yeni İsim:** {nickname}',
+        nick_error: '\n⚠️ **İsim Değiştirilemedi:** Botun yetkisi bu kişinin ismini değiştirmeye yetmiyor.',
+        owner_nick_notice: '\nℹ️ Sunucu sahibinin ismi bot tarafından değiştirilemez.',
+        force_reg_done: '✅ İşlem tamamlandı! Toplam **{count}** kayıtlı olmayan kullanıcının tüm rolleri alındı, {role} rolü verildi ve isimleri güncellendi.'
+    },
+    temp_role: {
+        expired_title: '⏳ Misafir Süresi Doldu',
+        expired_desc: '**{user}** adlı kullanıcının geçici misafir süresi dolduğu için rol güncellemeleri yapıldı.',
+        role_removed: '🔴 Alınan Rol: {role}',
+        role_added: '🟢 Verilen Rol: {role}',
+        actions_field: 'Yapılan İşlemler',
+        no_action: 'İşlem gerekmedi'
     }
 };
+

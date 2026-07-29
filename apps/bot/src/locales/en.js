@@ -172,5 +172,55 @@ module.exports = {
         kill_format: '{medal} [**{name}**]({webUrl}/player/{server}/{id}) — `{kills}` kills | `{fame}M` fame',
         death_format: '{medal} [**{name}**]({webUrl}/player/{server}/{id}) — `{deaths}` deaths | `{fame}M` lost fame',
         fame: 'Fame'
+    },
+    ticket: {
+        not_enabled: 'Ticket system is not active on this server.',
+        select_topic_placeholder: 'Select your support topic...',
+        select_topic_prompt: 'Please select the topic you need help with:',
+        creating_channel: '⏳ Creating your ticket channel...',
+        welcome_title: '🎫 Support Ticket',
+        welcome_desc: 'Hello {user}, your support ticket has been created.\nPlease describe your issue in detail. Our staff will assist you shortly.',
+        topic_field: '📌 Topic',
+        close_button: 'Close Ticket',
+        created_success: '✅ Ticket channel created: {channel}',
+        create_error: '❌ Failed to create channel. Check bot permissions.',
+        not_found: 'This channel was not found as a ticket in the database. Please delete it manually.',
+        staff_only: 'Only staff can close this ticket.',
+        closing: '⏳ Closing ticket, generating transcript, and deleting channel...',
+        close_error: '❌ An error occurred while closing the ticket.'
+    },
+    objective: {
+        title_call: '⚔️ Objective Call!',
+        title_closed: '🔒 Objective Closed',
+        field_map: 'Map',
+        field_event: 'Objective',
+        field_start: 'Starts',
+        btn_join: "I'm coming",
+        btn_closed: 'Ended / Closed',
+        reminder: '@everyone **{event}** ({map}) starts in 5 minutes!'
+    },
+    registration: {
+        approve_success: '✅ Registration approved for user {user}!{nickStatus}{roleStatus}{unregRoleStatus}\n\nThe channel will be closed in 5 seconds.',
+        reject_success: '❌ Registration rejected. Deleting channel...',
+        log_rejected_title: '❌ Registration Rejected',
+        role_given: '\n✅ **Role Given:** {role}',
+        role_error: '\n⚠️ **Role Error:** Bot may lack permissions to grant this role. (Move role below bot role)',
+        temp_role_given: '\n✅ **Temp Role Given:** {role}',
+        temp_role_error: '\n⚠️ **Role Error:** Bot may lack permissions to grant this role.',
+        unreg_role_removed: '\n✅ **Auto Unregistered Role Removed:** {role}',
+        duration: '\n⏳ **Duration:** {days} Days',
+        new_nickname: '\n✅ **New Nickname:** {nickname}',
+        nick_error: '\n⚠️ **Nickname Error:** Bot lacks permission to change this user\'s nickname.',
+        owner_nick_notice: '\nℹ️ Server owner\'s nickname cannot be changed by the bot.',
+        force_reg_done: '✅ Operation completed! Total **{count}** unregistered users had all roles removed, was granted {role} role, and nicknames updated.'
+    },
+    temp_role: {
+        expired_title: '⏳ Guest Period Expired',
+        expired_desc: 'Temporary guest period for user **{user}** has expired and roles have been updated.',
+        role_removed: '🔴 Removed Role: {role}',
+        role_added: '🟢 Added Role: {role}',
+        actions_field: 'Actions Taken',
+        no_action: 'No action required'
     }
 };
+

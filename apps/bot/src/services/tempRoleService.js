@@ -80,19 +80,21 @@ async function processRoleExpiration(record) {
         }
 
         const config = await getGuildConfig(record.guild_id);
+        const lang = config?.language || 'tr';
+        const { t } = require('./i18n');
 
         let actionLog = '';
 
         // Remove temp role
         if (record.temp_role_id && member.roles.cache.has(record.temp_role_id)) {
             await member.roles.remove(record.temp_role_id).catch(console.error);
-            actionLog += `🔴 Alınan Rol: <@&${record.temp_role_id}>\n`;
+            actionLog += `${t('temp_role.role_removed', lang, { role: `<@&${record.temp_role_id}>` })}\n`;
         }
 
         // Add fallback role
         if (record.fallback_role_id) {
             await member.roles.add(record.fallback_role_id).catch(console.error);
-            actionLog += `🟢 Verilen Rol: <@&${record.fallback_role_id}>\n`;
+            actionLog += `${t('temp_role.role_added', lang, { role: `<@&${record.fallback_role_id}>` })}\n`;
         }
 
         // Delete from database
@@ -103,15 +105,16 @@ async function processRoleExpiration(record) {
             const logChannel = guild.channels.cache.get(config.registration_log_channel_id);
             if (logChannel) {
                 const embed = new EmbedBuilder()
-                    .setTitle('⏳ Misafir Süresi Doldu')
+                    .setTitle(t('temp_role.expired_title', lang))
                     .setColor('#ff9f43')
-                    .setDescription(`**<@${member.id}>** adlı kullanıcının geçici misafir süresi dolduğu için rol güncellemeleri yapıldı.`)
-                    .addFields({ name: 'Yapılan İşlemler', value: actionLog || 'İşlem gerekmedi' })
+                    .setDescription(t('temp_role.expired_desc', lang, { user: member.id }))
+                    .addFields({ name: t('temp_role.actions_field', lang), value: actionLog || t('temp_role.no_action', lang) })
                     .setTimestamp();
 
                 await logChannel.send({ embeds: [embed] }).catch(() => {});
             }
         }
+
 
     } catch (e) {
         console.error(`[TempRoleService] Error processing record ${record.id}:`, e);

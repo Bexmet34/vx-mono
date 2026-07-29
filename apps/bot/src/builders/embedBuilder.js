@@ -461,21 +461,22 @@ function buildWaitlistField(multiRoleWaitlist, rolesWithMembers, lang = 'tr') {
 /**
  * Creates an objective report embed
  */
-function createObjectiveEmbed(map, event, startTime, isExpired = false) {
+function createObjectiveEmbed(map, event, startTime, isExpired = false, lang = 'tr') {
     const timestamp = Math.floor(startTime / 1000);
     const color = isExpired ? '#808080' : '#E74C3C';
 
     const description = [
-        `🗺️ **Harita:** **${map}**`,
-        `🎯 **Objektif:** **${event}**`,
-        `⌛ **Başlangıç:** ${isExpired ? '~~' : ''}**<t:${timestamp}:R> (<t:${timestamp}:F>)**${isExpired ? '~~' : ''}`
+        `🗺️ **${t('objective.field_map', lang)}:** **${map}**`,
+        `🎯 **${t('objective.field_event', lang)}:** **${event}**`,
+        `⌛ **${t('objective.field_start', lang)}:** ${isExpired ? '~~' : ''}**<t:${timestamp}:R> (<t:${timestamp}:F>)**${isExpired ? '~~' : ''}`
     ].join('\n');
 
     return new EmbedBuilder()
-        .setTitle(isExpired ? '🔒 Objektif Kapandı' : '⚔️ Objektif Çağrısı!')
+        .setTitle(isExpired ? t('objective.title_closed', lang) : t('objective.title_call', lang))
         .setDescription(description)
         .setColor(color);
 }
+
 
 /**
  * Creates the static info embed for the objective setup channel

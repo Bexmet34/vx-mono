@@ -1,14 +1,16 @@
 const { ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ChannelType, PermissionsBitField, EmbedBuilder, ButtonBuilder, ButtonStyle, MessageFlags } = require('discord.js');
 const { getGuildConfig } = require('../services/guildConfig');
+const { t } = require('../services/i18n');
 const db = require('../services/db');
 const { supabase } = require('@veyronix/database');
 
 async function handleTicketInteraction(interaction) {
     const customId = interaction.customId;
     const guildConfig = await getGuildConfig(interaction.guildId);
+    const lang = guildConfig?.language || 'tr';
     
     if (!guildConfig || !guildConfig.ticket_system_enabled) {
-        return interaction.reply({ content: 'Ticket sistemi bu sunucuda aktif değil.', flags: [MessageFlags.Ephemeral] });
+        return interaction.reply({ content: t('ticket.not_enabled', lang), flags: [MessageFlags.Ephemeral] });
     }
 
     if (customId === 'ticket_open') {
@@ -17,12 +19,12 @@ async function handleTicketInteraction(interaction) {
             try { options = JSON.parse(options); } catch (e) { options = []; }
         }
         if (!options || !Array.isArray(options) || options.length === 0) {
-            options = [{ label: "Genel Destek", value: "genel", description: "Genel konular hakkında destek alın", emoji: "📩" }];
+            options = [{ label: lang === 'tr' ? "Genel Destek" : "General Support", value: "genel", description: lang === 'tr' ? "Genel konular hakkında destek alın" : "Get support on general topics", emoji: "📩" }];
         }
 
         const selectMenu = new StringSelectMenuBuilder()
             .setCustomId('ticket_topic_select')
-            .setPlaceholder('Destek konunuzu seçin...')
+            .setPlaceholder(t('ticket.select_topic_placeholder', lang))
             .addOptions(
                 options.map(opt => new StringSelectMenuOptionBuilder()
                     .setLabel(opt.label)
@@ -33,7 +35,7 @@ async function handleTicketInteraction(interaction) {
             );
 
         await interaction.reply({
-            content: 'Lütfen hangi konuda destek almak istediğinizi seçin:',
+            content: t('ticket.select_topic_prompt', lang),
             components: [new ActionRowBuilder().addComponents(selectMenu)],
             flags: [MessageFlags.Ephemeral]
         });
@@ -50,7 +52,7 @@ async function handleTicketInteraction(interaction) {
         const topicObj = options.find(o => o.value === topicValue) || { label: topicValue };
         const topicLabel = topicObj.label;
 
-        await interaction.update({ content: '⏳ Ticket kanalınız oluşturuluyor...', components: [] });
+        await interaction.update({ content: t('ticket.creating_channel', lang), components: [] });
 
         const trMap = { 'ç': 'c', 'ğ': 'g', 'ı': 'i', 'ö': 'o', 'ş': 's', 'ü': 'u', 'Ç': 'c', 'Ğ': 'g', 'İ': 'i', 'Ö': 'o', 'Ş': 's', 'Ü': 'u' };
         const rawName = (interaction.member?.nickname || interaction.member?.displayName || interaction.user.username).replace(/[çğıöşüÇĞİÖŞÜ]/g, m => trMap[m]);
@@ -92,16 +94,16 @@ async function handleTicketInteraction(interaction) {
             ]);
 
             const welcomeEmbed = new EmbedBuilder()
-                .setTitle(`🎫 Destek Talebi`)
-                .setDescription(`Merhaba <@${interaction.user.id}>, destek talebiniz oluşturuldu.\nLütfen sorununuzu detaylı bir şekilde açıklayın. Yetkililerimiz en kısa sürede size yardımcı olacaktır.`)
-                .addFields({ name: '📌 Konu (Başlık)', value: `**${topicLabel}**`, inline: true })
+                .setTitle(t('ticket.welcome_title', lang))
+                .setDescription(t('ticket.welcome_desc', lang, { user: `<@${interaction.user.id}>` }))
+                .addFields({ name: t('ticket.topic_field', lang), value: `**${topicLabel}**`, inline: true })
                 .setColor('#2ecc71')
                 .setTimestamp();
 
             const closeRow = new ActionRowBuilder().addComponents(
                 new ButtonBuilder()
                     .setCustomId('ticket_close')
-                    .setLabel('Ticketı Kapat')
+                    .setLabel(t('ticket.close_button', lang))
                     .setStyle(ButtonStyle.Danger)
                     .setEmoji('🔒')
             );
@@ -114,18 +116,18 @@ async function handleTicketInteraction(interaction) {
                 components: [closeRow]
             });
 
-            await interaction.followUp({ content: `✅ Ticket kanalınız oluşturuldu: <#${ticketChannel.id}>`, flags: [MessageFlags.Ephemeral] });
+            await interaction.followUp({ content: t('ticket.created_success', lang, { channel: `<#${ticketChannel.id}>` }), flags: [MessageFlags.Ephemeral] });
 
         } catch (err) {
             console.error('Ticket Create Error:', err);
-            await interaction.followUp({ content: '❌ Kanal oluşturulamadı. Botun izinlerini kontrol edin.', flags: [MessageFlags.Ephemeral] });
+            await interaction.followUp({ content: t('ticket.create_error', lang), flags: [MessageFlags.Ephemeral] });
         }
     }
 
     if (customId === 'ticket_close') {
         const ticketRow = await db.get('SELECT * FROM tickets WHERE channel_id = ?', [interaction.channelId]);
         if (!ticketRow) {
-            return interaction.reply({ content: 'Bu kanal veritabanında ticket olarak bulunamadı. Lütfen kanalı manuel olarak silin.', flags: [MessageFlags.Ephemeral] });
+            return interaction.reply({ content: t('ticket.not_found', lang), flags: [MessageFlags.Ephemeral] });
         }
 
         // Check if user is staff or owner
@@ -133,10 +135,10 @@ async function handleTicketInteraction(interaction) {
         const isStaff = interaction.member.roles.cache.some(r => staffRoles.includes(r.id)) || interaction.member.permissions.has('Administrator');
         
         if (!isStaff) {
-            return interaction.reply({ content: 'Bu ticketı sadece yetkililer kapatabilir.', flags: [MessageFlags.Ephemeral] });
+            return interaction.reply({ content: t('ticket.staff_only', lang), flags: [MessageFlags.Ephemeral] });
         }
 
-        await interaction.reply({ content: '⏳ Ticket kapatılıyor, döküm alınıyor ve kanal siliniyor...' });
+        await interaction.reply({ content: t('ticket.closing', lang) });
 
         try {
             // Fetch messages for transcript
@@ -188,10 +190,11 @@ async function handleTicketInteraction(interaction) {
 
         } catch (err) {
             console.error('Ticket Close Error:', err);
-            interaction.editReply({ content: '❌ Ticket kapatılırken bir hata oluştu.' }).catch(()=>{});
+            interaction.editReply({ content: t('ticket.close_error', lang) }).catch(()=>{});
         }
     }
 }
+
 
 module.exports = {
     handleTicketInteraction

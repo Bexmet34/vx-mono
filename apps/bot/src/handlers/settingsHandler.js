@@ -15,11 +15,11 @@ async function handleSettingsLanguageSelect(interaction) {
     if (success) {
         // Update the embed to show success
         const embed = new EmbedBuilder()
-            .setTitle('⚙️ Bot Ayarları')
-            .setDescription(`✅ Dil başarıyla değiştirildi: ${lang === 'tr' ? 'Türkçe 🇹🇷' : 'English 🇺🇸'}`)
+            .setTitle(t('settings.settings_title', lang) || (lang === 'tr' ? '⚙️ Bot Ayarları' : '⚙️ Bot Settings'))
+            .setDescription(`✅ ${t('settings.success', lang)}`)
             .setColor(3447003)
             .addFields(
-                { name: `Mevcut Dil`, value: lang === 'tr' ? '🇹🇷 Türkçe' : '🇺🇸 English', inline: true }
+                { name: t('settings.lang_set', lang), value: lang === 'tr' ? '🇹🇷 Türkçe' : '🇺🇸 English', inline: true }
             );
 
         await interaction.update({
@@ -27,8 +27,9 @@ async function handleSettingsLanguageSelect(interaction) {
             components: []
         });
     } else {
-        await interaction.reply({ content: '❌ Dil değiştirilemedi.', flags: [MessageFlags.Ephemeral] });
+        await interaction.reply({ content: `❌ ${t('settings.error_saving', lang)}`, flags: [MessageFlags.Ephemeral] });
     }
+
 }
 
 module.exports = {
