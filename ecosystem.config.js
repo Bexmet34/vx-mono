@@ -17,6 +17,17 @@ module.exports = {
       env: {
         NODE_ENV: 'production'
       }
+    },
+    {
+      name: 'vxweb',
+      script: 'node_modules/next/dist/bin/next',
+      args: 'start -p 3000',
+      cwd: './apps/web',
+      watch: false,
+      env: {
+        NODE_ENV: 'production'
+      }
     }
   ]
 };
+
