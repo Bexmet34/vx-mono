@@ -2,10 +2,15 @@
 echo "==> Github'dan en guncel kodlar cekiliyor..."
 git pull origin main
 
-echo "==> Bagimliliklar kontrol ediliyor (gerekliyse yukleniyor)..."
+echo "==> Bagimliliklar kontrol ediliyor..."
 pnpm install
 
-echo "==> Proje yeniden baslatiliyor..."
-pnpm restart
+echo "==> Web projesi derleniyor (Build)..."
+pnpm --filter partikurweb build
 
-echo "==> Guncelleme tamamlandi!"
+echo "==> Servisler yeniden baslatiliyor (PM2)..."
+pm2 restart ecosystem.config.js
+pm2 save
+
+echo "==> Tum guncellemeler tamamlandi ve web sitesi yayinda!"
+
