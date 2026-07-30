@@ -117,6 +117,9 @@ export default function ServerSettings() {
     ticket_message_title: "Destek Talebi",
     ticket_message_desc: "Lütfen aşağıdaki menüden bir konu seçerek destek talebinizi oluşturun.",
     ticket_options: [{"label": "Genel Destek", "value": "genel", "description": "Genel konular hakkında destek alın", "emoji": "📩"}],
+    application_enabled: false,
+    registration_rules_text: "",
+    application_questions: [],
   });
   
   const [guildSearchQuery, setGuildSearchQuery] = useState("");
@@ -212,6 +215,9 @@ export default function ServerSettings() {
             }
             return (ev && ev.auto_delete_party_hours) ? ev.auto_delete_party_hours : 0;
           })(),
+          application_enabled: s?.application_enabled === true || s?.application_enabled === 'true',
+          registration_rules_text: s?.registration_rules_text || "",
+          application_questions: Array.isArray(s?.application_questions) ? s.application_questions : [],
         };
         setSettings(loadedSettings);
         setInitialSettings(loadedSettings);

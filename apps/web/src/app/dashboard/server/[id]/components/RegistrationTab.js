@@ -658,5 +658,297 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
         )}
       </div>
     </div>
+
+    {/* ═══════════════════════════════════════════════════════════════════
+        BAŞVURU ANKETİ YÖNETİM PANELİ
+    ════════════════════════════════════════════════════════════════════ */}
+    <div className="glass-panel p-8 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors mt-6">
+      <div className="flex items-start justify-between mb-2">
+        <h2 className="font-headline-lg text-2xl text-on-surface flex items-center gap-3 uppercase tracking-tight">
+          📋 {lang === 'en' ? 'Application Questionnaire' : 'Başvuru Anketi'}
+        </h2>
+        {/* Toggle */}
+        <label className="relative inline-flex items-center cursor-pointer mt-1">
+          <input
+            type="checkbox"
+            className="sr-only peer"
+            checked={settings.application_enabled || false}
+            onChange={(e) => setSettings({ ...settings, application_enabled: e.target.checked })}
+          />
+          <div className="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+        </label>
+      </div>
+      <p className="font-body-md text-on-surface-variant mb-6 text-sm">
+        {lang === 'en'
+          ? 'When enabled, users will first see guild rules (optional) and then answer your custom questions before staff reviews them.'
+          : 'Aktif edildiğinde kullanıcılar kayıt kanalı açılmadan önce guild kurallarını (opsiyonel) görür ve özel sorularınızı yanıtlar.'}
+      </p>
+
+      {!settings.application_enabled && (
+        <div className="py-6 text-center text-on-surface-variant text-sm border border-dashed border-outline-variant rounded-sm">
+          {lang === 'en' ? '🔒 Enable the toggle above to configure the questionnaire.' : '🔒 Anketi yapılandırmak için yukarıdaki toggle\'ı aktif edin.'}
+        </div>
+      )}
+
+      {settings.application_enabled && (
+        <div className="flex flex-col gap-8">
+
+          {/* ── Guild Kuralları ── */}
+          <div>
+            <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+              📜 {lang === 'en' ? 'Guild Rules Text (Optional)' : 'Guild Kuralları Metni (Opsiyonel)'}
+            </label>
+            <p className="text-xs text-on-surface-variant mb-3">
+              {lang === 'en'
+                ? 'If filled, users must click "I Accept" before the registration modal opens.'
+                : 'Doldurulursa kullanıcı kayıt formu açılmadan önce "Kabul Ediyorum" butonuna tıklamak zorunda kalır.'}
+            </p>
+            <textarea
+              className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md resize-y min-h-[140px]"
+              placeholder={lang === 'en'
+                ? 'e.g. No swearing, no harassment, no theft...\n\nDo you accept? Yes / No'
+                : 'Örn: Küfürlü konuşmamak önemlidir.\nAgresif tavırlar sergilememek...\n\nKabul ediyor musun?'}
+              value={settings.registration_rules_text || ''}
+              onChange={(e) => setSettings({ ...settings, registration_rules_text: e.target.value })}
+              maxLength={4000}
+            />
+            <p className="text-xs text-on-surface-variant/60 mt-1 text-right">
+              {(settings.registration_rules_text || '').length} / 4000
+            </p>
+          </div>
+
+          {/* ── Sorular ── */}
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <label className="text-sm font-label-bold text-on-surface-variant uppercase tracking-widest">
+                ❓ {lang === 'en' ? 'Questions' : 'Sorular'}
+                <span className="ml-2 text-xs text-on-surface-variant/60 normal-case tracking-normal">
+                  ({(settings.application_questions || []).length} / 15)
+                </span>
+              </label>
+              {(settings.application_questions || []).length < 15 && (
+                <button
+                  onClick={() => {
+                    const newQ = {
+                      id: `q_${Date.now()}`,
+                      order: (settings.application_questions || []).length + 1,
+                      type: 'text',
+                      question_tr: '',
+                      question_en: '',
+                      required: true,
+                      max_length: 500,
+                      options: []
+                    };
+                    setSettings({
+                      ...settings,
+                      application_questions: [...(settings.application_questions || []), newQ]
+                    });
+                  }}
+                  className="px-4 py-2 bg-primary-container/10 border border-primary-container/40 text-primary-container rounded-sm text-xs font-label-bold uppercase tracking-widest hover:bg-primary-container/20 transition-all flex items-center gap-1"
+                >
+                  + {lang === 'en' ? 'Add Question' : 'Soru Ekle'}
+                </button>
+              )}
+            </div>
+
+            {(settings.application_questions || []).length === 0 && (
+              <div className="py-8 text-center text-on-surface-variant text-sm border border-dashed border-outline-variant rounded-sm">
+                {lang === 'en' ? 'No questions yet. Click "+ Add Question" to get started.' : 'Henüz soru yok. "+ Soru Ekle" butonuna tıkla.'}
+              </div>
+            )}
+
+            <div className="flex flex-col gap-4">
+              {(settings.application_questions || []).map((q, idx) => (
+                <div key={q.id} className="bg-surface-container/40 border border-outline-variant rounded-sm p-5 flex flex-col gap-4 relative group hover:border-primary-container/30 transition-all">
+
+                  {/* Sıra + Sil */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-label-bold text-primary-container uppercase tracking-widest">
+                      #{idx + 1}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      {/* Yukarı */}
+                      {idx > 0 && (
+                        <button
+                          onClick={() => {
+                            const arr = [...(settings.application_questions || [])];
+                            [arr[idx - 1], arr[idx]] = [arr[idx], arr[idx - 1]];
+                            setSettings({ ...settings, application_questions: arr });
+                          }}
+                          className="text-xs px-2 py-1 bg-surface-container border border-outline-variant rounded text-on-surface-variant hover:text-on-surface transition-colors"
+                          title="Yukarı"
+                        >↑</button>
+                      )}
+                      {/* Aşağı */}
+                      {idx < (settings.application_questions || []).length - 1 && (
+                        <button
+                          onClick={() => {
+                            const arr = [...(settings.application_questions || [])];
+                            [arr[idx], arr[idx + 1]] = [arr[idx + 1], arr[idx]];
+                            setSettings({ ...settings, application_questions: arr });
+                          }}
+                          className="text-xs px-2 py-1 bg-surface-container border border-outline-variant rounded text-on-surface-variant hover:text-on-surface transition-colors"
+                          title="Aşağı"
+                        >↓</button>
+                      )}
+                      {/* Sil */}
+                      <button
+                        onClick={() => {
+                          const arr = (settings.application_questions || []).filter((_, i) => i !== idx);
+                          setSettings({ ...settings, application_questions: arr });
+                        }}
+                        className="text-xs px-2 py-1 bg-error/10 border border-error/30 rounded text-error hover:bg-error/20 transition-colors"
+                      >✕ {lang === 'en' ? 'Delete' : 'Sil'}</button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Soru Tipi */}
+                    <div>
+                      <label className="block text-xs font-label-bold text-on-surface-variant uppercase tracking-widest mb-1">
+                        {lang === 'en' ? 'Question Type' : 'Soru Tipi'}
+                      </label>
+                      <select
+                        className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors text-sm"
+                        value={q.type || 'text'}
+                        onChange={(e) => {
+                          const arr = [...(settings.application_questions || [])];
+                          arr[idx] = { ...arr[idx], type: e.target.value, options: [] };
+                          setSettings({ ...settings, application_questions: arr });
+                        }}
+                      >
+                        <option value="text">📝 {lang === 'en' ? 'Short Text' : 'Kısa Metin'}</option>
+                        <option value="paragraph">📄 {lang === 'en' ? 'Long Text (Paragraph)' : 'Uzun Metin (Paragraf)'}</option>
+                        <option value="yesno">✅ {lang === 'en' ? 'Yes / No' : 'Evet / Hayır'}</option>
+                        <option value="select">🔘 {lang === 'en' ? 'Single Choice' : 'Tek Seçim'}</option>
+                        <option value="multiselect">☑️ {lang === 'en' ? 'Multiple Choice' : 'Çoklu Seçim'}</option>
+                      </select>
+                    </div>
+
+                    {/* Max karakter (text ve paragraph için) */}
+                    {(q.type === 'text' || q.type === 'paragraph') && (
+                      <div>
+                        <label className="block text-xs font-label-bold text-on-surface-variant uppercase tracking-widest mb-1">
+                          {lang === 'en' ? 'Max Characters' : 'Max Karakter'}
+                        </label>
+                        <input
+                          type="number"
+                          min="10"
+                          max="1000"
+                          className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors text-sm"
+                          value={q.max_length || 500}
+                          onChange={(e) => {
+                            const arr = [...(settings.application_questions || [])];
+                            arr[idx] = { ...arr[idx], max_length: parseInt(e.target.value) || 500 };
+                            setSettings({ ...settings, application_questions: arr });
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Soru Metni (TR) */}
+                  <div>
+                    <label className="block text-xs font-label-bold text-on-surface-variant uppercase tracking-widest mb-1">
+                      🇹🇷 {lang === 'en' ? 'Question (Turkish)' : 'Soru Metni (Türkçe)'}
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors text-sm"
+                      placeholder={lang === 'en' ? 'e.g. How do you earn in-game currency?' : 'Örn: Oyundaki ekonominizi nasıl sağlıyorsunuz?'}
+                      value={q.question_tr || ''}
+                      maxLength={200}
+                      onChange={(e) => {
+                        const arr = [...(settings.application_questions || [])];
+                        arr[idx] = { ...arr[idx], question_tr: e.target.value };
+                        setSettings({ ...settings, application_questions: arr });
+                      }}
+                    />
+                  </div>
+
+                  {/* Soru Metni (EN) */}
+                  <div>
+                    <label className="block text-xs font-label-bold text-on-surface-variant uppercase tracking-widest mb-1">
+                      🇬🇧 {lang === 'en' ? 'Question (English)' : 'Soru Metni (İngilizce)'}
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors text-sm"
+                      placeholder="e.g. How do you earn in-game currency?"
+                      value={q.question_en || ''}
+                      maxLength={200}
+                      onChange={(e) => {
+                        const arr = [...(settings.application_questions || [])];
+                        arr[idx] = { ...arr[idx], question_en: e.target.value };
+                        setSettings({ ...settings, application_questions: arr });
+                      }}
+                    />
+                  </div>
+
+                  {/* Seçenekler (select / multiselect için) */}
+                  {(q.type === 'select' || q.type === 'multiselect') && (
+                    <div>
+                      <label className="block text-xs font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+                        {lang === 'en' ? 'Options (one per line)' : 'Seçenekler (her satıra bir tane)'}
+                      </label>
+                      <textarea
+                        className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors text-sm resize-y min-h-[80px]"
+                        placeholder={lang === 'en'
+                          ? 'Option 1\nOption 2\nOption 3'
+                          : 'Tank\nRDPS\nMDPS\nHealer\nSupport'}
+                        value={(q.options || []).join('\n')}
+                        onChange={(e) => {
+                          const arr = [...(settings.application_questions || [])];
+                          arr[idx] = {
+                            ...arr[idx],
+                            options: e.target.value.split('\n').map(s => s.trim()).filter(Boolean)
+                          };
+                          setSettings({ ...settings, application_questions: arr });
+                        }}
+                      />
+                      <p className="text-xs text-on-surface-variant/60 mt-1">
+                        {(q.options || []).length} {lang === 'en' ? 'options' : 'seçenek'} (max 25)
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Zorunlu toggle */}
+                  <div className="flex items-center gap-3">
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        className="sr-only peer"
+                        checked={q.required !== false}
+                        onChange={(e) => {
+                          const arr = [...(settings.application_questions || [])];
+                          arr[idx] = { ...arr[idx], required: e.target.checked };
+                          setSettings({ ...settings, application_questions: arr });
+                        }}
+                      />
+                      <div className="w-9 h-5 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary-container"></div>
+                    </label>
+                    <span className="text-xs font-label-bold text-on-surface-variant uppercase tracking-widest">
+                      {q.required !== false
+                        ? (lang === 'en' ? 'Required' : 'Zorunlu')
+                        : (lang === 'en' ? 'Optional' : 'Opsiyonel')}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {(settings.application_questions || []).length > 0 && (
+              <div className="mt-4 p-3 bg-primary-container/5 border border-primary-container/20 rounded-sm text-xs text-on-surface-variant">
+                💡 {lang === 'en'
+                  ? 'Text/Paragraph questions are shown in groups of 5 per Discord modal. Yes/No and Choice questions appear as buttons/menus between modals.'
+                  : 'Metin soruları Discord modal\'da 5\'er gruba ayrılır. Evet/Hayır ve Seçim soruları modallar arası buton/menü olarak gösterilir.'}
+              </div>
+            )}
+          </div>
+
+        </div>
+      )}
+    </div>
   );
 }
+

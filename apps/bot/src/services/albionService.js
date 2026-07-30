@@ -26,7 +26,7 @@ async function getPlayerInfo(playerName, server = 'Europe') {
         
         // 1. Search for the player to get the ID
         const searchUrl = `${baseUrl}/search?q=${encodeURIComponent(playerName)}`;
-        const searchResponse = await fetch(searchUrl);
+        const searchResponse = await fetch(searchUrl, { signal: AbortSignal.timeout(8000) });
         
         if (!searchResponse.ok) throw new Error('API_ERROR');
         
@@ -45,7 +45,7 @@ async function getPlayerInfo(playerName, server = 'Europe') {
         
         // 2. Get detailed player info
         const detailUrl = `${baseUrl}/players/${player.Id}`;
-        const detailResponse = await fetch(detailUrl);
+        const detailResponse = await fetch(detailUrl, { signal: AbortSignal.timeout(8000) });
         
         if (!detailResponse.ok) throw new Error('API_ERROR');
         

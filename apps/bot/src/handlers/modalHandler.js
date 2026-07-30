@@ -10,6 +10,7 @@ const db = require('../services/db');
 const { getGuildConfig } = require('../services/guildConfig');
 const { t } = require('../services/i18n');
 const { EMPTY_SLOT } = require('../constants/constants');
+const appSvc = require('../services/applicationService');
 
 
 const { buildRolesFields, addFooterFields, createObjectiveEmbed, createPlayerCardEmbed } = require('../builders/embedBuilder');
@@ -500,9 +501,54 @@ async function handleRegisterModal(interaction) {
                 components: rows
             });
 
-            return await interaction.editReply({
-                content: `✅ **${lang === 'tr' ? 'Başvurunuz alındı! Kanal açıldı:' : 'Application received! Channel created:'}** <#${channel.id}>`
-            });
+            // ─── ANKET: Sorular varsa başlat ─────────────────────────────────────────
+            const applicationEnabled = guildConfig?.application_enabled === true;
+            const questions = (guildConfig?.application_questions || []).filter(q => q.type !== 'rules_accept');
+
+            if (applicationEnabled && questions.length > 0) {
+                // Oturumu başlat
+                appSvc.startSession(interaction.user.id, interaction.guildId, channel.id, questions);
+
+                // İlk modal'a ait soru tipini belirle
+                const firstQ = questions[0];
+                const firstType = firstQ?.type || 'text';
+
+                if (firstType === 'text' || firstType === 'paragraph') {
+                    // Modal sayfası 1 açılabilir
+                    const { ActionRowBuilder: AR2, ButtonBuilder: BB2, ButtonStyle: BS2 } = require('discord.js');
+                    const continueRow = new AR2().addComponents(
+                        new BB2()
+                            .setCustomId(`app_continue:0:${channel.id}`)
+                            .setLabel(lang === 'tr' ? '▶ Soruları Yanıtla' : '▶ Answer Questions')
+                            .setStyle(BS2.Primary)
+                    );
+                    await interaction.editReply({
+                        content: `✅ **${lang === 'tr' ? 'Kanal açıldı:' : 'Channel created:'}** <#${channel.id}>\n\n📋 **${lang === 'tr' ? 'Başvuru sorularını yanıtlamak için aşağıdaki butona bas:' : 'Click below to answer the application questions:'}**`,
+                        components: [continueRow]
+                    });
+                } else if (firstType === 'yesno') {
+                    const { handleNextStep } = require('./buttonHandler');
+                    const session = appSvc.getSession(interaction.user.id, interaction.guildId);
+                    const nextStep = appSvc.getNextStep(session, questions);
+                    await interaction.editReply({ content: `✅ <#${channel.id}> \n\n📋 Başvuru soruları:` });
+                    await handleNextStep(interaction, nextStep, session, questions, lang, interaction.guildId, channel.id);
+                } else if (firstType === 'select' || firstType === 'multiselect') {
+                    const { handleNextStep } = require('./buttonHandler');
+                    const session = appSvc.getSession(interaction.user.id, interaction.guildId);
+                    const nextStep = appSvc.getNextStep(session, questions);
+                    await interaction.editReply({ content: `✅ <#${channel.id}> \n\n📋 Başvuru soruları:` });
+                    await handleNextStep(interaction, nextStep, session, questions, lang, interaction.guildId, channel.id);
+                } else {
+                    await interaction.editReply({
+                        content: `✅ **${lang === 'tr' ? 'Başvurunuz alındı! Kanal açıldı:' : 'Application received! Channel created:'}** <#${channel.id}>`
+                    });
+                }
+            } else {
+                // Anket yok → normal yanıt
+                await interaction.editReply({
+                    content: `✅ **${lang === 'tr' ? 'Başvurunuz alındı! Kanal açıldı:' : 'Application received! Channel created:'}** <#${channel.id}>`
+                });
+            }
 
         } catch (error) {
             console.error('[RegistrationModal] Error:', error);
@@ -513,9 +559,61 @@ async function handleRegisterModal(interaction) {
     }
 }
 
+/**
+ * Anket cevap modallarını işler
+ * customId format: app_answer_modal:{pageIndex}:{channelId}
+ */
+async function handleApplicationAnswerModal(interaction) {
+    const parts = interaction.customId.split(':');
+    const pageIndex = parseInt(parts[1]);
+    const channelId = parts[2];
+    const userId = interaction.user.id;
+    const guildId = interaction.guildId;
+
+    const guildConfig = await getGuildConfig(guildId);
+    const lang = guildConfig?.language || 'tr';
+    const questions = (guildConfig?.application_questions || []).filter(q => q.type !== 'rules_accept');
+
+    // Modal'daki cevapları oku
+    const newAnswers = {};
+    const { getModalQuestionsForPage } = appSvc;
+    const modalQuestions = getModalQuestionsForPage(questions, pageIndex);
+
+    for (const q of modalQuestions) {
+        try {
+            const val = interaction.fields.getTextInputValue(q.id);
+            if (val) newAnswers[q.id] = val;
+        } catch (e) {
+            // Alan boş bırakılmış (opsiyonel soru)
+        }
+    }
+
+    // Cevapları oturuma ekle
+    const added = appSvc.addAnswers(userId, guildId, newAnswers);
+    if (!added) {
+        // Oturum bulunamadı (bot restart vs.) → sessizce bitir
+        return await interaction.reply({
+            content: lang === 'tr'
+                ? '⚠️ Oturum bulunamadı. Lütfen başvuruyu yeniden başlat.'
+                : '⚠️ Session not found. Please restart the application.',
+            flags: [MessageFlags.Ephemeral]
+        });
+    }
+
+    await interaction.deferReply({ flags: [MessageFlags.Ephemeral] }).catch(() => {});
+
+    // Sonraki adımı belirle
+    const session = appSvc.getSession(userId, guildId);
+    const { handleNextStep } = require('./buttonHandler');
+    const nextStep = appSvc.getNextStep(session, questions);
+
+    await handleNextStep(interaction, nextStep, session, questions, lang, guildId, channelId);
+}
+
 module.exports = {
     handlePartiModal,
     handleObjectiveModal,
     handleRegisterModal,
+    handleApplicationAnswerModal,
     handleSaveTempModal
 };

@@ -12,7 +12,7 @@ const { handleHelpCommand, handleVoteCommand, handleClosePartyCommand, handleSet
 const { handleCreatePartyCommand, handleTempCommand, handleTempAutocomplete, handleMyTempsCommand } = require('./handlers/partikurHandler');
 
 const { handlePartyButtons, handleObjectiveButtons, handleRegisterButtons } = require('./handlers/buttonHandler');
-const { handlePartiModal, handleObjectiveModal, handleRegisterModal } = require('./handlers/modalHandler');
+const { handlePartiModal, handleObjectiveModal, handleRegisterModal, handleApplicationAnswerModal } = require('./handlers/modalHandler');
 const { AutoPoster } = require('topgg-autoposter');
 const { handleManageMenu, handleEditModal, handleKickMember, handleJoinRoleSelect, handleJoinMultiRoleSelect, handleAddMemberSelect, handleAddMemberUserSelect } = require('./handlers/menuHandler');
 const { handleSettingsLanguageSelect } = require('./handlers/settingsHandler');
@@ -258,7 +258,7 @@ client.on('interactionCreate', async interaction => {
                 await handleVoteCommand(interaction);
             } else if (interaction.customId === 'obj_open_modal' || interaction.customId.startsWith('obj_join_')) {
                 await handleObjectiveButtons(interaction);
-            } else if (interaction.customId === 'register_start' || interaction.customId === 'register_btn' || interaction.customId.startsWith('reg_approve_') || interaction.customId.startsWith('reg_reject_') || interaction.customId.startsWith('reg_temp_')) {
+            } else if (interaction.customId === 'register_start' || interaction.customId === 'register_btn' || interaction.customId.startsWith('reg_approve_') || interaction.customId.startsWith('reg_reject_') || interaction.customId.startsWith('reg_temp_') || interaction.customId === 'reg_rules_accept' || interaction.customId === 'reg_rules_reject' || interaction.customId.startsWith('app_yesno:') || interaction.customId.startsWith('app_continue:')) {
                 await handleRegisterButtons(interaction);
             } else if (interaction.customId.startsWith('fc_')) {
                 const { handleFixedContentButtons } = require('./handlers/fixedContentHandler');
@@ -296,6 +296,9 @@ client.on('interactionCreate', async interaction => {
             } else if (interaction.customId === 'ticket_topic_select') {
                 const { handleTicketInteraction } = require('./handlers/ticketHandler');
                 await handleTicketInteraction(interaction);
+            } else if (interaction.customId.startsWith('app_select:')) {
+                await handleRegisterButtons(interaction);
+
             }
         } else if (interaction.isUserSelectMenu()) {
             if (interaction.customId.startsWith('add_member_user_select_')) {
@@ -313,6 +316,8 @@ client.on('interactionCreate', async interaction => {
                 await handleObjectiveModal(interaction);
             } else if (interaction.customId === 'register_modal') {
                 await handleRegisterModal(interaction);
+            } else if (interaction.customId.startsWith('app_answer_modal:')) {
+                await handleApplicationAnswerModal(interaction);
             } else if (interaction.customId.startsWith('save_temp_modal:') || interaction.customId.startsWith('edit_temp_modal:')) {
                 const { handleSaveTempModal } = require('./handlers/modalHandler');
                 await handleSaveTempModal(interaction);

@@ -1,10 +1,20 @@
 const db = require('./db');
 const { getSupabaseGuildSettings, updateGuildLanguage, updateSupabaseGuildSettings } = require('@veyronix/database');
 
+const configCache = new Map();
+const CACHE_TTL_MS = 60 * 1000; // 60 seconds TTL
+
 /**
- * Gets configuration for a specific guild
+ * Gets configuration for a specific guild with in-memory caching
  */
 async function getGuildConfig(guildId) {
+    if (!guildId) return null;
+
+    const cached = configCache.get(guildId);
+    if (cached && (Date.now() - cached.timestamp < CACHE_TTL_MS)) {
+        return cached.data;
+    }
+
     let row = null;
     try {
         row = await db.get('SELECT * FROM guild_configs WHERE guild_id = ?', [guildId]);
@@ -26,7 +36,9 @@ async function getGuildConfig(guildId) {
             }
         }
 
-        return Object.keys(configResult).length > 0 ? configResult : null;
+        const finalConfig = Object.keys(configResult).length > 0 ? configResult : null;
+        configCache.set(guildId, { data: finalConfig, timestamp: Date.now() });
+        return finalConfig;
 
     } catch (error) {
         console.error(`[GuildConfig] CRITICAL ERROR fetching for ${guildId}:`, error);
@@ -39,6 +51,7 @@ async function getGuildConfig(guildId) {
  * Updates or sets configuration for a guild
  */
 async function updateGuildConfig(guildId, data) {
+    configCache.delete(guildId);
     const { 
         guild_name, 
         albion_guild_id, 
@@ -56,13 +69,11 @@ async function updateGuildConfig(guildId, data) {
 
     try {
         // 1. Update Supabase (Source of truth for dashboard)
-        // Language is handled separately via updateGuildLanguage which correctly
-        // does UPDATE if row exists, INSERT with owner_id if it doesn't.
         if (language) {
             await updateGuildLanguage(guildId, language);
         }
 
-        // Other settings go through the generic upsert (row should already exist)
+        // Other settings go through the generic upsert
         const sbData = {};
         if (albion_guild_id) sbData.albion_guild_id = albion_guild_id;
         if (albion_guild_name) sbData.albion_guild_name = albion_guild_name;

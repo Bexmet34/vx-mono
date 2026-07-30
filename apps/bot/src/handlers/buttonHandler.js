@@ -12,6 +12,7 @@ const { t } = require('../services/i18n');
 const { ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
 const { acquireLock } = require('../utils/partyLock');
 const { deleteUserTemplate } = require('@veyronix/database');
+const appSvc = require('../services/applicationService');
 
 
 
@@ -609,48 +610,139 @@ async function handleObjectiveButtons(interaction) {
  */
 async function handleRegisterButtons(interaction) {
     const customId = interaction.customId;
+
+    // ─── ANKET: Kural Kabul / Red ───────────────────────────────────────────
+    if (customId === 'reg_rules_accept') {
+        // Kuralları kabul etti → normal kayıt modalını aç
+        return await openRegisterModal(interaction);
+    }
+
+    if (customId === 'reg_rules_reject') {
+        return await interaction.update({
+            content: '❌ **Kayıt işlemi iptal edildi.** Guild kurallarını kabul etmeden kayıt olamazsınız.',
+            embeds: [], components: []
+        }).catch(() => interaction.reply({ content: '❌ Kayıt iptal edildi.', flags: [MessageFlags.Ephemeral] }));
+    }
+
+    // ─── ANKET: Yesno buton cevapları ──────────────────────────────────────
+    // customId: app_yesno:{questionId}:{yes|no}:{channelId}
+    if (customId.startsWith('app_yesno:')) {
+        const parts = customId.split(':');
+        const questionId = parts[1];
+        const answer = parts[2]; // 'yes' veya 'no'
+        const channelId = parts[3];
+        const userId = interaction.user.id;
+        const guildId = interaction.guildId;
+
+        const guildCfg = await getGuildConfig(guildId);
+        const lang = guildCfg?.language || 'tr';
+        const questions = (guildCfg?.application_questions || []).filter(q => q.type !== 'rules_accept');
+
+        const displayAnswer = answer === 'yes'
+            ? (lang === 'tr' ? '✅ Evet' : '✅ Yes')
+            : (lang === 'tr' ? '❌ Hayır' : '❌ No');
+
+        appSvc.addSingleAnswer(userId, guildId, questionId, displayAnswer);
+
+        // Sonraki adımı belirle
+        const session = appSvc.getSession(userId, guildId);
+        const nextStep = appSvc.getNextStep(session, questions);
+
+        await interaction.update({ content: `✅ Cevap kaydedildi: **${displayAnswer}**`, embeds: [], components: [] }).catch(() => {});
+        return await handleNextStep(interaction, nextStep, session, questions, lang, guildId, channelId);
+    }
+
+    // ─── ANKET: "Devam Et" butonu (modal'dan modal'a geçiş için ara buton) ─
+    // customId: app_continue:{pageIndex}:{channelId}
+    if (customId.startsWith('app_continue:')) {
+        const parts = customId.split(':');
+        const pageIndex = parseInt(parts[1]);
+        const channelId = parts[2];
+        const userId = interaction.user.id;
+        const guildId = interaction.guildId;
+
+        const guildCfg = await getGuildConfig(guildId);
+        const lang = guildCfg?.language || 'tr';
+        const questions = (guildCfg?.application_questions || []).filter(q => q.type !== 'rules_accept');
+
+        const modal = appSvc.buildAnswerModal(questions, pageIndex, channelId, lang);
+        if (modal) {
+            return await interaction.showModal(modal);
+        }
+        return;
+    }
+
+    // ─── Kayıt Başlat butonu ─────────────────────────────────────────────────
+    // 1. User clicks "Register" button in welcome channel
+    if (customId === 'register_start' || customId === 'register_btn') {
+        const guildCfg = await getGuildConfig(interaction.guildId);
+        const lang = guildCfg?.language || 'tr';
+
+        // Anket aktif ve kural metni var mı?
+        const applicationEnabled = guildCfg?.application_enabled === true;
+        const rulesText = guildCfg?.registration_rules_text;
+
+        if (applicationEnabled && rulesText && rulesText.trim().length > 0) {
+            // Önce kural onay ekranı göster
+            const rulesEmbed = new EmbedBuilder()
+                .setTitle(lang === 'tr' ? '📜 Guild Kuralları' : '📜 Guild Rules')
+                .setDescription(rulesText.substring(0, 4000))
+                .setColor('#5865F2')
+                .setFooter({ text: lang === 'tr' ? 'Devam etmek için kuralları kabul etmeniz gerekmektedir.' : 'You must accept the rules to continue.' });
+
+            const rulesRow = new ActionRowBuilder().addComponents(
+                new ButtonBuilder()
+                    .setCustomId('reg_rules_accept')
+                    .setLabel(lang === 'tr' ? '✅ Kabul Ediyorum' : '✅ I Accept')
+                    .setStyle(ButtonStyle.Success),
+                new ButtonBuilder()
+                    .setCustomId('reg_rules_reject')
+                    .setLabel(lang === 'tr' ? '❌ Kabul Etmiyorum' : '❌ I Reject')
+                    .setStyle(ButtonStyle.Danger)
+            );
+
+            return await interaction.reply({
+                embeds: [rulesEmbed],
+                components: [rulesRow],
+                flags: [MessageFlags.Ephemeral]
+            });
+        }
+
+        // Kural yok veya anket kapalı → Doğrudan modal aç
+        return await openRegisterModal(interaction);
+    }
+
+    // ─── ANKET: Select menu cevapları ───────────────────────────────────────
+    // customId: app_select:{questionId}:{single|multi}:{channelId}
+    if (customId.startsWith('app_select:')) {
+        // Bu kod StringSelectMenu interaction olarak da gelebilir
+        // index.js'den buraya yönlendirildi
+        const parts = customId.split(':');
+        const questionId = parts[1];
+        const isMulti = parts[2] === 'multi';
+        const channelId = parts[3];
+        const userId = interaction.user.id;
+        const guildId = interaction.guildId;
+
+        const guildCfg = await getGuildConfig(guildId);
+        const lang = guildCfg?.language || 'tr';
+        const questions = (guildCfg?.application_questions || []).filter(q => q.type !== 'rules_accept');
+
+        const selectedValues = interaction.values || [];
+        const displayAnswer = selectedValues.join(', ');
+
+        appSvc.addSingleAnswer(userId, guildId, questionId, displayAnswer);
+
+        const session = appSvc.getSession(userId, guildId);
+        const nextStep = appSvc.getNextStep(session, questions);
+
+        await interaction.update({ content: `✅ Seçiminiz kaydedildi: **${displayAnswer}**`, embeds: [], components: [] }).catch(() => {});
+        return await handleNextStep(interaction, nextStep, session, questions, lang, guildId, channelId);
+    }
+
     const guildConfig = await getGuildConfig(interaction.guildId);
     const lang = guildConfig?.language || 'tr';
     const message = interaction.message;
-
-    // 1. User clicks "Register" button in welcome channel
-    if (customId === 'register_start' || customId === 'register_btn') {
-        const modal = new ModalBuilder()
-            .setCustomId('register_modal')
-            .setTitle(lang === 'en' ? 'Registration' : 'Kayıt Sistemi');
-
-        const realNameInput = new TextInputBuilder()
-            .setCustomId('real_name')
-            .setLabel(lang === 'en' ? 'Your Real Name' : 'Gerçek İsminiz')
-            .setStyle(TextInputStyle.Short)
-            .setRequired(true)
-            .setMinLength(2)
-            .setMaxLength(30);
-
-        const inGameNameInput = new TextInputBuilder()
-            .setCustomId('ingame_name')
-            .setLabel(lang === 'en' ? 'Albion In-Game Nickname' : 'Albion Oyun İçi Nickiniz')
-            .setStyle(TextInputStyle.Short)
-            .setRequired(true)
-            .setMinLength(3)
-            .setMaxLength(30);
-
-        const ageInput = new TextInputBuilder()
-            .setCustomId('age')
-            .setLabel(lang === 'en' ? 'Your Age' : 'Yaşınız')
-            .setStyle(TextInputStyle.Short)
-            .setRequired(true)
-            .setMinLength(1)
-            .setMaxLength(2);
-
-        modal.addComponents(
-            new ActionRowBuilder().addComponents(realNameInput),
-            new ActionRowBuilder().addComponents(inGameNameInput),
-            new ActionRowBuilder().addComponents(ageInput)
-        );
-
-        return await interaction.showModal(modal);
-    }
 
     // 2. Staff clicks "Approve", "Reject" or "Temp"
     if (customId.startsWith('reg_approve_') || customId.startsWith('reg_reject_') || customId.startsWith('reg_temp_')) {
@@ -1006,8 +1098,111 @@ async function handleRegisterButtons(interaction) {
     }
 }
 
+
+// ─── YARDIMCI FONKSİYONLAR ─────────────────────────────────────────────────
+
+/**
+ * Standart kayıt modalını açar (İsim / Nick / Yaş)
+ */
+async function openRegisterModal(interaction) {
+    const modal = new ModalBuilder()
+        .setCustomId('register_modal')
+        .setTitle('Kayıt Sistemi');
+
+    const realNameInput = new TextInputBuilder()
+        .setCustomId('real_name')
+        .setLabel('Gerçek İsminiz')
+        .setStyle(TextInputStyle.Short)
+        .setRequired(true)
+        .setMinLength(2)
+        .setMaxLength(30);
+
+    const inGameNameInput = new TextInputBuilder()
+        .setCustomId('ingame_name')
+        .setLabel('Albion Oyun İçi Nickiniz')
+        .setStyle(TextInputStyle.Short)
+        .setRequired(true)
+        .setMinLength(3)
+        .setMaxLength(30);
+
+    const ageInput = new TextInputBuilder()
+        .setCustomId('age')
+        .setLabel('Yaşınız')
+        .setStyle(TextInputStyle.Short)
+        .setRequired(true)
+        .setMinLength(1)
+        .setMaxLength(2);
+
+    modal.addComponents(
+        new ActionRowBuilder().addComponents(realNameInput),
+        new ActionRowBuilder().addComponents(inGameNameInput),
+        new ActionRowBuilder().addComponents(ageInput)
+    );
+
+    try {
+        // Eğer interaction zaten update edilmişse (kurallar akışı sonrası), followUp ile değil showModal ile devam
+        if (interaction.replied || interaction.deferred) {
+            await interaction.followUp({ content: '⌛ Kayıt formu açılıyor...', flags: [MessageFlags.Ephemeral] }).catch(() => {});
+        }
+        return await interaction.showModal(modal);
+    } catch (err) {
+        console.error(`[RegisterButtons] Failed to show register modal: ${err.message}`);
+    }
+}
+
+/**
+ * Anket akışında bir sonraki adımı işler.
+ * Modal, yesno, select veya tamamlama (finalize) adımlarını yönetir.
+ */
+async function handleNextStep(interaction, nextStep, session, questions, lang, guildId, channelId) {
+    if (!nextStep || nextStep.type === 'done') {
+        // Tüm sorular cevaplandı → kaydet
+        const userId = interaction.user.id;
+        const success = await appSvc.finalizeAnswers(userId, guildId, interaction.client);
+
+        const doneMsg = lang === 'tr'
+            ? '✅ **Başvurunuz tamamlandı!** Cevaplarınız yetkililere iletildi. Lütfen bekleyin.'
+            : '✅ **Application complete!** Your answers have been forwarded to staff.';
+
+        await interaction.followUp({ content: doneMsg, flags: [MessageFlags.Ephemeral] }).catch(() => {});
+        return;
+    }
+
+    if (nextStep.type === 'modal') {
+        // Modal sayfaları arası: "Devam Et" butonu göster
+        const continueRow = new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setCustomId(`app_continue:${nextStep.pageIndex}:${channelId}`)
+                .setLabel(lang === 'tr' ? '▶ Sonraki Soruları Yanıtla' : '▶ Answer Next Questions')
+                .setStyle(ButtonStyle.Primary)
+        );
+        await interaction.followUp({
+            content: lang === 'tr'
+                ? '✅ Cevaplar kaydedildi. Devam etmek için butona tıkla:'
+                : '✅ Answers saved. Click to continue:',
+            components: [continueRow],
+            flags: [MessageFlags.Ephemeral]
+        }).catch(() => {});
+        return;
+    }
+
+    if (nextStep.type === 'yesno') {
+        const msg = appSvc.buildYesNoMessage(nextStep.question, channelId, lang);
+        await interaction.followUp({ ...msg, flags: [MessageFlags.Ephemeral] }).catch(() => {});
+        return;
+    }
+
+    if (nextStep.type === 'select' || nextStep.type === 'multiselect') {
+        const msg = appSvc.buildSelectMessage(nextStep.question, channelId, lang, nextStep.type === 'multiselect');
+        await interaction.followUp({ ...msg, flags: [MessageFlags.Ephemeral] }).catch(() => {});
+        return;
+    }
+}
+
 module.exports = {
     handlePartyButtons,
     handleObjectiveButtons,
-    handleRegisterButtons
+    handleRegisterButtons,
+    handleNextStep
 };
+
