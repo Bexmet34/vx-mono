@@ -1022,12 +1022,14 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                                   placeholder={lang === 'en'
                                     ? 'Option 1\nOption 2\nOption 3'
                                     : 'Tank\nRDPS\nMDPS\nHealer\nSupport'}
-                                  value={(q.options || []).join('\n')}
+                                  value={q.options_raw !== undefined ? q.options_raw : (q.options || []).join('\n')}
                                   onChange={(e) => {
+                                    const rawVal = e.target.value;
                                     const arr = [...(settings.application_questions || [])];
                                     arr[idx] = {
                                       ...arr[idx],
-                                      options: e.target.value.split('\n').map(s => s.trim()).filter(Boolean)
+                                      options_raw: rawVal,
+                                      options: rawVal.split('\n').map(s => s.trim()).filter(Boolean)
                                     };
                                     setSettings({ ...settings, application_questions: arr });
                                   }}
