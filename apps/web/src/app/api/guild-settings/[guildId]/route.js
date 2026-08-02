@@ -79,7 +79,8 @@ export async function POST(req, { params }) {
       channel_name_format, fixed_message_content,
       ticket_system_enabled, ticket_category_id, ticket_channel_id,
       ticket_staff_roles, ticket_message_title, ticket_message_desc,
-      ticket_options, auto_delete_party_hours
+      ticket_options, auto_delete_party_hours,
+      application_enabled, registration_rules_text, application_questions
     } = body;
 
     // Upsert: varsa güncelle, yoksa ekle
@@ -134,6 +135,9 @@ export async function POST(req, { params }) {
           ticket_message_title: ticket_message_title || 'Destek Talebi',
           ticket_message_desc: ticket_message_desc || 'Lütfen aşağıdaki menüden bir konu seçerek destek talebinizi oluşturun.',
           ticket_options: Array.isArray(ticket_options) ? ticket_options : [{"label": "Genel Destek", "value": "genel", "description": "Genel konular hakkında destek alın", "emoji": "📩"}],
+          application_enabled: application_enabled ?? false,
+          registration_rules_text: registration_rules_text || null,
+          application_questions: Array.isArray(application_questions) ? application_questions : [],
         },
         { onConflict: 'guild_id' }
       )
