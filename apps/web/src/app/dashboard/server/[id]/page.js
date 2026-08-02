@@ -274,14 +274,15 @@ export default function ServerSettings() {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [hasChanges]);
 
+  const loadedGuildIdRef = useRef(null);
+
   useEffect(() => {
-    if (status === "authenticated" && guildId) {
-      setTimeout(() => {
-        setDiscordRoles([]);
-        setDiscordMembers([]);
-        fetchSettings();
-        fetchDiscordData();
-      }, 0);
+    if (status === "authenticated" && guildId && loadedGuildIdRef.current !== guildId) {
+      loadedGuildIdRef.current = guildId;
+      setDiscordRoles([]);
+      setDiscordMembers([]);
+      fetchSettings();
+      fetchDiscordData();
     }
   }, [status, guildId, fetchSettings, fetchDiscordData]);
 
