@@ -822,14 +822,21 @@ async function handleRegisterButtons(interaction) {
             if (logChannelId) {
                 const logChannel = interaction.guild.channels.cache.get(logChannelId);
                 if (logChannel) {
+                    const logFields = [
+                        { name: lang === 'tr' ? '👤 Kullanıcı' : '👤 User', value: `<@${targetUserId}>`, inline: true },
+                        { name: lang === 'tr' ? '🛡️ İsim' : '🛡️ Name', value: `${ign || '-'} / ${realName || '-'}`, inline: true },
+                        { name: lang === 'tr' ? '👮 Yetkili' : '👮 Staff', value: `<@${interaction.user.id}>`, inline: true }
+                    ];
+
+                    const qFields = (embed.fields || []).filter(f => f.name.includes('❓') || f.name.includes('BAŞVURU CEVAPLARI') || (f.value && f.value.includes('BAŞVURU CEVAPLARI')));
+                    if (qFields.length > 0) {
+                        logFields.push(...qFields);
+                    }
+
                     const logEmbed = new EmbedBuilder()
                         .setTitle(t('registration.log_rejected_title', lang))
                         .setColor('#ff4757')
-                        .addFields(
-                            { name: lang === 'tr' ? '👤 Kullanıcı' : '👤 User', value: `<@${targetUserId}>`, inline: true },
-                            { name: lang === 'tr' ? '🛡️ İsim' : '🛡️ Name', value: `${ign || '-'} / ${realName || '-'}`, inline: true },
-                            { name: lang === 'tr' ? '👮 Yetkili' : '👮 Staff', value: `<@${interaction.user.id}>`, inline: true }
-                        )
+                        .addFields(logFields)
                         .setTimestamp();
                     await logChannel.send({ embeds: [logEmbed] }).catch(()=>{});
                 }
@@ -1055,6 +1062,11 @@ async function handleRegisterButtons(interaction) {
 
                         if (finalGivenRoleId) {
                             logFields.push({ name: '🛡️ Verilen Rol', value: `<@&${finalGivenRoleId}>`, inline: true });
+                        }
+
+                        const qFields = (embed.fields || []).filter(f => f.name.includes('❓') || f.name.includes('BAŞVURU CEVAPLARI') || (f.value && f.value.includes('BAŞVURU CEVAPLARI')));
+                        if (qFields.length > 0) {
+                            logFields.push(...qFields);
                         }
 
                         const logEmbed = new EmbedBuilder()
