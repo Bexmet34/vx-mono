@@ -376,6 +376,8 @@ function buildAnswerModal(questions, pageIndex, channelId, lang) {
         if (q.placeholder_tr || q.placeholder_en) {
             const placeholder = lang === 'tr' ? q.placeholder_tr : q.placeholder_en;
             if (placeholder) input.setPlaceholder(placeholder.substring(0, 100));
+        } else {
+            input.setPlaceholder(questionText.substring(0, 100));
         }
 
         modal.addComponents(new ActionRowBuilder().addComponents(input));
@@ -475,6 +477,30 @@ function getNextStep(session, allQuestions) {
     return { type: 'done' };
 }
 
+/**
+ * Creates an embed listing the full questions for a specific modal page index
+ */
+function buildModalQuestionsEmbed(questions, pageIndex, lang) {
+    const { EmbedBuilder } = require('discord.js');
+    const modalQuestions = getModalQuestionsForPage(questions, pageIndex);
+    const totalPages = getTotalModalPages(questions);
+    
+    const embed = new EmbedBuilder()
+        .setTitle(lang === 'tr' 
+            ? `📋 Başvuru Soruları - Sayfa ${pageIndex + 1}/${totalPages}` 
+            : `📋 Application Questions - Page ${pageIndex + 1}/${totalPages}`)
+        .setColor('#5865F2');
+
+    let desc = '';
+    modalQuestions.forEach((q, index) => {
+        const questionText = q.question_tr || q.question_en || `Soru ${q.order}`;
+        desc += `**${index + 1}.** ${questionText}\n\n`;
+    });
+
+    embed.setDescription(desc || '...');
+    return embed;
+}
+
 module.exports = {
     startSession,
     addAnswers,
@@ -488,5 +514,6 @@ module.exports = {
     buildSelectMessage,
     getNextStep,
     getModalQuestionsForPage,
-    getTotalModalPages
+    getTotalModalPages,
+    buildModalQuestionsEmbed
 };

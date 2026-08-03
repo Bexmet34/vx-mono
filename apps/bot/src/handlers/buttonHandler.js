@@ -1199,10 +1199,12 @@ async function handleNextStep(interaction, nextStep, session, questions, lang, g
                 .setLabel(lang === 'tr' ? '▶ Sonraki Soruları Yanıtla' : '▶ Answer Next Questions')
                 .setStyle(ButtonStyle.Primary)
         );
+        const qEmbed = appSvc.buildModalQuestionsEmbed(questions, nextStep.pageIndex, lang);
         await interaction.followUp({
             content: lang === 'tr'
                 ? '✅ Cevaplar kaydedildi. Devam etmek için butona tıkla:'
                 : '✅ Answers saved. Click to continue:',
+            embeds: [qEmbed],
             components: [continueRow],
             flags: [MessageFlags.Ephemeral]
         }).catch(() => {});

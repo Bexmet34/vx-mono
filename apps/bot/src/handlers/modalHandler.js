@@ -393,8 +393,10 @@ async function handleRegisterModal(interaction) {
                             .setLabel(lang === 'tr' ? '▶ Soruları Yanıtla' : '▶ Answer Questions')
                             .setStyle(BS2.Primary)
                     );
+                    const qEmbed = appSvc.buildModalQuestionsEmbed(questions, 0, lang);
                     await interaction.editReply({
                         content: `✅ **${lang === 'tr' ? 'Kayıt bilgileriniz alındı.' : 'Registration info received.'}**\n\n📋 **${lang === 'tr' ? 'Başvuru sorularını yanıtlamak için aşağıdaki butona bas:' : 'Click below to answer the application questions:'}**`,
+                        embeds: [qEmbed],
                         components: [continueRow]
                     });
                 } else if (firstType === 'yesno') {
