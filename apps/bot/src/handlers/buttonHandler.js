@@ -678,6 +678,15 @@ async function handleRegisterButtons(interaction) {
         const guildCfg = await getGuildConfig(interaction.guildId);
         const lang = guildCfg?.language || 'tr';
 
+        // Check if user already has an active session
+        const session = appSvc.getSession(interaction.user.id, interaction.guildId);
+        if (session) {
+            return await interaction.reply({
+                content: `❌ **${lang === 'tr' ? 'Devam eden bir kayıt/başvuru süreciniz bulunuyor.' : 'You have an active registration/application process.'}**`,
+                flags: [MessageFlags.Ephemeral]
+            });
+        }
+
         // Anket aktif ve kural metni var mı?
         const applicationEnabled = guildCfg?.application_enabled === true;
         const rulesText = guildCfg?.registration_rules_text;
@@ -1170,11 +1179,13 @@ async function handleNextStep(interaction, nextStep, session, questions, lang, g
     if (!nextStep || nextStep.type === 'done') {
         // Tüm sorular cevaplandı → kaydet
         const userId = interaction.user.id;
-        const success = await appSvc.finalizeAnswers(userId, guildId, interaction.client);
+        const result = await appSvc.finalizeAnswers(userId, guildId, interaction.client);
+        const createdChannelId = result && result.channelId ? result.channelId : null;
+        const channelLink = createdChannelId ? `<#${createdChannelId}>` : '';
 
         const doneMsg = lang === 'tr'
-            ? '✅ **Başvurunuz tamamlandı!** Cevaplarınız yetkililere iletildi. Lütfen bekleyin.'
-            : '✅ **Application complete!** Your answers have been forwarded to staff.';
+            ? `✅ **Başvurunuz tamamlandı!** Cevaplarınız yetkililere iletildi. Kayıt biletiniz oluşturuldu: ${channelLink}`
+            : `✅ **Application complete!** Your answers have been forwarded to staff. Your registration ticket: ${channelLink}`;
 
         await interaction.followUp({ content: doneMsg, flags: [MessageFlags.Ephemeral] }).catch(() => {});
         return;

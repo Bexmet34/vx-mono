@@ -20,13 +20,14 @@ const pendingAnswers = new Map();
 /**
  * Kullanıcının anket oturumunu başlatır
  */
-function startSession(userId, guildId, channelId, questionList) {
+function startSession(userId, guildId, channelId, questionList, registrationData = null) {
     const key = `${userId}_${guildId}`;
     pendingAnswers.set(key, {
         channelId,
         answers: {},
         questionList, // Tüm sorular (rules_accept hariç)
-        currentPage: 0
+        currentPage: 0,
+        registrationData
     });
 }
 
@@ -95,16 +96,173 @@ function getTotalModalPages(questions) {
 async function finalizeAnswers(userId, guildId, client) {
     const key = `${userId}_${guildId}`;
     const session = pendingAnswers.get(key);
-    if (!session) return false;
+    if (!session) return { success: false };
 
     try {
+        const { getGuildConfig } = require('./guildConfig');
+        const guildConfig = await getGuildConfig(guildId);
+        const lang = guildConfig?.language || 'tr';
+        const guild = await client.guilds.fetch(guildId).catch(() => null);
+
+        let channelId = session.channelId;
+
+        // If channel does not exist yet (delayed channel creation), create it now
+        if (!channelId && session.registrationData && guild) {
+            const { ChannelType, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+            const { createPlayerCardEmbed } = require('../builders/embedBuilder');
+            
+            const { realName, ign, age, playerData } = session.registrationData;
+            const categoryId = guildConfig?.registration_category_id;
+            
+            const staffRoles = guildConfig?.registration_staff_role_ids?.split(',') || [];
+            
+            const permissionOverwrites = [
+                { id: guild.id, deny: [PermissionFlagsBits.ViewChannel] },
+                { id: userId, allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages] },
+                { id: client.user.id, allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages, PermissionFlagsBits.ManageChannels] }
+            ];
+
+            staffRoles.forEach(roleId => {
+                if (roleId) permissionOverwrites.push({ id: roleId, allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages] });
+            });
+
+            const channelName = realName ? `${ign.toLowerCase()}-${realName.toLowerCase().replace(/\s+/g, '-')}` : `basvuru-${ign.toLowerCase()}`;
+
+            let channel;
+            try {
+                channel = await guild.channels.create({
+                    name: channelName,
+                    type: ChannelType.GuildText,
+                    parent: categoryId || null,
+                    permissionOverwrites
+                });
+                channelId = channel.id;
+                session.channelId = channelId;
+            } catch (chanErr) {
+                console.error('[ApplicationService] Failed to create channel in finalizeAnswers:', chanErr.message);
+                return { success: false };
+            }
+
+            // Create embed and add questionnaire answers directly
+            const embed = createPlayerCardEmbed(playerData, lang);
+            if (realName) embed.addFields({ name: '📝 Gerçek İsim', value: realName, inline: true });
+            if (ign) embed.addFields({ name: '🎮 Oyun İçi Nick', value: ign, inline: true });
+            if (age) embed.addFields({ name: '📅 Yaş', value: age, inline: true });
+            if (playerData && playerData.Id) embed.addFields({ name: '🔑 Albion ID', value: playerData.Id, inline: true });
+
+            if (guildConfig?.embed_thumbnail_url) {
+                embed.setThumbnail(guildConfig.embed_thumbnail_url);
+            }
+
+            embed.addFields({ name: '─────────────────────────', value: '📋 **BAŞVURU CEVAPLARI**', inline: false });
+            const questions = guildConfig?.application_questions || [];
+            for (const q of questions) {
+                if (q.type === 'rules_accept') continue;
+                const answer = session.answers[q.id];
+                if (!answer) continue;
+
+                const questionText = q.question_tr || q.question_en || `Soru ${q.order}`;
+                const displayLabel = questionText.length > 80
+                    ? questionText.substring(0, 77) + '...'
+                    : questionText;
+
+                const displayAnswer = String(answer).length > 1024
+                    ? String(answer).substring(0, 1021) + '...'
+                    : String(answer);
+
+                embed.addFields({
+                    name: `❓ ${displayLabel}`,
+                    value: `> ${displayAnswer}`,
+                    inline: false
+                });
+            }
+
+            const role1 = guildConfig?.registration_given_role_id;
+            const role2 = guildConfig?.registration_given_role_id_2;
+            const role3 = guildConfig?.registration_given_role_id_3;
+            const role4 = guildConfig?.registration_given_role_id_4;
+            const role5 = guildConfig?.registration_given_role_id_5;
+            const tempRole = guildConfig?.registration_unregistered_role_id;
+
+            const rows = [];
+            let currentRow = new ActionRowBuilder();
+            let buttonCountInRow = 0;
+
+            const addButtonToRow = (btn) => {
+                if (buttonCountInRow === 5) {
+                    rows.push(currentRow);
+                    currentRow = new ActionRowBuilder();
+                    buttonCountInRow = 0;
+                }
+                currentRow.addComponents(btn);
+                buttonCountInRow++;
+            };
+
+            const addApproveButton = (roleId, index) => {
+                if (!roleId) return;
+                const role = guild.roles.cache.get(roleId);
+                const roleName = role ? role.name : `Rol ${index}`;
+                const labelText = lang === 'tr' ? `Onayla (${roleName})` : `Approve (${roleName})`;
+                
+                addButtonToRow(
+                    new ButtonBuilder()
+                        .setCustomId(`reg_approve_${index}_${userId}`)
+                        .setLabel(labelText.substring(0, 80))
+                        .setStyle(ButtonStyle.Success)
+                );
+            };
+
+            addApproveButton(role1, 1);
+            addApproveButton(role2, 2);
+            addApproveButton(role3, 3);
+            addApproveButton(role4, 4);
+            addApproveButton(role5, 5);
+
+            if (tempRole) {
+                const tr = guild.roles.cache.get(tempRole);
+                const trName = tr ? tr.name : 'Misafir';
+                addButtonToRow(
+                    new ButtonBuilder()
+                        .setCustomId(`reg_temp_${userId}`)
+                        .setLabel(lang === 'tr' ? `Süreli (${trName})` : `Temp (${trName})`)
+                        .setStyle(ButtonStyle.Primary)
+                );
+            }
+
+            if (buttonCountInRow === 0 && rows.length === 0) {
+                addButtonToRow(
+                    new ButtonBuilder()
+                        .setCustomId(`reg_approve_1_${userId}`)
+                        .setLabel(lang === 'tr' ? 'Onayla' : 'Approve')
+                        .setStyle(ButtonStyle.Success)
+                );
+            }
+
+            addButtonToRow(
+                new ButtonBuilder()
+                    .setCustomId(`reg_reject_${userId}`)
+                    .setLabel(lang === 'tr' ? 'Reddet' : 'Reject')
+                    .setStyle(ButtonStyle.Danger)
+            );
+
+            rows.push(currentRow);
+
+            const staffPings = staffRoles.filter(r => r).map(r => `<@&${r}>`).join(' ');
+
+            await channel.send({
+                content: `🔔 **${lang === 'tr' ? 'Yeni Kayıt Başvurusu!' : 'New Registration Application!'}** <@${userId}> ${staffPings}`,
+                embeds: [embed],
+                components: rows
+            });
+        }
+
         // 1. Supabase'e kaydet
         const { error } = await supabase
             .from('application_answers')
             .insert({
                 guild_id: guildId,
                 user_id: userId,
-                ticket_channel_id: session.channelId,
+                ticket_channel_id: channelId,
                 answers: session.answers,
                 status: 'pending'
             });
@@ -114,7 +272,7 @@ async function finalizeAnswers(userId, guildId, client) {
         }
 
         // 2. Ticket kanalındaki embed'i güncelle
-        if (session.channelId && client) {
+        if (session.channelId && client && !session.registrationData) {
             try {
                 const channel = await client.channels.fetch(session.channelId).catch(() => null);
                 if (channel) {
@@ -164,11 +322,11 @@ async function finalizeAnswers(userId, guildId, client) {
 
         // 3. Oturumu temizle
         clearSession(userId, guildId);
-        return true;
+        return { success: true, channelId };
 
     } catch (err) {
         console.error('[ApplicationService] finalizeAnswers error:', err.message);
-        return false;
+        return { success: false };
     }
 }
 

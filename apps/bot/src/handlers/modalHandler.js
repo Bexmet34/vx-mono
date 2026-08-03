@@ -351,7 +351,7 @@ async function handleRegisterModal(interaction) {
                 });
             }
 
-            // 2. Create Ticket Channel
+            // 2. Create Ticket Channel (or delay if application is enabled)
             const categoryId = guildConfig?.registration_category_id;
             
             // --- ANTI-SPAM CHECK ---
@@ -368,183 +368,182 @@ async function handleRegisterModal(interaction) {
                     }
                 }
             }
-            
-            const staffRoles = guildConfig?.registration_staff_role_ids?.split(',') || [];
-            
-            const permissionOverwrites = [
-                { id: interaction.guild.id, deny: [PermissionFlagsBits.ViewChannel] },
-                { id: interaction.user.id, allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages] },
-                { id: interaction.client.user.id, allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages, PermissionFlagsBits.ManageChannels] }
-            ];
 
-            staffRoles.forEach(roleId => {
-                if (roleId) permissionOverwrites.push({ id: roleId, allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages] });
-            });
-
-            // Channel name format: ingamename-realname
-            const channelName = realName ? `${ign.toLowerCase()}-${realName.toLowerCase().replace(/\s+/g, '-')}` : `basvuru-${ign.toLowerCase()}`;
-
-            let channel;
-            try {
-                channel = await interaction.guild.channels.create({
-                    name: channelName,
-                    type: ChannelType.GuildText,
-                    parent: categoryId || null,
-                    permissionOverwrites
-                });
-            } catch (chanErr) {
-                if (chanErr.code === 50013) {
-                    return await interaction.editReply({
-                        content: `❌ **${lang === 'tr' ? 'Yetki Hatası: Botun bu sunucuda "Kanalları Yönet" yetkisi bulunmuyor!' : 'Permission Error: Bot lacks "Manage Channels" permission in this server!'}**`
-                    });
-                }
-                throw chanErr;
-            }
-
-            // 3. Send Player Card
-            const embed = createPlayerCardEmbed(playerData, lang);
-            if (realName) {
-                embed.addFields({ name: '📝 Gerçek İsim', value: realName, inline: true });
-            }
-            if (ign) {
-                embed.addFields({ name: '🎮 Oyun İçi Nick', value: ign, inline: true });
-            }
-            if (age) {
-                embed.addFields({ name: '📅 Yaş', value: age, inline: true });
-            }
-            if (playerData && playerData.Id) {
-                embed.addFields({ name: '🔑 Albion ID', value: playerData.Id, inline: true });
-            }
-
-            if (guildConfig?.embed_thumbnail_url) {
-                embed.setThumbnail(guildConfig.embed_thumbnail_url);
-            }
-
-            const role1 = guildConfig?.registration_given_role_id;
-            const role2 = guildConfig?.registration_given_role_id_2;
-            const role3 = guildConfig?.registration_given_role_id_3;
-            const role4 = guildConfig?.registration_given_role_id_4;
-            const role5 = guildConfig?.registration_given_role_id_5;
-            const tempRole = guildConfig?.registration_unregistered_role_id;
-            
-            const rows = [];
-            let currentRow = new ActionRowBuilder();
-            let buttonCountInRow = 0;
-
-            const addButtonToRow = (btn) => {
-                if (buttonCountInRow === 5) {
-                    rows.push(currentRow);
-                    currentRow = new ActionRowBuilder();
-                    buttonCountInRow = 0;
-                }
-                currentRow.addComponents(btn);
-                buttonCountInRow++;
-            };
-
-            const addApproveButton = (roleId, index) => {
-                if (!roleId) return;
-                const role = interaction.guild.roles.cache.get(roleId);
-                const roleName = role ? role.name : `Rol ${index}`;
-                const labelText = lang === 'tr' ? `Onayla (${roleName})` : `Approve (${roleName})`;
-                
-                addButtonToRow(
-                    new ButtonBuilder()
-                        .setCustomId(`reg_approve_${index}_${interaction.user.id}`)
-                        .setLabel(labelText.substring(0, 80))
-                        .setStyle(ButtonStyle.Success)
-                );
-            };
-
-            addApproveButton(role1, 1);
-            addApproveButton(role2, 2);
-            addApproveButton(role3, 3);
-            addApproveButton(role4, 4);
-            addApproveButton(role5, 5);
-
-            // Add Temp Role Button
-            if (tempRole) {
-                const tr = interaction.guild.roles.cache.get(tempRole);
-                const trName = tr ? tr.name : 'Misafir';
-                addButtonToRow(
-                    new ButtonBuilder()
-                        .setCustomId(`reg_temp_${interaction.user.id}`)
-                        .setLabel(lang === 'tr' ? `Süreli (${trName})` : `Temp (${trName})`)
-                        .setStyle(ButtonStyle.Primary)
-                );
-            }
-
-            // If no roles are configured, provide a generic fallback button
-            if (buttonCountInRow === 0 && rows.length === 0) {
-                addButtonToRow(
-                    new ButtonBuilder()
-                        .setCustomId(`reg_approve_1_${interaction.user.id}`)
-                        .setLabel(lang === 'tr' ? 'Onayla' : 'Approve')
-                        .setStyle(ButtonStyle.Success)
-                );
-            }
-
-            addButtonToRow(
-                new ButtonBuilder()
-                    .setCustomId(`reg_reject_${interaction.user.id}`)
-                    .setLabel(lang === 'tr' ? 'Reddet' : 'Reject')
-                    .setStyle(ButtonStyle.Danger)
-            );
-
-            rows.push(currentRow);
-
-            // Ping staff if configured
-            const staffPings = staffRoles.filter(r => r).map(r => `<@&${r}>`).join(' ');
-            
-            await channel.send({
-                content: `🔔 **${lang === 'tr' ? 'Yeni Kayıt Başvurusu!' : 'New Registration Application!'}** <@${interaction.user.id}> ${staffPings}`,
-                embeds: [embed],
-                components: rows
-            });
-
-            // ─── ANKET: Sorular varsa başlat ─────────────────────────────────────────
             const applicationEnabled = guildConfig?.application_enabled === true;
             const questions = (guildConfig?.application_questions || []).filter(q => q.type !== 'rules_accept');
 
             if (applicationEnabled && questions.length > 0) {
-                // Oturumu başlat
-                appSvc.startSession(interaction.user.id, interaction.guildId, channel.id, questions);
+                // Defer channel creation, store registration details in session
+                appSvc.startSession(interaction.user.id, interaction.guildId, null, questions, {
+                    realName,
+                    ign,
+                    age,
+                    playerData
+                });
 
-                // İlk modal'a ait soru tipini belirle
+                // Determine first question type
                 const firstQ = questions[0];
                 const firstType = firstQ?.type || 'text';
 
                 if (firstType === 'text' || firstType === 'paragraph') {
-                    // Modal sayfası 1 açılabilir
                     const { ActionRowBuilder: AR2, ButtonBuilder: BB2, ButtonStyle: BS2 } = require('discord.js');
                     const continueRow = new AR2().addComponents(
                         new BB2()
-                            .setCustomId(`app_continue:0:${channel.id}`)
+                            .setCustomId(`app_continue:0:nochan`)
                             .setLabel(lang === 'tr' ? '▶ Soruları Yanıtla' : '▶ Answer Questions')
                             .setStyle(BS2.Primary)
                     );
                     await interaction.editReply({
-                        content: `✅ **${lang === 'tr' ? 'Kanal açıldı:' : 'Channel created:'}** <#${channel.id}>\n\n📋 **${lang === 'tr' ? 'Başvuru sorularını yanıtlamak için aşağıdaki butona bas:' : 'Click below to answer the application questions:'}**`,
+                        content: `✅ **${lang === 'tr' ? 'Kayıt bilgileriniz alındı.' : 'Registration info received.'}**\n\n📋 **${lang === 'tr' ? 'Başvuru sorularını yanıtlamak için aşağıdaki butona bas:' : 'Click below to answer the application questions:'}**`,
                         components: [continueRow]
                     });
                 } else if (firstType === 'yesno') {
                     const { handleNextStep } = require('./buttonHandler');
                     const session = appSvc.getSession(interaction.user.id, interaction.guildId);
                     const nextStep = appSvc.getNextStep(session, questions);
-                    await interaction.editReply({ content: `✅ <#${channel.id}> \n\n📋 Başvuru soruları:` });
-                    await handleNextStep(interaction, nextStep, session, questions, lang, interaction.guildId, channel.id);
+                    await interaction.editReply({ content: `✅ **${lang === 'tr' ? 'Kayıt bilgileriniz alındı.' : 'Registration info received.'}**\n\n📋 **${lang === 'tr' ? 'Başvuru soruları:' : 'Application questions:'}**` });
+                    await handleNextStep(interaction, nextStep, session, questions, lang, interaction.guildId, 'nochan');
                 } else if (firstType === 'select' || firstType === 'multiselect') {
                     const { handleNextStep } = require('./buttonHandler');
                     const session = appSvc.getSession(interaction.user.id, interaction.guildId);
                     const nextStep = appSvc.getNextStep(session, questions);
-                    await interaction.editReply({ content: `✅ <#${channel.id}> \n\n📋 Başvuru soruları:` });
-                    await handleNextStep(interaction, nextStep, session, questions, lang, interaction.guildId, channel.id);
+                    await interaction.editReply({ content: `✅ **${lang === 'tr' ? 'Kayıt bilgileriniz alındı.' : 'Registration info received.'}**\n\n📋 **${lang === 'tr' ? 'Başvuru soruları:' : 'Application questions:'}**` });
+                    await handleNextStep(interaction, nextStep, session, questions, lang, interaction.guildId, 'nochan');
                 } else {
                     await interaction.editReply({
-                        content: `✅ **${lang === 'tr' ? 'Başvurunuz alındı! Kanal açıldı:' : 'Application received! Channel created:'}** <#${channel.id}>`
+                        content: `❌ **${lang === 'tr' ? 'Bir hata oluştu!' : 'An error occurred!'}**`
                     });
                 }
             } else {
-                // Anket yok → normal yanıt
+                // Survey disabled → Create channel immediately
+                const staffRoles = guildConfig?.registration_staff_role_ids?.split(',') || [];
+                
+                const permissionOverwrites = [
+                    { id: interaction.guild.id, deny: [PermissionFlagsBits.ViewChannel] },
+                    { id: interaction.user.id, allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages] },
+                    { id: interaction.client.user.id, allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages, PermissionFlagsBits.ManageChannels] }
+                ];
+
+                staffRoles.forEach(roleId => {
+                    if (roleId) permissionOverwrites.push({ id: roleId, allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages] });
+                });
+
+                const channelName = realName ? `${ign.toLowerCase()}-${realName.toLowerCase().replace(/\s+/g, '-')}` : `basvuru-${ign.toLowerCase()}`;
+
+                let channel;
+                try {
+                    channel = await interaction.guild.channels.create({
+                        name: channelName,
+                        type: ChannelType.GuildText,
+                        parent: categoryId || null,
+                        permissionOverwrites
+                    });
+                } catch (chanErr) {
+                    if (chanErr.code === 50013) {
+                        return await interaction.editReply({
+                            content: `❌ **${lang === 'tr' ? 'Yetki Hatası: Botun bu sunucuda "Kanalları Yönet" yetkisi bulunmuyor!' : 'Permission Error: Bot lacks "Manage Channels" permission in this server!'}**`
+                        });
+                    }
+                    throw chanErr;
+                }
+
+                // 3. Send Player Card
+                const embed = createPlayerCardEmbed(playerData, lang);
+                if (realName) {
+                    embed.addFields({ name: '📝 Gerçek İsim', value: realName, inline: true });
+                }
+                if (ign) {
+                    embed.addFields({ name: '🎮 Oyun İçi Nick', value: ign, inline: true });
+                }
+                if (age) {
+                    embed.addFields({ name: '📅 Yaş', value: age, inline: true });
+                }
+                if (playerData && playerData.Id) {
+                    embed.addFields({ name: '🔑 Albion ID', value: playerData.Id, inline: true });
+                }
+
+                if (guildConfig?.embed_thumbnail_url) {
+                    embed.setThumbnail(guildConfig.embed_thumbnail_url);
+                }
+
+                const role1 = guildConfig?.registration_given_role_id;
+                const role2 = guildConfig?.registration_given_role_id_2;
+                const role3 = guildConfig?.registration_given_role_id_3;
+                const role4 = guildConfig?.registration_given_role_id_4;
+                const role5 = guildConfig?.registration_given_role_id_5;
+                const tempRole = guildConfig?.registration_unregistered_role_id;
+                
+                const rows = [];
+                let currentRow = new ActionRowBuilder();
+                let buttonCountInRow = 0;
+
+                const addButtonToRow = (btn) => {
+                    if (buttonCountInRow === 5) {
+                        rows.push(currentRow);
+                        currentRow = new ActionRowBuilder();
+                        buttonCountInRow = 0;
+                    }
+                    currentRow.addComponents(btn);
+                    buttonCountInRow++;
+                };
+
+                const addApproveButton = (roleId, index) => {
+                    if (!roleId) return;
+                    const role = interaction.guild.roles.cache.get(roleId);
+                    const roleName = role ? role.name : `Rol ${index}`;
+                    const labelText = lang === 'tr' ? `Onayla (${roleName})` : `Approve (${roleName})`;
+                    
+                    addButtonToRow(
+                        new ButtonBuilder()
+                            .setCustomId(`reg_approve_${index}_${interaction.user.id}`)
+                            .setLabel(labelText.substring(0, 80))
+                            .setStyle(ButtonStyle.Success)
+                    );
+                };
+
+                addApproveButton(role1, 1);
+                addApproveButton(role2, 2);
+                addApproveButton(role3, 3);
+                addApproveButton(role4, 4);
+                addApproveButton(role5, 5);
+
+                if (tempRole) {
+                    const tr = interaction.guild.roles.cache.get(tempRole);
+                    const trName = tr ? tr.name : 'Misafir';
+                    addButtonToRow(
+                        new ButtonBuilder()
+                            .setCustomId(`reg_temp_${interaction.user.id}`)
+                            .setLabel(lang === 'tr' ? `Süreli (${trName})` : `Temp (${trName})`)
+                            .setStyle(ButtonStyle.Primary)
+                    );
+                }
+
+                if (buttonCountInRow === 0 && rows.length === 0) {
+                    addButtonToRow(
+                        new ButtonBuilder()
+                            .setCustomId(`reg_approve_1_${interaction.user.id}`)
+                            .setLabel(lang === 'tr' ? 'Onayla' : 'Approve')
+                            .setStyle(ButtonStyle.Success)
+                    );
+                }
+
+                addButtonToRow(
+                    new ButtonBuilder()
+                        .setCustomId(`reg_reject_${interaction.user.id}`)
+                        .setLabel(lang === 'tr' ? 'Reddet' : 'Reject')
+                        .setStyle(ButtonStyle.Danger)
+                );
+
+                rows.push(currentRow);
+
+                const staffPings = staffRoles.filter(r => r).map(r => `<@&${r}>`).join(' ');
+                
+                await channel.send({
+                    content: `🔔 **${lang === 'tr' ? 'Yeni Kayıt Başvurusu!' : 'New Registration Application!'}** <@${interaction.user.id}> ${staffPings}`,
+                    embeds: [embed],
+                    components: rows
+                });
+
                 await interaction.editReply({
                     content: `✅ **${lang === 'tr' ? 'Başvurunuz alındı! Kanal açıldı:' : 'Application received! Channel created:'}** <#${channel.id}>`
                 });
