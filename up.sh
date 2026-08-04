@@ -44,7 +44,11 @@ trap 'send_error_to_discord' ERR
 
 echo "==> [1/6] Github'dan güncel dosyalar çekiliyor..." | tee -a "$LOG_FILE"
 cd /root/vx-mono
-# Çakışmaları önlemek için git pull'u daha kararlı yapıyoruz
+# Son commit mesajını alalım
+commit_author=$(git log -1 --format="%an" 2>/dev/null || echo "Bilinmiyor")
+commit_message=$(git log -1 --format="%s" 2>/dev/null || echo "Bilinmiyor")
+commit_hash=$(git log -1 --format="%h" 2>/dev/null || echo "Bilinmiyor")
+
 git fetch --all >> "$LOG_FILE" 2>&1
 git reset --hard origin/main >> "$LOG_FILE" 2>&1
 
@@ -69,15 +73,37 @@ pm2 restart all >> "$LOG_FILE" 2>&1
 sudo apt-get autoclean -y >> "$LOG_FILE" 2>&1
 echo 3 > /proc/sys/vm/drop_caches
 
+# PM2 durumunu ve sistem kaynaklarını çekelim
+pm2_status=$(pm2 status | grep -E "partikur|vxdestek|vxweb" | awk '{print $2 " | " $10 " | " $12}' | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
+free_disk=$(df -h / | awk 'NR==2 {print $4 " boş (Toplam: " $2 ")"}')
+free_ram=$(free -h | awk 'NR==2 {print $4 " kullanılabilir (Toplam: " $2 ")"}')
+
 # Başarı mesajı gönder
 success_payload=$(cat <<JSON
 {
   "content": null,
   "embeds": [
     {
-      "title": "✅ Sunucu Başarıyla Güncellendi",
-      "description": "Tüm servisler derlendi, önbellekler temizlendi ve PM2 uygulamaları başarıyla yeniden başlatıldı.",
+      "title": "✅ Sunucu Dağıtım Başarılı!",
+      "description": "Tüm servisler başarıyla güncellendi ve yeniden başlatıldı.",
       "color": 65280,
+      "fields": [
+        {
+          "name": "📌 Son Güncelleme (Commit)",
+          "value": "\`$commit_hash\` - **$commit_message** *(Yazar: $commit_author)*",
+          "inline": false
+        },
+        {
+          "name": "⚙️ Servis Durumları (İsim | CPU | RAM)",
+          "value": "\`\`\`text\n$pm2_status\n\`\`\`",
+          "inline": false
+        },
+        {
+          "name": "💾 Sunucu Kaynakları",
+          "value": "• **Disk:** $free_disk\n• **RAM:** $free_ram",
+          "inline": false
+        }
+      ],
       "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
     }
   ]
