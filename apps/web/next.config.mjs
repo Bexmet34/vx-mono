@@ -1,7 +1,13 @@
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  serverExternalPackages: ['discord.js'], // If there was any previously needed or default
+  serverExternalPackages: ['discord.js'],
+  outputFileTracingRoot: path.join(__dirname, '../../'),
 };
 
 export default nextConfig;
