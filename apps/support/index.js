@@ -1,4 +1,5 @@
 require('dotenv').config();
+throw new Error("🚨 YAPAY TEST HATASI: Discord Webhook Entegrasyonu Başarıyla Çalışıyor!");
 const { Client, GatewayIntentBits, Collection, ActivityType } = require('discord.js');
 const { supabase } = require('@veyronix/database');
 const fs = require('fs');
