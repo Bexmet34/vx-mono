@@ -266,10 +266,11 @@ async function handleTempCommand(interaction) {
     if (partyCount >= limit) {
         let errorMsg = `❌ **${t('party.already_active', lang)}**\n\n${t('party.limit_desc_normal', lang)}`;
 
-        return await interaction.reply({
-            content: errorMsg,
-            flags: [MessageFlags.Ephemeral]
-        });
+        if (interaction.deferred || interaction.replied) {
+            return await interaction.editReply({ content: errorMsg }).catch(()=>{});
+        } else {
+            return await interaction.reply({ content: errorMsg, flags: [MessageFlags.Ephemeral] }).catch(()=>{});
+        }
     }
 
 function getTemplateByIndex(templatesStr, indexStr) {
@@ -288,9 +289,15 @@ function getTemplateByIndex(templatesStr, indexStr) {
         templateValue = interaction.options.getString('template');
     } else if (interaction.isStringSelectMenu && interaction.isStringSelectMenu()) {
         templateValue = interaction.values[0];
-        await interaction.update({ content: '⏳ Şablon yükleniyor ve parti oluşturuluyor...', components: [] }).catch(()=>{});
+        if (interaction.deferred || interaction.replied) {
+            await interaction.editReply({ content: '⏳ Şablon yükleniyor ve parti oluşturuluyor...', components: [] }).catch(()=>{});
+        } else {
+            await interaction.update({ content: '⏳ Şablon yükleniyor ve parti oluşturuluyor...', components: [] }).catch(()=>{});
+        }
     } else if (interaction.isButton && interaction.isButton()) {
-        await interaction.deferReply({ flags: [MessageFlags.Ephemeral] }).catch(()=>{});
+        if (!interaction.deferred && !interaction.replied) {
+            await interaction.deferReply({ flags: [MessageFlags.Ephemeral] }).catch(()=>{});
+        }
         
         const { getUserTemplates } = require('@veyronix/database');
         const userTemplates = await getUserTemplates(userId) || [];
