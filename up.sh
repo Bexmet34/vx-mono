@@ -1,39 +1,76 @@
 #!/bin/bash
-echo "🔄 [1/4] GitHub'dan en güncel kodlar çekiliyor..."
-if git pull origin main > /dev/null 2>&1; then
-    echo "✅ GitHub kodları başarıyla güncellendi."
-else
-    echo "⚠️ GitHub güncellemesi tamamlandı."
+
+WEBHOOK_URL="https://discord.com/api/webhooks/1534325527442358373/9geJu4CNNua-rhogcfNv7SeWkq5fnVf8MWXuBOKu-Jx5B9XgHHvUHzooxWOxR_USlEac"
+
+# Hata yakalama fonksiyonu
+send_error_to_discord() {
+    local exit_code=$?
+    local failed_command="$BASH_COMMAND"
+    echo "==> Hata algılandı! Discord'a bildiriliyor..."
+    
+    # Hata mesajı içeriği (Discord Markdown formatında)
+    local payload=$(cat <<JSON
+{
+  "content": null,
+  "embeds": [
+    {
+      "title": "🚨 Sunucu Dağıtım (Deploy) Hatası!",
+      "description": "**Başarısız olan komut:** \`$failed_command\`\n**Çıkış Kodu:** \`$exit_code\`\n\nLütfen sunucu terminal loglarını veya PM2 durumunu kontrol edin.",
+      "color": 16711680,
+      "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    }
+  ]
+}
+JSON
+)
+
+    curl -H "Content-Type: application/json" -X POST -d "$payload" "$WEBHOOK_URL"
+    exit $exit_code
+}
+
+# Herhangi bir hata oluştuğunda bu fonksiyonu çağır
+trap 'send_error_to_discord' ERR
+
+echo "==> [1/6] Github'dan güncel dosyalar çekiliyor..."
+cd /root/vx-mono
+git pull
+
+echo "==> [2/6] Next.js Önbelleği temizleniyor..."
+if [ -d "apps/web/.next" ]; then
+    rm -rf apps/web/.next
 fi
 
-echo "📦 [2/4] Bağımlılıklar kontrol ediliyor..."
-pnpm install > /dev/null 2>&1
+echo "==> [3/6] Gerekli paketler yükleniyor..."
+pnpm install --frozen-lockfile
 
-echo "🏗️ [3/4] Web sitesi derleniyor (Build)..."
-BUILD_OUTPUT=$(pnpm --filter partikurweb build 2>&1)
-BUILD_STATUS=$?
+echo "==> [4/6] Proje derleniyor (Build)..."
+pnpm build
 
-if [ $BUILD_STATUS -eq 0 ]; then
-    echo "✅ Web sitesi derlemesi başarılı (Build OK)."
-else
-    echo "❌ WEB SİTESİ DERLEME HATASI OLUŞTU:"
-    echo "------------------------------------------"
-    echo "$BUILD_OUTPUT" | tail -n 15
-    echo "------------------------------------------"
-    exit 1
-fi
+echo "==> [5/6] pnpm Önbelleği temizleniyor..."
+pnpm store prune
 
-echo "🚀 [4/4] Servisler yeniden başlatılıyor (PM2)..."
-pm2 restart ecosystem.config.js > /dev/null 2>&1
-pm2 save > /dev/null 2>&1
+echo "==> [6/6] PM2 servisleri yeniden başlatılıyor..."
+pm2 restart all
 
-echo ""
-echo "=========================================="
-echo "🎉 TÜM GÜNCELLEMELER BAŞARIYLA TAMAMLANDI!"
-echo "=========================================="
-echo "🟢 Partikur Botu   : GÜNCELLENDİ (ONLİNE)"
-echo "🟢 Destek Botu     : GÜNCELLENDİ (ONLİNE)"
-echo "🟢 Web Sitesi      : GÜNCELLENDİ (ONLİNE)"
-echo "=========================================="
+# Sistem genelinde ufak bir temizlik yapalım
+sudo apt-get autoclean -y
+echo 3 > /proc/sys/vm/drop_caches
 
+# Başarı mesajı gönder
+success_payload=$(cat <<JSON
+{
+  "content": null,
+  "embeds": [
+    {
+      "title": "✅ Sunucu Başarıyla Güncellendi",
+      "description": "Tüm servisler derlendi, önbellekler temizlendi ve PM2 uygulamaları başarıyla yeniden başlatıldı.",
+      "color": 65280,
+      "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    }
+  ]
+}
+JSON
+)
+curl -H "Content-Type: application/json" -X POST -d "$success_payload" "$WEBHOOK_URL"
 
+echo "==> Güncelleme ve optimizasyon başarıyla tamamlandı!"

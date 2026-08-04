@@ -1,0 +1,22 @@
+name: Sunucu Otomatik Canlıya Alma (Deploy)
+
+on:
+  push:
+    branches:
+      - main # main branch'ine push yapıldığında çalışır
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sunucuya SSH ile bağlan ve up.sh çalıştır
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }} # SSH Key kullanıyorsanız
+          # şifre kullanıyorsanız üstteki key satırını silip alttakini açabilirsiniz:
+          # password: ${{ secrets.SSH_PASSWORD }}
+          port: 22
+          script: |
+            /root/vx-mono/up.sh
