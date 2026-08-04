@@ -38,7 +38,7 @@ export async function fetchAlbion(url, options = {}, retries = 2, timeoutMs = 20
     } catch (err) {
       clearTimeout(timeoutId);
       if (attempt === retries) {
-        console.error(`[Albion Fetch Error] Failed to fetch ${url} after ${retries + 1} attempts. Error:`, err.message || err);
+        console.warn(`[Albion Fetch Warning] Failed to fetch ${url.split('?')[0]} after ${retries + 1} attempts. Error:`, err.message || err);
         return null;
       }
       // Wait before retrying
