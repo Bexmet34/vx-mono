@@ -73,8 +73,22 @@ pm2 restart all >> "$LOG_FILE" 2>&1
 sudo apt-get autoclean -y >> "$LOG_FILE" 2>&1
 echo 3 > /proc/sys/vm/drop_caches
 
-# PM2 durumunu ve sistem kaynaklarını çekelim
-pm2_status=$(pm2 status | grep -E "partikur|vxdestek|vxweb" | awk '{print $2 " | " $10 " | " $12}' | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
+# PM2 durumunu JSON formatından parse edip düzgün bir tablo yapalım
+pm2_status=$(pm2 jlist | node -e '
+const list = JSON.parse(require("fs").readFileSync(0, "utf-8"));
+const filtered = list.filter(app => ["partikur", "vxdestek", "vxweb"].includes(app.name));
+const output = filtered.map(app => {
+  const ram = (app.monit.memory / 1024 / 1024).toFixed(1) + " MB";
+  const cpu = app.monit.cpu + "%";
+  const status = app.pm2_env.status.toUpperCase();
+  return `${app.name.padEnd(10)} | ${status.padEnd(7)} | CPU: ${cpu.padEnd(4)} | RAM: ${ram}`;
+}).join("\n");
+console.log(output);
+' 2>/dev/null || echo "PM2 bilgileri alınamadı.")
+
+# Eğer çıktıda çift tırnak veya yeni satır varsa JSON bozulmasın diye kaçıralım
+pm2_status_escaped=$(echo "$pm2_status" | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
+
 free_disk=$(df -h / | awk 'NR==2 {print $4 " boş (Toplam: " $2 ")"}')
 free_ram=$(free -h | awk 'NR==2 {print $4 " kullanılabilir (Toplam: " $2 ")"}')
 
@@ -94,8 +108,8 @@ success_payload=$(cat <<JSON
           "inline": false
         },
         {
-          "name": "⚙️ Servis Durumları (İsim | CPU | RAM)",
-          "value": "\`\`\`text\n$pm2_status\n\`\`\`",
+          "name": "⚙️ Servis Durumları (İsim | Durum | CPU | RAM)",
+          "value": "\`\`\`text\n$pm2_status_escaped\n\`\`\`",
           "inline": false
         },
         {
