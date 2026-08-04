@@ -65,10 +65,6 @@ echo "==> [3/6] Gerekli paketler yükleniyor..." | tee -a "$LOG_FILE"
 pnpm install --frozen-lockfile >> "$LOG_FILE" 2>&1
 
 echo "==> [4/6] Proje derleniyor (Build)..." | tee -a "$LOG_FILE"
-# YAPAY HATA EKLEME (Test bittiğinde bu satır silinecek)
-echo "YAPAY DERLEME HATASI OLUŞTURULUYOR!" >> "$LOG_FILE"
-false # Bu komut hata kodu 1 döndürür ve betiği çökertir
-
 pnpm build >> "$LOG_FILE" 2>&1
 
 echo "==> [5/6] pnpm Önbelleği temizleniyor..." | tee -a "$LOG_FILE"
