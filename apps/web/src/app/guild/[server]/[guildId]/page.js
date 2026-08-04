@@ -4,6 +4,8 @@ import CtaBanner from "@/components/CtaBanner";
 import Link from "next/link";
 import { Shield, Users, Sword, Skull } from "lucide-react";
 
+import { fetchAlbion } from "@/utils/albion";
+
 export const revalidate = 600; // Cache guild page for 10 minutes (ISR)
 
 const REGIONS = {
@@ -16,11 +18,7 @@ const REGIONS = {
 async function getGuild(server, guildId) {
   const baseUrl = REGIONS[server.toLowerCase()] || REGIONS.europe;
   try {
-    const res = await fetch(`${baseUrl}/guilds/${guildId}`, {
-      next: { revalidate: 600 },
-    });
-    if (!res.ok) return null;
-    return res.json();
+    return await fetchAlbion(`${baseUrl}/guilds/${guildId}`);
   } catch (err) {
     console.error("Error fetching guild:", err);
     return null;
@@ -31,12 +29,8 @@ async function getGuild(server, guildId) {
 async function getGuildMembers(server, guildId) {
   const baseUrl = REGIONS[server.toLowerCase()] || REGIONS.europe;
   try {
-    const res = await fetch(`${baseUrl}/guilds/${guildId}/members`, {
-      next: { revalidate: 600 },
-    });
-
-    if (!res.ok) return [];
-    return res.json();
+    const data = await fetchAlbion(`${baseUrl}/guilds/${guildId}/members`);
+    return data || [];
   } catch (err) {
     console.error("Error fetching guild members:", err);
     return [];

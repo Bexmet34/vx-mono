@@ -25,16 +25,15 @@ const SERVERS_MAP = {
   },
 };
 
+import { fetchAlbion } from "@/utils/albion";
+
 async function getRecentKills(serverKey) {
   const serverInfo = SERVERS_MAP[serverKey.toLowerCase()];
   if (!serverInfo) return [];
 
   try {
-    const res = await fetch(`${serverInfo.baseUrl}/events?offset=0&limit=25`, {
-      next: { revalidate: 60 }, // Cache for 1 minute
-    });
-    if (!res.ok) return [];
-    return res.json();
+    const data = await fetchAlbion(`${serverInfo.baseUrl}/events?offset=0&limit=25`);
+    return data || [];
   } catch (err) {
     console.error(`[ServerKillboardPage] Error fetching ${serverKey} events:`, err);
     return [];

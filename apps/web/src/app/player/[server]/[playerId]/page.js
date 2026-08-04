@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import CtaBanner from "@/components/CtaBanner";
 import PlayerAnalyticsClient from "./PlayerAnalyticsClient";
 
+import { fetchAlbion } from "@/utils/albion";
+
 export const revalidate = 300; // Cache page for 5 minutes (ISR)
 
 const REGIONS = {
@@ -14,11 +16,7 @@ const REGIONS = {
 async function getPlayer(server, playerId) {
   const baseUrl = REGIONS[server.toLowerCase()] || REGIONS.europe;
   try {
-    const res = await fetch(`${baseUrl}/players/${playerId}`, {
-      next: { revalidate: 300 },
-    });
-    if (!res.ok) return null;
-    return res.json();
+    return await fetchAlbion(`${baseUrl}/players/${playerId}`);
   } catch (err) {
     console.error("Error fetching player:", err);
     return null;
@@ -47,19 +45,15 @@ async function getPlayerMatches(server, playerId, guildId, playerName) {
     }
 
     const responses = await Promise.all(
-      urls.map((url) => fetch(url, { next: { revalidate: 300 } }).catch(() => null))
+      urls.map((url) => fetchAlbion(url).catch(() => null))
     );
-
 
     const eventsMap = new Map();
     const targetName = (playerName || "").toLowerCase();
 
     for (let i = 0; i < responses.length; i++) {
-      const res = responses[i];
-      if (!res || !res.ok) continue;
-
-      const data = await res.json().catch(() => []);
-      if (!Array.isArray(data)) continue;
+      const data = responses[i];
+      if (!data || !Array.isArray(data)) continue;
 
       data.forEach((e) => {
         if (!e || !e.EventId) return;

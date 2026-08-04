@@ -9,6 +9,8 @@ import {
   HeartPulse, Zap, Flame, ExternalLink, Download, Share2, AlertTriangle, CheckCircle2
 } from "lucide-react";
 
+import { fetchAlbion } from "@/utils/albion";
+
 // Fetch Event from Albion API
 async function getKillEvent(server, eventId) {
   const REGIONS = {
@@ -19,15 +21,7 @@ async function getKillEvent(server, eventId) {
 
   const baseUrl = REGIONS[server.toLowerCase()] || REGIONS.europe;
   try {
-    const res = await fetch(`${baseUrl}/events/${eventId}`, {
-      next: { revalidate: 3600 }, // Cache for 1 hour
-    });
-
-    if (!res.ok) {
-      return null;
-    }
-
-    return res.json();
+    return await fetchAlbion(`${baseUrl}/events/${eventId}`);
   } catch (err) {
     console.error(`[KillboardEventPage] Error fetching event ${eventId}:`, err);
     return null;

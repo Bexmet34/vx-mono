@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
+import { fetchAlbion } from '@/utils/albion';
+
 const BASE_URLS = {
   'Americas': 'https://gameinfo.albiononline.com/api/gameinfo',
   'Europe':   'https://gameinfo-ams.albiononline.com/api/gameinfo',
@@ -21,16 +23,10 @@ export async function GET(request) {
     const serverKey = serverParam ? serverParam.charAt(0).toUpperCase() + serverParam.slice(1).toLowerCase() : 'Europe';
     const baseUrl = BASE_URLS[serverKey] || BASE_URLS['Europe'];
 
-    const res = await fetch(`${baseUrl}/search?q=${encodeURIComponent(query)}`, {
-      headers: { 'Accept': 'application/json' },
-      next: { revalidate: 0 }
-    });
-
-    if (!res.ok) {
+    const data = await fetchAlbion(`${baseUrl}/search?q=${encodeURIComponent(query)}`);
+    if (!data) {
       return NextResponse.json({ players: [], guilds: [] });
     }
-
-    const data = await res.json().catch(() => ({ players: [], guilds: [] }));
 
     const players = Array.isArray(data.players) ? data.players.map(p => ({
       Id: p.Id || p.id,

@@ -2,6 +2,8 @@ import { ImageResponse } from 'next/og';
 
 export const dynamic = 'force-dynamic';
 
+import { fetchAlbion } from '@/utils/albion';
+
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -20,16 +22,11 @@ export async function GET(request) {
     const baseUrl = REGIONS[server.toLowerCase()] || REGIONS.europe;
     
     // Fetch event data safely
-    const res = await fetch(`${baseUrl}/events/${eventId}`, {
-      headers: { 'Accept': 'application/json' },
-      cache: 'no-store',
-    });
+    const event = await fetchAlbion(`${baseUrl}/events/${eventId}`);
 
-    if (!res.ok) {
+    if (!event) {
       return new Response('Event not found from Albion API', { status: 404 });
     }
-    
-    const event = await res.json();
     const killer = event.Killer || {};
     const victim = event.Victim || {};
 

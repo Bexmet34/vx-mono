@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { fetchAlbion } from '@/utils/albion';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,19 +17,11 @@ export async function GET(req, { params }) {
 
     const baseUrl = REGIONS[server] || REGIONS.Europe;
 
-    const res = await fetch(
-      `${baseUrl}/guilds/${guildId}`,
-      {
-        headers: { 'Accept': 'application/json' },
-        next: { revalidate: 0 }
-      }
-    );
+    const data = await fetchAlbion(`${baseUrl}/guilds/${guildId}`);
 
-    if (!res.ok) {
-      return NextResponse.json({ error: `Albion API error: ${res.status}` }, { status: res.status });
+    if (!data) {
+      return NextResponse.json({ error: `Albion API error: failed to fetch guild details` }, { status: 502 });
     }
-
-    const data = await res.json();
 
     return NextResponse.json({
       Id: data.Id,
