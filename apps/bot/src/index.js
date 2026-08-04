@@ -208,6 +208,8 @@ client.on('interactionCreate', async interaction => {
         if (interaction.isAutocomplete()) {
             if (interaction.commandName === 'temp') {
                 await handleTempAutocomplete(interaction);
+            } else {
+                await handleAutocomplete(interaction);
             }
         } else if (interaction.isChatInputCommand()) {
             try {
@@ -251,8 +253,6 @@ client.on('interactionCreate', async interaction => {
                 const { handleForceRegistrationCommand } = require('./handlers/commandHandler');
                 await handleForceRegistrationCommand(interaction);
             }
-        } else if (interaction.isAutocomplete()) {
-            await handleAutocomplete(interaction);
         } else if (interaction.isButton()) {
             if (interaction.customId === 'help_vote') {
                 await handleVoteCommand(interaction);
