@@ -3,7 +3,7 @@
  * Includes timeout, User-Agent header, automatic retries, and disables Next.js fetch cache
  * to prevent "Failed to set fetch cache" / SocketError warnings and logs.
  */
-export async function fetchAlbion(url, options = {}, retries = 2, timeoutMs = 10000) {
+export async function fetchAlbion(url, options = {}, retries = 2, timeoutMs = 20000) {
   const finalHeaders = {
     'Accept': 'application/json',
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
