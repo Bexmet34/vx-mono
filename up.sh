@@ -52,6 +52,10 @@ commit_hash=$(git log -1 --format="%h" 2>/dev/null || echo "Bilinmiyor")
 git fetch --all >> "$LOG_FILE" 2>&1
 git reset --hard origin/main >> "$LOG_FILE" 2>&1
 
+# PM2 Discord logger'ın her zaman doğru webhook ile çalıştığından emin olalım
+pm2 set pm2-discord-logger:error_url "$WEBHOOK_URL" >> "$LOG_FILE" 2>&1
+pm2 set pm2-discord-logger:log_errors true >> "$LOG_FILE" 2>&1
+
 echo "==> [2/6] Next.js Önbelleği temizleniyor..." | tee -a "$LOG_FILE"
 if [ -d "apps/web/.next" ]; then
     rm -rf apps/web/.next >> "$LOG_FILE" 2>&1
@@ -61,6 +65,10 @@ echo "==> [3/6] Gerekli paketler yükleniyor..." | tee -a "$LOG_FILE"
 pnpm install --frozen-lockfile >> "$LOG_FILE" 2>&1
 
 echo "==> [4/6] Proje derleniyor (Build)..." | tee -a "$LOG_FILE"
+# YAPAY HATA EKLEME (Test bittiğinde bu satır silinecek)
+echo "YAPAY DERLEME HATASI OLUŞTURULUYOR!" >> "$LOG_FILE"
+false # Bu komut hata kodu 1 döndürür ve betiği çökertir
+
 pnpm build >> "$LOG_FILE" 2>&1
 
 echo "==> [5/6] pnpm Önbelleği temizleniyor..." | tee -a "$LOG_FILE"
