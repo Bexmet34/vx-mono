@@ -68,6 +68,15 @@ git reset --hard origin/main >> "$LOG_FILE" 2>&1
 pm2 set pm2-discord-logger:error_url "$WEBHOOK_URL" >> "$LOG_FILE" 2>&1
 pm2 set pm2-discord-logger:log_errors true >> "$LOG_FILE" 2>&1
 
+# RAM yetersizliğini (Exit Code 137 / OOM) önlemek için Swap kontrolü ve yapılandırması
+if [ -f /proc/meminfo ] && [ $(free -m 2>/dev/null | awk '/^Swap:/ {print $2}' || echo 0) -eq 0 ]; then
+    echo "==> Swap alanı bulunamadı, RAM taşmalarını önlemek için 2GB Swap oluşturuluyor..." | tee -a "$LOG_FILE"
+    fallocate -l 2G /swapfile 2>/dev/null || dd if=/dev/zero of=/swapfile bs=1M count=2048 2>>"$LOG_FILE"
+    chmod 600 /swapfile 2>/dev/null
+    mkswap /swapfile >> "$LOG_FILE" 2>&1
+    swapon /swapfile >> "$LOG_FILE" 2>&1
+fi
+
 echo "==> [2/6] Next.js Önbelleği temizleniyor..." | tee -a "$LOG_FILE"
 if [ -d "apps/web/.next" ]; then
     rm -rf apps/web/.next >> "$LOG_FILE" 2>&1
@@ -77,6 +86,8 @@ echo "==> [3/6] Gerekli paketler yükleniyor..." | tee -a "$LOG_FILE"
 pnpm install --frozen-lockfile >> "$LOG_FILE" 2>&1
 
 echo "==> [4/6] Proje derleniyor (Build)..." | tee -a "$LOG_FILE"
+export NODE_OPTIONS="--max-old-space-size=2048"
+export NEXT_TELEMETRY_DISABLED=1
 pnpm build >> "$LOG_FILE" 2>&1
 
 echo "==> [5/6] pnpm Önbelleği temizleniyor..." | tee -a "$LOG_FILE"
