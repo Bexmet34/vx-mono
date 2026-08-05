@@ -206,10 +206,10 @@ export default async function RootLayout({ children }) {
           `}
         </Script>
         {/* Google AdSense */}
-        <Script
+        <script
+          async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1315540294941790"
           crossOrigin="anonymous"
-          strategy="afterInteractive"
         />
         {/* Schema.org Structured Data */}
         <script
