@@ -187,7 +187,7 @@ export default async function RootLayout({ children }) {
   const lang = cookieStore.get("NEXT_LOCALE")?.value || "tr";
 
   return (
-    <html lang={lang} className={`dark ${sora.variable}`}>
+    <html lang={lang} className={`dark ${sora.variable}`} suppressHydrationWarning>
       <head>
         <link rel="manifest" href="/manifest.json" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
