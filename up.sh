@@ -83,6 +83,11 @@ echo "==> [3/6] Gerekli paketler yükleniyor..." | tee -a "$LOG_FILE"
 pnpm install --frozen-lockfile >> "$LOG_FILE" 2>&1
 
 echo "==> [4/6] Proje derleniyor (Build)..." | tee -a "$LOG_FILE"
+# Takılı kalan eski derleme süreçlerini temizleyelim
+pkill -f "next build" 2>/dev/null || true
+pkill -f "next-build" 2>/dev/null || true
+sleep 1
+
 export NODE_OPTIONS="--max-old-space-size=2048"
 export NEXT_TELEMETRY_DISABLED=1
 pnpm build >> "$LOG_FILE" 2>&1
