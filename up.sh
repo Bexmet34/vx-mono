@@ -92,7 +92,14 @@ sleep 1
 
 export NODE_OPTIONS="--max-old-space-size=1024"
 export NEXT_TELEMETRY_DISABLED=1
+export NEXT_DIST_DIR=".next_new"
 pnpm build >> "$LOG_FILE" 2>&1
+
+if [ -d "apps/web/.next_new" ]; then
+    echo "==> Yeni Next.js derlemesi aktif ediliyor (Swap)..." | tee -a "$LOG_FILE"
+    rm -rf apps/web/.next
+    mv apps/web/.next_new apps/web/.next
+fi
 
 echo "==> [5/6] pnpm Önbelleği temizleniyor..." | tee -a "$LOG_FILE"
 pnpm store prune >> "$LOG_FILE" 2>&1
