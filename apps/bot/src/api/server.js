@@ -51,10 +51,13 @@ function startApiServer(manager, port = process.env.BOT_API_PORT || 3005) {
             const giveaway = await getGiveawayById(giveawayId);
             if (!giveaway) return res.status(404).json({ error: 'Giveaway not found' });
 
+            const path = require('path');
+            const enginePath = path.join(process.cwd(), 'src/services/giveawayEngine');
+
             await manager.broadcastEval(async (client, context) => {
-                const { publishGiveawayMessage } = require('../services/giveawayEngine');
+                const { publishGiveawayMessage } = require(context.enginePath);
                 await publishGiveawayMessage(client, context.giveaway);
-            }, { context: { giveaway } });
+            }, { context: { giveaway, enginePath } });
 
             res.json({ success: true });
         } catch (error) {
