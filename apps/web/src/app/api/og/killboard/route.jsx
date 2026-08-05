@@ -117,6 +117,8 @@ export async function GET(request) {
                 fontWeight: '900',
                 color: '#fca311',
                 marginTop: '5px',
+                display: 'flex',
+                alignItems: 'center',
               }}
             >
               ⚡ {fameFormatted} FAME
@@ -145,7 +147,7 @@ export async function GET(request) {
                 padding: '25px',
               }}
             >
-              <div style={{ fontSize: '18px', color: '#2ecc71', fontWeight: 'bold', letterSpacing: '1px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', fontSize: '18px', color: '#2ecc71', fontWeight: 'bold', letterSpacing: '1px' }}>
                 ⚔️ KATİL (KILLER)
               </div>
               <div
@@ -203,7 +205,7 @@ export async function GET(request) {
                 padding: '25px',
               }}
             >
-              <div style={{ fontSize: '18px', color: '#e74c3c', fontWeight: 'bold', letterSpacing: '1px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', fontSize: '18px', color: '#e74c3c', fontWeight: 'bold', letterSpacing: '1px' }}>
                 💀 KURBAN (VICTIM)
               </div>
               <div
