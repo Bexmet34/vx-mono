@@ -254,6 +254,17 @@ async function finalizeAnswers(userId, guildId, client) {
                 embeds: [embed],
                 components: rows
             });
+
+            // Send custom ticket welcome message if configured
+            const ticketWelcomeMsg = lang === 'en' ? guildConfig?.registration_ticket_welcome_message_en : guildConfig?.registration_ticket_welcome_message_tr;
+            if (ticketWelcomeMsg) {
+                let parsedMsg = ticketWelcomeMsg
+                    .replace(/{user}/g, `<@${userId}>`)
+                    .replace(/{gamenickname}/g, ign || '')
+                    .replace(/{realname}/g, realName || '')
+                    .replace(/{age}/g, age || '');
+                await channel.send({ content: parsedMsg }).catch(() => {});
+            }
         }
 
         // 1. Supabase'e kaydet

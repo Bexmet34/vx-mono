@@ -580,6 +580,42 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                   {lang === 'en' ? 'Variables: {user}, {gamenickname}, {realname}, {age}' : 'Değişkenler: {user}, {gamenickname}, {realname}, {age}'}
                 </p>
               </div>
+
+              {/* Özel Bilet Kanalı Açılış Mesajı TR */}
+              <div className="md:col-span-2 border-t border-outline-variant/30 pt-4 mt-2">
+                <label className="flex items-center text-xs font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+                  🇹🇷 {lang === 'en' ? 'Private Ticket Channel Greeting (Turkish)' : 'Özel Bilet Kanalı Açılış Mesajı (Türkçe)'}
+                  <InfoTooltip text={lang === 'en' ? 'Custom message sent in the user\'s private ticket channel upon opening. E.g. Ask user for screenshot directly.' : 'Kayıt tamamlanıp kullanıcı için özel bilet kanalı açıldığında, kanal içerisine bot tarafından atılacak özel mesaj. Örneğin buradan kullanıcıdan resim/ekran görüntüsü isteyebilirsiniz.'} />
+                </label>
+                <textarea
+                  className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md resize-y"
+                  rows={3}
+                  placeholder="Hoş geldin {user}! Lütfen oyun içi profilinizin / giriş ekranınızın ekran görüntüsünü bu kanala yükleyin."
+                  value={settings.registration_ticket_welcome_message_tr || ""}
+                  onChange={(e) => setSettings({ ...settings, registration_ticket_welcome_message_tr: e.target.value })}
+                />
+                <p className="text-xs font-body-md text-on-surface-variant/80 mt-1">
+                  {lang === 'en' ? 'Variables: {user}, {gamenickname}, {realname}, {age}' : 'Değişkenler: {user}, {gamenickname}, {realname}, {age}'}
+                </p>
+              </div>
+
+              {/* Özel Bilet Kanalı Açılış Mesajı EN */}
+              <div className="md:col-span-2">
+                <label className="flex items-center text-xs font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+                  🇬🇧 {lang === 'en' ? 'Private Ticket Channel Greeting (English)' : 'Özel Bilet Kanalı Açılış Mesajı (İngilizce)'}
+                  <InfoTooltip text={lang === 'en' ? 'Custom message sent in the user\'s private ticket channel if server language is English.' : 'Sunucu dili İngilizce olduğunda özel bilet kanalında gösterilecek mesaj.'} />
+                </label>
+                <textarea
+                  className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md resize-y"
+                  rows={3}
+                  placeholder="Welcome {user}! Please upload a screenshot of your in-game profile to this channel."
+                  value={settings.registration_ticket_welcome_message_en || ""}
+                  onChange={(e) => setSettings({ ...settings, registration_ticket_welcome_message_en: e.target.value })}
+                />
+                <p className="text-xs font-body-md text-on-surface-variant/80 mt-1">
+                  {lang === 'en' ? 'Variables: {user}, {gamenickname}, {realname}, {age}' : 'Değişkenler: {user}, {gamenickname}, {realname}, {age}'}
+                </p>
+              </div>
             </div>
           </div>
         </div>

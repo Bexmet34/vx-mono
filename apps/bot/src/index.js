@@ -357,5 +357,32 @@ client.on(Events.MessageReactionRemove, async (reaction, user) => {
     await handleReactionRemove(reaction, user);
 });
 
+client.on(Events.ChannelDelete, async (channel) => {
+    try {
+        if (!channel.guild) return;
+        const { supabase } = require('@veyronix/database');
+        
+        // Kanalın pending bir kayıt bileti olup olmadığını kontrol et
+        const { data, error } = await supabase
+            .from('application_answers')
+            .select('id, user_id')
+            .eq('ticket_channel_id', channel.id)
+            .eq('status', 'pending');
+            
+        if (data && data.length > 0) {
+            // Eğer kanal silindiyse başvuruyu tamamen iptal et (sil)
+            await supabase
+                .from('application_answers')
+                .delete()
+                .eq('ticket_channel_id', channel.id)
+                .eq('status', 'pending');
+                
+            console.log(`[Registration] Pending ticket channel deleted for user ${data[0].user_id}. Registration cancelled.`);
+        }
+    } catch (err) {
+        console.error(`[ChannelDelete] Error cancelling pending registration:`, err.message);
+    }
+});
+
 // Start the bot
 startBot();
