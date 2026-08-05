@@ -69,12 +69,14 @@ pm2 set pm2-discord-logger:error_url "$WEBHOOK_URL" >> "$LOG_FILE" 2>&1
 pm2 set pm2-discord-logger:log_errors true >> "$LOG_FILE" 2>&1
 
 # RAM yetersizliğini (Exit Code 137 / OOM) önlemek için Swap kontrolü ve yapılandırması
-if [ -f /proc/meminfo ] && [ $(free -m 2>/dev/null | awk '/^Swap:/ {print $2}' || echo 0) -eq 0 ]; then
-    echo "==> Swap alanı bulunamadı, RAM taşmalarını önlemek için 2GB Swap oluşturuluyor..." | tee -a "$LOG_FILE"
-    fallocate -l 2G /swapfile 2>/dev/null || dd if=/dev/zero of=/swapfile bs=1M count=2048 2>>"$LOG_FILE"
-    chmod 600 /swapfile 2>/dev/null
-    mkswap /swapfile >> "$LOG_FILE" 2>&1
-    swapon /swapfile >> "$LOG_FILE" 2>&1
+if [ -f /proc/meminfo ] && [ $(free -m 2>/dev/null | awk '/^Swap:/ {print $2}' || echo 0) -lt 512 ]; then
+    echo "==> Swap alanı yetersiz, RAM taşmalarını önlemek için 2GB Swap oluşturuluyor..." | tee -a "$LOG_FILE"
+    swapoff /swapfile 2>/dev/null || true
+    rm -f /swapfile
+    dd if=/dev/zero of=/swapfile bs=1M count=2048 2>>"$LOG_FILE" || true
+    chmod 600 /swapfile 2>/dev/null || true
+    mkswap /swapfile >> "$LOG_FILE" 2>&1 || true
+    swapon /swapfile >> "$LOG_FILE" 2>&1 || true
 fi
 
 echo "==> [2/6] Paket bağımlılıkları kontrol ediliyor..." | tee -a "$LOG_FILE"
@@ -88,7 +90,7 @@ pkill -f "next build" 2>/dev/null || true
 pkill -f "next-build" 2>/dev/null || true
 sleep 1
 
-export NODE_OPTIONS="--max-old-space-size=2048"
+export NODE_OPTIONS="--max-old-space-size=1024"
 export NEXT_TELEMETRY_DISABLED=1
 pnpm build >> "$LOG_FILE" 2>&1
 
