@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { supabase } from '@/utils/supabase';
 import { checkDashboardAccess } from '@/utils/authUtils';
-import { createGiveaway, getActiveGiveaways, getEndedGiveaways, cancelGiveaway } => require('@veyronix/database');
+import { createGiveaway, getActiveGiveaways, getEndedGiveaways, cancelGiveaway } from '@veyronix/database';
 
 export const dynamic = 'force-dynamic';
 

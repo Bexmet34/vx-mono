@@ -12,29 +12,41 @@ send_error_to_discord() {
     local failed_command="$BASH_COMMAND"
     echo "==> Hata algılandı! Discord'a detaylı log gönderiliyor..."
     
-    # Hata log dosyasının son 15 satırını al
-    local error_details="Bilinmeyen hata logu bulunamadı."
-    if [ -f "$LOG_FILE" ]; then
-        error_details=$(tail -n 15 "$LOG_FILE" | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
-    fi
-    
-    # Hata mesajı içeriği (Discord Markdown formatında)
-    local payload=$(cat <<JSON
-{
-  "content": null,
-  "embeds": [
-    {
-      "title": "🚨 Sunucu Dağıtım (Deploy) Hatası!",
-      "description": "**Başarısız olan komut:** \`$failed_command\`\n**Çıkış Kodu:** \`$exit_code\`\n\n**Hata Detayları:**\n\`\`\`text\n$error_details\n\`\`\`",
-      "color": 16711680,
-      "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-    }
-  ]
-}
-JSON
-)
+    export FAILED_COMMAND="$failed_command"
+    export EXIT_CODE="$exit_code"
+    export LOG_FILE_PATH="$LOG_FILE"
+    export WEBHOOK_URL_VAL="$WEBHOOK_URL"
 
-    curl -H "Content-Type: application/json" -X POST -d "$payload" "$WEBHOOK_URL"
+    node -e '
+      const fs = require("fs");
+      const webhookUrl = process.env.WEBHOOK_URL_VAL;
+      const failedCommand = process.env.FAILED_COMMAND || "Bilinmeyen komut";
+      const exitCode = process.env.EXIT_CODE || "1";
+      const logFile = process.env.LOG_FILE_PATH || "/tmp/deploy_error.log";
+      
+      let errorDetails = "Bilinmeyen hata logu bulunamadı.";
+      if (fs.existsSync(logFile)) {
+        const lines = fs.readFileSync(logFile, "utf-8").split("\n");
+        errorDetails = lines.slice(-20).join("\n");
+      }
+
+      const payload = JSON.stringify({
+        content: null,
+        embeds: [{
+          title: "🚨 Sunucu Dağıtım (Deploy) Hatası!",
+          description: `**Başarısız olan komut:** \`${failedCommand}\`\n**Çıkış Kodu:** \`${exitCode}\`\n\n**Hata Detayları:**\n\`\`\`text\n${errorDetails.slice(-1500)}\n\`\`\``,
+          color: 16711680,
+          timestamp: new Date().toISOString()
+        }]
+      });
+
+      fs.writeFileSync("/tmp/discord_payload.json", payload);
+    '
+
+    if [ -f "/tmp/discord_payload.json" ]; then
+        curl -H "Content-Type: application/json" -X POST -d @"/tmp/discord_payload.json" "$WEBHOOK_URL"
+        rm -f /tmp/discord_payload.json
+    fi
     rm -f "$LOG_FILE"
     exit $exit_code
 }
