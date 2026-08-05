@@ -3,6 +3,7 @@ const subscriptionService = require('./subscriptionService');
 const guildSettingsService = require('./guildSettingsService');
 const campaignService = require('./campaignService');
 const userTemplateService = require('./userTemplateService');
+const giveawayService = require('./giveawayService');
 
 module.exports = {
   supabase,
@@ -10,5 +11,6 @@ module.exports = {
   ...subscriptionService,
   ...guildSettingsService,
   ...campaignService,
-  ...userTemplateService
+  ...userTemplateService,
+  ...giveawayService
 };

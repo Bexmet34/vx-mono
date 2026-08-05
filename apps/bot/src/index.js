@@ -266,6 +266,9 @@ client.on('interactionCreate', async interaction => {
             } else if (interaction.customId.startsWith('ticket_')) {
                 const { handleTicketInteraction } = require('./handlers/ticketHandler');
                 await handleTicketInteraction(interaction);
+            } else if (interaction.customId.startsWith('giveaway_')) {
+                const { handleGiveawayButtons } = require('./handlers/giveawayHandler');
+                await handleGiveawayButtons(interaction);
             } else {
                 await handlePartyButtons(interaction);
             }

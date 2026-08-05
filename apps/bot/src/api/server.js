@@ -42,6 +42,27 @@ function startApiServer(manager, port = process.env.BOT_API_PORT || 3005) {
         }
     });
 
+    app.post('/api/giveaway/publish', async (req, res) => {
+        const { giveawayId } = req.body;
+        if (!giveawayId) return res.status(400).json({ error: 'Missing giveawayId' });
+
+        try {
+            const { getGiveawayById } = require('@veyronix/database');
+            const giveaway = await getGiveawayById(giveawayId);
+            if (!giveaway) return res.status(404).json({ error: 'Giveaway not found' });
+
+            await manager.broadcastEval(async (client, context) => {
+                const { publishGiveawayMessage } = require('../services/giveawayEngine');
+                await publishGiveawayMessage(client, context.giveaway);
+            }, { context: { giveaway } });
+
+            res.json({ success: true });
+        } catch (error) {
+            console.error('[API] Error publishing giveaway:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    });
+
     app.listen(port, () => {
         console.log(`[API Server] Listening on port ${port}`);
     });

@@ -23,6 +23,7 @@ import RegistrationTab from "./components/RegistrationTab";
 import RoleMenuTab from "./components/RoleMenuTab";
 import TicketTab from "./components/TicketTab";
 import TicketHistoryTab from "./components/TicketHistoryTab";
+import GiveawayTab from "./components/GiveawayTab";
 
 function PremiumLock({ lang, t }) {
   return (
@@ -523,6 +524,9 @@ export default function ServerSettings() {
           <button className={`shrink-0 flex items-center gap-2 px-4 py-2 rounded-full font-label-bold text-sm transition-all whitespace-nowrap ${activeTab === 'ticket' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('ticket')}>
             <Shield size={16} /> Ticket
           </button>
+          <button className={`shrink-0 flex items-center gap-2 px-4 py-2 rounded-full font-label-bold text-sm transition-all whitespace-nowrap ${activeTab === 'giveaway' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('giveaway')}>
+            🎁 Giveaway
+          </button>
           <button className={`shrink-0 flex items-center gap-2 px-4 py-2 rounded-full font-label-bold text-sm transition-all whitespace-nowrap ${activeTab === 'killboard' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('killboard')}>
             <Lock size={16} /> KillBoard <span className="bg-primary-container text-on-primary text-[10px] px-2 py-0.5 rounded font-black ml-1 uppercase tracking-widest">BETA</span>
           </button>
@@ -594,6 +598,10 @@ export default function ServerSettings() {
 
         {activeTab === 'ticket' && (
           <TicketTab t={t} lang={lang} settings={settings} setSettings={setSettings} discordChannels={discordChannels} discordRoles={discordRoles} discordMembers={discordMembers} handleSave={handleSave} saving={saving} guildId={guildId} showToast={showToast} isPremium={isPremium} />
+        )}
+
+        {activeTab === 'giveaway' && (
+          <GiveawayTab t={t} lang={lang} guildId={guildId} discordChannels={discordChannels} discordRoles={discordRoles} />
         )}
 
       </main>
