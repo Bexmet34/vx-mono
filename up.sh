@@ -77,10 +77,7 @@ if [ -f /proc/meminfo ] && [ $(free -m 2>/dev/null | awk '/^Swap:/ {print $2}' |
     swapon /swapfile >> "$LOG_FILE" 2>&1
 fi
 
-echo "==> [2/6] Next.js Önbelleği temizleniyor..." | tee -a "$LOG_FILE"
-if [ -d "apps/web/.next" ]; then
-    rm -rf apps/web/.next >> "$LOG_FILE" 2>&1
-fi
+echo "==> [2/6] Paket bağımlılıkları kontrol ediliyor..." | tee -a "$LOG_FILE"
 
 echo "==> [3/6] Gerekli paketler yükleniyor..." | tee -a "$LOG_FILE"
 pnpm install --frozen-lockfile >> "$LOG_FILE" 2>&1
