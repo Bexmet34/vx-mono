@@ -46,8 +46,8 @@ export default function VideoSection() {
       
       {/* Sound Toggle Overlay */}
       <div className="absolute bottom-4 right-4 z-10 bg-black/60 hover:bg-primary-container hover:text-on-primary text-white p-3 rounded-full backdrop-blur-sm transition-all duration-300 opacity-0 group-hover:opacity-100 flex items-center gap-2">
-        {isVideoMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}
-        <span className="font-label-bold text-sm hidden md:block">
+        {isVideoMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+        <span className="font-label-bold text-[10px] hidden md:block">
           {isVideoMuted ? (lang === 'tr' ? 'Sesi Aç' : 'Unmute') : (lang === 'tr' ? 'Sesi Kapat' : 'Mute')}
         </span>
       </div>

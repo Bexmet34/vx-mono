@@ -11,26 +11,26 @@ export default function PublicServersSection({ publicServers = [] }) {
   }
 
   return (
-    <section className="py-12 border-y border-on-surface/10 bg-surface-container-low overflow-hidden">
-      <h2 className="text-center font-label-bold text-label-sm text-on-surface-variant uppercase tracking-[0.2em] mb-8">
+    <section className="py-1.5 border-y border-on-surface/10 bg-surface-container-low overflow-hidden">
+      <h2 className="text-center font-label-bold text-label-sm text-on-surface-variant uppercase tracking-[0.2em] mb-2">
         {t.marqueeTitle}
       </h2>
       <div className="relative flex overflow-x-hidden w-full group">
-        <div className="animate-marquee flex whitespace-nowrap items-center gap-12 px-6">
+        <div className="animate-marquee flex whitespace-nowrap items-center gap-1 px-3">
           {[...publicServers, ...publicServers, ...publicServers].map((server, idx) => (
-            <div key={idx} className="flex items-center gap-3 bg-surface-container-high px-4 py-2 border border-on-surface/10">
-              <Server size={18} className="text-primary-container" />
+            <div key={idx} className="flex items-center gap-1 bg-surface-container-high px-2 py-1 border border-on-surface/10">
+              <Server size={14} className="text-primary-container" />
               <span className="font-label-bold text-on-surface">{server.length > 20 ? server.substring(0, 17) + '...' : server}</span>
-              <BadgeCheck size={18} className="text-[#e9c400]" />
+              <BadgeCheck size={14} className="text-[#e9c400]" />
             </div>
           ))}
         </div>
-        <div className="absolute top-0 animate-marquee2 flex whitespace-nowrap items-center gap-12 px-6">
+        <div className="absolute top-0 animate-marquee2 flex whitespace-nowrap items-center gap-1 px-3">
           {[...publicServers, ...publicServers, ...publicServers].map((server, idx) => (
-            <div key={`dup-${idx}`} className="flex items-center gap-3 bg-surface-container-high px-4 py-2 border border-on-surface/10">
-              <Server size={18} className="text-primary-container" />
+            <div key={`dup-${idx}`} className="flex items-center gap-1 bg-surface-container-high px-2 py-1 border border-on-surface/10">
+              <Server size={14} className="text-primary-container" />
               <span className="font-label-bold text-on-surface">{server.length > 20 ? server.substring(0, 17) + '...' : server}</span>
-              <BadgeCheck size={18} className="text-[#e9c400]" />
+              <BadgeCheck size={14} className="text-[#e9c400]" />
             </div>
           ))}
         </div>

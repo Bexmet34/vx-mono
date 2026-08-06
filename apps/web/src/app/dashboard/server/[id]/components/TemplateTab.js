@@ -150,7 +150,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
             onClick={handleCreateTemplate}
             title={!isPremium && (settings.party_templates || []).length >= 5 ? (lang === 'tr' ? 'Yeni şablonlar eklemek için Premium pakete geçin.' : 'Upgrade to Premium to add more templates.') : ''}
           >
-             <Plus size={18} />
+             <Plus size={14} />
           </button>
         </div>
         
@@ -183,9 +183,9 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
           </div>
         ) : (
           <div className="animate-slide-up">
-            <h3 className="font-headline-lg text-[10px] text-on-surface mb-8 pb-4 border-b border-outline-variant/50 uppercase tracking-tight">{lang === 'en' ? 'Edit Template' : 'Şablonu Düzenle'}</h3>
+            <h3 className="font-headline-lg text-[10px] text-on-surface mb-2 pb-4 border-b border-outline-variant/50 uppercase tracking-tight">{lang === 'en' ? 'Edit Template' : 'Şablonu Düzenle'}</h3>
             
-            <div className="mb-6">
+            <div className="mb-3">
               <label className="flex items-center text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
                 {lang === 'en' ? 'Template Name' : 'Şablon Adı'}
                 <InfoTooltip text={lang === 'en' ? 'Give your template a clear name (e.g., ZvZ Build, Fame Farm).' : 'Şablonunuza net bir isim verin (Örn: ZvZ Setup, Fame Farm).'} />
@@ -198,7 +198,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
               />
             </div>
 
-            <div className="mb-6">
+            <div className="mb-3">
               <label className="block text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">{lang === 'en' ? 'Description' : 'Açıklama'}</label>
               <textarea 
                 className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md resize-y" 
@@ -209,8 +209,8 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
               />
             </div>
             
-            <div className="mb-8">
-              <div className="flex items-center justify-between mb-4">
+            <div className="mb-2">
+              <div className="flex items-center justify-between mb-2">
                 <label className="flex items-center text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest">
                   {lang === 'en' ? 'Party Content Builder' : 'Parti İçerik Oluşturucu'}
                   <InfoTooltip text={lang === 'en' ? 'Add headers and roles visually.' : 'Başlık ve roller ekleyerek partinizi görsel olarak kurun.'} />
@@ -303,7 +303,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
                     >
                       
                       <div className="mt-2 text-on-surface-variant/50 cursor-grab active:cursor-grabbing hidden md:block" title={lang === 'en' ? 'Drag to reorder' : 'Sürükleyip bırakarak sırala'}>
-                        <GripVertical size={18} />
+                        <GripVertical size={14} />
                       </div>
 
                       <div className="flex-1 w-full">

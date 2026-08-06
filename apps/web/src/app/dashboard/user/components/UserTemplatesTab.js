@@ -197,7 +197,7 @@ export default function UserTemplatesTab({ t, lang, templates, setTemplates, isP
   };
 
   return (
-    <div className="flex flex-col gap-6 animate-slide-up">
+    <div className="flex flex-col gap-1 animate-slide-up">
       {/* Datalists for Autocomplete */}
       <datalist id="weapons-list">{albionWeapons.map(w => <option key={w} value={w} />)}</datalist>
       <datalist id="heads-list">{albionHeads.map(w => <option key={w} value={w} />)}</datalist>
@@ -207,8 +207,8 @@ export default function UserTemplatesTab({ t, lang, templates, setTemplates, isP
       <datalist id="foods-list">{albionFoods.map(w => <option key={w} value={w} />)}</datalist>
 
       <div className="glass-panel relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors flex flex-col">
-        <div className="p-6 border-b border-outline-variant/50 flex justify-between items-center bg-surface-container-highest/30">
-          <h2 className="font-headline-md text-xl text-on-surface flex items-center gap-2 uppercase tracking-tight m-0">
+        <div className="p-3 border-b border-outline-variant/50 flex justify-between items-center bg-surface-container-highest/30">
+          <h2 className="font-headline-md text-xs text-on-surface flex items-center gap-2 uppercase tracking-tight m-0">
             <Copy className="text-primary-container" /> {lang === 'en' ? 'My Templates' : 'Şablonlarım'}
             <InfoTooltip text={lang === 'en' ? 'Create personal reusable party setups. Use the /mytemps command in Discord.' : 'Kişisel, tekrar kullanılabilir parti ayarları oluşturun. Discord\'da /mytemps komutu ile görebilirsiniz.'} />
           </h2>
@@ -217,19 +217,19 @@ export default function UserTemplatesTab({ t, lang, templates, setTemplates, isP
             onClick={handleCreateTemplate}
             title={!isPremium && templates.length >= 5 ? (lang === 'tr' ? 'Daha fazla şablon eklemek için Premium pakete geçin.' : 'Upgrade to Premium to add more templates.') : ''}
           >
-             <Plus size={18} />
+             <Plus size={14} />
           </button>
         </div>
         
         <div className="flex-1 overflow-y-auto custom-scrollbar max-h-[300px]">
           {(!templates || templates.length === 0) ? (
-            <div className="p-8 text-center text-on-surface-variant font-body-md">{lang === 'en' ? 'No templates yet.' : 'Henüz şablon yok.'}</div>
+            <div className="p-2 text-center text-on-surface-variant font-body-md">{lang === 'en' ? 'No templates yet.' : 'Henüz şablon yok.'}</div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 p-2">
               {templates.map(tpl => (
                 <div 
                   key={tpl.id} 
-                  className={`flex justify-between items-center p-4 border rounded-sm cursor-pointer transition-colors group ${selectedTemplateId === tpl.id ? 'bg-primary-container/10 border-primary-container' : 'border-outline-variant/30 hover:bg-white/5 hover:border-outline-variant'}`}
+                  className={`flex justify-between items-center p-2 border rounded-sm cursor-pointer transition-colors group ${selectedTemplateId === tpl.id ? 'bg-primary-container/10 border-primary-container' : 'border-outline-variant/30 hover:bg-white/5 hover:border-outline-variant'}`}
                   onClick={() => setSelectedTemplateId(tpl.id)}
                 >
                   <div className={`font-label-bold ${selectedTemplateId === tpl.id ? 'text-primary-container' : 'text-on-surface'}`}>{tpl.template_name}</div>
@@ -243,45 +243,45 @@ export default function UserTemplatesTab({ t, lang, templates, setTemplates, isP
         </div>
       </div>
 
-      <div className="glass-panel p-8 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
+      <div className="glass-panel p-2 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
         {!selectedTemplate ? (
           <div className="h-full min-h-[400px] flex items-center justify-center text-on-surface-variant font-body-md bg-surface-container-lowest/50 border border-dashed border-outline-variant/50 rounded-sm">
             {lang === 'en' ? 'Select or create a template to edit.' : 'Düzenlemek için bir şablon seçin veya oluşturun.'}
           </div>
         ) : (
           <div className="animate-slide-up">
-            <h3 className="font-headline-lg text-2xl text-on-surface mb-8 pb-4 border-b border-outline-variant/50 uppercase tracking-tight">{lang === 'en' ? 'Edit Template' : 'Şablonu Düzenle'}</h3>
+            <h3 className="font-headline-lg text-[10px] text-on-surface mb-2 pb-4 border-b border-outline-variant/50 uppercase tracking-tight">{lang === 'en' ? 'Edit Template' : 'Şablonu Düzenle'}</h3>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-1 mb-3">
               <div>
-                <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+                <label className="flex items-center text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
                   {lang === 'en' ? 'Template Name (Menu)' : 'Şablon Adı (Menü)'}
                 </label>
                 <input 
                   type="text" 
-                  className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md" 
+                  className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1.5 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md" 
                   value={selectedTemplate.template_name || ""} 
                   onChange={(e) => handleUpdateTemplateField({ template_name: e.target.value })} 
                 />
               </div>
 
               <div>
-                <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+                <label className="flex items-center text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
                   {lang === 'en' ? 'Party Header (Title)' : 'Parti Başlığı (Discord)'}
                 </label>
                 <input 
                   type="text" 
-                  className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md" 
+                  className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1.5 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md" 
                   value={selectedTemplate.party_header || ""} 
                   onChange={(e) => handleUpdateTemplateField({ party_header: e.target.value })} 
                 />
               </div>
             </div>
 
-            <div className="mb-6">
-              <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">{lang === 'en' ? 'Description' : 'Açıklama'}</label>
+            <div className="mb-3">
+              <label className="block text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">{lang === 'en' ? 'Description' : 'Açıklama'}</label>
               <textarea 
-                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md resize-y" 
+                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1.5 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md resize-y" 
                 rows={2}
                 value={selectedTemplate.party_description || ""} 
                 onChange={(e) => handleUpdateTemplateField({ party_description: e.target.value })} 
@@ -289,31 +289,31 @@ export default function UserTemplatesTab({ t, lang, templates, setTemplates, isP
               />
             </div>
             
-            <div className="mb-8">
-              <div className="flex items-center justify-between mb-4">
-                <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest">
+            <div className="mb-2">
+              <div className="flex items-center justify-between mb-2">
+                <label className="flex items-center text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest">
                   {lang === 'en' ? 'Party Content Builder' : 'Parti İçerik Oluşturucu'}
                   <InfoTooltip text={lang === 'en' ? 'Add headers and roles visually.' : 'Başlık ve roller ekleyerek partinizi görsel olarak kurun.'} />
                 </label>
                 <div className="flex gap-2">
                   <button 
                     onClick={() => addBlock('header')}
-                    className="flex items-center gap-1 px-3 py-1.5 bg-surface-container border border-outline-variant rounded-sm text-sm font-label-bold text-on-surface hover:border-primary-container hover:text-primary-container transition-colors"
+                    className="flex items-center gap-1 px-3 py-1.5 bg-surface-container border border-outline-variant rounded-sm text-[10px] font-label-bold text-on-surface hover:border-primary-container hover:text-primary-container transition-colors"
                   >
                     <PlusCircle size={14} /> {lang === 'en' ? 'Add Header' : 'Başlık Ekle'}
                   </button>
                   <button 
                     onClick={() => addBlock('role')}
-                    className="flex items-center gap-1 px-3 py-1.5 bg-primary-container/20 border border-primary-container/50 rounded-sm text-sm font-label-bold text-primary-container hover:bg-primary-container hover:text-on-primary transition-colors"
+                    className="flex items-center gap-1 px-3 py-1.5 bg-primary-container/20 border border-primary-container/50 rounded-sm text-[10px] font-label-bold text-primary-container hover:bg-primary-container hover:text-on-primary transition-colors"
                   >
                     <PlusCircle size={14} /> {lang === 'en' ? 'Add Role' : 'Rol Ekle'}
                   </button>
                 </div>
               </div>
 
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-1">
                 {blocks.length === 0 ? (
-                  <div className="p-8 text-center text-on-surface-variant font-body-md border border-dashed border-outline-variant/50 bg-surface-container-lowest/30 rounded-sm">
+                  <div className="p-2 text-center text-on-surface-variant font-body-md border border-dashed border-outline-variant/50 bg-surface-container-lowest/30 rounded-sm">
                     {lang === 'en' ? 'No roles added yet. Start by adding a header or a role.' : 'Henüz rol eklenmedi. Başlık veya rol ekleyerek başlayın.'}
                   </div>
                 ) : blocks.map((block, index) => (
@@ -371,7 +371,7 @@ export default function UserTemplatesTab({ t, lang, templates, setTemplates, isP
                       `}
                     >
                       <div className="mt-2 text-on-surface-variant/50 cursor-grab active:cursor-grabbing hidden md:block">
-                        <GripVertical size={18} />
+                        <GripVertical size={14} />
                       </div>
 
                       <div className="flex-1 w-full">
@@ -381,7 +381,7 @@ export default function UserTemplatesTab({ t, lang, templates, setTemplates, isP
                             value={block.text}
                             onChange={(e) => updateBlock(block.id, { text: e.target.value })}
                             placeholder={lang === 'en' ? 'Header Name (e.g. Tank)' : 'Başlık Adı (Örn: Tank)'}
-                            className="w-full bg-transparent border-b border-primary-container/50 focus:border-primary-container px-2 py-1 text-lg font-headline-md text-primary-container outline-none transition-colors"
+                            className="w-full bg-transparent border-b border-primary-container/50 focus:border-primary-container px-2 py-1 text-[10px] font-headline-md text-primary-container outline-none transition-colors"
                           />
                         ) : (
                           <div className="grid grid-cols-2 md:grid-cols-6 gap-2">
@@ -392,7 +392,7 @@ export default function UserTemplatesTab({ t, lang, templates, setTemplates, isP
                                 value={block.weapon}
                                 onChange={(e) => updateBlock(block.id, { weapon: e.target.value })}
                                 placeholder={lang === 'en' ? 'Role/Weapon' : 'Rol/Silah'}
-                                className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                                className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-[10px] text-on-surface focus:outline-none focus:border-primary-container transition-colors"
                               />
                             </div>
                             <div>
@@ -401,7 +401,7 @@ export default function UserTemplatesTab({ t, lang, templates, setTemplates, isP
                                 list="heads-list"
                                 value={block.head}
                                 onChange={(e) => updateBlock(block.id, { head: e.target.value })}
-                                className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                                className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-[10px] text-on-surface focus:outline-none focus:border-primary-container transition-colors"
                               />
                             </div>
                             <div>
@@ -410,7 +410,7 @@ export default function UserTemplatesTab({ t, lang, templates, setTemplates, isP
                                 list="chests-list"
                                 value={block.chest}
                                 onChange={(e) => updateBlock(block.id, { chest: e.target.value })}
-                                className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                                className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-[10px] text-on-surface focus:outline-none focus:border-primary-container transition-colors"
                               />
                             </div>
                             <div>
@@ -419,7 +419,7 @@ export default function UserTemplatesTab({ t, lang, templates, setTemplates, isP
                                 list="shoes-list"
                                 value={block.shoes}
                                 onChange={(e) => updateBlock(block.id, { shoes: e.target.value })}
-                                className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                                className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-[10px] text-on-surface focus:outline-none focus:border-primary-container transition-colors"
                               />
                             </div>
                             <div>
@@ -428,7 +428,7 @@ export default function UserTemplatesTab({ t, lang, templates, setTemplates, isP
                                 list="potions-list"
                                 value={block.potion}
                                 onChange={(e) => updateBlock(block.id, { potion: e.target.value })}
-                                className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                                className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-[10px] text-on-surface focus:outline-none focus:border-primary-container transition-colors"
                               />
                             </div>
                             <div>
@@ -437,7 +437,7 @@ export default function UserTemplatesTab({ t, lang, templates, setTemplates, isP
                                 list="foods-list"
                                 value={block.food}
                                 onChange={(e) => updateBlock(block.id, { food: e.target.value })}
-                                className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                                className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-[10px] text-on-surface focus:outline-none focus:border-primary-container transition-colors"
                               />
                             </div>
                           </div>

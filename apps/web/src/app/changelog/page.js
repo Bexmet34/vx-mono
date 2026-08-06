@@ -145,7 +145,7 @@ export default function ChangelogPage() {
                       <Calendar size={12} /> {item.date}
                     </span>
                     <div className={`chevron ${isExpanded ? 'up' : ''}`}>
-                      <ChevronDown size={20} />
+                      <ChevronDown size={14} />
                     </div>
                   </div>
                 </div>

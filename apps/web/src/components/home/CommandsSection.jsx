@@ -39,13 +39,13 @@ export default function CommandsSection({ gifs = [] }) {
           <h2 className="font-headline-xl text-3xl md:text-5xl text-on-surface uppercase tracking-tight">
             {lang === 'tr' ? 'Komuta Merkezi Emrinizde' : 'Command Center at your Command'}
           </h2>
-          <p className="font-body-lg text-lg text-on-surface-variant leading-relaxed">
+          <p className="font-body-lg text-[10px] text-on-surface-variant leading-relaxed">
             {lang === 'tr' 
               ? 'Basit ama güçlü slash komutlarıyla sunucunuzu bir savaş odasına dönüştürün. Karmaşık bot ayarlarıyla uğraşmayın.' 
               : 'Transform your server into a war room with simple yet powerful slash commands. No need to mess with complex bot settings.'}
           </p>
           <ul className="space-y-6">
-            <li className="flex items-center gap-4 group relative cursor-pointer" onClick={() => openGifModal('help')}>
+            <li className="flex items-center gap-2 group relative cursor-pointer" onClick={() => openGifModal('help')}>
               <div className="w-6 h-6 border border-primary-container flex items-center justify-center text-primary-container shrink-0">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
               </div>
@@ -55,7 +55,7 @@ export default function CommandsSection({ gifs = [] }) {
               {renderGifHoverOrModal('help')}
             </li>
 
-            <li className="flex items-center gap-4 group relative cursor-pointer" onClick={() => openGifModal('createparty')}>
+            <li className="flex items-center gap-2 group relative cursor-pointer" onClick={() => openGifModal('createparty')}>
               <div className="w-6 h-6 border border-primary-container flex items-center justify-center text-primary-container shrink-0">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
               </div>
@@ -65,7 +65,7 @@ export default function CommandsSection({ gifs = [] }) {
               {renderGifHoverOrModal('createparty')}
             </li>
 
-            <li className="flex items-center gap-4 group relative cursor-pointer" onClick={() => openGifModal('settings')}>
+            <li className="flex items-center gap-2 group relative cursor-pointer" onClick={() => openGifModal('settings')}>
               <div className="w-6 h-6 border border-primary-container flex items-center justify-center text-primary-container shrink-0">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
               </div>
@@ -80,14 +80,14 @@ export default function CommandsSection({ gifs = [] }) {
         {/* Right Column: Terminal Mockup */}
         <div className="glass-panel border border-outline-variant p-0 overflow-hidden shadow-[0_0_40px_rgba(255,215,0,0.05)]">
           {/* Terminal Header */}
-          <div className="bg-surface-container-highest px-4 py-3 flex items-center gap-2 border-b border-outline-variant/50">
+          <div className="bg-surface-container-highest px-2 py-1.5 flex items-center gap-2 border-b border-outline-variant/50">
             <div className="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
             <div className="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
             <div className="w-3 h-3 rounded-full bg-[#27c93f]"></div>
           </div>
           {/* Terminal Body */}
-          <div className="p-6 md:p-8 font-mono text-sm md:text-base space-y-6 bg-[#0B0F19]">
-            <div className="flex gap-4 text-on-surface-variant">
+          <div className="p-3 md:p-2 font-mono text-[10px] md:text-xs space-y-6 bg-[#0B0F19]">
+            <div className="flex gap-2 text-on-surface-variant">
               <span className="text-on-surface-variant/50 shrink-0">09:12:45</span>
               <div>
                 <span className="text-on-surface">@Commander:</span> <span className="text-primary-container">/createparty</span> type:ZvZ time:20:00
@@ -95,20 +95,20 @@ export default function CommandsSection({ gifs = [] }) {
             </div>
             
             {/* Bot Response Box */}
-            <div className="ml-12 md:ml-[4.5rem] bg-surface-container-high border-l-2 border-primary-container p-4 space-y-2">
+            <div className="ml-12 md:ml-[4.5rem] bg-surface-container-high border-l-2 border-primary-container p-2 space-y-2">
               <div className="font-label-bold text-on-surface tracking-widest uppercase">{lang === 'tr' ? 'PARTİ OLUŞTURULDU' : 'PARTY CREATED'}</div>
               <div className="text-on-surface-variant">{lang === 'tr' ? 'Hedef' : 'Objective'}: Red Zone Castle Fight</div>
               <div className="text-on-surface-variant">{lang === 'tr' ? 'Durum' : 'Status'}: {lang === 'tr' ? 'Bekleniyor' : 'Waiting'} (0/20)</div>
             </div>
 
-            <div className="flex gap-4 text-on-surface-variant">
+            <div className="flex gap-2 text-on-surface-variant">
               <span className="text-on-surface-variant/50 shrink-0">09:12:58</span>
               <div>
                 <span className="text-on-surface">@WarriorX:</span> <span className="text-primary-container">/join</span> slot:Tank
               </div>
             </div>
 
-            <div className="flex gap-4 text-on-surface-variant">
+            <div className="flex gap-2 text-on-surface-variant">
               <span className="text-on-surface-variant/50 shrink-0">09:13:02</span>
               <div>
                 <span className="text-primary-container">Veyronix:</span> @WarriorX {lang === 'tr' ? 'sisteme kayıt edildi.' : 'registered to the system.'}
@@ -122,13 +122,13 @@ export default function CommandsSection({ gifs = [] }) {
 
       {/* Mobile Modal for GIF Preview */}
       {activeGifModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setActiveGifModal(null)}>
-          <div className="bg-surface-container-high border border-outline-variant p-4 max-w-lg w-full relative rounded-lg" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-2" onClick={() => setActiveGifModal(null)}>
+          <div className="bg-surface-container-high border border-outline-variant p-2 max-w-lg w-full relative rounded-lg" onClick={(e) => e.stopPropagation()}>
             <button 
               onClick={() => setActiveGifModal(null)} 
               className="absolute top-3 right-3 text-on-surface-variant hover:text-on-surface"
             >
-              <X size={20} />
+              <X size={14} />
             </button>
             <h3 className="font-headline-md mb-3 uppercase text-primary-container">/{activeGifModal} Önizleme</h3>
             <Image 

@@ -206,22 +206,22 @@ export default function RoleMenuTab({ t, lang, guildId, discordChannels, discord
     return (
       <div className="grid grid-cols-1 gap-2 animate-slide-up w-full">
         <div className="glass-panel p-2 sm:p-3 relative overflow-hidden sm:overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 pb-6 border-b border-outline-variant/30 gap-2">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2 pb-6 border-b border-outline-variant/30 gap-2">
              <h2 className="font-headline-lg text-[10px] sm:text-[10px] text-on-surface flex items-center gap-2 uppercase tracking-tight">
                <Users className="text-primary-container shrink-0" /> 
                {lang === 'en' ? 'Custom Role Menus' : 'Özel Rol Menüleri'}
              </h2>
-             <button onClick={createNewConfig} className="w-full sm:w-auto px-6 py-2.5 bg-primary-container text-on-primary rounded-sm font-label-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-all hover:brightness-110 tactical-glow">
+             <button onClick={createNewConfig} className="w-full sm:w-auto px-3 py-1.5 bg-primary-container text-on-primary rounded-sm font-label-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-all hover:brightness-110 tactical-glow">
                <Plus size={16} className="shrink-0" />
                <span>{lang === 'en' ? 'Create New Menu' : 'Yeni Menü Oluştur'}</span>
              </button>
           </div>
 
           {configs.length === 0 ? (
-            <div className="text-center py-12 px-4 border border-dashed border-outline-variant rounded-sm bg-surface-container-low/50">
-               <Users className="mx-auto text-on-surface-variant mb-4 opacity-50" size={48} />
+            <div className="text-center py-1.5 px-2 border border-dashed border-outline-variant rounded-sm bg-surface-container-low/50">
+               <Users className="mx-auto text-on-surface-variant mb-2 opacity-50" size={48} />
                <h3 className="text-[10px] sm:text-[10px] text-on-surface font-headline-md mb-2">{lang === 'en' ? 'No Role Menus Found' : 'Rol Menüsü Bulunamadı'}</h3>
-               <p className="text-[10px] sm:text-base text-on-surface-variant font-body-md max-w-md mx-auto">
+               <p className="text-[10px] sm:text-xs text-on-surface-variant font-body-md max-w-md mx-auto">
                  {lang === 'en' 
                   ? 'Create dynamic role selection menus where users can pick their roles from a dropdown.' 
                   : 'Kullanıcıların açılır menülerden rollerini seçebileceği dinamik rol seçim menüleri oluşturun.'}
@@ -234,7 +234,7 @@ export default function RoleMenuTab({ t, lang, guildId, discordChannels, discord
                 return (
                   <div key={config.id} className="flex flex-col lg:flex-row items-start lg:items-center justify-between p-2 bg-surface-container border border-outline-variant/50 rounded-sm hover:border-primary-container/50 transition-colors gap-2">
                     <div className="flex-1 w-full">
-                      <h4 className="font-headline-sm text-base sm:text-[10px] text-on-surface flex flex-wrap items-center gap-2">
+                      <h4 className="font-headline-sm text-xs sm:text-[10px] text-on-surface flex flex-wrap items-center gap-2">
                         <span className="truncate">{config.embed_title || 'Untitled Menu'}</span>
                         <span className="text-[10px] font-label-bold px-2 py-0.5 bg-surface-container-high rounded-full border border-outline-variant text-on-surface-variant whitespace-nowrap">
                           {config.menus?.length || 0} Menus
@@ -271,23 +271,23 @@ export default function RoleMenuTab({ t, lang, guildId, discordChannels, discord
   return (
     <div className="grid grid-cols-1 gap-2 animate-slide-up w-full">
       <div className="glass-panel p-2 sm:p-3 relative overflow-hidden sm:overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 pb-6 border-b border-outline-variant/30 gap-2">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2 pb-6 border-b border-outline-variant/30 gap-2">
            <h2 className="font-headline-lg text-[10px] sm:text-[10px] text-on-surface flex items-center gap-2 uppercase tracking-tight">
              <Edit2 className="text-primary-container shrink-0" /> 
              {currentConfig.id ? (lang === 'en' ? 'Edit Menu' : 'Menüyü Düzenle') : (lang === 'en' ? 'Create Menu' : 'Menü Oluştur')}
            </h2>
            <div className="flex flex-wrap sm:flex-nowrap gap-2 w-full sm:w-auto">
-             <button onClick={() => setViewState("list")} className="flex-1 sm:flex-none justify-center px-6 py-2.5 bg-surface-container border border-outline-variant text-on-surface hover:text-on-surface-variant rounded-sm font-label-bold uppercase tracking-widest flex items-center gap-2 transition-all text-[10px] sm:text-[10px]">
+             <button onClick={() => setViewState("list")} className="flex-1 sm:flex-none justify-center px-3 py-1.5 bg-surface-container border border-outline-variant text-on-surface hover:text-on-surface-variant rounded-sm font-label-bold uppercase tracking-widest flex items-center gap-2 transition-all text-[10px] sm:text-[10px]">
                <span>{lang === 'en' ? 'Cancel' : 'İptal'}</span>
              </button>
-             <button onClick={saveCurrentConfig} disabled={saving} className="flex-1 sm:flex-none justify-center px-6 py-2.5 bg-primary-container text-on-primary rounded-sm font-label-bold uppercase tracking-widest flex items-center gap-2 transition-all hover:brightness-110 tactical-glow disabled:opacity-50 text-[10px] sm:text-[10px]">
+             <button onClick={saveCurrentConfig} disabled={saving} className="flex-1 sm:flex-none justify-center px-3 py-1.5 bg-primary-container text-on-primary rounded-sm font-label-bold uppercase tracking-widest flex items-center gap-2 transition-all hover:brightness-110 tactical-glow disabled:opacity-50 text-[10px] sm:text-[10px]">
                {saving ? <Loader2 size={16} className="animate-spin shrink-0" /> : <Save size={16} className="shrink-0" />}
                <span>{lang === 'en' ? 'Save' : 'Kaydet'}</span>
              </button>
            </div>
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-2 mb-8">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-2 mb-2">
           {/* Left Column: Message Settings */}
           <div className="space-y-6">
             <h3 className="font-headline-md text-[10px] sm:text-[10px] text-primary-container uppercase tracking-widest border-b border-outline-variant/30 pb-2">
@@ -341,7 +341,7 @@ export default function RoleMenuTab({ t, lang, guildId, discordChannels, discord
                 <div className="flex gap-2">
                   <input
                     type="color"
-                    className="w-12 h-12 rounded-sm cursor-pointer bg-transparent border-0 p-0 shrink-0"
+                    className="w-12 h-8 rounded-sm cursor-pointer bg-transparent border-0 p-0 shrink-0"
                     value={currentConfig.embed_color || "#fca311"}
                     onChange={(e) => setCurrentConfig({ ...currentConfig, embed_color: e.target.value })}
                   />
@@ -367,7 +367,7 @@ export default function RoleMenuTab({ t, lang, guildId, discordChannels, discord
               </div>
             </div>
             
-            <div className="bg-primary-container/10 border border-primary-container/30 rounded-sm p-2 mt-6">
+            <div className="bg-primary-container/10 border border-primary-container/30 rounded-sm p-2 mt-3">
               <h4 className="flex items-center gap-2 text-primary-container font-label-bold mb-2 uppercase text-[10px] tracking-widest">
                 <AlertTriangle size={14} className="shrink-0" /> {lang === 'en' ? 'Permissions Note' : 'Yetkiler Hakkında Not'}
               </h4>
@@ -398,7 +398,7 @@ export default function RoleMenuTab({ t, lang, guildId, discordChannels, discord
             </div>
 
             {currentConfig.menus.length === 0 && (
-               <div className="text-center py-8 px-4 text-on-surface-variant opacity-70 border border-dashed border-outline-variant rounded-sm text-[10px]">
+               <div className="text-center py-1 px-2 text-on-surface-variant opacity-70 border border-dashed border-outline-variant rounded-sm text-[10px]">
                   {lang === 'en' ? 'No menus added yet. Click "Add Menu" to start.' : 'Henüz menü eklenmedi. Başlamak için "Menü Ekle" butonuna tıklayın.'}
                </div>
             )}
@@ -418,7 +418,7 @@ export default function RoleMenuTab({ t, lang, guildId, discordChannels, discord
                         onChange={(e) => updateMenu(menuIdx, 'placeholder', e.target.value)}
                       />
                     </div>
-                    <button onClick={() => removeMenu(menuIdx)} className="w-full sm:w-auto justify-center p-2 text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded-sm transition-colors sm:mt-4 flex items-center gap-2" title="Remove Menu">
+                    <button onClick={() => removeMenu(menuIdx)} className="w-full sm:w-auto justify-center p-2 text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded-sm transition-colors sm:mt-2 flex items-center gap-2" title="Remove Menu">
                       <Trash2 size={16} /> <span className="sm:hidden text-[10px] font-label-bold uppercase">Remove</span>
                     </button>
                   </div>
@@ -439,7 +439,7 @@ export default function RoleMenuTab({ t, lang, guildId, discordChannels, discord
                     </div>
 
                     {menu.options.length === 0 && (
-                      <div className="text-[10px] sm:text-[10px] text-on-surface-variant/50 italic text-center py-2">
+                      <div className="text-[10px] sm:text-[10px] text-on-surface-variant/50 italic text-center py-1">
                         {lang === 'en' ? 'Add roles to display in this menu.' : 'Bu menüde gösterilecek rolleri ekleyin.'}
                       </div>
                     )}
@@ -452,7 +452,7 @@ export default function RoleMenuTab({ t, lang, guildId, discordChannels, discord
                             <input
                               type="text"
                               placeholder="Emoji (✨)"
-                              className="w-16 bg-surface-container-high border border-outline-variant rounded-sm px-2 py-2 sm:py-1.5 text-center text-[10px] shrink-0"
+                              className="w-16 bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1 sm:py-1.5 text-center text-[10px] shrink-0"
                               value={opt.emoji}
                               onChange={(e) => updateOption(menuIdx, optIdx, 'emoji', e.target.value)}
                             />
@@ -467,7 +467,7 @@ export default function RoleMenuTab({ t, lang, guildId, discordChannels, discord
 
                           <div className="flex items-center gap-2 w-full sm:w-auto flex-1">
                             <select
-                              className="flex-1 min-w-0 bg-surface-container-high border border-outline-variant rounded-sm px-2 py-2 sm:py-1.5 text-[10px] truncate"
+                              className="flex-1 min-w-0 bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1 sm:py-1.5 text-[10px] truncate"
                               value={opt.value}
                               onChange={(e) => updateOption(menuIdx, optIdx, 'value', e.target.value)}
                             >

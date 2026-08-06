@@ -202,11 +202,11 @@ export default function ServerKillboardClient({ serverKey, serverInfo, initialKi
                   outline: "none"
                 }}
               />
-              <Search size={18} color="#fca311" style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)" }} />
+              <Search size={14} color="#fca311" style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)" }} />
 
               {isSearching && (
                 <div style={{ position: "absolute", right: "1rem", top: "50%", transform: "translateY(-50%)", color: "#fca311" }}>
-                  <Loader2 className="animate-spin" size={18} />
+                  <Loader2 className="animate-spin" size={14} />
                 </div>
               )}
             </div>
@@ -286,7 +286,7 @@ export default function ServerKillboardClient({ serverKey, serverInfo, initialKi
                       className="hover:bg-white/10"
                     >
                       <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                        <User size={18} color="#2ecc71" />
+                        <User size={14} color="#2ecc71" />
                         <div>
                           <div style={{ color: "#fff", fontWeight: "bold", fontSize: "0.95rem" }}>{p.Name}</div>
                           {p.GuildName && <div style={{ color: "#aaa", fontSize: "0.8rem" }}>[{p.AllianceName || ''}] {p.GuildName}</div>}
@@ -318,7 +318,7 @@ export default function ServerKillboardClient({ serverKey, serverInfo, initialKi
                       className="hover:bg-white/10"
                     >
                       <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                        <Shield size={18} color="#e74c3c" />
+                        <Shield size={14} color="#e74c3c" />
                         <div>
                           <div style={{ color: "#fff", fontWeight: "bold", fontSize: "0.95rem" }}>{g.Name}</div>
                           {g.AllianceName && <div style={{ color: "#aaa", fontSize: "0.8rem" }}>[{g.AllianceName}]</div>}

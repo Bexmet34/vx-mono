@@ -22,7 +22,7 @@ export default function PrivacyPage() {
         <div className="glass-panel" style={{ padding: '3rem', lineHeight: '1.8', color: 'var(--text-muted)' }}>
           <section style={{ marginBottom: '2.5rem' }}>
             <h2 style={{ color: 'var(--text-main)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Eye size={24} /> {active.h1}
+              <Eye size={16} /> {active.h1}
             </h2>
             <p>
               {active.p1}
@@ -31,7 +31,7 @@ export default function PrivacyPage() {
 
           <section style={{ marginBottom: '2.5rem' }}>
             <h2 style={{ color: 'var(--text-main)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Lock size={24} /> {active.h2}
+              <Lock size={16} /> {active.h2}
             </h2>
             <p>
               {active.p2}
@@ -40,7 +40,7 @@ export default function PrivacyPage() {
 
           <section style={{ marginBottom: '2.5rem' }}>
             <h2 style={{ color: 'var(--text-main)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <FileText size={24} /> {active.h3}
+              <FileText size={16} /> {active.h3}
             </h2>
             <p>
               {active.p3}

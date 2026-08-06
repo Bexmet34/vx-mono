@@ -9,17 +9,17 @@ export default function VisualTab({ t, settings, setSettings, uploadingThumb, ch
   return (
     <div className="grid grid-cols-1 gap-2 animate-slide-up">
       <div className="glass-panel p-3 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
-        <h2 className="font-headline-lg text-[10px] text-on-surface mb-8 flex items-center gap-2 uppercase tracking-tight"><ImageIcon className="text-primary-container" /> Branding & Visuals</h2>
+        <h2 className="font-headline-lg text-[10px] text-on-surface mb-2 flex items-center gap-2 uppercase tracking-tight"><ImageIcon className="text-primary-container" /> Branding & Visuals</h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
           <div>
-            <div className="mb-8">
+            <div className="mb-2">
               <label className="flex items-center text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
                 Thumbnail Image URL
                 <InfoTooltip text={lang === 'en' ? 'The URL of the image to display in the top right corner of the bot\'s messages.' : 'Botun attığı mesajların sağ üst köşesinde görünecek küçük resmin (logo) bağlantısı.'} />
               </label>
               <div className="flex gap-2 items-center bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1 focus-within:border-primary-container transition-colors">
-                <LinkIcon size={18} className="text-on-surface-variant flex-shrink-0" />
+                <LinkIcon size={14} className="text-on-surface-variant flex-shrink-0" />
                 <input
                   type="text"
                   className="w-full bg-transparent text-on-surface focus:outline-none font-body-md"
@@ -49,7 +49,7 @@ export default function VisualTab({ t, settings, setSettings, uploadingThumb, ch
                   className="opacity-0 absolute inset-0 cursor-pointer z-10"
                 />
                 <div className="border border-dashed border-outline-variant/50 p-2 text-center rounded-sm cursor-pointer bg-white/5 hover:bg-white/10 hover:border-primary-container/50 transition-colors">
-                   <Upload size={24} className="text-on-surface-variant mx-auto mb-2" />
+                   <Upload size={16} className="text-on-surface-variant mx-auto mb-2" />
                    <div className="font-label-bold text-on-surface text-[10px] uppercase tracking-widest mb-1">Click to Browse</div>
                    <div className="text-[10px] font-body-md text-on-surface-variant">PNG, JPG up to 2MB</div>
                 </div>
@@ -69,22 +69,22 @@ export default function VisualTab({ t, settings, setSettings, uploadingThumb, ch
                      <div className="bg-[#1e1f22] h-2.5 w-2/5 rounded-sm mb-2"></div>
                      <div className="bg-[#1e1f22] h-2.5 w-4/5 rounded-sm mb-2"></div>
                      <div className="bg-[#1e1f22] h-2.5 w-3/4 rounded-sm mb-2"></div>
-                     <div className="bg-[#1e1f22] h-8 w-1/3 rounded-sm mt-4"></div>
+                     <div className="bg-[#1e1f22] h-8 w-1/3 rounded-sm mt-2"></div>
                    </div>
                    {(settings.embed_thumbnail_url && !thumbError) ? (
-                     <div className="w-16 h-16 rounded-sm overflow-hidden flex-shrink-0 bg-[#1e1f22]">
+                     <div className="w-16 h-7 rounded-sm overflow-hidden flex-shrink-0 bg-[#1e1f22]">
                        <img src={settings.embed_thumbnail_url} alt="Logo" className="w-full h-full object-cover" />
                      </div>
                    ) : (
-                     <div className="w-16 h-16 rounded-sm bg-[#1e1f22] flex items-center justify-center flex-shrink-0">
-                        <ImageIcon className="text-[#555]" size={24} />
+                     <div className="w-16 h-7 rounded-sm bg-[#1e1f22] flex items-center justify-center flex-shrink-0">
+                        <ImageIcon className="text-[#555]" size={16} />
                      </div>
                    )}
                 </div>
              </div>
              
              {settings.embed_thumbnail_url && !thumbError && (
-               <button className="flex items-center gap-2 mt-4 text-error hover:text-error/80 font-label-bold text-[10px] uppercase tracking-widest transition-colors px-3 py-1 hover:bg-error/10 rounded-sm" onClick={() => setSettings({ ...settings, embed_thumbnail_url: '' })}>
+               <button className="flex items-center gap-2 mt-2 text-error hover:text-error/80 font-label-bold text-[10px] uppercase tracking-widest transition-colors px-3 py-1 hover:bg-error/10 rounded-sm" onClick={() => setSettings({ ...settings, embed_thumbnail_url: '' })}>
                  <Trash size={16} /> Remove Logo
                </button>
              )}

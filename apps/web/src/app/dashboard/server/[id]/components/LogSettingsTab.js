@@ -86,7 +86,7 @@ export default function LogSettingsTab({ t, lang, settings, setSettings, discord
         {/* Sol Kolon: Ana Ayarlar */}
         <div className="flex-1 space-y-6">
           <div className="flex items-center justify-between bg-surface-variant p-2 border-l-4 border-primary shadow-sm relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-10 -mt-10 transition-transform group-hover:scale-150"></div>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-10 -mt-2 transition-transform group-hover:scale-150"></div>
             <div>
               <h3 className="font-title-bold text-on-surface flex items-center gap-2">
                 <Shield className="w-5 h-5 text-primary" />
@@ -201,7 +201,7 @@ export default function LogSettingsTab({ t, lang, settings, setSettings, discord
 
         {/* Sağ Kolon: Event Seçimi */}
         <div className="flex-1 bg-surface-variant rounded-md p-3 border border-white/5 shadow-sm relative">
-           <h3 className="font-label-bold text-on-surface mb-4 uppercase tracking-wider text-[10px] flex items-center gap-2">
+           <h3 className="font-label-bold text-on-surface mb-2 uppercase tracking-wider text-[10px] flex items-center gap-2">
             <Info className="w-4 h-4 text-primary" />
             {lang === 'tr' ? 'Loglanacak Olaylar' : 'Events to Log'}
           </h3>
@@ -234,11 +234,11 @@ export default function LogSettingsTab({ t, lang, settings, setSettings, discord
         </div>
       </div>
 
-      <div className="flex justify-end pt-4 border-t border-white/10 mt-6">
+      <div className="flex justify-end pt-4 border-t border-white/10 mt-3">
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-2 bg-primary text-on-primary px-6 py-2 rounded-sm font-label-bold uppercase tracking-widest text-[10px] hover:bg-primary/90 transition-all disabled:opacity-50 hover:shadow-[0_0_15px_rgba(var(--primary-color),0.4)] disabled:shadow-none"
+          className="flex items-center gap-2 bg-primary text-on-primary px-3 py-1 rounded-sm font-label-bold uppercase tracking-widest text-[10px] hover:bg-primary/90 transition-all disabled:opacity-50 hover:shadow-[0_0_15px_rgba(var(--primary-color),0.4)] disabled:shadow-none"
         >
           {saving ? (
             <>

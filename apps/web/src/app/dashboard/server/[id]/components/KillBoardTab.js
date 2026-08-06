@@ -29,7 +29,7 @@ export default function KillBoardTab({
             <h2 className="font-headline-lg text-[10px] text-error mb-2 flex items-center gap-2 uppercase tracking-tight"><ShieldAlert /> {lang === 'en' ? 'Action Required' : 'İşlem Gerekiyor'}</h2>
             <p className="font-body-md text-error/80">{lang === 'en' ? 'Please select an Albion Guild in the General settings before using the KillBoard.' : 'KillBoard kullanmadan önce lütfen Genel ayarlardan bir Albion Loncası seçin.'}</p>
           </div>
-          <button onClick={() => setActiveTab('general')} className="px-6 py-3 bg-error hover:bg-error/80 text-white border border-error rounded-sm font-label-bold uppercase tracking-widest transition-colors whitespace-nowrap">
+          <button onClick={() => setActiveTab('general')} className="px-3 py-1.5 bg-error hover:bg-error/80 text-white border border-error rounded-sm font-label-bold uppercase tracking-widest transition-colors whitespace-nowrap">
             {lang === 'en' ? 'Go to General Settings' : 'Genel Ayarlara Git'}
           </button>
         </div>
@@ -38,9 +38,9 @@ export default function KillBoardTab({
       {/* KillBoard Settings & Triggers */}
       <div className={`glass-panel p-3 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-all ${!settings.albion_guild_id ? 'opacity-40 pointer-events-none' : ''}`}>
         <h2 className="font-headline-lg text-[10px] text-on-surface mb-2 flex items-center gap-2 uppercase tracking-tight"><Send className="text-primary-container" /> Discord Integration</h2>
-        <p className="font-body-md text-on-surface-variant mb-6">Where and when should the KillBoard report be posted?</p>
+        <p className="font-body-md text-on-surface-variant mb-3">Where and when should the KillBoard report be posted?</p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
           <div>
             <label className="flex items-center text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
               Target Channel
@@ -73,12 +73,12 @@ export default function KillBoardTab({
         </div>
 
         <div className="flex flex-col sm:flex-row gap-2">
-           <button className="flex-1 px-6 py-3 bg-surface-container border border-outline-variant text-on-surface hover:text-primary-container hover:border-primary-container rounded-sm font-label-bold uppercase tracking-widest transition-colors flex items-center justify-center gap-2 disabled:opacity-50" onClick={handlePreviewKillBoard} disabled={!settings.albion_guild_id || loadingPreview || triggeringKillBoard}>
-              {loadingPreview ? <Loader2 size={18} className="animate-spin"/> : <Eye size={18}/>} 
+           <button className="flex-1 px-3 py-1.5 bg-surface-container border border-outline-variant text-on-surface hover:text-primary-container hover:border-primary-container rounded-sm font-label-bold uppercase tracking-widest transition-colors flex items-center justify-center gap-2 disabled:opacity-50" onClick={handlePreviewKillBoard} disabled={!settings.albion_guild_id || loadingPreview || triggeringKillBoard}>
+              {loadingPreview ? <Loader2 size={14} className="animate-spin"/> : <Eye size={14}/>} 
               Preview Data
            </button>
-           <button className="flex-1 px-6 py-3 bg-primary-container text-on-primary font-label-bold uppercase tracking-widest tactical-glow rounded-sm transition-all hover:brightness-110 flex items-center justify-center gap-2 disabled:opacity-50" onClick={handleTriggerKillBoard} disabled={!settings.albion_guild_id || !settings.killboard_channel_id || triggeringKillBoard || loadingPreview}>
-              {triggeringKillBoard ? <Loader2 size={18} className="animate-spin"/> : <ShieldAlert size={18}/>} 
+           <button className="flex-1 px-3 py-1.5 bg-primary-container text-on-primary font-label-bold uppercase tracking-widest tactical-glow rounded-sm transition-all hover:brightness-110 flex items-center justify-center gap-2 disabled:opacity-50" onClick={handleTriggerKillBoard} disabled={!settings.albion_guild_id || !settings.killboard_channel_id || triggeringKillBoard || loadingPreview}>
+              {triggeringKillBoard ? <Loader2 size={14} className="animate-spin"/> : <ShieldAlert size={14}/>} 
               Trigger Now
            </button>
         </div>
@@ -87,8 +87,8 @@ export default function KillBoardTab({
       {/* Preview Section */}
       {killboardPreview && (
         <div className="glass-panel p-3 relative overflow-visible border border-primary-container/30 animate-slide-up">
-          <h2 className="font-headline-lg text-[10px] text-on-surface mb-6 uppercase tracking-tight">Daily Summary Preview</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-8">
+          <h2 className="font-headline-lg text-[10px] text-on-surface mb-3 uppercase tracking-tight">Daily Summary Preview</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-2">
              <div className="bg-surface-container-lowest border border-outline-variant rounded-sm p-2 text-center">
                <div className="text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">Total Kills</div>
                <div className="text-4xl font-headline-xl text-success">{killboardPreview.totalKills || 0}</div>
@@ -103,9 +103,9 @@ export default function KillBoardTab({
              </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">
             <div className="bg-surface-container-lowest border border-outline-variant rounded-sm p-2">
-              <h3 className="font-headline-md text-[10px] text-on-surface mb-4 pb-2 border-b border-outline-variant/50 uppercase tracking-tight">⚔️ Top Killers</h3>
+              <h3 className="font-headline-md text-[10px] text-on-surface mb-2 pb-2 border-b border-outline-variant/50 uppercase tracking-tight">⚔️ Top Killers</h3>
               {killboardPreview.topKillers && killboardPreview.topKillers.length > 0 ? (
                 killboardPreview.topKillers.map((k, i) => (
                   <div key={k.name} className="flex justify-between items-center mb-2 font-body-md">
@@ -121,7 +121,7 @@ export default function KillBoardTab({
             </div>
 
             <div className="bg-surface-container-lowest border border-outline-variant rounded-sm p-2">
-              <h3 className="font-headline-md text-[10px] text-on-surface mb-4 pb-2 border-b border-outline-variant/50 uppercase tracking-tight">💀 Top Deaths</h3>
+              <h3 className="font-headline-md text-[10px] text-on-surface mb-2 pb-2 border-b border-outline-variant/50 uppercase tracking-tight">💀 Top Deaths</h3>
               {killboardPreview.topDeaths && killboardPreview.topDeaths.length > 0 ? (
                 killboardPreview.topDeaths.map((d, i) => (
                   <div key={d.name} className="flex justify-between items-center mb-2 font-body-md">
@@ -138,7 +138,7 @@ export default function KillBoardTab({
           </div>
 
           {killboardPreview.topFameKill && (
-            <div className="bg-primary-container/5 border border-primary-container/30 rounded-sm p-2 mb-6">
+            <div className="bg-primary-container/5 border border-primary-container/30 rounded-sm p-2 mb-3">
               <h3 className="font-headline-md text-[10px] text-primary-container mb-2 uppercase tracking-tight">💰 Most Valuable Kill</h3>
               <div className="font-body-md text-on-surface text-[10px]">
                 <span className="font-label-bold text-success">{killboardPreview.topFameKill.killer}</span> killed <span className="font-label-bold text-error">{killboardPreview.topFameKill.victim}</span>

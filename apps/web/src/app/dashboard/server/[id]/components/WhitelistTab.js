@@ -39,7 +39,7 @@ export default function WhitelistTab({ t, settings, setSettings, whitelistAddTab
           <Users className="text-primary-container" /> Active Whitelist
           <InfoTooltip text={lang === 'en' ? 'Only the users and roles listed here will be able to use restricted commands like /createparty.' : 'Sadece burada listelenen kullanıcılar veya roller /createparty gibi komutları kullanabilir.'} />
         </h2>
-        <p className="font-body-md text-on-surface-variant mb-6">Users or roles listed here can use restricted commands like /createparty.</p>
+        <p className="font-body-md text-on-surface-variant mb-3">Users or roles listed here can use restricted commands like /createparty.</p>
 
         {safeWhitelist.length === 0 ? (
           <div className="text-center p-3 bg-surface-container-highest border border-outline-variant rounded-sm text-on-surface-variant font-body-md">
@@ -56,7 +56,7 @@ export default function WhitelistTab({ t, settings, setSettings, whitelistAddTab
                     <span className="font-label-bold text-on-surface">{info.name}</span>
                   </div>
                   <button className="p-2 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-sm transition-colors opacity-50 group-hover:opacity-100" onClick={() => removeWhitelistId(id)}>
-                    <Trash2 size={18} />
+                    <Trash2 size={14} />
                   </button>
                 </div>
               );
@@ -66,18 +66,18 @@ export default function WhitelistTab({ t, settings, setSettings, whitelistAddTab
       </div>
 
       <div className="glass-panel p-3 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors md:col-span-5">
-        <h3 className="font-headline-md text-[10px] text-on-surface mb-6 flex items-center uppercase tracking-tight">
+        <h3 className="font-headline-md text-[10px] text-on-surface mb-3 flex items-center uppercase tracking-tight">
           Add New Entry
           <InfoTooltip text={lang === 'en' ? 'Search for a Discord role or user to add them to the whitelist.' : 'Beyaz listeye eklemek için bir Discord rolü veya kullanıcı arayın.'} />
         </h3>
-        <div className="flex gap-2 mb-4 bg-surface-container-highest p-1 rounded-sm border border-outline-variant">
-          <button className={`flex-1 py-2 rounded-sm font-label-bold uppercase tracking-widest text-[10px] transition-colors ${whitelistAddTab === 'roles' ? 'bg-primary-container text-on-primary tactical-glow' : 'text-on-surface-variant hover:text-on-surface'}`} onClick={() => setWhitelistAddTab('roles')}>Roles</button>
-          <button className={`flex-1 py-2 rounded-sm font-label-bold uppercase tracking-widest text-[10px] transition-colors ${whitelistAddTab === 'users' ? 'bg-primary-container text-on-primary tactical-glow' : 'text-on-surface-variant hover:text-on-surface'}`} onClick={() => setWhitelistAddTab('users')}>Users</button>
+        <div className="flex gap-2 mb-2 bg-surface-container-highest p-1 rounded-sm border border-outline-variant">
+          <button className={`flex-1 py-1 rounded-sm font-label-bold uppercase tracking-widest text-[10px] transition-colors ${whitelistAddTab === 'roles' ? 'bg-primary-container text-on-primary tactical-glow' : 'text-on-surface-variant hover:text-on-surface'}`} onClick={() => setWhitelistAddTab('roles')}>Roles</button>
+          <button className={`flex-1 py-1 rounded-sm font-label-bold uppercase tracking-widest text-[10px] transition-colors ${whitelistAddTab === 'users' ? 'bg-primary-container text-on-primary tactical-glow' : 'text-on-surface-variant hover:text-on-surface'}`} onClick={() => setWhitelistAddTab('users')}>Users</button>
         </div>
 
         <input
           type="text"
-          className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md mb-4"
+          className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md mb-2"
           placeholder="Search..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}

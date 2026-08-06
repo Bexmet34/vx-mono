@@ -50,8 +50,8 @@ export default function TicketHistoryTab({ t, lang, guildId, showToast, isPremiu
   return (
     <div className="grid grid-cols-1 gap-2 animate-fade-in pb-12">
       <div className="bg-surface-variant p-2 rounded-md border border-white/5 shadow-sm relative group">
-        <h3 className="font-headline-md text-[10px] text-on-surface mb-6 uppercase tracking-wider flex items-center gap-2">
-          <MessageSquare className="text-primary-container" size={20}/> 
+        <h3 className="font-headline-md text-[10px] text-on-surface mb-3 uppercase tracking-wider flex items-center gap-2">
+          <MessageSquare className="text-primary-container" size={14}/> 
           {lang === 'tr' ? 'Kapatılmış Ticket Geçmişi' : 'Closed Ticket History'}
         </h3>
         
@@ -59,7 +59,7 @@ export default function TicketHistoryTab({ t, lang, guildId, showToast, isPremiu
            <div className="flex justify-center p-3 text-primary-container"><Loader2 size={32} className="animate-spin" /></div>
         ) : tickets.length === 0 ? (
            <div className="flex flex-col items-center justify-center p-3 text-on-surface-variant bg-surface rounded border border-white/5">
-              <MessageSquare size={48} className="opacity-20 mb-4" />
+              <MessageSquare size={48} className="opacity-20 mb-2" />
               <p>{lang === 'tr' ? 'Henüz kapatılmış bir ticket bulunmuyor.' : 'No closed tickets found yet.'}</p>
            </div>
         ) : (
@@ -114,13 +114,13 @@ export default function TicketHistoryTab({ t, lang, guildId, showToast, isPremiu
            <div className="bg-[#313338] max-w-[800px] w-full max-h-[90vh] rounded-md shadow-2xl flex flex-col border border-white/10 relative overflow-hidden">
               <div className="p-2 border-b border-white/10 flex justify-between items-center bg-[#2b2d31]">
                  <div className="flex items-center gap-2">
-                    <Hash size={24} className="text-gray-400" />
+                    <Hash size={16} className="text-gray-400" />
                     <div>
                         <h2 className="font-bold text-white text-[10px] leading-tight">ticket-{selectedTranscript.owner_name}</h2>
                         <span className="text-[10px] text-gray-400">{lang === 'tr' ? 'Ticket Dökümü' : 'Ticket Transcript'}</span>
                     </div>
                  </div>
-                 <button onClick={() => setSelectedTranscript(null)} className="text-gray-400 hover:text-white transition-colors p-1"><X size={24} /></button>
+                 <button onClick={() => setSelectedTranscript(null)} className="text-gray-400 hover:text-white transition-colors p-1"><X size={16} /></button>
               </div>
               <div className="flex-1 overflow-y-auto p-2 custom-scrollbar space-y-4">
                  {!selectedTranscript.transcript || selectedTranscript.transcript.length === 0 ? (
@@ -128,7 +128,7 @@ export default function TicketHistoryTab({ t, lang, guildId, showToast, isPremiu
                  ) : (
                     selectedTranscript.transcript.map((msg, idx) => (
                        <div key={idx} className="flex gap-2 group hover:bg-[#2b2d31]/50 p-1 -mx-2 px-2 rounded">
-                          <img src={msg.avatar || "https://cdn.discordapp.com/embed/avatars/0.png"} className="w-10 h-10 rounded-full mt-0.5 object-cover" alt="avatar" />
+                          <img src={msg.avatar || "https://cdn.discordapp.com/embed/avatars/0.png"} className="w-10 h-7 rounded-full mt-0.5 object-cover" alt="avatar" />
                           <div className="flex-1 min-w-0">
                              <div className="flex items-baseline gap-2 mb-1">
                                 <span className="font-medium text-white">{msg.author}</span>

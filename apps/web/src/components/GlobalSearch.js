@@ -98,7 +98,7 @@ export default function GlobalSearch() {
         }}>
           {isLoading ? (
             <div style={{ padding: '1rem', textAlign: 'center', color: '#fca311' }}>
-              <Loader2 className="animate-spin inline-block" size={24} />
+              <Loader2 className="animate-spin inline-block" size={16} />
             </div>
           ) : results ? (
             <div style={{ maxHeight: '300px', overflowY: 'auto' }}>

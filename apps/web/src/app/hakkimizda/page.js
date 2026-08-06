@@ -32,7 +32,7 @@ export default function AboutPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--accent-color)' }}>
-                <Phone size={20} />
+                <Phone size={14} />
                 <span style={{ fontWeight: '600' }}>{t.phone}</span>
               </div>
               <p style={{ color: 'var(--text-muted)' }}>0551 078 82 61</p>
@@ -40,7 +40,7 @@ export default function AboutPage() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--accent-color)' }}>
-                <Mail size={20} />
+                <Mail size={14} />
                 <span style={{ fontWeight: '600' }}>{t.email}</span>
               </div>
               <p style={{ color: 'var(--text-muted)' }}>hakkibsknn@gmail.com</p>
@@ -48,7 +48,7 @@ export default function AboutPage() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--accent-color)' }}>
-                <MapPin size={20} />
+                <MapPin size={14} />
                 <span style={{ fontWeight: '600' }}>{t.address}</span>
               </div>
               <p style={{ color: 'var(--text-muted)' }}>{activeContent.addressVal}</p>
@@ -56,7 +56,7 @@ export default function AboutPage() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--accent-color)' }}>
-                <MessageSquare size={20} />
+                <MessageSquare size={14} />
                 <span style={{ fontWeight: '600' }}>{t.support}</span>
               </div>
               <a href="https://discord.gg/D6T3t4beqa" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-color)', textDecoration: 'underline' }}>{activeContent.supportVal}</a>

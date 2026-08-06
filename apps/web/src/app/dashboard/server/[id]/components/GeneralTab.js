@@ -91,7 +91,7 @@ export default function GeneralTab({
   return (
     <div className="grid grid-cols-1 gap-2 animate-slide-up pb-10">
       <div className="glass-panel p-3 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
-        <h2 className="font-headline-lg text-[10px] text-on-surface mb-6 flex items-center gap-2 uppercase tracking-tight"><Layout className="text-primary-container" /> {t.dGeneral}</h2>
+        <h2 className="font-headline-lg text-[10px] text-on-surface mb-3 flex items-center gap-2 uppercase tracking-tight"><Layout className="text-primary-container" /> {t.dGeneral}</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
           <div>
@@ -112,12 +112,12 @@ export default function GeneralTab({
       </div>
 
       {/* Content System Settings */}
-      <div className="glass-panel p-3 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors mt-4">
-        <h2 className="font-headline-lg text-[10px] text-on-surface mb-6 flex items-center gap-2 uppercase tracking-tight">
+      <div className="glass-panel p-3 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors mt-2">
+        <h2 className="font-headline-lg text-[10px] text-on-surface mb-3 flex items-center gap-2 uppercase tracking-tight">
           <Layout className="text-primary-container" /> {lang === 'tr' ? 'Content Sistemi Ayarları' : 'Content System Settings'}
         </h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">
           <div>
             <label className="flex items-center text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
               {lang === 'tr' ? 'Sistem Modu Seçimi' : 'System Mode Selection'}
@@ -218,7 +218,7 @@ export default function GeneralTab({
             
             <div className="md:col-span-2 mt-2">
               <button
-                className="px-6 py-3 bg-primary-container text-on-primary border border-primary-container rounded-sm font-label-bold text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 transition-all hover:brightness-110 active:scale-95 tactical-glow"
+                className="px-3 py-1.5 bg-primary-container text-on-primary border border-primary-container rounded-sm font-label-bold text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 transition-all hover:brightness-110 active:scale-95 tactical-glow"
                 onClick={async () => {
                    if(!settings.fixed_message_channel_id) return showToast(lang === 'tr' ? "Lütfen kanal seçin!" : "Please select a channel!", "error");
                    const res = await fetch(`/api/guild-settings/${guildId}/send-fixed-message`, { method: "POST" });
@@ -239,10 +239,10 @@ export default function GeneralTab({
           <Sword className="text-primary-container" /> Albion Guild Configuration
           <InfoTooltip text={lang === 'en' ? 'Search and link your Albion Online Guild. This is required for Killboard and Auto-Check features to work globally.' : 'Albion Online Loncanızı arayıp bağlayın. Killboard ve Otomatik Kontrol özelliklerinin çalışması için bu zorunludur.'} />
         </h2>
-        <p className="font-body-md text-on-surface-variant mb-6">Search and link your Albion Online Guild to be used globally across all features.</p>
+        <p className="font-body-md text-on-surface-variant mb-3">Search and link your Albion Online Guild to be used globally across all features.</p>
 
         {settings.albion_guild_id && guildDetail ? (
-          <div className="bg-primary-container/5 border border-primary-container/50 rounded-sm p-2 mb-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
+          <div className="bg-primary-container/5 border border-primary-container/50 rounded-sm p-2 mb-2 flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
              <div>
                <div className="text-[10px] font-label-bold text-primary-container uppercase tracking-widest mb-1">Active Guild</div>
                <div className="text-[10px] font-headline-lg text-on-surface">
@@ -252,7 +252,7 @@ export default function GeneralTab({
                  Server: <span className="text-primary-container font-semibold uppercase">{settings.albion_server || 'Europe'}</span> &bull; Leader: <span className="text-on-surface">{guildDetail.FounderName || 'Unknown'}</span> &bull; Members: <span className="text-on-surface">{guildDetail.MemberCount || 0}</span>
                </div>
              </div>
-             <button className="px-6 py-2 bg-error/10 text-error border border-error/50 hover:bg-error hover:text-on-error rounded-sm font-label-bold uppercase tracking-widest transition-colors" onClick={() => {
+             <button className="px-3 py-1 bg-error/10 text-error border border-error/50 hover:bg-error hover:text-on-error rounded-sm font-label-bold uppercase tracking-widest transition-colors" onClick={() => {
                 setSettings({ ...settings, albion_guild_id: "", albion_guild_name: "", albion_server: "Europe" });
                 setGuildDetail(null);
              }}>
@@ -261,7 +261,7 @@ export default function GeneralTab({
           </div>
         ) : (
           <div>
-            <div className="flex flex-col md:flex-row gap-2 mb-4">
+            <div className="flex flex-col md:flex-row gap-2 mb-2">
               <div className="w-full md:w-1/4">
                 <select
                   className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
@@ -282,8 +282,8 @@ export default function GeneralTab({
                   onChange={(e) => setGuildSearchQuery(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && searchGuilds()}
                 />
-                <button className="px-6 py-3 bg-surface-container-highest border border-outline-variant text-on-surface hover:text-primary-container hover:border-primary-container rounded-sm transition-colors disabled:opacity-50 flex items-center justify-center" onClick={searchGuilds} disabled={searchingGuild || guildSearchQuery.length < 3}>
-                  {searchingGuild ? <Loader2 size={20} className="animate-spin" /> : <Search size={20} />}
+                <button className="px-3 py-1.5 bg-surface-container-highest border border-outline-variant text-on-surface hover:text-primary-container hover:border-primary-container rounded-sm transition-colors disabled:opacity-50 flex items-center justify-center" onClick={searchGuilds} disabled={searchingGuild || guildSearchQuery.length < 3}>
+                  {searchingGuild ? <Loader2 size={14} className="animate-spin" /> : <Search size={14} />}
                 </button>
               </div>
             </div>
@@ -297,7 +297,7 @@ export default function GeneralTab({
                     onClick={() => handleSelectGuild(g)}
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <div className="font-label-bold text-on-surface text-base flex items-center gap-2">
+                      <div className="font-label-bold text-on-surface text-xs flex items-center gap-2">
                         {g.AllianceTag ? <span className="text-primary-container">[{g.AllianceTag}]</span> : null}
                         <span>{g.Name}</span>
                       </div>
@@ -321,11 +321,11 @@ export default function GeneralTab({
 
       {/* Admin Management Box (Only visible to OWNER) */}
       {isOwner && (
-        <div className="glass-panel p-3 relative overflow-visible border-t-4 border-t-error mt-4">
+        <div className="glass-panel p-3 relative overflow-visible border-t-4 border-t-error mt-2">
            <h3 className="font-headline-md text-[10px] text-error mb-2 uppercase tracking-tight flex items-center gap-2">
-            <ShieldAlert size={24} /> {lang === 'tr' ? 'Yöneticiler (Sadece Size Görünür)' : 'Administrators (Only Visible to You)'}
+            <ShieldAlert size={16} /> {lang === 'tr' ? 'Yöneticiler (Sadece Size Görünür)' : 'Administrators (Only Visible to You)'}
            </h3>
-           <p className="text-on-surface-variant text-[10px] mb-6">
+           <p className="text-on-surface-variant text-[10px] mb-3">
              {lang === 'tr' 
                ? 'Buradan eklediğiniz kişiler web paneline sizin gibi giriş yapabilir ve tüm bot ayarlarını değiştirebilir. Eklediğiniz kişiler bu sekmeyi göremez.' 
                : 'People added here can log into the web dashboard just like you and change all bot settings. They cannot see this tab.'}
@@ -342,7 +342,7 @@ export default function GeneralTab({
                   <input 
                     type="text" 
                     placeholder={lang === 'tr' ? 'Discord İsmi Ara...' : 'Search Discord Name...'}
-                    className="w-full bg-surface border border-outline text-on-surface pl-10 pr-4 py-3 rounded-sm focus:border-primary-container outline-none transition-colors"
+                    className="w-full bg-surface border border-outline text-on-surface pl-10 pr-4 py-1.5 rounded-sm focus:border-primary-container outline-none transition-colors"
                     value={adminSearch}
                     onChange={e => setAdminSearch(e.target.value)}
                   />
@@ -425,11 +425,11 @@ export default function GeneralTab({
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-background/80 backdrop-blur-sm p-2">
            <div className="glass-panel w-full max-w-md p-2 border-2 border-error animate-slide-up relative">
               <div className="absolute top-0 left-0 w-full h-1 bg-error"></div>
-              <ShieldAlert size={48} className="text-error mx-auto mb-4" />
+              <ShieldAlert size={48} className="text-error mx-auto mb-2" />
               <h2 className="text-[10px] font-headline-md text-center text-on-surface mb-2">
                 {lang === 'tr' ? 'DİKKAT!' : 'WARNING!'}
               </h2>
-              <p className="text-center text-on-surface-variant mb-6 text-[10px]">
+              <p className="text-center text-on-surface-variant mb-3 text-[10px]">
                 {lang === 'tr' 
                   ? `Şu anda ${selectedMember.global_name || selectedMember.username} adlı kişiye sunucunuzun web paneli üzerinde TAM YETKİ veriyorsunuz. Bu kişi sizin adınıza kayıt kanallarını, rollerini değiştirebilir veya bot özelliklerini kapatabilir.`
                   : `You are giving FULL ACCESS to ${selectedMember.global_name || selectedMember.username} on your server's web dashboard. They will be able to change all settings and roles on your behalf.`}
@@ -437,14 +437,14 @@ export default function GeneralTab({
               <div className="flex gap-2">
                 <button 
                   onClick={() => setShowWarningModal(false)}
-                  className="flex-1 py-3 border border-outline hover:bg-white/5 rounded-sm font-label-bold uppercase tracking-widest text-[10px] transition-colors"
+                  className="flex-1 py-1.5 border border-outline hover:bg-white/5 rounded-sm font-label-bold uppercase tracking-widest text-[10px] transition-colors"
                 >
                   {lang === 'tr' ? 'İptal' : 'Cancel'}
                 </button>
                 <button 
                   onClick={handleAddAdmin}
                   disabled={addingAdmin}
-                  className="flex-1 py-3 bg-error text-on-error hover:brightness-110 rounded-sm font-label-bold uppercase tracking-widest text-[10px] transition-colors disabled:opacity-50"
+                  className="flex-1 py-1.5 bg-error text-on-error hover:brightness-110 rounded-sm font-label-bold uppercase tracking-widest text-[10px] transition-colors disabled:opacity-50"
                 >
                   {addingAdmin ? '...' : (lang === 'tr' ? 'Onaylıyorum' : 'I Confirm')}
                 </button>

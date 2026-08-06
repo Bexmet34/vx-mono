@@ -87,54 +87,54 @@ export default function Navbar({ isStatic = false }) {
   return (
     <>
       <nav className={`${isStatic ? 'absolute' : 'fixed'} top-0 w-full z-40 bg-surface/80 backdrop-blur-md border-b border-on-surface/10 shadow-[0_0_15px_rgba(255,215,0,0.15)] transition-all`}>
-        <div className="flex justify-between items-center px-4 md:px-margin-desktop py-4 max-w-container-max mx-auto">
-          <div className="flex items-center gap-6">
+        <div className="flex justify-between items-center px-2 md:px-margin-desktop py-1 max-w-container-max mx-auto">
+          <div className="flex items-center gap-1">
             <Link href="/" className="flex items-center gap-2 font-headline-md text-headline-md font-bold tracking-tighter text-primary-container">
-              <Logo className="w-10 h-10" />
+              <Logo className="w-10 h-7" />
               Veyronix
             </Link>
             
             <div className="hidden md:flex space-x-6 lg:space-x-8 items-center border-l border-on-surface/10 pl-6">
               
-              <Link href="/killboard" className="flex items-center gap-1.5 font-body-md text-body-md text-primary-container font-bold hover:brightness-110 transition-all py-2">
+              <Link href="/killboard" className="flex items-center gap-1.5 font-body-md text-body-md text-primary-container font-bold hover:brightness-110 transition-all py-1">
                 <Swords size={16} />
                 Killboard
               </Link>
 
               {/* Dropdown for Page Sections */}
               <div className="relative group cursor-pointer">
-                <div className="flex items-center gap-1 font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors py-2">
+                <div className="flex items-center gap-1 font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors py-1">
                   {lang === 'tr' ? 'Keşfet' : 'Explore'}
                   <ChevronDown size={14} className="text-on-surface-variant group-hover:text-primary transition-transform group-hover:rotate-180" />
                 </div>
                 <div className="absolute top-[100%] left-0 mt-0 w-48 bg-surface-container border border-outline-variant/50 p-2 shadow-[0_10px_40px_rgba(0,0,0,0.8)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 rounded-md">
                   <div className="flex flex-col gap-1">
-                    <Link href="/killboard" className="px-4 py-2 text-sm text-primary-container font-bold hover:bg-primary-container/10 transition-colors rounded-sm flex items-center gap-2">
+                    <Link href="/killboard" className="px-2 py-1 text-[10px] text-primary-container font-bold hover:bg-primary-container/10 transition-colors rounded-sm flex items-center gap-2">
                       <Swords size={14} /> Killboard
                     </Link>
-                    <Link href="/#features" className="px-4 py-2 text-sm text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm">
+                    <Link href="/#features" className="px-2 py-1 text-[10px] text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm">
                       {lang === 'tr' ? 'Özellikler' : 'Features'}
                     </Link>
-                    <Link href="/#dashboard" className="px-4 py-2 text-sm text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm">
+                    <Link href="/#dashboard" className="px-2 py-1 text-[10px] text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm">
                       Dashboard
                     </Link>
-                    <Link href="/#commands" className="px-4 py-2 text-sm text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm">
+                    <Link href="/#commands" className="px-2 py-1 text-[10px] text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm">
                       {lang === 'tr' ? 'Komuta Merkezi' : 'Commands'}
                     </Link>
-                    <Link href="/#pricing" className="px-4 py-2 text-sm text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm">
+                    <Link href="/#pricing" className="px-2 py-1 text-[10px] text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm">
                       {lang === 'tr' ? 'Fiyatlar' : 'Pricing'}
                     </Link>
-                    <Link href="/#faq" className="px-4 py-2 text-sm text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm">
+                    <Link href="/#faq" className="px-2 py-1 text-[10px] text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm">
                       {lang === 'tr' ? 'SSS' : 'FAQ'}
                     </Link>
                     <div className="h-[1px] bg-outline-variant/30 my-1"></div>
-                    <Link href="/blog" className="px-4 py-2 text-sm text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm">
+                    <Link href="/blog" className="px-2 py-1 text-[10px] text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm">
                       {t.blog}
                     </Link>
-                    <a href="https://docs.veyronix.com.tr/" target="_blank" rel="noopener noreferrer" className="px-4 py-2 text-sm text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm">
+                    <a href="https://docs.veyronix.com.tr/" target="_blank" rel="noopener noreferrer" className="px-2 py-1 text-[10px] text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm">
                       Wiki
                     </a>
-                    <Link href="/changelog" className="px-4 py-2 text-sm text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm">
+                    <Link href="/changelog" className="px-2 py-1 text-[10px] text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm">
                       {t.changelog}
                     </Link>
                   </div>
@@ -143,11 +143,11 @@ export default function Navbar({ isStatic = false }) {
             </div>
           </div>
           
-          <div className="flex items-center gap-3 md:gap-4">
+          <div className="flex items-center gap-1 md:gap-2">
             {/* Premium Button */}
             <Link 
               href="/premium" 
-              className="hidden md:flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary-container/50 bg-primary-container/10 text-primary-container hover:bg-primary-container hover:text-on-primary transition-all font-label-bold shadow-[0_0_15px_rgba(255,215,0,0.1)] hover:shadow-[0_0_20px_rgba(255,215,0,0.3)]"
+              className="hidden md:flex items-center gap-2 px-2 py-1.5 rounded-full border border-primary-container/50 bg-primary-container/10 text-primary-container hover:bg-primary-container hover:text-on-primary transition-all font-label-bold shadow-[0_0_15px_rgba(255,215,0,0.1)] hover:shadow-[0_0_20px_rgba(255,215,0,0.3)]"
             >
               <span>{t.premiumBtnNavbar}</span>
               <Sparkles size={16} />
@@ -164,10 +164,10 @@ export default function Navbar({ isStatic = false }) {
             </button>
 
             {/* Desktop Auth */}
-            <div className="hidden md:flex items-center gap-4">
+            <div className="hidden md:flex items-center gap-2">
               {session ? (
-                <div className="flex items-center gap-4 pl-4 border-l border-on-surface/10">
-                  <Link href="/dashboard" className="group relative hidden md:flex items-center gap-2 px-5 py-2 bg-primary-container text-on-primary font-headline-md text-sm uppercase tracking-wider hover:brightness-110 transition-all duration-300 shadow-[0_0_15px_rgba(255,215,0,0.15)] hover:shadow-[0_0_25px_rgba(255,215,0,0.3)]">
+                <div className="flex items-center gap-2 pl-4 border-l border-on-surface/10">
+                  <Link href="/dashboard" className="group relative hidden md:flex items-center gap-2 px-2 py-1 bg-primary-container text-on-primary font-headline-md text-[10px] uppercase tracking-wider hover:brightness-110 transition-all duration-300 shadow-[0_0_15px_rgba(255,215,0,0.15)] hover:shadow-[0_0_25px_rgba(255,215,0,0.3)]">
                     <div className="absolute inset-0 border border-primary-container group-hover:scale-[1.04] transition-transform duration-300"></div>
                     <LayoutDashboard size={16} strokeWidth={2.5} />
                     {t.dashboard}
@@ -176,10 +176,10 @@ export default function Navbar({ isStatic = false }) {
                   <div ref={profileRef} className="relative border-l border-on-surface/10 pl-4 md:pl-6 ml-1 md:ml-2">
                     <button 
                       onClick={() => setIsProfileOpen(!isProfileOpen)}
-                      className="flex items-center gap-3 group focus:outline-none"
+                      className="flex items-center gap-1 group focus:outline-none"
                     >
                       <div className="hidden md:flex flex-col items-end">
-                        <span className="font-label-bold text-sm text-on-surface group-hover:text-primary-container transition-colors">
+                        <span className="font-label-bold text-[10px] text-on-surface group-hover:text-primary-container transition-colors">
                           {session.user?.name || 'Commander'}
                         </span>
                         {isAdmin && (
@@ -195,17 +195,17 @@ export default function Navbar({ isStatic = false }) {
                           width="40"
                           height="40"
                           onError={(e) => { e.currentTarget.src = 'https://cdn.discordapp.com/embed/avatars/0.png'; }}
-                          className="w-10 h-10 rounded-full border-2 border-outline-variant group-hover:border-primary-container relative z-10 transition-colors duration-300 object-cover" 
+                          className="w-10 h-7 rounded-full border-2 border-outline-variant group-hover:border-primary-container relative z-10 transition-colors duration-300 object-cover" 
                         />
                       </div>
                     </button>
 
                     {isProfileOpen && (
-                        <div className="absolute top-full right-0 mt-4 w-64 bg-surface-container border border-outline-variant/50 p-2 z-50 shadow-[0_10px_40px_rgba(0,0,0,0.8)] animate-in fade-in slide-in-from-top-2 rounded-sm">
+                        <div className="absolute top-full right-0 mt-2 w-64 bg-surface-container border border-outline-variant/50 p-2 z-50 shadow-[0_10px_40px_rgba(0,0,0,0.8)] animate-in fade-in slide-in-from-top-2 rounded-sm">
                           <div className="flex flex-col gap-1">
                             <Link 
                               href="/dashboard" 
-                              className="md:hidden flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm"
+                              className="md:hidden flex items-center gap-1 px-2 py-1.5 text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm"
                               onClick={() => setIsProfileOpen(false)}
                             >
                               <LayoutDashboard size={16} />
@@ -215,7 +215,7 @@ export default function Navbar({ isStatic = false }) {
                             {/* #14 — Odeme Gecmisi Butonu */}
                             <button
                               onClick={openPaymentHistory}
-                              className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm w-full text-left"
+                              className="flex items-center gap-1 px-2 py-1.5 text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm w-full text-left"
                             >
                               <CreditCard size={16} />
                               <span className="font-label-bold text-xs uppercase tracking-wider">
@@ -226,7 +226,7 @@ export default function Navbar({ isStatic = false }) {
                             {isAdmin && (
                               <Link 
                                 href="/admin" 
-                                className="flex items-center gap-3 px-4 py-3 text-[#ffb4ab]/80 hover:text-[#ffb4ab] hover:bg-[#ffb4ab]/10 transition-colors rounded-sm"
+                                className="flex items-center gap-1 px-2 py-1.5 text-[#ffb4ab]/80 hover:text-[#ffb4ab] hover:bg-[#ffb4ab]/10 transition-colors rounded-sm"
                                 onClick={() => setIsProfileOpen(false)}
                               >
                                 <Shield size={16} />
@@ -238,7 +238,7 @@ export default function Navbar({ isStatic = false }) {
                             
                             <button 
                               onClick={() => { signOut(); setIsProfileOpen(false); }} 
-                              className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-[#ffb4ab] hover:bg-[#ffb4ab]/10 transition-colors rounded-sm w-full text-left"
+                              className="flex items-center gap-1 px-2 py-1.5 text-on-surface-variant hover:text-[#ffb4ab] hover:bg-[#ffb4ab]/10 transition-colors rounded-sm w-full text-left"
                             >
                               <LogOut size={16} />
                               <span className="font-label-bold text-xs uppercase tracking-wider">{t.logout}</span>
@@ -251,10 +251,10 @@ export default function Navbar({ isStatic = false }) {
               ) : (
                 <button 
                   onClick={() => signIn("discord")} 
-                  className="bg-primary-container text-on-primary px-6 py-2 font-label-bold text-label-bold transition-all duration-300 ease-in-out active:scale-95 hover:brightness-110 hover:shadow-[0_0_20px_rgba(255,215,0,0.2)] rounded"
+                  className="bg-primary-container text-on-primary px-3 py-1 font-label-bold text-label-bold transition-all duration-300 ease-in-out active:scale-95 hover:brightness-110 hover:shadow-[0_0_20px_rgba(255,215,0,0.2)] rounded"
                 >
                   <span className="flex items-center gap-2">
-                    <LogIn size={18} />
+                    <LogIn size={14} />
                     {t.login}
                   </span>
                 </button>
@@ -304,7 +304,7 @@ export default function Navbar({ isStatic = false }) {
                   onClick={() => setShowPaymentHistory(false)} 
                   style={{padding:'0.5rem',borderRadius:'8px',border:'1px solid rgba(255,255,255,0.1)',background:'rgba(255,255,255,0.05)',color:'rgba(255,255,255,0.6)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}
                 >
-                  <X size={20} />
+                  <X size={14} />
                 </button>
               </div>
 
@@ -338,7 +338,7 @@ export default function Navbar({ isStatic = false }) {
                         <div key={p.id} style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.07)',borderRadius:'14px',padding:'1.2rem 1.5rem',display:'flex',alignItems:'center',gap:'1rem',flexWrap:'wrap'}}>
                           {/* Icon */}
                           <div style={{width:40,height:40,borderRadius:'10px',background:isHavale?'rgba(46,204,113,0.1)':'rgba(252,163,17,0.1)',border:`1px solid ${isHavale?'rgba(46,204,113,0.3)':'rgba(252,163,17,0.3)'}`,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
-                            <CreditCard size={18} color={isHavale?'#2ecc71':'#fca311'} />
+                            <CreditCard size={14} color={isHavale?'#2ecc71':'#fca311'} />
                           </div>
 
                           {/* Info */}
@@ -402,38 +402,38 @@ export default function Navbar({ isStatic = false }) {
         <div className="w-[85%] max-w-sm glass-panel flex flex-col relative h-full">
           <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-right from-transparent via-primary-container/30 to-transparent"></div>
           
-          <div className="flex justify-between items-center px-6 py-6 border-b border-on-surface/10">
+          <div className="flex justify-between items-center px-3 py-1.5 border-b border-on-surface/10">
             <span className="flex items-center gap-2 font-headline-md text-headline-md font-bold tracking-tighter text-primary-container">
               <Logo className="w-8 h-8" />
               Veyronix
             </span>
             <button 
-              className="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-primary-container transition-colors" 
+              className="w-10 h-7 flex items-center justify-center text-on-surface-variant hover:text-primary-container transition-colors" 
               onClick={() => setIsMenuOpen(false)}
             >
-              <X size={24} />
+              <X size={16} />
             </button>
           </div>
           
-          <nav className="flex-grow px-6 py-8 flex flex-col gap-y-6 overflow-y-auto relative z-10">
+          <nav className="flex-grow px-3 py-1 flex flex-col gap-y-6 overflow-y-auto relative z-10">
             <div className="menu-item-group">
-              <span className="text-[10px] font-label-bold text-outline uppercase tracking-[0.2em] mb-4 block">Central Hub</span>
-              <Link href="/" className="menu-item-hover group flex items-center justify-between py-2 cursor-pointer" onClick={() => setIsMenuOpen(false)}>
+              <span className="text-[10px] font-label-bold text-outline uppercase tracking-[0.2em] mb-2 block">Central Hub</span>
+              <Link href="/" className="menu-item-hover group flex items-center justify-between py-1 cursor-pointer" onClick={() => setIsMenuOpen(false)}>
                 <span className="font-headline-lg-mobile text-headline-lg-mobile text-primary-container transition-transform group-active:translate-x-2 pointer-events-none">{lang === 'tr' ? 'Ana Sayfa' : 'Home'}</span>
                 <ChevronRight className="text-primary-container/20 group-hover:text-primary-container transition-colors pointer-events-none" />
               </Link>
               <div className="indicator"></div>
               
-              <Link href="/dashboard" className="menu-item-hover group flex items-center justify-between py-2 mt-4 cursor-pointer" onClick={() => setIsMenuOpen(false)}>
+              <Link href="/dashboard" className="menu-item-hover group flex items-center justify-between py-1 mt-2 cursor-pointer" onClick={() => setIsMenuOpen(false)}>
                 <span className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant hover:text-primary-container transition-all group-active:translate-x-2 pointer-events-none">{t.dashboard}</span>
                 <ChevronRight className="text-primary-container/0 group-hover:text-primary-container transition-colors pointer-events-none" />
               </Link>
               <div className="indicator"></div>
 
               {/* Premium Button Mobile */}
-              <Link href="/premium" className="menu-item-hover group flex items-center justify-between py-2 mt-4 cursor-pointer" onClick={() => setIsMenuOpen(false)}>
+              <Link href="/premium" className="menu-item-hover group flex items-center justify-between py-1 mt-2 cursor-pointer" onClick={() => setIsMenuOpen(false)}>
                 <span className="font-headline-lg-mobile text-headline-lg-mobile text-primary-container hover:brightness-110 transition-all group-active:translate-x-2 pointer-events-none flex items-center gap-2">
-                  {t.premiumBtnNavbar} <Sparkles size={18} />
+                  {t.premiumBtnNavbar} <Sparkles size={14} />
                 </span>
                 <ChevronRight className="text-primary-container/0 group-hover:text-primary-container transition-colors pointer-events-none" />
               </Link>
@@ -443,7 +443,7 @@ export default function Navbar({ isStatic = false }) {
               {session && (
                 <>
                   <button
-                    className="menu-item-hover group flex items-center justify-between py-2 mt-4 w-full text-left"
+                    className="menu-item-hover group flex items-center justify-between py-1 mt-2 w-full text-left"
                     onClick={() => { setIsMenuOpen(false); openPaymentHistory(); }}
                   >
                     <span className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant hover:text-primary-container transition-all group-active:translate-x-2 pointer-events-none">
@@ -457,42 +457,42 @@ export default function Navbar({ isStatic = false }) {
             </div>
 
             <div className="menu-item-group">
-              <span className="text-[10px] font-label-bold text-outline uppercase tracking-[0.2em] mb-4 block">Resources</span>
+              <span className="text-[10px] font-label-bold text-outline uppercase tracking-[0.2em] mb-2 block">Resources</span>
               
               {/* Mobile Accordion for Page Sections */}
               <button 
-                className="menu-item-hover w-full group flex items-center justify-between py-2 cursor-pointer" 
+                className="menu-item-hover w-full group flex items-center justify-between py-1 cursor-pointer" 
                 onClick={() => setIsMobileExploreOpen(!isMobileExploreOpen)}
               >
                 <span className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant group-hover:text-primary-container transition-all">
                   {lang === 'tr' ? 'Keşfet' : 'Explore'}
                 </span>
-                <ChevronDown className={`text-primary-container/50 transition-transform duration-300 ${isMobileExploreOpen ? 'rotate-180' : ''}`} size={20} />
+                <ChevronDown className={`text-primary-container/50 transition-transform duration-300 ${isMobileExploreOpen ? 'rotate-180' : ''}`} size={14} />
               </button>
               
               <div className={`overflow-hidden transition-all duration-300 ease-in-out flex flex-col gap-2 ${isMobileExploreOpen ? 'max-h-[500px] mt-2 opacity-100' : 'max-h-0 opacity-0'}`}>
-                <Link href="/#features" className="pl-4 py-2 text-sm text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
+                <Link href="/#features" className="pl-4 py-1 text-[10px] text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
                   {lang === 'tr' ? 'Özellikler' : 'Features'}
                 </Link>
-                <Link href="/#dashboard" className="pl-4 py-2 text-sm text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
+                <Link href="/#dashboard" className="pl-4 py-1 text-[10px] text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
                   Dashboard
                 </Link>
-                <Link href="/#commands" className="pl-4 py-2 text-sm text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
+                <Link href="/#commands" className="pl-4 py-1 text-[10px] text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
                   {lang === 'tr' ? 'Komuta Merkezi' : 'Command Center'}
                 </Link>
-                <Link href="/#pricing" className="pl-4 py-2 text-sm text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
+                <Link href="/#pricing" className="pl-4 py-1 text-[10px] text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
                   {lang === 'tr' ? 'Fiyatlandırma' : 'Pricing'}
                 </Link>
-                <Link href="/#faq" className="pl-4 py-2 text-sm text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
+                <Link href="/#faq" className="pl-4 py-1 text-[10px] text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
                   {lang === 'tr' ? 'SSS' : 'FAQ'}
                 </Link>
-                <Link href="/blog" className="pl-4 py-2 text-sm text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
+                <Link href="/blog" className="pl-4 py-1 text-[10px] text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
                   {t.blog}
                 </Link>
-                <a href="https://docs.veyronix.com.tr/" target="_blank" rel="noopener noreferrer" className="pl-4 py-2 text-sm text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
+                <a href="https://docs.veyronix.com.tr/" target="_blank" rel="noopener noreferrer" className="pl-4 py-1 text-[10px] text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
                   Wiki
                 </a>
-                <Link href="/changelog" className="pl-4 py-2 text-sm text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
+                <Link href="/changelog" className="pl-4 py-1 text-[10px] text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
                   {t.changelog}
                 </Link>
               </div>
@@ -501,8 +501,8 @@ export default function Navbar({ isStatic = false }) {
             
             {isAdmin && (
               <div className="menu-item-group">
-                <span className="text-[10px] font-label-bold text-error uppercase tracking-[0.2em] mb-4 block">Admin</span>
-                <Link href="/admin" className="menu-item-hover group flex items-center justify-between py-2 cursor-pointer" onClick={() => setIsMenuOpen(false)}>
+                <span className="text-[10px] font-label-bold text-error uppercase tracking-[0.2em] mb-2 block">Admin</span>
+                <Link href="/admin" className="menu-item-hover group flex items-center justify-between py-1 cursor-pointer" onClick={() => setIsMenuOpen(false)}>
                   <span className="font-headline-lg-mobile text-headline-lg-mobile text-error hover:text-error-container transition-all group-active:translate-x-2 pointer-events-none">Admin Panel</span>
                   <ChevronRight className="text-error/0 group-hover:text-error transition-colors pointer-events-none" />
                 </Link>
@@ -511,26 +511,26 @@ export default function Navbar({ isStatic = false }) {
             )}
           </nav>
           
-          <div className="px-6 py-10 bg-surface-container-low border-t border-on-surface/10 space-y-8 relative z-10">
+          <div className="px-3 py-1 bg-surface-container-low border-t border-on-surface/10 space-y-8 relative z-10">
             {session ? (
               <button 
                 onClick={() => { signOut(); setIsMenuOpen(false); }} 
-                className="w-full h-14 border border-error/30 text-error hover:bg-error/10 font-label-bold text-label-bold uppercase tracking-widest active:scale-95 transition-all flex items-center justify-center gap-3"
+                className="w-full h-9 border border-error/30 text-error hover:bg-error/10 font-label-bold text-label-bold uppercase tracking-widest active:scale-95 transition-all flex items-center justify-center gap-1"
               >
-                <LogOut size={20} />
+                <LogOut size={14} />
                 {t.logout}
               </button>
             ) : (
               <button 
                 onClick={() => { signIn("discord"); setIsMenuOpen(false); }} 
-                className="w-full h-14 bg-primary-container text-on-primary font-label-bold text-label-bold uppercase tracking-widest active:scale-95 transition-all flex items-center justify-center gap-3 tactical-glow"
+                className="w-full h-9 bg-primary-container text-on-primary font-label-bold text-label-bold uppercase tracking-widest active:scale-95 transition-all flex items-center justify-center gap-1 tactical-glow"
               >
-                <LogIn size={20} />
+                <LogIn size={14} />
                 {t.login}
               </button>
             )}
             
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-1">
               <p className="font-label-sm text-label-sm text-on-surface-variant/40 max-w-[200px]">
                 &copy; 2024 Veyronix Tactical Command. All rights reserved.
               </p>

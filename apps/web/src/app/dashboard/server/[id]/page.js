@@ -29,11 +29,11 @@ function PremiumLock({ lang, t }) {
   return (
     <div className="glass-panel p-3 text-center border border-primary-container/30 bg-primary-container/5 relative overflow-hidden animate-slide-up flex flex-col items-center justify-center min-h-[400px]">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-primary-container/10 rounded-full blur-[80px] pointer-events-none"></div>
-      <Crown size={64} className="text-primary-container mb-6 animate-pulse" />
-      <h2 className="font-headline-xl text-[10px] text-on-surface mb-4 uppercase tracking-tight font-bold">
+      <Crown size={64} className="text-primary-container mb-3 animate-pulse" />
+      <h2 className="font-headline-xl text-[10px] text-on-surface mb-2 uppercase tracking-tight font-bold">
         {lang === 'tr' ? '👑 SUNUCU PREMİUM GEREKLİ' : '👑 GUILD PREMIUM REQUIRED'}
       </h2>
-      <p className="font-body-lg text-on-surface-variant max-w-lg mb-8 leading-relaxed">
+      <p className="font-body-lg text-on-surface-variant max-w-lg mb-2 leading-relaxed">
         {lang === 'tr' 
           ? 'Bu özellik sunucu bazlı Premium paket gerektirmektedir. Bireysel oylama muafiyeti (Individual) bu özelliği kapsamaz. Sunucu Premium satın alarak bu özelliği ve diğer gelişmiş özellikleri sunucunuzda aktifleştirebilirsiniz.'
           : 'This feature requires a server-level Guild Premium package. Individual vote bypass (Individual) does not cover this feature. Purchase Guild Premium to unlock this and other advanced features for your server.'}
@@ -43,7 +43,7 @@ function PremiumLock({ lang, t }) {
           href="https://veyronix.com.tr" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="px-8 py-3 bg-primary-container text-on-primary border border-primary-container rounded-sm font-label-bold uppercase tracking-widest text-[10px] transition-all hover:brightness-110 active:scale-95 tactical-glow"
+          className="px-2 py-1.5 bg-primary-container text-on-primary border border-primary-container rounded-sm font-label-bold uppercase tracking-widest text-[10px] transition-all hover:brightness-110 active:scale-95 tactical-glow"
         >
           {lang === 'tr' ? 'Satın Al / Web Sitesi' : 'Buy / Website'}
         </a>
@@ -464,7 +464,7 @@ export default function ServerSettings() {
     if (!err) return null;
     return (
       <div className="statusMsg">
-        <AlertTriangle size={18} />
+        <AlertTriangle size={14} />
         <span>{err === "invalid" ? (lang === "en" ? "Invalid image URL" : "Geçersiz görsel bağlantısı") : err}</span>
       </div>
     );
@@ -505,61 +505,61 @@ export default function ServerSettings() {
       
       {/* Vertical Sidebar */}
       <nav className="fixed left-0 top-0 h-full z-50 w-[60px] hover:w-[220px] transition-all duration-300 bg-surface-container-highest/95 backdrop-blur-xl border-r border-outline-variant/30 flex flex-col group overflow-hidden shadow-2xl">
-        <div className="flex flex-col items-center group-hover:items-start p-3 gap-2 w-full mt-4">
-          <Link href="/dashboard" className="flex items-center gap-3 px-3 py-2 w-full rounded-md text-on-surface-variant font-label-bold text-[10px] transition-all hover:text-on-surface hover:bg-white/5 border border-transparent shrink-0 group-hover:px-3">
-             <ArrowLeft size={18} className="shrink-0" />
+        <div className="flex flex-col items-center group-hover:items-start p-3 gap-2 w-full mt-2">
+          <Link href="/dashboard" className="flex items-center gap-1 px-3 py-1 w-full rounded-md text-on-surface-variant font-label-bold text-[10px] transition-all hover:text-on-surface hover:bg-white/5 border border-transparent shrink-0 group-hover:px-3">
+             <ArrowLeft size={14} className="shrink-0" />
              <span className="opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Dashboard</span>
           </Link>
           
           <div className="w-full h-px bg-outline-variant/30 my-2"></div>
 
-          <button className={`flex items-center gap-3 px-3 py-2 w-full rounded-md font-label-bold text-[10px] transition-all whitespace-nowrap shrink-0 group-hover:px-3 ${activeTab === 'overview' ? 'bg-primary-container/10 text-primary-container border border-primary-container/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('overview')}>
-            <Home size={18} className="shrink-0" />
+          <button className={`flex items-center gap-1 px-3 py-1 w-full rounded-md font-label-bold text-[10px] transition-all whitespace-nowrap shrink-0 group-hover:px-3 ${activeTab === 'overview' ? 'bg-primary-container/10 text-primary-container border border-primary-container/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('overview')}>
+            <Home size={14} className="shrink-0" />
             <span className="opacity-0 group-hover:opacity-100 transition-opacity">Overview</span>
           </button>
 
-          <button className={`flex items-center gap-3 px-3 py-2 w-full rounded-md font-label-bold text-[10px] transition-all whitespace-nowrap shrink-0 group-hover:px-3 ${activeTab === 'general' ? 'bg-primary-container/10 text-primary-container border border-primary-container/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('general')}>
-            <Layout size={18} className="shrink-0" />
+          <button className={`flex items-center gap-1 px-3 py-1 w-full rounded-md font-label-bold text-[10px] transition-all whitespace-nowrap shrink-0 group-hover:px-3 ${activeTab === 'general' ? 'bg-primary-container/10 text-primary-container border border-primary-container/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('general')}>
+            <Layout size={14} className="shrink-0" />
             <span className="opacity-0 group-hover:opacity-100 transition-opacity">General</span>
           </button>
 
-          <button className={`flex items-center gap-3 px-3 py-2 w-full rounded-md font-label-bold text-[10px] transition-all whitespace-nowrap shrink-0 group-hover:px-3 ${activeTab === 'registration' ? 'bg-primary-container/10 text-primary-container border border-primary-container/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('registration')}>
-            <UserPlus size={18} className="shrink-0" />
+          <button className={`flex items-center gap-1 px-3 py-1 w-full rounded-md font-label-bold text-[10px] transition-all whitespace-nowrap shrink-0 group-hover:px-3 ${activeTab === 'registration' ? 'bg-primary-container/10 text-primary-container border border-primary-container/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('registration')}>
+            <UserPlus size={14} className="shrink-0" />
             <span className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2">Reg <span className="bg-primary-container text-on-primary text-[8px] px-1 py-0.5 rounded font-black uppercase tracking-widest">BETA</span></span>
           </button>
 
-          <button className={`flex items-center gap-3 px-3 py-2 w-full rounded-md font-label-bold text-[10px] transition-all whitespace-nowrap shrink-0 group-hover:px-3 ${activeTab === 'rolemenu' ? 'bg-primary-container/10 text-primary-container border border-primary-container/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('rolemenu')}>
-            <Users size={18} className="shrink-0" />
+          <button className={`flex items-center gap-1 px-3 py-1 w-full rounded-md font-label-bold text-[10px] transition-all whitespace-nowrap shrink-0 group-hover:px-3 ${activeTab === 'rolemenu' ? 'bg-primary-container/10 text-primary-container border border-primary-container/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('rolemenu')}>
+            <Users size={14} className="shrink-0" />
             <span className="opacity-0 group-hover:opacity-100 transition-opacity">Roles</span>
           </button>
 
-          <button className={`flex items-center gap-3 px-3 py-2 w-full rounded-md font-label-bold text-[10px] transition-all whitespace-nowrap shrink-0 group-hover:px-3 ${activeTab === 'ticket' ? 'bg-primary-container/10 text-primary-container border border-primary-container/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('ticket')}>
-            <Shield size={18} className="shrink-0" />
+          <button className={`flex items-center gap-1 px-3 py-1 w-full rounded-md font-label-bold text-[10px] transition-all whitespace-nowrap shrink-0 group-hover:px-3 ${activeTab === 'ticket' ? 'bg-primary-container/10 text-primary-container border border-primary-container/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('ticket')}>
+            <Shield size={14} className="shrink-0" />
             <span className="opacity-0 group-hover:opacity-100 transition-opacity">Ticket</span>
           </button>
 
-          <button className={`flex items-center gap-3 px-3 py-2 w-full rounded-md font-label-bold text-[10px] transition-all whitespace-nowrap shrink-0 group-hover:px-3 ${activeTab === 'giveaway' ? 'bg-primary-container/10 text-primary-container border border-primary-container/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('giveaway')}>
-            <Gift size={18} className="shrink-0" />
+          <button className={`flex items-center gap-1 px-3 py-1 w-full rounded-md font-label-bold text-[10px] transition-all whitespace-nowrap shrink-0 group-hover:px-3 ${activeTab === 'giveaway' ? 'bg-primary-container/10 text-primary-container border border-primary-container/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('giveaway')}>
+            <Gift size={14} className="shrink-0" />
             <span className="opacity-0 group-hover:opacity-100 transition-opacity">Giveaway</span>
           </button>
 
-          <button className={`flex items-center gap-3 px-3 py-2 w-full rounded-md font-label-bold text-[10px] transition-all whitespace-nowrap shrink-0 group-hover:px-3 ${activeTab === 'killboard' ? 'bg-primary-container/10 text-primary-container border border-primary-container/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('killboard')}>
-            <Crosshair size={18} className="shrink-0" />
+          <button className={`flex items-center gap-1 px-3 py-1 w-full rounded-md font-label-bold text-[10px] transition-all whitespace-nowrap shrink-0 group-hover:px-3 ${activeTab === 'killboard' ? 'bg-primary-container/10 text-primary-container border border-primary-container/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('killboard')}>
+            <Crosshair size={14} className="shrink-0" />
             <span className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2">KillBoard <span className="bg-primary-container text-on-primary text-[8px] px-1 py-0.5 rounded font-black uppercase tracking-widest">BETA</span></span>
           </button>
 
-          <button className={`flex items-center gap-3 px-3 py-2 w-full rounded-md font-label-bold text-[10px] transition-all whitespace-nowrap shrink-0 group-hover:px-3 ${activeTab === 'templates' ? 'bg-primary-container/10 text-primary-container border border-primary-container/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('templates')}>
-            <Copy size={18} className="shrink-0" />
+          <button className={`flex items-center gap-1 px-3 py-1 w-full rounded-md font-label-bold text-[10px] transition-all whitespace-nowrap shrink-0 group-hover:px-3 ${activeTab === 'templates' ? 'bg-primary-container/10 text-primary-container border border-primary-container/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('templates')}>
+            <Copy size={14} className="shrink-0" />
             <span className="opacity-0 group-hover:opacity-100 transition-opacity">Templates</span>
           </button>
 
-          <button className={`flex items-center gap-3 px-3 py-2 w-full rounded-md font-label-bold text-[10px] transition-all whitespace-nowrap shrink-0 group-hover:px-3 ${activeTab === 'log' ? 'bg-primary-container/10 text-primary-container border border-primary-container/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('log')}>
-            <FileText size={18} className="shrink-0" />
+          <button className={`flex items-center gap-1 px-3 py-1 w-full rounded-md font-label-bold text-[10px] transition-all whitespace-nowrap shrink-0 group-hover:px-3 ${activeTab === 'log' ? 'bg-primary-container/10 text-primary-container border border-primary-container/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('log')}>
+            <FileText size={14} className="shrink-0" />
             <span className="opacity-0 group-hover:opacity-100 transition-opacity">Logs</span>
           </button>
 
-          <button className={`flex items-center gap-3 px-3 py-2 w-full rounded-md font-label-bold text-[10px] transition-all whitespace-nowrap shrink-0 group-hover:px-3 ${activeTab === 'embed' ? 'bg-primary-container/10 text-primary-container border border-primary-container/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('embed')}>
-            <ImageIcon size={18} className="shrink-0" />
+          <button className={`flex items-center gap-1 px-3 py-1 w-full rounded-md font-label-bold text-[10px] transition-all whitespace-nowrap shrink-0 group-hover:px-3 ${activeTab === 'embed' ? 'bg-primary-container/10 text-primary-container border border-primary-container/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('embed')}>
+            <ImageIcon size={14} className="shrink-0" />
             <span className="opacity-0 group-hover:opacity-100 transition-opacity">Branding</span>
           </button>
         </div>
@@ -567,8 +567,8 @@ export default function ServerSettings() {
 
       {/* Main Content Area */}
       <div className="flex-1 ml-[60px] h-screen overflow-y-auto custom-scrollbar pt-10 pb-32">
-        <main className="w-full max-w-[1200px] mx-auto px-4 md:px-8 flex flex-col">
-        <header className="flex flex-col md:flex-row items-center md:items-end justify-between mb-12 pb-8 border-b border-outline-variant/50">
+        <main className="w-full max-w-[1200px] mx-auto px-2 md:px-2 flex flex-col">
+        <header className="flex flex-col md:flex-row items-center md:items-end justify-between mb-3 pb-8 border-b border-outline-variant/50">
           <div className="flex flex-col md:flex-row items-center gap-2 text-center md:text-left">
             <div className="w-24 h-24 rounded-2xl bg-surface border border-outline-variant flex items-center justify-center text-[10px] font-headline-xl text-primary-container shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
               {guildDetail?.Name?.charAt(0) || guildId.charAt(0).toUpperCase()}
@@ -635,16 +635,16 @@ export default function ServerSettings() {
 
       {/* Unsaved Changes Banner */}
       {hasChanges && (
-        <div className="fixed bottom-0 left-0 right-0 bg-surface-container-highest/95 border-t border-primary-container p-2 md:p-2 z-[1000] flex flex-col md:flex-row justify-center items-center gap-2 md:gap-12 backdrop-blur-xl animate-slide-up shadow-[0_-10px_40px_rgba(255,215,0,0.1)]">
+        <div className="fixed bottom-0 left-0 right-0 bg-surface-container-highest/95 border-t border-primary-container p-2 md:p-2 z-[1000] flex flex-col md:flex-row justify-center items-center gap-2 md:gap-1 backdrop-blur-xl animate-slide-up shadow-[0_-10px_40px_rgba(255,215,0,0.1)]">
           <div className="text-on-surface font-label-bold text-[10px] md:text-[10px] flex items-center gap-2 md:gap-2 uppercase tracking-widest text-center">
-             <AlertTriangle size={20} className="text-primary-container hidden md:block" />
+             <AlertTriangle size={14} className="text-primary-container hidden md:block" />
              {lang === 'en' ? 'You have unsaved changes!' : 'Kaydedilmemiş değişiklikleriniz var!'}
           </div>
           <div className="flex gap-2 md:gap-2 w-full md:w-auto">
-            <button onClick={() => setSettings(initialSettings)} className="flex-1 md:flex-none px-4 md:px-8 py-3 md:py-3 bg-transparent border border-outline-variant text-on-surface-variant hover:text-on-surface hover:border-outline rounded-sm font-label-bold text-[10px] md:text-[10px] uppercase tracking-widest transition-all text-center">
+            <button onClick={() => setSettings(initialSettings)} className="flex-1 md:flex-none px-2 md:px-2 py-1.5 md:py-1.5 bg-transparent border border-outline-variant text-on-surface-variant hover:text-on-surface hover:border-outline rounded-sm font-label-bold text-[10px] md:text-[10px] uppercase tracking-widest transition-all text-center">
               {lang === 'en' ? 'Discard' : 'İptal Et'}
             </button>
-            <button onClick={handleSave} disabled={saving} className="flex-1 md:flex-none px-4 md:px-8 py-3 md:py-3 bg-primary-container text-on-primary border border-primary-container rounded-sm font-label-bold text-[10px] md:text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 transition-all hover:brightness-110 active:scale-95 tactical-glow disabled:opacity-50 disabled:cursor-not-allowed">
+            <button onClick={handleSave} disabled={saving} className="flex-1 md:flex-none px-2 md:px-2 py-1.5 md:py-1.5 bg-primary-container text-on-primary border border-primary-container rounded-sm font-label-bold text-[10px] md:text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 transition-all hover:brightness-110 active:scale-95 tactical-glow disabled:opacity-50 disabled:cursor-not-allowed">
               {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
               {lang === 'en' ? 'Save Changes' : 'Kaydet'}
             </button>
@@ -656,13 +656,13 @@ export default function ServerSettings() {
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-3">
            <div className="glass-panel max-w-[600px] w-full p-3 border border-primary-container relative">
               <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-right from-transparent via-primary-container to-transparent opacity-50"></div>
-              <h2 className="font-headline-lg text-[10px] text-on-surface mb-6 flex items-center gap-2 uppercase tracking-tight"><Crop size={24} className="text-primary-container"/> Crop Logo</h2>
-              <div className="h-[400px] relative bg-black rounded-sm overflow-hidden mb-8 border border-outline-variant">
+              <h2 className="font-headline-lg text-[10px] text-on-surface mb-3 flex items-center gap-2 uppercase tracking-tight"><Crop size={16} className="text-primary-container"/> Crop Logo</h2>
+              <div className="h-[400px] relative bg-black rounded-sm overflow-hidden mb-2 border border-outline-variant">
                  <Cropper image={imageToCrop} crop={crop} zoom={zoom} aspect={1} onCropChange={setCrop} onCropComplete={onCropComplete} onZoomChange={setZoom} />
               </div>
               <div className="flex justify-end gap-2">
-                 <button className="px-6 py-3 bg-transparent border border-outline-variant text-on-surface-variant hover:text-on-surface hover:border-outline transition-colors font-label-bold uppercase tracking-widest rounded-sm" onClick={() => setImageToCrop(null)}>Cancel</button>
-                 <button className="px-6 py-3 bg-primary-container text-on-primary font-label-bold uppercase tracking-widest tactical-glow rounded-sm transition-all hover:brightness-110 disabled:opacity-50" onClick={uploadCroppedImage} disabled={uploadingThumb}>Apply & Upload</button>
+                 <button className="px-3 py-1.5 bg-transparent border border-outline-variant text-on-surface-variant hover:text-on-surface hover:border-outline transition-colors font-label-bold uppercase tracking-widest rounded-sm" onClick={() => setImageToCrop(null)}>Cancel</button>
+                 <button className="px-3 py-1.5 bg-primary-container text-on-primary font-label-bold uppercase tracking-widest tactical-glow rounded-sm transition-all hover:brightness-110 disabled:opacity-50" onClick={uploadCroppedImage} disabled={uploadingThumb}>Apply & Upload</button>
               </div>
            </div>
         </div>

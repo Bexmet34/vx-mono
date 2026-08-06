@@ -73,7 +73,7 @@ export default function NotFound() {
 
           <div style={{ display: 'flex', gap: '0.8rem', marginTop: '0.5rem', flexWrap: 'wrap', justifyContent: 'center' }}>
             <Link href="/" className="btn-primary" style={{ textDecoration: 'none', padding: '0.6rem 1.2rem', fontSize: '0.9rem' }}>
-              <Home size={18} />
+              <Home size={14} />
               {t.backToHome}
             </Link>
             <button 
@@ -81,7 +81,7 @@ export default function NotFound() {
               className="signout-btn" 
               style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: '8px', padding: '0.6rem 1.2rem', fontSize: '0.9rem' }}
             >
-              <ArrowLeft size={18} />
+              <ArrowLeft size={14} />
               {lang === 'en' ? 'Go Back' : 'Geri Dön'}
             </button>
           </div>

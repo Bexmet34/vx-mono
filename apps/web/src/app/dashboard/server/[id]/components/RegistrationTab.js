@@ -119,8 +119,8 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
     return (
       <div className="bg-gradient-to-br from-primary-container/10 to-primary-container/5 border border-primary-container/20 rounded-lg p-3 flex flex-col items-center text-center gap-2 my-4 animate-slide-up relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-transparent via-primary-container/50 to-transparent"></div>
-        <div className="w-12 h-12 bg-primary-container/15 rounded-full flex items-center justify-center text-primary-container">
-          <Crown size={24} className="animate-pulse" />
+        <div className="w-12 h-8 bg-primary-container/15 rounded-full flex items-center justify-center text-primary-container">
+          <Crown size={16} className="animate-pulse" />
         </div>
         <h3 className="font-headline-md text-[10px] text-primary-container uppercase tracking-widest font-bold">
           {title}
@@ -132,7 +132,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
           href="https://veyronix.com.tr" 
           target="_blank" 
           rel="noopener noreferrer" 
-          className="px-6 py-2.5 bg-primary-container text-on-primary font-label-bold uppercase tracking-widest tactical-glow rounded-sm transition-all hover:brightness-110 text-[10px] mt-2"
+          className="px-3 py-1.5 bg-primary-container text-on-primary font-label-bold uppercase tracking-widest tactical-glow rounded-sm transition-all hover:brightness-110 text-[10px] mt-2"
         >
           {lang === 'en' ? 'Upgrade to Premium' : 'Premium Satın Al'}
         </a>
@@ -143,7 +143,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
   return (
     <div className="flex flex-col gap-2 animate-slide-up">
       {/* Sub-tab Navigation */}
-      <div className="flex flex-wrap gap-2 border-b border-outline-variant/30 pb-4 mb-4">
+      <div className="flex flex-wrap gap-2 border-b border-outline-variant/30 pb-4 mb-2">
         {[
           { id: "core", label: lang === 'en' ? "Core Config" : "Ana Ayarlar", icon: Settings },
           { id: "roles", label: lang === 'en' ? "Roles Setup" : "Rol Ayarları", icon: Tag },
@@ -156,7 +156,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
             <button
               key={tab.id}
               onClick={() => setSubTab(tab.id)}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-[10px] font-label-bold uppercase tracking-widest transition-all ${
+              className={`flex items-center gap-2 px-2 py-1.5 rounded-full text-[10px] font-label-bold uppercase tracking-widest transition-all ${
                 subTab === tab.id
                   ? "bg-primary-container text-on-primary border border-primary-container tactical-glow"
                   : "bg-surface-container/50 border border-outline-variant/30 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
@@ -278,7 +278,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
             </div>
           </div>
 
-          <div className="p-2 bg-surface-container/30 border border-outline-variant/30 text-center rounded-sm mt-6">
+          <div className="p-2 bg-surface-container/30 border border-outline-variant/30 text-center rounded-sm mt-3">
             <div className="text-[10px] font-label-bold text-on-surface uppercase tracking-wider">
               {lang === 'en' ? `Total Registered Members: ` : `Toplam Kayıtlı Üye: `}
               <span className="text-primary-container font-headline-md text-[10px] ml-1">{registeredCount}</span>
@@ -304,7 +304,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
 
           <div className="pt-6 border-t border-outline-variant/20 space-y-6">
             <div>
-              <h3 className="text-[10px] font-label-bold text-on-surface uppercase tracking-widest mb-4">
+              <h3 className="text-[10px] font-label-bold text-on-surface uppercase tracking-widest mb-2">
                 {lang === 'en' ? 'Approval Given Roles' : 'Kayıt Onayında Verilecek Roller'}
               </h3>
               
@@ -353,7 +353,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                     {isPremium ? (
                       <button
                         onClick={() => setVisibleRoleCount(prev => prev + 1)}
-                        className="w-full py-3 border border-dashed border-outline-variant/60 rounded-sm text-on-surface-variant hover:text-primary-container hover:border-primary-container transition-colors text-[10px] uppercase tracking-widest font-label-bold flex items-center justify-center gap-2"
+                        className="w-full py-1.5 border border-dashed border-outline-variant/60 rounded-sm text-on-surface-variant hover:text-primary-container hover:border-primary-container transition-colors text-[10px] uppercase tracking-widest font-label-bold flex items-center justify-center gap-2"
                       >
                         + {lang === 'en' ? 'Add Another Role' : 'Yeni Rol Ekle'}
                       </button>
@@ -397,7 +397,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                       </span>
                     )}
                   </div>
-                  <p className="text-[10px] text-on-surface-variant mb-4 leading-relaxed">
+                  <p className="text-[10px] text-on-surface-variant mb-2 leading-relaxed">
                     {lang === 'en' 
                       ? 'Temporarily assigns a role that expires automatically, returning them to unregistered status.' 
                       : 'Kullanıcıya geçici bir misafir rolü tanımlar. Belirlenen süre dolduğunda otomatik olarak geri alınır.'}
@@ -406,7 +406,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                   {isPremium ? (
                     <>
                       <select
-                        className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md mb-4"
+                        className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md mb-2"
                         value={settings.registration_unregistered_role_id || ""}
                         onChange={(e) => setSettings({ ...settings, registration_unregistered_role_id: e.target.value })}
                       >
@@ -454,7 +454,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                   <label className="block text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
                     {lang === 'en' ? 'Auto Role on Join' : 'Otomatik Rol (Girişte)'}
                   </label>
-                  <p className="text-[10px] text-on-surface-variant mb-4 leading-relaxed">
+                  <p className="text-[10px] text-on-surface-variant mb-2 leading-relaxed">
                     {lang === 'en' 
                       ? 'Role automatically granted by Discord bot to any member as soon as they join.' 
                       : 'Kullanıcı sunucuya katıldığında bot tarafından doğrudan verilecek varsayılan başlangıç rolü.'}
@@ -647,10 +647,10 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
             ) : (
               <>
                 {!settings.albion_guild_id && (
-                  <div className="glass-panel p-2 border border-error/50 bg-error/5 flex flex-col md:flex-row justify-between items-center gap-2 mb-6">
+                  <div className="glass-panel p-2 border border-error/50 bg-error/5 flex flex-col md:flex-row justify-between items-center gap-2 mb-3">
                     <div className="text-left">
                       <h3 className="font-headline-md text-[10px] text-error mb-2 flex items-center gap-2 uppercase tracking-tight">
-                        <AlertTriangle size={20} /> {lang === 'en' ? 'Action Required' : 'İşlem Gerekiyor'}
+                        <AlertTriangle size={14} /> {lang === 'en' ? 'Action Required' : 'İşlem Gerekiyor'}
                       </h3>
                       <p className="font-body-md text-error-variant text-[10px]">
                         {lang === 'en' 
@@ -658,7 +658,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                           : 'Otomatik kontrol ve Senkronizasyon sistemlerini kullanabilmek için Genel ayarlardan Albion Guildinizi seçmelisiniz.'}
                       </p>
                     </div>
-                    <button onClick={() => setActiveTab && setActiveTab('general')} className="px-6 py-2.5 bg-error hover:bg-error/80 text-white border border-error rounded-sm font-label-bold uppercase tracking-widest text-[10px] transition-colors whitespace-nowrap">
+                    <button onClick={() => setActiveTab && setActiveTab('general')} className="px-3 py-1.5 bg-error hover:bg-error/80 text-white border border-error rounded-sm font-label-bold uppercase tracking-widest text-[10px] transition-colors whitespace-nowrap">
                       {lang === 'en' ? 'Go to General Settings' : 'Genel Ayarlara Git'}
                     </button>
                   </div>
@@ -740,7 +740,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                       </div>
                       
                       {settings.auto_check_custom_role_id && (
-                        <div className="mt-4 animate-slide-up">
+                        <div className="mt-2 animate-slide-up">
                           <select
                             className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
                             value={settings.auto_check_custom_role_id === "none" ? "" : settings.auto_check_custom_role_id}
@@ -772,11 +772,11 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                       </select>
                     </div>
 
-                    <div className="mt-8 pt-6 border-t border-outline-variant/50">
+                    <div className="mt-2 pt-6 border-t border-outline-variant/50">
                       <label className="block text-[10px] font-label-bold text-primary-container uppercase tracking-widest mb-2">
                         {lang === 'en' ? 'Backward Compatibility Sync' : 'Geriye Dönük Senkronizasyon (Sync)'}
                       </label>
-                      <p className="text-[10px] font-body-md text-on-surface-variant mb-4 flex flex-col gap-1 leading-relaxed">
+                      <p className="text-[10px] font-body-md text-on-surface-variant mb-2 flex flex-col gap-1 leading-relaxed">
                         <span>{lang === 'en' 
                           ? 'Adds existing old members to the database safely.' 
                           : 'Eski kayıtlı üyelerinizi sisteme güvenle dahil eder.'}</span>
@@ -789,14 +789,14 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                         onClick={handleSync} 
                         disabled={syncing || settings.is_syncing || !settings.albion_guild_id}
                       >
-                        {(syncing || settings.is_syncing) ? <Loader2 size={18} className="animate-spin"/> : <Users size={18}/>} 
+                        {(syncing || settings.is_syncing) ? <Loader2 size={14} className="animate-spin"/> : <Users size={14}/>} 
                         {lang === 'en' 
                           ? (settings.albion_guild_id ? ((syncing || settings.is_syncing) ? `Syncing... ${settings.last_sync_result?.scanned || 0} / ${settings.last_sync_result?.total || '?'}` : 'Start Sync Process') : 'Set Guild in General Settings First') 
                           : (settings.albion_guild_id ? ((syncing || settings.is_syncing) ? `Şu an Taranıyor: ${settings.last_sync_result?.scanned || 0} / ${settings.last_sync_result?.total || '?'}` : 'Senkronizasyon İşlemini Başlat') : 'Önce Genel Ayarlardan Guild Seçin')}
                       </button>
 
                       {settings.last_sync_result && (
-                        <div className="mt-6 p-2 bg-primary-container/5 border border-primary-container/30 rounded-sm animate-slide-up">
+                        <div className="mt-3 p-2 bg-primary-container/5 border border-primary-container/30 rounded-sm animate-slide-up">
                           <h4 className="text-[10px] font-label-bold text-primary-container uppercase tracking-widest mb-2">{(syncing || settings.is_syncing) ? (lang === 'en' ? 'Live Progress' : 'Canlı Tarama İlerlemesi') : (lang === 'en' ? 'Last Sync Result' : 'Son Senkronizasyon Çıktısı')}</h4>
                           <div className="grid grid-cols-3 gap-2 text-[10px] font-body-md">
                             <div>{lang === 'en' ? 'Scanned:' : 'Taranan:'} <strong className="text-on-surface ml-1">{settings.last_sync_result.scanned || 0} {settings.last_sync_result.total ? `/ ${settings.last_sync_result.total}` : ''}</strong></div>
@@ -920,7 +920,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                       </div>
 
                       {(settings.application_questions || []).length === 0 && (
-                        <div className="py-8 text-center text-on-surface-variant text-[10px] border border-dashed border-outline-variant rounded-sm">
+                        <div className="py-1 text-center text-on-surface-variant text-[10px] border border-dashed border-outline-variant rounded-sm">
                           {lang === 'en' ? 'No questions yet. Click "+ Add Question" to get started.' : 'Henüz soru yok. "+ Soru Ekle" butonuna tıkla.'}
                         </div>
                       )}
@@ -1102,7 +1102,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                       </div>
 
                       {(settings.application_questions || []).length > 0 && (
-                        <div className="mt-4 p-3 bg-primary-container/5 border border-primary-container/20 rounded-sm text-[10px] text-on-surface-variant leading-relaxed">
+                        <div className="mt-2 p-3 bg-primary-container/5 border border-primary-container/20 rounded-sm text-[10px] text-on-surface-variant leading-relaxed">
                           💡 {lang === 'en'
                             ? 'Text/Paragraph questions are shown in groups of 5 per Discord modal. Yes/No and Choice questions appear as buttons/menus between modals.'
                             : 'Metin soruları Discord modal\'da 5\'er gruba ayrılır. Evet/Hayır ve Seçim soruları modallar arası buton/menü olarak gösterilir.'}

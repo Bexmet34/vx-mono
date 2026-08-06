@@ -53,16 +53,16 @@ export default function OverviewTab({ subscription, setActiveTab, settings }) {
           <Star size={120} />
         </div>
         <div className="relative z-10">
-          <h2 className="font-headline-lg text-[10px] text-primary-container mb-4 flex items-center gap-2 uppercase tracking-tight">
-            <Star size={24} className="fill-current" /> {lang === 'en' ? 'Overview' : 'Genel Bakış'}
+          <h2 className="font-headline-lg text-[10px] text-primary-container mb-2 flex items-center gap-2 uppercase tracking-tight">
+            <Star size={16} className="fill-current" /> {lang === 'en' ? 'Overview' : 'Genel Bakış'}
           </h2>
-          <p className="font-body-lg text-on-surface-variant max-w-2xl mb-8 leading-relaxed">
+          <p className="font-body-lg text-on-surface-variant max-w-2xl mb-2 leading-relaxed">
             {lang === 'tr'
               ? 'Sunucu komuta merkezine hoş geldiniz. Entegrasyonları yapılandırın, şablonları yönetin ve performansı izleyin.'
               : 'Welcome to your server command center. Configure integrations, manage templates, and monitor performance.'}
           </p>
 
-          <button className="px-8 py-3 bg-primary-container text-on-primary font-label-bold uppercase tracking-widest flex items-center gap-2 transition-all hover:brightness-110 active:scale-95 tactical-glow rounded-sm" onClick={() => setActiveTab('general')}>
+          <button className="px-2 py-1.5 bg-primary-container text-on-primary font-label-bold uppercase tracking-widest flex items-center gap-2 transition-all hover:brightness-110 active:scale-95 tactical-glow rounded-sm" onClick={() => setActiveTab('general')}>
             {lang === 'tr' ? 'Hızlı Kurulum' : 'Quick Setup'}
           </button>
         </div>
@@ -70,11 +70,11 @@ export default function OverviewTab({ subscription, setActiveTab, settings }) {
 
       {/* Subscription Status Box */}
       <div className="glass-panel p-3 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
-        <h3 className="font-headline-md text-[10px] text-on-surface mb-6 uppercase tracking-tight">
+        <h3 className="font-headline-md text-[10px] text-on-surface mb-3 uppercase tracking-tight">
           {lang === 'tr' ? 'Abonelik Durumu' : 'Subscription Status'}
         </h3>
         <div className="flex items-center gap-2">
-          <div className="w-16 h-16 rounded bg-surface border border-outline flex items-center justify-center shadow-lg" style={{ color: statusColor, borderColor: statusColor }}>
+          <div className="w-16 h-7 rounded bg-surface border border-outline flex items-center justify-center shadow-lg" style={{ color: statusColor, borderColor: statusColor }}>
             <StatusIcon size={32} />
           </div>
           <div>
@@ -84,7 +84,7 @@ export default function OverviewTab({ subscription, setActiveTab, settings }) {
         </div>
 
         {tier === 'freemium' && (
-          <div className="mt-8 p-2 bg-primary-container/10 border border-primary-container/30 text-primary-container font-body-md text-[10px]">
+          <div className="mt-2 p-2 bg-primary-container/10 border border-primary-container/30 text-primary-container font-body-md text-[10px]">
             {lang === 'tr'
               ? '💡 Premium paket alarak oy zorunluluğunu kaldırabilirsiniz.'
               : '💡 Upgrade to Premium to remove the vote requirement.'}
@@ -94,7 +94,7 @@ export default function OverviewTab({ subscription, setActiveTab, settings }) {
 
       {/* Quick Stats Box */}
       <div className="glass-panel p-3 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
-        <h3 className="font-headline-md text-[10px] text-on-surface mb-6 uppercase tracking-tight">
+        <h3 className="font-headline-md text-[10px] text-on-surface mb-3 uppercase tracking-tight">
           {lang === 'tr' ? 'Sistem Durumu' : 'System Status'}
         </h3>
         <ul className="space-y-3">

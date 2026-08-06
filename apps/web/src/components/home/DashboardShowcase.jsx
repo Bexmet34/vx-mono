@@ -21,7 +21,7 @@ export default function DashboardShowcase() {
     <section id="dashboard" className="px-margin-mobile md:px-margin-desktop py-24 bg-surface-container-lowest border-t border-on-surface/20">
       <div className="max-w-container-max mx-auto">
         <div className="text-center mb-16">
-          <h2 className="font-headline-lg text-headline-lg text-on-surface uppercase tracking-tight mb-4">
+          <h2 className="font-headline-lg text-headline-lg text-on-surface uppercase tracking-tight mb-2">
             {lang === 'tr' ? 'Kontrol Paneli (Dashboard)' : 'Dashboard Control Panel'}
           </h2>
           <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">
@@ -31,18 +31,18 @@ export default function DashboardShowcase() {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 lg:gap-1">
           {items.map((item, idx) => (
             <div key={idx} className="glass-panel overflow-hidden group border border-outline-variant hover:border-primary-container/50 transition-all p-0">
-              <div className="bg-surface-container px-6 py-4 border-b border-outline-variant flex justify-between items-center">
-                <h3 className="font-headline-md text-lg text-on-surface uppercase tracking-tight">{item.title}</h3>
+              <div className="bg-surface-container px-3 py-1 border-b border-outline-variant flex justify-between items-center">
+                <h3 className="font-headline-md text-[10px] text-on-surface uppercase tracking-tight">{item.title}</h3>
                 <div className="flex gap-2">
                   <div className="w-3 h-3 rounded-full bg-[#ff5f56] opacity-50"></div>
                   <div className="w-3 h-3 rounded-full bg-[#ffbd2e] opacity-50"></div>
                   <div className="w-3 h-3 rounded-full bg-[#27c93f] opacity-50"></div>
                 </div>
               </div>
-              <div className="p-6 bg-[#0B0F19] relative">
+              <div className="p-3 bg-[#0B0F19] relative">
                 <div className="absolute inset-0 bg-primary-container/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
                 <Image 
                   src={item.src} 
@@ -51,7 +51,7 @@ export default function DashboardShowcase() {
                   height={350} 
                   className="w-full h-auto rounded-md shadow-2xl group-hover:scale-[1.02] transition-transform duration-500 border border-outline-variant/30"
                 />
-                <p className="mt-6 font-body-md text-on-surface-variant text-center">{item.desc}</p>
+                <p className="mt-3 font-body-md text-on-surface-variant text-center">{item.desc}</p>
               </div>
             </div>
           ))}

@@ -86,7 +86,7 @@ export default async function GuildProfilePage({ params }) {
           </div>
           
           <div style={{ marginTop: '2rem', padding: '1rem 3rem', background: 'rgba(0,0,0,0.5)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', display: 'inline-flex', alignItems: 'center', gap: '1rem' }}>
-            <Users size={24} color="#aaa" />
+            <Users size={16} color="#aaa" />
             <div>
               <p style={{ color: '#aaa', fontSize: '0.9rem', marginBottom: '0.2rem', textAlign: 'left' }}>Üye Sayısı</p>
               <div style={{ fontSize: '1.5rem', color: '#fff', fontWeight: 'bold' }}>{guild.MemberCount || members?.length || 0}</div>

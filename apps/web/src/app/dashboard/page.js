@@ -115,45 +115,45 @@ export default function Dashboard() {
   return (
     <>
       <Navbar isStatic={true} />
-      <main className="pt-24 md:pt-32 pb-24 min-h-screen max-w-container-max mx-auto px-4 md:px-margin-desktop">
+      <main className="pt-24 md:pt-32 pb-24 min-h-screen max-w-container-max mx-auto px-2 md:px-margin-desktop">
         <ToastContainer toasts={toasts} />
 
         {/* --- NATIVE APP DASHBOARD HEADER --- */}
-        <div className="flex flex-col items-center mb-8 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-container/10 border border-primary-container/30 text-primary-container font-label-bold text-xs uppercase tracking-widest mb-4 shadow-[0_0_15px_rgba(255,215,0,0.1)]">
+        <div className="flex flex-col items-center mb-2 text-center">
+          <div className="inline-flex items-center gap-2 px-2 py-1.5 rounded-full bg-primary-container/10 border border-primary-container/30 text-primary-container font-label-bold text-xs uppercase tracking-widest mb-2 shadow-[0_0_15px_rgba(255,215,0,0.1)]">
             <Sparkles size={14} />
             {lang === 'tr' ? 'Yönetim Paneli' : 'Control Center'}
           </div>
           <h1 className="font-headline-xl text-3xl md:text-5xl text-on-surface mb-2 uppercase tracking-tight">
             {t.dashWelcome}
           </h1>
-          <p className="font-label-bold text-sm md:text-base text-primary-container tracking-widest uppercase mb-6 flex items-center gap-2">
+          <p className="font-label-bold text-[10px] md:text-xs text-primary-container tracking-widest uppercase mb-3 flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
             {session.user?.name}
           </p>
 
           <Link 
             href="/dashboard/user" 
-            className="glass-card-native text-on-surface-variant hover:text-primary-container hover:border-primary-container/60 p-4 md:p-5 rounded-2xl flex items-center justify-between gap-4 transition-all duration-200 active:scale-[0.98] max-w-md w-full shadow-lg group"
+            className="glass-card-native text-on-surface-variant hover:text-primary-container hover:border-primary-container/60 p-2 md:p-2 rounded-2xl flex items-center justify-between gap-2 transition-all duration-200 active:scale-[0.98] max-w-md w-full shadow-lg group"
           >
-            <div className="w-12 h-12 bg-primary-container/10 border border-primary-container/30 rounded-xl flex items-center justify-center text-primary-container shrink-0 group-hover:bg-primary-container group-hover:text-on-primary transition-colors">
+            <div className="w-12 h-8 bg-primary-container/10 border border-primary-container/30 rounded-xl flex items-center justify-center text-primary-container shrink-0 group-hover:bg-primary-container group-hover:text-on-primary transition-colors">
               <Settings size={22} />
             </div>
             <div className="text-left flex-1 min-w-0">
-              <div className="font-headline-sm uppercase text-sm font-bold text-on-surface group-hover:text-primary-container transition-colors truncate">
+              <div className="font-headline-sm uppercase text-[10px] font-bold text-on-surface group-hover:text-primary-container transition-colors truncate">
                 {lang === 'tr' ? 'Bireysel Şablon Paneli' : 'Personal User Dashboard'}
               </div>
               <div className="font-body-sm text-xs opacity-70 truncate">
                 {lang === 'tr' ? 'Özel parti şablonlarınızı yönetin' : 'Manage your personal party templates'}
               </div>
             </div>
-            <ChevronRight size={20} className="opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all text-primary-container shrink-0" />
+            <ChevronRight size={14} className="opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all text-primary-container shrink-0" />
           </Link>
         </div>
 
         {/* --- NATIVE MOBILE APP FILTER & SEARCH BAR --- */}
         {servers.length > 0 && (
-          <div className="mb-8 flex flex-col md:flex-row items-center justify-between gap-4 glass-panel p-3 rounded-2xl border border-outline-variant/30">
+          <div className="mb-2 flex flex-col md:flex-row items-center justify-between gap-2 glass-panel p-3 rounded-2xl border border-outline-variant/30">
             {/* Filter Pills */}
             <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar w-full md:w-auto pb-1 md:pb-0 px-1">
               {[
@@ -164,7 +164,7 @@ export default function Dashboard() {
                 <button
                   key={f.key}
                   onClick={() => setFilteredFilter(f.key)}
-                  className={`px-4 py-2 rounded-xl font-label-bold text-xs uppercase tracking-wider transition-all duration-200 whitespace-nowrap flex items-center gap-2 touch-manipulation active:scale-95 ${
+                  className={`px-2 py-1 rounded-xl font-label-bold text-xs uppercase tracking-wider transition-all duration-200 whitespace-nowrap flex items-center gap-2 touch-manipulation active:scale-95 ${
                     filteredFilter === f.key
                       ? 'bg-primary-container text-on-primary shadow-[0_0_15px_rgba(255,215,0,0.25)] font-bold'
                       : 'bg-surface-container-high/60 text-on-surface-variant hover:text-on-surface border border-outline-variant/20'
@@ -188,27 +188,27 @@ export default function Dashboard() {
                 placeholder={lang === 'tr' ? 'Sunucu ara...' : 'Search server...'}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-surface-container-lowest/80 border border-outline-variant/30 text-on-surface text-xs rounded-xl pl-10 pr-4 py-2.5 outline-none focus:border-primary-container transition-all placeholder:text-on-surface-variant/50"
+                className="w-full bg-surface-container-lowest/80 border border-outline-variant/30 text-on-surface text-xs rounded-xl pl-10 pr-4 py-1.5 outline-none focus:border-primary-container transition-all placeholder:text-on-surface-variant/50"
               />
             </div>
           </div>
         )}
 
         {errorMsg && (
-          <div className="bg-error/10 border border-error text-error font-body-md text-sm p-4 mb-8 text-center max-w-2xl mx-auto rounded-xl">
+          <div className="bg-error/10 border border-error text-error font-body-md text-[10px] p-2 mb-2 text-center max-w-2xl mx-auto rounded-xl">
             {errorMsg === "Supabase credentials missing" ? t.dashErrCreds : errorMsg}
           </div>
         )}
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-24 text-primary-container gap-4">
-            <Logo className="w-16 h-16 animate-pulse drop-shadow-[0_0_20px_rgba(255,215,0,0.3)]" />
+          <div className="flex flex-col items-center justify-center py-24 text-primary-container gap-2">
+            <Logo className="w-16 h-7 animate-pulse drop-shadow-[0_0_20px_rgba(255,215,0,0.3)]" />
             <span className="font-label-bold text-xs uppercase tracking-widest opacity-80">{lang === 'tr' ? 'Sunucular Yükleniyor...' : 'Loading Servers...'}</span>
           </div>
         ) : filteredServers.length === 0 && !errorMsg ? (
-          <div className="glass-panel p-12 text-center border-dashed border-outline-variant text-on-surface-variant max-w-xl mx-auto flex flex-col items-center rounded-2xl">
-            <AlertCircle size={44} className="text-primary-container opacity-60 mb-4 animate-bounce" />
-            <p className="font-headline-md text-base text-on-surface mb-2">
+          <div className="glass-panel p-3 text-center border-dashed border-outline-variant text-on-surface-variant max-w-xl mx-auto flex flex-col items-center rounded-2xl">
+            <AlertCircle size={44} className="text-primary-container opacity-60 mb-2 animate-bounce" />
+            <p className="font-headline-md text-xs text-on-surface mb-2">
               {searchQuery ? (lang === 'tr' ? 'Aramanıza uygun sunucu bulunamadı.' : 'No server matching search query.') : t.dashNoServers}
             </p>
             {searchQuery && (
@@ -222,7 +222,7 @@ export default function Dashboard() {
           </div>
         ) : (
           /* --- NATIVE MOBILE CARD STACK --- */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
             {filteredServers.map((server) => {
               const expired = isPast(new Date(server.expires_at));
               let timeStatus = "";
@@ -248,10 +248,10 @@ export default function Dashboard() {
                   key={server.id} 
                   className="glass-card-native rounded-2xl overflow-hidden flex flex-col justify-between transition-all duration-300 hover:border-primary-container/60 hover:shadow-[0_12px_40px_rgba(0,0,0,0.5)] active:scale-[0.99]"
                 >
-                  <div className="p-5 flex-grow">
+                  <div className="p-2 flex-grow">
                     {/* Header Badge */}
-                    <div className="flex justify-between items-start mb-5">
-                      <div className="w-14 h-14 bg-surface-container-high border border-outline-variant/40 rounded-2xl flex items-center justify-center font-headline-md text-xl text-primary-container font-bold uppercase shadow-inner shrink-0">
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="w-14 h-9 bg-surface-container-high border border-outline-variant/40 rounded-2xl flex items-center justify-center font-headline-md text-xs text-primary-container font-bold uppercase shadow-inner shrink-0">
                         {server.guild_name ? server.guild_name.substring(0, 2) : "VX"}
                       </div>
                       <div className={`font-label-bold text-[10px] uppercase tracking-widest px-3 py-1.5 rounded-full flex items-center gap-1.5 ${statusClass}`}>
@@ -261,7 +261,7 @@ export default function Dashboard() {
                     </div>
 
                     {/* Server Title */}
-                    <h3 className="font-headline-md text-xl text-on-surface mb-2 font-bold truncate" title={server.guild_name}>
+                    <h3 className="font-headline-md text-xs text-on-surface mb-2 font-bold truncate" title={server.guild_name}>
                       {server.guild_name || "Unknown Server"}
                     </h3>
 
@@ -292,14 +292,14 @@ export default function Dashboard() {
                   {/* Actions Footer */}
                   <div className="p-3 bg-surface-container-low/90 border-t border-outline-variant/30 grid grid-cols-2 gap-2">
                     <button 
-                      className="w-full flex items-center justify-center gap-2 font-label-bold text-xs uppercase tracking-wider text-on-surface-variant border border-outline-variant/50 hover:border-primary-container hover:text-primary-container transition-all py-3 rounded-xl touch-manipulation active:scale-95"
+                      className="w-full flex items-center justify-center gap-2 font-label-bold text-xs uppercase tracking-wider text-on-surface-variant border border-outline-variant/50 hover:border-primary-container hover:text-primary-container transition-all py-1.5 rounded-xl touch-manipulation active:scale-95"
                       onClick={() => openRedeemModal(server.guild_id)}
                     >
                       <Key size={15} /> Redeem
                     </button>
                     <Link 
                       href={`/dashboard/server/${server.guild_id}`} 
-                      className="w-full flex items-center justify-center gap-2 font-label-bold text-xs uppercase tracking-wider bg-primary-container text-on-primary font-bold hover:brightness-110 active:scale-95 transition-all py-3 rounded-xl tactical-glow touch-manipulation"
+                      className="w-full flex items-center justify-center gap-2 font-label-bold text-xs uppercase tracking-wider bg-primary-container text-on-primary font-bold hover:brightness-110 active:scale-95 transition-all py-1.5 rounded-xl tactical-glow touch-manipulation"
                     >
                       <Settings size={15} /> {t.dashManageBtn}
                     </Link>
@@ -312,7 +312,7 @@ export default function Dashboard() {
 
         {/* --- NATIVE MOBILE BOTTOM SHEET / REDEEM MODAL --- */}
         {redeemModalOpen && (
-          <div className="fixed inset-0 z-[120] flex items-end md:items-center justify-center p-0 md:p-4">
+          <div className="fixed inset-0 z-[120] flex items-end md:items-center justify-center p-0 md:p-2">
             {/* Backdrop */}
             <div 
               className="absolute inset-0 bg-black/80 backdrop-blur-md transition-opacity duration-300 animate-in fade-in" 
@@ -320,40 +320,40 @@ export default function Dashboard() {
             ></div>
 
             {/* Native Mobile Bottom Sheet / Modal */}
-            <div className="relative z-10 w-full max-w-md glass-card-native rounded-t-3xl md:rounded-3xl p-6 md:p-8 animate-slide-up border-t md:border border-primary-container/40 shadow-2xl">
-              <div className="w-12 h-1.5 bg-outline-variant/50 rounded-full mx-auto mb-6 md:hidden"></div>
+            <div className="relative z-10 w-full max-w-md glass-card-native rounded-t-3xl md:rounded-3xl p-3 md:p-2 animate-slide-up border-t md:border border-primary-container/40 shadow-2xl">
+              <div className="w-12 h-1.5 bg-outline-variant/50 rounded-full mx-auto mb-3 md:hidden"></div>
               
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-xl bg-primary-container/10 border border-primary-container/30 flex items-center justify-center text-primary-container">
-                  <Key size={20} />
+              <div className="flex items-center gap-1 mb-2">
+                <div className="w-10 h-7 rounded-xl bg-primary-container/10 border border-primary-container/30 flex items-center justify-center text-primary-container">
+                  <Key size={14} />
                 </div>
-                <h2 className="font-headline-lg text-xl md:text-2xl text-on-surface uppercase tracking-tight font-bold">
+                <h2 className="font-headline-lg text-xs md:text-[10px] text-on-surface uppercase tracking-tight font-bold">
                   Redeem Code
                 </h2>
               </div>
               
-              <p className="font-body-md text-xs md:text-sm text-on-surface-variant mb-6 leading-relaxed">
+              <p className="font-body-md text-xs md:text-[10px] text-on-surface-variant mb-3 leading-relaxed">
                 {lang === 'tr' ? 'Premium kodunuzu girerek sunucunuza hemen lisans tanımlayın.' : 'Enter your premium code to activate or extend your server license.'}
               </p>
 
               <input 
                 type="text" 
-                className="w-full bg-surface-container-lowest border border-outline-variant/40 focus:border-primary-container text-on-surface font-mono text-center tracking-widest p-4 rounded-xl mb-6 outline-none transition-all uppercase text-base font-bold shadow-inner" 
+                className="w-full bg-surface-container-lowest border border-outline-variant/40 focus:border-primary-container text-on-surface font-mono text-center tracking-widest p-2 rounded-xl mb-3 outline-none transition-all uppercase text-xs font-bold shadow-inner" 
                 placeholder="XXXX-XXXX-XXXX-XXXX"
                 value={redeemCode}
                 onChange={(e) => setRedeemCode(e.target.value.toUpperCase())}
                 autoFocus
               />
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-1">
                 <button 
-                  className="w-full border border-outline-variant/50 text-on-surface-variant font-label-bold text-xs uppercase tracking-wider py-3.5 rounded-xl hover:bg-on-surface/5 transition-colors touch-manipulation active:scale-95"
+                  className="w-full border border-outline-variant/50 text-on-surface-variant font-label-bold text-xs uppercase tracking-wider py-1.5.5 rounded-xl hover:bg-on-surface/5 transition-colors touch-manipulation active:scale-95"
                   onClick={() => setRedeemModalOpen(false)}
                 >
                   {lang === 'tr' ? 'İptal' : 'Cancel'}
                 </button>
                 <button 
-                  className="w-full bg-primary-container text-on-primary font-label-bold text-xs uppercase tracking-wider py-3.5 rounded-xl font-bold hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 tactical-glow touch-manipulation"
+                  className="w-full bg-primary-container text-on-primary font-label-bold text-xs uppercase tracking-wider py-1.5.5 rounded-xl font-bold hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 tactical-glow touch-manipulation"
                   onClick={handleRedeem}
                   disabled={!redeemCode.trim() || redeeming}
                 >

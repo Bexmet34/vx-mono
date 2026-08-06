@@ -67,9 +67,9 @@ export default function UserDashboard() {
       <main className="pt-32 pb-20 min-h-screen max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
         <ToastContainer toasts={toasts} />
 
-        <div className="mb-12 border-b border-white/5 pb-8 relative">
-          <div className="flex flex-col md:flex-row items-center md:items-end justify-between gap-6 relative z-10">
-            <div className="flex items-center gap-6">
+        <div className="mb-3 border-b border-white/5 pb-8 relative">
+          <div className="flex flex-col md:flex-row items-center md:items-end justify-between gap-1 relative z-10">
+            <div className="flex items-center gap-1">
               <div className="w-20 h-20 bg-surface-container-high border border-outline flex items-center justify-center font-headline-md text-3xl text-on-surface uppercase shadow-2xl relative overflow-hidden group">
                 {session.user?.image ? (
                   <img src={session.user.image} alt="Avatar" className="w-full h-full object-cover" />
@@ -79,7 +79,7 @@ export default function UserDashboard() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
               </div>
               <div>
-                <div className="flex items-center gap-3 mb-2">
+                <div className="flex items-center gap-1 mb-2">
                   <h1 className="font-headline-xl text-4xl text-on-surface tracking-tight m-0">{session.user?.name}</h1>
                   {isPremium ? (
                     <span className="bg-primary-container text-on-primary font-label-bold text-[10px] uppercase tracking-widest px-2 py-1 rounded-sm shadow-[0_0_10px_rgba(255,215,0,0.5)]">
@@ -91,13 +91,13 @@ export default function UserDashboard() {
                     </span>
                   )}
                 </div>
-                <p className="font-label-bold text-sm text-primary-container tracking-widest uppercase">{lang === 'tr' ? 'Bireysel Profil' : 'Individual Profile'}</p>
+                <p className="font-label-bold text-[10px] text-primary-container tracking-widest uppercase">{lang === 'tr' ? 'Bireysel Profil' : 'Individual Profile'}</p>
               </div>
             </div>
             
-            <nav className="flex gap-2 overflow-x-auto custom-scrollbar pb-2 w-full md:w-auto mt-4 md:mt-0">
+            <nav className="flex gap-2 overflow-x-auto custom-scrollbar pb-2 w-full md:w-auto mt-2 md:mt-0">
               <button 
-                className={`flex items-center gap-2 px-4 py-2 rounded-full font-label-bold text-sm transition-all whitespace-nowrap ${activeTab === 'templates' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} 
+                className={`flex items-center gap-2 px-2 py-1 rounded-full font-label-bold text-[10px] transition-all whitespace-nowrap ${activeTab === 'templates' ? 'bg-primary-container text-on-primary tactical-glow border border-primary-container' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} 
                 onClick={() => setActiveTab('templates')}
               >
                 <Copy size={16} /> {lang === 'tr' ? 'Kişisel Şablonlar' : 'Personal Templates'}

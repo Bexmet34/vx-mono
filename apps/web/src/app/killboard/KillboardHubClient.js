@@ -158,7 +158,7 @@ export default function KillboardHubClient() {
         boxShadow: "0 10px 30px rgba(0,0,0,0.5)"
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1rem" }}>
-          <Search size={24} style={{ color: "#fca311" }} />
+          <Search size={16} style={{ color: "#fca311" }} />
           <h3 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 'bold', color: '#fff' }}>
             {isTr ? "Oyuncu veya Lonca Arama" : "Search Player or Guild"} ({currentServerObj.name})
           </h3>
@@ -190,11 +190,11 @@ export default function KillboardHubClient() {
                   boxShadow: "0 4px 15px rgba(0,0,0,0.3)"
                 }}
               />
-              <Search size={20} color="#fca311" style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)" }} />
+              <Search size={14} color="#fca311" style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)" }} />
 
               {isSearching && (
                 <div style={{ position: "absolute", right: "1rem", top: "50%", transform: "translateY(-50%)", color: "#fca311" }}>
-                  <Loader2 className="animate-spin" size={20} />
+                  <Loader2 className="animate-spin" size={14} />
                 </div>
               )}
             </div>
@@ -217,7 +217,7 @@ export default function KillboardHubClient() {
               }}
               className="hover:brightness-110"
             >
-              <Search size={18} /> {isTr ? "Ara" : "Search"}
+              <Search size={14} /> {isTr ? "Ara" : "Search"}
             </button>
           </div>
 
@@ -278,7 +278,7 @@ export default function KillboardHubClient() {
                       className="hover:bg-white/10"
                     >
                       <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                        <User size={18} color="#2ecc71" />
+                        <User size={14} color="#2ecc71" />
                         <div>
                           <div style={{ color: "#fff", fontWeight: "bold", fontSize: "0.95rem" }}>{p.Name}</div>
                           {p.GuildName && <div style={{ color: "#aaa", fontSize: "0.8rem" }}>[{p.AllianceName || ''}] {p.GuildName}</div>}
@@ -312,7 +312,7 @@ export default function KillboardHubClient() {
                       className="hover:bg-white/10"
                     >
                       <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                        <Shield size={18} color="#e74c3c" />
+                        <Shield size={14} color="#e74c3c" />
                         <div>
                           <div style={{ color: "#fff", fontWeight: "bold", fontSize: "0.95rem" }}>{g.Name}</div>
                           {g.AllianceName && <div style={{ color: "#aaa", fontSize: "0.8rem" }}>[{g.AllianceName}]</div>}

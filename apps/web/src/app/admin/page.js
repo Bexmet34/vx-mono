@@ -593,16 +593,16 @@ export default function AdminPage() {
   });
 
   const menuItems = [
-    { id: "overview", label: "Genel Bakış", icon: <LayoutDashboard size={20} /> },
-    { id: "servers", label: "Sunucu Yönetimi", icon: <Server size={20} /> },
-    { id: "plans", label: "Paket Yönetimi", icon: <DollarSign size={20} /> }, 
-    { id: "manual-payments", label: "Havale/EFT Onayları", icon: <CheckCircle size={20} /> },
-    { id: "bank-accounts", label: "Banka Hesapları", icon: <CreditCard size={20} /> },
-    { id: "campaigns", label: "Kampanya & Hediye", icon: <Gift size={20} /> },
-    { id: "notifications", label: "Bildirim Şablonları", icon: <Bell size={20} /> },
-    { id: "broadcast", label: "Duyuru Merkezi", icon: <MessageSquare size={20} /> },
-    { id: "stats", label: "Veri Analizi", icon: <BarChart3 size={20} /> },
-    { id: "settings", label: "Sistem Ayarları", icon: <Settings size={20} /> },
+    { id: "overview", label: "Genel Bakış", icon: <LayoutDashboard size={14} /> },
+    { id: "servers", label: "Sunucu Yönetimi", icon: <Server size={14} /> },
+    { id: "plans", label: "Paket Yönetimi", icon: <DollarSign size={14} /> }, 
+    { id: "manual-payments", label: "Havale/EFT Onayları", icon: <CheckCircle size={14} /> },
+    { id: "bank-accounts", label: "Banka Hesapları", icon: <CreditCard size={14} /> },
+    { id: "campaigns", label: "Kampanya & Hediye", icon: <Gift size={14} /> },
+    { id: "notifications", label: "Bildirim Şablonları", icon: <Bell size={14} /> },
+    { id: "broadcast", label: "Duyuru Merkezi", icon: <MessageSquare size={14} /> },
+    { id: "stats", label: "Veri Analizi", icon: <BarChart3 size={14} /> },
+    { id: "settings", label: "Sistem Ayarları", icon: <Settings size={14} /> },
   ];
 
   // During SSR and initial client hydration, suppress differences
@@ -670,7 +670,7 @@ export default function AdminPage() {
            
            {message && (
              <div className={`status-msg ${message.type} animate-slide-up`} style={{marginBottom: '0.5rem', padding: '0.8rem 1.5rem', borderRadius: '12px', background: 'rgba(0,0,0,0.4)', border: '1px solid var(--admin-border)', display: 'flex', alignItems: 'center', gap: '0.75rem'}}>
-                {message.type === 'success' ? <CheckCircle size={18} color="var(--admin-success)" /> : <AlertCircle size={18} color="var(--admin-error)" />}
+                {message.type === 'success' ? <CheckCircle size={14} color="var(--admin-success)" /> : <AlertCircle size={14} color="var(--admin-error)" />}
                 <span style={{fontWeight: '600', fontSize: '0.9rem'}}>{message.text}</span>
              </div>
            )}
@@ -709,7 +709,7 @@ export default function AdminPage() {
                      <>
                        <div>
                           <div className="admin-search-container" style={{marginBottom: 0}}>
-                            <Search style={{ position: "absolute", left: "1.2rem", top: "50%", transform: "translateY(-50%)", color: "var(--admin-text-muted)" }} size={18} />
+                            <Search style={{ position: "absolute", left: "1.2rem", top: "50%", transform: "translateY(-50%)", color: "var(--admin-text-muted)" }} size={14} />
                             <input 
                               className="admin-search-input" 
                               placeholder="Sunucu ismi, ID veya Sahip ID ile ara..." 
@@ -746,7 +746,7 @@ export default function AdminPage() {
                      <>
                        <div>
                           <div className="admin-search-container" style={{marginBottom: 0, width: '350px'}}>
-                            <Search style={{ position: "absolute", left: "1.2rem", top: "50%", transform: "translateY(-50%)", color: "var(--admin-text-muted)" }} size={18} />
+                            <Search style={{ position: "absolute", left: "1.2rem", top: "50%", transform: "translateY(-50%)", color: "var(--admin-text-muted)" }} size={14} />
                             <input 
                               className="admin-search-input" 
                               placeholder="Discord ID ile ara..." 
@@ -757,7 +757,7 @@ export default function AdminPage() {
                        </div>
                        
                        <button className="btn-primary" onClick={() => setShowUserModal(true)} style={{padding: '0.8rem 1.5rem', borderRadius: '12px', marginLeft: 'auto'}}>
-                          <Plus size={20} /> Bireysel Lisans Ekle
+                          <Plus size={14} /> Bireysel Lisans Ekle
                        </button>
                      </>
                    )}
@@ -860,7 +860,7 @@ export default function AdminPage() {
                                       onClick={() => handleServerAction(s.guild_id, 'add_days', 30)}
                                       style={{color: 'var(--admin-success)', borderColor: 'rgba(46, 204, 113, 0.3)'}}
                                     >
-                                      {savingId === s.guild_id ? <Loader2 size={18} className="spin" /> : <Plus size={18} />}
+                                      {savingId === s.guild_id ? <Loader2 size={14} className="spin" /> : <Plus size={14} />}
                                     </button>
                                     
                                     <button 
@@ -869,7 +869,7 @@ export default function AdminPage() {
                                       disabled={savingId === s.guild_id}
                                       onClick={() => handleServerAction(s.guild_id, 'remove_days', 30)}
                                     >
-                                      {savingId === s.guild_id ? <Loader2 size={18} className="spin" /> : <Clock size={18} />}
+                                      {savingId === s.guild_id ? <Loader2 size={14} className="spin" /> : <Clock size={14} />}
                                     </button>
  
                                     <button 
@@ -878,7 +878,7 @@ export default function AdminPage() {
                                       disabled={savingId === s.guild_id}
                                       onClick={() => handleServerAction(s.guild_id, 'toggle_unlimited_party', !s.unlimited_party)}
                                     >
-                                      {savingId === s.guild_id ? <Loader2 size={18} className="spin" /> : <Gamepad2 size={18} />}
+                                      {savingId === s.guild_id ? <Loader2 size={14} className="spin" /> : <Gamepad2 size={14} />}
                                     </button>
                                     
                                     <button 
@@ -888,7 +888,7 @@ export default function AdminPage() {
                                       style={{ opacity: !s.is_active ? 0.3 : 1, cursor: !s.is_active ? 'not-allowed' : 'pointer' }}
                                       onClick={() => handleServerAction(s.guild_id, 'toggle_unlimited', !s.is_unlimited)}
                                     >
-                                      {savingId === s.guild_id ? <Loader2 size={18} className="spin" /> : <Infinity size={18} />}
+                                      {savingId === s.guild_id ? <Loader2 size={14} className="spin" /> : <Infinity size={14} />}
                                     </button>
                                     
                                     <button 
@@ -898,7 +898,7 @@ export default function AdminPage() {
                                       style={{ opacity: s.is_unlimited ? 0.3 : 1, cursor: s.is_unlimited ? 'not-allowed' : 'pointer' }}
                                       onClick={() => handleServerAction(s.guild_id, 'toggle_active', !s.is_active)}
                                     >
-                                      {savingId === s.guild_id ? <Loader2 size={18} className="spin" /> : <Power size={18} />}
+                                      {savingId === s.guild_id ? <Loader2 size={14} className="spin" /> : <Power size={14} />}
                                     </button>
                                   </div>
                                 </td>
@@ -1024,7 +1024,7 @@ export default function AdminPage() {
                                     onClick={() => handleUserAction(u.discord_id, 'add_days', 30)}
                                     style={{color: 'var(--admin-success)', borderColor: 'rgba(46, 204, 113, 0.3)'}}
                                   >
-                                    {savingId === u.discord_id ? <Loader2 size={18} className="spin" /> : <Plus size={18} />}
+                                    {savingId === u.discord_id ? <Loader2 size={14} className="spin" /> : <Plus size={14} />}
                                   </button>
                                   
                                   <button 
@@ -1033,7 +1033,7 @@ export default function AdminPage() {
                                     disabled={savingId === u.discord_id}
                                     onClick={() => handleUserAction(u.discord_id, 'remove_days', 30)}
                                   >
-                                    {savingId === u.discord_id ? <Loader2 size={18} className="spin" /> : <Clock size={18} />}
+                                    {savingId === u.discord_id ? <Loader2 size={14} className="spin" /> : <Clock size={14} />}
                                   </button>
                                   
                                   <button 
@@ -1042,7 +1042,7 @@ export default function AdminPage() {
                                     disabled={savingId === u.discord_id}
                                     onClick={() => handleUserAction(u.discord_id, 'toggle_unlimited', !u.is_unlimited)}
                                   >
-                                    {savingId === u.discord_id ? <Loader2 size={18} className="spin" /> : <Infinity size={18} />}
+                                    {savingId === u.discord_id ? <Loader2 size={14} className="spin" /> : <Infinity size={14} />}
                                   </button>
                                   
                                   <button 
@@ -1051,7 +1051,7 @@ export default function AdminPage() {
                                     disabled={savingId === u.discord_id}
                                     onClick={() => handleUserAction(u.discord_id, 'delete')}
                                   >
-                                    {savingId === u.discord_id ? <Loader2 size={18} className="spin" /> : <Trash2 size={18} />}
+                                    {savingId === u.discord_id ? <Loader2 size={14} className="spin" /> : <Trash2 size={14} />}
                                   </button>
                                 </div>
                               </td>
@@ -1081,7 +1081,7 @@ export default function AdminPage() {
                          setNewPlan({id: "", name_tr: "", name_en: "", amount: "", duration_days: 30, is_active: true, is_featured: false, sort_order: 0, features_tr: [], features_en: []});
                          setShowPlanModal(true);
                        }} style={{padding: '0.8rem 1.5rem', borderRadius: '12px'}}>
-                          <Plus size={20} /> Yeni Paket Ekle
+                          <Plus size={14} /> Yeni Paket Ekle
                        </button>
                     </div>
 
@@ -1128,10 +1128,10 @@ export default function AdminPage() {
                                      setNewPlan({...p});
                                      setShowPlanModal(true);
                                    }}>
-                                      <Edit3 size={18} />
+                                      <Edit3 size={14} />
                                    </button>
                                    <button className="admin-action-btn danger" onClick={() => handleDeletePlan(p.id)}>
-                                      <Trash2 size={18} />
+                                      <Trash2 size={14} />
                                    </button>
                                 </div>
                               </td>
@@ -1145,7 +1145,7 @@ export default function AdminPage() {
                   <>
                     <div style={{display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem'}}>
                        <button className="admin-action-btn" onClick={() => setShowPlanModal(false)} style={{padding: '0.5rem'}}>
-                          <ArrowLeft size={20} />
+                          <ArrowLeft size={14} />
                        </button>
                        <div>
                           <h2 style={{fontSize: '1.5rem', fontWeight: '800'}}>{editingPlanId ? 'Paketi Düzenle' : 'Yeni Paket Ekle'}</h2>
@@ -1230,7 +1230,7 @@ export default function AdminPage() {
                       <div style={{display: 'flex', gap: '1rem'}}>
                         <button className="admin-btn-secondary" style={{width: '200px'}} onClick={() => setShowPlanModal(false)}>İptal</button>
                         <button className="btn-primary" style={{width: '250px', padding: '1rem'}} onClick={handleSavePlan} disabled={loading || !newPlan.id || !newPlan.amount}>
-                          {loading ? <Loader2 size={20} className="spin" /> : <><Save size={20}/> {editingPlanId ? 'Değişiklikleri Kaydet' : 'Paketi Oluştur'}</>}
+                          {loading ? <Loader2 size={14} className="spin" /> : <><Save size={14}/> {editingPlanId ? 'Değişiklikleri Kaydet' : 'Paketi Oluştur'}</>}
                         </button>
                       </div>
                     </div>
@@ -1252,7 +1252,7 @@ export default function AdminPage() {
                 <div className="admin-card" style={{marginBottom: '2rem'}}>
                    <div style={{display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between'}}>
                       <div className="admin-search-container" style={{marginBottom: 0, flex: 1, minWidth: '300px'}}>
-                        <Search style={{ position: "absolute", left: "1.2rem", top: "50%", transform: "translateY(-50%)", color: "var(--admin-text-muted)" }} size={18} />
+                        <Search style={{ position: "absolute", left: "1.2rem", top: "50%", transform: "translateY(-50%)", color: "var(--admin-text-muted)" }} size={14} />
                         <input 
                           className="admin-search-input" 
                           placeholder="Sunucu ismi, Guild ID, User ID veya Açıklama Kodu ile ara..." 
@@ -1303,7 +1303,7 @@ export default function AdminPage() {
                       {/* HEADER */}
                       <div style={{ padding: '1.2rem', borderBottom: '1px solid var(--admin-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.2)' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                          <Server size={18} style={{ color: 'var(--admin-text-muted)' }} />
+                          <Server size={14} style={{ color: 'var(--admin-text-muted)' }} />
                           <div style={{ fontWeight: '800', fontSize: '1rem', color: 'var(--admin-text)' }}>{p.guild_name}</div>
                         </div>
                         <div>
@@ -1357,7 +1357,7 @@ export default function AdminPage() {
                              onClick={() => handleManualPaymentAction(p.id, 'paid')}
                              disabled={savingId === p.id}
                            >
-                             {savingId === p.id ? <Loader2 size={18} className="spin" /> : <><Check size={18} /> ONAYLA</>}
+                             {savingId === p.id ? <Loader2 size={14} className="spin" /> : <><Check size={14} /> ONAYLA</>}
                            </button>
                            <button 
                              className="admin-action-btn danger" 
@@ -1365,7 +1365,7 @@ export default function AdminPage() {
                              onClick={() => handleManualPaymentAction(p.id, 'rejected')}
                              disabled={savingId === p.id}
                            >
-                             {savingId === p.id ? <Loader2 size={18} className="spin" /> : <><X size={18} /> REDDET</>}
+                             {savingId === p.id ? <Loader2 size={14} className="spin" /> : <><X size={14} /> REDDET</>}
                            </button>
                         </div>
                       )}
@@ -1387,7 +1387,7 @@ export default function AdminPage() {
                     className="admin-btn" 
                     onClick={() => setShowBankModal(true)}
                   >
-                    <Plus size={18} /> Yeni Ekle
+                    <Plus size={14} /> Yeni Ekle
                   </button>
                 </div>
 
@@ -1435,7 +1435,7 @@ export default function AdminPage() {
                                 disabled={savingId === b.id}
                                 style={{color: 'var(--admin-accent)', borderColor: 'rgba(252,163,17,0.3)'}}
                               >
-                                <Edit3 size={18} />
+                                <Edit3 size={14} />
                               </button>
                               <button 
                                 className="admin-action-btn" 
@@ -1444,7 +1444,7 @@ export default function AdminPage() {
                                 disabled={savingId === b.id}
                                 style={{color: b.is_active ? 'var(--admin-warning)' : 'var(--admin-success)', borderColor: 'rgba(255, 255, 255, 0.1)'}}
                               >
-                                {savingId === b.id ? <Loader2 size={18} className="spin" /> : (b.is_active ? <EyeOff size={18} /> : <Eye size={18} />)}
+                                {savingId === b.id ? <Loader2 size={14} className="spin" /> : (b.is_active ? <EyeOff size={14} /> : <Eye size={14} />)}
                               </button>
                               <button 
                                 className="admin-action-btn danger" 
@@ -1452,7 +1452,7 @@ export default function AdminPage() {
                                 onClick={() => handleDeleteBankAccount(b.id)}
                                 disabled={savingId === b.id}
                               >
-                                {savingId === b.id ? <Loader2 size={18} className="spin" /> : <Trash2 size={18} />}
+                                {savingId === b.id ? <Loader2 size={14} className="spin" /> : <Trash2 size={14} />}
                               </button>
                             </div>
                           </td>
@@ -1485,7 +1485,7 @@ export default function AdminPage() {
                     <div style={{display:'flex',gap:'1rem',marginTop:'1rem'}}>
                       <button type="button" className="admin-btn-secondary" style={{flex:1}} onClick={() => setShowEditBankModal(null)}>İptal</button>
                       <button type="submit" className="btn-primary" style={{flex:2,padding:'0.9rem'}} disabled={savingId === showEditBankModal?.id}>
-                        {savingId === showEditBankModal?.id ? <Loader2 size={18} className="spin" /> : <><Save size={18}/> Kaydet</>}
+                        {savingId === showEditBankModal?.id ? <Loader2 size={14} className="spin" /> : <><Save size={14}/> Kaydet</>}
                       </button>
                     </div>
                   </form>
@@ -1500,14 +1500,14 @@ export default function AdminPage() {
                   <div key={tpl.id} className="admin-tpl-card animate-slide-up">
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                        <div style={{ background: "var(--admin-accent-muted)", padding: "0.75rem", borderRadius: "14px" }}><Bell size={24} color="var(--admin-accent)" /></div>
+                        <div style={{ background: "var(--admin-accent-muted)", padding: "0.75rem", borderRadius: "14px" }}><Bell size={16} color="var(--admin-accent)" /></div>
                         <div>
                           <h2 style={{ fontSize: "1.2rem", fontWeight: "800", margin: 0 }}>{tpl.id.toUpperCase().replace('_', ' ')}</h2>
                           <p style={{fontSize: '0.8rem', color: 'var(--admin-text-muted)', margin: 0}}>Olay tetiklendiğinde sahiplere gidecek mesaj.</p>
                         </div>
                       </div>
                       <button className="btn-primary" disabled={savingId === tpl.id} onClick={() => handleUpdateTemplate(tpl)} style={{ padding: "0.6rem 1.5rem", borderRadius: '10px' }}>
-                        {savingId === tpl.id ? <Loader2 className="spin" size={18} /> : <Save size={18} />}
+                        {savingId === tpl.id ? <Loader2 className="spin" size={14} /> : <Save size={14} />}
                         Kaydet
                       </button>
                     </div>
@@ -1552,7 +1552,7 @@ export default function AdminPage() {
                           <p style={{color: 'var(--admin-text-muted)'}}>Süresi biten kullanıcıları geri kazanın veya aktif üyelere hediye dağıtın.</p>
                        </div>
                        <button className="btn-primary" onClick={() => setShowCampaignModal(true)} style={{padding: '0.8rem 1.5rem', borderRadius: '12px'}}>
-                          <Plus size={20} /> Yeni Kampanya Başlat
+                          <Plus size={14} /> Yeni Kampanya Başlat
                        </button>
                     </div>
 
@@ -1606,10 +1606,10 @@ export default function AdminPage() {
                           <td data-label="İŞLEMLER">
                             <div style={{display: 'flex', gap: '0.5rem', justifyContent: 'flex-end'}}>
                                <button className="admin-action-btn" title="Anasayfa Görünürlüğü" onClick={() => handleToggleCampaign(c.id, 'show_on_home', !c.show_on_home)}>
-                                  {c.show_on_home ? <Eye size={18} color="var(--admin-accent)" /> : <EyeOff size={18} />}
+                                  {c.show_on_home ? <Eye size={14} color="var(--admin-accent)" /> : <EyeOff size={14} />}
                                </button>
                                <button className="admin-action-btn" onClick={() => handleToggleCampaign(c.id, 'is_active', !c.is_active)}>
-                                  <Power size={18} color={c.is_active ? 'var(--admin-success)' : ''} />
+                                  <Power size={14} color={c.is_active ? 'var(--admin-success)' : ''} />
                                </button>
                             </div>
                           </td>
@@ -1623,7 +1623,7 @@ export default function AdminPage() {
                 <>
                 <div style={{display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem'}}>
                    <button className="admin-action-btn" onClick={() => setShowCampaignModal(false)} style={{padding: '0.5rem'}}>
-                      <ArrowLeft size={20} />
+                      <ArrowLeft size={14} />
                    </button>
                    <div>
                       <h2 style={{fontSize: '1.5rem', fontWeight: '800'}}>Yeni Kampanya Başlat</h2>
@@ -1682,7 +1682,7 @@ export default function AdminPage() {
                   <div style={{display: 'flex', gap: '1rem'}}>
                     <button className="admin-btn-secondary" style={{width: '200px'}} onClick={() => setShowCampaignModal(false)}>İptal</button>
                     <button className="btn-primary" style={{width: '250px', padding: '1rem'}} onClick={handleCreateCampaign} disabled={loading}>
-                      {loading ? <Loader2 size={20} className="spin" /> : <><Send size={20}/> Kampanyayı Başlat</>}
+                      {loading ? <Loader2 size={14} className="spin" /> : <><Send size={14}/> Kampanyayı Başlat</>}
                     </button>
                   </div>
                 </div>
@@ -1702,7 +1702,7 @@ export default function AdminPage() {
                           <p style={{color: 'var(--admin-text-muted)'}}>Botun bulunduğu tüm sunuculara otomatik atılacak zamanlanmış mesajlar oluşturun.</p>
                        </div>
                        <button className="btn-primary" onClick={() => setShowScheduledModal(true)} style={{padding: '0.8rem 1.5rem', borderRadius: '12px'}}>
-                          <Plus size={20} /> Yeni Mesaj Planla
+                          <Plus size={14} /> Yeni Mesaj Planla
                        </button>
                     </div>
 
@@ -1749,7 +1749,7 @@ export default function AdminPage() {
                               <td data-label="İŞLEMLER">
                                 <div style={{display: 'flex', gap: '0.5rem', justifyContent: 'flex-end'}}>
                                    <button className="admin-action-btn danger" onClick={() => handleDeleteScheduled(m.id)}>
-                                      <Trash2 size={18} />
+                                      <Trash2 size={14} />
                                    </button>
                                 </div>
                               </td>
@@ -1763,7 +1763,7 @@ export default function AdminPage() {
                   <>
                     <div style={{display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem'}}>
                        <button className="admin-action-btn" onClick={() => setShowScheduledModal(false)} style={{padding: '0.5rem'}}>
-                          <ArrowLeft size={20} />
+                          <ArrowLeft size={14} />
                        </button>
                        <div>
                           <h2 style={{fontSize: '1.5rem', fontWeight: '800'}}>Yeni Mesaj Planla</h2>
@@ -1875,7 +1875,7 @@ export default function AdminPage() {
                                   setNewScheduled({...newScheduled, buttons: newBtns});
                                 }}
                               >
-                                <Trash2 size={18} />
+                                <Trash2 size={14} />
                               </button>
                            </div>
                          ))}
@@ -1884,7 +1884,7 @@ export default function AdminPage() {
                       <div style={{display: 'flex', gap: '1rem'}}>
                         <button className="admin-btn-secondary" style={{width: '200px'}} onClick={() => setShowScheduledModal(false)}>İptal</button>
                         <button className="btn-primary" style={{width: '250px', padding: '1rem'}} onClick={handleCreateScheduled} disabled={loading || !newScheduled.send_time || !newScheduled.message_content}>
-                          {loading ? <Loader2 size={20} className="spin" /> : <><Save size={20}/> Planı Kaydet</>}
+                          {loading ? <Loader2 size={14} className="spin" /> : <><Save size={14}/> Planı Kaydet</>}
                         </button>
                       </div>
                     </div>
@@ -1902,7 +1902,7 @@ export default function AdminPage() {
                       <p style={{color: 'var(--admin-text-muted)'}}>Global bot ve site ayarlarını yapılandırın.</p>
                    </div>
                    <button className="btn-primary" onClick={handleSaveSettings} disabled={loading} style={{padding: '0.8rem 1.5rem', borderRadius: '12px'}}>
-                      {loading ? <Loader2 size={20} className="spin" /> : <><Save size={20} /> Ayarları Kaydet</>}
+                      {loading ? <Loader2 size={14} className="spin" /> : <><Save size={14} /> Ayarları Kaydet</>}
                    </button>
                 </div>
 
@@ -1993,7 +1993,7 @@ export default function AdminPage() {
                   handleServerAction(showDayModal.guildId, action, val);
                 }}
               >
-                {savingId === showDayModal.guildId ? <Loader2 size={18} className="spin" /> : 'Güncelle'}
+                {savingId === showDayModal.guildId ? <Loader2 size={14} className="spin" /> : 'Güncelle'}
               </button>
             </div>
           </div>
@@ -2008,7 +2008,7 @@ export default function AdminPage() {
                 <h2 style={{fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0.3rem'}}>Analitik & İstatistikler</h2>
                 <p style={{color: 'var(--admin-text-muted)'}}>Bot kullanım verilerini grafiklerle inceleyin.</p>
              </div>
-             <button className="admin-btn-secondary" onClick={fetchStats}><Loader2 size={18} className={loading ? "spin" : ""} /> Yenile</button>
+             <button className="admin-btn-secondary" onClick={fetchStats}><Loader2 size={14} className={loading ? "spin" : ""} /> Yenile</button>
           </div>
 
           {!statsData ? (
@@ -2069,7 +2069,7 @@ export default function AdminPage() {
                 <div className="admin-card" style={{ overflow: 'hidden' }}>
                   <div className="admin-card-header" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '1.5rem' }}>
                     <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.1rem' }}>
-                       <Activity size={18} color="#fca311" /> Son 24 Saat Parti Aktivitesi
+                       <Activity size={14} color="#fca311" /> Son 24 Saat Parti Aktivitesi
                     </h3>
                   </div>
                   <div style={{height: 350, padding: '1.5rem 1.5rem 0 0'}}>
@@ -2098,7 +2098,7 @@ export default function AdminPage() {
                 <div className="admin-card" style={{ overflow: 'hidden' }}>
                   <div className="admin-card-header" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '1.5rem' }}>
                     <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.1rem' }}>
-                       <TerminalSquare size={18} color="#3a86ff" /> Popüler Komutlar
+                       <TerminalSquare size={14} color="#3a86ff" /> Popüler Komutlar
                     </h3>
                   </div>
                   <div style={{height: 350, padding: '1.5rem 1.5rem 0 0'}}>
@@ -2139,10 +2139,10 @@ export default function AdminPage() {
              <div className="admin-modal-header border-b border-[var(--admin-border)]">
                <h3 className="admin-modal-title">Ödeme İşlemi</h3>
                <button className="admin-modal-close" onClick={() => setShowConfirmModal(null)}>
-                 <X size={20} />
+                 <X size={14} />
                </button>
              </div>
-             <div className="admin-modal-body text-center py-6">
+             <div className="admin-modal-body text-center py-1.5">
                <div style={{background: showConfirmModal.status === 'paid' ? 'rgba(46, 204, 113, 0.1)' : 'rgba(231, 76, 60, 0.1)', width: '64px', height: '64px', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem'}}>
                   {showConfirmModal.status === 'paid' ? (
                     <CheckCircle size={32} color="var(--admin-success)" />
@@ -2167,7 +2167,7 @@ export default function AdminPage() {
                 onClick={executeManualPaymentAction}
                 disabled={savingId === showConfirmModal.id}
               >
-                {savingId === showConfirmModal.id ? <Loader2 size={18} className="spin" /> : 'Evet, Onayla'}
+                {savingId === showConfirmModal.id ? <Loader2 size={14} className="spin" /> : 'Evet, Onayla'}
               </button>
              </div>
           </div>
@@ -2178,10 +2178,10 @@ export default function AdminPage() {
       {showBankModal && (
         <div className="admin-modal-overlay" onClick={() => setShowBankModal(false)}>
           <div className="admin-modal animate-slide-up" onClick={e => e.stopPropagation()}>
-            <div className="admin-modal-header border-b border-[var(--admin-border)] mb-4 pb-4">
+            <div className="admin-modal-header border-b border-[var(--admin-border)] mb-2 pb-4">
               <h3 className="admin-modal-title">Yeni Banka Hesabı Ekle</h3>
               <button className="admin-modal-close" onClick={() => setShowBankModal(false)}>
-                <X size={20} />
+                <X size={14} />
               </button>
             </div>
             <form onSubmit={handleAddBankAccount}>
@@ -2220,14 +2220,14 @@ export default function AdminPage() {
                   />
                 </div>
               </div>
-              <div className="admin-modal-footer mt-6 pt-4 border-t border-[var(--admin-border)]">
+              <div className="admin-modal-footer mt-3 pt-4 border-t border-[var(--admin-border)]">
                 <button type="button" className="admin-btn-secondary" onClick={() => setShowBankModal(false)}>İptal</button>
                 <button 
                   type="submit"
                   className="admin-btn-primary"
                   disabled={savingId === 'new_bank' || !newBankAccount.bank_name || !newBankAccount.account_holder || !newBankAccount.iban}
                 >
-                  {savingId === 'new_bank' ? <Loader2 size={18} className="spin" /> : 'Kaydet'}
+                  {savingId === 'new_bank' ? <Loader2 size={14} className="spin" /> : 'Kaydet'}
                 </button>
               </div>
             </form>
@@ -2239,10 +2239,10 @@ export default function AdminPage() {
       {showUserModal && (
         <div className="admin-modal-overlay" onClick={() => setShowUserModal(false)}>
           <div className="admin-modal animate-slide-up" onClick={e => e.stopPropagation()}>
-            <div className="admin-modal-header border-b border-[var(--admin-border)] mb-4 pb-4">
+            <div className="admin-modal-header border-b border-[var(--admin-border)] mb-2 pb-4">
               <h3 className="admin-modal-title">Bireysel Premium Tanımla</h3>
               <button className="admin-modal-close" onClick={() => setShowUserModal(false)}>
-                <X size={20} />
+                <X size={14} />
               </button>
             </div>
             <form onSubmit={handleCreateUser}>
@@ -2284,14 +2284,14 @@ export default function AdminPage() {
                   </div>
                 )}
               </div>
-              <div className="admin-modal-footer mt-6 pt-4 border-t border-[var(--admin-border)]">
+              <div className="admin-modal-footer mt-3 pt-4 border-t border-[var(--admin-border)]">
                 <button type="button" className="admin-btn-secondary" onClick={() => setShowUserModal(false)}>İptal</button>
                 <button 
                   type="submit"
                   className="admin-btn-primary"
                   disabled={savingId === 'new_user' || !newUser.discord_id}
                 >
-                  {savingId === 'new_user' ? <Loader2 size={18} className="spin" /> : 'Tanımla'}
+                  {savingId === 'new_user' ? <Loader2 size={14} className="spin" /> : 'Tanımla'}
                 </button>
               </div>
             </form>

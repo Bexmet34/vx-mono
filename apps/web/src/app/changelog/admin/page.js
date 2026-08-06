@@ -204,7 +204,7 @@ export default function ChangelogAdmin() {
                 opacity: translating ? 0.6 : 1
               }}
             >
-              {translating ? <Loader2 size={18} className="animate-spin" /> : <Languages size={18} />}
+              {translating ? <Loader2 size={14} className="animate-spin" /> : <Languages size={14} />}
               {translating ? "Çevriliyor..." : "Tercüme Et (EN)"}
             </button>
             <button 
@@ -212,7 +212,7 @@ export default function ChangelogAdmin() {
               className="glass-panel" 
               style={{ padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', border: showPreview ? '1px solid var(--accent-color)' : '1px solid var(--border-color)' }}
             >
-              <Eye size={18} /> {showPreview ? "Editöre Dön" : "Önizleme"}
+              <Eye size={14} /> {showPreview ? "Editöre Dön" : "Önizleme"}
             </button>
             <div style={{ background: 'rgba(252, 163, 11, 0.1)', color: 'var(--accent-color)', padding: '0.5rem 1rem', borderRadius: '8px', fontWeight: '800' }}>
               Sıradaki: {formData.version}
@@ -303,7 +303,7 @@ export default function ChangelogAdmin() {
 
                 <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                   <button type="submit" disabled={loading} className="btn-primary" style={{ flex: 1, justifyContent: "center", padding: '1rem' }}>
-                    <Save size={20} /> {loading ? "Yükleniyor..." : "Yayınla"}
+                    <Save size={14} /> {loading ? "Yükleniyor..." : "Yayınla"}
                   </button>
                   <Link href="/changelog" className="signout-btn" style={{ padding: '0px 1.5rem', display: 'flex', alignItems: 'center' }}>
                     İptal

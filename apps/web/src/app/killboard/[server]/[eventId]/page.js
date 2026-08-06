@@ -196,7 +196,7 @@ export default async function KillboardEventPage({ params }) {
         {/* Total Fame */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <div style={{ width: '48px', height: '48px', borderRadius: '10px', background: 'rgba(231, 76, 60, 0.15)', border: '1px solid rgba(231, 76, 60, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#e74c3c' }}>
-            <Trophy size={24} />
+            <Trophy size={16} />
           </div>
           <div>
             <div style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase', letterSpacing: '1px' }}>Kazanılan Fame</div>
@@ -209,7 +209,7 @@ export default async function KillboardEventPage({ params }) {
         {/* IP Difference */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <div style={{ width: '48px', height: '48px', borderRadius: '10px', background: ipDiff >= 0 ? 'rgba(46, 204, 113, 0.15)' : 'rgba(155, 89, 182, 0.15)', border: `1px solid ${ipDiff >= 0 ? 'rgba(46, 204, 113, 0.3)' : 'rgba(155, 89, 182, 0.3)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: ipDiff >= 0 ? '#2ecc71' : '#9b59b6' }}>
-            <Shield size={24} />
+            <Shield size={16} />
           </div>
           <div>
             <div style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase', letterSpacing: '1px' }}>IP Farkı (Üstünlük)</div>
@@ -222,7 +222,7 @@ export default async function KillboardEventPage({ params }) {
         {/* Zone & Map Location */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <div style={{ width: '48px', height: '48px', borderRadius: '10px', background: 'rgba(252, 163, 17, 0.15)', border: '1px solid rgba(252, 163, 17, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fca311' }}>
-            <MapPin size={24} />
+            <MapPin size={16} />
           </div>
           <div>
             <div style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase', letterSpacing: '1px' }}>Savaş Alanı / Bölge</div>
@@ -235,7 +235,7 @@ export default async function KillboardEventPage({ params }) {
         {/* Date & Time */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <div style={{ width: '48px', height: '48px', borderRadius: '10px', background: 'rgba(52, 152, 219, 0.15)', border: '1px solid rgba(52, 152, 219, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3498db' }}>
-            <Users size={24} />
+            <Users size={16} />
           </div>
           <div>
             <div style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase', letterSpacing: '1px' }}>Tarih & Katılım</div>

@@ -23,7 +23,7 @@ export function ToastContainer({ toasts, onRemove }) {
     <div className={styles.container}>
       {toasts.map((toast) => (
         <div key={toast.id} className={`${styles.toast} ${styles[toast.type]}`}>
-          {toast.type === "success" ? <CheckCircle size={20} /> : <XCircle size={20} />}
+          {toast.type === "success" ? <CheckCircle size={14} /> : <XCircle size={14} />}
           <span>{toast.message}</span>
           <button onClick={() => onRemove(toast.id)} className={styles.close}>
             <X size={16} />

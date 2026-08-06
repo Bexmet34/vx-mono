@@ -95,8 +95,8 @@ export default function TicketTab({ t, lang, settings, setSettings, discordChann
         <div className="bg-surface-variant p-2 rounded-md border border-white/5 shadow-sm relative group overflow-hidden">
           <div className="absolute -inset-0.5 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
           
-          <h3 className="font-headline-md text-[10px] text-on-surface mb-6 uppercase tracking-wider flex items-center gap-2">
-            <Shield className="text-primary-container" size={20}/> 
+          <h3 className="font-headline-md text-[10px] text-on-surface mb-3 uppercase tracking-wider flex items-center gap-2">
+            <Shield className="text-primary-container" size={14}/> 
             {lang === 'tr' ? 'Ticket Durumu' : 'Ticket Status'}
           </h3>
 
@@ -113,7 +113,7 @@ export default function TicketTab({ t, lang, settings, setSettings, discordChann
           <button 
              onClick={handleDeploy}
              disabled={deploying}
-             className="w-full mt-4 flex items-center justify-center gap-2 py-3 bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/50 text-blue-300 rounded transition-all disabled:opacity-50 font-bold uppercase tracking-widest text-[10px]"
+             className="w-full mt-2 flex items-center justify-center gap-2 py-1.5 bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/50 text-blue-300 rounded transition-all disabled:opacity-50 font-bold uppercase tracking-widest text-[10px]"
           >
              <Send size={16} />
              {deploying ? (lang === 'tr' ? 'Gönderiliyor...' : 'Deploying...') : (lang === 'tr' ? 'Paneli Kanala Gönder' : 'Deploy Panel to Channel')}
@@ -122,8 +122,8 @@ export default function TicketTab({ t, lang, settings, setSettings, discordChann
 
         <div className="bg-surface-variant p-2 rounded-md border border-white/5 shadow-sm relative group">
           <div className="absolute -inset-0.5 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
-          <h3 className="font-headline-md text-[10px] text-on-surface mb-6 uppercase tracking-wider flex items-center gap-2">
-             <Hash className="text-primary-container" size={20}/> 
+          <h3 className="font-headline-md text-[10px] text-on-surface mb-3 uppercase tracking-wider flex items-center gap-2">
+             <Hash className="text-primary-container" size={14}/> 
              {lang === 'tr' ? 'Kanal ve Kategori' : 'Channel & Category'}
           </h3>
 
@@ -165,8 +165,8 @@ export default function TicketTab({ t, lang, settings, setSettings, discordChann
         </div>
 
         <div className="bg-surface-variant p-2 rounded-md border border-white/5 shadow-sm relative group">
-            <h3 className="font-headline-md text-[10px] text-on-surface mb-6 uppercase tracking-wider flex items-center gap-2">
-               <Users className="text-primary-container" size={20}/> 
+            <h3 className="font-headline-md text-[10px] text-on-surface mb-3 uppercase tracking-wider flex items-center gap-2">
+               <Users className="text-primary-container" size={14}/> 
                {lang === 'tr' ? 'Yetkili Roller' : 'Staff Roles'}
             </h3>
             <label className="flex items-center gap-2 font-label-bold text-on-surface mb-3 uppercase tracking-wider text-[10px]">
@@ -228,8 +228,8 @@ export default function TicketTab({ t, lang, settings, setSettings, discordChann
 
       <div className="col-span-1 lg:col-span-8 flex flex-col gap-2">
         <div className="bg-surface-variant p-2 rounded-md border border-white/5 shadow-sm relative group">
-            <h3 className="font-headline-md text-[10px] text-on-surface mb-6 uppercase tracking-wider flex items-center gap-2">
-               <Info className="text-primary-container" size={20}/> 
+            <h3 className="font-headline-md text-[10px] text-on-surface mb-3 uppercase tracking-wider flex items-center gap-2">
+               <Info className="text-primary-container" size={14}/> 
                {lang === 'tr' ? 'Panel Mesajı Ayarları' : 'Panel Message Settings'}
             </h3>
             
@@ -259,9 +259,9 @@ export default function TicketTab({ t, lang, settings, setSettings, discordChann
         </div>
 
         <div className="bg-surface-variant p-2 rounded-md border border-white/5 shadow-sm relative group">
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex justify-between items-center mb-3">
                 <h3 className="font-headline-md text-[10px] text-on-surface uppercase tracking-wider flex items-center gap-2">
-                <Search className="text-primary-container" size={20}/> 
+                <Search className="text-primary-container" size={14}/> 
                 {lang === 'tr' ? 'Destek Konuları (Menü Seçenekleri)' : 'Support Topics (Menu Options)'}
                 </h3>
                 <button onClick={addOption} className="bg-primary-container/20 text-primary-container px-3 py-1.5 rounded-sm font-label-bold text-[10px] uppercase flex items-center gap-1 hover:bg-primary-container hover:text-on-primary transition-colors">
@@ -322,7 +322,7 @@ export default function TicketTab({ t, lang, settings, setSettings, discordChann
         </div>
       </div>
 
-      <div className="col-span-1 lg:col-span-12 mt-4 border-t border-white/5 pt-8">
+      <div className="col-span-1 lg:col-span-12 mt-2 border-t border-white/5 pt-8">
         <TicketHistoryTab t={t} lang={lang} guildId={guildId} showToast={showToast} isPremium={isPremium} />
       </div>
     </div>
