@@ -130,7 +130,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
   };
 
   return (
-    <div className="flex flex-col gap-6 animate-slide-up">
+    <div className="flex flex-col gap-3 animate-slide-up">
       {/* Datalists for Autocomplete */}
       <datalist id="weapons-list">{albionWeapons.map(w => <option key={w} value={w} />)}</datalist>
       <datalist id="heads-list">{albionHeads.map(w => <option key={w} value={w} />)}</datalist>
@@ -140,8 +140,8 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
       <datalist id="foods-list">{albionFoods.map(w => <option key={w} value={w} />)}</datalist>
 
       <div className="glass-panel relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors flex flex-col">
-        <div className="p-6 border-b border-outline-variant/50 flex justify-between items-center bg-surface-container-highest/30">
-          <h2 className="font-headline-md text-xl text-on-surface flex items-center gap-2 uppercase tracking-tight m-0">
+        <div className="p-4 border-b border-outline-variant/50 flex justify-between items-center bg-surface-container-highest/30">
+          <h2 className="font-headline-md text-lg text-on-surface flex items-center gap-2 uppercase tracking-tight m-0">
             <Copy className="text-primary-container" /> {lang === 'en' ? 'Templates' : 'Şablonlar'}
             <InfoTooltip text={lang === 'en' ? 'Create reusable party setups. Use the /temp command in Discord to quickly start a party using these templates.' : 'Tekrar kullanılabilir parti ayarları oluşturun. Discord\'da /temp komutunu kullanarak bu şablonlarla saniyeler içinde parti kurabilirsiniz.'} />
           </h2>
@@ -156,9 +156,9 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
         
         <div className="flex-1 overflow-y-auto custom-scrollbar max-h-[300px]">
           {(!settings.party_templates || settings.party_templates.length === 0) ? (
-            <div className="p-8 text-center text-on-surface-variant font-body-md">{lang === 'en' ? 'No templates yet.' : 'Henüz şablon yok.'}</div>
+            <div className="p-5 text-center text-on-surface-variant font-body-md">{lang === 'en' ? 'No templates yet.' : 'Henüz şablon yok.'}</div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 p-4">
               {settings.party_templates.map(tpl => (
                 <div 
                   key={tpl.id} 
@@ -176,14 +176,14 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
         </div>
       </div>
 
-      <div className="glass-panel p-8 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
+      <div className="glass-panel p-5 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
         {!selectedTemplate ? (
           <div className="h-full min-h-[400px] flex items-center justify-center text-on-surface-variant font-body-md bg-surface-container-lowest/50 border border-dashed border-outline-variant/50 rounded-sm">
             {lang === 'en' ? 'Select or create a template to edit.' : 'Düzenlemek için bir şablon seçin veya oluşturun.'}
           </div>
         ) : (
           <div className="animate-slide-up">
-            <h3 className="font-headline-lg text-2xl text-on-surface mb-8 pb-4 border-b border-outline-variant/50 uppercase tracking-tight">{lang === 'en' ? 'Edit Template' : 'Şablonu Düzenle'}</h3>
+            <h3 className="font-headline-lg text-lg text-on-surface mb-8 pb-4 border-b border-outline-variant/50 uppercase tracking-tight">{lang === 'en' ? 'Edit Template' : 'Şablonu Düzenle'}</h3>
             
             <div className="mb-6">
               <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
@@ -192,7 +192,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
               </label>
               <input 
                 type="text" 
-                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md" 
+                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md" 
                 value={selectedTemplate.name || ""} 
                 onChange={(e) => handleUpdateTemplate({ name: e.target.value })} 
               />
@@ -201,7 +201,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
             <div className="mb-6">
               <label className="block text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">{lang === 'en' ? 'Description' : 'Açıklama'}</label>
               <textarea 
-                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md resize-y" 
+                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md resize-y" 
                 rows={2}
                 value={selectedTemplate.description || ""} 
                 onChange={(e) => handleUpdateTemplate({ description: e.target.value })} 
@@ -233,7 +233,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
 
               <div className="flex flex-col gap-3">
                 {blocks.length === 0 ? (
-                  <div className="p-8 text-center text-on-surface-variant font-body-md border border-dashed border-outline-variant/50 bg-surface-container-lowest/30 rounded-sm">
+                  <div className="p-5 text-center text-on-surface-variant font-body-md border border-dashed border-outline-variant/50 bg-surface-container-lowest/30 rounded-sm">
                     {lang === 'en' ? 'No roles added yet. Start by adding a header or a role.' : 'Henüz rol eklenmedi. Başlık veya rol ekleyerek başlayın.'}
                   </div>
                 ) : blocks.map((block, index) => (

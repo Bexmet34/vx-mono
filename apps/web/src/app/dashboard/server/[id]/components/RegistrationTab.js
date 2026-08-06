@@ -117,7 +117,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
   // Premium lock block rendering helper
   const renderPremiumLock = (title, desc) => {
     return (
-      <div className="bg-gradient-to-br from-primary-container/10 to-primary-container/5 border border-primary-container/20 rounded-lg p-8 flex flex-col items-center text-center gap-4 my-4 animate-slide-up relative overflow-hidden">
+      <div className="bg-gradient-to-br from-primary-container/10 to-primary-container/5 border border-primary-container/20 rounded-lg p-5 flex flex-col items-center text-center gap-3 my-4 animate-slide-up relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-transparent via-primary-container/50 to-transparent"></div>
         <div className="w-12 h-12 bg-primary-container/15 rounded-full flex items-center justify-center text-primary-container">
           <Crown size={24} className="animate-pulse" />
@@ -141,7 +141,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
   };
 
   return (
-    <div className="flex flex-col gap-6 animate-slide-up">
+    <div className="flex flex-col gap-3 animate-slide-up">
       {/* Sub-tab Navigation */}
       <div className="flex flex-wrap gap-2 border-b border-outline-variant/30 pb-4 mb-4">
         {[
@@ -174,9 +174,9 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
 
       {/* SUBTAB 1: Core Settings */}
       {subTab === "core" && (
-        <div className="glass-panel p-8 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors space-y-6">
+        <div className="glass-panel p-5 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors space-y-6">
           <div>
-            <h2 className="font-headline-lg text-2xl text-on-surface mb-2 flex items-center gap-3 uppercase tracking-tight">
+            <h2 className="font-headline-lg text-lg text-on-surface mb-2 flex items-center gap-3 uppercase tracking-tight">
               <Settings className="text-primary-container" />
               {lang === 'en' ? 'Core Registration Settings' : 'Ana Kayıt Ayarları'}
             </h2>
@@ -187,13 +187,13 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-outline-variant/20">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-4 border-t border-outline-variant/20">
             <div>
               <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
                 {lang === 'en' ? 'Enable Registration System' : 'Kayıt Sistemini Aktifleştir'}
                 <InfoTooltip text={lang === 'en' ? 'Turn the entire registration system on or off.' : 'Tüm kayıt sistemini açıp kapatmanızı sağlar.'} />
               </label>
-              <div className="flex items-center gap-4 mt-2">
+              <div className="flex items-center gap-3 mt-2">
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
@@ -217,7 +217,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                 <InfoTooltip text={lang === 'en' ? 'The channel where the "Register" button message will be sent.' : '"Kayıt Ol" butonunun bulunacağı sabit mesajın gönderileceği kanal.'} />
               </label>
               <select
-                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
                 value={settings.registration_channel_id || ""}
                 onChange={(e) => setSettings({ ...settings, registration_channel_id: e.target.value })}
               >
@@ -234,7 +234,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                 <InfoTooltip text={lang === 'en' ? 'The Discord category where private registration tickets will be created.' : 'Kullanıcılar kayıt butonuna bastığında açılacak özel kanalların (ticket) oluşturulacağı kategori.'} />
               </label>
               <select
-                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
                 value={settings.registration_category_id || ""}
                 onChange={(e) => setSettings({ ...settings, registration_category_id: e.target.value })}
               >
@@ -251,7 +251,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                 <InfoTooltip text={lang === 'en' ? 'The role allowed to see, review, and approve registration tickets.' : 'Kayıt kanallarını (ticket) görebilecek ve onaylayabilecek yetkili rolü.'} />
               </label>
               <select
-                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
                 value={settings.registration_staff_role_ids || ""}
                 onChange={(e) => setSettings({ ...settings, registration_staff_role_ids: e.target.value })}
               >
@@ -270,7 +270,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
               <input
                 type="text"
                 maxLength="5"
-                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md uppercase"
+                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md uppercase"
                 placeholder={lang === 'en' ? 'e.g. TAG (Brackets added automatically)' : 'Örn: TAG ([] parantezleri sistem ekler)'}
                 value={settings.auto_check_guild_tag || ""}
                 onChange={(e) => setSettings({ ...settings, auto_check_guild_tag: e.target.value.replace(/[\[\]]/g, '') })}
@@ -289,9 +289,9 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
 
       {/* SUBTAB 2: Roles Setup */}
       {subTab === "roles" && (
-        <div className="glass-panel p-8 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors space-y-6">
+        <div className="glass-panel p-5 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors space-y-6">
           <div>
-            <h2 className="font-headline-lg text-2xl text-on-surface mb-2 flex items-center gap-3 uppercase tracking-tight">
+            <h2 className="font-headline-lg text-lg text-on-surface mb-2 flex items-center gap-3 uppercase tracking-tight">
               <Tag className="text-primary-container" />
               {lang === 'en' ? 'Role Settings' : 'Rol Ayarları'}
             </h2>
@@ -308,7 +308,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                 {lang === 'en' ? 'Approval Given Roles' : 'Kayıt Onayında Verilecek Roller'}
               </h3>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {[...Array(visibleRoleCount)].map((_, i) => {
                   const roleKey = i === 0 ? 'registration_given_role_id' : `registration_given_role_id_${i + 1}`;
                   return (
@@ -328,7 +328,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                         )}
                       </label>
                       <select
-                        className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+                        className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
                         value={settings[roleKey] || ""}
                         onChange={(e) => setSettings({ ...settings, [roleKey]: e.target.value })}
                       >
@@ -384,7 +384,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                 {lang === 'en' ? 'Guest & Join Settings' : 'Misafir ve Giriş Rol Ayarları'}
               </h3>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {/* Temporary Guest Role with Premium Check */}
                 <div className={`p-5 rounded-lg border transition-all ${isPremium ? 'bg-surface-container/20 border-outline-variant/50' : 'bg-surface-container/5 border-outline-variant/20 opacity-90'}`}>
                   <div className="flex items-center justify-between mb-2">
@@ -406,7 +406,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                   {isPremium ? (
                     <>
                       <select
-                        className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md mb-4"
+                        className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md mb-4"
                         value={settings.registration_unregistered_role_id || ""}
                         onChange={(e) => setSettings({ ...settings, registration_unregistered_role_id: e.target.value })}
                       >
@@ -425,7 +425,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                             type="number"
                             min="1"
                             max="365"
-                            className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+                            className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
                             value={settings.registration_guest_role_duration || 7}
                             onChange={(e) => setSettings({ ...settings, registration_guest_role_duration: parseInt(e.target.value) || 7 })}
                           />
@@ -460,7 +460,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                       : 'Kullanıcı sunucuya katıldığında bot tarafından doğrudan verilecek varsayılan başlangıç rolü.'}
                   </p>
                   <select
-                    className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+                    className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
                     value={settings.auto_role_on_join_id || ""}
                     onChange={(e) => setSettings({ ...settings, auto_role_on_join_id: e.target.value })}
                   >
@@ -479,9 +479,9 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
 
       {/* SUBTAB 3: Welcome Messages & Logs */}
       {subTab === "messages" && (
-        <div className="glass-panel p-8 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors space-y-6">
+        <div className="glass-panel p-5 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors space-y-6">
           <div>
-            <h2 className="font-headline-lg text-2xl text-on-surface mb-2 flex items-center gap-3 uppercase tracking-tight">
+            <h2 className="font-headline-lg text-lg text-on-surface mb-2 flex items-center gap-3 uppercase tracking-tight">
               <MessageSquare className="text-primary-container" />
               {lang === 'en' ? 'Welcome & Log Messages' : 'Karşılama & Log Mesajları'}
             </h2>
@@ -494,7 +494,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
 
           {/* Welcome Message Config */}
           <div className="pt-6 border-t border-outline-variant/20 space-y-6">
-            <div className="bg-surface-container/20 p-6 rounded-lg border border-outline-variant/30 space-y-4">
+            <div className="bg-surface-container/20 p-4 rounded-lg border border-outline-variant/30 space-y-4">
               <h3 className="text-sm font-label-bold text-on-surface uppercase tracking-widest">
                 {lang === 'en' ? 'Register Button Setup' : 'Kayıt Ol Buton Kurulumu'}
               </h3>
@@ -505,7 +505,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                   <InfoTooltip text={lang === 'en' ? 'The text that appears above the Register button in the Welcome channel.' : 'Karşılama kanalındaki Kayıt Ol butonunun üzerinde yazacak açıklama metni.'} />
                 </label>
                 <textarea
-                  className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md resize-y"
+                  className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md resize-y"
                   rows={3}
                   placeholder={lang === 'en' ? 'Welcome! Click the button below to register.' : 'Hoşgeldiniz! Kayıt olmak için aşağıdaki butona tıklayın.'}
                   value={settings.registration_welcome_message || ""}
@@ -514,7 +514,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
               </div>
 
               <button 
-                className="w-full px-6 py-3.5 bg-primary-container text-on-primary font-label-bold uppercase tracking-widest tactical-glow rounded-sm transition-all hover:brightness-110 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed" 
+                className="w-full px-4 py-2 bg-primary-container text-on-primary font-label-bold uppercase tracking-widest tactical-glow rounded-sm transition-all hover:brightness-110 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed" 
                 onClick={handleSendSetup} 
                 disabled={!settings.registration_channel_id || sendingSetup}
               >
@@ -529,14 +529,14 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
             </div>
 
             {/* Post Registration logs */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-4">
               <div>
                 <label className="flex items-center text-xs font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
                   {lang === 'en' ? 'Log Channel' : 'Log Kanalı'}
                   <InfoTooltip text={lang === 'en' ? 'The channel where registration approvals and rejections will be logged.' : 'Kayıt onay veya red işlemlerinin loglanacağı (kaydedileceği) kanal.'} />
                 </label>
                 <select
-                  className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+                  className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
                   value={settings.registration_log_channel_id || ""}
                   onChange={(e) => setSettings({ ...settings, registration_log_channel_id: e.target.value })}
                 >
@@ -553,7 +553,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                   <InfoTooltip text={lang === 'en' ? 'The channel where a public welcome message is sent after successful registration.' : 'Kayıt işlemi başarıyla tamamlandıktan sonra herkese açık hoş geldin mesajının atılacağı kanal.'} />
                 </label>
                 <select
-                  className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+                  className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
                   value={settings.registration_welcome_channel_id || ""}
                   onChange={(e) => setSettings({ ...settings, registration_welcome_channel_id: e.target.value })}
                 >
@@ -570,7 +570,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                   <InfoTooltip text={lang === 'en' ? 'The text sent to the public welcome channel when a user registers.' : 'Bir kullanıcı kayıt olduğunda genel karşılama kanalına atılacak kutlama mesajı.'} />
                 </label>
                 <textarea
-                  className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md resize-y"
+                  className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md resize-y"
                   rows={3}
                   placeholder={lang === 'en' ? 'Welcome to the guild, {user} ({gamenickname})!' : 'Aramıza hoş geldin {user}! Oyun içi adın: {gamenickname}'}
                   value={settings.registration_welcome_message_text || ""}
@@ -588,7 +588,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                   <InfoTooltip text={lang === 'en' ? 'Custom message sent in the user\'s private ticket channel upon opening. E.g. Ask user for screenshot directly.' : 'Kayıt tamamlanıp kullanıcı için özel bilet kanalı açıldığında, kanal içerisine bot tarafından atılacak özel mesaj. Örneğin buradan kullanıcıdan resim/ekran görüntüsü isteyebilirsiniz.'} />
                 </label>
                 <textarea
-                  className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md resize-y"
+                  className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md resize-y"
                   rows={3}
                   placeholder="Hoş geldin {user}! Lütfen oyun içi profilinizin / giriş ekranınızın ekran görüntüsünü bu kanala yükleyin."
                   value={settings.registration_ticket_welcome_message_tr || ""}
@@ -606,7 +606,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                   <InfoTooltip text={lang === 'en' ? 'Custom message sent in the user\'s private ticket channel if server language is English.' : 'Sunucu dili İngilizce olduğunda özel bilet kanalında gösterilecek mesaj.'} />
                 </label>
                 <textarea
-                  className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md resize-y"
+                  className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md resize-y"
                   rows={3}
                   placeholder="Welcome {user}! Please upload a screenshot of your in-game profile to this channel."
                   value={settings.registration_ticket_welcome_message_en || ""}
@@ -623,9 +623,9 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
 
       {/* SUBTAB 4: Leave Check & Sync */}
       {subTab === "sync" && (
-        <div className="glass-panel p-8 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors space-y-6">
+        <div className="glass-panel p-5 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors space-y-6">
           <div>
-            <h2 className="font-headline-lg text-2xl text-on-surface mb-2 flex items-center gap-3 uppercase tracking-tight">
+            <h2 className="font-headline-lg text-lg text-on-surface mb-2 flex items-center gap-3 uppercase tracking-tight">
               <Users className="text-primary-container" />
               {lang === 'en' ? 'Guild Leave Check & Sync' : 'Ayrılık Kontrolü & Senkronizasyon'}
             </h2>
@@ -647,7 +647,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
             ) : (
               <>
                 {!settings.albion_guild_id && (
-                  <div className="glass-panel p-6 border border-error/50 bg-error/5 flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+                  <div className="glass-panel p-4 border border-error/50 bg-error/5 flex flex-col md:flex-row justify-between items-center gap-3 mb-6">
                     <div className="text-left">
                       <h3 className="font-headline-md text-lg text-error mb-2 flex items-center gap-2 uppercase tracking-tight">
                         <AlertTriangle size={20} /> {lang === 'en' ? 'Action Required' : 'İşlem Gerekiyor'}
@@ -664,14 +664,14 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                   </div>
                 )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="space-y-6">
                     <div>
                       <label className="flex items-center text-xs font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
                         {lang === 'en' ? 'Enable Auto-Check' : 'Sistemi Aktif Et'}
                         <InfoTooltip text={lang === 'en' ? 'Turn on the automatic guild roster checking system.' : 'Otomatik lonca oyuncu kontrol sistemini açıp kapatır.'} />
                       </label>
-                      <div className="flex items-center gap-4 mt-2">
+                      <div className="flex items-center gap-3 mt-2">
                         <label className="relative inline-flex items-center cursor-pointer">
                           <input
                             type="checkbox"
@@ -697,7 +697,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                         <input
                           type="number"
                           min="3"
-                          className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+                          className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
                           value={settings.auto_check_interval || 3}
                           onChange={(e) => {
                             let val = parseInt(e.target.value);
@@ -716,7 +716,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                         {lang === 'en' ? 'Role for Leavers' : "Guild'den Çıkanlara Verilecek Rol"}
                         <InfoTooltip text={lang === 'en' ? 'The role to give someone when they are detected as leaving the guild.' : 'Bir kişi loncadan ayrıldığında veya atıldığında ona verilecek Discord rolü.'} />
                       </label>
-                      <div className="flex items-center gap-4 mt-2">
+                      <div className="flex items-center gap-3 mt-2">
                         <label className="relative inline-flex items-center cursor-pointer">
                           <input
                             type="checkbox"
@@ -742,7 +742,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                       {settings.auto_check_custom_role_id && (
                         <div className="mt-4 animate-slide-up">
                           <select
-                            className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+                            className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
                             value={settings.auto_check_custom_role_id === "none" ? "" : settings.auto_check_custom_role_id}
                             onChange={(e) => setSettings({ ...settings, auto_check_custom_role_id: e.target.value })}
                           >
@@ -761,7 +761,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                         <InfoTooltip text={lang === 'en' ? 'The channel where auto-check removal notifications will be sent.' : 'Otomatik sistemin loncadan çıkanları tespit edip yetkilerini aldığına dair atacağı raporların kanalı.'} />
                       </label>
                       <select
-                        className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+                        className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
                         value={settings.auto_check_log_channel_id || ""}
                         onChange={(e) => setSettings({ ...settings, auto_check_log_channel_id: e.target.value })}
                       >
@@ -785,7 +785,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                           : '⚠️ Not: İşlem tamamen arka planda çalışır ve 15 dakikaya kadar sürebilir.'}</strong>
                       </p>
                       <button 
-                        className={`w-full px-6 py-4 font-label-bold uppercase tracking-widest rounded-sm transition-all flex items-center justify-center gap-2 text-xs ${settings.albion_guild_id ? ((syncing || settings.is_syncing) ? 'bg-primary-container/20 border border-primary-container/50 text-primary-container cursor-not-allowed' : 'bg-primary-container text-on-primary hover:brightness-110 tactical-glow cursor-pointer') : 'bg-surface-container border border-outline-variant text-on-surface-variant cursor-not-allowed'}`} 
+                        className={`w-full px-4 py-2.5 font-label-bold uppercase tracking-widest rounded-sm transition-all flex items-center justify-center gap-2 text-xs ${settings.albion_guild_id ? ((syncing || settings.is_syncing) ? 'bg-primary-container/20 border border-primary-container/50 text-primary-container cursor-not-allowed' : 'bg-primary-container text-on-primary hover:brightness-110 tactical-glow cursor-pointer') : 'bg-surface-container border border-outline-variant text-on-surface-variant cursor-not-allowed'}`} 
                         onClick={handleSync} 
                         disabled={syncing || settings.is_syncing || !settings.albion_guild_id}
                       >
@@ -819,9 +819,9 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
 
       {/* SUBTAB 5: Questionnaire with Premium Check */}
       {subTab === "questionnaire" && (
-        <div className="glass-panel p-8 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors space-y-6">
+        <div className="glass-panel p-5 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors space-y-6">
           <div>
-            <h2 className="font-headline-lg text-2xl text-on-surface mb-2 flex items-center gap-3 uppercase tracking-tight">
+            <h2 className="font-headline-lg text-lg text-on-surface mb-2 flex items-center gap-3 uppercase tracking-tight">
               <Layout className="text-primary-container" />
               {lang === 'en' ? 'Application Questionnaire' : 'Başvuru Anketi'}
             </h2>
@@ -865,14 +865,14 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                 </div>
 
                 {settings.application_enabled && (
-                  <div className="flex flex-col gap-8 pt-4 border-t border-outline-variant/20">
+                  <div className="flex flex-col gap-5 pt-4 border-t border-outline-variant/20">
                     {/* Guild Rules */}
                     <div className="bg-surface-container/20 p-5 border border-outline-variant/30 rounded-lg">
                       <label className="block text-xs font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
                         📜 {lang === 'en' ? 'Guild Rules Text (Optional)' : 'Guild Kuralları Metni (Opsiyonel)'}
                       </label>
                       <textarea
-                        className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md resize-y min-h-[120px]"
+                        className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md resize-y min-h-[120px]"
                         placeholder={lang === 'en'
                           ? 'e.g. No swearing, no harassment, no theft...\n\nDo you accept? Yes / No'
                           : 'Örn: Küfürlü konuşmamak önemlidir.\nAgresif tavırlar sergilememek...\n\nKabul ediyor musun?'}
@@ -925,9 +925,9 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                         </div>
                       )}
 
-                      <div className="flex flex-col gap-4">
+                      <div className="flex flex-col gap-3">
                         {(settings.application_questions || []).map((q, idx) => (
-                          <div key={q.id} className="bg-surface-container/30 border border-outline-variant/50 rounded-lg p-5 flex flex-col gap-4 relative group hover:border-primary-container/30 transition-all">
+                          <div key={q.id} className="bg-surface-container/30 border border-outline-variant/50 rounded-lg p-5 flex flex-col gap-3 relative group hover:border-primary-container/30 transition-all">
                             
                             {/* Sort & Delete */}
                             <div className="flex items-center justify-between">
@@ -965,7 +965,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                               </div>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                               {/* Question Type */}
                               <div>
                                 <label className="block text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest mb-1">

@@ -48,17 +48,17 @@ export default function TicketHistoryTab({ t, lang, guildId, showToast, isPremiu
   };
 
   return (
-    <div className="grid grid-cols-1 gap-8 animate-fade-in pb-12">
-      <div className="bg-surface-variant p-6 rounded-md border border-white/5 shadow-sm relative group">
+    <div className="grid grid-cols-1 gap-5 animate-fade-in pb-12">
+      <div className="bg-surface-variant p-4 rounded-md border border-white/5 shadow-sm relative group">
         <h3 className="font-headline-md text-lg text-on-surface mb-6 uppercase tracking-wider flex items-center gap-2">
           <MessageSquare className="text-primary-container" size={20}/> 
           {lang === 'tr' ? 'Kapatılmış Ticket Geçmişi' : 'Closed Ticket History'}
         </h3>
         
         {loading ? (
-           <div className="flex justify-center p-12 text-primary-container"><Loader2 size={32} className="animate-spin" /></div>
+           <div className="flex justify-center p-5 text-primary-container"><Loader2 size={32} className="animate-spin" /></div>
         ) : tickets.length === 0 ? (
-           <div className="flex flex-col items-center justify-center p-12 text-on-surface-variant bg-surface rounded border border-white/5">
+           <div className="flex flex-col items-center justify-center p-5 text-on-surface-variant bg-surface rounded border border-white/5">
               <MessageSquare size={48} className="opacity-20 mb-4" />
               <p>{lang === 'tr' ? 'Henüz kapatılmış bir ticket bulunmuyor.' : 'No closed tickets found yet.'}</p>
            </div>
@@ -110,7 +110,7 @@ export default function TicketHistoryTab({ t, lang, guildId, showToast, isPremiu
       </div>
 
       {selectedTranscript && (
-        <div className="fixed inset-0 bg-background/90 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 md:p-8 animate-fade-in">
+        <div className="fixed inset-0 bg-background/90 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 md:p-5 animate-fade-in">
            <div className="bg-[#313338] max-w-[800px] w-full max-h-[90vh] rounded-md shadow-2xl flex flex-col border border-white/10 relative overflow-hidden">
               <div className="p-4 border-b border-white/10 flex justify-between items-center bg-[#2b2d31]">
                  <div className="flex items-center gap-3">
@@ -124,10 +124,10 @@ export default function TicketHistoryTab({ t, lang, guildId, showToast, isPremiu
               </div>
               <div className="flex-1 overflow-y-auto p-4 custom-scrollbar space-y-4">
                  {!selectedTranscript.transcript || selectedTranscript.transcript.length === 0 ? (
-                    <div className="text-center text-gray-400 p-8">{lang === 'tr' ? 'Döküm verisi boş.' : 'Transcript is empty.'}</div>
+                    <div className="text-center text-gray-400 p-5">{lang === 'tr' ? 'Döküm verisi boş.' : 'Transcript is empty.'}</div>
                  ) : (
                     selectedTranscript.transcript.map((msg, idx) => (
-                       <div key={idx} className="flex gap-4 group hover:bg-[#2b2d31]/50 p-1 -mx-2 px-2 rounded">
+                       <div key={idx} className="flex gap-3 group hover:bg-[#2b2d31]/50 p-1 -mx-2 px-2 rounded">
                           <img src={msg.avatar || "https://cdn.discordapp.com/embed/avatars/0.png"} className="w-10 h-10 rounded-full mt-0.5 object-cover" alt="avatar" />
                           <div className="flex-1 min-w-0">
                              <div className="flex items-baseline gap-2 mb-1">

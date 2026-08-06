@@ -27,10 +27,10 @@ import GiveawayTab from "./components/GiveawayTab";
 
 function PremiumLock({ lang, t }) {
   return (
-    <div className="glass-panel p-12 text-center border border-primary-container/30 bg-primary-container/5 relative overflow-hidden animate-slide-up flex flex-col items-center justify-center min-h-[400px]">
+    <div className="glass-panel p-5 text-center border border-primary-container/30 bg-primary-container/5 relative overflow-hidden animate-slide-up flex flex-col items-center justify-center min-h-[400px]">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-primary-container/10 rounded-full blur-[80px] pointer-events-none"></div>
       <Crown size={64} className="text-primary-container mb-6 animate-pulse" />
-      <h2 className="font-headline-xl text-3xl text-on-surface mb-4 uppercase tracking-tight font-bold">
+      <h2 className="font-headline-xl text-lg text-on-surface mb-4 uppercase tracking-tight font-bold">
         {lang === 'tr' ? '👑 SUNUCU PREMİUM GEREKLİ' : '👑 GUILD PREMIUM REQUIRED'}
       </h2>
       <p className="font-body-lg text-on-surface-variant max-w-lg mb-8 leading-relaxed">
@@ -38,7 +38,7 @@ function PremiumLock({ lang, t }) {
           ? 'Bu özellik sunucu bazlı Premium paket gerektirmektedir. Bireysel oylama muafiyeti (Individual) bu özelliği kapsamaz. Sunucu Premium satın alarak bu özelliği ve diğer gelişmiş özellikleri sunucunuzda aktifleştirebilirsiniz.'
           : 'This feature requires a server-level Guild Premium package. Individual vote bypass (Individual) does not cover this feature. Purchase Guild Premium to unlock this and other advanced features for your server.'}
       </p>
-      <div className="flex gap-4">
+      <div className="flex gap-3">
         <a 
           href="https://veyronix.com.tr" 
           target="_blank" 
@@ -478,7 +478,7 @@ export default function ServerSettings() {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-primary-container/10 rounded-full blur-[100px] pointer-events-none"></div>
       
       {/* Simple Full Page Content */}
-      <div className="relative z-10 flex flex-col items-center gap-6">
+      <div className="relative z-10 flex flex-col items-center gap-3">
         {/* Simple Pulsing Icon */}
         <div className="flex items-center justify-center text-primary-container animate-pulse drop-shadow-[0_0_20px_rgba(252,163,17,0.5)]">
           <Logo className="w-32 h-32" />
@@ -486,7 +486,7 @@ export default function ServerSettings() {
 
         {/* Loading Text */}
         <div className="text-center space-y-2">
-          <h2 className="font-headline-md text-lg md:text-xl text-on-surface uppercase tracking-widest flex items-center justify-center gap-2">
+          <h2 className="font-headline-md text-lg md:text-lg text-on-surface uppercase tracking-widest flex items-center justify-center gap-2">
             {lang === 'en' ? 'Summoning Server Data' : 'Sunucu Verileri Çağrılıyor'}
             <span className="flex gap-1 ml-1">
               <span className="w-1.5 h-1.5 bg-primary-container rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
@@ -544,12 +544,12 @@ export default function ServerSettings() {
 
       <main className="flex-1 w-full max-w-[1200px] mx-auto px-4 md:px-8 py-10 pb-32 flex flex-col">
         <header className="flex flex-col md:flex-row items-center md:items-end justify-between mb-12 pb-8 border-b border-outline-variant/50">
-          <div className="flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
-            <div className="w-24 h-24 rounded-2xl bg-surface border border-outline-variant flex items-center justify-center text-3xl font-headline-xl text-primary-container shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
+          <div className="flex flex-col md:flex-row items-center gap-3 text-center md:text-left">
+            <div className="w-24 h-24 rounded-2xl bg-surface border border-outline-variant flex items-center justify-center text-lg font-headline-xl text-primary-container shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
               {guildDetail?.Name?.charAt(0) || guildId.charAt(0).toUpperCase()}
             </div>
             <div>
-              <h1 className="font-headline-xl text-3xl md:text-5xl text-on-surface mb-2 uppercase tracking-tight">{guildDetail?.Name || 'Server Settings'}</h1>
+              <h1 className="font-headline-xl text-lg md:text-5xl text-on-surface mb-2 uppercase tracking-tight">{guildDetail?.Name || 'Server Settings'}</h1>
               <div className="flex items-center justify-center md:justify-start gap-2 text-on-surface-variant font-label-bold uppercase tracking-widest text-sm">
                  <Shield size={16} className="text-primary-container" /> Administrator Access
               </div>
@@ -610,12 +610,12 @@ export default function ServerSettings() {
 
       {/* Unsaved Changes Banner */}
       {hasChanges && (
-        <div className="fixed bottom-0 left-0 right-0 bg-surface-container-highest/95 border-t border-primary-container p-4 md:p-6 z-[1000] flex flex-col md:flex-row justify-center items-center gap-4 md:gap-12 backdrop-blur-xl animate-slide-up shadow-[0_-10px_40px_rgba(255,215,0,0.1)]">
+        <div className="fixed bottom-0 left-0 right-0 bg-surface-container-highest/95 border-t border-primary-container p-4 md:p-4 z-[1000] flex flex-col md:flex-row justify-center items-center gap-3 md:gap-12 backdrop-blur-xl animate-slide-up shadow-[0_-10px_40px_rgba(255,215,0,0.1)]">
           <div className="text-on-surface font-label-bold text-sm md:text-lg flex items-center gap-2 md:gap-3 uppercase tracking-widest text-center">
              <AlertTriangle size={20} className="text-primary-container hidden md:block" />
              {lang === 'en' ? 'You have unsaved changes!' : 'Kaydedilmemiş değişiklikleriniz var!'}
           </div>
-          <div className="flex gap-2 md:gap-4 w-full md:w-auto">
+          <div className="flex gap-2 md:gap-3 w-full md:w-auto">
             <button onClick={() => setSettings(initialSettings)} className="flex-1 md:flex-none px-4 md:px-8 py-3 md:py-3 bg-transparent border border-outline-variant text-on-surface-variant hover:text-on-surface hover:border-outline rounded-sm font-label-bold text-xs md:text-sm uppercase tracking-widest transition-all text-center">
               {lang === 'en' ? 'Discard' : 'İptal Et'}
             </button>
@@ -628,14 +628,14 @@ export default function ServerSettings() {
       )}
 
       {imageToCrop && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-8">
-           <div className="glass-panel max-w-[600px] w-full p-8 border border-primary-container relative">
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-5">
+           <div className="glass-panel max-w-[600px] w-full p-5 border border-primary-container relative">
               <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-right from-transparent via-primary-container to-transparent opacity-50"></div>
-              <h2 className="font-headline-lg text-2xl text-on-surface mb-6 flex items-center gap-3 uppercase tracking-tight"><Crop size={24} className="text-primary-container"/> Crop Logo</h2>
+              <h2 className="font-headline-lg text-lg text-on-surface mb-6 flex items-center gap-3 uppercase tracking-tight"><Crop size={24} className="text-primary-container"/> Crop Logo</h2>
               <div className="h-[400px] relative bg-black rounded-sm overflow-hidden mb-8 border border-outline-variant">
                  <Cropper image={imageToCrop} crop={crop} zoom={zoom} aspect={1} onCropChange={setCrop} onCropComplete={onCropComplete} onZoomChange={setZoom} />
               </div>
-              <div className="flex justify-end gap-4">
+              <div className="flex justify-end gap-3">
                  <button className="px-6 py-3 bg-transparent border border-outline-variant text-on-surface-variant hover:text-on-surface hover:border-outline transition-colors font-label-bold uppercase tracking-widest rounded-sm" onClick={() => setImageToCrop(null)}>Cancel</button>
                  <button className="px-6 py-3 bg-primary-container text-on-primary font-label-bold uppercase tracking-widest tactical-glow rounded-sm transition-all hover:brightness-110 disabled:opacity-50" onClick={uploadCroppedImage} disabled={uploadingThumb}>Apply & Upload</button>
               </div>

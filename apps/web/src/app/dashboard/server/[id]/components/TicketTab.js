@@ -90,9 +90,9 @@ export default function TicketTab({ t, lang, settings, setSettings, discordChann
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fade-in pb-12">
-      <div className="col-span-1 lg:col-span-4 flex flex-col gap-6">
-        <div className="bg-surface-variant p-6 rounded-md border border-white/5 shadow-sm relative group overflow-hidden">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 animate-fade-in pb-12">
+      <div className="col-span-1 lg:col-span-4 flex flex-col gap-3">
+        <div className="bg-surface-variant p-4 rounded-md border border-white/5 shadow-sm relative group overflow-hidden">
           <div className="absolute -inset-0.5 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
           
           <h3 className="font-headline-md text-lg text-on-surface mb-6 uppercase tracking-wider flex items-center gap-2">
@@ -120,7 +120,7 @@ export default function TicketTab({ t, lang, settings, setSettings, discordChann
           </button>
         </div>
 
-        <div className="bg-surface-variant p-6 rounded-md border border-white/5 shadow-sm relative group">
+        <div className="bg-surface-variant p-4 rounded-md border border-white/5 shadow-sm relative group">
           <div className="absolute -inset-0.5 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
           <h3 className="font-headline-md text-lg text-on-surface mb-6 uppercase tracking-wider flex items-center gap-2">
              <Hash className="text-primary-container" size={20}/> 
@@ -164,7 +164,7 @@ export default function TicketTab({ t, lang, settings, setSettings, discordChann
           </div>
         </div>
 
-        <div className="bg-surface-variant p-6 rounded-md border border-white/5 shadow-sm relative group">
+        <div className="bg-surface-variant p-4 rounded-md border border-white/5 shadow-sm relative group">
             <h3 className="font-headline-md text-lg text-on-surface mb-6 uppercase tracking-wider flex items-center gap-2">
                <Users className="text-primary-container" size={20}/> 
                {lang === 'tr' ? 'Yetkili Roller' : 'Staff Roles'}
@@ -226,8 +226,8 @@ export default function TicketTab({ t, lang, settings, setSettings, discordChann
         </div>
       </div>
 
-      <div className="col-span-1 lg:col-span-8 flex flex-col gap-6">
-        <div className="bg-surface-variant p-6 rounded-md border border-white/5 shadow-sm relative group">
+      <div className="col-span-1 lg:col-span-8 flex flex-col gap-3">
+        <div className="bg-surface-variant p-4 rounded-md border border-white/5 shadow-sm relative group">
             <h3 className="font-headline-md text-lg text-on-surface mb-6 uppercase tracking-wider flex items-center gap-2">
                <Info className="text-primary-container" size={20}/> 
                {lang === 'tr' ? 'Panel Mesajı Ayarları' : 'Panel Message Settings'}
@@ -258,7 +258,7 @@ export default function TicketTab({ t, lang, settings, setSettings, discordChann
             </div>
         </div>
 
-        <div className="bg-surface-variant p-6 rounded-md border border-white/5 shadow-sm relative group">
+        <div className="bg-surface-variant p-4 rounded-md border border-white/5 shadow-sm relative group">
             <div className="flex justify-between items-center mb-6">
                 <h3 className="font-headline-md text-lg text-on-surface uppercase tracking-wider flex items-center gap-2">
                 <Search className="text-primary-container" size={20}/> 
@@ -314,7 +314,7 @@ export default function TicketTab({ t, lang, settings, setSettings, discordChann
                     </div>
                 ))}
                 {(!settings.ticket_options || settings.ticket_options.length === 0) && (
-                    <div className="text-center p-6 text-on-surface-variant bg-surface border border-white/5 rounded">
+                    <div className="text-center p-4 text-on-surface-variant bg-surface border border-white/5 rounded">
                         {lang === 'tr' ? 'Henüz hiçbir konu eklenmemiş.' : 'No topics added yet.'}
                     </div>
                 )}

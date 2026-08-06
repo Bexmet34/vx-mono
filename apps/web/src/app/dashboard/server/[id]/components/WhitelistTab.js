@@ -33,16 +33,16 @@ export default function WhitelistTab({ t, settings, setSettings, whitelistAddTab
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-12 gap-6 animate-slide-up">
-      <div className="glass-panel p-8 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors md:col-span-7">
-        <h2 className="font-headline-lg text-2xl text-on-surface mb-2 flex items-center gap-3 uppercase tracking-tight">
+    <div className="grid grid-cols-1 md:grid-cols-12 gap-3 animate-slide-up">
+      <div className="glass-panel p-5 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors md:col-span-7">
+        <h2 className="font-headline-lg text-lg text-on-surface mb-2 flex items-center gap-3 uppercase tracking-tight">
           <Users className="text-primary-container" /> Active Whitelist
           <InfoTooltip text={lang === 'en' ? 'Only the users and roles listed here will be able to use restricted commands like /createparty.' : 'Sadece burada listelenen kullanıcılar veya roller /createparty gibi komutları kullanabilir.'} />
         </h2>
         <p className="font-body-md text-on-surface-variant mb-6">Users or roles listed here can use restricted commands like /createparty.</p>
 
         {safeWhitelist.length === 0 ? (
-          <div className="text-center p-12 bg-surface-container-highest border border-outline-variant rounded-sm text-on-surface-variant font-body-md">
+          <div className="text-center p-5 bg-surface-container-highest border border-outline-variant rounded-sm text-on-surface-variant font-body-md">
             No whitelist entries. Everyone can use commands.
           </div>
         ) : (
@@ -65,8 +65,8 @@ export default function WhitelistTab({ t, settings, setSettings, whitelistAddTab
         )}
       </div>
 
-      <div className="glass-panel p-8 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors md:col-span-5">
-        <h3 className="font-headline-md text-xl text-on-surface mb-6 flex items-center uppercase tracking-tight">
+      <div className="glass-panel p-5 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors md:col-span-5">
+        <h3 className="font-headline-md text-lg text-on-surface mb-6 flex items-center uppercase tracking-tight">
           Add New Entry
           <InfoTooltip text={lang === 'en' ? 'Search for a Discord role or user to add them to the whitelist.' : 'Beyaz listeye eklemek için bir Discord rolü veya kullanıcı arayın.'} />
         </h3>
@@ -77,7 +77,7 @@ export default function WhitelistTab({ t, settings, setSettings, whitelistAddTab
 
         <input
           type="text"
-          className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md mb-4"
+          className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md mb-4"
           placeholder="Search..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}

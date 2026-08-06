@@ -104,13 +104,13 @@ export default function GiveawayTab({ t, lang, guildId, discordChannels, discord
   return (
     <div className="space-y-8">
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-pink-900/40 via-purple-900/30 to-slate-900/50 p-6 rounded-2xl border border-pink-500/20 shadow-xl backdrop-blur-md">
-        <div className="flex items-center gap-4">
+      <div className="bg-gradient-to-r from-pink-900/40 via-purple-900/30 to-slate-900/50 p-4 rounded-2xl border border-pink-500/20 shadow-xl backdrop-blur-md">
+        <div className="flex items-center gap-3">
           <div className="p-3 bg-pink-500/20 rounded-xl border border-pink-500/30 text-pink-400">
             <Gift className="w-8 h-8" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-white tracking-wide">
+            <h2 className="text-lg font-bold text-white tracking-wide">
               {lang === "tr" ? "🎁 Çekiliş Yönetimi" : "🎁 Giveaway Management"}
             </h2>
             <p className="text-slate-400 text-sm mt-1">
@@ -123,14 +123,14 @@ export default function GiveawayTab({ t, lang, guildId, discordChannels, discord
       </div>
 
       {/* Form: Create Giveaway */}
-      <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-6 shadow-lg backdrop-blur-md">
+      <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-4 shadow-lg backdrop-blur-md">
         <h3 className="text-lg font-semibold text-white flex items-center gap-2 mb-6">
           <Plus className="w-5 h-5 text-pink-400" />
           {lang === "tr" ? "Yeni Çekiliş Oluştur" : "Start New Giveaway"}
         </h3>
 
         <form onSubmit={handleCreate} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {/* Title */}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
@@ -142,7 +142,7 @@ export default function GiveawayTab({ t, lang, guildId, discordChannels, discord
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder={lang === "tr" ? "Örn: 10M Silver & VIP Rolü" : "e.g. 10M Silver & VIP Role"}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-pink-500 transition-colors"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-pink-500 transition-colors"
               />
             </div>
 
@@ -155,7 +155,7 @@ export default function GiveawayTab({ t, lang, guildId, discordChannels, discord
                 required
                 value={channelId}
                 onChange={(e) => setChannelId(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-pink-500 transition-colors"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-pink-500 transition-colors"
               >
                 <option value="">{lang === "tr" ? "-- Kanal Seçin --" : "-- Select Channel --"}</option>
                 {textChannels.map((c) => (
@@ -177,11 +177,11 @@ export default function GiveawayTab({ t, lang, guildId, discordChannels, discord
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder={lang === "tr" ? "Çekiliş detaylarını yazın..." : "Write giveaway details..."}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-pink-500 transition-colors"
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-pink-500 transition-colors"
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {/* Duration */}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
@@ -190,7 +190,7 @@ export default function GiveawayTab({ t, lang, guildId, discordChannels, discord
               <select
                 value={durationHours}
                 onChange={(e) => setDurationHours(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-pink-500 transition-colors"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-pink-500 transition-colors"
               >
                 <option value="1">{lang === "tr" ? "1 Saat" : "1 Hour"}</option>
                 <option value="6">{lang === "tr" ? "6 Saat" : "6 Hours"}</option>
@@ -212,7 +212,7 @@ export default function GiveawayTab({ t, lang, guildId, discordChannels, discord
                 max={10}
                 value={winnerCount}
                 onChange={(e) => setWinnerCount(parseInt(e.target.value, 10) || 1)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-pink-500 transition-colors"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-pink-500 transition-colors"
               />
             </div>
 
@@ -227,7 +227,7 @@ export default function GiveawayTab({ t, lang, guildId, discordChannels, discord
                 max={5}
                 value={backupCount}
                 onChange={(e) => setBackupCount(parseInt(e.target.value, 10) || 0)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-pink-500 transition-colors"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-pink-500 transition-colors"
               />
             </div>
           </div>
@@ -277,24 +277,24 @@ export default function GiveawayTab({ t, lang, guildId, discordChannels, discord
       </div>
 
       {/* Active Giveaways List */}
-      <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-6 shadow-lg backdrop-blur-md">
+      <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-4 shadow-lg backdrop-blur-md">
         <h3 className="text-lg font-semibold text-white flex items-center gap-2 mb-6">
           <Clock className="w-5 h-5 text-amber-400" />
           {lang === "tr" ? "Aktif Çekilişler" : "Active Giveaways"} ({activeGiveaways.length})
         </h3>
 
         {loading ? (
-          <div className="flex items-center justify-center p-8 text-slate-400">
+          <div className="flex items-center justify-center p-5 text-slate-400">
             <Loader2 className="w-6 h-6 animate-spin mr-2" />
             {lang === "tr" ? "Yükleniyor..." : "Loading..."}
           </div>
         ) : activeGiveaways.length === 0 ? (
-          <div className="text-center p-8 text-slate-500 bg-slate-950/40 rounded-xl border border-slate-800/50">
+          <div className="text-center p-5 text-slate-500 bg-slate-950/40 rounded-xl border border-slate-800/50">
             <Gift className="w-10 h-10 mx-auto mb-2 opacity-40" />
             <p className="text-sm">{lang === "tr" ? "Şu an aktif çekiliş yok." : "No active giveaways right now."}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {activeGiveaways.map((g) => (
               <div key={g.id} className="bg-slate-950 p-5 rounded-xl border border-slate-800 flex flex-col justify-between">
                 <div>
@@ -305,7 +305,7 @@ export default function GiveawayTab({ t, lang, guildId, discordChannels, discord
                     </span>
                   </div>
                   <p className="text-xs text-slate-400 mt-2 line-clamp-2">{g.description || "-"}</p>
-                  <div className="flex items-center gap-4 text-xs text-slate-400 mt-4">
+                  <div className="flex items-center gap-3 text-xs text-slate-400 mt-4">
                     <span className="flex items-center gap-1">
                       <Users className="w-3.5 h-3.5 text-pink-400" /> {g.winner_count} Kazanan
                     </span>
@@ -329,14 +329,14 @@ export default function GiveawayTab({ t, lang, guildId, discordChannels, discord
       </div>
 
       {/* Ended Giveaways List */}
-      <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-6 shadow-lg backdrop-blur-md">
+      <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-4 shadow-lg backdrop-blur-md">
         <h3 className="text-lg font-semibold text-white flex items-center gap-2 mb-6">
           <CheckCircle2 className="w-5 h-5 text-emerald-400" />
           {lang === "tr" ? "Sonuçlanan Çekilişler" : "Ended Giveaways"} ({endedGiveaways.length})
         </h3>
 
         {endedGiveaways.length === 0 ? (
-          <div className="text-center p-6 text-slate-500 bg-slate-950/40 rounded-xl border border-slate-800/50">
+          <div className="text-center p-4 text-slate-500 bg-slate-950/40 rounded-xl border border-slate-800/50">
             <p className="text-sm">{lang === "tr" ? "Henüz bitmiş çekiliş yok." : "No ended giveaways yet."}</p>
           </div>
         ) : (

@@ -89,18 +89,18 @@ export default function GeneralTab({
   ).slice(0, 5);
 
   return (
-    <div className="grid grid-cols-1 gap-6 animate-slide-up pb-10">
-      <div className="glass-panel p-8 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
-        <h2 className="font-headline-lg text-2xl text-on-surface mb-6 flex items-center gap-3 uppercase tracking-tight"><Layout className="text-primary-container" /> {t.dGeneral}</h2>
+    <div className="grid grid-cols-1 gap-3 animate-slide-up pb-10">
+      <div className="glass-panel p-5 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
+        <h2 className="font-headline-lg text-lg text-on-surface mb-6 flex items-center gap-3 uppercase tracking-tight"><Layout className="text-primary-container" /> {t.dGeneral}</h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
             <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
               {t.dLangLabel}
               <InfoTooltip text={lang === 'en' ? 'Determines the main language the bot uses when sending messages in your server.' : 'Botun sunucunuzda mesaj atarken kullanacağı ana dili belirler.'} />
             </label>
             <select
-              className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+              className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
               value={settings.language || "tr"}
               onChange={(e) => setSettings({ ...settings, language: e.target.value })}
             >
@@ -112,18 +112,18 @@ export default function GeneralTab({
       </div>
 
       {/* Content System Settings */}
-      <div className="glass-panel p-8 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors mt-4">
-        <h2 className="font-headline-lg text-2xl text-on-surface mb-6 flex items-center gap-3 uppercase tracking-tight">
+      <div className="glass-panel p-5 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors mt-4">
+        <h2 className="font-headline-lg text-lg text-on-surface mb-6 flex items-center gap-3 uppercase tracking-tight">
           <Layout className="text-primary-container" /> {lang === 'tr' ? 'Content Sistemi Ayarları' : 'Content System Settings'}
         </h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
           <div>
             <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
               {lang === 'tr' ? 'Sistem Modu Seçimi' : 'System Mode Selection'}
             </label>
             <select
-              className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+              className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
               value={settings.system_mode || "command"}
               onChange={(e) => setSettings({ ...settings, system_mode: e.target.value })}
             >
@@ -138,7 +138,7 @@ export default function GeneralTab({
               <InfoTooltip text={lang === 'tr' ? 'Oluşturulma tarihinin üzerinden bu süre geçen Content kanalları otomatik silinir.' : 'Party channels older than this duration will be deleted automatically.'} />
             </label>
             <select
-              className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+              className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
               value={settings.auto_delete_party_hours || 0}
               onChange={(e) => setSettings({ ...settings, auto_delete_party_hours: parseInt(e.target.value) })}
             >
@@ -153,14 +153,14 @@ export default function GeneralTab({
         </div>
 
         {settings.system_mode === 'fixed_channel' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-slide-down">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 animate-slide-down">
             <div>
               <label className="flex items-center text-sm font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
                 {lang === 'tr' ? 'Sabit Mesaj Kanalı' : 'Fixed Message Channel'}
                 <InfoTooltip text={lang === 'tr' ? 'Sabit butonlu mesajın atılacağı kanal.' : 'The channel where the fixed message will be sent.'} />
               </label>
               <select
-                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
                 value={settings.fixed_message_channel_id || ""}
                 onChange={(e) => setSettings({ ...settings, fixed_message_channel_id: e.target.value })}
               >
@@ -177,7 +177,7 @@ export default function GeneralTab({
                 <InfoTooltip text={lang === 'tr' ? 'Yeni açılacak content kanallarının konulacağı kategori.' : 'Category where new content channels will be created.'} />
               </label>
               <select
-                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
                 value={settings.target_category_id || ""}
                 onChange={(e) => setSettings({ ...settings, target_category_id: e.target.value })}
               >
@@ -193,7 +193,7 @@ export default function GeneralTab({
                 {lang === 'tr' ? 'Kanal İsim Formatı' : 'Channel Name Format'}
               </label>
               <select
-                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
                 value={settings.channel_name_format || "name_title"}
                 onChange={(e) => setSettings({ ...settings, channel_name_format: e.target.value })}
               >
@@ -209,7 +209,7 @@ export default function GeneralTab({
                 {lang === 'tr' ? 'Sabit Mesaj İçeriği' : 'Fixed Message Content'}
               </label>
               <textarea
-                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md h-24 custom-scrollbar"
+                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md h-24 custom-scrollbar"
                 placeholder={lang === 'tr' ? "Lütfen bir parti oluşturmak için aşağıdaki butonları kullanın..." : "Please use the buttons below to create a party..."}
                 value={settings.fixed_message_content || ""}
                 onChange={(e) => setSettings({ ...settings, fixed_message_content: e.target.value })}
@@ -234,18 +234,18 @@ export default function GeneralTab({
       </div>
 
       {/* Search & Select Guild - Moved from Killboard */}
-      <div className="glass-panel p-8 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
-        <h2 className="font-headline-lg text-2xl text-on-surface mb-2 flex items-center gap-3 uppercase tracking-tight">
+      <div className="glass-panel p-5 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
+        <h2 className="font-headline-lg text-lg text-on-surface mb-2 flex items-center gap-3 uppercase tracking-tight">
           <Sword className="text-primary-container" /> Albion Guild Configuration
           <InfoTooltip text={lang === 'en' ? 'Search and link your Albion Online Guild. This is required for Killboard and Auto-Check features to work globally.' : 'Albion Online Loncanızı arayıp bağlayın. Killboard ve Otomatik Kontrol özelliklerinin çalışması için bu zorunludur.'} />
         </h2>
         <p className="font-body-md text-on-surface-variant mb-6">Search and link your Albion Online Guild to be used globally across all features.</p>
 
         {settings.albion_guild_id && guildDetail ? (
-          <div className="bg-primary-container/5 border border-primary-container/50 rounded-sm p-6 mb-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="bg-primary-container/5 border border-primary-container/50 rounded-sm p-4 mb-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
              <div>
                <div className="text-xs font-label-bold text-primary-container uppercase tracking-widest mb-1">Active Guild</div>
-               <div className="text-2xl font-headline-lg text-on-surface">
+               <div className="text-lg font-headline-lg text-on-surface">
                  {guildDetail.AllianceTag ? `[${guildDetail.AllianceTag}] ` : ''}{guildDetail.Name}
                </div>
                <div className="text-sm font-body-md text-on-surface-variant mt-1">
@@ -264,7 +264,7 @@ export default function GeneralTab({
             <div className="flex flex-col md:flex-row gap-3 mb-4">
               <div className="w-full md:w-1/4">
                 <select
-                  className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+                  className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
                   value={settings.albion_server || "Europe"}
                   onChange={(e) => setSettings({ ...settings, albion_server: e.target.value })}
                 >
@@ -276,7 +276,7 @@ export default function GeneralTab({
               <div className="flex-1 flex gap-2">
                 <input 
                   type="text" 
-                  className="flex-1 bg-surface-container-high border border-outline-variant rounded-sm px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md" 
+                  className="flex-1 bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md" 
                   placeholder="Enter Albion Guild Name..."
                   value={guildSearchQuery}
                   onChange={(e) => setGuildSearchQuery(e.target.value)}
@@ -296,7 +296,7 @@ export default function GeneralTab({
                     className="flex flex-col p-4 hover:bg-white/5 cursor-pointer border-b border-outline-variant/30 last:border-0 transition-colors rounded-sm" 
                     onClick={() => handleSelectGuild(g)}
                   >
-                    <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center justify-between gap-3">
                       <div className="font-label-bold text-on-surface text-base flex items-center gap-2">
                         {g.AllianceTag ? <span className="text-primary-container">[{g.AllianceTag}]</span> : null}
                         <span>{g.Name}</span>
@@ -321,8 +321,8 @@ export default function GeneralTab({
 
       {/* Admin Management Box (Only visible to OWNER) */}
       {isOwner && (
-        <div className="glass-panel p-8 relative overflow-visible border-t-4 border-t-error mt-4">
-           <h3 className="font-headline-md text-xl text-error mb-2 uppercase tracking-tight flex items-center gap-2">
+        <div className="glass-panel p-5 relative overflow-visible border-t-4 border-t-error mt-4">
+           <h3 className="font-headline-md text-lg text-error mb-2 uppercase tracking-tight flex items-center gap-2">
             <ShieldAlert size={24} /> {lang === 'tr' ? 'Yöneticiler (Sadece Size Görünür)' : 'Administrators (Only Visible to You)'}
            </h3>
            <p className="text-on-surface-variant text-sm mb-6">
@@ -331,7 +331,7 @@ export default function GeneralTab({
                : 'People added here can log into the web dashboard just like you and change all bot settings. They cannot see this tab.'}
            </p>
 
-           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
              {/* Add Admin */}
              <div>
                 <h4 className="font-label-bold text-on-surface mb-3 uppercase text-sm tracking-widest">
@@ -423,10 +423,10 @@ export default function GeneralTab({
       {/* Warning Modal */}
       {showWarningModal && selectedMember && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-background/80 backdrop-blur-sm p-4">
-           <div className="glass-panel w-full max-w-md p-6 border-2 border-error animate-slide-up relative">
+           <div className="glass-panel w-full max-w-md p-4 border-2 border-error animate-slide-up relative">
               <div className="absolute top-0 left-0 w-full h-1 bg-error"></div>
               <ShieldAlert size={48} className="text-error mx-auto mb-4" />
-              <h2 className="text-2xl font-headline-md text-center text-on-surface mb-2">
+              <h2 className="text-lg font-headline-md text-center text-on-surface mb-2">
                 {lang === 'tr' ? 'DİKKAT!' : 'WARNING!'}
               </h2>
               <p className="text-center text-on-surface-variant mb-6 text-sm">
@@ -434,7 +434,7 @@ export default function GeneralTab({
                   ? `Şu anda ${selectedMember.global_name || selectedMember.username} adlı kişiye sunucunuzun web paneli üzerinde TAM YETKİ veriyorsunuz. Bu kişi sizin adınıza kayıt kanallarını, rollerini değiştirebilir veya bot özelliklerini kapatabilir.`
                   : `You are giving FULL ACCESS to ${selectedMember.global_name || selectedMember.username} on your server's web dashboard. They will be able to change all settings and roles on your behalf.`}
               </p>
-              <div className="flex gap-4">
+              <div className="flex gap-3">
                 <button 
                   onClick={() => setShowWarningModal(false)}
                   className="flex-1 py-3 border border-outline hover:bg-white/5 rounded-sm font-label-bold uppercase tracking-widest text-sm transition-colors"

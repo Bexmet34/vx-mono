@@ -82,7 +82,7 @@ export default function LogSettingsTab({ t, lang, settings, setSettings, discord
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row gap-6">
+      <div className="flex flex-col md:flex-row gap-3">
         {/* Sol Kolon: Ana Ayarlar */}
         <div className="flex-1 space-y-6">
           <div className="flex items-center justify-between bg-surface-variant p-4 border-l-4 border-primary shadow-sm relative overflow-hidden group">
