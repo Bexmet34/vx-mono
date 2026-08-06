@@ -34,7 +34,7 @@ jobs:
           
       - name: 📥 Bağımlılıkları Yükle (Install)
         id: install
-        run: pnpm install --frozen-lockfile > install_log.txt 2>&1
+        run: pnpm install --no-frozen-lockfile > install_log.txt 2>&1
         continue-on-error: true
 
       - name: 🚨 Install Hatasını Discord'a Gönder
