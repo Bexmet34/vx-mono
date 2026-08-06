@@ -201,7 +201,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                     checked={settings.registration_enabled || false}
                     onChange={(e) => setSettings({ ...settings, registration_enabled: e.target.checked })}
                   />
-                  <div className="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+                  <div className="w-10 h-5 bg-[#1e293b] border border-outline-variant/30 rounded-full peer peer-checked:bg-primary-container peer-checked:border-primary-container after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 peer-checked:after:bg-black peer-checked:after:translate-x-[20px] after:rounded-full after:h-4 after:w-4 after:transition-all shadow-inner"></div>
                 </label>
                 <span className="text-[10px] font-label-bold uppercase tracking-widest text-on-surface-variant">
                   {settings.registration_enabled 
