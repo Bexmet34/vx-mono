@@ -13,15 +13,24 @@ jobs:
       - name: 📦 Kodu İndir
         uses: actions/checkout@v4
 
-      - name: ⚙️ Node.js Kur
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
       - name: 🚀 PNPM Kur
         uses: pnpm/action-setup@v3
         with:
           version: 9
+
+      - name: ⚙️ Node.js Kur
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+          
+      - name: ⚡ Turbo Cache (Önbellek) Ayarı
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: turbo-${{ github.job }}-${{ github.ref_name }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ github.job }}-${{ github.ref_name }}-
           
       - name: 📥 Bağımlılıkları Yükle (Install)
         id: install
