@@ -991,16 +991,16 @@ export default function AdminPage() {
                                 <div style={{display: 'flex', gap: '0.4rem', flexWrap: 'wrap', maxWidth: '250px'}}>
                                   {u.mutual_guilds && u.mutual_guilds.length > 0 ? (
                                     u.mutual_guilds.slice(0, 5).map(mg => (
-                                      <div key={mg.id} title={mg.name} style={{
+                                      <a href={`https://discord.com/channels/${mg.id}`} target="_blank" rel="noopener noreferrer" key={mg.id} title={mg.name} style={{
                                         width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)',
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', cursor: 'help'
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', cursor: 'pointer', textDecoration: 'none'
                                       }}>
                                         {mg.icon ? (
                                           <img src={mg.icon} alt={mg.name} style={{width: '100%', height: '100%', objectFit: 'cover'}} />
                                         ) : (
-                                          <span style={{fontSize: '0.65rem', fontWeight: 'bold'}}>{mg.name.charAt(0)}</span>
+                                          <span style={{fontSize: '0.65rem', fontWeight: 'bold', color: 'white'}}>{mg.name.charAt(0)}</span>
                                         )}
-                                      </div>
+                                      </a>
                                     ))
                                   ) : (
                                     <span style={{fontSize: '0.8rem', color: 'var(--admin-text-muted)'}}>Sunucu bulunamadı</span>

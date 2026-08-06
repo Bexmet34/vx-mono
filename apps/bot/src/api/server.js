@@ -18,17 +18,32 @@ function startApiServer(manager, port = process.env.BOT_API_PORT || 3005) {
         try {
             // BroadcastEval to all shards
             // We search for guilds where the members.cache has this user.
-            const results = await manager.broadcastEval((client, context) => {
+            const results = await manager.broadcastEval(async (client, context) => {
                 const guilds = [];
-                client.guilds.cache.forEach(guild => {
-                    if (guild.members.cache.has(context.userId)) {
-                        guilds.push({
-                            id: guild.id,
-                            name: guild.name,
-                            icon: guild.iconURL({ format: 'png', size: 64 })
-                        });
+                const fetchPromises = client.guilds.cache.map(async guild => {
+                    try {
+                        if (guild.members.cache.has(context.userId)) {
+                            guilds.push({
+                                id: guild.id,
+                                name: guild.name,
+                                icon: guild.iconURL({ format: 'png', size: 64 })
+                            });
+                        } else {
+                            const member = await guild.members.fetch(context.userId).catch(() => null);
+                            if (member) {
+                                guilds.push({
+                                    id: guild.id,
+                                    name: guild.name,
+                                    icon: guild.iconURL({ format: 'png', size: 64 })
+                                });
+                            }
+                        }
+                    } catch (e) {
+                        // ignore fetching errors for this guild
                     }
                 });
+                
+                await Promise.all(fetchPromises);
                 return guilds;
             }, { context: { userId } });
 
