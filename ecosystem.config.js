@@ -20,13 +20,12 @@ module.exports = {
     },
     {
       name: 'vxweb',
-      script: 'npm',
-      args: 'run start',
+      script: '../../node_modules/next/dist/bin/next',
+      args: 'start -p 3000',
       cwd: './apps/web',
       watch: false,
       env: {
-        NODE_ENV: 'production',
-        PORT: '3000'
+        NODE_ENV: 'production'
       }
     }
   ]
