@@ -20,9 +20,9 @@ module.exports = {
     },
     {
       name: 'vxweb',
-      script: 'node_modules/.bin/next',
+      script: '/root/vx-mono/node_modules/next/dist/bin/next',
       args: 'start -p 3000',
-      cwd: './apps/web',
+      cwd: '/root/vx-mono/apps/web',
       watch: false,
       env: {
         NODE_ENV: 'production'
