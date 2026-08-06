@@ -1,20 +1,86 @@
-name: Sunucu Otomatik Canlıya Alma (Deploy)
+name: CI/CD Deployment
 
 on:
   push:
     branches:
-      - main # main branch'ine push yapıldığında çalışır
+      - main
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Sunucuya SSH ile bağlan ve up.sh çalıştır
-        uses: appleboy/ssh-action@master
+      - name: 📦 Kodu İndir
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Node.js Kur
+        uses: actions/setup-node@v4
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          password: ${{ secrets.SSH_PASSWORD }}
-          port: 22
+          node-version: 20
+
+      - name: 🚀 PNPM Kur
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+          
+      - name: 📥 Bağımlılıkları Yükle (Install)
+        id: install
+        run: pnpm install --frozen-lockfile > install_log.txt 2>&1
+        continue-on-error: true
+
+      - name: 🚨 Install Hatasını Discord'a Gönder
+        if: steps.install.outcome == 'failure'
+        run: |
+          ERROR_LOG=$(tail -n 25 install_log.txt | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g' | tr -d '\r')
+          curl -H "Content-Type: application/json" -X POST -d "{\"embeds\":[{\"title\":\"🚨 Bağımlılık Yükleme Hatası (Install)\",\"description\":\"\`\`\`text\n${ERROR_LOG}\n\`\`\`\",\"color\":16711680}]}" ${{ secrets.DISCORD_WEBHOOK_URL }}
+          exit 1
+
+      - name: 🏗️ Projeyi Derle (Build)
+        id: build
+        run: pnpm build > build_log.txt 2>&1
+        continue-on-error: true
+
+      - name: 🚨 Build Hatasını Discord'a Gönder
+        if: steps.build.outcome == 'failure'
+        run: |
+          ERROR_LOG=$(tail -n 25 build_log.txt | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g' | tr -d '\r')
+          curl -H "Content-Type: application/json" -X POST -d "{\"embeds\":[{\"title\":\"🚨 Proje Derleme Hatası (Build)\",\"description\":\"\`\`\`text\n${ERROR_LOG}\n\`\`\`\",\"color\":16711680}]}" ${{ secrets.DISCORD_WEBHOOK_URL }}
+          exit 1
+
+      - name: 📦 Dağıtım Paketi Hazırla
+        run: |
+          tar -czf deploy.tar.gz --exclude='.git' --exclude='.github' .
+        
+      - name: 📤 Sunucuya Gönder (SCP)
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          source: "deploy.tar.gz"
+          target: "/root/vx-mono-deploy"
+
+      - name: 🔄 Sunucuda Güncelle ve Yeniden Başlat (SSH)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          password: ${{ secrets.VPS_PASSWORD }}
           script: |
-            /root/vx-mono/up.sh
+            mkdir -p /root/vx-mono
+            cd /root/vx-mono
+            
+            # Yeni dosyaları üstüne yaz
+            tar -xzf /root/vx-mono-deploy/deploy.tar.gz
+            rm -f /root/vx-mono-deploy/deploy.tar.gz
+            
+            # PM2'yi yeniden başlat
+            pm2 reload ecosystem.config.js || pm2 start ecosystem.config.js
+
+      - name: ✅ Başarı Mesajını Discord'a Gönder
+        if: success()
+        run: |
+          COMMIT_MSG=$(echo "${{ github.event.head_commit.message }}" | head -n 1 | sed 's/"/\\"/g')
+          COMMIT_HASH=$(echo "${{ github.sha }}" | cut -c1-7)
+          AUTHOR=$(echo "${{ github.event.head_commit.author.name }}" | sed 's/"/\\"/g')
+          curl -H "Content-Type: application/json" -X POST -d "{\"embeds\":[{\"title\":\"✅ Sunucu Dağıtım Başarılı! (GitHub Actions)\",\"description\":\"Tüm servisler başarıyla güncellendi ve sunucu tarafında hiçbir kesinti/kilitlenme yaşanmadan yeniden başlatıldı.\",\"color\":65280,\"fields\":[{\"name\":\"📌 Son Güncelleme (Commit)\",\"value\":\"\`${COMMIT_HASH}\` - **${COMMIT_MSG}** *(Yazar: ${AUTHOR})*\",\"inline\":false}]}]}" ${{ secrets.DISCORD_WEBHOOK_URL }}
