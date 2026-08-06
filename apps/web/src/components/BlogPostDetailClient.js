@@ -5,7 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Link from 'next/link';
 import { Calendar, ArrowLeft, Clock, Share2, Copy, Check, Sparkles, MessageSquare, Bot, BookOpen } from "lucide-react";
-import styles from "../../page.module.css";
+import styles from "../app/page.module.css";
 
 export default function BlogPostDetailClient({ post, relatedPosts = [] }) {
   const [copied, setCopied] = useState(false);
