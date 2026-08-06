@@ -56,13 +56,14 @@ trap 'send_error_to_discord' ERR
 
 echo "==> [1/6] Github'dan güncel dosyalar çekiliyor..." | tee -a "$LOG_FILE"
 cd /root/vx-mono
-# Son commit mesajını alalım
-commit_author=$(git log -1 --format="%an" 2>/dev/null || echo "Bilinmiyor")
-commit_message=$(git log -1 --format="%s" 2>/dev/null || echo "Bilinmiyor")
-commit_hash=$(git log -1 --format="%h" 2>/dev/null || echo "Bilinmiyor")
 
 git fetch --all >> "$LOG_FILE" 2>&1
 git reset --hard origin/main >> "$LOG_FILE" 2>&1
+
+# Son commit mesajını alalım (Güncelleme yapıldıktan SONRA)
+commit_author=$(git log -1 --format="%an" 2>/dev/null || echo "Bilinmiyor")
+commit_message=$(git log -1 --format="%s" 2>/dev/null || echo "Bilinmiyor")
+commit_hash=$(git log -1 --format="%h" 2>/dev/null || echo "Bilinmiyor")
 
 # PM2 Discord logger'ın her zaman doğru webhook ile çalıştığından emin olalım
 pm2 set pm2-discord-logger:error_url "$WEBHOOK_URL" >> "$LOG_FILE" 2>&1
