@@ -8,8 +8,9 @@ import {
   LayoutDashboard, Server, MessageSquare, Settings, 
   Users, BarChart3, Search, Clock, Infinity, Power, 
   Calendar, Trash2, ChevronRight, ArrowLeft, Gift, Plus, Send, Edit3, Eye, EyeOff, DollarSign, Check, X, Gamepad2, CreditCard,
-  Activity, TerminalSquare
+  Activity, TerminalSquare, Sparkles
 } from "lucide-react";
+import AdminBlogAutomationTab from "@/components/AdminBlogAutomationTab";
 import { useCallback } from "react";
 import { format } from "date-fns";
 import { tr, enUS } from "date-fns/locale";
@@ -601,6 +602,7 @@ export default function AdminPage() {
     { id: "campaigns", label: "Kampanya & Hediye", icon: <Gift size={14} /> },
     { id: "notifications", label: "Bildirim Şablonları", icon: <Bell size={14} /> },
     { id: "broadcast", label: "Duyuru Merkezi", icon: <MessageSquare size={14} /> },
+    { id: "blog-automation", label: "Blog Otomasyonu", icon: <Sparkles size={14} /> },
     { id: "stats", label: "Veri Analizi", icon: <BarChart3 size={14} /> },
     { id: "settings", label: "Sistem Ayarları", icon: <Settings size={14} /> },
   ];
@@ -683,6 +685,11 @@ export default function AdminPage() {
         ) : (
           <div className="animate-slide-up">
             
+            {/* BLOG AUTOMATION TAB */}
+            {activeTab === "blog-automation" && (
+              <AdminBlogAutomationTab showToast={showToast} />
+            )}
+
             {/* SERVER MANAGEMENT TAB */}
             {activeTab === "servers" && (
               <>

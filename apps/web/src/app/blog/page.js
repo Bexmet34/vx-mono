@@ -1,14 +1,16 @@
-import { getAllPosts } from '@/lib/markdown';
+import { getAllBlogPosts } from '@/lib/supabaseBlog';
 import Navbar from "@/components/Navbar";
 import BlogListClient from "@/components/BlogListClient";
 
 export const metadata = {
   title: 'Blog & Rehberler | Veyronix',
-  description: 'Albion Online parti yönetimi, Discord oyun botları ve topluluk yönetimi hakkında en güncel ipuçları ve rehberler.',
+  description: 'Albion Online parti yönetimi, Discord oyun botları, sunucu otomasyonu ve topluluk yönetimi hakkında kapsamlı rehberler ve ipuçları.',
 };
 
-export default function BlogIndex() {
-  const posts = getAllPosts();
+export const revalidate = 60; // 60 saniyede bir yeni yazıları kontrol et (ISR)
+
+export default async function BlogIndex() {
+  const posts = await getAllBlogPosts();
 
   return (
     <>

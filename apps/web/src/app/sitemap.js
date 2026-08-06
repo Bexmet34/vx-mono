@@ -1,13 +1,13 @@
-import { getPostSlugs, getPostBySlug } from '@/lib/markdown';
+import { getAllBlogPosts } from '@/lib/supabaseBlog';
 
-export default function sitemap() {
-  const slugs = getPostSlugs() || [];
-  const posts = slugs.map((slug) => {
-    const post = getPostBySlug(slug);
+export default async function sitemap() {
+  const posts = await getAllBlogPosts();
+
+  const blogUrls = posts.map((post) => {
     return {
       url: `https://veyronix.com.tr/blog/${post.slug}`,
-      lastModified: new Date(post.meta.date),
-      changeFrequency: 'monthly',
+      lastModified: new Date(post.publishedAt || Date.now()),
+      changeFrequency: 'daily',
       priority: 0.8,
     };
   });
@@ -25,7 +25,7 @@ export default function sitemap() {
       changeFrequency: 'daily',
       priority: 0.9,
     },
-    ...posts,
+    ...blogUrls,
     {
       url: 'https://veyronix.com.tr/hakkimizda',
       lastModified: new Date(),
