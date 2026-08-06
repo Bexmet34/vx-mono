@@ -84,6 +84,17 @@ jobs:
             tar -xzf /root/vx-mono-deploy/deploy.tar.gz
             rm -f /root/vx-mono-deploy/deploy.tar.gz
             
+            # GitHub Secrets içerisindeki GEMINI_API_KEY ortam değişkenini sunucudaki .env dosyasına otomatik yaz
+            mkdir -p apps/web
+            touch apps/web/.env
+            if [ -n "${{ secrets.GEMINI_API_KEY }}" ]; then
+              if ! grep -q "^GEMINI_API_KEY=" apps/web/.env; then
+                echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> apps/web/.env
+              else
+                sed -i 's|^GEMINI_API_KEY=.*|GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}|' apps/web/.env
+              fi
+            fi
+            
             # PM2'yi yeniden başlat
             pm2 reload ecosystem.config.js || pm2 start ecosystem.config.js
 
