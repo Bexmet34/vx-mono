@@ -45,15 +45,15 @@ export default function OverviewTab({ subscription, setActiveTab, settings }) {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 animate-slide-up">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 animate-slide-up">
       {/* Main Welcome Box */}
-      <div className="md:col-span-2 glass-panel p-5 relative overflow-visible border border-primary-container/30 bg-primary-container/5 hover:border-primary-container transition-colors group">
+      <div className="md:col-span-2 glass-panel p-3 relative overflow-visible border border-primary-container/30 bg-primary-container/5 hover:border-primary-container transition-colors group">
         <div className="scanline"></div>
         <div className="absolute top-8 right-8 text-primary-container/10 group-hover:text-primary-container/30 transition-colors">
           <Star size={120} />
         </div>
         <div className="relative z-10">
-          <h2 className="font-headline-lg text-lg text-primary-container mb-4 flex items-center gap-3 uppercase tracking-tight">
+          <h2 className="font-headline-lg text-[10px] text-primary-container mb-4 flex items-center gap-2 uppercase tracking-tight">
             <Star size={24} className="fill-current" /> {lang === 'en' ? 'Overview' : 'Genel Bakış'}
           </h2>
           <p className="font-body-lg text-on-surface-variant max-w-2xl mb-8 leading-relaxed">
@@ -69,22 +69,22 @@ export default function OverviewTab({ subscription, setActiveTab, settings }) {
       </div>
 
       {/* Subscription Status Box */}
-      <div className="glass-panel p-5 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
-        <h3 className="font-headline-md text-lg text-on-surface mb-6 uppercase tracking-tight">
+      <div className="glass-panel p-3 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
+        <h3 className="font-headline-md text-[10px] text-on-surface mb-6 uppercase tracking-tight">
           {lang === 'tr' ? 'Abonelik Durumu' : 'Subscription Status'}
         </h3>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <div className="w-16 h-16 rounded bg-surface border border-outline flex items-center justify-center shadow-lg" style={{ color: statusColor, borderColor: statusColor }}>
             <StatusIcon size={32} />
           </div>
           <div>
-            <div className="font-headline-lg text-lg uppercase tracking-tight" style={{ color: statusColor }}>{timeStatus}</div>
-            <div className="font-label-sm text-sm text-on-surface-variant mt-1 uppercase tracking-widest">{statusDesc}</div>
+            <div className="font-headline-lg text-[10px] uppercase tracking-tight" style={{ color: statusColor }}>{timeStatus}</div>
+            <div className="font-label-sm text-[10px] text-on-surface-variant mt-1 uppercase tracking-widest">{statusDesc}</div>
           </div>
         </div>
 
         {tier === 'freemium' && (
-          <div className="mt-8 p-4 bg-primary-container/10 border border-primary-container/30 text-primary-container font-body-md text-sm">
+          <div className="mt-8 p-2 bg-primary-container/10 border border-primary-container/30 text-primary-container font-body-md text-[10px]">
             {lang === 'tr'
               ? '💡 Premium paket alarak oy zorunluluğunu kaldırabilirsiniz.'
               : '💡 Upgrade to Premium to remove the vote requirement.'}
@@ -93,24 +93,24 @@ export default function OverviewTab({ subscription, setActiveTab, settings }) {
       </div>
 
       {/* Quick Stats Box */}
-      <div className="glass-panel p-5 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
-        <h3 className="font-headline-md text-lg text-on-surface mb-6 uppercase tracking-tight">
+      <div className="glass-panel p-3 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
+        <h3 className="font-headline-md text-[10px] text-on-surface mb-6 uppercase tracking-tight">
           {lang === 'tr' ? 'Sistem Durumu' : 'System Status'}
         </h3>
         <ul className="space-y-3">
-           <li className={`flex items-center justify-between p-3 border rounded-sm font-label-bold text-sm uppercase tracking-widest ${settings?.albion_guild_id ? 'border-success/30 bg-success/5 text-success' : 'border-outline text-on-surface-variant'}`}>
+           <li className={`flex items-center justify-between p-3 border rounded-sm font-label-bold text-[10px] uppercase tracking-widest ${settings?.albion_guild_id ? 'border-success/30 bg-success/5 text-success' : 'border-outline text-on-surface-variant'}`}>
              <span className="flex items-center gap-2">{settings?.albion_guild_id ? '✓' : '✗'} {lang === 'tr' ? 'Albion Lonca Bağlantısı' : 'Albion Guild Link'}</span>
              <span>{settings?.albion_guild_id ? (lang === 'tr' ? 'Bağlı' : 'Linked') : (lang === 'tr' ? 'Kurulum Bekliyor' : 'Setup Required')}</span>
            </li>
-           <li className={`flex items-center justify-between p-3 border rounded-sm font-label-bold text-sm uppercase tracking-widest ${settings?.registration_enabled ? 'border-success/30 bg-success/5 text-success' : 'border-outline text-on-surface-variant'}`}>
+           <li className={`flex items-center justify-between p-3 border rounded-sm font-label-bold text-[10px] uppercase tracking-widest ${settings?.registration_enabled ? 'border-success/30 bg-success/5 text-success' : 'border-outline text-on-surface-variant'}`}>
              <span className="flex items-center gap-2">{settings?.registration_enabled ? '✓' : '✗'} {lang === 'tr' ? 'Kayıt (Registration) Sistemi' : 'Registration System'}</span>
              <span>{settings?.registration_enabled ? (lang === 'tr' ? 'Aktif' : 'Active') : (lang === 'tr' ? 'Kapalı' : 'Disabled')}</span>
            </li>
-           <li className={`flex items-center justify-between p-3 border rounded-sm font-label-bold text-sm uppercase tracking-widest ${settings?.auto_check_enabled ? 'border-success/30 bg-success/5 text-success' : 'border-outline text-on-surface-variant'}`}>
+           <li className={`flex items-center justify-between p-3 border rounded-sm font-label-bold text-[10px] uppercase tracking-widest ${settings?.auto_check_enabled ? 'border-success/30 bg-success/5 text-success' : 'border-outline text-on-surface-variant'}`}>
              <span className="flex items-center gap-2">{settings?.auto_check_enabled ? '✓' : '✗'} {lang === 'tr' ? 'Otomatik Ayrılık Kontrolü' : 'Guild Leave Auto-Check'}</span>
              <span>{settings?.auto_check_enabled ? (lang === 'tr' ? 'Aktif' : 'Active') : (lang === 'tr' ? 'Kapalı' : 'Disabled')}</span>
            </li>
-           <li className={`flex items-center justify-between p-3 border rounded-sm font-label-bold text-sm uppercase tracking-widest ${settings?.killboard_channel_id ? 'border-success/30 bg-success/5 text-success' : 'border-outline text-on-surface-variant'}`}>
+           <li className={`flex items-center justify-between p-3 border rounded-sm font-label-bold text-[10px] uppercase tracking-widest ${settings?.killboard_channel_id ? 'border-success/30 bg-success/5 text-success' : 'border-outline text-on-surface-variant'}`}>
              <span className="flex items-center gap-2">{settings?.killboard_channel_id ? '✓' : '✗'} {lang === 'tr' ? 'KillBoard Raporları' : 'KillBoard Reports'}</span>
              <span>{settings?.killboard_channel_id ? (lang === 'tr' ? 'Aktif' : 'Active') : (lang === 'tr' ? 'Kapalı' : 'Disabled')}</span>
            </li>

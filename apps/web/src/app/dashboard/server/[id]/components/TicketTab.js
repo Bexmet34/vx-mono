@@ -90,20 +90,20 @@ export default function TicketTab({ t, lang, settings, setSettings, discordChann
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 animate-fade-in pb-12">
-      <div className="col-span-1 lg:col-span-4 flex flex-col gap-3">
-        <div className="bg-surface-variant p-4 rounded-md border border-white/5 shadow-sm relative group overflow-hidden">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 animate-fade-in pb-12">
+      <div className="col-span-1 lg:col-span-4 flex flex-col gap-2">
+        <div className="bg-surface-variant p-2 rounded-md border border-white/5 shadow-sm relative group overflow-hidden">
           <div className="absolute -inset-0.5 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
           
-          <h3 className="font-headline-md text-lg text-on-surface mb-6 uppercase tracking-wider flex items-center gap-2">
+          <h3 className="font-headline-md text-[10px] text-on-surface mb-6 uppercase tracking-wider flex items-center gap-2">
             <Shield className="text-primary-container" size={20}/> 
             {lang === 'tr' ? 'Ticket Durumu' : 'Ticket Status'}
           </h3>
 
-          <div className="flex items-center justify-between p-4 bg-surface rounded-sm border border-white/5 hover:border-primary/30 transition-colors cursor-pointer group/toggle" onClick={() => handleToggleEvent('ticket_system_enabled')}>
+          <div className="flex items-center justify-between p-2 bg-surface rounded-sm border border-white/5 hover:border-primary/30 transition-colors cursor-pointer group/toggle" onClick={() => handleToggleEvent('ticket_system_enabled')}>
             <div>
               <div className="font-label-bold text-on-surface mb-1">{lang === 'tr' ? 'Ticket Sistemini Aç' : 'Enable Ticket System'}</div>
-              <div className="text-xs text-on-surface-variant">{lang === 'tr' ? 'Özel kanallarda destek talebi oluşturmayı aktifleştirir.' : 'Enable creating support tickets in private channels.'}</div>
+              <div className="text-[10px] text-on-surface-variant">{lang === 'tr' ? 'Özel kanallarda destek talebi oluşturmayı aktifleştirir.' : 'Enable creating support tickets in private channels.'}</div>
             </div>
             <div className={`w-10 h-5 rounded-full relative transition-colors ${settings?.ticket_system_enabled ? 'bg-primary-container' : 'bg-surface-variant border border-white/10'}`}>
               <div className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full transition-transform ${settings?.ticket_system_enabled ? 'translate-x-5 bg-on-primary' : 'bg-on-surface-variant'}`}></div>
@@ -113,23 +113,23 @@ export default function TicketTab({ t, lang, settings, setSettings, discordChann
           <button 
              onClick={handleDeploy}
              disabled={deploying}
-             className="w-full mt-4 flex items-center justify-center gap-2 py-3 bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/50 text-blue-300 rounded transition-all disabled:opacity-50 font-bold uppercase tracking-widest text-sm"
+             className="w-full mt-4 flex items-center justify-center gap-2 py-3 bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/50 text-blue-300 rounded transition-all disabled:opacity-50 font-bold uppercase tracking-widest text-[10px]"
           >
              <Send size={16} />
              {deploying ? (lang === 'tr' ? 'Gönderiliyor...' : 'Deploying...') : (lang === 'tr' ? 'Paneli Kanala Gönder' : 'Deploy Panel to Channel')}
           </button>
         </div>
 
-        <div className="bg-surface-variant p-4 rounded-md border border-white/5 shadow-sm relative group">
+        <div className="bg-surface-variant p-2 rounded-md border border-white/5 shadow-sm relative group">
           <div className="absolute -inset-0.5 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
-          <h3 className="font-headline-md text-lg text-on-surface mb-6 uppercase tracking-wider flex items-center gap-2">
+          <h3 className="font-headline-md text-[10px] text-on-surface mb-6 uppercase tracking-wider flex items-center gap-2">
              <Hash className="text-primary-container" size={20}/> 
              {lang === 'tr' ? 'Kanal ve Kategori' : 'Channel & Category'}
           </h3>
 
           <div className="space-y-5">
             <div>
-              <label className="flex items-center gap-2 font-label-bold text-on-surface mb-3 uppercase tracking-wider text-xs">
+              <label className="flex items-center gap-2 font-label-bold text-on-surface mb-3 uppercase tracking-wider text-[10px]">
                 {lang === 'tr' ? 'Ticket Kategorisi' : 'Ticket Category'}
                 <InfoTooltip text={lang === 'tr' ? 'Yeni ticket kanallarının açılacağı kategori.' : 'The category where new ticket channels will be created.'} />
               </label>
@@ -146,7 +146,7 @@ export default function TicketTab({ t, lang, settings, setSettings, discordChann
             </div>
 
             <div>
-              <label className="flex items-center gap-2 font-label-bold text-on-surface mb-3 uppercase tracking-wider text-xs">
+              <label className="flex items-center gap-2 font-label-bold text-on-surface mb-3 uppercase tracking-wider text-[10px]">
                 {lang === 'tr' ? 'Panel Kanalı' : 'Panel Channel'}
                 <InfoTooltip text={lang === 'tr' ? 'Destek talebi açma butonunun (Panelin) bulunacağı kanal.' : 'The channel where the ticket creation panel will be placed.'} />
               </label>
@@ -164,12 +164,12 @@ export default function TicketTab({ t, lang, settings, setSettings, discordChann
           </div>
         </div>
 
-        <div className="bg-surface-variant p-4 rounded-md border border-white/5 shadow-sm relative group">
-            <h3 className="font-headline-md text-lg text-on-surface mb-6 uppercase tracking-wider flex items-center gap-2">
+        <div className="bg-surface-variant p-2 rounded-md border border-white/5 shadow-sm relative group">
+            <h3 className="font-headline-md text-[10px] text-on-surface mb-6 uppercase tracking-wider flex items-center gap-2">
                <Users className="text-primary-container" size={20}/> 
                {lang === 'tr' ? 'Yetkili Roller' : 'Staff Roles'}
             </h3>
-            <label className="flex items-center gap-2 font-label-bold text-on-surface mb-3 uppercase tracking-wider text-xs">
+            <label className="flex items-center gap-2 font-label-bold text-on-surface mb-3 uppercase tracking-wider text-[10px]">
               {lang === 'tr' ? 'Ticket Görme ve Cevaplama İzni' : 'Ticket View & Reply Permission'}
             </label>
             <div className="relative" ref={dropdownRef}>
@@ -177,7 +177,7 @@ export default function TicketTab({ t, lang, settings, setSettings, discordChann
                 {selectedIds.map(id => {
                   const opt = options.find(o => o.id === id);
                   return (
-                    <div key={id} className="flex items-center gap-1 bg-surface-variant border border-white/10 px-2 py-1 rounded-sm text-xs font-medium">
+                    <div key={id} className="flex items-center gap-1 bg-surface-variant border border-white/10 px-2 py-1 rounded-sm text-[10px] font-medium">
                       {opt ? opt.icon : <Hash size={14} />}
                       <span className="max-w-[120px] truncate">{opt ? opt.name : id}</span>
                       <button onClick={() => handleRemoveId(id)} className="ml-1 text-on-surface-variant hover:text-red-400 transition-colors">
@@ -188,7 +188,7 @@ export default function TicketTab({ t, lang, settings, setSettings, discordChann
                 })}
                 <input
                   type="text"
-                  className="flex-1 bg-transparent outline-none min-w-[150px] text-sm py-1"
+                  className="flex-1 bg-transparent outline-none min-w-[150px] text-[10px] py-1"
                   placeholder={lang === 'tr' ? "Aramak için yazın..." : "Type to search..."}
                   value={searchQuery}
                   onChange={(e) => {
@@ -207,7 +207,7 @@ export default function TicketTab({ t, lang, settings, setSettings, discordChann
                         key={opt.id}
                         onClick={() => handleAddId(opt.id)}
                         disabled={selectedIds.includes(opt.id)}
-                        className={`w-full text-left px-3 py-2 flex items-center justify-between text-sm transition-colors ${selectedIds.includes(opt.id) ? 'opacity-50 cursor-not-allowed bg-surface/30' : 'hover:bg-surface'}`}
+                        className={`w-full text-left px-2 py-1 flex items-center justify-between text-[10px] transition-colors ${selectedIds.includes(opt.id) ? 'opacity-50 cursor-not-allowed bg-surface/30' : 'hover:bg-surface'}`}
                       >
                         <div className="flex items-center gap-2">
                           <span className="text-purple-400">{opt.icon}</span>
@@ -216,7 +216,7 @@ export default function TicketTab({ t, lang, settings, setSettings, discordChann
                       </button>
                     ))
                   ) : (
-                    <div className="p-3 text-sm text-on-surface-variant text-center">
+                    <div className="p-3 text-[10px] text-on-surface-variant text-center">
                       {lang === 'tr' ? 'Rol bulunamadı.' : 'No roles found.'}
                     </div>
                   )}
@@ -226,16 +226,16 @@ export default function TicketTab({ t, lang, settings, setSettings, discordChann
         </div>
       </div>
 
-      <div className="col-span-1 lg:col-span-8 flex flex-col gap-3">
-        <div className="bg-surface-variant p-4 rounded-md border border-white/5 shadow-sm relative group">
-            <h3 className="font-headline-md text-lg text-on-surface mb-6 uppercase tracking-wider flex items-center gap-2">
+      <div className="col-span-1 lg:col-span-8 flex flex-col gap-2">
+        <div className="bg-surface-variant p-2 rounded-md border border-white/5 shadow-sm relative group">
+            <h3 className="font-headline-md text-[10px] text-on-surface mb-6 uppercase tracking-wider flex items-center gap-2">
                <Info className="text-primary-container" size={20}/> 
                {lang === 'tr' ? 'Panel Mesajı Ayarları' : 'Panel Message Settings'}
             </h3>
             
             <div className="space-y-5">
               <div>
-                <label className="flex items-center gap-2 font-label-bold text-on-surface mb-3 uppercase tracking-wider text-xs">
+                <label className="flex items-center gap-2 font-label-bold text-on-surface mb-3 uppercase tracking-wider text-[10px]">
                     {lang === 'tr' ? 'Başlık' : 'Title'}
                 </label>
                 <input 
@@ -246,7 +246,7 @@ export default function TicketTab({ t, lang, settings, setSettings, discordChann
                 />
               </div>
               <div>
-                <label className="flex items-center gap-2 font-label-bold text-on-surface mb-3 uppercase tracking-wider text-xs">
+                <label className="flex items-center gap-2 font-label-bold text-on-surface mb-3 uppercase tracking-wider text-[10px]">
                     {lang === 'tr' ? 'Açıklama' : 'Description'}
                 </label>
                 <textarea 
@@ -258,20 +258,20 @@ export default function TicketTab({ t, lang, settings, setSettings, discordChann
             </div>
         </div>
 
-        <div className="bg-surface-variant p-4 rounded-md border border-white/5 shadow-sm relative group">
+        <div className="bg-surface-variant p-2 rounded-md border border-white/5 shadow-sm relative group">
             <div className="flex justify-between items-center mb-6">
-                <h3 className="font-headline-md text-lg text-on-surface uppercase tracking-wider flex items-center gap-2">
+                <h3 className="font-headline-md text-[10px] text-on-surface uppercase tracking-wider flex items-center gap-2">
                 <Search className="text-primary-container" size={20}/> 
                 {lang === 'tr' ? 'Destek Konuları (Menü Seçenekleri)' : 'Support Topics (Menu Options)'}
                 </h3>
-                <button onClick={addOption} className="bg-primary-container/20 text-primary-container px-3 py-1.5 rounded-sm font-label-bold text-xs uppercase flex items-center gap-1 hover:bg-primary-container hover:text-on-primary transition-colors">
+                <button onClick={addOption} className="bg-primary-container/20 text-primary-container px-3 py-1.5 rounded-sm font-label-bold text-[10px] uppercase flex items-center gap-1 hover:bg-primary-container hover:text-on-primary transition-colors">
                     <Plus size={14} /> {lang === 'tr' ? 'Ekle' : 'Add'}
                 </button>
             </div>
             
             <div className="space-y-4">
                 {(settings.ticket_options || []).map((opt, i) => (
-                    <div key={i} className="flex flex-col md:flex-row gap-3 bg-surface p-3 rounded border border-white/5">
+                    <div key={i} className="flex flex-col md:flex-row gap-2 bg-surface p-3 rounded border border-white/5">
                         <div className="w-16">
                             <input 
                                type="text" 
@@ -314,7 +314,7 @@ export default function TicketTab({ t, lang, settings, setSettings, discordChann
                     </div>
                 ))}
                 {(!settings.ticket_options || settings.ticket_options.length === 0) && (
-                    <div className="text-center p-4 text-on-surface-variant bg-surface border border-white/5 rounded">
+                    <div className="text-center p-2 text-on-surface-variant bg-surface border border-white/5 rounded">
                         {lang === 'tr' ? 'Henüz hiçbir konu eklenmemiş.' : 'No topics added yet.'}
                     </div>
                 )}

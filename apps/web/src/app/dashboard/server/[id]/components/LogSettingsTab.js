@@ -82,17 +82,17 @@ export default function LogSettingsTab({ t, lang, settings, setSettings, discord
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row gap-3">
+      <div className="flex flex-col md:flex-row gap-2">
         {/* Sol Kolon: Ana Ayarlar */}
         <div className="flex-1 space-y-6">
-          <div className="flex items-center justify-between bg-surface-variant p-4 border-l-4 border-primary shadow-sm relative overflow-hidden group">
+          <div className="flex items-center justify-between bg-surface-variant p-2 border-l-4 border-primary shadow-sm relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-10 -mt-10 transition-transform group-hover:scale-150"></div>
             <div>
               <h3 className="font-title-bold text-on-surface flex items-center gap-2">
                 <Shield className="w-5 h-5 text-primary" />
                 {lang === 'tr' ? 'Log Sistemi Durumu' : 'Log System Status'}
               </h3>
-              <p className="text-on-surface-variant text-sm mt-1 max-w-sm">
+              <p className="text-on-surface-variant text-[10px] mt-1 max-w-sm">
                 {lang === 'tr' ? 'Sunucudaki denetim olaylarını takip etmek için sistemi aktif edin.' : 'Enable the system to track audit events in the server.'}
               </p>
             </div>
@@ -107,9 +107,9 @@ export default function LogSettingsTab({ t, lang, settings, setSettings, discord
             </label>
           </div>
 
-          <div className="bg-surface-variant p-5 rounded-md border border-white/5 shadow-sm relative group overflow-hidden">
+          <div className="bg-surface-variant p-3 rounded-md border border-white/5 shadow-sm relative group overflow-hidden">
              <div className="absolute -inset-0.5 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
-            <label className="flex items-center gap-2 font-label-bold text-on-surface mb-3 uppercase tracking-wider text-xs">
+            <label className="flex items-center gap-2 font-label-bold text-on-surface mb-3 uppercase tracking-wider text-[10px]">
               <Hash className="w-4 h-4 text-primary" />
               {lang === 'tr' ? 'Log Kanalı' : 'Log Channel'}
               <InfoTooltip text={lang === 'tr' ? 'Log kayıtlarının gönderileceği kanal.' : 'The channel where log records will be sent.'} />
@@ -133,9 +133,9 @@ export default function LogSettingsTab({ t, lang, settings, setSettings, discord
             </div>
           </div>
 
-          <div className="bg-surface-variant p-5 rounded-md border border-white/5 shadow-sm relative group">
+          <div className="bg-surface-variant p-3 rounded-md border border-white/5 shadow-sm relative group">
             <div className="absolute -inset-0.5 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none rounded-md"></div>
-            <label className="flex items-center gap-2 font-label-bold text-on-surface mb-3 uppercase tracking-wider text-xs">
+            <label className="flex items-center gap-2 font-label-bold text-on-surface mb-3 uppercase tracking-wider text-[10px]">
               <Shield className="w-4 h-4 text-primary" />
               {lang === 'tr' ? 'Muaf Tutulan Kişiler, Botlar ve Roller' : 'Exempted Users, Bots, and Roles'}
               <InfoTooltip text={lang === 'tr' ? 'Loglanmasını istemediğiniz kişi, bot veya rolleri seçin.' : 'Select users, bots, or roles you want to exclude from logs.'} />
@@ -145,7 +145,7 @@ export default function LogSettingsTab({ t, lang, settings, setSettings, discord
                 {selectedIds.map(id => {
                   const opt = options.find(o => o.id === id);
                   return (
-                    <div key={id} className="flex items-center gap-1 bg-surface-variant border border-white/10 px-2 py-1 rounded-sm text-xs font-medium">
+                    <div key={id} className="flex items-center gap-1 bg-surface-variant border border-white/10 px-2 py-1 rounded-sm text-[10px] font-medium">
                       {opt ? opt.icon : <Hash size={14} />}
                       <span className="max-w-[120px] truncate">{opt ? opt.name : id}</span>
                       <button onClick={() => handleRemoveId(id)} className="ml-1 text-on-surface-variant hover:text-red-400 transition-colors">
@@ -156,7 +156,7 @@ export default function LogSettingsTab({ t, lang, settings, setSettings, discord
                 })}
                 <input
                   type="text"
-                  className="flex-1 bg-transparent outline-none min-w-[150px] text-sm py-1"
+                  className="flex-1 bg-transparent outline-none min-w-[150px] text-[10px] py-1"
                   placeholder={lang === 'tr' ? "Aramak için yazın..." : "Type to search..."}
                   value={searchQuery}
                   onChange={(e) => {
@@ -175,7 +175,7 @@ export default function LogSettingsTab({ t, lang, settings, setSettings, discord
                         key={opt.id}
                         onClick={() => handleAddId(opt.id)}
                         disabled={selectedIds.includes(opt.id)}
-                        className={`w-full text-left px-3 py-2 flex items-center justify-between text-sm transition-colors ${selectedIds.includes(opt.id) ? 'opacity-50 cursor-not-allowed bg-surface/30' : 'hover:bg-surface'}`}
+                        className={`w-full text-left px-2 py-1 flex items-center justify-between text-[10px] transition-colors ${selectedIds.includes(opt.id) ? 'opacity-50 cursor-not-allowed bg-surface/30' : 'hover:bg-surface'}`}
                       >
                         <div className="flex items-center gap-2">
                           <span className={`${opt.type === 'role' ? 'text-purple-400' : opt.type === 'bot' ? 'text-blue-400' : 'text-gray-300'}`}>
@@ -189,7 +189,7 @@ export default function LogSettingsTab({ t, lang, settings, setSettings, discord
                       </button>
                     ))
                   ) : (
-                    <div className="p-3 text-sm text-on-surface-variant text-center">
+                    <div className="p-3 text-[10px] text-on-surface-variant text-center">
                       {lang === 'tr' ? 'Sonuç bulunamadı.' : 'No results found.'}
                     </div>
                   )}
@@ -200,8 +200,8 @@ export default function LogSettingsTab({ t, lang, settings, setSettings, discord
         </div>
 
         {/* Sağ Kolon: Event Seçimi */}
-        <div className="flex-1 bg-surface-variant rounded-md p-5 border border-white/5 shadow-sm relative">
-           <h3 className="font-label-bold text-on-surface mb-4 uppercase tracking-wider text-xs flex items-center gap-2">
+        <div className="flex-1 bg-surface-variant rounded-md p-3 border border-white/5 shadow-sm relative">
+           <h3 className="font-label-bold text-on-surface mb-4 uppercase tracking-wider text-[10px] flex items-center gap-2">
             <Info className="w-4 h-4 text-primary" />
             {lang === 'tr' ? 'Loglanacak Olaylar' : 'Events to Log'}
           </h3>
@@ -214,7 +214,7 @@ export default function LogSettingsTab({ t, lang, settings, setSettings, discord
                     <div className={`font-medium ${isChecked ? 'text-primary' : 'text-on-surface'}`}>
                       {getEventName(eventKey)}
                     </div>
-                    <div className="text-xs text-on-surface-variant mt-0.5">
+                    <div className="text-[10px] text-on-surface-variant mt-0.5">
                       {getEventDesc(eventKey)}
                     </div>
                   </div>
@@ -238,7 +238,7 @@ export default function LogSettingsTab({ t, lang, settings, setSettings, discord
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-2 bg-primary text-on-primary px-6 py-2 rounded-sm font-label-bold uppercase tracking-widest text-sm hover:bg-primary/90 transition-all disabled:opacity-50 hover:shadow-[0_0_15px_rgba(var(--primary-color),0.4)] disabled:shadow-none"
+          className="flex items-center gap-2 bg-primary text-on-primary px-6 py-2 rounded-sm font-label-bold uppercase tracking-widest text-[10px] hover:bg-primary/90 transition-all disabled:opacity-50 hover:shadow-[0_0_15px_rgba(var(--primary-color),0.4)] disabled:shadow-none"
         >
           {saving ? (
             <>

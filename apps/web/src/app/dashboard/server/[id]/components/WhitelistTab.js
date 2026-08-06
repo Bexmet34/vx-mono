@@ -33,16 +33,16 @@ export default function WhitelistTab({ t, settings, setSettings, whitelistAddTab
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-12 gap-3 animate-slide-up">
-      <div className="glass-panel p-5 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors md:col-span-7">
-        <h2 className="font-headline-lg text-lg text-on-surface mb-2 flex items-center gap-3 uppercase tracking-tight">
+    <div className="grid grid-cols-1 md:grid-cols-12 gap-2 animate-slide-up">
+      <div className="glass-panel p-3 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors md:col-span-7">
+        <h2 className="font-headline-lg text-[10px] text-on-surface mb-2 flex items-center gap-2 uppercase tracking-tight">
           <Users className="text-primary-container" /> Active Whitelist
           <InfoTooltip text={lang === 'en' ? 'Only the users and roles listed here will be able to use restricted commands like /createparty.' : 'Sadece burada listelenen kullanıcılar veya roller /createparty gibi komutları kullanabilir.'} />
         </h2>
         <p className="font-body-md text-on-surface-variant mb-6">Users or roles listed here can use restricted commands like /createparty.</p>
 
         {safeWhitelist.length === 0 ? (
-          <div className="text-center p-5 bg-surface-container-highest border border-outline-variant rounded-sm text-on-surface-variant font-body-md">
+          <div className="text-center p-3 bg-surface-container-highest border border-outline-variant rounded-sm text-on-surface-variant font-body-md">
             No whitelist entries. Everyone can use commands.
           </div>
         ) : (
@@ -50,8 +50,8 @@ export default function WhitelistTab({ t, settings, setSettings, whitelistAddTab
             {safeWhitelist.map(id => {
               const info = getEntityInfo(id);
               return (
-                <div key={id} className="flex justify-between items-center p-4 bg-surface-container border border-outline-variant rounded-sm hover:border-primary-container/50 transition-colors group">
-                  <div className="flex items-center gap-3">
+                <div key={id} className="flex justify-between items-center p-2 bg-surface-container border border-outline-variant rounded-sm hover:border-primary-container/50 transition-colors group">
+                  <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full" style={{ background: info.color }}></div>
                     <span className="font-label-bold text-on-surface">{info.name}</span>
                   </div>
@@ -65,19 +65,19 @@ export default function WhitelistTab({ t, settings, setSettings, whitelistAddTab
         )}
       </div>
 
-      <div className="glass-panel p-5 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors md:col-span-5">
-        <h3 className="font-headline-md text-lg text-on-surface mb-6 flex items-center uppercase tracking-tight">
+      <div className="glass-panel p-3 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors md:col-span-5">
+        <h3 className="font-headline-md text-[10px] text-on-surface mb-6 flex items-center uppercase tracking-tight">
           Add New Entry
           <InfoTooltip text={lang === 'en' ? 'Search for a Discord role or user to add them to the whitelist.' : 'Beyaz listeye eklemek için bir Discord rolü veya kullanıcı arayın.'} />
         </h3>
         <div className="flex gap-2 mb-4 bg-surface-container-highest p-1 rounded-sm border border-outline-variant">
-          <button className={`flex-1 py-2 rounded-sm font-label-bold uppercase tracking-widest text-sm transition-colors ${whitelistAddTab === 'roles' ? 'bg-primary-container text-on-primary tactical-glow' : 'text-on-surface-variant hover:text-on-surface'}`} onClick={() => setWhitelistAddTab('roles')}>Roles</button>
-          <button className={`flex-1 py-2 rounded-sm font-label-bold uppercase tracking-widest text-sm transition-colors ${whitelistAddTab === 'users' ? 'bg-primary-container text-on-primary tactical-glow' : 'text-on-surface-variant hover:text-on-surface'}`} onClick={() => setWhitelistAddTab('users')}>Users</button>
+          <button className={`flex-1 py-2 rounded-sm font-label-bold uppercase tracking-widest text-[10px] transition-colors ${whitelistAddTab === 'roles' ? 'bg-primary-container text-on-primary tactical-glow' : 'text-on-surface-variant hover:text-on-surface'}`} onClick={() => setWhitelistAddTab('roles')}>Roles</button>
+          <button className={`flex-1 py-2 rounded-sm font-label-bold uppercase tracking-widest text-[10px] transition-colors ${whitelistAddTab === 'users' ? 'bg-primary-container text-on-primary tactical-glow' : 'text-on-surface-variant hover:text-on-surface'}`} onClick={() => setWhitelistAddTab('users')}>Users</button>
         </div>
 
         <input
           type="text"
-          className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md mb-4"
+          className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md mb-4"
           placeholder="Search..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -87,9 +87,9 @@ export default function WhitelistTab({ t, settings, setSettings, whitelistAddTab
           {whitelistAddTab === 'roles' ? (
             filteredRoles.slice(0, 50).map(role => (
               <div key={role.id} className="flex justify-between items-center p-3 mb-1 hover:bg-white/5 rounded-sm transition-colors group">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                   <div className="w-2.5 h-2.5 rounded-full" style={{ background: role.color ? `#${role.color.toString(16).padStart(6, '0')}` : '#fff' }}></div>
-                  <span className="font-label-bold text-on-surface text-sm">{role.name}</span>
+                  <span className="font-label-bold text-on-surface text-[10px]">{role.name}</span>
                 </div>
                 <button className="p-1.5 text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 rounded-sm transition-colors opacity-0 group-hover:opacity-100" onClick={() => handleAdd(role.id)}>
                   <Plus size={16} />
@@ -99,11 +99,11 @@ export default function WhitelistTab({ t, settings, setSettings, whitelistAddTab
           ) : (
             filteredMembers.slice(0, 50).map(member => (
               <div key={member.id} className="flex justify-between items-center p-3 mb-1 hover:bg-white/5 rounded-sm transition-colors group">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                    <div className="w-6 h-6 rounded-full bg-surface-container-highest overflow-hidden">
                      {member.avatar && <img src={`https://cdn.discordapp.com/avatars/${member.id}/${member.avatar}.png`} className="w-full h-full object-cover" />}
                    </div>
-                   <span className="font-label-bold text-on-surface text-sm">{member.username}</span>
+                   <span className="font-label-bold text-on-surface text-[10px]">{member.username}</span>
                 </div>
                 <button className="p-1.5 text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 rounded-sm transition-colors opacity-0 group-hover:opacity-100" onClick={() => handleAdd(member.id)}>
                   <Plus size={16} />
