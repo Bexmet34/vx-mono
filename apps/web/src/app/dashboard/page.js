@@ -103,20 +103,15 @@ export default function Dashboard() {
 
   if (status === "loading" || !session) {
     return (
-      <>
-        <Navbar isStatic={true} />
-        <div className="min-h-screen flex items-center justify-center">
-          <Logo className="w-20 h-20 animate-pulse drop-shadow-[0_0_15px_rgba(255,215,0,0.3)]" />
-        </div>
-      </>
+      <div className="min-h-screen flex items-center justify-center">
+        <Logo className="w-20 h-20 animate-pulse drop-shadow-[0_0_15px_rgba(255,215,0,0.3)]" />
+      </div>
     );
   }
 
   return (
-    <>
-      <Navbar isStatic={true} />
-      <main className="pt-24 md:pt-32 pb-24 min-h-screen max-w-container-max mx-auto px-2 md:px-margin-desktop">
-        <ToastContainer toasts={toasts} />
+    <div className="min-h-screen max-w-container-max mx-auto px-2 md:px-margin-desktop pt-6 pb-24">
+      <ToastContainer toasts={toasts} />
 
         {/* --- NATIVE APP DASHBOARD HEADER --- */}
         <div className="flex flex-col items-center mb-2 text-center">
@@ -363,7 +358,6 @@ export default function Dashboard() {
             </div>
           </div>
         )}
-      </main>
-    </>
+    </div>
   );
 }

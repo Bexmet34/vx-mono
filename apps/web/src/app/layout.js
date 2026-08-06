@@ -10,8 +10,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 import { Sora } from "next/font/google";
 
 import Script from "next/script";
-
-import MobileAppDock from "@/components/MobileAppDock";
+import LayoutWrapper from "@/components/LayoutWrapper";
 
 const sora = Sora({ subsets: ["latin"], variable: "--font-sora", display: "swap" });
 
@@ -228,16 +227,9 @@ export default async function RootLayout({ children }) {
       <body>
         <LanguageProvider initialLang={lang}>
           <NextAuthProvider>
-            <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', paddingBottom: '70px' }}>
-              <Navbar />
-              <div style={{ flex: 1, paddingTop: '80px' }}>
-                {children}
-              </div>
-              <Footer />
-              <SystemStatusWidget />
-              <ScrollToTop />
-              <MobileAppDock />
-            </div>
+            <LayoutWrapper>
+              {children}
+            </LayoutWrapper>
           </NextAuthProvider>
         </LanguageProvider>
       </body>

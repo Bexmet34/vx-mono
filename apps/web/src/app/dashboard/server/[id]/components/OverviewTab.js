@@ -53,10 +53,10 @@ export default function OverviewTab({ subscription, setActiveTab, settings }) {
           <Star size={120} />
         </div>
         <div className="relative z-10">
-          <h2 className="font-headline-lg text-[10px] text-primary-container mb-2 flex items-center gap-2 uppercase tracking-tight">
+          <h2 className="font-headline-lg text-sm text-primary-container mb-1 flex items-center gap-2 uppercase tracking-tight">
             <Star size={16} className="fill-current" /> {lang === 'en' ? 'Overview' : 'Genel Bakış'}
           </h2>
-          <p className="font-body-lg text-on-surface-variant max-w-2xl mb-2 leading-relaxed">
+          <p className="font-body-lg text-xs text-on-surface-variant max-w-2xl mb-3 leading-relaxed">
             {lang === 'tr'
               ? 'Sunucu komuta merkezine hoş geldiniz. Entegrasyonları yapılandırın, şablonları yönetin ve performansı izleyin.'
               : 'Welcome to your server command center. Configure integrations, manage templates, and monitor performance.'}
@@ -70,16 +70,16 @@ export default function OverviewTab({ subscription, setActiveTab, settings }) {
 
       {/* Subscription Status Box */}
       <div className="glass-panel p-3 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
-        <h3 className="font-headline-md text-[10px] text-on-surface mb-3 uppercase tracking-tight">
+        <h3 className="font-headline-md text-xs text-on-surface mb-2 uppercase tracking-tight">
           {lang === 'tr' ? 'Abonelik Durumu' : 'Subscription Status'}
         </h3>
-        <div className="flex items-center gap-2">
-          <div className="w-16 h-7 rounded bg-surface border border-outline flex items-center justify-center shadow-lg" style={{ color: statusColor, borderColor: statusColor }}>
-            <StatusIcon size={32} />
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded bg-surface border border-outline flex items-center justify-center shadow-lg" style={{ color: statusColor, borderColor: statusColor }}>
+            <StatusIcon size={20} />
           </div>
           <div>
-            <div className="font-headline-lg text-[10px] uppercase tracking-tight" style={{ color: statusColor }}>{timeStatus}</div>
-            <div className="font-label-sm text-[10px] text-on-surface-variant mt-1 uppercase tracking-widest">{statusDesc}</div>
+            <div className="font-headline-lg text-xs uppercase tracking-tight" style={{ color: statusColor }}>{timeStatus}</div>
+            <div className="font-label-sm text-[10px] text-on-surface-variant mt-0.5 uppercase tracking-widest">{statusDesc}</div>
           </div>
         </div>
 
@@ -94,7 +94,7 @@ export default function OverviewTab({ subscription, setActiveTab, settings }) {
 
       {/* Quick Stats Box */}
       <div className="glass-panel p-3 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
-        <h3 className="font-headline-md text-[10px] text-on-surface mb-3 uppercase tracking-tight">
+        <h3 className="font-headline-md text-xs text-on-surface mb-2 uppercase tracking-tight">
           {lang === 'tr' ? 'Sistem Durumu' : 'System Status'}
         </h3>
         <ul className="space-y-3">

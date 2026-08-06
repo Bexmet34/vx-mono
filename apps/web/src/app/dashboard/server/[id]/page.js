@@ -500,11 +500,11 @@ export default function ServerSettings() {
   );
 
   return (
-    <div className="min-h-screen flex bg-background relative overflow-hidden" suppressHydrationWarning>
+    <div className="flex bg-background relative w-full h-[calc(100vh-56px)] overflow-hidden" suppressHydrationWarning>
       <ToastContainer toasts={toasts} />
       
       {/* Vertical Sidebar */}
-      <nav className="fixed left-0 top-0 h-full z-50 w-[60px] hover:w-[220px] transition-all duration-300 bg-surface-container-highest/95 backdrop-blur-xl border-r border-outline-variant/30 flex flex-col group overflow-hidden shadow-2xl">
+      <nav className="fixed left-0 top-[56px] h-[calc(100vh-56px)] z-30 w-[52px] hover:w-[180px] transition-all duration-300 bg-surface-container-highest/95 backdrop-blur-xl border-r border-outline-variant/30 flex flex-col group overflow-y-auto custom-scrollbar shadow-2xl">
         <div className="flex flex-col items-center group-hover:items-start p-3 gap-2 w-full mt-2">
           <Link href="/dashboard" className="flex items-center gap-1 px-3 py-1 w-full rounded-md text-on-surface-variant font-label-bold text-[10px] transition-all hover:text-on-surface hover:bg-white/5 border border-transparent shrink-0 group-hover:px-3">
              <ArrowLeft size={14} className="shrink-0" />
@@ -566,7 +566,7 @@ export default function ServerSettings() {
       </nav>
 
       {/* Main Content Area */}
-      <div className="flex-1 ml-[60px] h-screen overflow-y-auto custom-scrollbar pt-10 pb-32">
+      <div className="flex-1 ml-[52px] h-[calc(100vh-56px)] overflow-y-auto custom-scrollbar p-4 pb-20">
         <main className="w-full max-w-[1200px] mx-auto px-2 md:px-2 flex flex-col">
         <header className="flex flex-col md:flex-row items-center md:items-end justify-between mb-3 pb-8 border-b border-outline-variant/50">
           <div className="flex flex-col md:flex-row items-center gap-2 text-center md:text-left">
@@ -669,10 +669,6 @@ export default function ServerSettings() {
       )}
 
       </div>
-
-      <style jsx global>{`
-        body { background-color: #000 !important; background-image: none !important; overflow: hidden; }
-      `}</style>
     </div>
   );
 }
