@@ -95,15 +95,15 @@ export default function TicketTab({ t, lang, settings, setSettings, discordChann
         <div className="bg-surface-variant p-2 rounded-md border border-white/5 shadow-sm relative group overflow-hidden">
           <div className="absolute -inset-0.5 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
           
-          <h3 className="font-headline-md text-[10px] text-on-surface mb-3 uppercase tracking-wider flex items-center gap-2">
-            <Shield className="text-primary-container" size={14}/> 
+          <h3 className="font-headline-md text-xs font-bold text-on-surface mb-3 uppercase tracking-wider flex items-center gap-2">
+            <Shield className="text-primary-container" size={16}/> 
             {lang === 'tr' ? 'Ticket Durumu' : 'Ticket Status'}
           </h3>
 
           <div className="flex items-center justify-between p-2 bg-surface rounded-sm border border-white/5 hover:border-primary/30 transition-colors cursor-pointer group/toggle" onClick={() => handleToggleEvent('ticket_system_enabled')}>
             <div>
-              <div className="font-label-bold text-on-surface mb-1">{lang === 'tr' ? 'Ticket Sistemini Aç' : 'Enable Ticket System'}</div>
-              <div className="text-[10px] text-on-surface-variant">{lang === 'tr' ? 'Özel kanallarda destek talebi oluşturmayı aktifleştirir.' : 'Enable creating support tickets in private channels.'}</div>
+              <div className="font-semibold text-sm text-on-surface mb-0.5">{lang === 'tr' ? 'Ticket Sistemini Aç' : 'Enable Ticket System'}</div>
+              <div className="text-xs text-on-surface-variant">{lang === 'tr' ? 'Özel kanallarda destek talebi oluşturmayı aktifleştirir.' : 'Enable creating support tickets in private channels.'}</div>
             </div>
             <div className={`w-10 h-5 rounded-full relative transition-colors ${settings?.ticket_system_enabled ? 'bg-primary-container' : 'bg-surface-variant border border-white/10'}`}>
               <div className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full transition-transform ${settings?.ticket_system_enabled ? 'translate-x-5 bg-on-primary' : 'bg-on-surface-variant'}`}></div>
@@ -122,14 +122,14 @@ export default function TicketTab({ t, lang, settings, setSettings, discordChann
 
         <div className="bg-surface-variant p-2 rounded-md border border-white/5 shadow-sm relative group">
           <div className="absolute -inset-0.5 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
-          <h3 className="font-headline-md text-[10px] text-on-surface mb-3 uppercase tracking-wider flex items-center gap-2">
-             <Hash className="text-primary-container" size={14}/> 
+          <h3 className="font-headline-md text-xs font-bold text-on-surface mb-3 uppercase tracking-wider flex items-center gap-2">
+             <Hash className="text-primary-container" size={16}/> 
              {lang === 'tr' ? 'Kanal ve Kategori' : 'Channel & Category'}
           </h3>
 
-          <div className="space-y-5">
+          <div className="space-y-4">
             <div>
-              <label className="flex items-center gap-2 font-label-bold text-on-surface mb-3 uppercase tracking-wider text-[10px]">
+              <label className="flex items-center gap-2 font-label-bold text-on-surface mb-2 uppercase tracking-wider text-xs">
                 {lang === 'tr' ? 'Ticket Kategorisi' : 'Ticket Category'}
                 <InfoTooltip text={lang === 'tr' ? 'Yeni ticket kanallarının açılacağı kategori.' : 'The category where new ticket channels will be created.'} />
               </label>

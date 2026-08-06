@@ -119,7 +119,7 @@ export default function Dashboard() {
             <Sparkles size={14} />
             {lang === 'tr' ? 'Yönetim Paneli' : 'Control Center'}
           </div>
-          <h1 className="font-headline-xl text-3xl md:text-5xl text-on-surface mb-2 uppercase tracking-tight">
+          <h1 className="font-headline-xl text-lg md:text-5xl text-on-surface mb-2 uppercase tracking-tight">
             {t.dashWelcome}
           </h1>
           <p className="font-label-bold text-[10px] md:text-xs text-primary-container tracking-widest uppercase mb-3 flex items-center gap-2">

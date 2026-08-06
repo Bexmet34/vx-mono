@@ -70,7 +70,7 @@ export default function UserDashboard() {
         <div className="mb-3 border-b border-white/5 pb-8 relative">
           <div className="flex flex-col md:flex-row items-center md:items-end justify-between gap-1 relative z-10">
             <div className="flex items-center gap-1">
-              <div className="w-20 h-20 bg-surface-container-high border border-outline flex items-center justify-center font-headline-md text-3xl text-on-surface uppercase shadow-2xl relative overflow-hidden group">
+              <div className="w-20 h-20 bg-surface-container-high border border-outline flex items-center justify-center font-headline-md text-lg text-on-surface uppercase shadow-2xl relative overflow-hidden group">
                 {session.user?.image ? (
                   <img src={session.user.image} alt="Avatar" className="w-full h-full object-cover" />
                 ) : (

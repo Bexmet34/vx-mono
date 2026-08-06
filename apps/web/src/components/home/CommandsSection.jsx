@@ -36,7 +36,7 @@ export default function CommandsSection({ gifs = [] }) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         {/* Left Column: Text & Interactive Command Items */}
         <div className="space-y-8">
-          <h2 className="font-headline-xl text-3xl md:text-5xl text-on-surface uppercase tracking-tight">
+          <h2 className="font-headline-xl text-lg md:text-5xl text-on-surface uppercase tracking-tight">
             {lang === 'tr' ? 'Komuta Merkezi Emrinizde' : 'Command Center at your Command'}
           </h2>
           <p className="font-body-lg text-[10px] text-on-surface-variant leading-relaxed">

@@ -50,8 +50,8 @@ export default function TicketHistoryTab({ t, lang, guildId, showToast, isPremiu
   return (
     <div className="grid grid-cols-1 gap-2 animate-fade-in pb-12">
       <div className="bg-surface-variant p-2 rounded-md border border-white/5 shadow-sm relative group">
-        <h3 className="font-headline-md text-[10px] text-on-surface mb-3 uppercase tracking-wider flex items-center gap-2">
-          <MessageSquare className="text-primary-container" size={14}/> 
+        <h3 className="font-headline-md text-xs font-bold text-on-surface mb-3 uppercase tracking-wider flex items-center gap-2">
+          <MessageSquare className="text-primary-container" size={16}/> 
           {lang === 'tr' ? 'Kapatılmış Ticket Geçmişi' : 'Closed Ticket History'}
         </h3>
         
@@ -65,33 +65,33 @@ export default function TicketHistoryTab({ t, lang, guildId, showToast, isPremiu
         ) : (
            <div className="overflow-x-auto">
              <table className="w-full text-left border-collapse">
-               <thead>
-                 <tr className="border-b border-white/10 text-[10px] uppercase tracking-widest text-on-surface-variant font-label-bold bg-surface/50">
-                   <th className="p-2 rounded-tl-sm">ID</th>
-                   <th className="p-2">{lang === 'tr' ? 'Kullanıcı' : 'User'}</th>
-                   <th className="p-2">{lang === 'tr' ? 'Konu' : 'Topic'}</th>
-                   <th className="p-2">{lang === 'tr' ? 'Kapatan' : 'Closed By'}</th>
-                   <th className="p-2">{lang === 'tr' ? 'Tarih' : 'Date'}</th>
-                   <th className="p-2 text-right rounded-tr-sm">{lang === 'tr' ? 'İşlemler' : 'Actions'}</th>
-                 </tr>
-               </thead>
-               <tbody>
-                 {tickets.map(ticket => (
-                   <tr key={ticket.id} className="border-b border-white/5 hover:bg-surface/50 transition-colors text-[10px]">
-                     <td className="p-2 font-mono text-[10px] text-on-surface-variant">#{ticket.id}</td>
-                     <td className="p-2">
-                        <div className="flex items-center gap-2">
-                           <User size={14} className="text-primary-container" />
-                           {ticket.owner_name || ticket.owner_id}
-                        </div>
-                     </td>
-                     <td className="p-2"><span className="bg-surface border border-white/10 px-2 py-1 rounded text-[10px]">{ticket.topic || 'Genel'}</span></td>
-                     <td className="p-2 text-on-surface-variant">{ticket.closed_by || 'Bilinmiyor'}</td>
-                     <td className="p-2 text-on-surface-variant flex items-center gap-1">
-                        <Calendar size={14} />
-                        {new Date(ticket.closed_at || ticket.created_at).toLocaleString(lang === 'tr' ? 'tr-TR' : 'en-US')}
-                     </td>
-                     <td className="p-2 text-right">
+                <thead>
+                  <tr className="border-b border-white/10 text-xs uppercase tracking-wider text-on-surface-variant font-label-bold bg-surface/50">
+                    <th className="p-2.5 rounded-tl-sm">ID</th>
+                    <th className="p-2.5">{lang === 'tr' ? 'Kullanıcı' : 'User'}</th>
+                    <th className="p-2.5">{lang === 'tr' ? 'Konu' : 'Topic'}</th>
+                    <th className="p-2.5">{lang === 'tr' ? 'Kapatan' : 'Closed By'}</th>
+                    <th className="p-2.5">{lang === 'tr' ? 'Tarih' : 'Date'}</th>
+                    <th className="p-2.5 text-right rounded-tr-sm">{lang === 'tr' ? 'İşlemler' : 'Actions'}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {tickets.map(ticket => (
+                    <tr key={ticket.id} className="border-b border-white/5 hover:bg-surface/50 transition-colors text-xs">
+                      <td className="p-2.5 font-mono text-xs text-on-surface-variant">#{ticket.id}</td>
+                      <td className="p-2.5">
+                         <div className="flex items-center gap-2 font-medium">
+                            <User size={14} className="text-primary-container" />
+                            {ticket.owner_name || ticket.owner_id}
+                         </div>
+                      </td>
+                      <td className="p-2.5"><span className="bg-surface border border-white/10 px-2 py-1 rounded text-xs">{ticket.topic || 'Genel'}</span></td>
+                      <td className="p-2.5 text-on-surface-variant">{ticket.closed_by || 'Bilinmiyor'}</td>
+                      <td className="p-2.5 text-on-surface-variant flex items-center gap-1">
+                         <Calendar size={14} />
+                         {new Date(ticket.closed_at || ticket.created_at).toLocaleString(lang === 'tr' ? 'tr-TR' : 'en-US')}
+                      </td>
+                      <td className="p-2.5 text-right">
                         <div className="flex justify-end gap-2">
                             <button onClick={() => setSelectedTranscript(ticket)} className="p-2 bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white rounded transition-colors" title="Oku">
                                <Eye size={16} />

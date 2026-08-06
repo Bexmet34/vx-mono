@@ -409,7 +409,7 @@ export default function PremiumPage() {
                        <div className="absolute inset-0 bg-primary-container/20 blur-xl rounded-full scale-150"></div>
                        <CheckCircle size={80} className="text-primary-container relative z-10 drop-shadow-[0_0_15px_rgba(255,215,0,0.8)]" />
                      </div>
-                     <h3 className="font-headline-xl text-3xl md:text-4xl text-on-surface uppercase tracking-tight mb-2">Talebini Aldık!</h3>
+                     <h3 className="font-headline-xl text-lg md:text-4xl text-on-surface uppercase tracking-tight mb-2">Talebini Aldık!</h3>
                      <p className="text-on-surface-variant font-body-lg mb-2 max-w-md">Ödeme bildiriminiz başarıyla admin paneline ulaştı. Ekiplerimiz kontrol edip onayladığında paketiniz otomatik olarak hesabınıza tanımlanacaktır.</p>
                      
                      <button 
@@ -492,7 +492,7 @@ export default function PremiumPage() {
                 <>
                   <div className="mb-2 text-center mt-2">
                     <span className="inline-block py-0.5 px-2 mb-2 bg-primary-container text-on-primary font-label-bold text-[10px] tracking-widest uppercase">Premium Deployment</span>
-                    <h2 className="font-headline-xl text-[10px] md:text-3xl text-on-surface mb-1 uppercase tracking-tight">Upgrade Infrastructure</h2>
+                    <h2 className="font-headline-xl text-[10px] md:text-lg text-on-surface mb-1 uppercase tracking-tight">Upgrade Infrastructure</h2>
                     <p className="font-body-md text-[10px] text-on-surface-variant">Select the strategic asset for {lang === 'tr' ? selectedPlan.name_tr : selectedPlan.name_en} integration.</p>
                   </div>
 
