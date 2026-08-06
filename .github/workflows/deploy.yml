@@ -87,6 +87,11 @@ jobs:
             # PM2'yi yeniden başlat
             pm2 reload ecosystem.config.js || pm2 start ecosystem.config.js
 
+      - name: 🚨 Beklenmeyen Hatayı Discord'a Gönder
+        if: failure()
+        run: |
+          curl -H "Content-Type: application/json" -X POST -d "{\"embeds\":[{\"title\":\"🚨 Sunucu Dağıtımı (Deploy) Başarısız!\",\"description\":\"Kodların sunucuya aktarımı veya paketlenmesi (Build harici) sırasında beklenmeyen bir hata oluştu.\\n\\nHatanın sebebini görmek için [**Buraya Tıklayarak GitHub Actions**](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) loglarına bakabilirsiniz.\",\"color\":16711680}]}" ${{ secrets.DISCORD_WEBHOOK_URL }}
+
       - name: ✅ Başarı Mesajını Discord'a Gönder
         if: success()
         run: |
