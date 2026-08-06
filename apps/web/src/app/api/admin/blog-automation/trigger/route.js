@@ -94,30 +94,49 @@ Lütfen tam olarak aşağıdaki JSON formatında yanıt ver (Başka hiçbir meti
 }
 `;
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 0.7,
-          responseMimeType: "application/json"
+    const MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-2.0-flash-lite'];
+    let article = null;
+    let lastError = null;
+
+    for (const model of MODELS) {
+      try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiApiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: {
+              temperature: 0.7,
+              responseMimeType: "application/json"
+            }
+          })
+        });
+
+        if (response.ok) {
+          const aiData = await response.json();
+          const rawJsonText = aiData.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (rawJsonText) {
+            article = JSON.parse(rawJsonText);
+            break; // Başarılı, döngüden çık
+          }
+        } else {
+          const errText = await response.text();
+          if (response.status === 429) {
+            console.warn(`[Gemini API] ${model} kotası aşıldı (429), yedek modele geçiliyor...`);
+            lastError = `Google Gemini API ücretsiz kullanım limitine ulaştı (Rate Limit 429). Lütfen ~30 saniye sonra tekrar deneyin veya Google AI Studio hesabınızı kontrol edin.`;
+          } else {
+            lastError = `Gemini API Hatası (${model}): ${errText}`;
+          }
         }
-      })
-    });
-
-    if (!response.ok) {
-      const errText = await response.text();
-      return NextResponse.json({ error: `Gemini API Hatası: ${errText}` }, { status: 500 });
+      } catch (err) {
+        lastError = err.message;
+      }
     }
 
-    const aiData = await response.json();
-    const rawJsonText = aiData.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!rawJsonText) {
-      return NextResponse.json({ error: 'Gemini yanıt üretmedi.' }, { status: 500 });
+    if (!article) {
+      return NextResponse.json({ error: lastError || 'Gemini yanıt üretmedi.' }, { status: 429 });
     }
 
-    const article = JSON.parse(rawJsonText);
     const baseSlug = slugify(article.title);
     const slug = `${baseSlug}-${Date.now().toString().slice(-4)}`;
 

@@ -123,34 +123,49 @@ Lütfen tam olarak aşağıdaki JSON formatında yanıt ver (Başka hiçbir giri
 }
 `;
 
-  console.log('🤖 Google Gemini 2.0 Flash API çağrılıyor...');
+  const MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-2.0-flash-lite'];
+  let articleData = null;
+  let lastError = null;
 
-  try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 0.7,
-          responseMimeType: "application/json"
+  for (const model of MODELS) {
+    try {
+      console.log(`🤖 Google Gemini (${model}) API çağrılıyor...`);
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiApiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.7,
+            responseMimeType: "application/json"
+          }
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const rawJsonText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (rawJsonText) {
+          articleData = JSON.parse(rawJsonText);
+          break;
         }
-      })
-    });
-
-    if (!response.ok) {
-      const errText = await response.text();
-      throw new Error(`Gemini API Hatası (${response.status}): ${errText}`);
+      } else {
+        const errText = await response.text();
+        if (response.status === 429) {
+          console.warn(`⚠️ [Rate Limit] ${model} kotası aşıldı (429). Sonraki modele geçiliyor...`);
+          lastError = `Gemini API 429 Rate Limit (Ücretsiz kullanım kotası doldu).`;
+        } else {
+          lastError = `Gemini API Hatası (${model}): ${errText}`;
+        }
+      }
+    } catch (err) {
+      lastError = err.message;
     }
+  }
 
-    const data = await response.json();
-    const rawJsonText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (!rawJsonText) {
-      throw new Error('Gemini API boş yanıt döndürdü!');
-    }
-
-    const articleData = JSON.parse(rawJsonText);
+  if (!articleData) {
+    throw new Error(lastError || 'Gemini API tüm modeller denendi ancak yanıt alınamadı.');
+  }
     
     const baseSlug = slugify(articleData.title);
     const slug = `${baseSlug}-${Date.now().toString().slice(-4)}`;
