@@ -58,7 +58,7 @@ jobs:
 
       - name: 📦 Dağıtım Paketi Hazırla
         run: |
-          tar -czf deploy.tar.gz --exclude='.git' --exclude='.github' .
+          tar -czf deploy.tar.gz --exclude='deploy.tar.gz' --exclude='.git' --exclude='.github' .
         
       - name: 📤 Sunucuya Gönder (SCP)
         uses: appleboy/scp-action@v0.1.7
