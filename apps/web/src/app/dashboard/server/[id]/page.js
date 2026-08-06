@@ -504,64 +504,63 @@ export default function ServerSettings() {
       <ToastContainer toasts={toasts} />
       
       {/* Vertical Sidebar */}
-      <nav className="fixed left-0 top-[56px] h-[calc(100vh-56px)] z-30 w-[52px] hover:w-[180px] transition-all duration-300 bg-surface-container-highest/95 backdrop-blur-xl border-r border-outline-variant/30 flex flex-col group overflow-y-auto custom-scrollbar shadow-2xl">
-        <div className="flex flex-col items-center group-hover:items-start p-3 gap-2 w-full mt-2">
-          <Link href="/dashboard" className="flex items-center gap-1 px-3 py-1 w-full rounded-md text-on-surface-variant font-label-bold text-[10px] transition-all hover:text-on-surface hover:bg-white/5 border border-transparent shrink-0 group-hover:px-3">
-             <ArrowLeft size={14} className="shrink-0" />
-             <span className="opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Dashboard</span>
+      <nav className="fixed left-0 top-[56px] h-[calc(100vh-56px)] z-30 w-[56px] hover:w-[200px] transition-all duration-300 bg-surface-container-highest/95 backdrop-blur-xl border-r border-outline-variant/30 flex flex-col group overflow-y-auto custom-scrollbar shadow-2xl">
+        <div className="flex flex-col items-center p-2 gap-1.5 w-full mt-2">
+          
+          <Link
+            href="/dashboard"
+            title="Dashboard"
+            className="flex items-center h-9 w-9 group-hover:w-full rounded-lg transition-all duration-200 text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent shrink-0 overflow-hidden"
+          >
+             <div className="w-9 h-9 shrink-0 flex items-center justify-center">
+               <ArrowLeft size={16} />
+             </div>
+             <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap text-xs font-label-bold pr-3">
+               Dashboard
+             </span>
           </Link>
           
-          <div className="w-full h-px bg-outline-variant/30 my-2"></div>
+          <div className="w-6 group-hover:w-full h-px bg-outline-variant/30 my-1 transition-all"></div>
 
-          <button className={`flex items-center gap-1 px-3 py-1 w-full rounded-md font-label-bold text-[10px] transition-all whitespace-nowrap shrink-0 group-hover:px-3 ${activeTab === 'overview' ? 'bg-primary-container/10 text-primary-container border border-primary-container/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('overview')}>
-            <Home size={14} className="shrink-0" />
-            <span className="opacity-0 group-hover:opacity-100 transition-opacity">Overview</span>
-          </button>
-
-          <button className={`flex items-center gap-1 px-3 py-1 w-full rounded-md font-label-bold text-[10px] transition-all whitespace-nowrap shrink-0 group-hover:px-3 ${activeTab === 'general' ? 'bg-primary-container/10 text-primary-container border border-primary-container/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('general')}>
-            <Layout size={14} className="shrink-0" />
-            <span className="opacity-0 group-hover:opacity-100 transition-opacity">General</span>
-          </button>
-
-          <button className={`flex items-center gap-1 px-3 py-1 w-full rounded-md font-label-bold text-[10px] transition-all whitespace-nowrap shrink-0 group-hover:px-3 ${activeTab === 'registration' ? 'bg-primary-container/10 text-primary-container border border-primary-container/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('registration')}>
-            <UserPlus size={14} className="shrink-0" />
-            <span className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2">Reg <span className="bg-primary-container text-on-primary text-[8px] px-1 py-0.5 rounded font-black uppercase tracking-widest">BETA</span></span>
-          </button>
-
-          <button className={`flex items-center gap-1 px-3 py-1 w-full rounded-md font-label-bold text-[10px] transition-all whitespace-nowrap shrink-0 group-hover:px-3 ${activeTab === 'rolemenu' ? 'bg-primary-container/10 text-primary-container border border-primary-container/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('rolemenu')}>
-            <Users size={14} className="shrink-0" />
-            <span className="opacity-0 group-hover:opacity-100 transition-opacity">Roles</span>
-          </button>
-
-          <button className={`flex items-center gap-1 px-3 py-1 w-full rounded-md font-label-bold text-[10px] transition-all whitespace-nowrap shrink-0 group-hover:px-3 ${activeTab === 'ticket' ? 'bg-primary-container/10 text-primary-container border border-primary-container/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('ticket')}>
-            <Shield size={14} className="shrink-0" />
-            <span className="opacity-0 group-hover:opacity-100 transition-opacity">Ticket</span>
-          </button>
-
-          <button className={`flex items-center gap-1 px-3 py-1 w-full rounded-md font-label-bold text-[10px] transition-all whitespace-nowrap shrink-0 group-hover:px-3 ${activeTab === 'giveaway' ? 'bg-primary-container/10 text-primary-container border border-primary-container/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('giveaway')}>
-            <Gift size={14} className="shrink-0" />
-            <span className="opacity-0 group-hover:opacity-100 transition-opacity">Giveaway</span>
-          </button>
-
-          <button className={`flex items-center gap-1 px-3 py-1 w-full rounded-md font-label-bold text-[10px] transition-all whitespace-nowrap shrink-0 group-hover:px-3 ${activeTab === 'killboard' ? 'bg-primary-container/10 text-primary-container border border-primary-container/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('killboard')}>
-            <Crosshair size={14} className="shrink-0" />
-            <span className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2">KillBoard <span className="bg-primary-container text-on-primary text-[8px] px-1 py-0.5 rounded font-black uppercase tracking-widest">BETA</span></span>
-          </button>
-
-          <button className={`flex items-center gap-1 px-3 py-1 w-full rounded-md font-label-bold text-[10px] transition-all whitespace-nowrap shrink-0 group-hover:px-3 ${activeTab === 'templates' ? 'bg-primary-container/10 text-primary-container border border-primary-container/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('templates')}>
-            <Copy size={14} className="shrink-0" />
-            <span className="opacity-0 group-hover:opacity-100 transition-opacity">Templates</span>
-          </button>
-
-          <button className={`flex items-center gap-1 px-3 py-1 w-full rounded-md font-label-bold text-[10px] transition-all whitespace-nowrap shrink-0 group-hover:px-3 ${activeTab === 'log' ? 'bg-primary-container/10 text-primary-container border border-primary-container/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('log')}>
-            <FileText size={14} className="shrink-0" />
-            <span className="opacity-0 group-hover:opacity-100 transition-opacity">Logs</span>
-          </button>
-
-          <button className={`flex items-center gap-1 px-3 py-1 w-full rounded-md font-label-bold text-[10px] transition-all whitespace-nowrap shrink-0 group-hover:px-3 ${activeTab === 'embed' ? 'bg-primary-container/10 text-primary-container border border-primary-container/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'}`} onClick={() => setActiveTab('embed')}>
-            <ImageIcon size={14} className="shrink-0" />
-            <span className="opacity-0 group-hover:opacity-100 transition-opacity">Branding</span>
-          </button>
+          {[
+            { id: 'overview', label: 'Overview', icon: Home },
+            { id: 'general', label: 'General', icon: Layout },
+            { id: 'registration', label: 'Reg', icon: UserPlus, isBeta: true },
+            { id: 'rolemenu', label: 'Roles', icon: Users },
+            { id: 'ticket', label: 'Ticket', icon: Shield },
+            { id: 'giveaway', label: 'Giveaway', icon: Gift },
+            { id: 'killboard', label: 'KillBoard', icon: Crosshair, isBeta: true },
+            { id: 'templates', label: 'Templates', icon: Copy },
+            { id: 'log', label: 'Logs', icon: FileText },
+            { id: 'embed', label: 'Branding', icon: ImageIcon },
+          ].map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                title={tab.label}
+                className={`relative flex items-center h-9 w-9 group-hover:w-full rounded-lg transition-all duration-200 shrink-0 overflow-hidden ${
+                  isActive
+                    ? 'bg-primary-container/15 text-primary-container border border-primary-container/40 shadow-[0_0_12px_rgba(255,215,0,0.15)] font-bold'
+                    : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'
+                }`}
+              >
+                <div className="w-9 h-9 shrink-0 flex items-center justify-center">
+                  <Icon size={16} className={isActive ? 'text-primary-container' : ''} />
+                </div>
+                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap text-xs font-label-bold pr-3 flex items-center gap-1.5">
+                  {tab.label}
+                  {tab.isBeta && (
+                    <span className="bg-primary-container text-on-primary text-[8px] px-1 py-0.5 rounded font-black uppercase tracking-widest">
+                      BETA
+                    </span>
+                  )}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </nav>
 
