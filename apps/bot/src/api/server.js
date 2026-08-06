@@ -22,21 +22,39 @@ function startApiServer(manager, port = process.env.BOT_API_PORT || 3005) {
                 const guilds = [];
                 const fetchPromises = client.guilds.cache.map(async guild => {
                     try {
+                        let isMember = false;
                         if (guild.members.cache.has(context.userId)) {
+                            isMember = true;
+                        } else {
+                            const member = await guild.members.fetch(context.userId).catch(() => null);
+                            if (member) isMember = true;
+                        }
+
+                        if (isMember) {
+                            let inviteUrl = `https://discord.com/channels/${guild.id}`;
+                            try {
+                                if (guild.members.me.permissions.has('ManageGuild')) {
+                                    const invites = await guild.invites.fetch().catch(() => null);
+                                    if (invites && invites.size > 0) {
+                                        inviteUrl = invites.first().url;
+                                    } else {
+                                        const channel = guild.channels.cache.find(c => c.isTextBased() && c.permissionsFor(guild.members.me).has('CreateInstantInvite'));
+                                        if (channel) {
+                                            const invite = await channel.createInvite({ maxAge: 0, maxUses: 0 }).catch(() => null);
+                                            if (invite) inviteUrl = invite.url;
+                                        }
+                                    }
+                                }
+                            } catch (e) {
+                                // ignore invite fetch errors
+                            }
+
                             guilds.push({
                                 id: guild.id,
                                 name: guild.name,
-                                icon: guild.iconURL({ format: 'png', size: 64 })
+                                icon: guild.iconURL({ format: 'png', size: 64 }),
+                                invite: inviteUrl
                             });
-                        } else {
-                            const member = await guild.members.fetch(context.userId).catch(() => null);
-                            if (member) {
-                                guilds.push({
-                                    id: guild.id,
-                                    name: guild.name,
-                                    icon: guild.iconURL({ format: 'png', size: 64 })
-                                });
-                            }
                         }
                     } catch (e) {
                         // ignore fetching errors for this guild

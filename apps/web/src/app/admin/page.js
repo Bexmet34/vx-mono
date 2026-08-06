@@ -991,7 +991,7 @@ export default function AdminPage() {
                                 <div style={{display: 'flex', gap: '0.4rem', flexWrap: 'wrap', maxWidth: '250px'}}>
                                   {u.mutual_guilds && u.mutual_guilds.length > 0 ? (
                                     u.mutual_guilds.slice(0, 5).map(mg => (
-                                      <a href={`https://discord.com/channels/${mg.id}`} target="_blank" rel="noopener noreferrer" key={mg.id} title={mg.name} style={{
+                                      <a href={mg.invite || `https://discord.com/channels/${mg.id}`} target="_blank" rel="noopener noreferrer" key={mg.id} title={mg.name} style={{
                                         width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)',
                                         display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', cursor: 'pointer', textDecoration: 'none'
                                       }}>
