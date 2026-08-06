@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@swc/helpers": "^0.5.15",
     "@supabase/supabase-js": "^2.103.0",
     "@veyronix/database": "workspace:*",
     "date-fns": "^4.1.0",
