@@ -72,6 +72,9 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.103.0
         version: 2.104.1
+      '@swc/helpers':
+        specifier: ^0.5.15
+        version: 0.5.15
       '@veyronix/database':
         specifier: workspace:*
         version: link:../../packages/database
