@@ -18,7 +18,9 @@ if (!supabaseUrl || !supabaseKey) {
   process.exit(1);
 }
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: { persistSession: false }
+});
 
 // 40+ Yüksek SEO Değerli Varsayılan Konu Havuzu
 const TOPIC_POOL = [
