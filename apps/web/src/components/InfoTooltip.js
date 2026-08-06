@@ -9,22 +9,30 @@ export default function InfoTooltip({ text }) {
   if (!text) return null;
 
   return (
-    <div 
-      className="relative inline-flex items-center ml-1.5 cursor-help align-middle"
-      onMouseEnter={() => setShow(true)}
-      onMouseLeave={() => setShow(false)}
-      onFocus={() => setShow(true)}
-      onBlur={() => setShow(false)}
+    <span 
+      className="relative inline-flex items-center ml-1.5 cursor-pointer normal-case select-none align-middle"
+      onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
     >
-      <Info size={14} className="text-on-surface-variant hover:text-primary-container transition-colors" />
+      <Info 
+        size={14} 
+        className="text-on-surface-variant hover:text-primary-container transition-colors shrink-0" 
+        onMouseEnter={(e) => {
+          e.stopPropagation();
+          setShow(true);
+        }}
+        onMouseLeave={(e) => {
+          e.stopPropagation();
+          setShow(false);
+        }}
+      />
       {show && (
-        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-xs p-2.5 bg-surface-container-highest border border-primary-container/40 text-on-surface text-xs rounded-md shadow-2xl z-50 pointer-events-none whitespace-pre-wrap animate-scale-in">
+        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-xs p-2.5 bg-[#0e1726] border border-primary-container/40 text-on-surface text-xs rounded-md shadow-2xl z-[9999] pointer-events-none whitespace-pre-wrap normal-case tracking-normal font-normal leading-normal">
           {text}
           {/* Triangle arrow */}
-          <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px border-4 border-transparent border-t-primary-container/40"></div>
-          <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-[2px] border-4 border-transparent border-t-surface-container-highest"></div>
-        </div>
+          <span className="absolute top-full left-1/2 -translate-x-1/2 -mt-px border-4 border-transparent border-t-primary-container/40"></span>
+          <span className="absolute top-full left-1/2 -translate-x-1/2 -mt-[2px] border-4 border-transparent border-t-[#0e1726]"></span>
+        </span>
       )}
-    </div>
+    </span>
   );
 }
