@@ -95,8 +95,8 @@ jobs:
               fi
             fi
             
-            # PM2'yi yeniden başlat
-            pm2 reload ecosystem.config.js || pm2 start ecosystem.config.js
+            # PM2'yi yeni ortam değişkenleriyle (env) yeniden başlat
+            pm2 restart ecosystem.config.js --update-env || pm2 start ecosystem.config.js
 
       - name: 🚨 Beklenmeyen Hatayı Discord'a Gönder
         if: failure()
