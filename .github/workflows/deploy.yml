@@ -72,10 +72,13 @@ jobs:
 
       - name: 🔄 Sunucuda Güncelle ve Yeniden Başlat (SSH)
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
           password: ${{ secrets.VPS_PASSWORD }}
+          envs: GEMINI_API_KEY
           script: |
             mkdir -p /root/vx-mono
             cd /root/vx-mono
@@ -87,11 +90,11 @@ jobs:
             # GitHub Secrets içerisindeki GEMINI_API_KEY ortam değişkenini sunucudaki .env dosyasına otomatik yaz
             mkdir -p apps/web
             touch apps/web/.env
-            if [ -n "${{ secrets.GEMINI_API_KEY }}" ]; then
+            if [ -n "$GEMINI_API_KEY" ]; then
               if ! grep -q "^GEMINI_API_KEY=" apps/web/.env; then
-                echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> apps/web/.env
+                echo "GEMINI_API_KEY=$GEMINI_API_KEY" >> apps/web/.env
               else
-                sed -i 's|^GEMINI_API_KEY=.*|GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}|' apps/web/.env
+                sed -i "s|^GEMINI_API_KEY=.*|GEMINI_API_KEY=$GEMINI_API_KEY|" apps/web/.env
               fi
             fi
             
