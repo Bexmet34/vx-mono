@@ -10,6 +10,7 @@ export default function AdminBlogAutomationTab({ showToast }) {
     posts_per_day: 3
   });
   const [keywords, setKeywords] = useState([]);
+  const [lastGeneratedPost, setLastGeneratedPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [triggering, setTriggering] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
@@ -44,11 +45,13 @@ export default function AdminBlogAutomationTab({ showToast }) {
   // Trigger Immediate Article Generation
   const handleTriggerNow = async () => {
     setTriggering(true);
+    setLastGeneratedPost(null);
     try {
       const res = await fetch('/api/admin/blog-automation/trigger', { method: 'POST' });
       const data = await res.json();
 
       if (res.ok && data.success) {
+        if (data.post) setLastGeneratedPost(data.post);
         if (showToast) showToast(data.message || 'Yeni makale başarıyla yayınlandı!', 'success');
         fetchData(); // Refresh custom keyword list
       } else {
@@ -184,6 +187,40 @@ export default function AdminBlogAutomationTab({ showToast }) {
           </button>
         </div>
       </div>
+
+      {/* Newly Generated Post Success Banner */}
+      {lastGeneratedPost && (
+        <div className="admin-card" style={{ background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(15, 23, 42, 0.8) 100%)', border: '1px solid rgba(16, 185, 129, 0.5)', padding: '1.2rem 1.8rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+          <div>
+            <div style={{ color: '#10B981', fontWeight: 'bold', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.3rem' }}>
+              <CheckCircle2 size={16} /> Yeni Makale Başarıyla Üretildi ve Yayınlandı!
+            </div>
+            <h4 style={{ color: '#fff', margin: 0, fontSize: '1.15rem', fontWeight: '700' }}>
+              {lastGeneratedPost.title}
+            </h4>
+          </div>
+          <a 
+            href={`/blog/${lastGeneratedPost.slug}`} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            style={{ 
+              background: '#10B981', 
+              color: '#fff', 
+              padding: '0.65rem 1.4rem', 
+              borderRadius: '10px', 
+              textDecoration: 'none', 
+              fontWeight: 'bold', 
+              fontSize: '0.9rem',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              boxShadow: '0 4px 15px rgba(16, 185, 129, 0.3)'
+            }}
+          >
+            Makaleyi Gör & Oku →
+          </a>
+        </div>
+      )}
 
       {/* Grid: Status Cards & Schedule */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
