@@ -175,7 +175,15 @@ export default function BlogPostDetailClient({ post, relatedPosts = [] }) {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem' }}>
               {relatedPosts.map(rel => (
                 <Link href={`/blog/${rel.slug}`} key={rel.slug} style={{ textDecoration: 'none' }}>
-                  <div className={styles.bentoCard} style={{ height: '100%', padding: '1.2rem' }}>
+                  <div style={{ 
+                    height: '100%', 
+                    padding: '1.25rem', 
+                    background: 'rgba(15, 23, 42, 0.75)', 
+                    border: '1px solid rgba(88, 101, 242, 0.3)', 
+                    borderRadius: '16px',
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+                    transition: 'all 0.2s ease' 
+                  }}>
                     <span style={{ fontSize: '0.75rem', color: '#5865F2', fontWeight: 'bold' }}>{rel.category}</span>
                     <h4 style={{ fontSize: '1.1rem', color: '#fff', margin: '0.5rem 0', lineHeight: '1.4' }}>{rel.title}</h4>
                     <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', lineHeight: '1.5', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
