@@ -205,6 +205,6 @@ Lütfen tam olarak aşağıdaki JSON formatında yanıt ver (Başka hiçbir meti
     });
 
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 429 });
+    return NextResponse.json({ success: false, error: error.message }, { status: 200 });
   }
 }
