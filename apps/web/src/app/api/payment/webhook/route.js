@@ -115,29 +115,50 @@ export async function POST(req) {
             is_unlimited: userProfile?.is_unlimited || false
           }, { onConflict: 'discord_id' });
 
-        // Queue DM notification to User (Bilingual TR + EN)
+        // Queue DM notification to User (Stacked EN top / TR bottom format)
         try {
           const isUnlimited = userProfile?.is_unlimited || false;
           const expiryStr = currentExpiry.toLocaleDateString('tr-TR');
           
           let embedTitle = isUnlimited 
-            ? "💎 Veyronix Sınırsız Bireysel Premium Aktif / Unlimited Individual Premium Activated" 
-            : "⚡ Veyronix Bireysel Premium Aktif / Individual Premium Activated";
+            ? "💎 Veyronix Premium Activated / Aktif Edildi!" 
+            : "✨ Veyronix Premium Activated / Aktif Edildi!";
           let embedDescription = "";
 
           if (isUnlimited) {
-            embedDescription = `Bireysel premium aboneliğiniz aktif edildi! / Your individual premium subscription has been activated!\n\n` +
-              `• **Paket Türü / Plan Type:** Sınırsız (Ömür Boyu) / Unlimited (Lifetime)\n` +
-              `• **Top.gg Oy Verme Zorunluluğu / Top.gg Vote Requirement:** Süresiz olarak kaldırıldı / Permanently removed.\n` +
-              `• Botu tüm sunucularda oylama yapmadan sınırsız kullanabilirsiniz. / You can use the bot on all servers without voting.\n` +
-              `• **Web Sitesi / Website:** https://veyronix.com.tr/`;
+            embedDescription = 
+              `🇬🇧 **Unlimited Premium Activated!**\n` +
+              `Your individual premium subscription has been activated.\n` +
+              `• **Status:** Active (Unlimited / Lifetime)\n` +
+              `• **Expiration Date:** Never (Lifetime Access)\n` +
+              `• **Top.gg Vote Requirement:** Permanently Removed\n` +
+              `• **Website:** https://veyronix.com.tr/\n` +
+              `• **Support Server:** https://discord.gg/D6T3t4beqa\n\n` +
+              `▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n\n` +
+              `🇹🇷 **Sınırsız Premium Aktif Edildi!**\n` +
+              `Bireysel premium aboneliğiniz Ömür Boyu Sınırsız olarak tanımlandı.\n` +
+              `• **Durum:** Aktif (Sınırsız / Ömür Boyu)\n` +
+              `• **Son Kullanma Tarihi:** Süresiz (Ömür Boyu)\n` +
+              `• **Top.gg Oy Verme Zorunluluğu:** Süresiz Kaldırıldı\n` +
+              `• **Web Sitesi:** https://veyronix.com.tr/\n` +
+              `• **Destek Sunucusu:** https://discord.gg/D6T3t4beqa`;
           } else {
-            embedDescription = `Bireysel premium aboneliğiniz aktif edildi! / Your individual premium subscription has been activated!\n\n` +
-              `• **Paket Türü / Plan Type:** Süreli Bireysel Premium / Timed Individual Premium\n` +
-              `• **Eklenen Süre / Duration Added:** ${payment.duration_days} Gün / ${payment.duration_days} Days\n` +
-              `• **Son Kullanma Tarihi / Expiration Date:** ${expiryStr}\n` +
-              `• **Top.gg Oy Verme Zorunluluğu / Top.gg Vote Requirement:** Belirtilen tarihe kadar kaldırıldı / Removed until expiration date.\n` +
-              `• **Web Sitesi / Website:** https://veyronix.com.tr/`;
+            embedDescription = 
+              `🇬🇧 **Premium Subscription Activated!**\n` +
+              `Your individual premium subscription has been activated.\n` +
+              `• **Status:** Active (+${payment.duration_days} Days Extended)\n` +
+              `• **Expiration Date:** ${expiryStr}\n` +
+              `• **Top.gg Vote Requirement:** Removed\n` +
+              `• **Website:** https://veyronix.com.tr/\n` +
+              `• **Support Server:** https://discord.gg/D6T3t4beqa\n\n` +
+              `▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n\n` +
+              `🇹🇷 **Premium Aboneliği Aktif Edildi!**\n` +
+              `Bireysel premium aboneliğiniz aktif edildi.\n` +
+              `• **Durum:** Aktif (+${payment.duration_days} Gün Uzatıldı)\n` +
+              `• **Son Kullanma Tarihi:** ${expiryStr}\n` +
+              `• **Top.gg Oy Verme Zorunluluğu:** Kaldırıldı\n` +
+              `• **Web Sitesi:** https://veyronix.com.tr/\n` +
+              `• **Destek Sunucusu:** https://discord.gg/D6T3t4beqa`;
           }
 
           if (payment.user_id) {
