@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # ==============================================================================
-# Veyronix (VX-Mono) Akıllı Güncelleme, Sistem Temizliği ve Canlıya Alma (up)
+# Veyronix (VX-Mono) Akıllı Güncelleme, VPS Makine Temizliği ve Canlıya Alma (up)
 # ==============================================================================
 
 set -e
@@ -11,7 +11,7 @@ if [ "$1" == "--force" ] || [ "$1" == "-f" ]; then
   FORCE_BUILD=true
 fi
 
-echo "🚀 [Veyronix UP] Akıllı güncelleme ve sistem temizliği başlatılıyor..."
+echo "🚀 [Veyronix UP] Akıllı güncelleme ve genel VPS makine temizliği başlatılıyor..."
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$PROJECT_DIR"
@@ -87,12 +87,35 @@ else
   echo "⏩ [Destek Botu] Değişiklik yok, restart es geçildi."
 fi
 
-# 7. Derin Sistem Temizliği (Maksimum Sunucu / Disk Performansı)
-echo "🧼 [6/7] Derin sistem ve disk temizliği yapılıyor..."
-pnpm store prune 2>/dev/null || true
-pm2 flush 2>/dev/null || true
+# 7. Derin Genel VPS Makine & Sistem Temizliği (Disk & RAM Performansı)
+echo "🧼 [6/7] Genel VPS makine ve sistem temizliği yapılıyor (RAM & Disk)..."
+
+# A. APT paket önbelleği ve gereksiz sistem paket temizliği
+if command -v apt-get >/dev/null 2>&1; then
+  apt-get autoremove -y >/dev/null 2>&1 || true
+  apt-get autoclean -y >/dev/null 2>&1 || true
+  apt-get clean >/dev/null 2>&1 || true
+fi
+
+# B. Systemd Journal Log temizliği (Gigabaytlarca şişen sistem logları)
+if command -v journalctl >/dev/null 2>&1; then
+  journalctl --vacuum-time=3d >/dev/null 2>&1 || true
+  journalctl --vacuum-size=50M >/dev/null 2>&1 || true
+fi
+
+# C. Sistem geçici klasörleri (/tmp, /var/tmp) ve eski log arşivleri
+rm -rf /tmp/* /var/tmp/* /var/log/*.gz /var/log/*.[0-9] 2>/dev/null || true
 rm -f *.log *.txt install_log.txt build_log.txt 2>/dev/null || true
+
+# D. Node/PNPM paket ve PM2 Log Çöpü Temizliği
+pnpm store prune >/dev/null 2>&1 || true
+pm2 flush >/dev/null 2>&1 || true
+
+# E. Git çöp nesne temizliği
 git gc --prune=now --quiet 2>/dev/null || true
+
+# F. RAM Önbelleği Temizliği (Boşta Kalan RAM'i Sıfırlama)
+sync && (echo 3 > /proc/sys/vm/drop_caches 2>/dev/null || true)
 
 # 8. Otomatik 'up' kısayol güncelleme
 echo "⚙️ [7/7] Kısayol kontrolü..."
@@ -100,6 +123,6 @@ cp "$PROJECT_DIR/up.sh" /usr/local/bin/up 2>/dev/null || true
 chmod +x /usr/local/bin/up 2>/dev/null || true
 
 echo "=============================================================================="
-echo "✅ [BAŞARILI] Veyronix Sunucu Güncellemesi ve Sistem Temizliği Tamamlandı!"
+echo "✅ [BAŞARILI] Veyronix Sunucu Güncellemesi ve Genel Makine Temizliği Tamamlandı!"
 echo "=============================================================================="
 pm2 status
