@@ -27,7 +27,7 @@ rm -rf apps/web/.next
 
 # 5. Bağımlılıkları kontrol et
 echo "📦 [4/6] Paket bağımlılıkları doğrulanıyor..."
-pnpm install --frozen-lockfile || pnpm install
+CI=true pnpm install --no-frozen-lockfile || pnpm install
 
 # 6. Web sitesini sıfırdan derle (Production Build)
 echo "🏗️ [5/6] Web sitesi (vxweb) production build alınıyor..."
