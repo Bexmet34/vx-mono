@@ -183,26 +183,26 @@ export async function POST(req) {
 
     if (upsertError) throw upsertError;
 
-    // Queue DM notification to User with clear timing details
+    // Queue DM notification to User with clear timing details (Bilingual TR + EN)
     try {
-      const parsed = await getParsedTemplate('user_premium_admin');
-
-      let embedTitle = parsed?.title || (is_unlimited ? "💎 Veyronix Sınırsız Bireysel Premium Aktif!" : "⚡ Veyronix Bireysel Premium Aktif!");
+      let embedTitle = is_unlimited 
+        ? "💎 Veyronix Sınırsız Bireysel Premium / Unlimited Individual Premium" 
+        : "⚡ Veyronix Bireysel Premium Aktif / Individual Premium Activated";
       
       let embedDescription = "";
       if (is_unlimited) {
-        embedDescription = `Bireysel premium aboneliğiniz Yönetici tarafından tanımlandı!\n\n` +
-          `• **Paket Türü:** Sınırsız (Ömür Boyu)\n` +
-          `• **Top.gg Oy Verme Zorunluluğu:** Süresiz olarak kaldırıldı.\n` +
-          `• Botu tüm sunucularda oylama yapmadan sınırsız kullanabilirsiniz.\n` +
-          `• **Web Sitesi:** https://veyronix.com.tr/`;
+        embedDescription = `Bireysel premium aboneliğiniz tanımlandı! / Your individual premium subscription has been defined!\n\n` +
+          `• **Paket Türü / Plan Type:** Sınırsız (Ömür Boyu) / Unlimited (Lifetime)\n` +
+          `• **Top.gg Oy Verme Zorunluluğu / Top.gg Vote Requirement:** Süresiz olarak kaldırıldı / Permanently removed.\n` +
+          `• Botu tüm sunucularda oylama yapmadan sınırsız kullanabilirsiniz. / You can use the bot on all servers without voting.\n` +
+          `• **Web Sitesi / Website:** https://veyronix.com.tr/`;
       } else {
-        embedDescription = `Bireysel premium aboneliğiniz Yönetici tarafından tanımlandı!\n\n` +
-          `• **Paket Türü:** Süreli Bireysel Premium\n` +
-          `• **Tanımlanan Süre:** ${duration_days} Gün\n` +
-          `• **Son Kullanma Tarihi:** ${expiryDateStr}\n` +
-          `• **Top.gg Oy Verme Zorunluluğu:** Belirtilen süre boyunca kaldırıldı.\n` +
-          `• **Web Sitesi:** https://veyronix.com.tr/`;
+        embedDescription = `Bireysel premium aboneliğiniz tanımlandı! / Your individual premium subscription has been defined!\n\n` +
+          `• **Paket Türü / Plan Type:** Süreli Bireysel Premium / Timed Individual Premium\n` +
+          `• **Tanımlanan Süre / Duration:** ${duration_days} Gün / ${duration_days} Days\n` +
+          `• **Son Kullanma Tarihi / Expiration Date:** ${expiryDateStr}\n` +
+          `• **Top.gg Oy Verme Zorunluluğu / Top.gg Vote Requirement:** Belirtilen süre boyunca kaldırıldı / Removed during this period.\n` +
+          `• **Web Sitesi / Website:** https://veyronix.com.tr/`;
       }
 
       await supabase.from('message_queue').insert({
@@ -294,23 +294,25 @@ export async function PATCH(req) {
 
     if (updateError) throw updateError;
 
-    // Queue DM notification to User
+    // Queue DM notification to User (Bilingual TR + EN)
     try {
-      let embedTitle = isUnlimited ? "💎 Veyronix Sınırsız Bireysel Premium Güncellendi" : "⚡ Veyronix Bireysel Premium Güncellendi";
+      let embedTitle = isUnlimited 
+        ? "💎 Veyronix Sınırsız Bireysel Premium Güncellendi / Unlimited Individual Premium Updated" 
+        : "⚡ Veyronix Bireysel Premium Güncellendi / Individual Premium Updated";
       let embedDescription = "";
 
       if (isUnlimited) {
-        embedDescription = `Bireysel premium durumunuz güncellendi!\n\n` +
-          `• **Paket Türü:** Sınırsız (Ömür Boyu)\n` +
-          `• **Top.gg Oy Verme Zorunluluğu:** Süresiz olarak kaldırıldı.\n` +
-          `• **Web Sitesi:** https://veyronix.com.tr/`;
+        embedDescription = `Bireysel premium durumunuz güncellendi! / Your individual premium status has been updated!\n\n` +
+          `• **Paket Türü / Plan Type:** Sınırsız (Ömür Boyu) / Unlimited (Lifetime)\n` +
+          `• **Top.gg Oy Verme Zorunluluğu / Top.gg Vote Requirement:** Süresiz olarak kaldırıldı / Permanently removed.\n` +
+          `• **Web Sitesi / Website:** https://veyronix.com.tr/`;
       } else {
         const dateStr = newExpiryDate ? newExpiryDate.toLocaleDateString('tr-TR') : 'Belirtilmedi';
-        embedDescription = `Bireysel premium süreniz güncellendi!\n\n` +
-          `• **Paket Türü:** Süreli Bireysel Premium\n` +
-          `• **Son Kullanma Tarihi:** ${dateStr}\n` +
-          `• **Top.gg Oy Verme Zorunluluğu:** Belirtilen tarihe kadar kaldırıldı.\n` +
-          `• **Web Sitesi:** https://veyronix.com.tr/`;
+        embedDescription = `Bireysel premium süreniz güncellendi! / Your individual premium duration has been updated!\n\n` +
+          `• **Paket Türü / Plan Type:** Süreli Bireysel Premium / Timed Individual Premium\n` +
+          `• **Son Kullanma Tarihi / Expiration Date:** ${dateStr}\n` +
+          `• **Top.gg Oy Verme Zorunluluğu / Top.gg Vote Requirement:** Belirtilen tarihe kadar kaldırıldı / Removed until expiration date.\n` +
+          `• **Web Sitesi / Website:** https://veyronix.com.tr/`;
       }
 
       await supabase.from('message_queue').insert({
