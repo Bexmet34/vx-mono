@@ -12,18 +12,24 @@ const isAdminUser = (id) => id && (id === ADMIN_ID || id === ADMIN_ID_2);
 
 async function getDiscordUser(discordId) {
   const token = process.env.DISCORD_BOT_TOKEN;
-  if (!token) return { username: "Bilinmeyen", avatar_url: null };
+  if (!token) return { username: `Kullanıcı (${discordId})`, avatar_url: null };
 
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 1000);
+
     const res = await fetch(`https://discord.com/api/v10/users/${discordId}`, {
       headers: {
         'Authorization': `Bot ${token}`
       },
+      signal: controller.signal,
       next: { revalidate: 3600 } // cache for 1 hour
     });
 
+    clearTimeout(timeoutId);
+
     if (!res.ok) {
-      return { username: "Bilinmeyen", avatar_url: null };
+      return { username: `Kullanıcı (${discordId})`, avatar_url: null };
     }
 
     const data = await res.json();
@@ -32,40 +38,42 @@ async function getDiscordUser(discordId) {
       const isGif = data.avatar.startsWith('a_');
       avatarUrl = `https://cdn.discordapp.com/avatars/${discordId}/${data.avatar}.${isGif ? 'gif' : 'png'}`;
     } else {
-      // New system default avatar
       const defaultIdx = Number((BigInt(discordId) >> 22n) % 6n);
       avatarUrl = `https://cdn.discordapp.com/embed/avatars/${defaultIdx}.png`;
     }
 
     return {
-      username: data.global_name || data.username || "Bilinmeyen",
+      username: data.global_name || data.username || `Kullanıcı (${discordId})`,
       avatar_url: avatarUrl
     };
   } catch (error) {
-    console.error(`Error fetching Discord user ${discordId}:`, error);
-    return { username: "Bilinmeyen", avatar_url: null };
+    return { username: `Kullanıcı (${discordId})`, avatar_url: null };
   }
 }
 
 async function getParsedTemplate(templateId, placeholders = {}) {
-  const { data: template } = await supabase
-    .from('notification_templates')
-    .select('*')
-    .eq('id', templateId)
-    .single();
+  try {
+    const { data: template } = await supabase
+      .from('notification_templates')
+      .select('*')
+      .eq('id', templateId)
+      .single();
 
-  if (!template) return null;
+    if (!template) return null;
 
-  let title = template.title_tr; 
-  let content = template.content_tr;
+    let title = template.title_tr; 
+    let content = template.content_tr;
 
-  Object.keys(placeholders).forEach(key => {
-    const regex = new RegExp(`{${key}}`, 'g');
-    title = title?.replace(regex, placeholders[key]);
-    content = content?.replace(regex, placeholders[key]);
-  });
+    Object.keys(placeholders).forEach(key => {
+      const regex = new RegExp(`{${key}}`, 'g');
+      title = title?.replace(regex, placeholders[key]);
+      content = content?.replace(regex, placeholders[key]);
+    });
 
-  return { title, content, color: template.color, is_embed: template.is_embed };
+    return { title, content, color: template.color, is_embed: template.is_embed };
+  } catch (err) {
+    return null;
+  }
 }
 
 export async function GET() {
@@ -81,26 +89,27 @@ export async function GET() {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  // Fetch discord profile details and mutual guilds for each user in parallel
-  const usersWithProfiles = await Promise.all((data || []).map(async (u) => {
+  // Fast parallel enrichment with timeouts using Promise.allSettled
+  const results = await Promise.allSettled((data || []).map(async (u) => {
     const discordProfile = await getDiscordUser(u.discord_id);
     
-    // Fetch mutual guilds from Bot API
     let mutualGuilds = [];
     try {
       const botApiUrl = process.env.BOT_API_URL || 'http://localhost:3005';
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 600);
       const botRes = await fetch(`${botApiUrl}/api/mutual-guilds/${u.discord_id}`, {
-        next: { revalidate: 300 } // cache 5 min
+        signal: controller.signal,
+        next: { revalidate: 300 }
       });
+      clearTimeout(timeoutId);
       if (botRes.ok) {
         const botData = await botRes.json();
-        if (botData.success) {
+        if (botData?.success && Array.isArray(botData.guilds)) {
           mutualGuilds = botData.guilds;
         }
       }
-    } catch (botErr) {
-      console.warn(`[Admin Users API] Could not fetch mutual guilds for ${u.discord_id}:`, botErr.message);
-    }
+    } catch (botErr) {}
 
     return {
       ...u,
@@ -109,6 +118,17 @@ export async function GET() {
       mutual_guilds: mutualGuilds
     };
   }));
+
+  const usersWithProfiles = results.map((res, index) => {
+    if (res.status === 'fulfilled') return res.value;
+    const u = data[index];
+    return {
+      ...u,
+      username: `Kullanıcı (${u.discord_id})`,
+      avatar_url: null,
+      mutual_guilds: []
+    };
+  });
 
   return NextResponse.json(usersWithProfiles);
 }
@@ -134,6 +154,7 @@ export async function POST(req) {
       .single();
 
     let updateData = { discord_id };
+    let expiryDateStr = "";
 
     if (is_unlimited) {
       updateData.is_unlimited = true;
@@ -153,6 +174,7 @@ export async function POST(req) {
       currentExpiry.setDate(currentExpiry.getDate() + days);
       updateData.is_unlimited = false;
       updateData.premium_until = currentExpiry.toISOString();
+      expiryDateStr = currentExpiry.toLocaleDateString('tr-TR');
     }
 
     const { error: upsertError } = await supabase
@@ -161,28 +183,42 @@ export async function POST(req) {
 
     if (upsertError) throw upsertError;
 
-    // Queue DM notification to User
+    // Queue DM notification to User with clear timing details
     try {
-      const durationText = is_unlimited ? "Sınırsız" : `${duration_days} Günlük`;
-      const parsed = await getParsedTemplate('user_premium_admin', {
-        sure: durationText
-      });
-      if (parsed && discord_id) {
-        await supabase.from('message_queue').insert({
-          owner_id: discord_id,
-          message_content: JSON.stringify({
-            embeds: [{
-              title: parsed.title,
-              description: parsed.content,
-              color: parsed.color ? parseInt(parsed.color.replace('#', ''), 16) : 0xfca311,
-              timestamp: new Date().toISOString()
-            }]
-          }),
-          status: 'pending'
-        });
+      const parsed = await getParsedTemplate('user_premium_admin');
+
+      let embedTitle = parsed?.title || (is_unlimited ? "💎 Veyronix Sınırsız Bireysel Premium Aktif!" : "⚡ Veyronix Bireysel Premium Aktif!");
+      
+      let embedDescription = "";
+      if (is_unlimited) {
+        embedDescription = `Bireysel premium aboneliğiniz Yönetici tarafından tanımlandı!\n\n` +
+          `• **Paket Türü:** Sınırsız (Ömür Boyu)\n` +
+          `• **Top.gg Oy Verme Zorunluluğu:** Süresiz olarak kaldırıldı.\n` +
+          `• Botu tüm sunucularda oylama yapmadan sınırsız kullanabilirsiniz.\n` +
+          `• **Web Sitesi:** https://veyronix.com.tr/`;
+      } else {
+        embedDescription = `Bireysel premium aboneliğiniz Yönetici tarafından tanımlandı!\n\n` +
+          `• **Paket Türü:** Süreli Bireysel Premium\n` +
+          `• **Tanımlanan Süre:** ${duration_days} Gün\n` +
+          `• **Son Kullanma Tarihi:** ${expiryDateStr}\n` +
+          `• **Top.gg Oy Verme Zorunluluğu:** Belirtilen süre boyunca kaldırıldı.\n` +
+          `• **Web Sitesi:** https://veyronix.com.tr/`;
       }
+
+      await supabase.from('message_queue').insert({
+        owner_id: discord_id,
+        message_content: JSON.stringify({
+          embeds: [{
+            title: embedTitle,
+            description: embedDescription,
+            color: is_unlimited ? 0xfca311 : 0x2ecc71,
+            timestamp: new Date().toISOString()
+          }]
+        }),
+        status: 'pending'
+      });
     } catch (queueErr) {
-      console.error("[Admin Users POST] Error queueing bought DM notification:", queueErr.message);
+      console.error("[Admin Users POST] Error queueing DM notification:", queueErr.message);
     }
 
     return NextResponse.json({ success: true, user: updateData });
@@ -216,13 +252,17 @@ export async function PATCH(req) {
     }
 
     let updateData = {};
+    let isUnlimited = false;
+    let newExpiryDate = null;
 
     if (action === 'toggle_unlimited') {
       updateData.is_unlimited = !!value;
+      isUnlimited = updateData.is_unlimited;
       if (updateData.is_unlimited) {
         updateData.premium_until = null;
       } else {
         updateData.premium_until = userProfile.premium_until || new Date().toISOString();
+        newExpiryDate = new Date(updateData.premium_until);
       }
     } else if (action === 'add_days' || action === 'remove_days') {
       const days = parseInt(value) || 0;
@@ -241,6 +281,8 @@ export async function PATCH(req) {
 
       updateData.premium_until = newExpiry.toISOString();
       updateData.is_unlimited = false;
+      isUnlimited = false;
+      newExpiryDate = newExpiry;
     } else {
       return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
@@ -254,34 +296,37 @@ export async function PATCH(req) {
 
     // Queue DM notification to User
     try {
-      let durationText = "Güncellendi";
-      if (action === 'toggle_unlimited') {
-        durationText = value ? "Sınırsız" : "Süreli Paket";
-      } else if (action === 'add_days') {
-        durationText = `+${value} Gün (Uzatıldı)`;
-      } else if (action === 'remove_days') {
-        durationText = `-${value} Gün (Düşürüldü)`;
+      let embedTitle = isUnlimited ? "💎 Veyronix Sınırsız Bireysel Premium Güncellendi" : "⚡ Veyronix Bireysel Premium Güncellendi";
+      let embedDescription = "";
+
+      if (isUnlimited) {
+        embedDescription = `Bireysel premium durumunuz güncellendi!\n\n` +
+          `• **Paket Türü:** Sınırsız (Ömür Boyu)\n` +
+          `• **Top.gg Oy Verme Zorunluluğu:** Süresiz olarak kaldırıldı.\n` +
+          `• **Web Sitesi:** https://veyronix.com.tr/`;
+      } else {
+        const dateStr = newExpiryDate ? newExpiryDate.toLocaleDateString('tr-TR') : 'Belirtilmedi';
+        embedDescription = `Bireysel premium süreniz güncellendi!\n\n` +
+          `• **Paket Türü:** Süreli Bireysel Premium\n` +
+          `• **Son Kullanma Tarihi:** ${dateStr}\n` +
+          `• **Top.gg Oy Verme Zorunluluğu:** Belirtilen tarihe kadar kaldırıldı.\n` +
+          `• **Web Sitesi:** https://veyronix.com.tr/`;
       }
-      
-      const parsed = await getParsedTemplate('user_premium_admin', {
-        sure: durationText
+
+      await supabase.from('message_queue').insert({
+        owner_id: discord_id,
+        message_content: JSON.stringify({
+          embeds: [{
+            title: embedTitle,
+            description: embedDescription,
+            color: isUnlimited ? 0xfca311 : 0x3498db,
+            timestamp: new Date().toISOString()
+          }]
+        }),
+        status: 'pending'
       });
-      if (parsed && discord_id) {
-        await supabase.from('message_queue').insert({
-          owner_id: discord_id,
-          message_content: JSON.stringify({
-            embeds: [{
-              title: parsed.title,
-              description: parsed.content,
-              color: parsed.color ? parseInt(parsed.color.replace('#', ''), 16) : 0xfca311,
-              timestamp: new Date().toISOString()
-            }]
-          }),
-          status: 'pending'
-        });
-      }
     } catch (queueErr) {
-      console.error("[Admin Users PATCH] Error queueing bought DM notification:", queueErr.message);
+      console.error("[Admin Users PATCH] Error queueing DM notification:", queueErr.message);
     }
 
     return NextResponse.json({ success: true, updatedData: updateData });

@@ -5,7 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Link from 'next/link';
 import { Calendar, ArrowLeft, Clock, Share2, Copy, Check, Sparkles, MessageSquare, Bot, BookOpen } from "lucide-react";
-import styles from "../app/page.module.css";
+import AdSenseUnit from "@/components/AdSenseUnit";
 
 export default function BlogPostDetailClient({ post, relatedPosts = [] }) {
   const [copied, setCopied] = useState(false);
@@ -114,6 +114,9 @@ export default function BlogPostDetailClient({ post, relatedPosts = [] }) {
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {post.content}
             </ReactMarkdown>
+
+            {/* Google AdSense Unit */}
+            <AdSenseUnit />
 
             {/* CTA Box (Call to Action) */}
             <div style={{ marginTop: '4rem', padding: '2rem', borderRadius: '16px', background: 'linear-gradient(135deg, rgba(88, 101, 242, 0.15) 0%, rgba(15, 23, 42, 0.8) 100%)', border: '1px solid rgba(88, 101, 242, 0.4)', textAlign: 'center' }}>

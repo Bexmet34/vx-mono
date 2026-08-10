@@ -205,9 +205,11 @@ export default async function RootLayout({ children }) {
           `}
         </Script>
         {/* Google AdSense */}
-        <script
-          async
+        <meta name="google-adsense-account" content="ca-pub-1315540294941790" />
+        <Script
+          id="google-adsense"
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1315540294941790"
+          strategy="afterInteractive"
           crossOrigin="anonymous"
         />
         {/* Schema.org Structured Data */}

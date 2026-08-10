@@ -117,17 +117,34 @@ export async function POST(req) {
 
         // Queue DM notification to User
         try {
-          const parsed = await getParsedTemplate('user_premium_bought', {
-            gun: payment.duration_days
-          });
-          if (parsed && payment.user_id) {
+          const isUnlimited = userProfile?.is_unlimited || false;
+          const expiryStr = currentExpiry.toLocaleDateString('tr-TR');
+          
+          let embedTitle = isUnlimited ? "💎 Veyronix Sınırsız Bireysel Premium Aktif!" : "⚡ Veyronix Bireysel Premium Aktif!";
+          let embedDescription = "";
+
+          if (isUnlimited) {
+            embedDescription = `Bireysel premium aboneliğiniz aktif edildi!\n\n` +
+              `• **Paket Türü:** Sınırsız (Ömür Boyu)\n` +
+              `• **Top.gg Oy Verme Zorunluluğu:** Süresiz olarak kaldırıldı.\n` +
+              `• **Web Sitesi:** https://veyronix.com.tr/`;
+          } else {
+            embedDescription = `Bireysel premium aboneliğiniz aktif edildi!\n\n` +
+              `• **Paket Türü:** Süreli Bireysel Premium\n` +
+              `• **Eklenen Süre:** ${payment.duration_days} Gün\n` +
+              `• **Son Kullanma Tarihi:** ${expiryStr}\n` +
+              `• **Top.gg Oy Verme Zorunluluğu:** Belirtilen tarihe kadar kaldırıldı.\n` +
+              `• **Web Sitesi:** https://veyronix.com.tr/`;
+          }
+
+          if (payment.user_id) {
             await supabase.from('message_queue').insert({
               owner_id: payment.user_id,
               message_content: JSON.stringify({
                 embeds: [{
-                  title: parsed.title,
-                  description: parsed.content,
-                  color: parsed.color ? parseInt(parsed.color.replace('#', ''), 16) : 0x2ecc71,
+                  title: embedTitle,
+                  description: embedDescription,
+                  color: isUnlimited ? 0xfca311 : 0x2ecc71,
                   timestamp: new Date().toISOString()
                 }]
               }),

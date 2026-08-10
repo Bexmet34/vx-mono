@@ -183,13 +183,13 @@ const en = {
   legal: {
     privacy: {
       h1: "Information Collection & GDPR",
-      p1: "[ŞİRKET_VEYA_ŞAHIS_UNVANINIZI_GİRİN] (Hereinafter referred to as \"Veyronix\") collects minimal data required for functionality. This includes your Discord user ID, server IDs where the bot is present, and basic settings you configure. We are committed to protecting user data.",
-      h2: "Data Usage",
-      p2: "Your data is used solely to provide party management services and Albion Online integration. We never sell or share your data with third parties.",
+      p1: "Veyronix (Hereinafter referred to as \"Veyronix\") collects minimal data required for functionality. This includes your Discord user ID, server IDs where the bot is present, and basic settings you configure. We are committed to protecting user data under GDPR guidelines.",
+      h2: "Data Usage & Google AdSense / Cookies",
+      p2: "Your data is used solely to provide party management services and Albion Online integration. Third-party vendors, including Google, use cookies to serve ads based on your prior visits to our website. Google's use of advertising cookies enables it and its partners to serve ads based on your visit to our site and/or other sites on the Internet. You may opt out of personalized advertising by visiting Google Ads Settings.",
       h3: "Security",
       p3: "We implement industry-standard security measures to protect your information. Data is stored on secure servers with restricted access.",
       footer: "By using Veyronix services, you agree to these policies. If you have questions about your data rights, please contact us at hakkibsknn@gmail.com.",
-      lastUpdated: "Last updated: April 2026"
+      lastUpdated: "Last updated: August 2026"
     },
     terms: {
       title: "Terms of Service",
@@ -200,7 +200,7 @@ const en = {
       h3: "Premium Services",
       p3: "Premium subscriptions are non-refundable unless required by law. Subscriptions automatically grant premium features to the specified Discord server for the duration of the plan.",
       footer: "Veyronix reserves the right to modify these terms at any time. Continued use of the service constitutes acceptance of the new terms.",
-      lastUpdated: "Last updated: April 2026"
+      lastUpdated: "Last updated: August 2026"
     },
     about: {
       title: "About Us & Contact",
@@ -208,7 +208,7 @@ const en = {
       p1: "Veyronix is a professional bot service designed to enhance the management and interaction of your Discord servers. Our goal is to provide community owners and managers with advanced tools to manage their servers more efficiently and interact better with their members.",
       p2: "With our advanced party system, moderation tools, and user-friendly interface, we continue to make a difference in the Discord ecosystem.",
       infoTitle: "Contact Information",
-      addressVal: "[AÇIK_ADRESİNİZİ_GİRİN]",
+      addressVal: "İstanbul, Türkiye",
       supportVal: "Our Discord Server"
     },
     sales: {
@@ -216,9 +216,9 @@ const en = {
       h1: "1. PARTIES",
       p1: "This Agreement has been signed between the following parties within the framework of the terms and conditions stated below.",
       satici: `SELLER INFORMATION:
-Title: [ŞİRKET_VEYA_ŞAHIS_UNVANINIZI_GİRİN]
-Address: [AÇIK_ADRESİNİZİ_GİRİN]
-Phone: [TELEFON_NUMARANIZ]
+Title: Veyronix Software & Automation
+Address: İstanbul, Türkiye
+Phone: 0551 078 82 61
 Email: hakkibsknn@gmail.com
 (Hereinafter referred to as "SELLER")`,
       alici: "BUYER: The user who purchases Veyronix services through the website (Hereinafter referred to as \"BUYER\")",
@@ -330,13 +330,6 @@ const tr = {
   dGuildIdDesc: "Albion Online guild ID'nizi buraya girin.",
   
   dQuickDesc: "En önemli ayarlarınıza hızlıca göz atın.",
-  dGeneralDesc: "Sunucunuzun temel işleyişini buradan yapılandırın.",
-  dBotLang: "Bot Dili",
-  dBotLangDesc: "Botun sunucuda vereceği mesajların dilini belirler.",
-  dAutoRole: "Otomatik Rol Senkronizasyonu",
-  dAutoRoleDesc: "Guild üyelerinin rollerini otomatik olarak oyun içi rolleriyle eşitler.",
-  dGuildId: "Albion Guild ID",
-  dGuildIdDesc: "Albion Online guild ID'nizi buraya girin.",
 
   promoTitle: "30 Gün Hediye Kazan!",
   promoDesc: "Botu denemeniz ve amacını görmeniz için destek sunucumuza katılan herkese 30 günlük premium üyelik hediye ediyoruz!",
@@ -470,14 +463,14 @@ const tr = {
   
   legal: {
     privacy: {
-      h1: "Veri Toplama ve KVKK",
-      p1: "[ŞİRKET_VEYA_ŞAHIS_UNVANINIZI_GİRİN] (Bundan sonra \"Veyronix\" olarak anılacaktır), 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) uyarınca, kullanıcılarının verilerini korumayı taahhüt eder. Sadece hizmetin işleyişi için gerekli olan Discord ID, sunucu ID ve temel ayar verileri toplanır.",
-      h2: "Veri Kullanımı",
-      p2: "Toplanan veriler sadece botun sunduğu party yönetim sistemi ve Albion Online entegrasyonu gibi hizmetlerin sağlanması amacıyla kullanılır. Verileriniz kesinlikle üçüncü taraflarla paylaşılmaz veya satılmaz.",
+      h1: "Veri Toplama ve KVKK / AdSense Gizlilik Bildirimi",
+      p1: "Veyronix (Bundan sonra \"Veyronix\" olarak anılacaktır), 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) uyarınca kullanıcılarının verilerini korumayı taahhüt eder. Sadece hizmetin işleyişi için gerekli olan Discord ID, sunucu ID ve temel ayar verileri toplanır.",
+      h2: "Veri Kullanımı, Çerezler ve Google AdSense Reklamları",
+      p2: "Toplanan veriler sadece botun sunduğu party yönetim sistemi ve Albion Online entegrasyonu gibi hizmetlerin sağlanması amacıyla kullanılır. Sitemizde yayınlanan Google AdSense reklamları kapsamında Google dahil üçüncü taraf tedarikçiler, web sitemize yapılan önceki ziyaretlere dayalı olarak reklam sunmak için çerezlerden faydalanır. Kullanıcılar Google Kişiselleştirilmiş Reklam Ayarları sayfasını ziyaret ederek kişiselleştirilmiş reklamcılığı devre dışı bırakabilirler.",
       h3: "Güvenlik",
       p3: "Verileriniz güvenli sunucularda saklanmakta olup, yetkisiz erişime karşı endüstri standardı güvenlik önlemleri uygulanmaktadır.",
       footer: "Veyronix hizmetlerini kullanarak bu politikaları kabul etmiş sayılırsınız. KVKK kapsamındaki haklarınız ve diğer sorularınız için hakkibsknn@gmail.com adresinden bizimle iletişime geçebilirsiniz.",
-      lastUpdated: "Son güncelleme: Nisan 2026"
+      lastUpdated: "Son güncelleme: Ağustos 2026"
     },
     terms: {
       title: "Kullanım Koşulları",
@@ -488,7 +481,7 @@ const tr = {
       h3: "Premium Hizmetler",
       p3: "Premium abonelikler yasa gereği zorunlu olmadığı sürece iade edilemez. Abonelikler, plan süresi boyunca belirtilen Discord sunucusuna otomatik olarak premium özellikleri sağlar.",
       footer: "Veyronix bu koşulları dilediği zaman değiştirme hakkını saklı tutar. Hizmeti kullanmaya devam etmeniz, yeni koşulları kabul ettiğiniz anlamına gelir.",
-      lastUpdated: "Son güncelleme: Nisan 2026"
+      lastUpdated: "Son güncelleme: Ağustos 2026"
     },
     about: {
       title: "Hakkımızda ve İletişim",
@@ -496,7 +489,7 @@ const tr = {
       p1: "Veyronix, Discord sunucularınızın yönetimini ve etkileşimini artırmak için tasarlanmış profesyonel bir bot hizmetidir. Amacımız, topluluk sahiplerine ve yöneticilere, sunucularını daha verimli bir şekilde yönetebilecekleri, üyeleriyle daha iyi etkileşim kurabilecekleri gelişmiş araçlar sunmaktır.",
       p2: "Gelişmiş parti sistemi, moderasyon araçları ve kullanıcı dostu arayüzümüzle, Discord ekosisteminde fark yaratmaya devam ediyoruz.",
       infoTitle: "İletişim Bilgileri",
-      addressVal: "[AÇIK_ADRESİNİZİ_GİRİN]",
+      addressVal: "İstanbul, Türkiye",
       supportVal: "Discord Sunucumuz"
     },
     sales: {
@@ -504,9 +497,9 @@ const tr = {
       h1: "1. TARAFLAR",
       p1: "İşbu Sözleşme aşağıdaki taraflar arasında aşağıda belirtilen hüküm ve şartlar çerçevesinde imzalanmıştır.",
       satici: `SATICI BİLGİLERİ:
-Ünvan: [ŞİRKET_VEYA_ŞAHIS_UNVANINIZI_GİRİN]
-Adres: [AÇIK_ADRESİNİZİ_GİRİN]
-Telefon: [TELEFON_NUMARANIZ]
+Ünvan: Veyronix Yazılım ve Otomasyon Hizmetleri
+Adres: İstanbul, Türkiye
+Telefon: 0551 078 82 61
 E-Posta: hakkibsknn@gmail.com
 (Bundan sonra "SATICI" olarak anılacaktır)`,
       alici: "ALICI: Veyronix hizmetlerini web sitesi üzerinden satın alan kullanıcı (Bundan sonra \"ALICI\" olarak anılacaktır)",
