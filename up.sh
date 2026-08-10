@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # ==============================================================================
-# Veyronix (VX-Mono) Akıllı Güncelleme, VPS Makine Temizliği ve Canlıya Alma (up)
+# Veyronix (VX-Mono) Akıllı Güncelleme, Bakım Modu & Sistem Temizliği (up)
 # ==============================================================================
 
 set -e
@@ -11,7 +11,7 @@ if [ "$1" == "--force" ] || [ "$1" == "-f" ]; then
   FORCE_BUILD=true
 fi
 
-echo "🚀 [Veyronix UP] Akıllı güncelleme ve genel VPS makine temizliği başlatılıyor..."
+echo "🚀 [Veyronix UP] Akıllı güncelleme ve sistem temizliği başlatılıyor..."
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$PROJECT_DIR"
@@ -58,11 +58,23 @@ CI=true pnpm install --no-frozen-lockfile || pnpm install
 
 # 5. Akıllı Web Build (Sadece Web veya Bağımlılık Değiştiyse)
 if [ "$WEB_CHANGED" = true ]; then
+  echo "🟡 [Bakım Modu] Derleme süresince Bakım Sayfası (3 Çarklı Animasyonlu) yayına alınıyor..."
+  pm2 stop vxweb 2>/dev/null || true
+  pkill -f "scripts/maintenance-server.js" 2>/dev/null || true
+  node "$PROJECT_DIR/scripts/maintenance-server.js" 3000 >/dev/null 2>&1 &
+  MAINT_PID=$!
+  sleep 1
+
   echo "🏗️ [4/7] Web sitesinde değişiklik tespit edildi, sıfırdan derleniyor (vxweb)..."
   rm -rf apps/web/.next
   cd apps/web
   pnpm run build
   cd "$PROJECT_DIR"
+
+  # Derleme bitti, bakım sunucusunu kapat
+  echo "🟢 [Bakım Modu] Derleme bitti, Bakım Sunucusu kapatılıyor..."
+  kill $MAINT_PID 2>/dev/null || true
+  pkill -f "scripts/maintenance-server.js" 2>/dev/null || true
 else
   echo "⏩ [4/7] Web sitesinde değişiklik yok, ağır derleme adımı es geçildi (Tasarruf)."
 fi
