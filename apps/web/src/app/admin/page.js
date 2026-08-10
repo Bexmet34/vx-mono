@@ -8,7 +8,7 @@ import {
   LayoutDashboard, Server, MessageSquare, Settings, 
   Users, BarChart3, Search, Clock, Infinity, Power, 
   Calendar, Trash2, ChevronRight, ArrowLeft, Gift, Plus, Send, Edit3, Eye, EyeOff, DollarSign, Check, X, Gamepad2, CreditCard,
-  Activity, TerminalSquare, Sparkles
+  Activity, TerminalSquare, Sparkles, FileText
 } from "lucide-react";
 import AdminBlogAutomationTab from "@/components/AdminBlogAutomationTab";
 import { useCallback } from "react";
