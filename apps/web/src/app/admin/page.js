@@ -602,7 +602,7 @@ export default function AdminPage() {
     { id: "campaigns", label: "Kampanya & Hediye", icon: <Gift size={14} /> },
     { id: "notifications", label: "Bildirim Şablonları", icon: <Bell size={14} /> },
     { id: "broadcast", label: "Duyuru Merkezi", icon: <MessageSquare size={14} /> },
-    { id: "blog-automation", label: "Blog Otomasyonu", icon: <Sparkles size={14} /> },
+    { id: "blog-automation", label: "Manuel Blog & SEO Editörü", icon: <FileText size={14} /> },
     { id: "stats", label: "Veri Analizi", icon: <BarChart3 size={14} /> },
     { id: "settings", label: "Sistem Ayarları", icon: <Settings size={14} /> },
   ];
