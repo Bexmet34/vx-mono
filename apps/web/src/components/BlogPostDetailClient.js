@@ -42,7 +42,7 @@ export default function BlogPostDetailClient({ post, relatedPosts = [] }) {
   };
 
   return (
-    <main className={styles.main} style={{ paddingBottom: '6rem' }}>
+    <main style={{ paddingBottom: '6rem' }}>
       <article style={{ maxWidth: '900px', margin: '0 auto', width: '100%', padding: '0 1.5rem' }}>
         
         {/* Navigation Back */}
