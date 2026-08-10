@@ -23,6 +23,68 @@ function calculateReadTime(content = '') {
   return Math.max(1, Math.ceil(words / 200));
 }
 
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function fetchGeminiWithRotationAndRetry(prompt) {
+  const rawKeys = process.env.GEMINI_API_KEY || '';
+  const apiKeys = rawKeys.split(',').map(k => k.trim()).filter(Boolean);
+
+  if (apiKeys.length === 0) {
+    throw new Error('GEMINI_API_KEY ortam değişkeni bulunamadı.');
+  }
+
+  const MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-2.0-flash-lite'];
+  const MAX_RETRIES = 2; // Web API route max 2 retries to stay within serverless/HTTP timeout limits
+  let lastError = null;
+
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    for (const apiKey of apiKeys) {
+      for (const model of MODELS) {
+        try {
+          console.log(`[Blog Trigger API] Gemini API çağrılıyor (${model}, Key index: ${apiKeys.indexOf(apiKey)})...`);
+          const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }] }],
+              generationConfig: {
+                temperature: 0.7,
+                responseMimeType: "application/json"
+              }
+            })
+          });
+
+          if (response.ok) {
+            const aiData = await response.json();
+            let rawJsonText = aiData.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (rawJsonText) {
+              rawJsonText = rawJsonText.replace(/```json\s*/gi, '').replace(/```\s*$/gi, '').trim();
+              return JSON.parse(rawJsonText);
+            }
+          } else {
+            const errText = await response.text();
+            if (response.status === 429) {
+              console.warn(`[Blog Trigger API] ⚠️ ${model} kotası aşıldı (429), sonraki anahtar/modele geçiliyor...`);
+              lastError = `Google Gemini API 429 Rate Limit (Limit Aşıldı). Lütfen ~15-30 saniye sonra tekrar deneyin veya .env dosyasına virgülle ayırarak 2. bir ücretsiz Gemini API Key ekleyin.`;
+            } else {
+              lastError = `Gemini API Hatası (${model}): ${errText}`;
+            }
+          }
+        } catch (err) {
+          lastError = err.message;
+        }
+      }
+    }
+
+    if (attempt < MAX_RETRIES) {
+      console.log(`[Blog Trigger API] 429 Rate Limit nedeniyle 10 saniye bekleniyor (${attempt}/${MAX_RETRIES})...`);
+      await delay(10000);
+    }
+  }
+
+  throw new Error(lastError || 'Gemini tüm denemeler sonucunda yanıt vermedi.');
+}
+
 // 40+ Yüksek SEO Değerli Varsayılan Konu Havuzu
 const DEFAULT_TOPICS = [
   { category: 'Albion Online', topic: 'Albion Online 2026 Black Zone Rehberi: Tehlikeli Bölgelerde Hayatta Kalma ve Gankten Kaçma Taktikleri' },
@@ -36,11 +98,11 @@ const DEFAULT_TOPICS = [
 
 export async function POST() {
   try {
-    const geminiApiKey = process.env.GEMINI_API_KEY;
+    const rawKeys = process.env.GEMINI_API_KEY;
 
-    if (!geminiApiKey) {
+    if (!rawKeys) {
       return NextResponse.json({ 
-        error: 'GEMINI_API_KEY ortam değişkeni bulunamadı. Lütfen ortam değişkenlerinize Google Gemini API key ekleyin.' 
+        error: 'GEMINI_API_KEY ortam değişkeni bulunamadı. Lütfen ortama Google Gemini API key ekleyin.' 
       }, { status: 400 });
     }
 
@@ -94,48 +156,7 @@ Lütfen tam olarak aşağıdaki JSON formatında yanıt ver (Başka hiçbir meti
 }
 `;
 
-    const MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-2.0-flash-lite'];
-    let article = null;
-    let lastError = null;
-
-    for (const model of MODELS) {
-      try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiApiKey}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: {
-              temperature: 0.7,
-              responseMimeType: "application/json"
-            }
-          })
-        });
-
-        if (response.ok) {
-          const aiData = await response.json();
-          const rawJsonText = aiData.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (rawJsonText) {
-            article = JSON.parse(rawJsonText);
-            break; // Başarılı, döngüden çık
-          }
-        } else {
-          const errText = await response.text();
-          if (response.status === 429) {
-            console.warn(`[Gemini API] ${model} kotası aşıldı (429), yedek modele geçiliyor...`);
-            lastError = `Google Gemini API ücretsiz kullanım limitine ulaştı (Rate Limit 429). Lütfen ~30 saniye sonra tekrar deneyin veya Google AI Studio hesabınızı kontrol edin.`;
-          } else {
-            lastError = `Gemini API Hatası (${model}): ${errText}`;
-          }
-        }
-      } catch (err) {
-        lastError = err.message;
-      }
-    }
-
-    if (!article) {
-      return NextResponse.json({ error: lastError || 'Gemini yanıt üretmedi.' }, { status: 429 });
-    }
+    const article = await fetchGeminiWithRotationAndRetry(prompt);
 
     const baseSlug = slugify(article.title);
     const slug = `${baseSlug}-${Date.now().toString().slice(-4)}`;
@@ -184,6 +205,6 @@ Lütfen tam olarak aşağıdaki JSON formatında yanıt ver (Başka hiçbir meti
     });
 
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: error.message }, { status: 429 });
   }
 }

@@ -158,7 +158,7 @@ export default function AdminBlogAutomationTab({ showToast }) {
               Otomatik SEO Blog İçerik Üreticisi
             </h2>
             <p style={{ color: 'var(--text-muted)', margin: '0.5rem 0 0', fontSize: '0.95rem' }}>
-              Google Gemini 2.0 Flash ile günde 3 paylaşım otomatik yapılır veya dilediğiniz an tek tıkla makale ürettirebilirsiniz.
+              Google Gemini Flash (Otomatik 429 Limit Bekleme & Çoklu API Key Rotasyonu Destekli) ile günde 3 paylaşım otomatik yapılır veya dilediğiniz an tek tıkla makale ürettirebilirsiniz.
             </p>
           </div>
 
