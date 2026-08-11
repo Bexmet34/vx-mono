@@ -188,7 +188,7 @@ const en = {
       p2: "Your data is used solely to provide party management services and Albion Online integration. Third-party vendors, including Google, use cookies to serve ads based on your prior visits to our website. Google's use of advertising cookies enables it and its partners to serve ads based on your visit to our site and/or other sites on the Internet. You may opt out of personalized advertising by visiting Google Ads Settings.",
       h3: "Security",
       p3: "We implement industry-standard security measures to protect your information. Data is stored on secure servers with restricted access.",
-      footer: "By using Veyronix services, you agree to these policies. If you have questions about your data rights, please contact us at hakkibsknn@gmail.com.",
+      footer: "By using Veyronix services, you agree to these policies. If you have questions about your data rights, please contact us at info@veyronix.com.tr.",
       lastUpdated: "Last updated: August 2026"
     },
     terms: {
@@ -219,7 +219,7 @@ const en = {
 Title: Veyronix Software & Automation
 Address: İstanbul, Türkiye
 Phone: 0551 078 82 61
-Email: hakkibsknn@gmail.com
+Email: info@veyronix.com.tr
 (Hereinafter referred to as "SELLER")`,
       alici: "BUYER: The user who purchases Veyronix services through the website (Hereinafter referred to as \"BUYER\")",
       h2: "2. SUBJECT OF THE AGREEMENT",
@@ -237,7 +237,7 @@ Email: hakkibsknn@gmail.com
       h2: "CANCELLATION PROCEDURE",
       p2: "You can cancel our subscription-based services at any time. When the cancellation is performed, you can continue to benefit from the service until the end of your current usage period. No deduction will be made from your card in the next billing period.",
       h3: "ERRONEOUS TRANSACTIONS",
-      p3: "In case the service is not defined due to erroneous deductions or technical failures caused by the system, you can contact us at hakkibsknn@gmail.com to report the situation. Necessary corrections will be made in the requests found justified after the examination.",
+      p3: "In case the service is not defined due to erroneous deductions or technical failures caused by the system, you can contact us at info@veyronix.com.tr to report the situation. Necessary corrections will be made in the requests found justified after the examination.",
       h4: "CONTACT",
       p4: "For all your questions about refund and cancellation issues:",
       email: "Email",
@@ -252,7 +252,7 @@ Email: hakkibsknn@gmail.com
       h2: "DELIVERY TIME",
       p3: "After payment confirmation, delivery (activation of the service) is automatically carried out by the system within an average of 1-5 minutes.",
       h3: "POSSIBLE DELAYS",
-      p4: "In the event of an unusual delay in delivery due to delays originating from the Discord API or system congestion, you can get instant support by contacting us via our support server or at hakkibsknn@gmail.com."
+      p4: "In the event of an unusual delay in delivery due to delays originating from the Discord API or system congestion, you can get instant support by contacting us via our support server or at info@veyronix.com.tr."
     }
   },
   
@@ -469,7 +469,7 @@ const tr = {
       p2: "Toplanan veriler sadece botun sunduğu party yönetim sistemi ve Albion Online entegrasyonu gibi hizmetlerin sağlanması amacıyla kullanılır. Sitemizde yayınlanan Google AdSense reklamları kapsamında Google dahil üçüncü taraf tedarikçiler, web sitemize yapılan önceki ziyaretlere dayalı olarak reklam sunmak için çerezlerden faydalanır. Kullanıcılar Google Kişiselleştirilmiş Reklam Ayarları sayfasını ziyaret ederek kişiselleştirilmiş reklamcılığı devre dışı bırakabilirler.",
       h3: "Güvenlik",
       p3: "Verileriniz güvenli sunucularda saklanmakta olup, yetkisiz erişime karşı endüstri standardı güvenlik önlemleri uygulanmaktadır.",
-      footer: "Veyronix hizmetlerini kullanarak bu politikaları kabul etmiş sayılırsınız. KVKK kapsamındaki haklarınız ve diğer sorularınız için hakkibsknn@gmail.com adresinden bizimle iletişime geçebilirsiniz.",
+      footer: "Veyronix hizmetlerini kullanarak bu politikaları kabul etmiş sayılırsınız. KVKK kapsamındaki haklarınız ve diğer sorularınız için info@veyronix.com.tr adresinden bizimle iletişime geçebilirsiniz.",
       lastUpdated: "Son güncelleme: Ağustos 2026"
     },
     terms: {
@@ -500,7 +500,7 @@ const tr = {
 Ünvan: Veyronix Yazılım ve Otomasyon Hizmetleri
 Adres: İstanbul, Türkiye
 Telefon: 0551 078 82 61
-E-Posta: hakkibsknn@gmail.com
+E-Posta: info@veyronix.com.tr
 (Bundan sonra "SATICI" olarak anılacaktır)`,
       alici: "ALICI: Veyronix hizmetlerini web sitesi üzerinden satın alan kullanıcı (Bundan sonra \"ALICI\" olarak anılacaktır)",
       h2: "2. SÖZLEŞMENİN KONUSU",
@@ -518,7 +518,7 @@ E-Posta: hakkibsknn@gmail.com
       h2: "İPTAL PROSEDÜRÜ",
       p2: "Abonelik bazlı hizmetlerimizi dilediğiniz zaman iptal edebilirsiniz. İptal işlemi gerçekleştirildiğinde, mevcut kullanım sürenizin sonuna kadar hizmetten yararlanmaya devam edebilirsiniz. Bir sonraki faturalandırma döneminde kartınızdan herhangi bir çekim yapılmayacaktır.",
       h3: "HATALI İŞLEMLER",
-      p3: "Sistemden kaynaklı hatalı çekimler veya teknik aksaklıklar nedeniyle hizmetin tanımlanmaması durumunda, durumu bildirmek için hakkibsknn@gmail.com adresi üzerinden bizimle iletişime geçebilirsiniz. İnceleme sonrası haklı bulunan taleplerde gerekli düzeltmeler yapılacaktır.",
+      p3: "Sistemden kaynaklı hatalı çekimler veya teknik aksaklıklar nedeniyle hizmetin tanımlanmaması durumunda, durumu bildirmek için info@veyronix.com.tr adresi üzerinden bizimle iletişime geçebilirsiniz. İnceleme sonrası haklı bulunan taleplerde gerekli düzeltmeler yapılacaktır.",
       h4: "İLETİŞİM",
       p4: "İade ve iptal konularındaki tüm sorularınız için:",
       email: "E-posta",
@@ -533,7 +533,7 @@ E-Posta: hakkibsknn@gmail.com
       h2: "TESLİMAT SÜRESİ",
       p3: "Ödeme onayı alındıktan sonra teslimat (hizmetin aktifleşmesi) ortalama 1-5 dakika içerisinde sistem tarafından otomatik olarak gerçekleştirilir.",
       h3: "OLASI GECİKMELER",
-      p4: "Discord API kaynaklı gecikmeler veya sistem yoğunlukları sebebiyle teslimatta olağan dışı bir gecikme yaşanması durumunda, destek sunucumuz üzerinden veya hakkibsknn@gmail.com adresinden bize ulaşarak anında destek alabilirsiniz."
+      p4: "Discord API kaynaklı gecikmeler veya sistem yoğunlukları sebebiyle teslimatta olağan dışı bir gecikme yaşanması durumunda, destek sunucumuz üzerinden veya info@veyronix.com.tr adresinden bize ulaşarak anında destek alabilirsiniz."
     }
   },
   

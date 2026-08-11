@@ -43,7 +43,7 @@ export default function AboutPage() {
                 <Mail size={14} />
                 <span style={{ fontWeight: '600' }}>{t.email}</span>
               </div>
-              <p style={{ color: 'var(--text-muted)' }}>hakkibsknn@gmail.com</p>
+              <p style={{ color: 'var(--text-muted)' }}>info@veyronix.com.tr</p>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>

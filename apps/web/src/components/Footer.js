@@ -100,7 +100,7 @@ export default function Footer() {
               {t.phone}: 0551 078 82 61
             </li>
             <li className="font-body-md text-[10px] text-on-surface-variant">
-              {t.email}: hakkibsknn@gmail.com
+              {t.email}: info@veyronix.com.tr
             </li>
             <li className="font-body-md text-[10px] text-on-surface-variant">
               Adres: [AÇIK_ADRESİNİZİ_BURAYA_GİRİN]
