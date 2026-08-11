@@ -103,7 +103,7 @@ export default function Footer() {
               {t.email}: info@veyronix.com.tr
             </li>
             <li className="font-body-md text-[10px] text-on-surface-variant">
-              Adres: [AÇIK_ADRESİNİZİ_BURAYA_GİRİN]
+              {t.address}: İzmir, Türkiye
             </li>
           </ul>
         </div>

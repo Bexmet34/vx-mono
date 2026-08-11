@@ -208,7 +208,7 @@ const en = {
       p1: "Veyronix is a professional bot service designed to enhance the management and interaction of your Discord servers. Our goal is to provide community owners and managers with advanced tools to manage their servers more efficiently and interact better with their members.",
       p2: "With our advanced party system, moderation tools, and user-friendly interface, we continue to make a difference in the Discord ecosystem.",
       infoTitle: "Contact Information",
-      addressVal: "İstanbul, Türkiye",
+      addressVal: "İzmir, Türkiye",
       supportVal: "Our Discord Server"
     },
     sales: {
@@ -217,7 +217,7 @@ const en = {
       p1: "This Agreement has been signed between the following parties within the framework of the terms and conditions stated below.",
       satici: `SELLER INFORMATION:
 Title: Veyronix Software & Automation
-Address: İstanbul, Türkiye
+Address: İzmir, Türkiye
 Phone: 0551 078 82 61
 Email: info@veyronix.com.tr
 (Hereinafter referred to as "SELLER")`,
@@ -489,7 +489,7 @@ const tr = {
       p1: "Veyronix, Discord sunucularınızın yönetimini ve etkileşimini artırmak için tasarlanmış profesyonel bir bot hizmetidir. Amacımız, topluluk sahiplerine ve yöneticilere, sunucularını daha verimli bir şekilde yönetebilecekleri, üyeleriyle daha iyi etkileşim kurabilecekleri gelişmiş araçlar sunmaktır.",
       p2: "Gelişmiş parti sistemi, moderasyon araçları ve kullanıcı dostu arayüzümüzle, Discord ekosisteminde fark yaratmaya devam ediyoruz.",
       infoTitle: "İletişim Bilgileri",
-      addressVal: "İstanbul, Türkiye",
+      addressVal: "İzmir, Türkiye",
       supportVal: "Discord Sunucumuz"
     },
     sales: {
@@ -498,7 +498,7 @@ const tr = {
       p1: "İşbu Sözleşme aşağıdaki taraflar arasında aşağıda belirtilen hüküm ve şartlar çerçevesinde imzalanmıştır.",
       satici: `SATICI BİLGİLERİ:
 Ünvan: Veyronix Yazılım ve Otomasyon Hizmetleri
-Adres: İstanbul, Türkiye
+Adres: İzmir, Türkiye
 Telefon: 0551 078 82 61
 E-Posta: info@veyronix.com.tr
 (Bundan sonra "SATICI" olarak anılacaktır)`,
