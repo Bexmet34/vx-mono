@@ -115,6 +115,36 @@ const commands = [
                 .setDescription('Kayıtsız kullanıcılara verilecek rol')
                 .setRequired(true))
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+        
+    new SlashCommandBuilder()
+        .setName('rd')
+        .setDescription('Kayıtlı bir kullanıcının rolünü (tagını) ve ismini düzenler. 32 karakter sınırına otomatik uyar.')
+        .addUserOption(option => 
+            option.setName('kullanici')
+                .setDescription('Düzenlenecek kullanıcı')
+                .setRequired(true))
+        .addStringOption(option =>
+            option.setName('rol')
+                .setDescription('Verilecek yeni rol')
+                .setRequired(true)
+                .addChoices(
+                    { name: 'Lonca Üyesi (Rol 1)', value: '1' },
+                    { name: 'Topluluk/İttifak (Rol 2)', value: '2' },
+                    { name: 'Rol 3', value: '3' },
+                    { name: 'Rol 4', value: '4' },
+                    { name: 'Rol 5', value: '5' },
+                    { name: 'Misafir (Geçici Rol)', value: 'temp' }
+                ))
+        .addStringOption(option => 
+            option.setName('ign')
+                .setDescription('Oyun içi isim (Boş bırakılırsa mevcut isminden çekilir)'))
+        .addStringOption(option => 
+            option.setName('isim')
+                .setDescription('Gerçek isim (Boş bırakılırsa mevcut isminden çekilir)'))
+        .addStringOption(option => 
+            option.setName('yas')
+                .setDescription('Yaş (Boş bırakılırsa mevcut isminden çekilir)'))
+        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 ];
 
 module.exports = commands.map(command => command.toJSON());

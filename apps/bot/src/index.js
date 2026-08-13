@@ -252,6 +252,9 @@ client.on('interactionCreate', async interaction => {
             } else if (interaction.commandName === 'kayitsizlari-belirle') {
                 const { handleForceRegistrationCommand } = require('./handlers/commandHandler');
                 await handleForceRegistrationCommand(interaction);
+            } else if (interaction.commandName === 'rd') {
+                const { handleFixRegistrationCommand } = require('./handlers/commandHandler');
+                await handleFixRegistrationCommand(interaction);
             }
         } else if (interaction.isButton()) {
             if (interaction.customId === 'help_vote') {

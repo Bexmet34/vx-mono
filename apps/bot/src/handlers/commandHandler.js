@@ -650,6 +650,185 @@ async function handleForceRegistrationCommand(interaction) {
     }
 }
 
+/**
+ * Handles /kayit-duzenle command
+ */
+async function handleFixRegistrationCommand(interaction) {
+    const guildConfig = await getGuildConfig(interaction.guildId);
+    const lang = guildConfig?.language || 'tr';
+
+    // Verify staff permissions
+    const staffRoles = guildConfig?.registration_staff_role_ids?.split(',') || [];
+    const isStaff = interaction.member.roles.cache.some(r => staffRoles.includes(r.id)) || interaction.member.permissions.has(PermissionFlagsBits.Administrator);
+
+    if (!isStaff) {
+        return await safeReply(interaction, {
+            content: `⛔ **${lang === 'tr' ? 'Sadece kayıt sorumluları bu komutu kullanabilir!' : 'Only registration staff can use this command!'}**`,
+            flags: [MessageFlags.Ephemeral]
+        });
+    }
+
+    const targetUser = interaction.options.getUser('kullanici');
+    const targetMember = await interaction.guild.members.fetch(targetUser.id).catch(() => null);
+
+    if (!targetMember) {
+        return await safeReply(interaction, {
+            content: `❌ **${lang === 'tr' ? 'Kullanıcı sunucuda bulunamadı!' : 'User not found in the server!'}**`,
+            flags: [MessageFlags.Ephemeral]
+        });
+    }
+
+    const roleAction = interaction.options.getString('rol');
+    
+    // Extract info from current nickname
+    let currentNickname = targetMember.nickname || targetMember.user.username;
+    let currentIgn = '', currentIsim = '', currentYas = '';
+
+    // Remove tag/prefix if exists (e.g. [TURQ] Ign - Isim Yas)
+    let nameWithoutPrefix = currentNickname.replace(/^\[.*?\]\s*/, '').trim();
+
+    // Split by ' - ' to separate Ign from RealName/Age
+    let parts = nameWithoutPrefix.split(' - ');
+    currentIgn = parts[0].trim();
+
+    if (parts.length > 1) {
+        let rest = parts.slice(1).join(' - ').trim();
+        let lastSpaceIndex = rest.lastIndexOf(' ');
+        
+        if (lastSpaceIndex !== -1) {
+            currentIsim = rest.substring(0, lastSpaceIndex).trim();
+            currentYas = rest.substring(lastSpaceIndex + 1).trim();
+            // Check if yas is just numbers
+            if (!/^\d+$/.test(currentYas)) {
+                // It's not a number, maybe they don't have age, just a multi-word name
+                currentIsim = rest;
+                currentYas = '';
+            }
+        } else {
+            currentIsim = rest;
+            currentYas = '';
+        }
+    }
+
+    const capitalize = (str) => {
+        if (!str) return '';
+        return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+    };
+
+    let ign = interaction.options.getString('ign') || currentIgn;
+    let realName = interaction.options.getString('isim') || currentIsim;
+    let age = interaction.options.getString('yas') || currentYas;
+
+    ign = capitalize(ign);
+    realName = capitalize(realName);
+
+    await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
+
+    try {
+        // Find which roles to add and remove
+        let givenRoleId = null;
+        let roleIndex = roleAction === 'temp' ? 'temp' : parseInt(roleAction, 10);
+
+        if (roleIndex === 1) givenRoleId = guildConfig?.registration_given_role_id;
+        else if (roleIndex === 2) givenRoleId = guildConfig?.registration_given_role_id_2;
+        else if (roleIndex === 3) givenRoleId = guildConfig?.registration_given_role_id_3;
+        else if (roleIndex === 4) givenRoleId = guildConfig?.registration_given_role_id_4;
+        else if (roleIndex === 5) givenRoleId = guildConfig?.registration_given_role_id_5;
+        else if (roleIndex === 'temp') givenRoleId = guildConfig?.registration_unregistered_role_id;
+
+        if (!givenRoleId) {
+            return await interaction.editReply({
+                content: `❌ **${lang === 'tr' ? 'Seçilen rol türü sistemde ayarlanmamış!' : 'Selected role type is not configured in the system!'}**`
+            });
+        }
+
+        const allRegRoles = [
+            guildConfig?.registration_given_role_id,
+            guildConfig?.registration_given_role_id_2,
+            guildConfig?.registration_given_role_id_3,
+            guildConfig?.registration_given_role_id_4,
+            guildConfig?.registration_given_role_id_5,
+            guildConfig?.registration_unregistered_role_id,
+            guildConfig?.auto_role_on_join_id
+        ].filter(r => r);
+
+        // Remove other registration roles
+        for (const roleId of allRegRoles) {
+            if (roleId && roleId !== givenRoleId && targetMember.roles.cache.has(roleId)) {
+                await targetMember.roles.remove(roleId).catch(() => {});
+            }
+        }
+
+        // Add the target role
+        await targetMember.roles.add(givenRoleId).catch(() => {});
+
+        // Format Nickname: [PREFIX] Ign - RealName Age
+        let prefix = '';
+        if (roleIndex === 1 && guildConfig?.auto_check_guild_tag) {
+            prefix = `[${guildConfig.auto_check_guild_tag}] `;
+        } else if (roleIndex !== 1 && guildConfig?.auto_check_guild_tag) {
+            // For community members, we can use NAN or leave it without a prefix. 
+            // In the buttonHandler, it tries to get it from the embed. Let's just use NAN or custom if not role 1.
+            prefix = `[NAN] `;
+        } else {
+            prefix = `[NAN] `;
+        }
+
+        const safeAge = age ? ` ${age}` : '';
+        const safeRealName = realName ? ` - ${realName}` : '';
+        
+        const fixedLength = prefix.length + safeRealName.length + safeAge.length;
+        let finalIgn = ign;
+        
+        // Truncate logic
+        if (fixedLength + finalIgn.length > 32) {
+            let charsToRemove = (fixedLength + finalIgn.length) - 32;
+            const vowels = 'aeıioöuüAEIİOÖUÜ';
+            let ignArr = finalIgn.split('');
+            
+            for (let i = ignArr.length - 1; i >= 0 && charsToRemove > 0; i--) {
+                if (vowels.includes(ignArr[i])) {
+                    ignArr.splice(i, 1);
+                    charsToRemove--;
+                }
+            }
+            
+            finalIgn = ignArr.join('');
+            
+            if (fixedLength + finalIgn.length > 32) {
+                const maxIgnLength = Math.max(0, 32 - fixedLength);
+                finalIgn = finalIgn.substring(0, maxIgnLength);
+            }
+        }
+        
+        let newNickname = `${prefix}${finalIgn}${safeRealName}${safeAge}`.trim();
+        if (newNickname.length > 32) {
+            newNickname = newNickname.substring(0, 32);
+        }
+
+        let nickStatus = '';
+        if (interaction.guild.ownerId !== targetMember.id) {
+            try {
+                await targetMember.setNickname(newNickname);
+                nickStatus = `\n✅ **Yeni İsim:** \`${newNickname}\``;
+            } catch (e) {
+                console.error(`[Nickname error] ${e.message} for user ${targetMember.id}`);
+                nickStatus = `\n❌ **İsim değiştirilemedi (Yetki sınırı olabilir). Olması gereken:** \`${newNickname}\``;
+            }
+        } else {
+            nickStatus = `\n⚠️ **Sunucu sahibinin ismi değiştirilemez. Olması gereken:** \`${newNickname}\``;
+        }
+
+        await interaction.editReply({
+            content: `✅ **<@${targetMember.id}> kullanıcısının kaydı başarıyla güncellendi!**\n🎖️ **Verilen Rol:** <@&${givenRoleId}>${nickStatus}`
+        });
+
+    } catch (err) {
+        console.error('[CommandHandler] Error in handleFixRegistrationCommand:', err);
+        await interaction.editReply({ content: `❌ Bir hata oluştu: ${err.message}` });
+    }
+}
+
 module.exports = {
     handleHelpCommand,
     handleVoteCommand,
@@ -666,5 +845,6 @@ module.exports = {
     handleSetupGuildCommand,
     handleSetupKillBoardCommand,
     handleSetupRegistrationCommand,
-    handleForceRegistrationCommand
+    handleForceRegistrationCommand,
+    handleFixRegistrationCommand
 };
