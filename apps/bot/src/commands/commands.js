@@ -127,14 +127,7 @@ const commands = [
             option.setName('rol')
                 .setDescription('Verilecek yeni rol')
                 .setRequired(true)
-                .addChoices(
-                    { name: 'Lonca Üyesi (Rol 1)', value: '1' },
-                    { name: 'Topluluk/İttifak (Rol 2)', value: '2' },
-                    { name: 'Rol 3', value: '3' },
-                    { name: 'Rol 4', value: '4' },
-                    { name: 'Rol 5', value: '5' },
-                    { name: 'Misafir (Geçici Rol)', value: 'temp' }
-                ))
+                .setAutocomplete(true))
         .addStringOption(option => 
             option.setName('ign')
                 .setDescription('Oyun içi isim (Boş bırakılırsa mevcut isminden çekilir)'))
@@ -143,8 +136,7 @@ const commands = [
                 .setDescription('Gerçek isim (Boş bırakılırsa mevcut isminden çekilir)'))
         .addStringOption(option => 
             option.setName('yas')
-                .setDescription('Yaş (Boş bırakılırsa mevcut isminden çekilir)'))
-        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+                .setDescription('Yaş (Boş bırakılırsa mevcut isminden çekilir)')),
 ];
 
 module.exports = commands.map(command => command.toJSON());

@@ -736,6 +736,17 @@ async function handleFixRegistrationCommand(interaction) {
         else if (roleIndex === 5) givenRoleId = guildConfig?.registration_given_role_id_5;
         else if (roleIndex === 'temp') givenRoleId = guildConfig?.registration_unregistered_role_id;
 
+        // Support direct role ID if passed directly
+        if (!givenRoleId && roleAction) {
+            if (roleAction === guildConfig?.registration_given_role_id) { givenRoleId = roleAction; roleIndex = 1; }
+            else if (roleAction === guildConfig?.registration_given_role_id_2) { givenRoleId = roleAction; roleIndex = 2; }
+            else if (roleAction === guildConfig?.registration_given_role_id_3) { givenRoleId = roleAction; roleIndex = 3; }
+            else if (roleAction === guildConfig?.registration_given_role_id_4) { givenRoleId = roleAction; roleIndex = 4; }
+            else if (roleAction === guildConfig?.registration_given_role_id_5) { givenRoleId = roleAction; roleIndex = 5; }
+            else if (roleAction === guildConfig?.registration_unregistered_role_id) { givenRoleId = roleAction; roleIndex = 'temp'; }
+            else if (interaction.guild.roles.cache.has(roleAction)) { givenRoleId = roleAction; roleIndex = 1; }
+        }
+
         if (!givenRoleId) {
             return await interaction.editReply({
                 content: `❌ **${lang === 'tr' ? 'Seçilen rol türü sistemde ayarlanmamış!' : 'Selected role type is not configured in the system!'}**`
