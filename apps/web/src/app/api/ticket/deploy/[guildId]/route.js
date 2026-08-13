@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { checkDashboardAccess } from '@/utils/authUtils';
+import { supabase } from '@/utils/supabase';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,7 +15,7 @@ export async function POST(req, { params }) {
 
         const { guildId } = await params;
         const { hasAccess } = await checkDashboardAccess(guildId, session.user.id);
-        
+
         if (!hasAccess) {
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
@@ -26,13 +27,28 @@ export async function POST(req, { params }) {
             return NextResponse.json({ error: "Kanal ayarlanmamış." }, { status: 400 });
         }
 
+        // Fetch guild language setting
+        const { data: guildSettings } = await supabase
+            .from('guild_settings')
+            .select('language')
+            .eq('guild_id', guildId)
+            .single();
+
+        const lang = guildSettings?.language || 'tr';
+
+        const defaultTitle = lang === 'en' ? "Support Ticket" : "Destek Talebi";
+        const defaultDesc = lang === 'en' 
+            ? "Please click the button below to create a support ticket." 
+            : "Lütfen aşağıdaki butona tıklayarak destek talebinizi oluşturun.";
+        const buttonLabel = lang === 'en' ? "Open Support Ticket" : "Destek Talebi Aç";
+
         const botToken = process.env.DISCORD_BOT_TOKEN;
-        
+
         const payload = {
             embeds: [
                 {
-                    title: ticket_message_title || "Destek Talebi",
-                    description: ticket_message_desc || "Lütfen aşağıdaki butona tıklayarak destek talebinizi oluşturun.",
+                    title: ticket_message_title || defaultTitle,
+                    description: ticket_message_desc || defaultDesc,
                     color: 5793266, // Blurple
                     footer: { text: "Veyronix Ticket System" }
                 }
@@ -44,7 +60,7 @@ export async function POST(req, { params }) {
                         {
                             type: 2, // Button
                             style: 1, // Primary
-                            label: "Destek Talebi Aç",
+                            label: buttonLabel,
                             emoji: { name: "🎫" },
                             custom_id: "ticket_open"
                         }
