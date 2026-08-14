@@ -664,11 +664,17 @@ async function handleRegisterButtons(interaction) {
         const guildCfg = await getGuildConfig(guildId);
         const lang = guildCfg?.language || 'tr';
         const questions = (guildCfg?.application_questions || []).filter(q => q.type !== 'rules_accept');
+        const session = appSvc.getSession(userId, guildId);
+        const nextStep = appSvc.getNextStep(session, questions);
 
-        const modal = appSvc.buildAnswerModal(questions, pageIndex, channelId, lang);
-        if (modal) {
-            return await interaction.showModal(modal);
+        if (nextStep && nextStep.type === 'modal') {
+            const modal = appSvc.buildAnswerModal(questions, pageIndex, channelId, lang);
+            if (modal) {
+                return await interaction.showModal(modal);
+            }
         }
+
+        await handleNextStep(interaction, nextStep, session, questions, lang, guildId, channelId);
         return;
     }
 
@@ -718,7 +724,7 @@ async function handleRegisterButtons(interaction) {
         }
 
         // Kural yok veya anket kapalı → Doğrudan modal aç
-        return await openRegisterModal(interaction);
+        return await openRegisterModal(interaction, lang);
     }
 
     // ─── ANKET: Select menu cevapları ───────────────────────────────────────
@@ -1176,6 +1182,18 @@ async function openRegisterModal(interaction, lang = 'tr') {
  * Modal, yesno, select veya tamamlama (finalize) adımlarını yönetir.
  */
 async function handleNextStep(interaction, nextStep, session, questions, lang, guildId, channelId) {
+    const sendOrFollowUp = async (payload) => {
+        try {
+            if (interaction.replied || interaction.deferred) {
+                return await interaction.followUp({ ...payload, flags: [MessageFlags.Ephemeral] });
+            } else {
+                return await interaction.reply({ ...payload, flags: [MessageFlags.Ephemeral] });
+            }
+        } catch (e) {
+            console.error('[handleNextStep] Response error:', e.message);
+        }
+    };
+
     if (!nextStep || nextStep.type === 'done') {
         // Tüm sorular cevaplandı → kaydet
         const userId = interaction.user.id;
@@ -1187,7 +1205,7 @@ async function handleNextStep(interaction, nextStep, session, questions, lang, g
             ? `✅ **Başvurunuz tamamlandı!** Cevaplarınız yetkililere iletildi. Kayıt biletiniz oluşturuldu: ${channelLink}`
             : `✅ **Application complete!** Your answers have been forwarded to staff. Your registration ticket: ${channelLink}`;
 
-        await interaction.followUp({ content: doneMsg, flags: [MessageFlags.Ephemeral] }).catch(() => {});
+        await sendOrFollowUp({ content: doneMsg });
         return;
     }
 
@@ -1200,26 +1218,25 @@ async function handleNextStep(interaction, nextStep, session, questions, lang, g
                 .setStyle(ButtonStyle.Primary)
         );
         const qEmbed = appSvc.buildModalQuestionsEmbed(questions, nextStep.pageIndex, lang);
-        await interaction.followUp({
+        await sendOrFollowUp({
             content: lang === 'tr'
                 ? '✅ Cevaplar kaydedildi. Devam etmek için butona tıkla:'
                 : '✅ Answers saved. Click to continue:',
             embeds: [qEmbed],
-            components: [continueRow],
-            flags: [MessageFlags.Ephemeral]
-        }).catch(() => {});
+            components: [continueRow]
+        });
         return;
     }
 
     if (nextStep.type === 'yesno') {
         const msg = appSvc.buildYesNoMessage(nextStep.question, channelId, lang);
-        await interaction.followUp({ ...msg, flags: [MessageFlags.Ephemeral] }).catch(() => {});
+        await sendOrFollowUp(msg);
         return;
     }
 
     if (nextStep.type === 'select' || nextStep.type === 'multiselect') {
         const msg = appSvc.buildSelectMessage(nextStep.question, channelId, lang, nextStep.type === 'multiselect');
-        await interaction.followUp({ ...msg, flags: [MessageFlags.Ephemeral] }).catch(() => {});
+        await sendOrFollowUp(msg);
         return;
     }
 }

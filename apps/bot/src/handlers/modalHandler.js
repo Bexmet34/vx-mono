@@ -381,41 +381,19 @@ async function handleRegisterModal(interaction) {
                     playerData
                 });
 
-                // Determine first question type
-                const firstQ = questions[0];
-                const firstType = firstQ?.type || 'text';
-
-                if (firstType === 'text' || firstType === 'paragraph') {
-                    const { ActionRowBuilder: AR2, ButtonBuilder: BB2, ButtonStyle: BS2 } = require('discord.js');
-                    const continueRow = new AR2().addComponents(
-                        new BB2()
-                            .setCustomId(`app_continue:0:nochan`)
-                            .setLabel(lang === 'tr' ? '▶ Soruları Yanıtla' : '▶ Answer Questions')
-                            .setStyle(BS2.Primary)
-                    );
-                    const qEmbed = appSvc.buildModalQuestionsEmbed(questions, 0, lang);
-                    await interaction.editReply({
-                        content: `✅ **${lang === 'tr' ? 'Kayıt bilgileriniz alındı.' : 'Registration info received.'}**\n\n📋 **${lang === 'tr' ? 'Başvuru sorularını yanıtlamak için aşağıdaki butona bas:' : 'Click below to answer the application questions:'}**`,
-                        embeds: [qEmbed],
-                        components: [continueRow]
-                    });
-                } else if (firstType === 'yesno') {
-                    const { handleNextStep } = require('./buttonHandler');
-                    const session = appSvc.getSession(interaction.user.id, interaction.guildId);
-                    const nextStep = appSvc.getNextStep(session, questions);
-                    await interaction.editReply({ content: `✅ **${lang === 'tr' ? 'Kayıt bilgileriniz alındı.' : 'Registration info received.'}**\n\n📋 **${lang === 'tr' ? 'Başvuru soruları:' : 'Application questions:'}**` });
-                    await handleNextStep(interaction, nextStep, session, questions, lang, interaction.guildId, 'nochan');
-                } else if (firstType === 'select' || firstType === 'multiselect') {
-                    const { handleNextStep } = require('./buttonHandler');
-                    const session = appSvc.getSession(interaction.user.id, interaction.guildId);
-                    const nextStep = appSvc.getNextStep(session, questions);
-                    await interaction.editReply({ content: `✅ **${lang === 'tr' ? 'Kayıt bilgileriniz alındı.' : 'Registration info received.'}**\n\n📋 **${lang === 'tr' ? 'Başvuru soruları:' : 'Application questions:'}**` });
-                    await handleNextStep(interaction, nextStep, session, questions, lang, interaction.guildId, 'nochan');
-                } else {
-                    await interaction.editReply({
-                        content: `❌ **${lang === 'tr' ? 'Bir hata oluştu!' : 'An error occurred!'}**`
-                    });
-                }
+                const { ActionRowBuilder: AR2, ButtonBuilder: BB2, ButtonStyle: BS2 } = require('discord.js');
+                const continueRow = new AR2().addComponents(
+                    new BB2()
+                        .setCustomId(`app_continue:0:nochan`)
+                        .setLabel(lang === 'tr' ? '▶ Soruları Yanıtla' : '▶ Answer Questions')
+                        .setStyle(BS2.Primary)
+                );
+                const qEmbed = appSvc.buildModalQuestionsEmbed(questions, 0, lang);
+                await interaction.editReply({
+                    content: `✅ **${lang === 'tr' ? 'Kayıt bilgileriniz alındı.' : 'Registration info received.'}**\n\n📋 **${lang === 'tr' ? 'Başvuru sorularını yanıtlamak için aşağıdaki butona bas:' : 'Click below to answer the application questions:'}**`,
+                    embeds: [qEmbed],
+                    components: [continueRow]
+                });
             } else {
                 // Survey disabled → Create channel immediately
                 const staffRoles = guildConfig?.registration_staff_role_ids?.split(',') || [];
