@@ -657,11 +657,10 @@ async function handleRegisterButtons(interaction) {
         return await handleNextStep(interaction, nextStep, session, questions, lang, guildId, channelId);
     }
 
-    // ─── ANKET: "Devam Et" butonu (modal'dan modal'a geçiş için ara buton) ─
+    // ─── ANKET: "Devam Et" butonu (kayıt modal sonrası veya modal sayfaları arası) ─
     // customId: app_continue:{pageIndex}:{channelId}
     if (customId.startsWith('app_continue:')) {
         const parts = customId.split(':');
-        const pageIndex = parseInt(parts[1]);
         const channelId = parts[2];
         const userId = interaction.user.id;
         const guildId = interaction.guildId;
@@ -670,15 +669,27 @@ async function handleRegisterButtons(interaction) {
         const lang = (guildCfg?.language || '').toString().toLowerCase().trim() === 'en' ? 'en' : 'tr';
         const questions = (guildCfg?.application_questions || []).filter(q => q.type !== 'rules_accept');
         const session = appSvc.getSession(userId, guildId);
+
+        if (!session) {
+            return await interaction.reply({
+                content: lang === 'tr'
+                    ? '⚠️ Oturum bulunamadı. Lütfen kayıt işlemini yeniden başlatın.'
+                    : '⚠️ Session not found. Please restart the registration process.',
+                flags: [MessageFlags.Ephemeral]
+            });
+        }
+
         const nextStep = appSvc.getNextStep(session, questions);
 
         if (nextStep && nextStep.type === 'modal') {
-            const modal = appSvc.buildAnswerModal(questions, pageIndex, channelId, lang);
+            // Modal sorular için modal aç — nextStep.pageIndex kullan (URL'deki değer değil)
+            const modal = appSvc.buildAnswerModal(questions, nextStep.pageIndex, channelId, lang);
             if (modal) {
                 return await interaction.showModal(modal);
             }
         }
 
+        // yesno / select / multiselect / done → handleNextStep ile işle
         await handleNextStep(interaction, nextStep, session, questions, lang, guildId, channelId);
         return;
     }
@@ -1213,19 +1224,18 @@ async function handleNextStep(interaction, nextStep, session, questions, lang, g
     }
 
     if (nextStep.type === 'modal') {
-        // Modal sayfaları arası: "Devam Et" butonu göster
+        // Modal sayfaları arası: "Devam Et" butonu göster (embed yok, sadece buton)
         const continueRow = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
                 .setCustomId(`app_continue:${nextStep.pageIndex}:${channelId}`)
-                .setLabel(lang === 'tr' ? '▶ Sonraki Soruları Yanıtla' : '▶ Answer Next Questions')
+                .setLabel(lang === 'tr' ? '📋 Sonraki Soruları Yanıtla' : '📋 Answer Next Questions')
                 .setStyle(ButtonStyle.Primary)
         );
-        const qEmbed = appSvc.buildModalQuestionsEmbed(questions, nextStep.pageIndex, lang);
         await sendOrFollowUp({
             content: lang === 'tr'
-                ? '✅ Cevaplar kaydedildi. Devam etmek için butona tıkla:'
-                : '✅ Answers saved. Click to continue:',
-            embeds: [qEmbed],
+                ? '✅ Cevaplar kaydedildi. Devam etmek için butona basın:'
+                : '✅ Answers saved. Click the button to continue:',
+            embeds: [],
             components: [continueRow]
         });
         return;

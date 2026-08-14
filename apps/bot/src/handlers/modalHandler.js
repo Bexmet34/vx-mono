@@ -326,7 +326,7 @@ async function handleObjectiveModal(interaction) {
 async function handleRegisterModal(interaction) {
     if (interaction.customId === 'register_modal') {
         const guildConfig = await getGuildConfig(interaction.guildId);
-        const lang = guildConfig?.language || 'tr';
+        const lang = (guildConfig?.language || '').toString().toLowerCase().trim() === 'en' ? 'en' : 'tr';
         
         let realName = '';
         let ign = '';
@@ -381,17 +381,17 @@ async function handleRegisterModal(interaction) {
                     playerData
                 });
 
-                const { ActionRowBuilder: AR2, ButtonBuilder: BB2, ButtonStyle: BS2 } = require('discord.js');
-                const continueRow = new AR2().addComponents(
-                    new BB2()
+                const continueRow = new ActionRowBuilder().addComponents(
+                    new ButtonBuilder()
                         .setCustomId(`app_continue:0:nochan`)
-                        .setLabel(lang === 'tr' ? '▶ Soruları Yanıtla' : '▶ Answer Questions')
-                        .setStyle(BS2.Primary)
+                        .setLabel(lang === 'tr' ? '📋 Soruları Yanıtla' : '📋 Answer Questions')
+                        .setStyle(ButtonStyle.Primary)
                 );
-                const qEmbed = appSvc.buildModalQuestionsEmbed(questions, 0, lang);
                 await interaction.editReply({
-                    content: `✅ **${lang === 'tr' ? 'Kayıt bilgileriniz alındı.' : 'Registration info received.'}**\n\n📋 **${lang === 'tr' ? 'Başvuru sorularını yanıtlamak için aşağıdaki butona bas:' : 'Click below to answer the application questions:'}**`,
-                    embeds: [qEmbed],
+                    content: lang === 'tr'
+                        ? '✅ **Kayıt bilgileriniz alındı.**\n\nBaşvuru sorularını yanıtlamak için aşağıdaki butona basın:'
+                        : '✅ **Registration info received.**\n\nClick the button below to answer the application questions:',
+                    embeds: [],
                     components: [continueRow]
                 });
             } else {
@@ -550,7 +550,7 @@ async function handleApplicationAnswerModal(interaction) {
     const guildId = interaction.guildId;
 
     const guildConfig = await getGuildConfig(guildId);
-    const lang = guildConfig?.language || 'tr';
+    const lang = (guildConfig?.language || '').toString().toLowerCase().trim() === 'en' ? 'en' : 'tr';
     const questions = (guildConfig?.application_questions || []).filter(q => q.type !== 'rules_accept');
 
     // Modal'daki cevapları oku

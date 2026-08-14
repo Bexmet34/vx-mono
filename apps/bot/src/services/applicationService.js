@@ -101,7 +101,7 @@ async function finalizeAnswers(userId, guildId, client) {
     try {
         const { getGuildConfig } = require('./guildConfig');
         const guildConfig = await getGuildConfig(guildId);
-        const lang = guildConfig?.language || 'tr';
+        const lang = (guildConfig?.language || '').toString().toLowerCase().trim() === 'en' ? 'en' : 'tr';
         const guild = await client.guilds.fetch(guildId).catch(() => null);
 
         let channelId = session.channelId;
