@@ -610,18 +610,23 @@ async function handleObjectiveButtons(interaction) {
  */
 async function handleRegisterButtons(interaction) {
     const customId = interaction.customId;
+    const guildCfg = await getGuildConfig(interaction.guildId);
+    const lang = guildCfg?.language || 'tr';
+    const isEn = lang === 'en';
 
     // ─── ANKET: Kural Kabul / Red ───────────────────────────────────────────
     if (customId === 'reg_rules_accept') {
         // Kuralları kabul etti → normal kayıt modalını aç
-        return await openRegisterModal(interaction);
+        return await openRegisterModal(interaction, lang);
     }
 
     if (customId === 'reg_rules_reject') {
         return await interaction.update({
-            content: '❌ **Kayıt işlemi iptal edildi.** Guild kurallarını kabul etmeden kayıt olamazsınız.',
+            content: isEn
+                ? '❌ **Registration cancelled.** You must accept the guild rules to register.'
+                : '❌ **Kayıt işlemi iptal edildi.** Guild kurallarını kabul etmeden kayıt olamazsınız.',
             embeds: [], components: []
-        }).catch(() => interaction.reply({ content: '❌ Kayıt iptal edildi.', flags: [MessageFlags.Ephemeral] }));
+        }).catch(() => interaction.reply({ content: isEn ? '❌ Registration cancelled.' : '❌ Kayıt iptal edildi.', flags: [MessageFlags.Ephemeral] }));
     }
 
     // ─── ANKET: Yesno buton cevapları ──────────────────────────────────────
@@ -755,8 +760,7 @@ async function handleRegisterButtons(interaction) {
         return await handleNextStep(interaction, nextStep, session, questions, lang, guildId, channelId);
     }
 
-    const guildConfig = await getGuildConfig(interaction.guildId);
-    const lang = guildConfig?.language || 'tr';
+    const guildConfig = guildCfg;
     const message = interaction.message;
 
     // 2. Staff clicks "Approve", "Reject" or "Temp"

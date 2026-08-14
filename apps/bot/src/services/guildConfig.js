@@ -2,7 +2,7 @@ const db = require('./db');
 const { getSupabaseGuildSettings, updateGuildLanguage, updateSupabaseGuildSettings } = require('@veyronix/database');
 
 const configCache = new Map();
-const CACHE_TTL_MS = 60 * 1000; // 60 seconds TTL
+const CACHE_TTL_MS = 5 * 1000; // 5 seconds TTL
 
 /**
  * Gets configuration for a specific guild with in-memory caching
@@ -24,6 +24,9 @@ async function getGuildConfig(guildId) {
         if (sbSettings) {
             // Merge SB settings into local config
             configResult = { ...configResult, ...sbSettings };
+            if (sbSettings.language) {
+                configResult.language = sbSettings.language;
+            }
             
             // Extract auto_delete_party_hours from log_events JSON if it exists
             if (sbSettings.log_events) {
