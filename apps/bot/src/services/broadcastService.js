@@ -1,4 +1,6 @@
 const { supabase } = require('@veyronix/database');
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { LINKS } = require('../constants/constants');
 
 /**
  * Starts the broadcast worker which polls the message_queue table.
@@ -144,8 +146,7 @@ function startBroadcastWorker(client) {
             const title = lang === 'tr' ? campaign.title_tr : campaign.title_en;
             const desc = lang === 'tr' ? campaign.description_tr : campaign.description_en;
 
-            const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-            const { LINKS } = require('../constants/constants');
+
 
             const embed = new EmbedBuilder()
                 .setTitle(title)

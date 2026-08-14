@@ -1,4 +1,4 @@
-const { MessageFlags, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, PermissionFlagsBits, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
+const { MessageFlags, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, PermissionFlagsBits, ModalBuilder, TextInputBuilder, TextInputStyle, AttachmentBuilder } = require('discord.js');
 const { DEFAULT_CONTENT, LOGO_NAME, LINKS } = require('../constants/constants');
 const { sendSubscriptionNotification, logPublicTransaction } = require('../utils/notificationUtils');
 const config = require('../config/config');
@@ -403,7 +403,6 @@ async function handleVoteCommand(interaction) {
             .setURL(LINKS.TOPGG)
     );
 
-    const { AttachmentBuilder } = require('discord.js');
     const { LOGO_PATH } = require('../constants/constants');
     const logo = new AttachmentBuilder(LOGO_PATH, { name: LOGO_NAME });
 
@@ -547,7 +546,7 @@ async function handleSetupKillBoardCommand(interaction) {
  * Handles /setup-registration command
  */
 async function handleSetupRegistrationCommand(interaction) {
-    const { EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder } = require('discord.js');
+
     const guildConfig = await getGuildConfig(interaction.guildId);
     const lang = guildConfig?.language || 'tr';
 

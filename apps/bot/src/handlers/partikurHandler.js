@@ -1,4 +1,4 @@
-const { MessageFlags, ActionRowBuilder, TextInputBuilder, TextInputStyle, ModalBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, ChannelType } = require('discord.js');
+const { MessageFlags, ActionRowBuilder, TextInputBuilder, TextInputStyle, ModalBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, ChannelType, StringSelectMenuBuilder, StringSelectMenuOptionBuilder } = require('discord.js');
 const { getActivePartyCount, setActiveParty } = require('../services/partyManager');
 const { getGuildConfig } = require('../services/guildConfig');
 const { t } = require('../services/i18n');
@@ -309,7 +309,7 @@ function getTemplateByIndex(templatesStr, indexStr) {
             });
         }
 
-        const { StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ActionRowBuilder } = require('discord.js');
+
         const selectMenu = new StringSelectMenuBuilder()
             .setCustomId('fc_temp_select')
             .setPlaceholder(lang === 'tr' ? 'Oluşturmak istediğiniz şablonu seçin...' : 'Select a template to create...');
@@ -503,7 +503,7 @@ async function handleMyTempsCommand(interaction) {
         });
     }
 
-    const { StringSelectMenuBuilder, StringSelectMenuOptionBuilder } = require('discord.js');
+
     
     const selectMenu = new StringSelectMenuBuilder()
         .setCustomId('mytemps_select')

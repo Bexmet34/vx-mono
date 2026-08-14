@@ -1,23 +1,16 @@
-const { EmbedBuilder, MessageFlags, ActionRowBuilder, ButtonBuilder, ButtonStyle, AttachmentBuilder } = require('discord.js');
+const { EmbedBuilder, MessageFlags, ActionRowBuilder, ButtonBuilder, ButtonStyle, AttachmentBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, StringSelectMenuBuilder, StringSelectMenuOptionBuilder } = require('discord.js');
 const { EMPTY_SLOT, LOGO_PATH, LOGO_NAME, LINKS } = require('../constants/constants');
 const { updateButtonStates, createClosedButton, createCustomPartyComponents, isSelectMenuMode } = require('../builders/componentBuilder');
 const { removeActiveParty } = require('../services/partyManager');
 const { getGuildConfig } = require('../services/guildConfig');
 const { createHelpEmbed, createDonateEmbed, createPartikurEmbed, addFooterFields, buildRolesValue, buildRolesFields, parseEmbedData } = require('../builders/embedBuilder');
 const { resolveRoleEmoji } = require('../utils/generalUtils');
-
 const config = require('../config/config');
 const db = require('../services/db');
 const { t } = require('../services/i18n');
-const { ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
 const { acquireLock } = require('../utils/partyLock');
 const { deleteUserTemplate } = require('@veyronix/database');
 const appSvc = require('../services/applicationService');
-
-
-
-
-
 /**
  * Handles join and leave button interactions
  */

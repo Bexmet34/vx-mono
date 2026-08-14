@@ -12,6 +12,12 @@
  */
 
 const { supabase } = require('@veyronix/database');
+const {
+    ChannelType, PermissionFlagsBits,
+    ActionRowBuilder, ButtonBuilder, ButtonStyle,
+    EmbedBuilder, ModalBuilder, TextInputBuilder, TextInputStyle,
+    StringSelectMenuBuilder, StringSelectMenuOptionBuilder
+} = require('discord.js');
 
 // RAM'de geçici cevap deposu (Modal zincirleme için)
 // Key: `${userId}_${guildId}`, Value: { channelId, answers, questionList, currentPage }
@@ -108,7 +114,6 @@ async function finalizeAnswers(userId, guildId, client) {
 
         // If channel does not exist yet (delayed channel creation), create it now
         if (!channelId && session.registrationData && guild) {
-            const { ChannelType, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
             const { createPlayerCardEmbed } = require('../builders/embedBuilder');
             
             const { realName, ign, age, playerData } = session.registrationData;
@@ -291,7 +296,7 @@ async function finalizeAnswers(userId, guildId, client) {
                     const botMessage = messages.find(m => m.author.bot && m.embeds.length > 0);
 
                     if (botMessage) {
-                        const { EmbedBuilder } = require('discord.js');
+
                         const oldEmbed = botMessage.embeds[0];
                         const updatedEmbed = EmbedBuilder.from(oldEmbed);
 
@@ -369,7 +374,7 @@ function getQuestionText(q, lang = 'tr') {
 }
 
 function buildAnswerModal(questions, pageIndex, channelId, lang) {
-    const { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder } = require('discord.js');
+
     const modalQuestions = getModalQuestionsForPage(questions, pageIndex);
     const totalPages = getTotalModalPages(questions);
 
@@ -409,7 +414,7 @@ function buildAnswerModal(questions, pageIndex, channelId, lang) {
  * Evet/Hayır sorusu için Discord butonu mesajı oluşturur
  */
 function buildYesNoMessage(question, channelId, lang) {
-    const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require('discord.js');
+
     const questionText = getQuestionText(question, lang);
 
     const embed = new EmbedBuilder()
@@ -435,7 +440,7 @@ function buildYesNoMessage(question, channelId, lang) {
  * Seçim sorusu için Discord SelectMenu mesajı oluşturur
  */
 function buildSelectMessage(question, channelId, lang, isMulti = false) {
-    const { ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, EmbedBuilder } = require('discord.js');
+
     const questionText = getQuestionText(question, lang);
     let rawOptions = Array.isArray(question.options) ? question.options : [];
 
