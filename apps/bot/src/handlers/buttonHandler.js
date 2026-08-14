@@ -1125,14 +1125,15 @@ async function handleRegisterButtons(interaction) {
 /**
  * Standart kayıt modalını açar (İsim / Nick / Yaş)
  */
-async function openRegisterModal(interaction) {
+async function openRegisterModal(interaction, lang = 'tr') {
+    const isEn = lang === 'en';
     const modal = new ModalBuilder()
         .setCustomId('register_modal')
-        .setTitle('Kayıt Sistemi');
+        .setTitle(isEn ? 'Registration System' : 'Kayıt Sistemi');
 
     const realNameInput = new TextInputBuilder()
         .setCustomId('real_name')
-        .setLabel('Gerçek İsminiz')
+        .setLabel(isEn ? 'Real Name' : 'Gerçek İsminiz')
         .setStyle(TextInputStyle.Short)
         .setRequired(true)
         .setMinLength(2)
@@ -1140,7 +1141,7 @@ async function openRegisterModal(interaction) {
 
     const inGameNameInput = new TextInputBuilder()
         .setCustomId('ingame_name')
-        .setLabel('Albion Oyun İçi Nickiniz')
+        .setLabel(isEn ? 'Albion In-Game Nickname' : 'Albion Oyun İçi Nickiniz')
         .setStyle(TextInputStyle.Short)
         .setRequired(true)
         .setMinLength(3)
@@ -1148,7 +1149,7 @@ async function openRegisterModal(interaction) {
 
     const ageInput = new TextInputBuilder()
         .setCustomId('age')
-        .setLabel('Yaşınız')
+        .setLabel(isEn ? 'Your Age' : 'Yaşınız')
         .setStyle(TextInputStyle.Short)
         .setRequired(true)
         .setMinLength(1)
@@ -1161,9 +1162,8 @@ async function openRegisterModal(interaction) {
     );
 
     try {
-        // Eğer interaction zaten update edilmişse (kurallar akışı sonrası), followUp ile değil showModal ile devam
         if (interaction.replied || interaction.deferred) {
-            await interaction.followUp({ content: '⌛ Kayıt formu açılıyor...', flags: [MessageFlags.Ephemeral] }).catch(() => {});
+            await interaction.followUp({ content: isEn ? '⌛ Opening registration form...' : '⌛ Kayıt formu açılıyor...', flags: [MessageFlags.Ephemeral] }).catch(() => {});
         }
         return await interaction.showModal(modal);
     } catch (err) {

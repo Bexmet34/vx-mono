@@ -161,7 +161,7 @@ async function finalizeAnswers(userId, guildId, client) {
                 const answer = session.answers[q.id];
                 if (!answer) continue;
 
-                const questionText = q.question_tr || q.question_en || `Soru ${q.order}`;
+                const questionText = getQuestionText(q, lang);
                 const displayLabel = questionText.length > 80
                     ? questionText.substring(0, 77) + '...'
                     : questionText;
@@ -360,6 +360,14 @@ async function updateAnswerStatus(userId, guildId, status) {
 /**
  * Modal builder: Verilen sayfa indeksindeki soruları modal olarak oluşturur
  */
+function getQuestionText(q, lang = 'tr') {
+    if (!q) return 'Soru';
+    if (lang === 'en') {
+        return q.question_en || q.question_tr || `Question ${q.order || 1}`;
+    }
+    return q.question_tr || q.question_en || `Soru ${q.order || 1}`;
+}
+
 function buildAnswerModal(questions, pageIndex, channelId, lang) {
     const { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder } = require('discord.js');
     const modalQuestions = getModalQuestionsForPage(questions, pageIndex);
@@ -374,7 +382,7 @@ function buildAnswerModal(questions, pageIndex, channelId, lang) {
             : `📋 Application Questions (${pageIndex + 1}/${totalPages})`);
 
     for (const q of modalQuestions) {
-        const questionText = q.question_tr || q.question_en || `Soru ${q.order}`;
+        const questionText = getQuestionText(q, lang);
         const label = questionText.length > 45 ? questionText.substring(0, 42) + '...' : questionText;
 
         const input = new TextInputBuilder()
@@ -385,7 +393,7 @@ function buildAnswerModal(questions, pageIndex, channelId, lang) {
             .setMaxLength(q.max_length || (q.type === 'paragraph' ? 1000 : 500));
 
         if (q.placeholder_tr || q.placeholder_en) {
-            const placeholder = lang === 'tr' ? q.placeholder_tr : q.placeholder_en;
+            const placeholder = lang === 'en' ? (q.placeholder_en || q.placeholder_tr) : (q.placeholder_tr || q.placeholder_en);
             if (placeholder) input.setPlaceholder(placeholder.substring(0, 100));
         } else {
             input.setPlaceholder(questionText.substring(0, 100));
@@ -402,7 +410,7 @@ function buildAnswerModal(questions, pageIndex, channelId, lang) {
  */
 function buildYesNoMessage(question, channelId, lang) {
     const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require('discord.js');
-    const questionText = question.question_tr || question.question_en || 'Soru';
+    const questionText = getQuestionText(question, lang);
 
     const embed = new EmbedBuilder()
         .setTitle(lang === 'tr' ? '📋 Başvuru Sorusu' : '📋 Application Question')
@@ -428,8 +436,22 @@ function buildYesNoMessage(question, channelId, lang) {
  */
 function buildSelectMessage(question, channelId, lang, isMulti = false) {
     const { ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, EmbedBuilder } = require('discord.js');
-    const questionText = question.question_tr || question.question_en || 'Soru';
-    const options = question.options || [];
+    const questionText = getQuestionText(question, lang);
+    let rawOptions = Array.isArray(question.options) ? question.options : [];
+
+    if (rawOptions.length === 0) {
+        rawOptions = [lang === 'tr' ? 'Seçenek 1' : 'Option 1'];
+    }
+
+    const safeOptions = rawOptions.slice(0, 25).map((opt, i) => {
+        const rawLabel = typeof opt === 'string' ? opt : (opt.label || opt.value || `Option ${i + 1}`);
+        const rawVal = typeof opt === 'string' ? opt : (opt.value || opt.label || `opt_${i + 1}`);
+        const label = String(rawLabel).trim().substring(0, 100) || `Option ${i + 1}`;
+        const value = String(rawVal).trim().substring(0, 100) || `val_${i + 1}`;
+        return new StringSelectMenuOptionBuilder()
+            .setLabel(label)
+            .setValue(value);
+    });
 
     const embed = new EmbedBuilder()
         .setTitle(lang === 'tr' ? '📋 Başvuru Sorusu' : '📋 Application Question')
@@ -440,16 +462,8 @@ function buildSelectMessage(question, channelId, lang, isMulti = false) {
         .setCustomId(`app_select:${question.id}:${isMulti ? 'multi' : 'single'}:${channelId}`)
         .setPlaceholder(lang === 'tr' ? 'Bir seçenek seçin...' : 'Select an option...')
         .setMinValues(1)
-        .setMaxValues(isMulti ? Math.min(options.length, 5) : 1)
-        .addOptions(
-            options.map(opt => {
-                const label = typeof opt === 'string' ? opt : (opt.label || opt);
-                const value = typeof opt === 'string' ? opt : (opt.value || opt.label || opt);
-                return new StringSelectMenuOptionBuilder()
-                    .setLabel(String(label).substring(0, 100))
-                    .setValue(String(value).substring(0, 100));
-            })
-        );
+        .setMaxValues(isMulti ? Math.min(safeOptions.length, 5) : 1)
+        .addOptions(safeOptions);
 
     return { embeds: [embed], components: [new ActionRowBuilder().addComponents(menu)] };
 }
@@ -493,22 +507,20 @@ function getNextStep(session, allQuestions) {
  */
 function buildModalQuestionsEmbed(questions, pageIndex, lang) {
     const { EmbedBuilder } = require('discord.js');
-    const modalQuestions = getModalQuestionsForPage(questions, pageIndex);
-    const totalPages = getTotalModalPages(questions);
     
     const embed = new EmbedBuilder()
         .setTitle(lang === 'tr' 
-            ? `📋 Başvuru Soruları - Sayfa ${pageIndex + 1}/${totalPages}` 
-            : `📋 Application Questions - Page ${pageIndex + 1}/${totalPages}`)
+            ? `📋 Başvuru Soruları` 
+            : `📋 Application Questions`)
         .setColor('#5865F2');
 
     let desc = '';
-    modalQuestions.forEach((q, index) => {
-        const questionText = q.question_tr || q.question_en || `Soru ${q.order}`;
+    questions.forEach((q, index) => {
+        const questionText = getQuestionText(q, lang);
         desc += `**${index + 1}.** ${questionText}\n\n`;
     });
 
-    embed.setDescription(desc || '...');
+    embed.setDescription(desc.substring(0, 4000) || '...');
     return embed;
 }
 
