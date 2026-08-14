@@ -40,6 +40,11 @@ async function getGuildConfig(guildId) {
         }
 
         const finalConfig = Object.keys(configResult).length > 0 ? configResult : null;
+
+        // Normalize language field to always be lowercase 'en' or 'tr'
+        if (finalConfig && finalConfig.language) {
+            finalConfig.language = finalConfig.language.toString().toLowerCase().trim() === 'en' ? 'en' : 'tr';
+        }
         configCache.set(guildId, { data: finalConfig, timestamp: Date.now() });
         return finalConfig;
 

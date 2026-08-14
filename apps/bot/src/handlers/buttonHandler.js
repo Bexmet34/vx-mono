@@ -611,7 +611,7 @@ async function handleObjectiveButtons(interaction) {
 async function handleRegisterButtons(interaction) {
     const customId = interaction.customId;
     const guildCfg = await getGuildConfig(interaction.guildId);
-    const lang = guildCfg?.language || 'tr';
+    const lang = (guildCfg?.language || '').toString().toLowerCase().trim() === 'en' ? 'en' : 'tr';
     const isEn = lang === 'en';
 
     // ─── ANKET: Kural Kabul / Red ───────────────────────────────────────────
@@ -640,7 +640,7 @@ async function handleRegisterButtons(interaction) {
         const guildId = interaction.guildId;
 
         const guildCfg = await getGuildConfig(guildId);
-        const lang = guildCfg?.language || 'tr';
+        const lang = (guildCfg?.language || '').toString().toLowerCase().trim() === 'en' ? 'en' : 'tr';
         const questions = (guildCfg?.application_questions || []).filter(q => q.type !== 'rules_accept');
 
         const displayAnswer = answer === 'yes'
@@ -667,7 +667,7 @@ async function handleRegisterButtons(interaction) {
         const guildId = interaction.guildId;
 
         const guildCfg = await getGuildConfig(guildId);
-        const lang = guildCfg?.language || 'tr';
+        const lang = (guildCfg?.language || '').toString().toLowerCase().trim() === 'en' ? 'en' : 'tr';
         const questions = (guildCfg?.application_questions || []).filter(q => q.type !== 'rules_accept');
         const session = appSvc.getSession(userId, guildId);
         const nextStep = appSvc.getNextStep(session, questions);
@@ -686,8 +686,7 @@ async function handleRegisterButtons(interaction) {
     // ─── Kayıt Başlat butonu ─────────────────────────────────────────────────
     // 1. User clicks "Register" button in welcome channel
     if (customId === 'register_start' || customId === 'register_btn') {
-        const guildCfg = await getGuildConfig(interaction.guildId);
-        const lang = guildCfg?.language || 'tr';
+        // lang already resolved from guildCfg at top of function
 
         // Check if user already has an active session
         const session = appSvc.getSession(interaction.user.id, interaction.guildId);
@@ -745,7 +744,7 @@ async function handleRegisterButtons(interaction) {
         const guildId = interaction.guildId;
 
         const guildCfg = await getGuildConfig(guildId);
-        const lang = guildCfg?.language || 'tr';
+        const lang = (guildCfg?.language || '').toString().toLowerCase().trim() === 'en' ? 'en' : 'tr';
         const questions = (guildCfg?.application_questions || []).filter(q => q.type !== 'rules_accept');
 
         const selectedValues = interaction.values || [];
