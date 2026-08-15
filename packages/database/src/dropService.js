@@ -1,10 +1,12 @@
 const { supabase } = require('./client');
 
 const dropSettingsCache = new Map();
-const CACHE_TTL = 30 * 1000; // 30 seconds
+const CACHE_TTL = 30 * 1000; // 30 saniye
+
+// ─── drop_settings ────────────────────────────────────────────────────────────
 
 /**
- * Get drop settings for a guild (creates default if not exists)
+ * Sunucunun drop ayarlarını getirir
  */
 async function getDropSettings(guildId) {
   if (!guildId) return null;
@@ -29,7 +31,7 @@ async function getDropSettings(guildId) {
 }
 
 /**
- * Upsert (create or update) drop settings for a guild
+ * Drop ayarlarını oluştur ya da güncelle (upsert)
  */
 async function upsertDropSettings(guildId, updates) {
   const { data, error } = await supabase
@@ -47,19 +49,24 @@ async function upsertDropSettings(guildId, updates) {
   return data;
 }
 
+// ─── drop_logs ────────────────────────────────────────────────────────────────
+
 /**
- * Create a new drop log entry (returns the new log record with its ID for the claim step)
+ * Yeni drop log kaydı oluşturur (v2: drop_code, expires_at, points_given eklendi)
  */
 async function createDropLog(data) {
   const { data: log, error } = await supabase
     .from('drop_logs')
     .insert({
-      guild_id:     data.guild_id,
-      channel_id:   data.channel_id,
-      message_id:   data.message_id || null,
-      trigger_type: data.trigger_type,
-      reward_type:  data.reward_type,
+      guild_id:      data.guild_id,
+      channel_id:    data.channel_id,
+      message_id:    data.message_id    || null,
+      trigger_type:  data.trigger_type,
+      reward_type:   data.reward_type,
       reward_amount: data.reward_amount || 0,
+      drop_code:     data.drop_code     || null,
+      expires_at:    data.expires_at    || null,
+      points_given:  data.points_given  || 0,
     })
     .select()
     .single();
@@ -73,7 +80,7 @@ async function createDropLog(data) {
 }
 
 /**
- * Update drop log with Discord message_id after the embed is sent
+ * Drop log kaydına Discord message_id yazar
  */
 async function updateDropMessageId(dropId, messageId) {
   const { error } = await supabase
@@ -87,25 +94,7 @@ async function updateDropMessageId(dropId, messageId) {
 }
 
 /**
- * Atomic claim — uses the claim_drop RPC function
- * Returns true if this user successfully claimed, false if someone else already did
- */
-async function claimDrop(dropId, userId) {
-  const { data, error } = await supabase.rpc('claim_drop', {
-    p_drop_id: dropId,
-    p_user_id: userId,
-  });
-
-  if (error) {
-    console.error('[DropService] Error in claimDrop RPC:', error);
-    return false;
-  }
-
-  return data === true;
-}
-
-/**
- * Get drop log by ID (to check claim status)
+ * ID ile drop log'u getirir
  */
 async function getDropLog(dropId) {
   const { data } = await supabase
@@ -118,7 +107,7 @@ async function getDropLog(dropId) {
 }
 
 /**
- * Get recent drop history for a guild
+ * Sunucunun son drop geçmişini getirir
  */
 async function getDropHistory(guildId, limit = 20) {
   const { data } = await supabase
@@ -131,12 +120,96 @@ async function getDropHistory(guildId, limit = 20) {
   return data || [];
 }
 
+// ─── Kod ile atomik claim ─────────────────────────────────────────────────────
+
+/**
+ * Kodu ilk yazan kullanıcıya drop'u atar (atomik RPC).
+ * Returns true = kazandı, false = zaten kapılmış / süresi geçmiş
+ */
+async function claimDropByCode(code, guildId, channelId, userId) {
+  const { data, error } = await supabase.rpc('claim_drop_by_code', {
+    p_code:       code,
+    p_user_id:    userId,
+    p_guild_id:   guildId,
+    p_channel_id: channelId,
+  });
+
+  if (error) {
+    console.error('[DropService] claimDropByCode RPC error:', error);
+    return false;
+  }
+
+  return data === true;
+}
+
+// ─── Puan sistemi ─────────────────────────────────────────────────────────────
+
+/**
+ * Kullanıcıya puan ekler (UPSERT RPC)
+ */
+async function addDropPoints(guildId, userId, points) {
+  const { error } = await supabase.rpc('add_drop_points', {
+    p_guild_id: guildId,
+    p_user_id:  userId,
+    p_points:   points,
+  });
+
+  if (error) {
+    console.error('[DropService] addDropPoints RPC error:', error);
+  }
+}
+
+/**
+ * Kullanıcının drop puanını getirir
+ */
+async function getUserDropPoints(guildId, userId) {
+  const { data, error } = await supabase
+    .from('drop_points')
+    .select('total_points, win_count, last_win_at')
+    .eq('guild_id', guildId)
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (error) {
+    console.error('[DropService] getUserDropPoints error:', error);
+    return null;
+  }
+
+  return data;
+}
+
+/**
+ * Sunucunun drop liderlik tablosunu getirir (en iyi N kullanıcı)
+ */
+async function getDropLeaderboard(guildId, limit = 10) {
+  const { data, error } = await supabase
+    .from('drop_points')
+    .select('user_id, total_points, win_count, last_win_at')
+    .eq('guild_id', guildId)
+    .order('total_points', { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error('[DropService] getDropLeaderboard error:', error);
+    return [];
+  }
+
+  return data || [];
+}
+
 module.exports = {
+  // Settings
   getDropSettings,
   upsertDropSettings,
+  // Logs
   createDropLog,
   updateDropMessageId,
-  claimDrop,
   getDropLog,
   getDropHistory,
+  // Claim
+  claimDropByCode,
+  // Points
+  addDropPoints,
+  getUserDropPoints,
+  getDropLeaderboard,
 };

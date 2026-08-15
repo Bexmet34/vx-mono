@@ -1,119 +1,135 @@
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const { createDropLog, updateDropMessageId } = require('@veyronix/database');
 
 /**
- * dropEngine.js — Random Drop Embed & Publish Service
- * 
- * Drop embed mesajını oluşturur ve kanala gönderir.
- * Race condition koruması dropHandler.js içindeki claimDrop RPC'siyle sağlanır.
+ * dropEngine.js — Drop v2: 8 Haneli Kod Sistemi
+ *
+ * Bot hedef kanala rastgele 8 haneli bir kod atar.
+ * O kodu chat'e ilk yazan kullanıcı kazanır.
+ * Buton sistemi tamamen kaldırıldı.
  */
 
 // ─── Ödül tiplerine göre renkler ve emojiler ─────────────────────────────────
 const REWARD_VISUALS = {
-  coin:   { color: '#FFD700', emoji: '🪙', labelTr: 'Coin',   labelEn: 'Coin'   },
-  xp:     { color: '#7C83FD', emoji: '⭐', labelTr: 'XP',     labelEn: 'XP'     },
+  coin:   { color: '#FFD700', emoji: '🪙', labelTr: 'Coin',     labelEn: 'Coin'   },
+  xp:     { color: '#7C83FD', emoji: '⭐', labelTr: 'XP',       labelEn: 'XP'     },
   role:   { color: '#2ed573', emoji: '🎖️', labelTr: 'Özel Rol', labelEn: 'Special Role' },
-  ticket: { color: '#ff6b81', emoji: '🎟️', labelTr: 'Bilet',  labelEn: 'Ticket' },
+  ticket: { color: '#ff6b81', emoji: '🎟️', labelTr: 'Bilet',    labelEn: 'Ticket' },
 };
 
-// ─── Trigger tiplerine göre başlık mesajları ─────────────────────────────────
-const TRIGGER_MESSAGES = {
-  silence_break: {
-    tr: ['🌊 Sessizliği Sen Bozabilirsin!', '💤 Uyanan Kanalda Ganimet!', '🌙 İlk Mesaja Sürpriz!'],
-    en: ['🌊 Break the Silence!',           '💤 Loot Woke Up!',            '🌙 Surprise for First Message!'],
-  },
-  burst: {
-    tr: ['🔥 Ateş Var! Ganimet Düştü!', '🎉 Aktiflik Ödüllendiriliyor!', '⚡ Kalabalık Ödülü!'],
-    en: ['🔥 Hot Chat! Loot Dropped!',  '🎉 Activity Rewarded!',          '⚡ Crowd Bonus!'],
-  },
-};
+// ─── Aktif drop'ları RAM'de sakla: Map<`${guildId}:${channelId}`, dropInfo> ──
+// dropInfo: { dropId, code, expiresAt, rewardType, rewardAmount, pointsToGive }
+const activeDrops = new Map();
 
-function pickRandom(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
+/**
+ * 8 karakterli rastgele büyük harf + rakam kodu üretir.
+ * Örn: "XK7M2P9Q"
+ */
+function generateDropCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Karıştırıcı karakterler hariç (0,O,1,I)
+  let code = '';
+  for (let i = 0; i < 8; i++) {
+    code += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return code;
 }
 
 /**
- * Drop embed'ini oluşturur
+ * Drop embed'ini oluşturur (kod ile)
  */
-function buildDropEmbed(dropSettings, triggerType, lang = 'tr') {
-  const visual  = REWARD_VISUALS[dropSettings.reward_type] || REWARD_VISUALS.coin;
-  const msgs    = TRIGGER_MESSAGES[triggerType] || TRIGGER_MESSAGES.burst;
-  const title   = pickRandom(msgs[lang] || msgs.tr);
-  const isEn    = lang === 'en';
+function buildDropEmbed(dropSettings, code, lang = 'tr') {
+  const visual = REWARD_VISUALS[dropSettings.reward_type] || REWARD_VISUALS.coin;
+  const isEn   = lang === 'en';
+  const expSec = dropSettings.code_expire_seconds || 60;
 
   const rewardLine = dropSettings.reward_type === 'role'
-    ? (isEn ? `🎖️ **Special Role** granted!` : `🎖️ **Özel Rol** verilecek!`)
-    : `${visual.emoji} **${dropSettings.reward_amount} ${visual[isEn ? 'labelEn' : 'labelTr']}**`;
+    ? (isEn ? `🎖️ **Special Role**` : `🎖️ **Özel Rol**`)
+    : `${visual.emoji} **${dropSettings.reward_amount || 100} ${visual[isEn ? 'labelEn' : 'labelTr']}**`;
 
   return new EmbedBuilder()
-    .setTitle(`${visual.emoji} ${isEn ? 'LOOT DROP!' : 'GANİMET DÜŞTÜ!'}`)
+    .setTitle(`🎁 ${isEn ? 'LOOT DROP!' : 'GANİMET DÜŞTÜ!'}`)
     .setDescription(
-      `## ${title}\n\n` +
       (isEn
-        ? `A **Random Drop** just landed in this channel!\n\nReward: ${rewardLine}\n\n🏃 **Be the first to claim it!**`
-        : `Bu kanala bir **Rastgele Ganimet** düştü!\n\nÖdül: ${rewardLine}\n\n🏃 **İlk kaçıran pişman olur!**`)
+        ? `## 🔑 Type the code below to claim the reward!\n\n`
+        : `## 🔑 Aşağıdaki kodu chat'e yaz ve ödülü kap!\n\n`) +
+      `# \`${code}\`\n\n` +
+      (isEn
+        ? `**Reward:** ${rewardLine}\n**Points:** 🏆 ${dropSettings.drop_points || 10} pts\n\n⏱️ Code expires in **${expSec} seconds**. First one wins!`
+        : `**Ödül:** ${rewardLine}\n**Puan:** 🏆 ${dropSettings.drop_points || 10} puan\n\n⏱️ Kod **${expSec} saniye** geçerli. İlk yazan kazanır!`)
     )
     .setColor(visual.color)
     .setFooter({
       text: isEn
-        ? 'Veyronix Random Drop • First click wins!'
-        : 'Veyronix Random Drop • İlk tıklayan kazanır!'
+        ? 'Veyronix Drop • Type the code exactly as shown!'
+        : 'Veyronix Drop • Kodu tam olarak göründüğü gibi yaz!'
     })
     .setTimestamp();
 }
 
 /**
- * Drop butonunu oluşturur
+ * Drop'u kanala yayınlar:
+ * 1. Kod üretir
+ * 2. DB'ye log kaydı oluşturur
+ * 3. Embed gönderir
+ * 4. Aktif drop map'ine ekler (RAM)
+ *
+ * @param {import('discord.js').Client} client
+ * @param {object} dropSettings   drop_settings DB kaydı
+ * @param {string} channelId      Hedef kanal ID'si
+ * @param {string} triggerType    'scheduled' | 'percent_roll'
+ * @param {string} lang           'tr' | 'en'
+ * @returns {object|null}
  */
-function buildDropComponents(dropId, disabled = false) {
-  return [
-    new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setCustomId(`drop_claim:${dropId}`)
-        .setLabel('🤑 Kap!')
-        .setStyle(ButtonStyle.Success)
-        .setDisabled(disabled)
-    )
-  ];
-}
-
-/**
- * Drop'u kanala yayınlar
- * 1. DB'ye log kaydı oluşturur (claimed_by = NULL)
- * 2. Embed + buton gönderir
- * 3. message_id'yi log kaydına yazar
- * 
- * @param {Client}  client        Discord.js client
- * @param {object}  dropSettings  drop_settings DB kaydı
- * @param {string}  channelId     Hedef kanal ID'si
- * @param {string}  triggerType   'silence_break' | 'burst'
- * @param {string}  lang          'tr' | 'en'
- * @returns {object|null} Oluşturulan drop log kaydı
- */
-async function publishDrop(client, dropSettings, channelId, triggerType, lang = 'tr') {
+async function publishDrop(client, dropSettings, channelId, triggerType = 'scheduled', lang = 'tr') {
   try {
     const channel = await client.channels.fetch(channelId).catch(() => null);
     if (!channel) return null;
 
-    // 1. DB log oluştur (message_id henüz yok)
+    const code    = generateDropCode();
+    const expSec  = dropSettings.code_expire_seconds || 60;
+    const expires = new Date(Date.now() + expSec * 1000);
+
+    // 1. DB log oluştur
     const dropLog = await createDropLog({
-      guild_id:     dropSettings.guild_id,
-      channel_id:   channelId,
-      trigger_type: triggerType,
-      reward_type:  dropSettings.reward_type,
-      reward_amount: dropSettings.reward_amount || 0,
+      guild_id:      dropSettings.guild_id,
+      channel_id:    channelId,
+      trigger_type:  triggerType,
+      reward_type:   dropSettings.reward_type   || 'coin',
+      reward_amount: dropSettings.reward_amount || 100,
+      drop_code:     code,
+      expires_at:    expires.toISOString(),
+      points_given:  dropSettings.drop_points   || 10,
     });
 
-    // 2. Embed & buton gönder
-    const embed      = buildDropEmbed(dropSettings, triggerType, lang);
-    const components = buildDropComponents(dropLog.id);
-
-    const message = await channel.send({ embeds: [embed], components });
+    // 2. Embed gönder
+    const embed   = buildDropEmbed(dropSettings, code, lang);
+    const message = await channel.send({ embeds: [embed] });
 
     // 3. message_id'yi DB'ye yaz
     if (message?.id) {
       await updateDropMessageId(dropLog.id, message.id);
     }
+
+    // 4. Aktif drop olarak RAM'e kaydet
+    const mapKey = `${dropSettings.guild_id}:${channelId}`;
+    activeDrops.set(mapKey, {
+      dropId:       dropLog.id,
+      code,
+      expiresAt:    expires,
+      message,
+      rewardType:   dropSettings.reward_type   || 'coin',
+      rewardAmount: dropSettings.reward_amount || 100,
+      pointsToGive: dropSettings.drop_points   || 10,
+    });
+
+    // Süre dolunca aktif drop'u temizle ve embed'i güncelle
+    setTimeout(async () => {
+      const current = activeDrops.get(mapKey);
+      if (current && current.dropId === dropLog.id) {
+        activeDrops.delete(mapKey);
+        await markDropExpired(message, lang).catch(() => {});
+      }
+    }, expSec * 1000);
 
     return { dropLog, message };
   } catch (err) {
@@ -123,37 +139,54 @@ async function publishDrop(client, dropSettings, channelId, triggerType, lang = 
 }
 
 /**
- * Drop mesajını "kapatılmış" haline günceller (kazanan belirlendi)
+ * Drop mesajını "kazanıldı" olarak günceller
  */
-async function markDropClaimed(message, winnerId, dropSettings, lang = 'tr') {
+async function markDropClaimed(message, winnerId, dropInfo, lang = 'tr') {
   try {
-    const visual  = REWARD_VISUALS[dropSettings.reward_type] || REWARD_VISUALS.coin;
-    const isEn    = lang === 'en';
+    const visual = REWARD_VISUALS[dropInfo.rewardType] || REWARD_VISUALS.coin;
+    const isEn   = lang === 'en';
 
     const claimedEmbed = new EmbedBuilder()
       .setTitle(`${visual.emoji} ${isEn ? 'Loot Claimed!' : 'Ganimet Kapıldı!'}`)
       .setDescription(
         isEn
-          ? `<@${winnerId}> was the fastest and claimed the loot!`
-          : `<@${winnerId}> en hızlı davrandı ve ganimeti kaptı!`
+          ? `<@${winnerId}> was the fastest and claimed the loot!\n\n🏆 **+${dropInfo.pointsToGive} points** added!`
+          : `<@${winnerId}> en hızlı davrandı ve ganimeti kaptı!\n\n🏆 **+${dropInfo.pointsToGive} puan** eklendi!`
       )
       .setColor('#2ed573')
-      .setFooter({ text: isEn ? 'Veyronix Random Drop' : 'Veyronix Random Drop' })
+      .setFooter({ text: 'Veyronix Drop' })
       .setTimestamp();
 
-    // Butonu disabled yap
-    const dropId   = message.components[0]?.components[0]?.customId?.split(':')?.[1];
-    const disabled = dropId ? buildDropComponents(dropId, true) : [];
-
-    await message.edit({ embeds: [claimedEmbed], components: disabled });
+    await message.edit({ embeds: [claimedEmbed] });
   } catch (err) {
     console.error('[DropEngine] Error marking drop as claimed:', err.message);
   }
 }
 
+/**
+ * Süresi dolmuş drop embed'ini günceller
+ */
+async function markDropExpired(message, lang = 'tr') {
+  const isEn = lang === 'en';
+  const expiredEmbed = new EmbedBuilder()
+    .setTitle(`⏱️ ${isEn ? 'Drop Expired' : 'Drop Süresi Doldu'}`)
+    .setDescription(isEn ? 'Nobody claimed this drop in time.' : 'Bu drop kimse tarafından zamanında kaptılmadı.')
+    .setColor('#555555')
+    .setTimestamp();
+  await message.edit({ embeds: [expiredEmbed] });
+}
+
+/**
+ * Aktif drop map'ini döner (message listener için)
+ */
+function getActiveDrops() {
+  return activeDrops;
+}
+
 module.exports = {
-  buildDropEmbed,
-  buildDropComponents,
+  generateDropCode,
   publishDrop,
   markDropClaimed,
+  markDropExpired,
+  getActiveDrops,
 };

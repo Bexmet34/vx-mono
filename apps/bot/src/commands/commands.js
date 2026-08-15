@@ -137,6 +137,15 @@ const commands = [
         .addStringOption(option => 
             option.setName('yas')
                 .setDescription('Yaş (Boş bırakılırsa mevcut isminden çekilir)')),
+
+    // ─── Drop Puan Sistemi ────────────────────────────────────────────────────
+    new SlashCommandBuilder()
+        .setName('mypoints')
+        .setDescription('View your total drop points and win count in this server.'),
+
+    new SlashCommandBuilder()
+        .setName('drop-leaderboard')
+        .setDescription('View the top drop point earners in this server.'),
 ];
 
 module.exports = commands.map(command => command.toJSON());

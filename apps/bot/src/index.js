@@ -7,7 +7,7 @@ const config = require('./config/config');
 const fs = require('fs');
 const path = require('path');
 const { registerCommands } = require('./services/commandRegistration');
-const { handleHelpCommand, handleVoteCommand, handleClosePartyCommand, handleSettingsCommand, handleServersCommand, handleSubscriptionCommand, handleSubscriptionSelect, handleSubscriptionModal, handleSetupObjectiveSystemCommand, handleSetupGuildCommand, handleSetupKillBoardCommand } = require('./handlers/commandHandler');
+const { handleHelpCommand, handleVoteCommand, handleClosePartyCommand, handleSettingsCommand, handleServersCommand, handleSubscriptionCommand, handleSubscriptionSelect, handleSubscriptionModal, handleSetupObjectiveSystemCommand, handleSetupGuildCommand, handleSetupKillBoardCommand, handleMyPointsCommand, handleDropLeaderboardCommand } = require('./handlers/commandHandler');
 
 const { handleCreatePartyCommand, handleTempCommand, handleTempAutocomplete, handleMyTempsCommand } = require('./handlers/partikurHandler');
 
@@ -36,7 +36,7 @@ const client = new Client({
         GatewayIntentBits.DirectMessages,
         GatewayIntentBits.GuildEmojisAndStickers,
         GatewayIntentBits.GuildMessageReactions,
-        // GatewayIntentBits.MessageContent // BUNDAN DOLAYI ÇÖKÜYOR! DISCORD DEVELOPER PORTAL'DAN "MESSAGE CONTENT INTENT" AÇILANA KADAR KAPALI KALMALI
+        GatewayIntentBits.MessageContent, // Drop v2: Kod okumak için gerekli — Discord Developer Portal'da da açılmalı!
     ],
     partials: [Partials.Channel, Partials.Message, Partials.Reaction],
 });
@@ -255,6 +255,10 @@ client.on('interactionCreate', async interaction => {
             } else if (interaction.commandName === 'rd') {
                 const { handleFixRegistrationCommand } = require('./handlers/commandHandler');
                 await handleFixRegistrationCommand(interaction);
+            } else if (interaction.commandName === 'mypoints') {
+                await handleMyPointsCommand(interaction);
+            } else if (interaction.commandName === 'drop-leaderboard') {
+                await handleDropLeaderboardCommand(interaction);
             }
         } else if (interaction.isButton()) {
             if (interaction.customId === 'help_vote') {
@@ -390,22 +394,30 @@ client.on(Events.ChannelDelete, async (channel) => {
     }
 });
 
-// messageCreate — Random Drop Activity Tracker
-// Not: MessageContent intent kapalı olduğu için mesaj içeriğine erişilmiyor.
-// Sadece mesaj geldiğini (timestamp) takip etmek yeterli.
+// messageCreate — Drop v2:
+//   1. percent_based mod: her mesajda % şansla drop düşür
+//   2. Aktif drop kodu varsa: yazılan mesajı kodla karşılaştır
+// NOT: MessageContent intent Discord Developer Portal'da da açık olmalı!
 client.on(Events.MessageCreate, async (message) => {
     try {
         if (message.author?.bot || !message.guild) return;
 
-        const { trackMessage } = require('./services/activityTracker');
-        const { getDropSettings, publishDrop: _pub } = require('@veyronix/database');
-        const { publishDrop } = require('./services/dropEngine');
+        const { getDropSettings } = require('@veyronix/database');
+        const { publishDrop, getActiveDrops } = require('./services/dropEngine');
+        const { shouldTriggerPercentDrop } = require('./services/activityTracker');
+        const { handleDropCodeMessage } = require('./handlers/dropHandler');
 
+        // ── 1. Aktif drop kodu kontrolü (tüm modlarda çalışır) ──────────────────────────
+        const activeDrops = getActiveDrops();
+        const mapKey = `${message.guild.id}:${message.channel.id}`;
+        if (activeDrops.has(mapKey)) {
+            await handleDropCodeMessage(message);
+        }
+
+        // ── 2. percent_based mod tetikleme ────────────────────────────────────
         const settings = await getDropSettings(message.guild.id);
-        if (!settings || !settings.is_enabled) return;
-
-        // Sadece 'activity' modu seçiliyse mesaj sayarak çalışır. (Eski sistem uyumluluğu)
-        if (settings.schedule_type !== 'activity') return;
+        if (!settings?.is_enabled) return;
+        if (settings.schedule_type !== 'percent_based') return;
 
         // Bu kanal izleme listesinde mi?
         let channelIds = settings.channel_ids;
@@ -413,17 +425,19 @@ client.on(Events.MessageCreate, async (message) => {
             try { channelIds = JSON.parse(channelIds); } catch (e) { channelIds = []; }
         }
         if (!Array.isArray(channelIds)) channelIds = [];
-        if (!channelIds.includes(message.channel.id)) return;
+        if (channelIds.length > 0 && !channelIds.includes(message.channel.id)) return;
 
-        const { shouldDrop, triggerType } = trackMessage(message.guild.id, message.channel.id, settings);
-        if (!shouldDrop) return;
+        // Bu kanalda zaten aktif bir drop var mı? Çift drop önle
+        if (activeDrops.has(mapKey)) return;
+
+        const triggerDrop = shouldTriggerPercentDrop(message.guild.id, message.channel.id, settings);
+        if (!triggerDrop) return;
 
         const guildConfig = await getGuildConfig(message.guild.id);
         const lang = guildConfig?.language || 'tr';
 
-        await publishDrop(client, settings, message.channel.id, triggerType, lang);
+        await publishDrop(client, settings, message.channel.id, 'percent_roll', lang);
     } catch (err) {
-        // Crash önleme — drop tracker asla botu çökertmemeli
         console.error('[DropTracker] messageCreate error:', err.message);
     }
 });

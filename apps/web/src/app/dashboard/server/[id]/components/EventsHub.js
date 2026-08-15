@@ -2,11 +2,11 @@
 
 import { useState, useEffect, useCallback } from "react";
 import {
-  Gift, Zap, Settings, RefreshCw, Save, CheckCircle2,
-  Clock, Coins, Tag, Hash, ChevronDown, ChevronUp,
-  AlertTriangle, Sparkles
+  Gift, Zap, RefreshCw, Save, CheckCircle2,
+  Clock, AlertTriangle, Sparkles
 } from "lucide-react";
 import GiveawayTab from "./GiveawayTab";
+import DropTab from "./DropTab";
 
 // ─── Sub-tab definitions ──────────────────────────────────────────────────────
 const SUB_TABS = [
@@ -29,41 +29,40 @@ const REWARD_TYPES = [
 ];
 
 // ─── Random Drop Settings Tab ─────────────────────────────────────────────────
-function RandomDropTab({ lang, guildId, discordChannels, discordRoles }) {
+// ─── RandomDropTab: DropTab bileşenini saran wrapper ─────────────────────────
+function RandomDropTab({ lang, guildId, discordChannels }) {
   const isEn = lang === "en";
-  const textChannels = (discordChannels || []).filter(c => c.type === 0);
 
   const defaultSettings = {
-    is_enabled: false,
-    channel_ids: [],
-    drop_chance: "medium",
-    custom_chance_pct: 15,
-    cooldown_minutes: 15,
-    reward_type: "coin",
-    reward_amount: 100,
-    reward_role_id: "",
-    silence_threshold_min: 15,
-    burst_threshold_msg: 30,
-    burst_window_sec: 180,
+    is_enabled:           false,
+    schedule_type:        "exact_minutes",
+    channel_ids:          [],
+    channel_drop_mode:    "random_one",
+    exact_minutes:        [],
+    random_interval_min:  30,
+    random_interval_max:  120,
+    hourly_chance_pct:    25,
+    drop_chance_pct:      5.0,
+    reward_type:          "coin",
+    reward_amount:        100,
+    reward_role_id:       "",
+    drop_points:          10,
+    code_expire_seconds:  60,
   };
 
-  const [settings, setSettings]   = useState(defaultSettings);
-  const [history, setHistory]     = useState([]);
-  const [loading, setLoading]     = useState(true);
-  const [saving, setSaving]       = useState(false);
-  const [saved, setSaved]         = useState(false);
-  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [settings, setSettings] = useState(defaultSettings);
+  const [history, setHistory]   = useState([]);
+  const [loading, setLoading]   = useState(true);
+  const [saving, setSaving]     = useState(false);
+  const [saved, setSaved]       = useState(false);
 
-  // ── Load ────────────────────────────────────────────────────────────────────
   const fetchSettings = useCallback(async () => {
     try {
       setLoading(true);
       const res = await fetch(`/api/drop-settings/${guildId}`);
       if (res.ok) {
         const data = await res.json();
-        if (data.settings) {
-          setSettings({ ...defaultSettings, ...data.settings });
-        }
+        if (data.settings) setSettings({ ...defaultSettings, ...data.settings });
         setHistory(data.history || []);
       }
     } catch (e) {
@@ -75,7 +74,6 @@ function RandomDropTab({ lang, guildId, discordChannels, discordRoles }) {
 
   useEffect(() => { fetchSettings(); }, [fetchSettings]);
 
-  // ── Save ─────────────────────────────────────────────────────────────────────
   const handleSave = async () => {
     try {
       setSaving(true);
@@ -95,16 +93,6 @@ function RandomDropTab({ lang, guildId, discordChannels, discordRoles }) {
     }
   };
 
-  // ── Channel multi-select toggle ───────────────────────────────────────────────
-  const toggleChannel = (id) => {
-    setSettings(prev => ({
-      ...prev,
-      channel_ids: prev.channel_ids.includes(id)
-        ? prev.channel_ids.filter(c => c !== id)
-        : [...prev.channel_ids, id],
-    }));
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20 text-slate-400 text-xs gap-2">
@@ -116,37 +104,70 @@ function RandomDropTab({ lang, guildId, discordChannels, discordRoles }) {
 
   return (
     <div className="space-y-5">
+      {/* DropTab: tüm UI buradan geliyor */}
+      <DropTab
+        lang={lang}
+        settings={settings}
+        setSettings={setSettings}
+        saving={saving}
+        saveSettings={handleSave}
+        discordChannels={discordChannels}
+      />
 
-      {/* Header */}
-      <div className="bg-gradient-to-r from-yellow-950/30 via-orange-950/20 to-slate-900/50 border border-yellow-500/20 rounded-2xl p-4 flex items-center gap-3">
-        <div className="p-3 bg-yellow-500/15 rounded-xl border border-yellow-500/20 text-yellow-400">
-          <Zap className="w-7 h-7" />
-        </div>
-        <div>
-          <h3 className="text-sm font-bold text-white">
-            {isEn ? "⚡ Random Drop System" : "⚡ Random Drop Sistemi"}
-          </h3>
-          <p className="text-[11px] text-slate-400 mt-0.5">
-            {isEn
-              ? "Drop random loot in active channels. First to click wins!"
-              : "Aktif kanallara rastgele ganimet bırakın. İlk tıklayan kazanır!"}
-          </p>
-        </div>
-      </div>
+      {/* Kaydet Butonu */}
+      <button
+        onClick={handleSave}
+        disabled={saving}
+        className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-black font-bold py-3.5 px-6 rounded-2xl transition-all shadow-xl hover:shadow-yellow-500/25 flex items-center justify-center gap-2 text-sm disabled:opacity-50"
+      >
+        {saving ? (
+          <RefreshCw className="w-5 h-5 animate-spin" />
+        ) : saved ? (
+          <><CheckCircle2 className="w-5 h-5" /> {isEn ? "Saved!" : "Kaydedildi!"}</>
+        ) : (
+          <><Save className="w-5 h-5" /> {isEn ? "Save Drop Settings" : "Drop Ayarlarını Kaydet"}</>
+        )}
+      </button>
 
-      {/* Enable/Disable Toggle */}
-      <div className="bg-[#12131C]/90 border border-slate-800/80 rounded-2xl p-5 flex items-center justify-between">
-        <div>
-          <h4 className="text-xs font-semibold text-white">
-            {isEn ? "Enable Random Drop" : "Random Drop Aktif"}
+      {/* Son Droplar (Geçmiş) */}
+      {history.length > 0 && (
+        <div className="bg-[#12131C]/90 border border-slate-800/80 rounded-2xl p-5">
+          <h4 className="text-xs font-semibold text-slate-300 mb-3 flex items-center gap-2">
+            <Clock className="w-4 h-4 text-yellow-400" />
+            {isEn ? "Recent Drops" : "Son Droplar"}
           </h4>
-          <p className="text-[11px] text-slate-400 mt-0.5">
-            {isEn ? "Activate the drop system for this server." : "Bu sunucu için drop sistemini aktifleştirin."}
-          </p>
+          <div className="space-y-2">
+            {history.map(d => (
+              <div key={d.id} className="flex items-center justify-between bg-[#171926] px-3 py-2 rounded-lg border border-slate-800/60 text-xs">
+                <div className="flex items-center gap-2">
+                  <span className={`px-2 py-0.5 rounded-full text-[9px] font-semibold ${
+                    d.trigger_type === "percent_roll"
+                      ? "bg-blue-500/15 text-blue-400 border border-blue-500/30"
+                      : "bg-orange-500/15 text-orange-400 border border-orange-500/30"
+                  }`}>
+                    {d.trigger_type === "percent_roll" ? "% Roll" : "Scheduled"}
+                  </span>
+                  {d.drop_code && (
+                    <span className="font-mono text-[10px] text-slate-500 bg-slate-800/50 px-1.5 py-0.5 rounded">
+                      {d.drop_code}
+                    </span>
+                  )}
+                  <span className="text-slate-400">
+                    {d.claimed_by ? `✅ <@${d.claimed_by}>` : (isEn ? "⏳ Unclaimed" : "⏳ Kapılmadı")}
+                  </span>
+                </div>
+                <span className="text-slate-600 font-mono text-[10px]">
+                  {new Date(d.created_at).toLocaleString()}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
-        <label className="relative inline-flex items-center cursor-pointer shrink-0">
-          <input
-            type="checkbox"
+      )}
+    </div>
+  );
+}
+
             checked={settings.is_enabled}
             onChange={e => setSettings(p => ({ ...p, is_enabled: e.target.checked }))}
             className="sr-only peer"

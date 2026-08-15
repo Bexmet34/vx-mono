@@ -29,7 +29,7 @@ export async function GET(req, { params }) {
   }
 }
 
-// ─── POST: Drop ayarlarını güncelle ──────────────────────────────────────────
+// ─── POST: Drop ayarlarını güncelle (v2) ─────────────────────────────────────
 export async function POST(req, { params }) {
   try {
     const session = await getServerSession(authOptions);
@@ -46,22 +46,29 @@ export async function POST(req, { params }) {
     const body = await req.json();
 
     const updated = await upsertDropSettings(guildId, {
-      is_enabled:            body.is_enabled            ?? false,
-      channel_ids:           body.channel_ids           || [],
-      schedule_type:         body.schedule_type         || 'exact_minutes',
-      exact_minutes:         body.exact_minutes         || [],
-      hourly_chance_pct:     parseInt(body.hourly_chance_pct, 10)     || 25,
-      random_interval_min:   parseInt(body.random_interval_min, 10)   || 30,
-      random_interval_max:   parseInt(body.random_interval_max, 10)   || 120,
-      drop_chance:           body.drop_chance           || 'medium',
-      custom_chance_pct:     parseInt(body.custom_chance_pct, 10)     || 15,
-      cooldown_minutes:      parseInt(body.cooldown_minutes, 10)      || 15,
-      reward_type:           body.reward_type           || 'coin',
-      reward_amount:         parseInt(body.reward_amount, 10)         || 100,
-      reward_role_id:        body.reward_role_id        || null,
-      silence_threshold_min: parseInt(body.silence_threshold_min, 10) || 15,
-      burst_threshold_msg:   parseInt(body.burst_threshold_msg, 10)   || 30,
-      burst_window_sec:      parseInt(body.burst_window_sec, 10)      || 180,
+      // Temel
+      is_enabled:           body.is_enabled          ?? false,
+      channel_ids:          body.channel_ids          || [],
+      channel_drop_mode:    body.channel_drop_mode    || 'random_one',
+
+      // Zamanlama
+      schedule_type:        body.schedule_type        || 'exact_minutes',
+      exact_minutes:        body.exact_minutes        || [],
+      random_interval_min:  parseInt(body.random_interval_min,  10) || 30,
+      random_interval_max:  parseInt(body.random_interval_max,  10) || 120,
+      hourly_chance_pct:    parseFloat(body.hourly_chance_pct)       || 25,
+
+      // Mesaj bazlı % modu
+      drop_chance_pct:      parseFloat(body.drop_chance_pct)         || 5.0,
+
+      // Ödül
+      reward_type:          body.reward_type          || 'coin',
+      reward_amount:        parseInt(body.reward_amount, 10)         || 100,
+      reward_role_id:       body.reward_role_id       || null,
+
+      // Puan & Kod
+      drop_points:          parseInt(body.drop_points,         10)  || 10,
+      code_expire_seconds:  parseInt(body.code_expire_seconds, 10)  || 60,
     });
 
     return NextResponse.json({ success: true, settings: updated });

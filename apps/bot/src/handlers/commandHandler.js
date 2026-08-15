@@ -11,6 +11,7 @@ const { getGuildConfig, updateGuildConfig } = require('../services/guildConfig')
 const { t } = require('../services/i18n');
 const { performServerCleanup } = require('../services/cronService');
 const { parseTimeToMs } = require('../utils/timeUtils');
+const { getUserDropPoints, getDropLeaderboard } = require('@veyronix/database');
 const { createObjectiveEmbed, createObjectiveInfoEmbed } = require('../builders/embedBuilder');
 const { createObjectiveButtons, createObjectiveSetupButtons } = require('../builders/componentBuilder');
 
@@ -856,5 +857,84 @@ module.exports = {
     handleSetupKillBoardCommand,
     handleSetupRegistrationCommand,
     handleForceRegistrationCommand,
-    handleFixRegistrationCommand
+    handleFixRegistrationCommand,
+
+    handleMyPointsCommand,
+    handleDropLeaderboardCommand,
 };
+
+/**
+ * /mypoints — Kullanıcının bu sunucudaki drop puanını gösterir
+ */
+async function handleMyPointsCommand(interaction) {
+    const guildConfig = await getGuildConfig(interaction.guildId);
+    const lang = guildConfig?.language || 'tr';
+    const isEn = lang === 'en';
+
+    const data = await getUserDropPoints(interaction.guildId, interaction.user.id);
+
+    const embed = new EmbedBuilder()
+        .setTitle(isEn ? '🏆 Your Drop Points' : '🏆 Drop Puanlarım')
+        .setColor('#7C83FD')
+        .setThumbnail(interaction.user.displayAvatarURL({ dynamic: true }))
+        .setTimestamp()
+        .setFooter({ text: 'Veyronix Drop System' });
+
+    if (!data || data.total_points === 0) {
+        embed.setDescription(
+            isEn
+                ? `You haven't won any drops yet in **${interaction.guild.name}**.\n\nJoin a channel and type the drop code first to earn points!`
+                : `**${interaction.guild.name}** sunucusunda henüz hiç drop kazanmadın.\n\nBir kanaldaki drop kodunu ilk yazan olmaya çalış!`
+        );
+    } else {
+        const lastWin = data.last_win_at
+            ? `<t:${Math.floor(new Date(data.last_win_at).getTime() / 1000)}:R>`
+            : (isEn ? 'Never' : 'Hiç');
+
+        embed
+            .setDescription(isEn
+                ? `Here are your drop stats for **${interaction.guild.name}**:`
+                : `**${interaction.guild.name}** sunucusundaki drop istatistiklerin:`)
+            .addFields(
+                { name: isEn ? '🏆 Total Points' : '🏆 Toplam Puan', value: `**${data.total_points}**`, inline: true },
+                { name: isEn ? '🎯 Wins'         : '🎯 Kazanılan',  value: `**${data.win_count}**`,    inline: true },
+                { name: isEn ? '⏱️ Last Win'      : '⏱️ Son Kazanma', value: lastWin,                  inline: true },
+            );
+    }
+
+    await interaction.reply({ embeds: [embed], flags: [MessageFlags.Ephemeral] });
+}
+
+/**
+ * /drop-leaderboard — Sunucunun drop puan liderlik tablosu
+ */
+async function handleDropLeaderboardCommand(interaction) {
+    await interaction.deferReply();
+
+    const guildConfig = await getGuildConfig(interaction.guildId);
+    const lang = guildConfig?.language || 'tr';
+    const isEn = lang === 'en';
+
+    const leaderboard = await getDropLeaderboard(interaction.guildId, 10);
+
+    const embed = new EmbedBuilder()
+        .setTitle(isEn ? '🏆 Drop Leaderboard' : '🏆 Drop Liderlik Tablosu')
+        .setColor('#FFD700')
+        .setTimestamp()
+        .setFooter({ text: `${interaction.guild.name} • Veyronix Drop System` });
+
+    if (!leaderboard || leaderboard.length === 0) {
+        embed.setDescription(isEn
+            ? 'No drops have been claimed yet in this server!'
+            : 'Bu sunucuda henüz hiç drop kazanılmadı!');
+    } else {
+        const medals = ['🥇', '🥈', '🥉'];
+        const rows = leaderboard.map((entry, i) => {
+            const medal = medals[i] || `**${i + 1}.**`;
+            return `${medal} <@${entry.user_id}> — **${entry.total_points}** ${isEn ? 'pts' : 'puan'} *(${entry.win_count} ${isEn ? 'wins' : 'kazanım'})*`;
+        });
+        embed.setDescription(rows.join('\n'));
+    }
+
+    await interaction.editReply({ embeds: [embed] });
+}

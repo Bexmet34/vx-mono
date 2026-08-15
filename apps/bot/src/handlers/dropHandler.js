@@ -1,89 +1,72 @@
-const { MessageFlags } = require('discord.js');
-const { claimDrop, getDropLog, getDropSettings } = require('@veyronix/database');
+const { claimDropByCode, addDropPoints } = require('@veyronix/database');
 const { getGuildConfig } = require('../services/guildConfig');
-const { markDropClaimed } = require('../services/dropEngine');
+const { getActiveDrops, markDropClaimed } = require('../services/dropEngine');
 
 /**
- * dropHandler.js — Handles the "Kap!" button interaction
- * 
- * Race Condition Koruması:
- *   claimDrop() Supabase RPC'sini çağırır → atomik UPDATE.
- *   Sadece claimed_by = NULL olan kayıtlar güncellenir.
- *   İlk çağıran TRUE alır → kazandı.
- *   Sonrakiler FALSE alır → "kapmış" mesajı.
+ * dropHandler.js — Drop v2: Kod Mesajı Handler
+ *
+ * messageCreate event'inden çağrılır.
+ * Kullanıcının yazdığı mesaj aktif bir drop koduyla eşleşiyorsa
+ * atomik olarak claim eder, puan verir ve embed'i günceller.
+ *
+ * @param {import('discord.js').Message} message
  */
-async function handleDropButtons(interaction) {
-  const { customId } = interaction;
+async function handleDropCodeMessage(message) {
+  try {
+    if (message.author?.bot || !message.guild) return;
 
-  if (!customId.startsWith('drop_claim:')) return;
+    const content = message.content?.trim().toUpperCase();
+    if (!content || content.length !== 8) return;
 
-  const dropId = customId.split(':')[1];
-  if (!dropId) return;
+    // Sadece harf ve rakamdan oluşan 8 karakter mi?
+    if (!/^[A-Z0-9]{8}$/.test(content)) return;
 
-  // Kullanıcının sunucuya ait yapılandırmayı çek
-  const guildConfig = await getGuildConfig(interaction.guildId);
-  const lang        = guildConfig?.language || 'tr';
-  const isEn        = lang === 'en';
+    const mapKey    = `${message.guild.id}:${message.channel.id}`;
+    const activeDrops = getActiveDrops();
+    const drop      = activeDrops.get(mapKey);
 
-  // Önce drop log'una bak — çoktan kapılmış mı?
-  const dropLog = await getDropLog(dropId);
-  if (!dropLog) {
-    return interaction.reply({
-      content: isEn ? '❌ This drop is no longer valid.' : '❌ Bu drop artık geçerli değil.',
-      flags:   [MessageFlags.Ephemeral],
-    });
-  }
+    if (!drop) return;                       // Bu kanalda aktif drop yok
+    if (drop.code !== content) return;       // Kod eşleşmedi
+    if (new Date() > drop.expiresAt) return; // Süresi geçmiş (RAM temizlenmemiş olabilir)
 
-  if (dropLog.claimed_by) {
-    return interaction.reply({
+    // ── Atomik claim ──────────────────────────────────────────────────────────
+    const won = await claimDropByCode(
+      drop.code,
+      message.guild.id,
+      message.channel.id,
+      message.author.id
+    );
+
+    if (!won) {
+      // Başkası nanosaniye fark ile önce yazdı — sessizce yoksay
+      return;
+    }
+
+    // ── Kazandı! ─────────────────────────────────────────────────────────────
+    activeDrops.delete(mapKey); // RAM'den kaldır
+
+    // Puan ekle
+    await addDropPoints(message.guild.id, message.author.id, drop.pointsToGive);
+
+    // Embed'i güncelle
+    const guildConfig = await getGuildConfig(message.guild.id);
+    const lang        = guildConfig?.language || 'tr';
+    const isEn        = lang === 'en';
+
+    await markDropClaimed(drop.message, message.author.id, drop, lang);
+
+    // Kazanma mesajı (sadece o kullanıcıya görünür değil, kanala yaz — drop'un karakteri)
+    await message.reply({
       content: isEn
-        ? `⚡ Too late! <@${dropLog.claimed_by}> already grabbed the loot.`
-        : `⚡ Geç kaldın! <@${dropLog.claimed_by}> ganimeti zaten kaptı.`,
-      flags: [MessageFlags.Ephemeral],
-    });
+        ? `🎉 **Congratulations <@${message.author.id}>!** You claimed the loot!\n🏆 **+${drop.pointsToGive} points** have been added to your account.`
+        : `🎉 **Tebrikler <@${message.author.id}>!** Ganimeti sen kaptın!\n🏆 Hesabına **+${drop.pointsToGive} puan** eklendi.`,
+    }).catch(() => {});
+
+  } catch (err) {
+    console.error('[DropHandler] handleDropCodeMessage error:', err.message);
   }
-
-  // ── Atomik Claim ───────────────────────────────────────────────────────────
-  const won = await claimDrop(dropId, interaction.user.id);
-
-  if (!won) {
-    // Bir diğer kullanıcı nanosaniye fark ile önce tıkladı
-    const freshLog = await getDropLog(dropId);
-    return interaction.reply({
-      content: freshLog?.claimed_by
-        ? (isEn
-          ? `⚡ Too late! <@${freshLog.claimed_by}> snagged it first!`
-          : `⚡ Geç kaldın! <@${freshLog.claimed_by}> daha hızlıydı!`)
-        : (isEn ? '⚡ Someone else got it first!' : '⚡ Başkası daha hızlı davrandı!'),
-      flags: [MessageFlags.Ephemeral],
-    });
-  }
-
-  // ── Kazandı! ───────────────────────────────────────────────────────────────
-  // Drop embed mesajını "kapıldı" haline getir
-  const dropSettings = await getDropSettings(dropLog.guild_id);
-  await markDropClaimed(interaction.message, interaction.user.id, dropSettings || {}, lang);
-
-  // Kazan mesajını ephemerally gönder
-  await interaction.reply({
-    content: isEn
-      ? `🎉 **Congratulations!** You grabbed the loot!\n\n${
-          dropLog.reward_type === 'role'
-            ? '🎖️ Your reward role will be assigned shortly.'
-            : `🪙 **${dropLog.reward_amount} ${dropLog.reward_type.toUpperCase()}** has been added to your account.`
-        }`
-      : `🎉 **Tebrikler!** Ganimeti kapan sensin!\n\n${
-          dropLog.reward_type === 'role'
-            ? '🎖️ Ödül rolün kısa süre içinde verilecek.'
-            : `🪙 **${dropLog.reward_amount} ${dropLog.reward_type.toUpperCase()}** hesabına eklendi.`
-        }`,
-    flags: [MessageFlags.Ephemeral],
-  });
-
-  // TODO: Burada reward_type'a göre ödül dağıtım mantığı entegre edilecek
-  // (coin/xp sistemi ile bağlantı, rol verme vs.)
 }
 
 module.exports = {
-  handleDropButtons,
+  handleDropCodeMessage,
 };
