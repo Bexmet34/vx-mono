@@ -1,9 +1,18 @@
 const { supabase } = require('./client');
 
+const dropSettingsCache = new Map();
+const CACHE_TTL = 30 * 1000; // 30 seconds
+
 /**
  * Get drop settings for a guild (creates default if not exists)
  */
 async function getDropSettings(guildId) {
+  if (!guildId) return null;
+  const cached = dropSettingsCache.get(guildId);
+  if (cached && (Date.now() - cached.timestamp < CACHE_TTL)) {
+    return cached.data;
+  }
+
   const { data, error } = await supabase
     .from('drop_settings')
     .select('*')
@@ -15,6 +24,7 @@ async function getDropSettings(guildId) {
     return null;
   }
 
+  dropSettingsCache.set(guildId, { data, timestamp: Date.now() });
   return data;
 }
 
@@ -33,6 +43,7 @@ async function upsertDropSettings(guildId, updates) {
     throw error;
   }
 
+  dropSettingsCache.delete(guildId);
   return data;
 }
 

@@ -13,16 +13,16 @@
 // Structure: Map<`${guildId}:${channelId}`, { messages: number[], lastDropAt: number }>
 const activityMap = new Map();
 
-// ─── Cleanup: 5 dakikada bir 10 dakikadan eski verileri temizle ───────────────
+// ─── Cleanup: 10 dakikada bir 1 saatten eski verileri temizle ───────────────
 setInterval(() => {
-  const cutoff = Date.now() - 10 * 60 * 1000; // 10 dakika
+  const cutoff = Date.now() - 60 * 60 * 1000; // 60 dakika (1 saat)
   for (const [key, val] of activityMap.entries()) {
     val.messages = val.messages.filter(ts => ts > cutoff);
     if (val.messages.length === 0 && val.lastDropAt < cutoff) {
       activityMap.delete(key);
     }
   }
-}, 5 * 60 * 1000);
+}, 10 * 60 * 1000);
 
 /**
  * Bir mesaj kaydeder ve drop tetiklenip tetiklenmeyeceğini döner.
