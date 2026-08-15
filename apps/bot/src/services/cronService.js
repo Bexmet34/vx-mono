@@ -11,10 +11,13 @@ const { t } = require('./i18n');
  * @param {import('discord.js').Client} client 
  */
 function startCronService(client) {
-    // --- Giveaway Expiration Check (Every 1 minute) ---
+    // --- Giveaway Expiration Check & Random Drop Scheduler (Every 1 minute) ---
     cron.schedule('* * * * *', async () => {
         const { checkExpiredGiveaways } = require('./giveawayEngine');
+        const { processTimeBasedDrops } = require('./dropScheduler');
+        
         await checkExpiredGiveaways(client).catch(() => {});
+        await processTimeBasedDrops(client).catch(() => {});
     });
 
     // --- Offline DB Queue Processor (Every 2 minutes) ---

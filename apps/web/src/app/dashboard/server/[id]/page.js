@@ -12,6 +12,8 @@ import getCroppedImg from "@/utils/cropImage";
 import { supabase } from "@/utils/supabase";
 import Logo from "@/components/Logo";
 
+import DropTab from "./components/DropTab";
+
 // Modular Components (These will be refactored to use new Bento grid classes)
 import OverviewTab from "./components/OverviewTab";
 import GeneralTab from "./components/GeneralTab";
@@ -69,6 +71,28 @@ export default function ServerSettings() {
   ));
   const [isOwner, setIsOwner] = useState(false);
   const [selectedTemplateId, setSelectedTemplateId] = useState(null);
+  
+  // Drop Settings State
+  const [dropSettings, setDropSettings] = useState({
+    is_enabled: false,
+    channel_ids: [],
+    schedule_type: 'exact_minutes',
+    exact_minutes: [],
+    hourly_chance_pct: 25,
+    random_interval_min: 30,
+    random_interval_max: 120,
+    drop_chance: 'medium',
+    custom_chance_pct: 15,
+    cooldown_minutes: 15,
+    reward_type: 'coin',
+    reward_amount: 100,
+    reward_role_id: null,
+    silence_threshold_min: 15,
+    burst_threshold_msg: 30,
+    burst_window_sec: 180,
+  });
+  const [initialDropSettings, setInitialDropSettings] = useState(null);
+
   const [initialSettings, setInitialSettings] = useState(null);
   const [settings, setSettings] = useState({
     language: "tr",
@@ -229,6 +253,16 @@ export default function ServerSettings() {
            img.src = s.embed_thumbnail_url;
         }
       }
+
+      // Fetch Drop Settings
+      const dropRes = await fetch(`/api/drop-settings/${guildId}`);
+      if (dropRes.ok) {
+        const dropData = await dropRes.json();
+        if (dropData.settings) {
+          setDropSettings(dropData.settings);
+          setInitialDropSettings(dropData.settings);
+        }
+      }
     } catch (err) { console.error(err); }
     finally { 
       setTimeout(() => setLoading(false), 800);
@@ -263,7 +297,8 @@ export default function ServerSettings() {
     if (status === "unauthenticated") router.push("/");
   }, [status, router]);
 
-  const hasChanges = initialSettings && JSON.stringify(settings) !== JSON.stringify(initialSettings);
+  const hasChanges = (initialSettings && JSON.stringify(settings) !== JSON.stringify(initialSettings)) ||
+                     (initialDropSettings && JSON.stringify(dropSettings) !== JSON.stringify(initialDropSettings));
 
   useEffect(() => {
     if (!hasChanges) return;
@@ -337,8 +372,16 @@ export default function ServerSettings() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(settings),
       });
-      if (res.ok) {
+      
+      const dropRes = await fetch(`/api/drop-settings/${guildId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dropSettings),
+      });
+
+      if (res.ok && dropRes.ok) {
         setInitialSettings(settings);
+        setInitialDropSettings(dropSettings);
         showToast(lang === "en" ? "Settings saved!" : "Ayarlar kaydedildi!", "success");
       }
       else throw new Error("Save failed");
@@ -448,13 +491,10 @@ export default function ServerSettings() {
         body: JSON.stringify(newSettings),
       });
 
-      if (saveRes.ok) {
-        showToast(lang === 'en' ? 'Logo updated & saved!' : 'Logo güncellendi ve kaydedildi!', 'success');
-      } else {
-        showToast(lang === 'en' ? 'Logo uploaded but save failed!' : 'Logo yüklendi ama kaydedilemedi!', 'warning');
-      }
+      if (saveRes.ok) showToast(lang === 'tr' ? "Görsel güncellendi!" : "Thumbnail updated!", "success");
+      else throw new Error("Upload failed");
     } catch (err) {
-      showToast("Upload failed: " + err.message, "error");
+      showToast(lang === 'tr' ? "Görsel yüklenirken hata oluştu" : "Upload failed", "error");
     } finally {
       setUploadingThumb(false);
     }
@@ -470,34 +510,23 @@ export default function ServerSettings() {
     );
   };
 
-  if (!mounted) return null;
-
-  if (loading) return (
-    <div className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-background overflow-hidden">
-      {/* Subtle Background Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-primary-container/10 rounded-full blur-[100px] pointer-events-none"></div>
-      
-      {/* Simple Full Page Content */}
-      <div className="relative z-10 flex flex-col items-center gap-2">
-        {/* Simple Pulsing Icon */}
-        <div className="flex items-center justify-center text-primary-container animate-pulse drop-shadow-[0_0_20px_rgba(252,163,17,0.5)]">
-          <Logo className="w-32 h-32" />
-        </div>
-
-        {/* Loading Text */}
-        <div className="text-center space-y-2">
-          <h2 className="font-headline-md text-[10px] md:text-[10px] text-on-surface uppercase tracking-widest flex items-center justify-center gap-2">
-            {lang === 'en' ? 'Summoning Server Data' : 'Sunucu Verileri Çağrılıyor'}
-            <span className="flex gap-1 ml-1">
-              <span className="w-1.5 h-1.5 bg-primary-container rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-              <span className="w-1.5 h-1.5 bg-primary-container rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-              <span className="w-1.5 h-1.5 bg-primary-container rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
-            </span>
-          </h2>
+  if (!mounted || loading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-background relative overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary-container/20 rounded-full blur-[100px] pointer-events-none"></div>
+        <div className="flex flex-col items-center gap-6 z-10">
+          <div className="relative">
+            <div className="absolute inset-0 bg-primary-container/20 blur-xl rounded-full"></div>
+            <Logo width={64} height={64} className="text-primary-container animate-pulse-slow relative z-10" />
+          </div>
+          <div className="flex flex-col items-center gap-2">
+            <Loader2 className="w-5 h-5 text-on-surface-variant animate-spin" />
+            <span className="text-on-surface-variant text-sm font-label-bold uppercase tracking-widest animate-pulse">Loading Workspace</span>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
 
   return (
     <div className="flex bg-background relative w-full h-[calc(100vh-56px)] overflow-hidden" suppressHydrationWarning>
@@ -529,6 +558,7 @@ export default function ServerSettings() {
             { id: 'rolemenu', label: 'Roles', icon: Users },
             { id: 'ticket', label: 'Ticket', icon: Shield },
             { id: 'events', label: 'Events', icon: Sparkles },
+            { id: 'drop', label: 'Drop', icon: Gift },
             { id: 'killboard', label: 'KillBoard', icon: Crosshair, isBeta: true },
             { id: 'templates', label: 'Templates', icon: Copy },
             { id: 'log', label: 'Logs', icon: FileText },
@@ -601,31 +631,35 @@ export default function ServerSettings() {
         )}
 
         {activeTab === 'templates' && (
-          <TemplateTab t={t} lang={lang} settings={settings} setSettings={setSettings} selectedTemplateId={selectedTemplateId} setSelectedTemplateId={setSelectedTemplateId} handleSave={handleSave} saving={saving} isPremium={isPremium} showToast={showToast} />
+          <TemplateTab t={t} lang={lang} settings={settings} setSettings={setSettings} selectedTemplateId={selectedTemplateId} setSelectedTemplateId={setSelectedTemplateId} discordRoles={discordRoles} isPremium={isPremium} handleSave={handleSave} saving={saving} />
         )}
 
         {activeTab === 'killboard' && (
-          isPremium ? (
-            <KillBoardTab t={t} lang={lang} settings={settings} setSettings={setSettings} discordChannels={discordChannels} guildSearchQuery={guildSearchQuery} setGuildSearchQuery={setGuildSearchQuery} searchGuilds={searchGuilds} searchingGuild={searchingGuild} guildSearchResults={guildSearchResults} setGuildSearchResults={setGuildSearchResults} guildDetail={guildDetail} setGuildDetail={setGuildDetail} killboardPreview={killboardPreview} loadingPreview={loadingPreview} handlePreviewKillBoard={handlePreviewKillBoard} handleTriggerKillBoard={handleTriggerKillBoard} triggeringKillBoard={triggeringKillBoard} handleSave={handleSave} saving={saving} setActiveTab={setActiveTab} />
-          ) : (
-            <PremiumLock lang={lang} t={t} />
-          )
+          <KillBoardTab t={t} lang={lang} settings={settings} setSettings={setSettings} discordChannels={discordChannels} isPremium={isPremium} handleSave={handleSave} saving={saving} guildId={guildId} handleTriggerKillBoard={handleTriggerKillBoard} triggeringKillBoard={triggeringKillBoard} handlePreviewKillBoard={handlePreviewKillBoard} loadingPreview={loadingPreview} killboardPreview={killboardPreview} />
         )}
 
         {activeTab === 'registration' && (
-          <RegistrationTab t={t} lang={lang} settings={settings} setSettings={setSettings} discordChannels={discordChannels} discordRoles={discordRoles} handleSave={handleSave} saving={saving} guildId={guildId} registeredCount={settings.registered_count || 0} setActiveTab={setActiveTab} isPremium={isPremium} />
+          <RegistrationTab t={t} lang={lang} settings={settings} setSettings={setSettings} discordChannels={discordChannels} discordRoles={discordRoles} handleSave={handleSave} saving={saving} isPremium={isPremium} />
         )}
 
         {activeTab === 'rolemenu' && (
-          <RoleMenuTab t={t} lang={lang} guildId={guildId} discordChannels={discordChannels} discordRoles={discordRoles} showToast={showToast} />
+          <RoleMenuTab t={t} lang={lang} discordRoles={discordRoles} discordChannels={discordChannels} guildId={guildId} isPremium={isPremium} />
         )}
 
         {activeTab === 'ticket' && (
-          <TicketTab t={t} lang={lang} settings={settings} setSettings={setSettings} discordChannels={discordChannels} discordRoles={discordRoles} discordMembers={discordMembers} handleSave={handleSave} saving={saving} guildId={guildId} showToast={showToast} isPremium={isPremium} />
+          <TicketTab t={t} lang={lang} settings={settings} setSettings={setSettings} discordChannels={discordChannels} discordRoles={discordRoles} handleSave={handleSave} saving={saving} isPremium={isPremium} guildId={guildId} />
+        )}
+
+        {activeTab === 'ticket_history' && (
+          <TicketHistoryTab t={t} lang={lang} guildId={guildId} isPremium={isPremium} />
         )}
 
         {activeTab === 'events' && (
-          <EventsHub t={t} lang={lang} guildId={guildId} discordChannels={discordChannels} discordRoles={discordRoles} />
+          <EventsHub t={t} lang={lang} guildId={guildId} discordChannels={discordChannels} isPremium={isPremium} />
+        )}
+
+        {activeTab === 'drop' && (
+          <DropTab t={t} lang={lang} settings={dropSettings} setSettings={setDropSettings} saving={saving} saveSettings={handleSave} />
         )}
 
       </main>

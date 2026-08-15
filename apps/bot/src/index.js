@@ -404,8 +404,15 @@ client.on(Events.MessageCreate, async (message) => {
         const settings = await getDropSettings(message.guild.id);
         if (!settings || !settings.is_enabled) return;
 
+        // Sadece 'activity' modu seçiliyse mesaj sayarak çalışır. (Eski sistem uyumluluğu)
+        if (settings.schedule_type !== 'activity') return;
+
         // Bu kanal izleme listesinde mi?
-        const channelIds = settings.channel_ids || [];
+        let channelIds = settings.channel_ids;
+        if (typeof channelIds === 'string') {
+            try { channelIds = JSON.parse(channelIds); } catch (e) { channelIds = []; }
+        }
+        if (!Array.isArray(channelIds)) channelIds = [];
         if (!channelIds.includes(message.channel.id)) return;
 
         const { shouldDrop, triggerType } = trackMessage(message.guild.id, message.channel.id, settings);

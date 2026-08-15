@@ -48,6 +48,11 @@ export async function POST(req, { params }) {
     const updated = await upsertDropSettings(guildId, {
       is_enabled:            body.is_enabled            ?? false,
       channel_ids:           body.channel_ids           || [],
+      schedule_type:         body.schedule_type         || 'exact_minutes',
+      exact_minutes:         body.exact_minutes         || [],
+      hourly_chance_pct:     parseInt(body.hourly_chance_pct, 10)     || 25,
+      random_interval_min:   parseInt(body.random_interval_min, 10)   || 30,
+      random_interval_max:   parseInt(body.random_interval_max, 10)   || 120,
       drop_chance:           body.drop_chance           || 'medium',
       custom_chance_pct:     parseInt(body.custom_chance_pct, 10)     || 15,
       cooldown_minutes:      parseInt(body.cooldown_minutes, 10)      || 15,

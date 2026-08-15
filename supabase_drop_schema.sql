@@ -9,7 +9,12 @@ CREATE TABLE IF NOT EXISTS public.drop_settings (
     guild_id              TEXT NOT NULL UNIQUE,
     is_enabled            BOOLEAN DEFAULT FALSE,
     channel_ids           JSONB DEFAULT '[]'::jsonb,        -- İzlenecek kanal ID'leri dizisi
-    drop_chance           TEXT DEFAULT 'medium',             -- 'low' | 'medium' | 'high' | 'custom'
+    schedule_type         TEXT DEFAULT 'exact_minutes',      -- 'exact_minutes' | 'hourly_chance' | 'random_interval' | 'activity'
+    exact_minutes         JSONB DEFAULT '[]'::jsonb,         -- [0, 15, 30, 45] (schedule_type = 'exact_minutes' ise)
+    hourly_chance_pct     INT DEFAULT 25,                    -- Her saat başı tetiklenme ihtimali % (schedule_type = 'hourly_chance' ise)
+    random_interval_min   INT DEFAULT 30,                    -- Rastgele düşme aralığı Min (dakika)
+    random_interval_max   INT DEFAULT 120,                   -- Rastgele düşme aralığı Max (dakika)
+    drop_chance           TEXT DEFAULT 'medium',             -- 'low' | 'medium' | 'high' | 'custom' (Aktivite modu için)
     custom_chance_pct     INT DEFAULT 15,                    -- Özel % oran (drop_chance = 'custom' ise)
     cooldown_minutes      INT DEFAULT 15,                    -- İki drop arası minimum bekleme süresi
     reward_type           TEXT DEFAULT 'coin',               -- 'coin' | 'xp' | 'role' | 'ticket'
