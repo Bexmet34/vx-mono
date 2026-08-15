@@ -272,6 +272,9 @@ client.on('interactionCreate', async interaction => {
             } else if (interaction.customId.startsWith('giveaway_')) {
                 const { handleGiveawayButtons } = require('./handlers/giveawayHandler');
                 await handleGiveawayButtons(interaction);
+            } else if (interaction.customId.startsWith('drop_claim:')) {
+                const { handleDropButtons } = require('./handlers/dropHandler');
+                await handleDropButtons(interaction);
             } else {
                 await handlePartyButtons(interaction);
             }
@@ -384,6 +387,37 @@ client.on(Events.ChannelDelete, async (channel) => {
         }
     } catch (err) {
         console.error(`[ChannelDelete] Error cancelling pending registration:`, err.message);
+    }
+});
+
+// messageCreate — Random Drop Activity Tracker
+// Not: MessageContent intent kapalı olduğu için mesaj içeriğine erişilmiyor.
+// Sadece mesaj geldiğini (timestamp) takip etmek yeterli.
+client.on(Events.MessageCreate, async (message) => {
+    try {
+        if (message.author?.bot || !message.guild) return;
+
+        const { trackMessage } = require('./services/activityTracker');
+        const { getDropSettings, publishDrop: _pub } = require('@veyronix/database');
+        const { publishDrop } = require('./services/dropEngine');
+
+        const settings = await getDropSettings(message.guild.id);
+        if (!settings || !settings.is_enabled) return;
+
+        // Bu kanal izleme listesinde mi?
+        const channelIds = settings.channel_ids || [];
+        if (!channelIds.includes(message.channel.id)) return;
+
+        const { shouldDrop, triggerType } = trackMessage(message.guild.id, message.channel.id, settings);
+        if (!shouldDrop) return;
+
+        const guildConfig = await getGuildConfig(message.guild.id);
+        const lang = guildConfig?.language || 'tr';
+
+        await publishDrop(client, settings, message.channel.id, triggerType, lang);
+    } catch (err) {
+        // Crash önleme — drop tracker asla botu çökertmemeli
+        console.error('[DropTracker] messageCreate error:', err.message);
     }
 });
 
