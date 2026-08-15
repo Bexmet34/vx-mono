@@ -22,16 +22,34 @@ async function handleGiveawayButtons(interaction) {
       });
     }
 
+    const memberRoles = interaction.member?.roles?.cache;
+
+    // Excluded Roles Check
+    if (giveaway.excluded_role_ids && giveaway.excluded_role_ids.length > 0) {
+      const isExcluded = giveaway.excluded_role_ids.some(rid => memberRoles?.has(rid));
+      if (isExcluded) {
+        return await interaction.reply({
+          content: lang === 'tr'
+            ? '⛔ **Bu çekilişe muaf / yasaklı bir role sahip olduğunuz için katılamazsınız.**'
+            : '⛔ **You cannot join this giveaway because you have an excluded role.**',
+          flags: [MessageFlags.Ephemeral]
+        });
+      }
+    }
+
     // Role Requirements Check
     if (giveaway.required_role_ids && giveaway.required_role_ids.length > 0) {
-      const memberRoles = interaction.member?.roles?.cache;
-      const hasRequiredRole = giveaway.required_role_ids.some(rid => memberRoles?.has(rid));
-      if (!hasRequiredRole) {
+      const isAllMode = giveaway.role_match_mode === 'all';
+      const hasRequiredRoles = isAllMode
+        ? giveaway.required_role_ids.every(rid => memberRoles?.has(rid))
+        : giveaway.required_role_ids.some(rid => memberRoles?.has(rid));
+
+      if (!hasRequiredRoles) {
         const requiredRolesStr = giveaway.required_role_ids.map(r => `<@&${r}>`).join(', ');
         return await interaction.reply({
           content: lang === 'tr'
-            ? `⛔ **Çekilişe katılmak için şu rollere sahip olmalısınız:** ${requiredRolesStr}`
-            : `⛔ **You must have the following roles to join:** ${requiredRolesStr}`,
+            ? `⛔ **Çekilişe katılmak için ${isAllMode ? 'ŞU ROLLERİN TÜMÜNE' : 'ŞU ROLLERDEN EN AZ BİRİNE'} sahip olmalısınız:** ${requiredRolesStr}`
+            : `⛔ **You must have ${isAllMode ? 'ALL of the following roles' : 'AT LEAST ONE of the following roles'} to join:** ${requiredRolesStr}`,
           flags: [MessageFlags.Ephemeral]
         });
       }

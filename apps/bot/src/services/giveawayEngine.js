@@ -23,9 +23,30 @@ function buildGiveawayEmbed(giveaway, participantCount = 0, lang = 'tr', isEnded
       { name: lang === 'tr' ? '🎟️ Katılımcı Sayısı' : '🎟️ Participants', value: `\`${participantCount}\``, inline: true }
     );
 
+  if (giveaway.image_url) {
+    embed.setImage(giveaway.image_url);
+  }
+
   if (giveaway.required_role_ids && giveaway.required_role_ids.length > 0) {
     const rolesStr = giveaway.required_role_ids.map(r => `<@&${r}>`).join(' ');
-    embed.addFields({ name: lang === 'tr' ? '🔒 Gerekli Rol' : '🔒 Required Roles', value: rolesStr, inline: false });
+    const modeStr = giveaway.role_match_mode === 'all' 
+      ? (lang === 'tr' ? '(Tüm roller gerekli)' : '(All roles required)') 
+      : (lang === 'tr' ? '(Herhangi biri yeterli)' : '(Any role is enough)');
+    embed.addFields({ name: lang === 'tr' ? '🔒 Gerekli Rol' : '🔒 Required Roles', value: `${rolesStr} ${modeStr}`, inline: false });
+  }
+
+  if (giveaway.excluded_role_ids && giveaway.excluded_role_ids.length > 0) {
+    const rolesStr = giveaway.excluded_role_ids.map(r => `<@&${r}>`).join(' ');
+    embed.addFields({ name: lang === 'tr' ? '🚫 Muaf / Yasaklı Roller' : '🚫 Excluded Roles', value: rolesStr, inline: false });
+  }
+
+  if (giveaway.role_multipliers && giveaway.role_multipliers.length > 0) {
+    const multStr = giveaway.role_multipliers.map(m => `<@&${m.role_id}>: **${m.multiplier}x**`).join(' | ');
+    embed.addFields({ name: lang === 'tr' ? '⚡ Rol Çarpanları' : '⚡ Role Multipliers', value: multStr, inline: false });
+  }
+
+  if (giveaway.reward_role_id) {
+    embed.addFields({ name: lang === 'tr' ? '🎁 Otomatik Ödül Rolü' : '🎁 Reward Role', value: `<@&${giveaway.reward_role_id}>`, inline: false });
   }
 
   if (isEnded) {
@@ -146,6 +167,23 @@ async function finalizeGiveaway(client, giveaway) {
   giveaway.backups = backups;
   giveaway.status = 'ended';
 
+  // Automatically grant reward role if configured
+  if (giveaway.reward_role_id && winners.length > 0) {
+    try {
+      const guild = await client.guilds.fetch(giveaway.guild_id).catch(() => null);
+      if (guild) {
+        for (const winnerId of winners) {
+          const member = await guild.members.fetch(winnerId).catch(() => null);
+          if (member) {
+            await member.roles.add(giveaway.reward_role_id).catch(e => console.error(`[GiveawayEngine] Error assigning reward role ${giveaway.reward_role_id} to ${winnerId}:`, e.message));
+          }
+        }
+      }
+    } catch (err) {
+      console.error('[GiveawayEngine] Reward role assignment failed:', err.message);
+    }
+  }
+
   const participantCount = await getGiveawayParticipantCount(giveaway.id);
   const embed = buildGiveawayEmbed(giveaway, participantCount, lang, true);
   const components = buildGiveawayComponents(giveaway.id, participantCount, lang, true);
@@ -166,6 +204,41 @@ async function finalizeGiveaway(client, giveaway) {
       : (lang === 'tr' ? '⚠️ Çekilişe katılım olmadığı için kazanan seçilemedi.' : '⚠️ No winners could be selected as there were no participants.');
 
     await channel.send({ content: announceMsg }).catch(() => {});
+  }
+
+  // Handle Auto Repeat if enabled
+  if (giveaway.auto_repeat) {
+    try {
+      const startTime = new Date();
+      const durationMs = new Date(giveaway.ends_at).getTime() - new Date(giveaway.starts_at || giveaway.created_at).getTime();
+      const endsTime = new Date(startTime.getTime() + (durationMs > 0 ? durationMs : 24 * 60 * 60 * 1000));
+
+      const newGiveawayData = {
+        guild_id: giveaway.guild_id,
+        channel_id: giveaway.channel_id,
+        title: giveaway.title,
+        description: giveaway.description,
+        winner_count: giveaway.winner_count,
+        backup_count: giveaway.backup_count,
+        required_role_ids: giveaway.required_role_ids,
+        excluded_role_ids: giveaway.excluded_role_ids,
+        role_match_mode: giveaway.role_match_mode,
+        role_multipliers: giveaway.role_multipliers,
+        reward_role_id: giveaway.reward_role_id,
+        reward_role_duration: giveaway.reward_role_duration,
+        image_url: giveaway.image_url,
+        auto_repeat: true,
+        secret_fairness: giveaway.secret_fairness,
+        starts_at: startTime.toISOString(),
+        ends_at: endsTime.toISOString(),
+        created_by: giveaway.created_by
+      };
+
+      const newGiveaway = await createGiveaway(newGiveawayData);
+      await publishGiveawayMessage(client, newGiveaway);
+    } catch (e) {
+      console.error('[GiveawayEngine] Error auto-repeating giveaway:', e.message);
+    }
   }
 }
 

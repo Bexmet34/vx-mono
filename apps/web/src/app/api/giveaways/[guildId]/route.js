@@ -60,7 +60,15 @@ export async function POST(req, { params }) {
       winner_count: parseInt(body.winner_count, 10) || 1,
       backup_count: parseInt(body.backup_count, 10) || 1,
       required_role_ids: body.required_role_ids || [],
+      excluded_role_ids: body.excluded_role_ids || [],
+      role_match_mode: body.role_match_mode || 'any',
+      role_multipliers: body.role_multipliers || [],
+      reward_role_id: body.reward_role_id || null,
+      reward_role_duration: body.reward_role_duration || 'permanent',
+      image_url: body.image_url || null,
+      auto_repeat: body.auto_repeat ?? false,
       secret_fairness: body.secret_fairness ?? true,
+      starts_at: body.starts_at || new Date().toISOString(),
       ends_at: body.ends_at,
       created_by: session.user.id
     };
