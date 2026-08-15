@@ -22,26 +22,31 @@ async function handleTicketInteraction(interaction) {
             options = [{ label: lang === 'tr' ? "Genel Destek" : "General Support", value: "genel", description: lang === 'tr' ? "Genel konular hakkında destek alın" : "Get support on general topics", emoji: "📩" }];
         }
 
+        // Build select menu options safely — skip empty/invalid emoji to prevent crash
+        const menuOptions = options.map(opt => {
+            const builder = new StringSelectMenuOptionBuilder()
+                .setLabel(opt.label || 'Konu')
+                .setDescription((opt.description || ' ').substring(0, 100))
+                .setValue(opt.value || 'genel');
+            // Only set emoji if it's a non-empty string
+            if (opt.emoji && typeof opt.emoji === 'string' && opt.emoji.trim().length > 0) {
+                try { builder.setEmoji(opt.emoji.trim()); } catch (e) { /* ignore invalid emoji */ }
+            }
+            return builder;
+        });
+
         const selectMenu = new StringSelectMenuBuilder()
             .setCustomId('ticket_topic_select')
             .setPlaceholder(t('ticket.select_topic_placeholder', lang))
-            .addOptions(
-                options.map(opt => new StringSelectMenuOptionBuilder()
-                    .setLabel(opt.label)
-                    .setDescription(opt.description || ' ')
-                    .setValue(opt.value)
-                    .setEmoji(opt.emoji || '📩')
-                )
-            );
+            .addOptions(menuOptions);
 
         await interaction.reply({
             content: t('ticket.select_topic_prompt', lang),
             components: [new ActionRowBuilder().addComponents(selectMenu)],
             flags: [MessageFlags.Ephemeral]
         });
-    }
 
-    if (customId === 'ticket_topic_select') {
+    } else if (customId === 'ticket_topic_select') {
         const topicValue = interaction.values[0];
         let options = guildConfig.ticket_options;
         if (typeof options === 'string') {
@@ -52,7 +57,22 @@ async function handleTicketInteraction(interaction) {
         const topicObj = options.find(o => o.value === topicValue) || { label: topicValue };
         const topicLabel = topicObj.label;
 
+        // Acknowledge the select menu interaction immediately to prevent timeout
         await interaction.update({ content: t('ticket.creating_channel', lang), components: [] });
+
+        // Check for existing open ticket by this user in this guild
+        const existingTicket = await db.get(
+            'SELECT channel_id FROM tickets WHERE guild_id = ? AND owner_id = ? AND status = ?',
+            [interaction.guildId, interaction.user.id, 'open']
+        );
+        if (existingTicket) {
+            return interaction.editReply({
+                content: lang === 'tr'
+                    ? `❌ Zaten açık bir destek talebiniz var: <#${existingTicket.channel_id}>`
+                    : `❌ You already have an open ticket: <#${existingTicket.channel_id}>`,
+                components: []
+            });
+        }
 
         const trMap = { 'ç': 'c', 'ğ': 'g', 'ı': 'i', 'ö': 'o', 'ş': 's', 'ü': 'u', 'Ç': 'c', 'Ğ': 'g', 'İ': 'i', 'Ö': 'o', 'Ş': 's', 'Ü': 'u' };
         const rawName = (interaction.member?.nickname || interaction.member?.displayName || interaction.user.username).replace(/[çğıöşüÇĞİÖŞÜ]/g, m => trMap[m]);
@@ -116,15 +136,21 @@ async function handleTicketInteraction(interaction) {
                 components: [closeRow]
             });
 
-            await interaction.followUp({ content: t('ticket.created_success', lang, { channel: `<#${ticketChannel.id}>` }), flags: [MessageFlags.Ephemeral] });
+            // Use editReply since we already called update() above
+            await interaction.editReply({
+                content: t('ticket.created_success', lang, { channel: `<#${ticketChannel.id}>` }),
+                components: []
+            });
 
         } catch (err) {
             console.error('Ticket Create Error:', err);
-            await interaction.followUp({ content: t('ticket.create_error', lang), flags: [MessageFlags.Ephemeral] });
+            await interaction.editReply({
+                content: t('ticket.create_error', lang),
+                components: []
+            });
         }
-    }
 
-    if (customId === 'ticket_close') {
+    } else if (customId === 'ticket_close') {
         const ticketRow = await db.get('SELECT * FROM tickets WHERE channel_id = ?', [interaction.channelId]);
         if (!ticketRow) {
             return interaction.reply({ content: t('ticket.not_found', lang), flags: [MessageFlags.Ephemeral] });

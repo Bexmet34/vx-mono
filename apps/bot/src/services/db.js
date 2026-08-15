@@ -182,6 +182,14 @@ function initDb() {
             safeAlter("ALTER TABLE guild_configs ADD COLUMN albion_server TEXT DEFAULT 'Europe'");
             safeAlter("ALTER TABLE guild_configs ADD COLUMN auto_delete_party_hours INTEGER DEFAULT 0");
 
+            // Ticket System
+            safeAlter("ALTER TABLE guild_configs ADD COLUMN ticket_system_enabled INTEGER DEFAULT 0");
+            safeAlter("ALTER TABLE guild_configs ADD COLUMN ticket_category_id TEXT");
+            safeAlter("ALTER TABLE guild_configs ADD COLUMN ticket_channel_id TEXT");
+            safeAlter("ALTER TABLE guild_configs ADD COLUMN ticket_staff_roles TEXT");
+            safeAlter("ALTER TABLE guild_configs ADD COLUMN ticket_options TEXT");
+
+
             // Set default settings if not exists
             try {
                 db.exec(`INSERT OR IGNORE INTO system_settings (key, value) VALUES ('vote_cooldown_hours', '168')`); // 1 week default
