@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, useCallback, useRef } from "react";
-import { ArrowLeft, Loader2, Image as ImageIcon, Layout, Shield, X, Crop, Users, Copy, Lock, Home, Save, AlertTriangle, Swords, Crown, Gift, FileText, Crosshair, UserPlus } from "lucide-react";
+import { ArrowLeft, Loader2, Image as ImageIcon, Layout, Shield, X, Crop, Users, Copy, Lock, Home, Save, AlertTriangle, Swords, Crown, Gift, FileText, Crosshair, UserPlus, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 import { useToast, ToastContainer } from "@/components/Toast";
@@ -23,7 +23,7 @@ import RegistrationTab from "./components/RegistrationTab";
 import RoleMenuTab from "./components/RoleMenuTab";
 import TicketTab from "./components/TicketTab";
 import TicketHistoryTab from "./components/TicketHistoryTab";
-import GiveawayTab from "./components/GiveawayTab";
+import EventsHub from "./components/EventsHub";
 
 function PremiumLock({ lang, t }) {
   return (
@@ -528,7 +528,7 @@ export default function ServerSettings() {
             { id: 'registration', label: 'Reg', icon: UserPlus, isBeta: true },
             { id: 'rolemenu', label: 'Roles', icon: Users },
             { id: 'ticket', label: 'Ticket', icon: Shield },
-            { id: 'giveaway', label: 'Giveaway', icon: Gift },
+            { id: 'events', label: 'Events', icon: Sparkles },
             { id: 'killboard', label: 'KillBoard', icon: Crosshair, isBeta: true },
             { id: 'templates', label: 'Templates', icon: Copy },
             { id: 'log', label: 'Logs', icon: FileText },
@@ -624,8 +624,8 @@ export default function ServerSettings() {
           <TicketTab t={t} lang={lang} settings={settings} setSettings={setSettings} discordChannels={discordChannels} discordRoles={discordRoles} discordMembers={discordMembers} handleSave={handleSave} saving={saving} guildId={guildId} showToast={showToast} isPremium={isPremium} />
         )}
 
-        {activeTab === 'giveaway' && (
-          <GiveawayTab t={t} lang={lang} guildId={guildId} discordChannels={discordChannels} discordRoles={discordRoles} />
+        {activeTab === 'events' && (
+          <EventsHub t={t} lang={lang} guildId={guildId} discordChannels={discordChannels} discordRoles={discordRoles} />
         )}
 
       </main>
