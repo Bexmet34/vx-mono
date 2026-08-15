@@ -161,6 +161,15 @@ async function handleTicketInteraction(interaction) {
         const isStaff = interaction.member.roles.cache.some(r => staffRoles.includes(r.id)) || interaction.member.permissions.has('Administrator');
         
         if (!isStaff) {
+            // If the user is the ticket owner but not staff, send a close request
+            if (interaction.user.id === ticketRow.owner_id) {
+                const staffMentions = staffRoles.map(id => `<@&${id}>`).join(' ');
+                const requestMessage = lang === 'tr'
+                    ? `🔒 ${staffMentions} **Ticket sahibi bu ticketin kapatılmasını talep ediyor.**`
+                    : `🔒 ${staffMentions} **The ticket owner has requested to close this ticket.**`;
+                
+                return interaction.reply({ content: requestMessage });
+            }
             return interaction.reply({ content: t('ticket.staff_only', lang), flags: [MessageFlags.Ephemeral] });
         }
 
