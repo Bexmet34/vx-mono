@@ -127,16 +127,6 @@ export default function DropTab({ lang, t, settings, setSettings, saving, saveSe
 
       {settings.is_enabled && (
         <div className="space-y-6">
-          {/* ── Bilgilendirme: MessageContent Intent ──────────────────────────── */}
-          <div className="flex items-start gap-3 bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 text-sm text-amber-400">
-            <AlertCircle size={18} className="mt-0.5 flex-shrink-0" />
-            <span>
-              {isEn
-                ? "⚠️ This system requires the \"Message Content Intent\" to be enabled in the Discord Developer Portal (Bot settings). Without it, the bot cannot read user messages."
-                : "⚠️ Bu sistem için Discord Developer Portal → Bot → \"Message Content Intent\" açık olmalıdır. Aksi hâlde bot mesajları okuyamaz."}
-            </span>
-          </div>
-
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* ── Sol: Mod Seçimi ────────────────────────────────────────────── */}
             <div className="lg:col-span-1 space-y-3">
