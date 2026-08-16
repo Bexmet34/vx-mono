@@ -258,7 +258,7 @@ export default function DropTab({ lang, t, settings, setSettings, saving, saveSe
                         type="range" min="1" max="100"
                         value={settings.hourly_chance_pct || 25}
                         onChange={e => updateSettings("hourly_chance_pct", parseInt(e.target.value))}
-                        className="w-full h-2 bg-surface rounded-lg appearance-none cursor-pointer accent-primary"
+                        className="w-full h-2 bg-white/10 rounded-full appearance-none cursor-pointer accent-primary"
                       />
                       <div className="flex justify-between text-xs text-on-surface-variant mt-2">
                         <span>1% ({isEn ? "Rare" : "Nadir"})</span>
@@ -288,7 +288,7 @@ export default function DropTab({ lang, t, settings, setSettings, saving, saveSe
                         type="range" min="0.1" max="100" step="0.1"
                         value={settings.drop_chance_pct || 5}
                         onChange={e => updateSettings("drop_chance_pct", parseFloat(e.target.value))}
-                        className="w-full h-2 bg-surface rounded-lg appearance-none cursor-pointer accent-primary"
+                        className="w-full h-2 bg-white/10 rounded-full appearance-none cursor-pointer accent-primary"
                       />
                       <div className="flex justify-between text-xs text-on-surface-variant mt-2">
                         <span>0.1% ({isEn ? "Very Rare" : "Çok Nadir"})</span>
