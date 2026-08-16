@@ -31,8 +31,8 @@ function generateDropCode() {
  * Kod için rastgele arka plana sahip resim oluşturur
  */
 function generateCodeImage(code) {
-  const width = 400;
-  const height = 150;
+  const width = 350;
+  const height = 120;
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext('2d');
 
@@ -56,7 +56,7 @@ function generateCodeImage(code) {
   ctx.strokeRect(0, 0, width, height);
 
   // Yazı
-  ctx.font = 'bold 54px sans-serif';
+  ctx.font = 'bold 36px sans-serif';
   ctx.fillStyle = '#FFD700';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
