@@ -8,7 +8,7 @@ import {
   LayoutDashboard, Server, MessageSquare, Settings, 
   Users, BarChart3, Search, Clock, Infinity, Power, 
   Calendar, Trash2, ChevronRight, ArrowLeft, Gift, Plus, Send, Edit3, Eye, EyeOff, DollarSign, Check, X, Gamepad2, CreditCard,
-  Activity, TerminalSquare, Sparkles, FileText
+  Activity, TerminalSquare, Sparkles, FileText, RefreshCw
 } from "lucide-react";
 import AdminBlogAutomationTab from "@/components/AdminBlogAutomationTab";
 import { useCallback } from "react";
@@ -219,6 +219,8 @@ export default function AdminPage() {
     }
   }, [activeTab, serverSubTab, fetchRules]);
 
+  const [isSyncingGuilds, setIsSyncingGuilds] = useState(false);
+
   const handleSearchGuild = async () => {
     if (!guildSearchQuery || guildSearchQuery.length < 3) {
       setMessage({ type: "error", text: "Lütfen en az 3 karakter girin." });
@@ -237,6 +239,24 @@ export default function AdminPage() {
       setMessage({ type: "error", text: "Bağlantı hatası." });
     } finally {
       setIsSearchingGuild(false);
+    }
+  };
+
+  const handleSyncGuilds = async () => {
+    setIsSyncingGuilds(true);
+    setMessage({ type: "info", text: "Lonca üyeleri arka planda senkronize ediliyor, lütfen bekleyin..." });
+    try {
+      const res = await fetch(`/api/admin/sync-guilds`, { method: "POST" });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setMessage({ type: "success", text: data.message || "Senkronizasyon tamamlandı!" });
+      } else {
+        setMessage({ type: "error", text: data.error || "Senkronizasyon hatası." });
+      }
+    } catch (e) {
+      setMessage({ type: "error", text: "Bağlantı hatası." });
+    } finally {
+      setIsSyncingGuilds(false);
     }
   };
 
@@ -2388,16 +2408,26 @@ export default function AdminPage() {
             <div className="admin-modal-body space-y-6" style={{ maxHeight: '70vh', overflowY: 'auto', paddingRight: '0.5rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h4 style={{ fontSize: '0.95rem', fontWeight: '600', color: 'var(--admin-text)' }}>Mevcut Kurallar</h4>
-                <button 
-                  className="btn-primary" 
-                  style={{ padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.85rem' }}
-                  onClick={() => {
-                    setEditingRuleId(null);
-                    setNewRule({ id: "", rule_name: "", albion_guilds: "", discord_servers: "", premium_type: "limited", days_to_give: 30 });
-                  }}
-                >
-                  <Plus size={14} /> Yeni Kural Ekle
-                </button>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <button 
+                    className="btn-secondary" 
+                    style={{ padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+                    onClick={handleSyncGuilds}
+                    disabled={isSyncingGuilds}
+                  >
+                    {isSyncingGuilds ? <Loader2 size={14} className="spin" /> : <RefreshCw size={14} />} Üyeleri Senkronize Et
+                  </button>
+                  <button 
+                    className="btn-primary" 
+                    style={{ padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.85rem' }}
+                    onClick={() => {
+                      setEditingRuleId(null);
+                      setNewRule({ id: "", rule_name: "", albion_guilds: "", discord_servers: "", premium_type: "limited", days_to_give: 30 });
+                    }}
+                  >
+                    <Plus size={14} /> Yeni Kural Ekle
+                  </button>
+                </div>
               </div>
 
               {autoPremiumRules.length === 0 ? (

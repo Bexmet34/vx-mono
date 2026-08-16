@@ -601,50 +601,31 @@ async function handleAutoPremiumModal(interaction) {
     const { data: rules } = await supabase.from('auto_premium_rules').select('*');
     if (!rules || rules.length === 0) return interaction.editReply('❌ Aktif premium kuralı yok.');
 
-    // 2. Albion Karakter Bilgisi Çek (Tüm Sunucularda Eşzamanlı)
+    // 2. Albion Karakter Bilgisi Çek (Yerel Veritabanından)
     let matchingPlayers = [];
-    const endpoints = [
-        'https://gameinfo.albiononline.com/api/gameinfo/search?q=',
-        'https://gameinfo-sg.albiononline.com/api/gameinfo/search?q=',
-        'https://gameinfo-ams.albiononline.com/api/gameinfo/search?q='
-    ];
-
     try {
-        // 10 saniyelik timeout ile tüm sunuculara aynı anda istek at (Hız ve dayanıklılık için)
-        const fetchPromises = endpoints.map(url => 
-            fetch(`${url}${encodeURIComponent(ign)}`, { signal: AbortSignal.timeout(10000) })
-                .then(res => {
-                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                    return res.json();
-                })
-        );
+        const { data: cachedMember, error } = await supabase
+            .from('cached_guild_members')
+            .select('*')
+            .ilike('ign', ign)
+            .single();
 
-        const results = await Promise.allSettled(fetchPromises);
-        
-        let allFailed = true;
-        for (const result of results) {
-            if (result.status === 'fulfilled') {
-                allFailed = false;
-                const searchData = result.value;
-                const player = searchData.players?.find(p => p.Name.toLowerCase() === ign.toLowerCase());
-                if (player) {
-                    matchingPlayers.push(player);
-                }
-            } else {
-                console.warn(`[AutoPremium] API fetch failed for one endpoint:`, result.reason);
-            }
+        if (error && error.code !== 'PGRST116') { // PGRST116 is "Rows not found"
+            console.error('DB Error:', error);
+            return interaction.editReply('❌ Veritabanına bağlanırken bir sorun oluştu.');
         }
 
-        if (allFailed) {
-            return interaction.editReply('❌ Albion API sunucuları şu an yanıt vermiyor, lütfen daha sonra tekrar deneyin.');
+        if (cachedMember) {
+            // DB'de ign tekildir (UNIQUE). Tek bir kayıt döner.
+            matchingPlayers.push({ GuildName: cachedMember.guild_name });
         }
         
         if (matchingPlayers.length === 0) {
-            return interaction.editReply(`❌ **${ign}** isminde bir karakter hiçbir sunucuda bulunamadı.`);
+            return interaction.editReply(`❌ **${ign}** isminde bir karakter hiçbir kural listesindeki loncada bulunamadı. Lütfen adınızı doğru yazdığınızdan ve loncada olduğunuza emin olun. Yeni katıldıysanız, yetkilinin listeyi senkronize etmesini bekleyin.`);
         }
     } catch (e) {
-        console.error('API Error:', e);
-        return interaction.editReply('❌ Albion API bağlanırken beklenmedik bir sorun oluştu.');
+        console.error('DB Catch Error:', e);
+        return interaction.editReply('❌ Beklenmedik bir veritabanı hatası oluştu.');
     }
 
     // 3. Şartları Kontrol Et
