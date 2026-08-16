@@ -89,6 +89,7 @@ function RandomDropTab({ lang, guildId, discordChannels }) {
         saving={saving}
         saveSettings={handleSave}
         discordChannels={discordChannels}
+        guildId={guildId}
       />
 
       {/* Kaydet Butonu */}

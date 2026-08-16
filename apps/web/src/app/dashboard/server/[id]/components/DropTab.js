@@ -1,5 +1,6 @@
 "use client";
 import { AlertCircle, Clock, CalendarClock, Zap, Dices, MessageSquare, Gift, Hash, Users } from "lucide-react";
+import DropLeaderboard from "./DropLeaderboard";
 
 /**
  * DropTab v2 — Manuel Drop Oranı Sistemi
@@ -10,7 +11,7 @@ import { AlertCircle, Clock, CalendarClock, Zap, Dices, MessageSquare, Gift, Has
  *   hourly_chance  — Her saat başı % ihtimalle
  *   percent_based  — Her mesajda % şansla
  */
-export default function DropTab({ lang, t, settings, setSettings, saving, saveSettings, discordChannels }) {
+export default function DropTab({ lang, t, settings, setSettings, saving, saveSettings, discordChannels, guildId }) {
   const isEn = lang === "en";
   const textChannels = (discordChannels || []).filter(c => c.type === 0);
 
@@ -421,6 +422,9 @@ export default function DropTab({ lang, t, settings, setSettings, saving, saveSe
           </div>
         </div>
       )}
+
+      {/* Leaderboard */}
+      <DropLeaderboard guildId={guildId} lang={lang} />
     </div>
   );
 }

@@ -195,6 +195,39 @@ async function getDropLeaderboard(guildId, limit = 10) {
   return data || [];
 }
 
+/**
+ * Sunucunun drop liderlik tablosunu sayfalama (pagination) ile getirir
+ */
+async function getDropLeaderboardPaginated(guildId, page = 1, limit = 20) {
+  const offset = (page - 1) * limit;
+
+  // Önce toplam sayıyı alalım (pagination hesaplaması için)
+  const { count, error: countError } = await supabase
+    .from('drop_points')
+    .select('*', { count: 'exact', head: true })
+    .eq('guild_id', guildId);
+
+  if (countError) {
+    console.error('[DropService] getDropLeaderboardPaginated count error:', countError);
+    return { data: [], total: 0 };
+  }
+
+  // Sonra veriyi alalım
+  const { data, error } = await supabase
+    .from('drop_points')
+    .select('user_id, total_points, win_count, last_win_at')
+    .eq('guild_id', guildId)
+    .order('total_points', { ascending: false })
+    .range(offset, offset + limit - 1);
+
+  if (error) {
+    console.error('[DropService] getDropLeaderboardPaginated data error:', error);
+    return { data: [], total: count || 0 };
+  }
+
+  return { data: data || [], total: count || 0 };
+}
+
 module.exports = {
   // Settings
   getDropSettings,
@@ -210,4 +243,5 @@ module.exports = {
   addDropPoints,
   getUserDropPoints,
   getDropLeaderboard,
+  getDropLeaderboardPaginated,
 };
