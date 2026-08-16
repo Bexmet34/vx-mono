@@ -632,12 +632,21 @@ async function handleAutoPremiumModal(interaction) {
 
     // 3. Şartları Kontrol Et
     let matchedRule = null;
+    console.log(`[AutoPremium] Checking rules for user ${interaction.user.tag} (${interaction.user.id}), IGN: ${ign}, Guild: ${playerGuild}`);
+    
     for (const rule of rules) {
         const requiredGuilds = rule.albion_guilds || [];
         const requiredServers = rule.discord_servers || [];
+        console.log(`[AutoPremium] Evaluating Rule: ${rule.rule_name}`);
 
-        // A) En az 1 Lonca eşleşmesi
-        if (requiredGuilds.length > 0 && !requiredGuilds.includes(playerGuild)) continue;
+        // A) En az 1 Lonca eşleşmesi (Büyük/Küçük harf duyarsız)
+        if (requiredGuilds.length > 0) {
+            const guildMatch = requiredGuilds.some(g => g.toLowerCase() === (playerGuild || "").toLowerCase());
+            if (!guildMatch) {
+                console.log(`[AutoPremium] -> Failed: Player guild '${playerGuild}' not in required list [${requiredGuilds.join(', ')}]`);
+                continue;
+            }
+        }
 
         // B) Tüm Discord sunucularında bulunma şartı
         let inAllServers = true;
@@ -645,15 +654,22 @@ async function handleAutoPremiumModal(interaction) {
             try {
                 const guildObj = await interaction.client.guilds.fetch(serverId);
                 await guildObj.members.fetch(interaction.user.id);
-            } catch {
+            } catch (err) {
+                console.log(`[AutoPremium] -> Failed: User ${interaction.user.id} not found in Discord server ${serverId}. Error: ${err.message}`);
                 inAllServers = false; break;
             }
         }
 
-        if (inAllServers) { matchedRule = rule; break; }
+        if (inAllServers) { 
+            console.log(`[AutoPremium] -> Success: Matched rule '${rule.rule_name}'`);
+            matchedRule = rule; break; 
+        }
     }
 
-    if (!matchedRule) return interaction.editReply('❌ Maalesef Premium şartlarını (Gerekli Lonca ve Discord Sunucusu) sağlamıyorsunuz.');
+    if (!matchedRule) {
+        console.log(`[AutoPremium] User ${interaction.user.tag} failed all rules.`);
+        return interaction.editReply('❌ Maalesef Premium şartlarını (Gerekli Lonca ve Discord Sunucusu) sağlamıyorsunuz.');
+    }
 
     // 4. Premium Ver
     const isUnlimited = matchedRule.premium_type === 'unlimited';

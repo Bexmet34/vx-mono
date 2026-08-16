@@ -15,16 +15,20 @@ export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const q = searchParams.get('q');
 
+  const server = searchParams.get('server') || 'all';
+
   if (!q || q.length < 3) {
     return NextResponse.json({ error: "En az 3 karakter girilmelidir." }, { status: 400 });
   }
 
   try {
-    const endpoints = [
-        'https://gameinfo.albiononline.com/api/gameinfo/search?q=',
-        'https://gameinfo-sg.albiononline.com/api/gameinfo/search?q=',
-        'https://gameinfo-ams.albiononline.com/api/gameinfo/search?q='
-    ];
+    const allEndpoints = {
+        'americas': 'https://gameinfo.albiononline.com/api/gameinfo/search?q=',
+        'asia': 'https://gameinfo-sg.albiononline.com/api/gameinfo/search?q=',
+        'europe': 'https://gameinfo-ams.albiononline.com/api/gameinfo/search?q='
+    };
+    
+    const endpoints = server === 'all' ? Object.values(allEndpoints) : [allEndpoints[server]];
 
     let allGuilds = [];
     for (const url of endpoints) {

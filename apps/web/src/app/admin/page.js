@@ -54,6 +54,7 @@ export default function AdminPage() {
   
   // Albion Guild Search States
   const [guildSearchQuery, setGuildSearchQuery] = useState("");
+  const [guildSearchServer, setGuildSearchServer] = useState("all");
   const [guildSearchResults, setGuildSearchResults] = useState([]);
   const [isSearchingGuild, setIsSearchingGuild] = useState(false);
 
@@ -225,7 +226,7 @@ export default function AdminPage() {
     }
     setIsSearchingGuild(true);
     try {
-      const res = await fetch(`/api/admin/albion-search?q=${encodeURIComponent(guildSearchQuery)}`);
+      const res = await fetch(`/api/admin/albion-search?q=${encodeURIComponent(guildSearchQuery)}&server=${guildSearchServer}`);
       const data = await res.json();
       if (res.ok && data.success) {
         setGuildSearchResults(data.guilds || []);
@@ -2490,6 +2491,17 @@ export default function AdminPage() {
                 <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--admin-border)' }}>
                   <label className="admin-input-label">Albion Loncası Ara ve Ekle</label>
                   <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                    <select 
+                      className="admin-input-field"
+                      style={{ width: '120px' }}
+                      value={guildSearchServer}
+                      onChange={e => setGuildSearchServer(e.target.value)}
+                    >
+                      <option value="all">Tümü (Yavaş)</option>
+                      <option value="americas">Americas</option>
+                      <option value="asia">Asia</option>
+                      <option value="europe">Europe</option>
+                    </select>
                     <input 
                       type="text" 
                       className="admin-input-field"
