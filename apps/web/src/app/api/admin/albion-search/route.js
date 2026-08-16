@@ -31,16 +31,23 @@ export async function GET(req) {
     const endpoints = server === 'all' ? Object.values(allEndpoints) : [allEndpoints[server]];
 
     let allGuilds = [];
-    for (const url of endpoints) {
-        const res = await fetch(`${url}${encodeURIComponent(q)}`);
-        if (!res.ok) continue;
-        const data = await res.json();
-        if (data.guilds) {
-            allGuilds = [...allGuilds, ...data.guilds];
+    const fetchPromises = endpoints.map(url => 
+        fetch(`${url}${encodeURIComponent(q)}`, { signal: AbortSignal.timeout(10000) })
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return res.json();
+            })
+    );
+
+    const results = await Promise.allSettled(fetchPromises);
+    
+    for (const result of results) {
+        if (result.status === 'fulfilled' && result.value.guilds) {
+            allGuilds = [...allGuilds, ...result.value.guilds];
         }
     }
 
-    // Tekrarlananları temizle (Farklı API'lerden aynı isim gelebilir mi? ID'ye göre filtrele)
+    // Tekrarlananları temizle (ID'ye göre filtrele)
     const uniqueGuilds = Array.from(new Map(allGuilds.map(g => [g.Id, g])).values());
 
     return NextResponse.json({ success: true, guilds: uniqueGuilds.slice(0, 15) });

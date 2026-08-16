@@ -601,9 +601,8 @@ async function handleAutoPremiumModal(interaction) {
     const { data: rules } = await supabase.from('auto_premium_rules').select('*');
     if (!rules || rules.length === 0) return interaction.editReply('❌ Aktif premium kuralı yok.');
 
-    // 2. Albion Karakter Bilgisi Çek (Tüm Sunucularda)
-    let playerGuild = null;
-    let playerFound = false;
+    // 2. Albion Karakter Bilgisi Çek (Tüm Sunucularda Eşzamanlı)
+    let matchingPlayers = [];
     const endpoints = [
         'https://gameinfo.albiononline.com/api/gameinfo/search?q=',
         'https://gameinfo-sg.albiononline.com/api/gameinfo/search?q=',
@@ -611,28 +610,47 @@ async function handleAutoPremiumModal(interaction) {
     ];
 
     try {
-        for (const url of endpoints) {
-            const res = await fetch(`${url}${encodeURIComponent(ign)}`);
-            if (!res.ok) continue;
-            const searchData = await res.json();
-            const player = searchData.players?.find(p => p.Name.toLowerCase() === ign.toLowerCase());
-            
-            if (player) {
-                playerFound = true;
-                playerGuild = player.GuildName;
-                break; // Bulunduysa diğer sunuculara bakma
+        // 10 saniyelik timeout ile tüm sunuculara aynı anda istek at (Hız ve dayanıklılık için)
+        const fetchPromises = endpoints.map(url => 
+            fetch(`${url}${encodeURIComponent(ign)}`, { signal: AbortSignal.timeout(10000) })
+                .then(res => {
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    return res.json();
+                })
+        );
+
+        const results = await Promise.allSettled(fetchPromises);
+        
+        let allFailed = true;
+        for (const result of results) {
+            if (result.status === 'fulfilled') {
+                allFailed = false;
+                const searchData = result.value;
+                const player = searchData.players?.find(p => p.Name.toLowerCase() === ign.toLowerCase());
+                if (player) {
+                    matchingPlayers.push(player);
+                }
+            } else {
+                console.warn(`[AutoPremium] API fetch failed for one endpoint:`, result.reason);
             }
         }
+
+        if (allFailed) {
+            return interaction.editReply('❌ Albion API sunucuları şu an yanıt vermiyor, lütfen daha sonra tekrar deneyin.');
+        }
         
-        if (!playerFound) return interaction.editReply(`❌ **${ign}** isminde bir karakter hiçbir sunucuda bulunamadı.`);
+        if (matchingPlayers.length === 0) {
+            return interaction.editReply(`❌ **${ign}** isminde bir karakter hiçbir sunucuda bulunamadı.`);
+        }
     } catch (e) {
         console.error('API Error:', e);
-        return interaction.editReply('❌ Albion API bağlanırken bir sorun oluştu.');
+        return interaction.editReply('❌ Albion API bağlanırken beklenmedik bir sorun oluştu.');
     }
 
     // 3. Şartları Kontrol Et
     let matchedRule = null;
-    console.log(`[AutoPremium] Checking rules for user ${interaction.user.tag} (${interaction.user.id}), IGN: ${ign}, Guild: ${playerGuild}`);
+    const allGuildsOfPlayer = matchingPlayers.map(p => p.GuildName).filter(Boolean);
+    console.log(`[AutoPremium] Checking rules for user ${interaction.user.tag} (${interaction.user.id}), IGN: ${ign}, Found Guilds: [${allGuildsOfPlayer.join(', ')}]`);
     
     for (const rule of rules) {
         const requiredGuilds = rule.albion_guilds || [];
@@ -641,9 +659,11 @@ async function handleAutoPremiumModal(interaction) {
 
         // A) En az 1 Lonca eşleşmesi (Büyük/Küçük harf duyarsız)
         if (requiredGuilds.length > 0) {
-            const guildMatch = requiredGuilds.some(g => g.toLowerCase() === (playerGuild || "").toLowerCase());
+            const guildMatch = matchingPlayers.some(p => 
+                requiredGuilds.some(g => g.toLowerCase() === (p.GuildName || "").toLowerCase())
+            );
             if (!guildMatch) {
-                console.log(`[AutoPremium] -> Failed: Player guild '${playerGuild}' not in required list [${requiredGuilds.join(', ')}]`);
+                console.log(`[AutoPremium] -> Failed: Player guilds [${allGuildsOfPlayer.join(', ')}] not in required list [${requiredGuilds.join(', ')}]`);
                 continue;
             }
         }
