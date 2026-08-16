@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/utils/supabase';
 
 const ADMIN_ID = process.env.NEXT_PUBLIC_ADMIN_ID;
 const ADMIN_ID_2 = process.env.NEXT_PUBLIC_ADMIN_ID_2 || "407234961582587916";
