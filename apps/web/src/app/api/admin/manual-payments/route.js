@@ -1,34 +1,15 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { supabase } from "@veyronix/database";
+import { getAllCryptoPayments, getCryptoPaymentById, updateCryptoPayment, getUserProfile, upsertUser, getSubscriptionByGuildId, updateSubscription, createSubscription, queueMessage, getParsedTemplate } from "@veyronix/database";
+import { sendSupportMessage } from '@/lib/discordApi';
 
 const ADMIN_ID = process.env.NEXT_PUBLIC_ADMIN_ID;
 const ADMIN_ID_2 = process.env.NEXT_PUBLIC_ADMIN_ID_2 || "407234961582587916";
 
 const isAdminUser = (id) => id && (id === ADMIN_ID || id === ADMIN_ID_2);
 
-// Helper to fetch notification template
-async function getParsedTemplate(templateId, placeholders = {}) {
-  const { data: template } = await supabase
-    .from('notification_templates')
-    .select('*')
-    .eq('id', templateId)
-    .single();
-
-  if (!template) return null;
-
-  let title = template.title_tr; 
-  let content = template.content_tr;
-
-  Object.keys(placeholders).forEach(key => {
-    const regex = new RegExp(`{${key}}`, 'g');
-    title = title?.replace(regex, placeholders[key]);
-    content = content?.replace(regex, placeholders[key]);
-  });
-
-  return { title, content, color: template.color, is_embed: template.is_embed };
-}
+// getParsedTemplate imported from @veyronix/database
 
 export const dynamic = 'force-dynamic';
 
@@ -39,13 +20,7 @@ export async function GET(req) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { data, error } = await supabase
-      .from('crypto_payments')
-      .select('*')
-      .eq('payment_method', 'havale')
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
+    const data = await getAllCryptoPayments('havale');
     
     return NextResponse.json(data);
   } catch (error) {
@@ -68,13 +43,14 @@ export async function PATCH(req) {
     }
 
     // 1. Ödemeyi al
-    const { data: payment, error: fetchError } = await supabase
-      .from('crypto_payments')
-      .select('*')
-      .eq('id', id)
-      .single();
+    let payment;
+    try {
+      payment = await getCryptoPaymentById(id);
+    } catch (e) {
+      return NextResponse.json({ error: "Payment not found" }, { status: 404 });
+    }
 
-    if (fetchError || !payment) {
+    if (!payment) {
       return NextResponse.json({ error: "Payment not found" }, { status: 404 });
     }
 
@@ -86,12 +62,7 @@ export async function PATCH(req) {
     const dbStatus = status === 'cancel' ? 'rejected' : status;
 
     // 2. Durumu güncelle
-    const { error: updateError } = await supabase
-      .from('crypto_payments')
-      .update({ status: dbStatus })
-      .eq('id', id);
-
-    if (updateError) throw updateError;
+    await updateCryptoPayment(id, { status: dbStatus });
 
     // 3. Eğer onaylandıysa aboneliği uzat
     if (status === 'paid') {
@@ -99,15 +70,14 @@ export async function PATCH(req) {
 
       if (isUserPlan) {
         // Bireysel Oylama Muafiyeti (User Premium)
-        const { data: userProfile, error: userError } = await supabase
-          .from('users')
-          .select('*')
-          .eq('discord_id', payment.user_id)
-          .single();
+        let userProfile = null;
+        try {
+          userProfile = await getUserProfile(payment.user_id);
+        } catch (e) {}
 
         const now = new Date();
         let currentExpiry = now;
-        if (!userError && userProfile && userProfile.premium_until) {
+        if (userProfile && userProfile.premium_until) {
           const profileExpiry = new Date(userProfile.premium_until);
           if (profileExpiry > now) {
             currentExpiry = profileExpiry;
@@ -116,24 +86,21 @@ export async function PATCH(req) {
 
         currentExpiry.setDate(currentExpiry.getDate() + payment.duration_days);
 
-        await supabase
-          .from('users')
-          .upsert({
+        await upsertUser({
             discord_id: payment.user_id,
             premium_until: currentExpiry.toISOString(),
             is_unlimited: userProfile?.is_unlimited || false
-          }, { onConflict: 'discord_id' });
+          });
 
         console.log(`[Admin Manual Payment] Approved User plan for ${payment.user_id} (+${payment.duration_days} days).`);
       } else {
         // Sunucu Premium (Server/Guild Premium)
-        const { data: subscription, error: subError } = await supabase
-          .from('subscriptions')
-          .select('*')
-          .eq('guild_id', payment.guild_id)
-          .single();
+        let subscription = null;
+        try {
+          subscription = await getSubscriptionByGuildId(payment.guild_id);
+        } catch (e) {}
 
-        if (!subError && subscription) {
+        if (subscription) {
           const now = new Date();
           let currentExpiry = new Date(subscription.expires_at);
 
@@ -143,14 +110,11 @@ export async function PATCH(req) {
 
           currentExpiry.setDate(currentExpiry.getDate() + payment.duration_days);
 
-          await supabase
-            .from('subscriptions')
-            .update({ 
+          await updateSubscription(subscription.guild_id, { 
               expires_at: currentExpiry.toISOString(),
               is_active: true,
               is_unlimited: subscription.is_unlimited || false
-            })
-            .eq('id', subscription.id);
+            });
 
           console.log(`[Admin Manual Payment] Order ${payment.order_id} approved. Guild ${payment.guild_id} extended by ${payment.duration_days} days.`);
         } else {
@@ -158,9 +122,7 @@ export async function PATCH(req) {
           const now = new Date();
           now.setDate(now.getDate() + payment.duration_days);
 
-          await supabase
-            .from('subscriptions')
-            .insert({
+          await createSubscription({
               guild_id: payment.guild_id,
               guild_name: payment.guild_name || 'Bilinmeyen Sunucu',
               expires_at: now.toISOString(),
@@ -178,7 +140,7 @@ export async function PATCH(req) {
         gun: payment.duration_days 
       });
       if (parsed && payment.user_id) {
-        await supabase.from('message_queue').insert({
+        await queueMessage({
           guild_id: payment.guild_id,
           owner_id: payment.user_id,
           message_content: JSON.stringify({
@@ -188,8 +150,7 @@ export async function PATCH(req) {
               color: parsed.color ? parseInt(parsed.color.replace('#', ''), 16) : 0x2ecc71,
               timestamp: new Date().toISOString()
             }]
-          }),
-          status: 'pending'
+          })
         });
       }
 
@@ -201,15 +162,8 @@ export async function PATCH(req) {
             ? `**Bireysel Oylama Muafiyeti (${payment.duration_days} Günlük)**`
             : `**${payment.guild_name || 'Sunucu'}** için ${payment.duration_days} günlük Sunucu Premium`;
 
-          await fetch('https://discord.com/api/v10/channels/1490798764427051088/messages', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bot ${botToken}`,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
+          await sendSupportMessage({
               content: `✅ **Havale/EFT Onaylandı!**\n<@${payment.user_id}> — ${planDetailText} onaylandı.\n📋 Kod: \`${payment.description_code}\` | 🏦 Banka: ${payment.target_bank || 'Bilinmiyor'}`
-            })
           });
         } catch (e) {
           console.error("[Admin Manual Payment] Discord notification error:", e);
@@ -221,7 +175,7 @@ export async function PATCH(req) {
         sunucu: payment.guild_name || 'Sunucu'
       });
       if (parsedRej && payment.user_id) {
-        await supabase.from('message_queue').insert({
+        await queueMessage({
           guild_id: payment.guild_id,
           owner_id: payment.user_id,
           message_content: JSON.stringify({
@@ -231,8 +185,7 @@ export async function PATCH(req) {
               color: parsedRej.color ? parseInt(parsedRej.color.replace('#', ''), 16) : 0xe74c3c,
               timestamp: new Date().toISOString()
             }]
-          }),
-          status: 'pending'
+          })
         });
       }
     }

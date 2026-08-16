@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { supabase } from '@veyronix/database';
+import { getAllUsers, getUserProfile, upsertUser, updateUser, deleteUser, queueMessage, getParsedTemplate } from '@veyronix/database';
+import { getDiscordUser } from '@/lib/discordApi';
 
 export const dynamic = "force-dynamic";
 
@@ -10,70 +11,11 @@ const ADMIN_ID_2 = process.env.NEXT_PUBLIC_ADMIN_ID_2 || "407234961582587916";
 
 const isAdminUser = (id) => id && (id === ADMIN_ID || id === ADMIN_ID_2);
 
-async function getDiscordUser(discordId) {
-  const token = process.env.DISCORD_BOT_TOKEN;
-  if (!token) return { username: `Kullanıcı (${discordId})`, avatar_url: null };
 
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 1000);
 
-    const res = await fetch(`https://discord.com/api/v10/users/${discordId}`, {
-      headers: {
-        'Authorization': `Bot ${token}`
-      },
-      signal: controller.signal,
-      next: { revalidate: 3600 } // cache for 1 hour
-    });
-
-    clearTimeout(timeoutId);
-
-    if (!res.ok) {
-      return { username: `Kullanıcı (${discordId})`, avatar_url: null };
-    }
-
-    const data = await res.json();
-    let avatarUrl = null;
-    if (data.avatar) {
-      const isGif = data.avatar.startsWith('a_');
-      avatarUrl = `https://cdn.discordapp.com/avatars/${discordId}/${data.avatar}.${isGif ? 'gif' : 'png'}`;
-    } else {
-      const defaultIdx = Number((BigInt(discordId) >> 22n) % 6n);
-      avatarUrl = `https://cdn.discordapp.com/embed/avatars/${defaultIdx}.png`;
-    }
-
-    return {
-      username: data.global_name || data.username || `Kullanıcı (${discordId})`,
-      avatar_url: avatarUrl
-    };
-  } catch (error) {
-    return { username: `Kullanıcı (${discordId})`, avatar_url: null };
-  }
-}
-
-async function getParsedTemplate(templateId, placeholders = {}) {
-  try {
-    const { data: template } = await supabase
-      .from('notification_templates')
-      .select('*')
-      .eq('id', templateId)
-      .single();
-
-    if (!template) return null;
-
-    let title = template.title_tr; 
-    let content = template.content_tr;
-
-    Object.keys(placeholders).forEach(key => {
-      const regex = new RegExp(`{${key}}`, 'g');
-      title = title?.replace(regex, placeholders[key]);
-      content = content?.replace(regex, placeholders[key]);
-    });
-
-    return { title, content, color: template.color, is_embed: template.is_embed };
-  } catch (err) {
-    return null;
-  }
+async function _getParsedTemplateWrapper(templateId, placeholders = {}) {
+  // Use the service's getParsedTemplate
+  return getParsedTemplate(templateId, placeholders);
 }
 
 export async function GET() {
@@ -82,16 +24,31 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { data, error } = await supabase
-    .from('users')
-    .select('*')
-    .order('discord_id', { ascending: true });
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  let data;
+  try {
+    data = await getAllUsers();
+  } catch (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 
   // Fast parallel enrichment with timeouts using Promise.allSettled
   const results = await Promise.allSettled((data || []).map(async (u) => {
-    const discordProfile = await getDiscordUser(u.discord_id);
+    let discordProfile = { username: `Kullanıcı (${u.discord_id})`, avatar_url: null };
+    try {
+      const data = await getDiscordUser(u.discord_id);
+      let avatarUrl = null;
+      if (data.avatar) {
+        const isGif = data.avatar.startsWith('a_');
+        avatarUrl = `https://cdn.discordapp.com/avatars/${u.discord_id}/${data.avatar}.${isGif ? 'gif' : 'png'}`;
+      } else {
+        const defaultIdx = Number((BigInt(u.discord_id) >> 22n) % 6n);
+        avatarUrl = `https://cdn.discordapp.com/embed/avatars/${defaultIdx}.png`;
+      }
+      discordProfile = {
+        username: data.global_name || data.username || `Kullanıcı (${u.discord_id})`,
+        avatar_url: avatarUrl
+      };
+    } catch (e) {}
     
     let mutualGuilds = [];
     try {
@@ -147,11 +104,10 @@ export async function POST(req) {
     }
 
     // Check if user already exists
-    const { data: userProfile, error: userError } = await supabase
-      .from('users')
-      .select('*')
-      .eq('discord_id', discord_id)
-      .single();
+    let userProfile = null;
+    try {
+      userProfile = await getUserProfile(discord_id);
+    } catch (e) {}
 
     let updateData = { discord_id };
     let expiryDateStr = "";
@@ -164,7 +120,7 @@ export async function POST(req) {
       const now = new Date();
       let currentExpiry = now;
 
-      if (!userError && userProfile && userProfile.premium_until) {
+      if (userProfile && userProfile.premium_until) {
         const profileExpiry = new Date(userProfile.premium_until);
         if (profileExpiry > now) {
           currentExpiry = profileExpiry;
@@ -177,11 +133,11 @@ export async function POST(req) {
       expiryDateStr = currentExpiry.toLocaleDateString('tr-TR');
     }
 
-    const { error: upsertError } = await supabase
-      .from('users')
-      .upsert(updateData, { onConflict: 'discord_id' });
-
-    if (upsertError) throw upsertError;
+    try {
+      await upsertUser(updateData);
+    } catch (upsertError) {
+      throw upsertError;
+    }
 
     // Queue DM notification to User (Stacked EN top / TR bottom format)
     try {
@@ -226,7 +182,7 @@ export async function POST(req) {
           `• **Destek Sunucusu:** https://discord.gg/D6T3t4beqa`;
       }
 
-      await supabase.from('message_queue').insert({
+      await queueMessage({
         owner_id: discord_id,
         message_content: JSON.stringify({
           embeds: [{
@@ -235,8 +191,7 @@ export async function POST(req) {
             color: is_unlimited ? 0xfca311 : 0x2ecc71,
             timestamp: new Date().toISOString()
           }]
-        }),
-        status: 'pending'
+        })
       });
     } catch (queueErr) {
       console.error("[Admin Users POST] Error queueing DM notification:", queueErr.message);
@@ -262,13 +217,14 @@ export async function PATCH(req) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
 
-    const { data: userProfile, error: fetchError } = await supabase
-      .from('users')
-      .select('*')
-      .eq('discord_id', discord_id)
-      .single();
+    let userProfile;
+    try {
+      userProfile = await getUserProfile(discord_id);
+    } catch (fetchError) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
 
-    if (fetchError || !userProfile) {
+    if (!userProfile) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
@@ -314,12 +270,11 @@ export async function PATCH(req) {
       return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
 
-    const { error: updateError } = await supabase
-      .from('users')
-      .update(updateData)
-      .eq('discord_id', discord_id);
-
-    if (updateError) throw updateError;
+    try {
+      await updateUser(discord_id, updateData);
+    } catch (updateError) {
+      throw updateError;
+    }
 
     // Queue DM notification to User (Stacked EN top / TR bottom format)
     try {
@@ -366,7 +321,7 @@ export async function PATCH(req) {
           `• **Destek Sunucusu:** https://discord.gg/D6T3t4beqa`;
       }
 
-      await supabase.from('message_queue').insert({
+      await queueMessage({
         owner_id: discord_id,
         message_content: JSON.stringify({
           embeds: [{
@@ -375,8 +330,7 @@ export async function PATCH(req) {
             color: isUnlimited ? 0xfca311 : 0x3498db,
             timestamp: new Date().toISOString()
           }]
-        }),
-        status: 'pending'
+        })
       });
     } catch (queueErr) {
       console.error("[Admin Users PATCH] Error queueing DM notification:", queueErr.message);
@@ -419,7 +373,7 @@ export async function DELETE(req) {
         `• **Web Sitesi:** https://veyronix.com.tr/\n` +
         `• **Destek Sunucusu:** https://discord.gg/D6T3t4beqa`;
 
-      await supabase.from('message_queue').insert({
+      await queueMessage({
         owner_id: discordId,
         message_content: JSON.stringify({
           embeds: [{
@@ -428,19 +382,17 @@ export async function DELETE(req) {
             color: 0xe74c3c,
             timestamp: new Date().toISOString()
           }]
-        }),
-        status: 'pending'
+        })
       });
     } catch (cancelQueueErr) {
       console.error("[Admin Users DELETE] Error queueing cancellation DM:", cancelQueueErr.message);
     }
 
-    const { error } = await supabase
-      .from('users')
-      .delete()
-      .eq('discord_id', discordId);
-
-    if (error) throw error;
+    try {
+      await deleteUser(discordId);
+    } catch (error) {
+      throw error;
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

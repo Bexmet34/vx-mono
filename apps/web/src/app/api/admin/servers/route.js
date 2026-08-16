@@ -1,45 +1,25 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { supabase } from '@veyronix/database';
+import { getAllSubscriptions, getSubscriptionByGuildId, updateSubscription, queueMessage, getParsedTemplate } from '@veyronix/database';
 
 export const dynamic = "force-dynamic";
 
 const ADMIN_ID = process.env.NEXT_PUBLIC_ADMIN_ID;
 
-// Helper to fetch notification template
-async function getParsedTemplate(templateId, placeholders = {}) {
-  const { data: template } = await supabase
-    .from('notification_templates')
-    .select('*')
-    .eq('id', templateId)
-    .single();
-
-  if (!template) return null;
-
-  let title = template.title_tr; // Default to TR for now as per project context
-  let content = template.content_tr;
-
-  Object.keys(placeholders).forEach(key => {
-    const regex = new RegExp(`{${key}}`, 'g');
-    title = title?.replace(regex, placeholders[key]);
-    content = content?.replace(regex, placeholders[key]);
-  });
-
-  return { title, content, color: template.color, is_embed: template.is_embed };
-}
+// getParsedTemplate is now imported from @veyronix/database
 
 export async function GET() {
   const session = await getServerSession(authOptions);
   const isAdmin = session?.user?.id === ADMIN_ID || session?.user?.id === "407234961582587916";
   if (!isAdmin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data, error } = await supabase
-    .from('subscriptions')
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  let data;
+  try {
+    data = await getAllSubscriptions();
+  } catch (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
   return NextResponse.json(data);
 }
 
@@ -53,9 +33,14 @@ export async function PATCH(req) {
   console.log(`[AdminAPI] Action: ${action}, Guild: ${guildId}, Value: ${value}`);
 
   // 1. Fetch current sub
-  const { data: currentSub, error: fetchError } = await supabase.from('subscriptions').select('*').eq('guild_id', guildId).single();
-  if (fetchError || !currentSub) {
+  let currentSub;
+  try {
+    currentSub = await getSubscriptionByGuildId(guildId);
+  } catch (fetchError) {
     console.error(`[AdminAPI] Fetch Error: ${fetchError?.message}`);
+    return NextResponse.json({ error: "Server not found" }, { status: 404 });
+  }
+  if (!currentSub) {
     return NextResponse.json({ error: "Server not found" }, { status: 404 });
   }
 
@@ -123,8 +108,9 @@ export async function PATCH(req) {
   }
 
   // 2. Update Subscription
-  const { error: updateError } = await supabase.from('subscriptions').update(updateData).eq('guild_id', guildId);
-  if (updateError) {
+  try {
+    await updateSubscription(guildId, updateData);
+  } catch (updateError) {
     console.error(`[AdminAPI] Update Error: ${updateError.message}`);
     return NextResponse.json({ error: updateError.message }, { status: 500 });
   }
@@ -133,20 +119,22 @@ export async function PATCH(req) {
   if (templateId) {
     const parsed = await getParsedTemplate(templateId, placeholders);
     if (parsed) {
-      const { error: queueError } = await supabase.from('message_queue').insert({
-        guild_id: guildId,
-        owner_id: currentSub.owner_id,
-        message_content: JSON.stringify({
-          embeds: [{
-            title: parsed.title,
-            description: parsed.content,
-            color: parsed.color ? parseInt(parsed.color.replace('#', ''), 16) : 0x5865f2,
-            timestamp: new Date().toISOString()
-          }]
-        }),
-        status: 'pending'
-      });
-      if (queueError) console.error(`[AdminAPI] Queue Error: ${queueError.message}`);
+      try {
+        await queueMessage({
+          guild_id: guildId,
+          owner_id: currentSub.owner_id,
+          message_content: JSON.stringify({
+            embeds: [{
+              title: parsed.title,
+              description: parsed.content,
+              color: parsed.color ? parseInt(parsed.color.replace('#', ''), 16) : 0x5865f2,
+              timestamp: new Date().toISOString()
+            }]
+          })
+        });
+      } catch (queueError) {
+        console.error(`[AdminAPI] Queue Error: ${queueError.message}`);
+      }
     }
   }
 

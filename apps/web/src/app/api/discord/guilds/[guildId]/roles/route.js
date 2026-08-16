@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { checkDashboardAccess } from '@/utils/authUtils';
+import { getGuildRoles, getGuildMembers, getGuildChannels } from '@/lib/discordApi';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,19 +27,13 @@ export async function GET(req, { params }) {
       return NextResponse.json({ error: "DISCORD_BOT_TOKEN is missing" }, { status: 500 });
     }
 
-    // 1. Fetch Roles
-    const res = await fetch(`https://discord.com/api/v10/guilds/${guildId}/roles`, {
-      headers: { Authorization: `Bot ${token}` },
-      cache: 'no-store'
-    });
-
-    if (!res.ok) {
-      const errText = await res.text();
-      console.error(`[API] Discord Roles Error: ${res.status} - ${errText}`);
-      return NextResponse.json({ error: "Failed to fetch roles from Discord" }, { status: res.status });
+    let roles = [];
+    try {
+      roles = await getGuildRoles(guildId);
+    } catch (error) {
+      console.error(`[API] Discord Roles Error: ${error.message}`);
+      return NextResponse.json({ error: "Failed to fetch roles from Discord" }, { status: 500 });
     }
-
-    const roles = await res.json();
     const formattedRoles = roles
       .filter(r => r.name !== '@everyone') 
       .sort((a, b) => b.position - a.position);
@@ -46,24 +41,16 @@ export async function GET(req, { params }) {
     // 2. Fetch Members (Guild Specific)
     let formattedMembers = [];
     try {
-      const memRes = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members?limit=1000`, {
-        headers: { Authorization: `Bot ${token}` },
-        cache: 'no-store'
-      });
+      const membersData = await getGuildMembers(guildId, 1000);
       
-      if (memRes.ok) {
-        const membersData = await memRes.json();
-        console.log(`[API] Fetched ${membersData.length} members for Guild: ${guildId}`);
-        formattedMembers = membersData.map(m => ({
-          id: m.user.id,
-          username: m.user.username,
-          global_name: m.user.global_name,
-          avatar: m.user.avatar,
-          bot: m.user.bot || false
-        }));
-      } else {
-        console.warn(`[API] Could not fetch members for ${guildId}: ${memRes.status}`);
-      }
+      console.log(`[API] Fetched ${membersData.length} members for Guild: ${guildId}`);
+      formattedMembers = membersData.map(m => ({
+        id: m.user.id,
+        username: m.user.username,
+        global_name: m.user.global_name,
+        avatar: m.user.avatar,
+        bot: m.user.bot || false
+      }));
     } catch (e) {
       console.error("[API] Member Fetch Exception:", e);
     }
@@ -71,19 +58,12 @@ export async function GET(req, { params }) {
     // 3. Fetch Channels
     let formattedChannels = [];
     try {
-      const chanRes = await fetch(`https://discord.com/api/v10/guilds/${guildId}/channels`, {
-        headers: { Authorization: `Bot ${token}` },
-        cache: 'no-store'
-      });
-      
-      if (chanRes.ok) {
-        const channelsData = await chanRes.json();
-        formattedChannels = channelsData.map(c => ({
-          id: c.id,
-          name: c.name,
-          type: c.type
-        }));
-      }
+      const channelsData = await getGuildChannels(guildId);
+      formattedChannels = channelsData.map(c => ({
+        id: c.id,
+        name: c.name,
+        type: c.type
+      }));
     } catch (e) {
       console.error("[API] Channel Fetch Exception:", e);
     }

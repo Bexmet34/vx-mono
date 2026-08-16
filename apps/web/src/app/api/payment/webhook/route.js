@@ -1,29 +1,11 @@
 import { NextResponse } from 'next/server';
-import { supabase } from "@veyronix/database";
+import { getCryptoPaymentByOrderId, updateCryptoPaymentByOrderId, getUserProfile, upsertUser, getSubscriptionByGuildId, updateSubscription, createSubscription, queueMessage, getParsedTemplate } from "@veyronix/database";
 import crypto from 'crypto';
+import { sendSupportMessage } from '@/lib/discordApi';
 
 export const dynamic = 'force-dynamic';
 
-async function getParsedTemplate(templateId, placeholders = {}) {
-  const { data: template } = await supabase
-    .from('notification_templates')
-    .select('*')
-    .eq('id', templateId)
-    .single();
-
-  if (!template) return null;
-
-  let title = template.title_tr; 
-  let content = template.content_tr;
-
-  Object.keys(placeholders).forEach(key => {
-    const regex = new RegExp(`{${key}}`, 'g');
-    title = title?.replace(regex, placeholders[key]);
-    content = content?.replace(regex, placeholders[key]);
-  });
-
-  return { title, content, color: template.color, is_embed: template.is_embed };
-}
+// getParsedTemplate is imported from @veyronix/database
 
 export async function POST(req) {
   try {
@@ -63,13 +45,15 @@ export async function POST(req) {
     if (status === 'paid' || status === 'paid_over') {
       
       // 1. Ödemeyi veritabanında bul
-      const { data: payment, error: fetchError } = await supabase
-        .from('crypto_payments')
-        .select('*')
-        .eq('order_id', order_id)
-        .single();
+      let payment;
+      try {
+        payment = await getCryptoPaymentByOrderId(order_id);
+      } catch (e) {
+        console.error(`[Cryptomus Webhook] Order ${order_id} not found in DB`);
+        return NextResponse.json({ error: "Order not found" }, { status: 404 });
+      }
 
-      if (fetchError || !payment) {
+      if (!payment) {
         console.error(`[Cryptomus Webhook] Order ${order_id} not found in DB`);
         return NextResponse.json({ error: "Order not found" }, { status: 404 });
       }
@@ -80,25 +64,21 @@ export async function POST(req) {
       }
 
       // 2. Ödemeyi 'paid' olarak güncelle
-      await supabase
-        .from('crypto_payments')
-        .update({ status: 'paid' })
-        .eq('id', payment.id);
+      await updateCryptoPaymentByOrderId(order_id, { status: 'paid' });
 
       // 3. İlgili sunucu veya üye süresini uzat
       const isUserPlan = payment.plan_type === 'user';
 
       if (isUserPlan) {
         // Bireysel Oylama Muafiyeti (User Premium)
-        const { data: userProfile, error: userError } = await supabase
-          .from('users')
-          .select('*')
-          .eq('discord_id', payment.user_id)
-          .single();
+        let userProfile = null;
+        try {
+          userProfile = await getUserProfile(payment.user_id);
+        } catch (e) {}
 
         const now = new Date();
         let currentExpiry = now;
-        if (!userError && userProfile && userProfile.premium_until) {
+        if (userProfile && userProfile.premium_until) {
           const profileExpiry = new Date(userProfile.premium_until);
           if (profileExpiry > now) {
             currentExpiry = profileExpiry;
@@ -107,13 +87,11 @@ export async function POST(req) {
 
         currentExpiry.setDate(currentExpiry.getDate() + payment.duration_days);
 
-        await supabase
-          .from('users')
-          .upsert({
+        await upsertUser({
             discord_id: payment.user_id,
             premium_until: currentExpiry.toISOString(),
             is_unlimited: userProfile?.is_unlimited || false
-          }, { onConflict: 'discord_id' });
+          });
 
         // Queue DM notification to User (Stacked EN top / TR bottom format)
         try {
@@ -162,7 +140,7 @@ export async function POST(req) {
           }
 
           if (payment.user_id) {
-            await supabase.from('message_queue').insert({
+            await queueMessage({
               owner_id: payment.user_id,
               message_content: JSON.stringify({
                 embeds: [{
@@ -171,8 +149,7 @@ export async function POST(req) {
                   color: isUnlimited ? 0xfca311 : 0x2ecc71,
                   timestamp: new Date().toISOString()
                 }]
-              }),
-              status: 'pending'
+              })
             });
           }
         } catch (queueErr) {
@@ -182,19 +159,16 @@ export async function POST(req) {
         console.log(`[Cryptomus Webhook] Order ${order_id} processed. User ${payment.user_id} global premium extended by ${payment.duration_days} days.`);
       } else {
         // Sunucu Premium (Server/Guild Premium)
-        const { data: subscription, error: subError } = await supabase
-          .from('subscriptions')
-          .select('*')
-          .eq('guild_id', payment.guild_id)
-          .single();
+        let subscription = null;
+        try {
+          subscription = await getSubscriptionByGuildId(payment.guild_id);
+        } catch (e) {}
 
-        if (subError || !subscription) {
+        if (!subscription) {
           // Abonelik hiç yoksa yeni oluştur
           const now = new Date();
           now.setDate(now.getDate() + payment.duration_days);
-          await supabase
-            .from('subscriptions')
-            .insert({
+          await createSubscription({
               guild_id: payment.guild_id,
               guild_name: payment.guild_name || 'Bilinmeyen Sunucu',
               expires_at: now.toISOString(),
@@ -215,14 +189,11 @@ export async function POST(req) {
           // Gün ekle
           currentExpiry.setDate(currentExpiry.getDate() + payment.duration_days);
 
-          await supabase
-            .from('subscriptions')
-            .update({ 
+          await updateSubscription(subscription.guild_id, { 
               expires_at: currentExpiry.toISOString(),
               is_active: true,
               is_unlimited: subscription.is_unlimited || false
-            })
-            .eq('id', subscription.id);
+            });
 
           console.log(`[Cryptomus Webhook] Order ${order_id} processed. Guild ${payment.guild_id} extended by ${payment.duration_days} days.`);
         }
@@ -242,15 +213,8 @@ export async function POST(req) {
                messageContent = `🎉 <@${payment.user_id}>, **${guildNameSafe}** sunucusu için **Sunucu Premium (${planName})** satın aldı! Bizi tercih ettiğiniz için teşekkür ederiz. Destek taleplerinize artık öncelikli olarak bakılacaktır.`;
             }
 
-            await fetch('https://discord.com/api/v10/channels/1490798764427051088/messages', {
-               method: 'POST',
-               headers: {
-                  'Authorization': `Bot ${botToken}`,
-                  'Content-Type': 'application/json'
-               },
-               body: JSON.stringify({
-                  content: messageContent
-               })
+            await sendSupportMessage({
+               content: messageContent
             });
          } catch(e) {
             console.error("[Cryptomus Webhook] Discord notification error:", e);

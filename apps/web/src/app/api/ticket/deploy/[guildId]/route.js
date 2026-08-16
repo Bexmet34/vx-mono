@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { checkDashboardAccess } from '@/utils/authUtils';
 import { supabase } from '@veyronix/database';
+import { sendChannelMessage } from '@/lib/discordApi';
 
 export const dynamic = 'force-dynamic';
 
@@ -69,18 +70,10 @@ export async function POST(req, { params }) {
             ]
         };
 
-        const res = await fetch(`https://discord.com/api/v10/channels/${ticket_channel_id}/messages`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bot ${botToken}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-        });
-
-        if (!res.ok) {
-            const data = await res.json();
-            console.error("Discord API Error:", data);
+        try {
+            await sendChannelMessage(ticket_channel_id, payload);
+        } catch (apiError) {
+            console.error("Discord API Error:", apiError.message);
             return NextResponse.json({ error: "Discord'a gönderilemedi. Kanal izinlerini veya ID'sini kontrol edin." }, { status: 500 });
         }
 

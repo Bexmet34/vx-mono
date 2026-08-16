@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { supabase } from '@veyronix/database';
 import { checkDashboardAccess } from '@/utils/authUtils';
+import { sendChannelMessage, deleteChannelMessage } from '@/lib/discordApi';
 
 export const dynamic = 'force-dynamic';
 
@@ -89,31 +90,20 @@ You can quickly use the party (content) system on our server using the buttons b
       ]
     };
 
-    let fetchUrl = `https://discord.com/api/v10/channels/${channelId}/messages`;
-    let fetchMethod = 'POST';
-
     if (settings.fixed_message_id) {
-      await fetch(`https://discord.com/api/v10/channels/${channelId}/messages/${settings.fixed_message_id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bot ${token}` }
-      });
+      try {
+        await deleteChannelMessage(channelId, settings.fixed_message_id);
+      } catch (e) {
+        console.error("Old fixed message delete error", e);
+      }
     }
 
-    const discordRes = await fetch(fetchUrl, {
-      method: fetchMethod,
-      headers: {
-        'Authorization': `Bot ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(messagePayload)
-    });
-
-    if (!discordRes.ok) {
-      const errorText = await discordRes.text();
-      return NextResponse.json({ error: "Discord API Error", details: errorText }, { status: discordRes.status });
+    let responseData;
+    try {
+      responseData = await sendChannelMessage(channelId, messagePayload);
+    } catch (e) {
+      return NextResponse.json({ error: "Discord API Error", details: e.message }, { status: 500 });
     }
-
-    const responseData = await discordRes.json();
 
     await supabase
       .from('guild_settings')

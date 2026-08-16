@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { checkDashboardAccess } from '@/utils/authUtils';
 import { getDropLeaderboardPaginated } from '@veyronix/database';
+import { getGuildMember, getDiscordUser } from '@/lib/discordApi';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,41 +26,29 @@ export async function GET(req, { params }) {
 
     const { data, total } = await getDropLeaderboardPaginated(guildId, page, limit);
 
-    const token = process.env.DISCORD_BOT_TOKEN;
-    
     // Enrich data with discord user info
     const enrichedData = await Promise.all(data.map(async (row) => {
       let discordUser = null;
-      if (token) {
+      try {
         try {
-          const res = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${row.user_id}`, {
-            headers: { Authorization: `Bot ${token}` }
-          });
-          if (res.ok) {
-            const member = await res.json();
-            discordUser = {
-              name: member.nick || member.user.global_name || member.user.username,
-              avatarUrl: member.avatar
-                ? `https://cdn.discordapp.com/guilds/${guildId}/users/${row.user_id}/avatars/${member.avatar}.png`
-                : member.user.avatar
-                  ? `https://cdn.discordapp.com/avatars/${row.user_id}/${member.user.avatar}.png`
-                  : null,
-            };
-          } else {
-            const ures = await fetch(`https://discord.com/api/v10/users/${row.user_id}`, {
-               headers: { Authorization: `Bot ${token}` }
-            });
-            if (ures.ok) {
-               const user = await ures.json();
-               discordUser = {
-                  name: user.global_name || user.username,
-                  avatarUrl: user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : null
-               };
-            }
-          }
-        } catch (e) {
-          console.error(`Error fetching discord user ${row.user_id}:`, e.message);
+          const member = await getGuildMember(guildId, row.user_id);
+          discordUser = {
+            name: member.nick || member.user.global_name || member.user.username,
+            avatarUrl: member.avatar
+              ? `https://cdn.discordapp.com/guilds/${guildId}/users/${row.user_id}/avatars/${member.avatar}.png`
+              : member.user.avatar
+                ? `https://cdn.discordapp.com/avatars/${row.user_id}/${member.user.avatar}.png`
+                : null,
+          };
+        } catch (memErr) {
+          const user = await getDiscordUser(row.user_id);
+          discordUser = {
+              name: user.global_name || user.username,
+              avatarUrl: user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : null
+          };
         }
+      } catch (e) {
+        console.error(`Error fetching discord user ${row.user_id}:`, e.message);
       }
       return { ...row, discordUser };
     }));

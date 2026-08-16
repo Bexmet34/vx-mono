@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { supabase } from '@veyronix/database';
+import { getAutoPremiumRules, createAutoPremiumRule, updateAutoPremiumRule, deleteAutoPremiumRule } from '@veyronix/database';
 
 export const dynamic = "force-dynamic";
 
@@ -16,12 +16,12 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { data, error } = await supabase
-    .from('auto_premium_rules')
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  let data;
+  try {
+    data = await getAutoPremiumRules();
+  } catch (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
   return NextResponse.json(data || []);
 }
 
@@ -38,21 +38,10 @@ export async function POST(req) {
     let result;
     if (id) {
       // Update
-      const { data, error } = await supabase
-        .from('auto_premium_rules')
-        .update({ rule_name, albion_guilds, discord_servers, premium_type, days_to_give })
-        .eq('id', id)
-        .select();
-      if (error) throw error;
-      result = data;
+      result = await updateAutoPremiumRule(id, { rule_name, albion_guilds, discord_servers, premium_type, days_to_give });
     } else {
       // Insert
-      const { data, error } = await supabase
-        .from('auto_premium_rules')
-        .insert([{ rule_name, albion_guilds, discord_servers, premium_type, days_to_give }])
-        .select();
-      if (error) throw error;
-      result = data;
+      result = await createAutoPremiumRule({ rule_name, albion_guilds, discord_servers, premium_type, days_to_give });
     }
 
     return NextResponse.json({ success: true, data: result });
@@ -74,8 +63,11 @@ export async function DELETE(req) {
 
     if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
 
-    const { error } = await supabase.from('auto_premium_rules').delete().eq('id', id);
-    if (error) throw error;
+    try {
+      await deleteAutoPremiumRule(id);
+    } catch (error) {
+      throw error;
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

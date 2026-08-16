@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@veyronix/database';
+import { createDMChannel, sendChannelMessage } from '@/lib/discordApi';
 export const dynamic = 'force-dynamic';
 
 export async function POST(req) {
@@ -92,35 +93,20 @@ export async function POST(req) {
             const discordTimestamp = Math.floor(newExpiresAt / 1000);
             desc = desc.replace(/{bitis_tarihi}/g, discordTimestamp);
 
-            // Create DM Channel
-            const dmRes = await fetch(`https://discord.com/api/v10/users/@me/channels`, {
-                method: 'POST',
-                headers: { 
-                    'Authorization': `Bot ${process.env.DISCORD_BOT_TOKEN}`, 
-                    'Content-Type': 'application/json' 
-                },
-                body: JSON.stringify({ recipient_id: userId })
-            });
-
-            if (dmRes.ok) {
-                const dmData = await dmRes.json();
-                // Send Message
-                await fetch(`https://discord.com/api/v10/channels/${dmData.id}/messages`, {
-                    method: 'POST',
-                    headers: { 
-                        'Authorization': `Bot ${process.env.DISCORD_BOT_TOKEN}`, 
-                        'Content-Type': 'application/json' 
-                    },
-                    body: JSON.stringify({
+            // Create DM Channel and Send Message
+            try {
+                const dmData = await createDMChannel(userId);
+                if (dmData && dmData.id) {
+                    await sendChannelMessage(dmData.id, {
                         embeds: [{
                             title: title,
                             description: desc.replace(/\\n/g, '\n'),
                             color: color
                         }]
-                    })
-                });
-            } else {
-                console.error("Webhook Discord DM Channel Error:", await dmRes.text());
+                    });
+                }
+            } catch (err) {
+                console.error("Webhook Discord DM Channel Error:", err.message);
             }
         }
 

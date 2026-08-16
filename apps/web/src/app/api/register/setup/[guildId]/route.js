@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { sendChannelMessage } from '@/lib/discordApi';
 
 export async function POST(req, { params }) {
   try {
@@ -51,22 +52,12 @@ export async function POST(req, { params }) {
       ]
     };
 
-    const res = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bot ${botToken}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(body)
-    });
-
-    if (!res.ok) {
-      const errorData = await res.json();
-      return NextResponse.json({ error: "Discord API Error", details: errorData }, { status: res.status });
+    try {
+      const data = await sendChannelMessage(channelId, body);
+      return NextResponse.json({ success: true, messageId: data.id });
+    } catch (apiError) {
+      return NextResponse.json({ error: "Discord API Error", details: apiError.message }, { status: 500 });
     }
-
-    const data = await res.json();
-    return NextResponse.json({ success: true, messageId: data.id });
   } catch (err) {
     console.error("Setup message error:", err);
     return NextResponse.json({ error: err.message }, { status: 500 });

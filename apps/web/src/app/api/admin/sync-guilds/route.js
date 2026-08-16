@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { supabase } from '@veyronix/database';
+import { getAutoPremiumRulesOnlyGuilds, upsertCachedGuildMembers, deleteOldCachedGuildMembers } from '@veyronix/database';
 
 const ADMIN_ID = process.env.NEXT_PUBLIC_ADMIN_ID;
 const ADMIN_ID_2 = process.env.NEXT_PUBLIC_ADMIN_ID_2 || "407234961582587916";
@@ -21,8 +21,8 @@ export async function POST(req) {
 
   try {
     // 1. Tüm kuralları çek ve lonca isimlerini topla
-    const { data: rules } = await supabase.from('auto_premium_rules').select('albion_guilds');
-    if (!rules) return NextResponse.json({ success: true, message: "Kural yok." });
+    const rules = await getAutoPremiumRulesOnlyGuilds();
+    if (!rules || rules.length === 0) return NextResponse.json({ success: true, message: "Kural yok." });
 
     const guildNames = new Set();
     for (const rule of rules) {
@@ -87,17 +87,12 @@ export async function POST(req) {
 
     // 3. Veritabanına kaydet (Upsert)
     if (membersToUpsert.length > 0) {
-        // Chunk'lara bölerek yükle (Supabase limitine takılmamak için)
-        const chunkSize = 500;
-        for (let i = 0; i < membersToUpsert.length; i += chunkSize) {
-            const chunk = membersToUpsert.slice(i, i + chunkSize);
-            await supabase.from('cached_guild_members').upsert(chunk, { onConflict: 'ign' });
-        }
+        await upsertCachedGuildMembers(membersToUpsert);
     }
 
     // 4. Eski verileri sil (Son 2 saat içinde güncellenmeyenler loncadan çıkmış demektir)
     const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
-    await supabase.from('cached_guild_members').delete().lt('last_seen', twoHoursAgo);
+    await deleteOldCachedGuildMembers(twoHoursAgo);
 
     return NextResponse.json({ 
         success: true, 

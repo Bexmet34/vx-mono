@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@veyronix/database";
+// removed supabase import
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Save, ArrowLeft, PlusCircle, Trash2, Eye, Languages, Sparkles, Loader2 } from "lucide-react";
@@ -50,15 +50,13 @@ export default function ChangelogAdmin() {
   }, [status, session?.user?.id, router]);
 
   async function fetchLogs() {
-    const { data, error } = await supabase
-      .from("changelogs")
-      .select("*")
-      .order("created_at", { ascending: false });
-    
-    if (error) {
-      console.error("Supabase fetch error:", error.message || error);
-      return;
-    }
+    try {
+      const res = await fetch("/api/admin/changelogs");
+      if (!res.ok) {
+        console.error("Fetch error:", await res.text());
+        return;
+      }
+      const data = await res.json();
 
     if (data) {
       setLogs(data);
@@ -73,6 +71,9 @@ export default function ChangelogAdmin() {
       } else {
         setFormData(prev => ({ ...prev, version: "1.0.0" }));
       }
+    }
+    } catch (e) {
+      console.error("Fetch logs error:", e);
     }
   }
 
@@ -148,14 +149,17 @@ export default function ChangelogAdmin() {
       content_en: formData.content_en
     };
 
-    const { error } = await supabase
-      .from("changelogs")
-      .insert([payload]);
-
-    if (error) {
-      console.error("Supabase insert error:", error.message || error);
-      alert("Hata: " + (error.message || "Bilinmeyen bir hata oluştu."));
-    } else {
+    try {
+      const res = await fetch("/api/admin/changelogs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Unknown error");
+      }
       alert("Başarıyla kaydedildi!");
       const nextVer = formData.version; // This will be updated after fetchLogs
       setFormData({
@@ -168,6 +172,9 @@ export default function ChangelogAdmin() {
         _previewLang: "tr"
       });
       fetchLogs();
+    } catch (error) {
+      console.error("Insert error:", error);
+      alert("Hata: " + error.message);
     }
     setLoading(false);
   }
@@ -175,8 +182,12 @@ export default function ChangelogAdmin() {
   async function deleteLog(id) {
     if (!confirm("Bu kaydı silmek istediğinize emin misiniz?")) return;
     
-    const { error } = await supabase.from("changelogs").delete().eq("id", id);
-    if (!error) fetchLogs();
+    try {
+      const res = await fetch(`/api/admin/changelogs?id=${id}`, { method: "DELETE" });
+      if (res.ok) fetchLogs();
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   if (status === "loading") return <p style={{ padding: '2rem' }}>Yükleniyor...</p>;
