@@ -1,5 +1,6 @@
-const { EmbedBuilder } = require('discord.js');
+const { EmbedBuilder, AttachmentBuilder } = require('discord.js');
 const { createDropLog, updateDropMessageId } = require('@veyronix/database');
+const { createCanvas } = require('canvas');
 
 /**
  * dropEngine.js — Drop v2: 8 Haneli Kod Sistemi
@@ -27,9 +28,50 @@ function generateDropCode() {
 }
 
 /**
+ * Kod için rastgele arka plana sahip resim oluşturur
+ */
+function generateCodeImage(code) {
+  const width = 400;
+  const height = 150;
+  const canvas = createCanvas(width, height);
+  const ctx = canvas.getContext('2d');
+
+  // Arka plan
+  ctx.fillStyle = '#2b2d31'; // Discord dark theme rengi
+  ctx.fillRect(0, 0, width, height);
+
+  // Kopyalamayı ve OCR'ı zorlaştırmak için basit çizgiler (Gürültü)
+  for (let i = 0; i < 30; i++) {
+    ctx.beginPath();
+    ctx.strokeStyle = `rgba(255, 255, 255, ${Math.random() * 0.15})`;
+    ctx.lineWidth = Math.random() * 3;
+    ctx.moveTo(Math.random() * width, Math.random() * height);
+    ctx.lineTo(Math.random() * width, Math.random() * height);
+    ctx.stroke();
+  }
+
+  // Çerçeve
+  ctx.strokeStyle = '#FFD700';
+  ctx.lineWidth = 4;
+  ctx.strokeRect(0, 0, width, height);
+
+  // Yazı
+  ctx.font = 'bold 54px sans-serif';
+  ctx.fillStyle = '#FFD700';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  
+  // Harfler arasına biraz boşluk eklemek için split join kullanıyoruz
+  const spacedCode = code.split('').join(' ');
+  ctx.fillText(spacedCode, width / 2, height / 2);
+
+  return canvas.toBuffer('image/png');
+}
+
+/**
  * Drop embed'ini oluşturur (kod ile)
  */
-function buildDropEmbed(dropSettings, code, lang = 'tr') {
+function buildDropEmbed(dropSettings, lang = 'tr') {
   const isEn   = lang === 'en';
   const expSec = dropSettings.code_expire_seconds || 60;
   const points = dropSettings.drop_points || 10;
@@ -38,18 +80,18 @@ function buildDropEmbed(dropSettings, code, lang = 'tr') {
     .setTitle(`🎁 ${isEn ? 'LOOT DROP!' : 'GANİMET DÜŞTÜ!'}`)
     .setDescription(
       (isEn
-        ? `## 🔑 Type the code below to claim the reward!\n\n`
-        : `## 🔑 Aşağıdaki kodu chat'e yaz ve puanı kap!\n\n`) +
-      `# \`${code}\`\n\n` +
+        ? `## 🔑 Type the code in the image to claim the reward!\n\n`
+        : `## 🔑 Resimdeki kodu chat'e yaz ve puanı kap!\n\n`) +
       (isEn
         ? `**Points:** 🏆 ${points} pts\n\n⏱️ Code expires in **${expSec} seconds**. First one wins!`
         : `**Puan:** 🏆 ${points} puan\n\n⏱️ Kod **${expSec} saniye** geçerli. İlk yazan kazanır!`)
     )
     .setColor('#FFD700') // Altın sarısı sabit renk
+    .setImage('attachment://drop-code.png')
     .setFooter({
       text: isEn
-        ? 'Veyronix Drop • Type the code exactly as shown!'
-        : 'Veyronix Drop • Kodu tam olarak göründüğü gibi yaz!'
+        ? 'Veyronix Drop • Type the code exactly as shown in the image!'
+        : 'Veyronix Drop • Kodu resimde göründüğü gibi yaz!'
     })
     .setTimestamp();
 }
@@ -87,9 +129,12 @@ async function publishDrop(client, dropSettings, channelId, triggerType = 'sched
       points_given:  dropSettings.drop_points   || 10,
     });
 
-    // 2. Embed gönder
-    const embed   = buildDropEmbed(dropSettings, code, lang);
-    const message = await channel.send({ embeds: [embed] });
+    // 2. Embed ve resmi gönder
+    const imageBuffer = generateCodeImage(code);
+    const attachment = new AttachmentBuilder(imageBuffer, { name: 'drop-code.png' });
+
+    const embed   = buildDropEmbed(dropSettings, lang);
+    const message = await channel.send({ embeds: [embed], files: [attachment] });
 
     // 3. message_id'yi DB'ye yaz
     if (message?.id) {
