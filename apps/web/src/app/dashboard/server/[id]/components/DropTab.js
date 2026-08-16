@@ -128,46 +128,36 @@ export default function DropTab({ lang, t, settings, setSettings, saving, saveSe
 
       {settings.is_enabled && (
         <div className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* ── Sol: Mod Seçimi ────────────────────────────────────────────── */}
-            <div className="lg:col-span-1 space-y-3">
-              <h3 className="text-xs font-semibold text-primary uppercase tracking-wider flex items-center gap-2">
+          <div className="flex flex-col gap-6">
+            {/* ── Üst: Mod Seçimi ────────────────────────────────────────────── */}
+            <div className="bg-surface/50 p-6 rounded-2xl border border-white/5 space-y-3">
+              <label className="text-xs font-semibold text-primary uppercase tracking-wider flex items-center gap-2">
                 <Clock size={14} />
                 {isEn ? "Trigger Mode" : "Tetiklenme Modu"}
-              </h3>
-              {MODES.map(({ id, icon: Icon, labelTr, labelEn: labelEnStr, descTr, descEn }) => (
-                <label
-                  key={id}
-                  className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${
-                    scheduleType === id
-                      ? "bg-primary/10 border-primary/30"
-                      : "bg-surface border-white/5 hover:bg-surface-variant/50"
-                  }`}
-                >
-                  <div className="mt-0.5">
-                    <input
-                      type="radio"
-                      name="schedule_type"
-                      checked={scheduleType === id}
-                      onChange={() => updateSettings("schedule_type", id)}
-                      className="accent-primary"
-                    />
-                  </div>
-                  <div>
-                    <div className="font-medium text-sm flex items-center gap-2">
-                      <Icon size={13} className="text-primary" />
-                      {isEn ? labelEnStr : labelTr}
-                    </div>
-                    <div className="text-xs text-on-surface-variant mt-0.5">
-                      {isEn ? descEn : descTr}
-                    </div>
-                  </div>
-                </label>
-              ))}
+              </label>
+              <select
+                value={scheduleType}
+                onChange={(e) => updateSettings("schedule_type", e.target.value)}
+                className="w-full bg-surface border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-primary/50 outline-none text-white appearance-none cursor-pointer"
+              >
+                {MODES.map(mode => (
+                  <option key={mode.id} value={mode.id}>
+                    {isEn ? mode.labelEn : mode.labelTr}
+                  </option>
+                ))}
+              </select>
+              <div className="text-xs text-on-surface-variant bg-surface-variant/30 p-3 rounded-xl border border-white/5 flex items-start gap-2 mt-2">
+                <AlertCircle size={14} className="mt-0.5 flex-shrink-0 text-primary" />
+                <span>
+                  {isEn 
+                    ? MODES.find(m => m.id === scheduleType)?.descEn 
+                    : MODES.find(m => m.id === scheduleType)?.descTr}
+                </span>
+              </div>
             </div>
 
-            {/* ── Sağ: Dinamik Ayarlar ───────────────────────────────────────── */}
-            <div className="lg:col-span-2 space-y-6">
+            {/* ── Alt: Dinamik Ayarlar ───────────────────────────────────────── */}
+            <div className="space-y-6">
 
               {/* exact_minutes */}
               {scheduleType === "exact_minutes" && (
