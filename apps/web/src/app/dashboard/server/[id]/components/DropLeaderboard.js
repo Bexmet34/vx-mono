@@ -110,14 +110,26 @@ export default function DropLeaderboard({ guildId, lang }) {
                 </div>
                 <div className="col-span-4 flex items-center gap-2">
                   <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center border border-white/10 shrink-0 overflow-hidden">
-                    {/* Placeholder avatar */}
-                    <span className="text-xs text-slate-400">
-                      <Hash className="w-4 h-4" />
-                    </span>
+                    {user.discordUser?.avatarUrl ? (
+                      <img src={user.discordUser.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-xs text-slate-400">
+                        <Hash className="w-4 h-4" />
+                      </span>
+                    )}
                   </div>
-                  <div className="font-medium truncate">
-                    <span className="opacity-50 text-xs mr-1">ID:</span>
-                    {user.user_id}
+                  <div className="font-medium truncate flex flex-col">
+                    {user.discordUser?.name ? (
+                      <>
+                        <span className="text-sm">{user.discordUser.name}</span>
+                        <span className="opacity-50 text-[10px]">ID: {user.user_id}</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="opacity-50 text-[10px]">ID:</span>
+                        <span className="text-sm">{user.user_id}</span>
+                      </>
+                    )}
                   </div>
                 </div>
                 <div className="col-span-3 text-center font-bold text-primary">
