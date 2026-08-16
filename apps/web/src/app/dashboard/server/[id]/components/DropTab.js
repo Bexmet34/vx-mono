@@ -114,7 +114,7 @@ export default function DropTab({ lang, t, settings, setSettings, saving, saveSe
           <button
             onClick={() => updateSettings("is_enabled", !settings.is_enabled)}
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              settings.is_enabled ? "bg-primary" : "bg-surface-variant"
+              settings.is_enabled ? "bg-green-500" : "bg-surface-variant"
             }`}
           >
             <span
@@ -243,8 +243,8 @@ export default function DropTab({ lang, t, settings, setSettings, saving, saveSe
                       ? "Every hour at xx:00, the bot rolls the dice. Drop occurs only if it hits."
                       : "Her saat başı (xx:00) zar atılır. Sadece ayarladığınız yüzdede düşer."}
                   </p>
-                  <div className="flex items-center gap-6">
-                    <div className="flex-1">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-6">
+                    <div className="w-full sm:w-64 shrink-0">
                       <input
                         type="range" min="1" max="100"
                         value={settings.hourly_chance_pct || 25}
@@ -252,12 +252,12 @@ export default function DropTab({ lang, t, settings, setSettings, saving, saveSe
                         className="w-full h-2 bg-white/10 rounded-full appearance-none cursor-pointer accent-primary"
                       />
                       <div className="flex justify-between text-xs text-on-surface-variant mt-2">
-                        <span>1% ({isEn ? "Rare" : "Nadir"})</span>
+                        <span>1%</span>
                         <span>50%</span>
-                        <span>100% ({isEn ? "Every hour" : "Her saat"})</span>
+                        <span>100%</span>
                       </div>
                     </div>
-                    <div className="bg-surface px-4 py-3 rounded-xl border border-white/5 font-bold text-2xl text-primary w-24 text-center">
+                    <div className="bg-surface px-4 py-3 rounded-xl border border-white/5 font-bold text-xl text-primary w-24 text-center">
                       %{settings.hourly_chance_pct || 25}
                     </div>
                   </div>
@@ -273,8 +273,8 @@ export default function DropTab({ lang, t, settings, setSettings, saving, saveSe
                       ? "Every message sent in the selected channels has this % chance to trigger a drop."
                       : "Seçili kanallara gönderilen her mesajda bu yüzde ihtimalle drop tetiklenir."}
                   </p>
-                  <div className="flex items-center gap-6">
-                    <div className="flex-1">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-6">
+                    <div className="w-full sm:w-64 shrink-0">
                       <input
                         type="range" min="0.1" max="100" step="0.1"
                         value={settings.drop_chance_pct || 5}
@@ -282,12 +282,12 @@ export default function DropTab({ lang, t, settings, setSettings, saving, saveSe
                         className="w-full h-2 bg-white/10 rounded-full appearance-none cursor-pointer accent-primary"
                       />
                       <div className="flex justify-between text-xs text-on-surface-variant mt-2">
-                        <span>0.1% ({isEn ? "Very Rare" : "Çok Nadir"})</span>
+                        <span>0.1%</span>
                         <span>50%</span>
-                        <span>100% ({isEn ? "Every msg" : "Her mesaj"})</span>
+                        <span>100%</span>
                       </div>
                     </div>
-                    <div className="bg-surface px-4 py-3 rounded-xl border border-white/5 font-bold text-2xl text-primary w-24 text-center">
+                    <div className="bg-surface px-4 py-3 rounded-xl border border-white/5 font-bold text-xl text-primary w-24 text-center">
                       %{(settings.drop_chance_pct || 5).toFixed(1)}
                     </div>
                   </div>
@@ -379,30 +379,48 @@ export default function DropTab({ lang, t, settings, setSettings, saving, saveSe
                     {isEn ? "No text channels found." : "Text kanalı bulunamadı."}
                   </p>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-60 overflow-y-auto pr-1">
-                    {textChannels.map(ch => {
-                      const selected = selectedChannels.includes(ch.id);
-                      return (
-                        <button
-                          key={ch.id}
-                          onClick={() => toggleChannel(ch.id)}
-                          className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-left text-sm transition-all ${
-                            selected
-                              ? "bg-primary/15 border-primary/40 text-primary"
-                              : "bg-surface border-white/5 hover:bg-surface-variant/50 text-on-surface-variant"
-                          }`}
-                        >
-                          <span className="text-xs opacity-60">#</span>
-                          <span className="truncate font-medium">{ch.name}</span>
-                          {selected && <span className="ml-auto text-xs">✓</span>}
-                        </button>
-                      );
-                    })}
+                  <div>
+                    <select
+                      className="w-full bg-surface border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-primary/50 outline-none text-white appearance-none cursor-pointer"
+                      value=""
+                      onChange={(e) => {
+                        if(e.target.value) toggleChannel(e.target.value);
+                      }}
+                    >
+                      <option value="" disabled>
+                        {isEn ? "Add a channel..." : "Bir kanal ekle..."}
+                      </option>
+                      {textChannels.filter(ch => !selectedChannels.includes(ch.id)).map(ch => (
+                        <option key={ch.id} value={ch.id}>
+                          # {ch.name}
+                        </option>
+                      ))}
+                    </select>
+
+                    {selectedChannels.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mt-4">
+                        {selectedChannels.map(id => {
+                          const ch = textChannels.find(c => c.id === id);
+                          if (!ch) return null;
+                          return (
+                            <button
+                              key={id}
+                              onClick={() => toggleChannel(id)}
+                              className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 border border-primary/30 text-primary rounded-xl text-xs font-medium hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30 transition-all group"
+                              title={isEn ? "Click to remove" : "Kaldırmak için tıkla"}
+                            >
+                              <span># {ch.name}</span>
+                              <span className="opacity-40 group-hover:opacity-100 font-bold ml-1">×</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 )}
 
                 {selectedChannels.length > 0 && (
-                  <p className="text-xs text-primary mt-3">
+                  <p className="text-xs text-primary mt-4">
                     ✅ {isEn ? `${selectedChannels.length} channel(s) selected` : `${selectedChannels.length} kanal seçili`}
                   </p>
                 )}
