@@ -20,13 +20,26 @@ export async function GET(req) {
   }
 
   try {
-    const res = await fetch(`https://gameinfo.albiononline.com/api/gameinfo/search?q=${encodeURIComponent(q)}`);
-    if (!res.ok) throw new Error("Albion API Error");
-    const data = await res.json();
-    
-    // We only care about guilds
-    const guilds = data.guilds || [];
-    return NextResponse.json({ success: true, guilds: guilds.slice(0, 10) }); // return top 10 matches
+    const endpoints = [
+        'https://gameinfo.albiononline.com/api/gameinfo/search?q=',
+        'https://gameinfo-sg.albiononline.com/api/gameinfo/search?q=',
+        'https://gameinfo-ams.albiononline.com/api/gameinfo/search?q='
+    ];
+
+    let allGuilds = [];
+    for (const url of endpoints) {
+        const res = await fetch(`${url}${encodeURIComponent(q)}`);
+        if (!res.ok) continue;
+        const data = await res.json();
+        if (data.guilds) {
+            allGuilds = [...allGuilds, ...data.guilds];
+        }
+    }
+
+    // Tekrarlananları temizle (Farklı API'lerden aynı isim gelebilir mi? ID'ye göre filtrele)
+    const uniqueGuilds = Array.from(new Map(allGuilds.map(g => [g.Id, g])).values());
+
+    return NextResponse.json({ success: true, guilds: uniqueGuilds.slice(0, 15) });
   } catch (error) {
     return NextResponse.json({ error: "Arama sırasında bir hata oluştu." }, { status: 500 });
   }

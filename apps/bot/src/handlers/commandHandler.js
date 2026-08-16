@@ -985,14 +985,14 @@ async function handleSetupAutoPremiumCommand(interaction) {
     }
 
     const embed = new EmbedBuilder()
-        .setTitle('💎 Premium Başvurusu')
-        .setDescription('Eğer şartları karşılıyorsanız, aşağıdaki butona tıklayarak sistemin size özel Premium tanımlamasını sağlayabilirsiniz.\nSistem sizden oyun içi adınızı (IGN) isteyecektir.')
+        .setTitle('💎 Claim Premium')
+        .setDescription('If you meet the requirements, click the button below to claim your Veyronix Premium.\nThe system will ask for your in-game name (IGN).')
         .setColor('#FFD700');
 
     const row = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
             .setCustomId('request_auto_premium')
-            .setLabel('💎 Premium Talep Et')
+            .setLabel('💎 Claim Premium')
             .setStyle(ButtonStyle.Success)
     );
 

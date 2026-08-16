@@ -601,15 +601,30 @@ async function handleAutoPremiumModal(interaction) {
     const { data: rules } = await supabase.from('auto_premium_rules').select('*');
     if (!rules || rules.length === 0) return interaction.editReply('❌ Aktif premium kuralı yok.');
 
-    // 2. Albion Karakter Bilgisi Çek
+    // 2. Albion Karakter Bilgisi Çek (Tüm Sunucularda)
     let playerGuild = null;
+    let playerFound = false;
+    const endpoints = [
+        'https://gameinfo.albiononline.com/api/gameinfo/search?q=',
+        'https://gameinfo-sg.albiononline.com/api/gameinfo/search?q=',
+        'https://gameinfo-ams.albiononline.com/api/gameinfo/search?q='
+    ];
+
     try {
-        const res = await fetch(`https://gameinfo.albiononline.com/api/gameinfo/search?q=${encodeURIComponent(ign)}`);
-        const searchData = await res.json();
-        const player = searchData.players?.find(p => p.Name.toLowerCase() === ign.toLowerCase());
+        for (const url of endpoints) {
+            const res = await fetch(`${url}${encodeURIComponent(ign)}`);
+            if (!res.ok) continue;
+            const searchData = await res.json();
+            const player = searchData.players?.find(p => p.Name.toLowerCase() === ign.toLowerCase());
+            
+            if (player) {
+                playerFound = true;
+                playerGuild = player.GuildName;
+                break; // Bulunduysa diğer sunuculara bakma
+            }
+        }
         
-        if (!player) return interaction.editReply(`❌ **${ign}** isminde bir karakter bulunamadı.`);
-        playerGuild = player.GuildName;
+        if (!playerFound) return interaction.editReply(`❌ **${ign}** isminde bir karakter hiçbir sunucuda bulunamadı.`);
     } catch (e) {
         console.error('API Error:', e);
         return interaction.editReply('❌ Albion API bağlanırken bir sorun oluştu.');
