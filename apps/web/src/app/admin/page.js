@@ -763,9 +763,33 @@ export default function AdminPage() {
                           </div>
                        </div>
                        
-                       <button className="btn-primary" onClick={() => setShowUserModal(true)} style={{padding: '0.8rem 1.5rem', borderRadius: '12px', marginLeft: 'auto'}}>
-                          <Plus size={14} /> Bireysel Lisans Ekle
-                       </button>
+                       <div style={{ display: 'flex', gap: '1rem', marginLeft: 'auto' }}>
+                         <button 
+                           className="btn-secondary" 
+                           onClick={async () => {
+                             setLoading(true);
+                             try {
+                               const res = await fetch('/api/admin/scan-auto-premium', { method: 'POST' });
+                               const data = await res.json();
+                               if (data.success) {
+                                 setMessage({ type: "success", text: `Tarama tamamlandı! ${data.revokedCount || 0} kişinin otomatik premiumu iptal edildi.` });
+                                 fetchUsers();
+                               } else {
+                                 setMessage({ type: "error", text: "Tarama sırasında bir hata oluştu." });
+                               }
+                             } catch (e) {
+                               setMessage({ type: "error", text: "Bağlantı hatası." });
+                             }
+                             setLoading(false);
+                           }} 
+                           style={{padding: '0.8rem 1.5rem', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid rgba(255,255,255,0.1)'}}
+                         >
+                            <Search size={14} /> 🤖 Otomatik Premiumları Tara
+                         </button>
+                         <button className="btn-primary" onClick={() => setShowUserModal(true)} style={{padding: '0.8rem 1.5rem', borderRadius: '12px'}}>
+                            <Plus size={14} /> Bireysel Lisans Ekle
+                         </button>
+                       </div>
                      </>
                    )}
                 </div>
@@ -966,13 +990,21 @@ export default function AdminPage() {
                                 </div>
                               </td>
                               <td data-label="DURUM">
-                                {u.is_unlimited ? (
-                                  <span className="admin-badge badge-unlimited">Sınırsız</span>
-                                ) : isPremiumActive ? (
-                                  <span className="admin-badge badge-active">Aktif</span>
-                                ) : (
-                                  <span className="admin-badge badge-passive">Süresi Dolan</span>
-                                )}
+                                <div style={{display: 'flex', flexDirection: 'column', gap: '0.4rem', alignItems: 'flex-start'}}>
+                                  {u.is_unlimited ? (
+                                    <span className="admin-badge badge-unlimited">Sınırsız</span>
+                                  ) : isPremiumActive ? (
+                                    <span className="admin-badge badge-active">Aktif</span>
+                                  ) : (
+                                    <span className="admin-badge badge-passive">Süresi Dolan</span>
+                                  )}
+                                  
+                                  {u.is_auto_premium ? (
+                                    <span className="admin-badge" style={{background: 'rgba(56, 189, 248, 0.12)', color: '#38bdf8', border: '1px solid rgba(56, 189, 248, 0.3)', fontSize: '0.62rem'}}>🤖 Otomatik (Şartlı)</span>
+                                  ) : (
+                                    <span className="admin-badge" style={{background: 'rgba(252, 163, 17, 0.12)', color: '#fca311', border: '1px solid rgba(252, 163, 17, 0.3)', fontSize: '0.62rem'}}>💎 Manuel / Satın Alınan</span>
+                                  )}
+                                </div>
                               </td>
                               <td data-label="PLAN / SÜRE">
                                 <div style={{display: 'flex', flexDirection: 'column', gap: '0.4rem', alignItems: 'flex-start'}}>

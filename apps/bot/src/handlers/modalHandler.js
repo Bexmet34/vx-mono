@@ -589,10 +589,79 @@ async function handleApplicationAnswerModal(interaction) {
     await handleNextStep(interaction, nextStep, session, questions, lang, guildId, channelId);
 }
 
+/**
+ * Handle Auto Premium Modal
+ */
+async function handleAutoPremiumModal(interaction) {
+    await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
+    const ign = interaction.fields.getTextInputValue('ign_input');
+
+    // 1. Kuralları Çek
+    const { supabase } = require('@veyronix/database');
+    const { data: rules } = await supabase.from('auto_premium_rules').select('*');
+    if (!rules || rules.length === 0) return interaction.editReply('❌ Aktif premium kuralı yok.');
+
+    // 2. Albion Karakter Bilgisi Çek
+    let playerGuild = null;
+    try {
+        const res = await fetch(`https://gameinfo.albiononline.com/api/gameinfo/search?q=${encodeURIComponent(ign)}`);
+        const searchData = await res.json();
+        const player = searchData.players?.find(p => p.Name.toLowerCase() === ign.toLowerCase());
+        
+        if (!player) return interaction.editReply(`❌ **${ign}** isminde bir karakter bulunamadı.`);
+        playerGuild = player.GuildName;
+    } catch (e) {
+        console.error('API Error:', e);
+        return interaction.editReply('❌ Albion API bağlanırken bir sorun oluştu.');
+    }
+
+    // 3. Şartları Kontrol Et
+    let matchedRule = null;
+    for (const rule of rules) {
+        const requiredGuilds = rule.albion_guilds || [];
+        const requiredServers = rule.discord_servers || [];
+
+        // A) En az 1 Lonca eşleşmesi
+        if (requiredGuilds.length > 0 && !requiredGuilds.includes(playerGuild)) continue;
+
+        // B) Tüm Discord sunucularında bulunma şartı
+        let inAllServers = true;
+        for (const serverId of requiredServers) {
+            try {
+                const guildObj = await interaction.client.guilds.fetch(serverId);
+                await guildObj.members.fetch(interaction.user.id);
+            } catch {
+                inAllServers = false; break;
+            }
+        }
+
+        if (inAllServers) { matchedRule = rule; break; }
+    }
+
+    if (!matchedRule) return interaction.editReply('❌ Maalesef Premium şartlarını (Gerekli Lonca ve Discord Sunucusu) sağlamıyorsunuz.');
+
+    // 4. Premium Ver
+    const isUnlimited = matchedRule.premium_type === 'unlimited';
+    let premiumUntil = null;
+    if (!isUnlimited) {
+        premiumUntil = new Date(Date.now() + (matchedRule.days_to_give || 30) * 86400000).toISOString();
+    }
+
+    await supabase.from('users').upsert({
+        discord_id: interaction.user.id,
+        is_unlimited: isUnlimited,
+        premium_until: premiumUntil,
+        is_auto_premium: true
+    }, { onConflict: 'discord_id' });
+
+    await interaction.editReply(`✅ **Başarılı!** Şartları sağladığınız için hesabınıza Premium tanımlandı.`);
+}
+
 module.exports = {
     handlePartiModal,
     handleObjectiveModal,
     handleRegisterModal,
     handleApplicationAnswerModal,
-    handleSaveTempModal
+    handleSaveTempModal,
+    handleAutoPremiumModal
 };

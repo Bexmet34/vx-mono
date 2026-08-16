@@ -108,6 +108,10 @@ const commands = [
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
         
     new SlashCommandBuilder()
+        .setName('setup-autopremium')
+        .setDescription('Kullanıcıların premium talep edebileceği butonu oluşturur (Owner only).'),
+        
+    new SlashCommandBuilder()
         .setName('kayitsizlari-belirle')
         .setDescription('Kayıtsız üyelerin tüm rollerini siler, ismini [Kayıt Bekliyor] yapar ve seçili rolü verir.')
         .addRoleOption(option => 

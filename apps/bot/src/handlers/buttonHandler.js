@@ -1247,10 +1247,35 @@ async function handleNextStep(interaction, nextStep, session, questions, lang, g
     }
 }
 
+}
+
+/**
+ * Handle Auto Premium request button
+ */
+async function handleAutoPremiumButton(interaction) {
+    if (interaction.customId === 'request_auto_premium') {
+        const modal = new ModalBuilder()
+            .setCustomId('auto_premium_modal')
+            .setTitle('Premium Talep Formu');
+
+        const ignInput = new TextInputBuilder()
+            .setCustomId('ign_input')
+            .setLabel('Albion Online Oyun İçi Adınız (IGN)')
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true);
+
+        const firstActionRow = new ActionRowBuilder().addComponents(ignInput);
+        modal.addComponents(firstActionRow);
+
+        await interaction.showModal(modal);
+    }
+}
+
 module.exports = {
     handlePartyButtons,
     handleObjectiveButtons,
     handleRegisterButtons,
-    handleNextStep
+    handleNextStep,
+    handleAutoPremiumButton
 };
 

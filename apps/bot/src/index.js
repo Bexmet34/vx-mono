@@ -262,6 +262,9 @@ client.on('interactionCreate', async interaction => {
             } else if (interaction.commandName === 'drop-manual') {
                 const { handleDropManualCommand } = require('./handlers/commandHandler');
                 await handleDropManualCommand(interaction);
+            } else if (interaction.commandName === 'setup-autopremium') {
+                const { handleSetupAutoPremiumCommand } = require('./handlers/commandHandler');
+                await handleSetupAutoPremiumCommand(interaction);
             }
         } else if (interaction.isButton()) {
             if (interaction.customId === 'help_vote') {
@@ -282,6 +285,9 @@ client.on('interactionCreate', async interaction => {
             } else if (interaction.customId.startsWith('drop_claim:')) {
                 const { handleDropButtons } = require('./handlers/dropHandler');
                 await handleDropButtons(interaction);
+            } else if (interaction.customId === 'request_auto_premium') {
+                const { handleAutoPremiumButton } = require('./handlers/buttonHandler');
+                await handleAutoPremiumButton(interaction);
             } else {
                 await handlePartyButtons(interaction);
             }
@@ -332,6 +338,9 @@ client.on('interactionCreate', async interaction => {
                 await handleObjectiveModal(interaction);
             } else if (interaction.customId === 'register_modal') {
                 await handleRegisterModal(interaction);
+            } else if (interaction.customId === 'auto_premium_modal') {
+                const { handleAutoPremiumModal } = require('./handlers/modalHandler');
+                await handleAutoPremiumModal(interaction);
             } else if (interaction.customId.startsWith('app_answer_modal:')) {
                 await handleApplicationAnswerModal(interaction);
             } else if (interaction.customId.startsWith('save_temp_modal:') || interaction.customId.startsWith('edit_temp_modal:')) {

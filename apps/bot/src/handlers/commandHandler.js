@@ -862,6 +862,7 @@ module.exports = {
     handleMyPointsCommand,
     handleDropLeaderboardCommand,
     handleDropManualCommand,
+    handleSetupAutoPremiumCommand,
 };
 
 /**
@@ -973,4 +974,28 @@ async function handleDropManualCommand(interaction) {
     } else {
         await interaction.editReply({ content: '❌ Drop düşürülürken bir hata oluştu.' });
     }
+}
+
+/**
+ * /setup-autopremium — Otomatik Premium butonu gönderir
+ */
+async function handleSetupAutoPremiumCommand(interaction) {
+    if (interaction.user.id !== config.OWNER_ID) {
+        return interaction.reply({ content: '❌ Bu komutu sadece bot yetkilisi kullanabilir.', flags: [MessageFlags.Ephemeral] });
+    }
+
+    const embed = new EmbedBuilder()
+        .setTitle('💎 Premium Başvurusu')
+        .setDescription('Eğer şartları karşılıyorsanız, aşağıdaki butona tıklayarak sistemin size özel Premium tanımlamasını sağlayabilirsiniz.\nSistem sizden oyun içi adınızı (IGN) isteyecektir.')
+        .setColor('#FFD700');
+
+    const row = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId('request_auto_premium')
+            .setLabel('💎 Premium Talep Et')
+            .setStyle(ButtonStyle.Success)
+    );
+
+    await interaction.channel.send({ embeds: [embed], components: [row] });
+    await interaction.reply({ content: '✅ Buton gönderildi.', flags: [MessageFlags.Ephemeral] });
 }
