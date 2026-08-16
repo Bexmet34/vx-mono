@@ -9,7 +9,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { useToast, ToastContainer } from "@/components/Toast";
 import Cropper from "react-easy-crop";
 import getCroppedImg from "@/utils/cropImage";
-import { supabase } from "@/utils/supabase";
+import { supabase } from '@veyronix/database';
 import Logo from "@/components/Logo";
 
 import DropTab from "./components/DropTab";

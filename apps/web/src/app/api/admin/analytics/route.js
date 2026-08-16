@@ -16,7 +16,7 @@ export async function GET() {
   }
 
   try {
-    const { supabase } = require('@/utils/supabase');
+    const { supabase } = require('@veyronix/database');
 
     // 1. Top commands
     const { data: commandData, error: cmdError } = await supabase

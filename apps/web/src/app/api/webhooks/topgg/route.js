@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/utils/supabase';
+import { supabase } from '@veyronix/database';
 export const dynamic = 'force-dynamic';
 
 export async function POST(req) {

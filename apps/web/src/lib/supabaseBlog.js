@@ -1,4 +1,4 @@
-import { supabase } from '@/utils/supabase';
+import { supabase } from '@veyronix/database';
 import { getAllPosts as getLocalMarkdownPosts, getPostBySlug as getLocalPostBySlug } from './markdown';
 
 /**

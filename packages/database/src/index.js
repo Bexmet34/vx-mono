@@ -5,6 +5,7 @@ const campaignService = require('./campaignService');
 const userTemplateService = require('./userTemplateService');
 const giveawayService = require('./giveawayService');
 const dropService = require('./dropService');
+const userService = require('./userService');
 
 module.exports = {
   supabase,
@@ -14,6 +15,7 @@ module.exports = {
   ...campaignService,
   ...userTemplateService,
   ...giveawayService,
-  ...dropService
+  ...dropService,
+  ...userService
 };
 

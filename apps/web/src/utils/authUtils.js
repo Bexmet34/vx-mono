@@ -1,4 +1,4 @@
-import { supabase } from "@/utils/supabase";
+import { supabase } from '@veyronix/database';
 
 /**
  * Checks if a user has access to a specific dashboard.

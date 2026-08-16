@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/utils/supabase';
+import { supabase } from '@veyronix/database';
 
 // GET: Ayarları ve Özel Anahtar Kelimeleri Getir
 export async function GET() {

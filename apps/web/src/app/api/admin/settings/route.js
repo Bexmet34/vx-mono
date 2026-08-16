@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]/route";
-import { supabase } from "@/utils/supabase";
+import { supabase } from '@veyronix/database';
 
 export const dynamic = "force-dynamic";
 export async function GET(req) {

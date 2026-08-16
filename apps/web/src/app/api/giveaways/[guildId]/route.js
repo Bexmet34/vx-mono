@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { supabase } from '@/utils/supabase';
+import { supabase } from '@veyronix/database';
 import { checkDashboardAccess } from '@/utils/authUtils';
 import { createGiveaway, getActiveGiveaways, getEndedGiveaways, cancelGiveaway } from '@veyronix/database';
 

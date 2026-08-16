@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
-import { supabase } from '@/utils/supabase';
+import { supabase } from '@veyronix/database';
 
 export const dynamic = 'force-dynamic';
 

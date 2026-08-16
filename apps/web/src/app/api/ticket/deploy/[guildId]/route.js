@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { checkDashboardAccess } from '@/utils/authUtils';
-import { supabase } from '@/utils/supabase';
+import { supabase } from '@veyronix/database';
 
 export const dynamic = 'force-dynamic';
 
