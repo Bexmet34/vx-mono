@@ -259,6 +259,9 @@ client.on('interactionCreate', async interaction => {
                 await handleMyPointsCommand(interaction);
             } else if (interaction.commandName === 'drop-leaderboard') {
                 await handleDropLeaderboardCommand(interaction);
+            } else if (interaction.commandName === 'drop-manual') {
+                const { handleDropManualCommand } = require('./handlers/commandHandler');
+                await handleDropManualCommand(interaction);
             }
         } else if (interaction.isButton()) {
             if (interaction.customId === 'help_vote') {

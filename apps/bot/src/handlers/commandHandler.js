@@ -861,6 +861,7 @@ module.exports = {
 
     handleMyPointsCommand,
     handleDropLeaderboardCommand,
+    handleDropManualCommand,
 };
 
 /**
@@ -937,4 +938,39 @@ async function handleDropLeaderboardCommand(interaction) {
     }
 
     await interaction.editReply({ embeds: [embed] });
+}
+
+/**
+ * /drop-manual — Sadece Bot Owner kullanabilir. Manuel drop düşürür.
+ */
+async function handleDropManualCommand(interaction) {
+    const isBotOwner = interaction.user.id === config.OWNER_ID;
+    if (!isBotOwner) {
+        return await safeReply(interaction, { content: '❌ Bu komutu sadece bot sahibi kullanabilir.', flags: [MessageFlags.Ephemeral] });
+    }
+
+    const { getDropSettings } = require('@veyronix/database');
+    const { publishDrop } = require('../services/dropEngine');
+
+    let settings = await getDropSettings(interaction.guildId);
+    if (!settings) {
+        // Eğer sunucu drop sistemini kurmamışsa varsayılan ayarlar oluştur
+        settings = {
+            guild_id: interaction.guildId,
+            code_expire_seconds: 60,
+            drop_points: 10
+        };
+    }
+
+    const guildConfig = await getGuildConfig(interaction.guildId);
+    const lang = guildConfig?.language || 'tr';
+
+    await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
+
+    const result = await publishDrop(interaction.client, settings, interaction.channel.id, 'manual', lang);
+    if (result) {
+        await interaction.editReply({ content: '✅ Drop başarıyla bu kanala düşürüldü.' });
+    } else {
+        await interaction.editReply({ content: '❌ Drop düşürülürken bir hata oluştu.' });
+    }
 }

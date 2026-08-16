@@ -146,6 +146,10 @@ const commands = [
     new SlashCommandBuilder()
         .setName('drop-leaderboard')
         .setDescription('View the top drop point earners in this server.'),
+
+    new SlashCommandBuilder()
+        .setName('drop-manual')
+        .setDescription('Bot sahibi için manuel drop düşürme komutu (Owner only).'),
 ];
 
 module.exports = commands.map(command => command.toJSON());
