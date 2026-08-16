@@ -61,11 +61,6 @@ export async function POST(req, { params }) {
       // Mesaj bazlı % modu
       drop_chance_pct:      parseFloat(body.drop_chance_pct)         || 5.0,
 
-      // Ödül
-      reward_type:          body.reward_type          || 'coin',
-      reward_amount:        parseInt(body.reward_amount, 10)         || 100,
-      reward_role_id:       body.reward_role_id       || null,
-
       // Puan & Kod
       drop_points:          parseInt(body.drop_points,         10)  || 10,
       code_expire_seconds:  parseInt(body.code_expire_seconds, 10)  || 60,

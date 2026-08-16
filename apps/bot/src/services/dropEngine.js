@@ -9,16 +9,8 @@ const { createDropLog, updateDropMessageId } = require('@veyronix/database');
  * Buton sistemi tamamen kaldırıldı.
  */
 
-// ─── Ödül tiplerine göre renkler ve emojiler ─────────────────────────────────
-const REWARD_VISUALS = {
-  coin:   { color: '#FFD700', emoji: '🪙', labelTr: 'Coin',     labelEn: 'Coin'   },
-  xp:     { color: '#7C83FD', emoji: '⭐', labelTr: 'XP',       labelEn: 'XP'     },
-  role:   { color: '#2ed573', emoji: '🎖️', labelTr: 'Özel Rol', labelEn: 'Special Role' },
-  ticket: { color: '#ff6b81', emoji: '🎟️', labelTr: 'Bilet',    labelEn: 'Ticket' },
-};
-
 // ─── Aktif drop'ları RAM'de sakla: Map<`${guildId}:${channelId}`, dropInfo> ──
-// dropInfo: { dropId, code, expiresAt, rewardType, rewardAmount, pointsToGive }
+// dropInfo: { dropId, code, expiresAt, pointsToGive }
 const activeDrops = new Map();
 
 /**
@@ -38,26 +30,22 @@ function generateDropCode() {
  * Drop embed'ini oluşturur (kod ile)
  */
 function buildDropEmbed(dropSettings, code, lang = 'tr') {
-  const visual = REWARD_VISUALS[dropSettings.reward_type] || REWARD_VISUALS.coin;
   const isEn   = lang === 'en';
   const expSec = dropSettings.code_expire_seconds || 60;
-
-  const rewardLine = dropSettings.reward_type === 'role'
-    ? (isEn ? `🎖️ **Special Role**` : `🎖️ **Özel Rol**`)
-    : `${visual.emoji} **${dropSettings.reward_amount || 100} ${visual[isEn ? 'labelEn' : 'labelTr']}**`;
+  const points = dropSettings.drop_points || 10;
 
   return new EmbedBuilder()
     .setTitle(`🎁 ${isEn ? 'LOOT DROP!' : 'GANİMET DÜŞTÜ!'}`)
     .setDescription(
       (isEn
         ? `## 🔑 Type the code below to claim the reward!\n\n`
-        : `## 🔑 Aşağıdaki kodu chat'e yaz ve ödülü kap!\n\n`) +
+        : `## 🔑 Aşağıdaki kodu chat'e yaz ve puanı kap!\n\n`) +
       `# \`${code}\`\n\n` +
       (isEn
-        ? `**Reward:** ${rewardLine}\n**Points:** 🏆 ${dropSettings.drop_points || 10} pts\n\n⏱️ Code expires in **${expSec} seconds**. First one wins!`
-        : `**Ödül:** ${rewardLine}\n**Puan:** 🏆 ${dropSettings.drop_points || 10} puan\n\n⏱️ Kod **${expSec} saniye** geçerli. İlk yazan kazanır!`)
+        ? `**Points:** 🏆 ${points} pts\n\n⏱️ Code expires in **${expSec} seconds**. First one wins!`
+        : `**Puan:** 🏆 ${points} puan\n\n⏱️ Kod **${expSec} saniye** geçerli. İlk yazan kazanır!`)
     )
-    .setColor(visual.color)
+    .setColor('#FFD700') // Altın sarısı sabit renk
     .setFooter({
       text: isEn
         ? 'Veyronix Drop • Type the code exactly as shown!'
@@ -94,8 +82,6 @@ async function publishDrop(client, dropSettings, channelId, triggerType = 'sched
       guild_id:      dropSettings.guild_id,
       channel_id:    channelId,
       trigger_type:  triggerType,
-      reward_type:   dropSettings.reward_type   || 'coin',
-      reward_amount: dropSettings.reward_amount || 100,
       drop_code:     code,
       expires_at:    expires.toISOString(),
       points_given:  dropSettings.drop_points   || 10,
@@ -117,8 +103,6 @@ async function publishDrop(client, dropSettings, channelId, triggerType = 'sched
       code,
       expiresAt:    expires,
       message,
-      rewardType:   dropSettings.reward_type   || 'coin',
-      rewardAmount: dropSettings.reward_amount || 100,
       pointsToGive: dropSettings.drop_points   || 10,
     });
 
@@ -143,11 +127,10 @@ async function publishDrop(client, dropSettings, channelId, triggerType = 'sched
  */
 async function markDropClaimed(message, winnerId, dropInfo, lang = 'tr') {
   try {
-    const visual = REWARD_VISUALS[dropInfo.rewardType] || REWARD_VISUALS.coin;
     const isEn   = lang === 'en';
 
     const claimedEmbed = new EmbedBuilder()
-      .setTitle(`${visual.emoji} ${isEn ? 'Loot Claimed!' : 'Ganimet Kapıldı!'}`)
+      .setTitle(`🪙 ${isEn ? 'Loot Claimed!' : 'Ganimet Kapıldı!'}`)
       .setDescription(
         isEn
           ? `<@${winnerId}> was the fastest and claimed the loot!\n\n🏆 **+${dropInfo.pointsToGive} points** added!`

@@ -25,9 +25,6 @@ function RandomDropTab({ lang, guildId, discordChannels }) {
     random_interval_max:  120,
     hourly_chance_pct:    25,
     drop_chance_pct:      5.0,
-    reward_type:          "coin",
-    reward_amount:        100,
-    reward_role_id:       "",
     drop_points:          10,
     code_expire_seconds:  60,
   };

@@ -321,45 +321,10 @@ export default function DropTab({ lang, t, settings, setSettings, saving, saveSe
                 </div>
               )}
 
-              {/* ── Ödül Yapılandırması ──────────────────────────────────────── */}
+              {/* ── Puan & Kod Yapılandırması ──────────────────────────────────────── */}
               <div className="bg-surface/50 p-6 rounded-2xl border border-white/5">
-                <h3 className="text-base font-bold mb-4">{isEn ? "Reward & Code Settings" : "Ödül & Kod Ayarları"}</h3>
+                <h3 className="text-base font-bold mb-4">{isEn ? "Points & Code Settings" : "Puan & Kod Ayarları"}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">{isEn ? "Reward Type" : "Ödül Türü"}</label>
-                    <select
-                      value={settings.reward_type || "coin"}
-                      onChange={e => updateSettings("reward_type", e.target.value)}
-                      className="w-full bg-surface border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-primary/50 outline-none"
-                    >
-                      <option value="coin">Coin</option>
-                      <option value="xp">XP</option>
-                      <option value="role">{isEn ? "Special Role" : "Özel Rol"}</option>
-                    </select>
-                  </div>
-
-                  {settings.reward_type === "role" ? (
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">{isEn ? "Reward Role ID" : "Ödül Rol ID"}</label>
-                      <input
-                        type="text" placeholder="Role ID"
-                        value={settings.reward_role_id || ""}
-                        onChange={e => updateSettings("reward_role_id", e.target.value)}
-                        className="w-full bg-surface border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-primary/50 outline-none"
-                      />
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">{isEn ? "Reward Amount" : "Ödül Miktarı"}</label>
-                      <input
-                        type="number" min="1"
-                        value={settings.reward_amount || 100}
-                        onChange={e => updateSettings("reward_amount", parseInt(e.target.value))}
-                        className="w-full bg-surface border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-primary/50 outline-none"
-                      />
-                    </div>
-                  )}
-
                   <div className="space-y-2">
                     <label className="text-sm font-medium">{isEn ? "Drop Points (per win)" : "Drop Puanı (kazanım başı)"}</label>
                     <input
@@ -368,7 +333,7 @@ export default function DropTab({ lang, t, settings, setSettings, saving, saveSe
                       onChange={e => updateSettings("drop_points", parseInt(e.target.value))}
                       className="w-full bg-surface border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-primary/50 outline-none"
                     />
-                    <p className="text-xs text-on-surface-variant">{isEn ? "Points added to winner via /mypoints" : "/mypoints komutuyla görülebilir puan"}</p>
+                    <p className="text-xs text-on-surface-variant">{isEn ? "Points added to winner via /mypoints" : "/mypoints komutuyla birikir"}</p>
                   </div>
 
                   <div className="space-y-2">

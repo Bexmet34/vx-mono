@@ -62,8 +62,6 @@ async function createDropLog(data) {
       channel_id:    data.channel_id,
       message_id:    data.message_id    || null,
       trigger_type:  data.trigger_type,
-      reward_type:   data.reward_type,
-      reward_amount: data.reward_amount || 0,
       drop_code:     data.drop_code     || null,
       expires_at:    data.expires_at    || null,
       points_given:  data.points_given  || 0,
