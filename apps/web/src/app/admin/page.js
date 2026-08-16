@@ -46,6 +46,12 @@ export default function AdminPage() {
   const [serverSubTab, setServerSubTab] = useState("guilds"); // guilds, users
   const [showUserModal, setShowUserModal] = useState(false);
   const [newUser, setNewUser] = useState({ discord_id: "", duration_days: 30, is_unlimited: false });
+  // Auto Premium Rules States
+  const [autoPremiumRules, setAutoPremiumRules] = useState([]);
+  const [showRulesModal, setShowRulesModal] = useState(false);
+  const [newRule, setNewRule] = useState({ id: "", rule_name: "", albion_guilds: "[]", discord_servers: "[]", premium_type: "limited", days_to_give: 30 });
+  const [editingRuleId, setEditingRuleId] = useState(null);
+
   // Modal States
   const [showDayModal, setShowDayModal] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(null);
@@ -192,6 +198,61 @@ export default function AdminPage() {
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
   }, []);
+
+  const fetchRules = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/auto-premium-rules");
+      const data = await res.json();
+      if (res.ok) setAutoPremiumRules(data);
+    } catch (err) { console.error(err); }
+  }, []);
+
+  useEffect(() => {
+    if (activeTab === "servers" && serverSubTab === "users") {
+      fetchRules();
+    }
+  }, [activeTab, serverSubTab, fetchRules]);
+
+  const handleSaveRule = async () => {
+    try {
+      let parsedGuilds, parsedServers;
+      try {
+        parsedGuilds = JSON.parse(newRule.albion_guilds || "[]");
+        parsedServers = JSON.parse(newRule.discord_servers || "[]");
+      } catch(e) {
+        setMessage({ type: "error", text: "Loncalar ve Sunucular geçerli JSON formatında olmalıdır! Örn: [\"Lonca1\"]" });
+        return;
+      }
+      
+      const res = await fetch("/api/admin/auto-premium-rules", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...newRule, albion_guilds: parsedGuilds, discord_servers: parsedServers })
+      });
+      if (res.ok) {
+        setMessage({ type: "success", text: "Kural kaydedildi!" });
+        setShowRulesModal(false);
+        fetchRules();
+      } else {
+        setMessage({ type: "error", text: "Kural kaydedilemedi." });
+      }
+    } catch (e) {
+      setMessage({ type: "error", text: "Bağlantı hatası." });
+    }
+  };
+
+  const handleDeleteRule = async (id) => {
+    if (!confirm("Bu kuralı silmek istediğinize emin misiniz?")) return;
+    try {
+      const res = await fetch(`/api/admin/auto-premium-rules?id=${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setMessage({ type: "success", text: "Kural silindi!" });
+        fetchRules();
+      }
+    } catch (e) {
+      setMessage({ type: "error", text: "Silinirken hata oluştu." });
+    }
+  };
 
   const handleCreateUser = async (e) => {
     e.preventDefault();
@@ -785,6 +846,13 @@ export default function AdminPage() {
                            style={{padding: '0.8rem 1.5rem', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid rgba(255,255,255,0.1)'}}
                          >
                             <Search size={14} /> 🤖 Otomatik Premiumları Tara
+                         </button>
+                         <button 
+                           className="btn-secondary"
+                           onClick={() => setShowRulesModal(true)}
+                           style={{padding: '0.8rem 1.5rem', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid rgba(255,255,255,0.1)'}}
+                         >
+                            <Settings size={14} /> Kurallar
                          </button>
                          <button className="btn-primary" onClick={() => setShowUserModal(true)} style={{padding: '0.8rem 1.5rem', borderRadius: '12px'}}>
                             <Plus size={14} /> Bireysel Lisans Ekle
@@ -2275,6 +2343,169 @@ export default function AdminPage() {
       )}
 
       {/* Bireysel Premium Modal */}
+      {showRulesModal && (
+        <div className="admin-modal-overlay" onClick={() => setShowRulesModal(false)}>
+          <div className="admin-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '800px', width: '90%' }}>
+            <div className="admin-modal-header">
+              <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Settings size={20} /> Otomatik Premium Kuralları
+              </h2>
+              <button className="admin-modal-close" onClick={() => setShowRulesModal(false)}><X size={20} /></button>
+            </div>
+            
+            <div className="admin-modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                <h3 style={{ fontSize: '1.1rem', margin: 0 }}>Mevcut Kurallar</h3>
+                <button 
+                  className="btn-primary" 
+                  style={{ padding: '0.4rem 1rem', borderRadius: '8px', fontSize: '0.9rem' }}
+                  onClick={() => {
+                    setEditingRuleId(null);
+                    setNewRule({ id: "", rule_name: "", albion_guilds: "[]", discord_servers: "[]", premium_type: "limited", days_to_give: 30 });
+                  }}
+                >
+                  <Plus size={14} /> Yeni Kural Ekle
+                </button>
+              </div>
+
+              {autoPremiumRules.length === 0 ? (
+                <div style={{ padding: '2rem', textAlign: 'center', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', marginBottom: '2rem' }}>
+                  Henüz kural eklenmemiş.
+                </div>
+              ) : (
+                <div className="table-responsive" style={{ marginBottom: '2rem' }}>
+                  <table className="admin-table">
+                    <thead>
+                      <tr>
+                        <th>KURAL ADI</th>
+                        <th>LONCALAR</th>
+                        <th>SUNUCULAR</th>
+                        <th>TİP / SÜRE</th>
+                        <th style={{ textAlign: 'right' }}>İŞLEMLER</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {autoPremiumRules.map(r => (
+                        <tr key={r.id}>
+                          <td>{r.rule_name}</td>
+                          <td><code style={{ fontSize: '0.75rem' }}>{JSON.stringify(r.albion_guilds)}</code></td>
+                          <td><code style={{ fontSize: '0.75rem' }}>{JSON.stringify(r.discord_servers)}</code></td>
+                          <td>
+                            {r.premium_type === 'unlimited' ? 'Sınırsız' : `${r.days_to_give} Gün`}
+                          </td>
+                          <td style={{ textAlign: 'right', display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+                            <button 
+                              className="admin-action-btn"
+                              onClick={() => {
+                                setEditingRuleId(r.id);
+                                setNewRule({ 
+                                  id: r.id, 
+                                  rule_name: r.rule_name, 
+                                  albion_guilds: JSON.stringify(r.albion_guilds), 
+                                  discord_servers: JSON.stringify(r.discord_servers), 
+                                  premium_type: r.premium_type, 
+                                  days_to_give: r.days_to_give 
+                                });
+                              }}
+                            >
+                              <Edit3 size={14} />
+                            </button>
+                            <button className="admin-action-btn danger" onClick={() => handleDeleteRule(r.id)}>
+                              <Trash2 size={14} />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              <hr style={{ borderColor: 'rgba(255,255,255,0.1)', margin: '2rem 0' }} />
+
+              <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem' }}>
+                {editingRuleId ? 'Kuralı Düzenle' : 'Yeni Kural Ekle'}
+              </h3>
+              
+              <div className="admin-form-group">
+                <label>Kural Adı (Örn: Alpha Loncası Premiumu)</label>
+                <input 
+                  type="text" 
+                  className="admin-input"
+                  value={newRule.rule_name}
+                  onChange={e => setNewRule({...newRule, rule_name: e.target.value})}
+                  placeholder="Kural adını girin..."
+                />
+              </div>
+
+              <div className="admin-form-group">
+                <label>Zorunlu Albion Loncaları (JSON Array)</label>
+                <input 
+                  type="text" 
+                  className="admin-input"
+                  value={newRule.albion_guilds}
+                  onChange={e => setNewRule({...newRule, albion_guilds: e.target.value})}
+                  placeholder='Örn: ["Lonca1", "Lonca2"]'
+                  style={{ fontFamily: 'monospace' }}
+                />
+                <small style={{ color: 'var(--admin-text-muted)', marginTop: '0.3rem', display: 'block' }}>Kullanıcı bu loncalardan EN AZ BİRİNDE olmalıdır.</small>
+              </div>
+
+              <div className="admin-form-group">
+                <label>Zorunlu Discord Sunucuları (JSON Array)</label>
+                <input 
+                  type="text" 
+                  className="admin-input"
+                  value={newRule.discord_servers}
+                  onChange={e => setNewRule({...newRule, discord_servers: e.target.value})}
+                  placeholder='Örn: ["1234567890", "0987654321"]'
+                  style={{ fontFamily: 'monospace' }}
+                />
+                <small style={{ color: 'var(--admin-text-muted)', marginTop: '0.3rem', display: 'block' }}>Kullanıcı bu sunucuların HEPSİNDE bulunmalıdır.</small>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1.5rem' }}>
+                <div className="admin-form-group">
+                  <label>Premium Tipi</label>
+                  <select 
+                    className="admin-input"
+                    value={newRule.premium_type}
+                    onChange={e => setNewRule({...newRule, premium_type: e.target.value})}
+                  >
+                    <option value="limited">Süreli (Günlük)</option>
+                    <option value="unlimited">Sınırsız (Ömür Boyu)</option>
+                  </select>
+                </div>
+                
+                {newRule.premium_type === 'limited' && (
+                  <div className="admin-form-group">
+                    <label>Süre (Gün)</label>
+                    <input 
+                      type="number" 
+                      className="admin-input"
+                      value={newRule.days_to_give}
+                      onChange={e => setNewRule({...newRule, days_to_give: parseInt(e.target.value)})}
+                      min="1"
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <div className="admin-modal-footer">
+              <button className="btn-secondary" onClick={() => setShowRulesModal(false)}>İptal</button>
+              <button 
+                className="btn-primary" 
+                onClick={handleSaveRule}
+                disabled={!newRule.rule_name || !newRule.albion_guilds || !newRule.discord_servers}
+              >
+                {editingRuleId ? 'Güncelle' : 'Kaydet'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showUserModal && (
         <div className="admin-modal-overlay" onClick={() => setShowUserModal(false)}>
           <div className="admin-modal animate-slide-up" onClick={e => e.stopPropagation()}>

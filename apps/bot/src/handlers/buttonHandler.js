@@ -1247,8 +1247,6 @@ async function handleNextStep(interaction, nextStep, session, questions, lang, g
     }
 }
 
-}
-
 /**
  * Handle Auto Premium request button
  */
