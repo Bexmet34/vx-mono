@@ -5,12 +5,13 @@ export async function checkDiscordPresence(discordId, serverIds) {
             const res = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${discordId}`, {
                 headers: { 'Authorization': `Bot ${process.env.DISCORD_BOT_TOKEN}` }
             });
-            if (res.ok) return true;
+            if (!res.ok) return false; // Eğer herhangi bir sunucuda yoksa false döner (VE mantığı)
         } catch (e) {
             console.error(`Error checking presence for user ${discordId} in guild ${guildId}:`, e);
+            return false;
         }
     }
-    return false;
+    return true; // Tüm sunucularda varsa true döner
 }
 
 export async function getDiscordUser(discordId) {
