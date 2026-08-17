@@ -402,7 +402,7 @@ function buildAnswerModal(questions, pageIndex, channelId, lang) {
         const label = questionText.length > 45 ? questionText.substring(0, 42) + '...' : questionText;
 
         const input = new TextInputBuilder()
-            .setCustomId(q.id)
+            .setCustomId(String(q.id))
             .setLabel(label)
             .setStyle(q.type === 'paragraph' ? TextInputStyle.Paragraph : TextInputStyle.Short)
             .setRequired(q.required !== false)
@@ -494,7 +494,7 @@ function getNextStep(session, allQuestions) {
     const answered = session.answers;
     const unanswered = allQuestions.filter(q => {
         if (q.type === 'rules_accept') return false;
-        return !answered.hasOwnProperty(q.id);
+        return !answered.hasOwnProperty(String(q.id));
     });
 
     if (unanswered.length === 0) return { type: 'done' };

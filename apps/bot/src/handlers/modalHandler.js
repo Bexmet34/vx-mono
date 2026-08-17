@@ -560,10 +560,11 @@ async function handleApplicationAnswerModal(interaction) {
 
     for (const q of modalQuestions) {
         try {
-            const val = interaction.fields.getTextInputValue(q.id);
-            if (val) newAnswers[q.id] = val;
+            const qIdStr = String(q.id);
+            const val = interaction.fields.getTextInputValue(qIdStr);
+            if (val) newAnswers[qIdStr] = val;
         } catch (e) {
-            // Alan boş bırakılmış (opsiyonel soru)
+            // Alan boş bırakılmış (opsiyonel soru) veya id hatası
         }
     }
 
