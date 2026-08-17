@@ -45,12 +45,12 @@ export async function POST(req, { params }) {
     };
 
     const buttonType = settings.registration_button_type || 'both';
-    
+
     if (buttonType === 'tr' || buttonType === 'both') {
       body.components[0].components.push({
         type: 2, // Button
         style: 1, // Primary (Blurple)
-        label: "🇹🇷 Türkçe Kayıt Ol",
+        label: "🇹🇷 Kayıt Ol",
         custom_id: "register_start_tr",
       });
     }
