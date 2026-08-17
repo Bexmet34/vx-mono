@@ -863,6 +863,7 @@ module.exports = {
     handleDropLeaderboardCommand,
     handleDropManualCommand,
     handleSetupAutoPremiumCommand,
+    handleRegCloseCommand,
 };
 
 /**
@@ -998,4 +999,46 @@ async function handleSetupAutoPremiumCommand(interaction) {
 
     await interaction.channel.send({ embeds: [embed], components: [row] });
     await interaction.reply({ content: '✅ Buton gönderildi.', flags: [MessageFlags.Ephemeral] });
+}
+
+/**
+ * /reg-close — Manuel kayıt oturumu sonlandırma (Sadece Kayıt Sorumluları)
+ */
+async function handleRegCloseCommand(interaction) {
+    const guildConfig = await getGuildConfig(interaction.guildId);
+    const lang = guildConfig?.language || 'tr';
+    const staffRoles = guildConfig?.registration_staff_role_ids?.split(',') || [];
+
+    // Kullanıcının yetkisi var mı kontrol et
+    const hasPermission = interaction.member.roles.cache.some(role => staffRoles.includes(role.id)) || interaction.member.permissions.has(PermissionFlagsBits.Administrator);
+    if (!hasPermission) {
+        return interaction.reply({
+            content: lang === 'tr' ? '❌ Bu komutu sadece Kayıt Sorumluları kullanabilir.' : '❌ Only Registration Staff can use this command.',
+            flags: [MessageFlags.Ephemeral]
+        });
+    }
+
+    const targetUser = interaction.options.getUser('kullanici');
+    if (!targetUser) {
+        return interaction.reply({ content: '❌ Kullanıcı bulunamadı.', flags: [MessageFlags.Ephemeral] });
+    }
+
+    const appSvc = require('../services/applicationService');
+    const { supabase } = require('@veyronix/database');
+
+    // Supabase'den pending kayıtları sil
+    await supabase
+        .from('application_answers')
+        .delete()
+        .eq('user_id', targetUser.id)
+        .eq('guild_id', interaction.guildId)
+        .eq('status', 'pending');
+
+    // RAM'den oturumu temizle
+    appSvc.clearSession(targetUser.id, interaction.guildId);
+
+    return interaction.reply({
+        content: `✅ <@${targetUser.id}> adlı kullanıcının takılı kalan kayıt oturumu başarıyla sonlandırıldı. Artık yeniden kayıt başlatabilir.`,
+        flags: [MessageFlags.Ephemeral]
+    });
 }

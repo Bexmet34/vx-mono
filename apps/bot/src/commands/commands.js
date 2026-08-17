@@ -144,6 +144,14 @@ const commands = [
 
     // ─── Drop Puan Sistemi ────────────────────────────────────────────────────
     new SlashCommandBuilder()
+        .setName('reg-close')
+        .setDescription('Kullanıcının devam eden kayıt oturumunu manuel olarak kapatır.')
+        .addUserOption(option => 
+            option.setName('kullanici')
+                .setDescription('Oturumu kapatılacak kullanıcı')
+                .setRequired(true)),
+                
+    new SlashCommandBuilder()
         .setName('mypoints')
         .setDescription('View your total drop points and win count in this server.'),
 
