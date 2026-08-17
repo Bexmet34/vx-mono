@@ -59,7 +59,7 @@ async function handleClosePartyCommand(interaction) {
         if (!parties || parties.length === 0) {
             console.log(`[CommandHandler] JSON empty, searching SQL DB for active parties of ${userId}`);
             const dbParties = await db.all('SELECT message_id, channel_id FROM parties WHERE owner_id = ? AND status = ?', [userId, 'active']);
-            
+
             if (dbParties && dbParties.length > 0) {
                 parties = dbParties.map(p => ({ messageId: p.message_id, channelId: p.channel_id }));
             }
@@ -96,7 +96,7 @@ async function handleClosePartyCommand(interaction) {
                             try {
                                 await channel.send({ content: `⏳ **${lang === 'tr' ? 'Bu kanal 5 saniye içinde silinecek...' : 'This channel will be deleted in 5 seconds...'}**` });
                                 setTimeout(async () => {
-                                    await channel.delete().catch(() => {});
+                                    await channel.delete().catch(() => { });
                                 }, 5000);
                                 totalClosed++;
                             } catch (err) { }
@@ -117,8 +117,8 @@ async function handleClosePartyCommand(interaction) {
 
                                 const { createClosedButton } = require('../builders/componentBuilder');
                                 const closedRow = createClosedButton(lang);
-                                await message.edit({ 
-                                    embeds: [closedEmbed], 
+                                await message.edit({
+                                    embeds: [closedEmbed],
                                     components: [closedRow]
                                 }).catch(() => { });
                                 totalClosed++;
@@ -187,7 +187,7 @@ async function handleSettingsCommand(interaction) {
  */
 async function handleServersCommand(interaction) {
     const isBotOwner = interaction.user.id === config.OWNER_ID;
-    
+
     if (!isBotOwner) {
         return await safeReply(interaction, { content: '❌ Bu komutu sadece bot yetkilisi kullanabilir.', flags: [MessageFlags.Ephemeral] });
     }
@@ -213,7 +213,7 @@ const { addSubscriptionDays, removeSubscriptionDays, setUnlimitedSubscription, s
  */
 async function handleSubscriptionCommand(interaction) {
     const isBotOwner = interaction.user.id === config.OWNER_ID;
-    
+
     if (!isBotOwner) {
         return await safeReply(interaction, { content: '❌ Bu komutu sadece bot sahibi kullanabilir.', flags: [MessageFlags.Ephemeral] });
     }
@@ -304,7 +304,7 @@ async function handleSubscriptionSelect(interaction) {
 
     if (success) {
         const updatedSub = await getSubscription(guildId, 'Sistem', interaction.user.id);
-        
+
         // Log transaction
         let detail = '';
         if (action === 'toggle_unlimited') detail = updatedSub.is_unlimited ? '♾️ Sınırsız mod açıldı.' : '🚫 Sınırsız mod kapatıldı.';
@@ -359,27 +359,27 @@ async function handleSubscriptionModal(interaction) {
  */
 async function handleCleanupManualCommand(interaction) {
     const BOT_OWNER_ID = '407234961582587916';
-    
+
     if (interaction.user.id !== BOT_OWNER_ID) {
-        return await safeReply(interaction, { 
-            content: '❌ Bu komutu sadece bot sahibi kullanabilir.', 
-            flags: [MessageFlags.Ephemeral] 
+        return await safeReply(interaction, {
+            content: '❌ Bu komutu sadece bot sahibi kullanabilir.',
+            flags: [MessageFlags.Ephemeral]
         });
     }
 
-    await interaction.reply({ 
-        content: '⏳ Sunucu temizleme işlemi başlatıldı. Veritabanı taranıyor...', 
-        flags: [MessageFlags.Ephemeral] 
+    await interaction.reply({
+        content: '⏳ Sunucu temizleme işlemi başlatıldı. Veritabanı taranıyor...',
+        flags: [MessageFlags.Ephemeral]
     });
 
     try {
         await performServerCleanup(interaction.client, `Manuel Komut (${interaction.user.tag})`);
-        await interaction.editReply({ 
-            content: '✅ Sunucu temizleme işlemi başarıyla tamamlandı. Rapor özel mesaj ile gönderildi.' 
+        await interaction.editReply({
+            content: '✅ Sunucu temizleme işlemi başarıyla tamamlandı. Rapor özel mesaj ile gönderildi.'
         });
     } catch (err) {
-        await interaction.editReply({ 
-            content: `❌ Temizleme sırasında hata oluştu: ${err.message}` 
+        await interaction.editReply({
+            content: `❌ Temizleme sırasında hata oluştu: ${err.message}`
         });
     }
 }
@@ -420,22 +420,22 @@ async function handleVoteCommand(interaction) {
 async function handleSetupObjectiveSystemCommand(interaction) {
     const guildConfig = await getGuildConfig(interaction.guildId);
     const lang = guildConfig?.language || 'tr';
-    
+
     // Check Subscription
     const isPremium = await isSubscriptionActive(interaction.guildId, interaction.guild.name, interaction.guild.ownerId);
     if (!isPremium) {
         return await safeReply(interaction, {
-            content: lang === 'tr' 
+            content: lang === 'tr'
                 ? `❌ **Bu özellik Veyronix Premium gerektirir!**\n\nObjektif ve Timer takip sistemini sunucunuzda kurmak için web panelimiz üzerinden sunucunuzu premium pakete yükseltin.`
                 : `❌ **This feature requires Veyronix Premium!**\n\nTo set up Objective and Timer tracking on your server, upgrade your server to premium via our web panel.`,
             flags: [MessageFlags.Ephemeral]
         });
     }
-    
+
     const setupChannel = interaction.options.getChannel('setup_kanal');
     const notifyChannel = interaction.options.getChannel('bildirim_kanal');
 
-    const success = await updateGuildConfig(interaction.guildId, { 
+    const success = await updateGuildConfig(interaction.guildId, {
         objective_channel_id: setupChannel.id,
         objective_notify_channel_id: notifyChannel.id
     });
@@ -444,7 +444,7 @@ async function handleSetupObjectiveSystemCommand(interaction) {
         // Send static info message to setup channel
         const infoEmbed = createObjectiveInfoEmbed(lang);
         const buttons = createObjectiveSetupButtons(lang);
-        
+
         const channel = await interaction.client.channels.fetch(setupChannel.id).catch(() => null);
         if (channel) {
             await channel.send({
@@ -454,7 +454,7 @@ async function handleSetupObjectiveSystemCommand(interaction) {
         }
 
         return await safeReply(interaction, {
-            content: lang === 'tr' 
+            content: lang === 'tr'
                 ? `✅ **Sistem başarıyla kuruldu!**\nSetup Kanalı: <#${setupChannel.id}>\nBildirim Kanalı: <#${notifyChannel.id}>`
                 : `✅ **System successfully set up!**\nSetup Channel: <#${setupChannel.id}>\nNotification Channel: <#${notifyChannel.id}>`,
             flags: [MessageFlags.Ephemeral]
@@ -473,7 +473,7 @@ async function handleSetupObjectiveSystemCommand(interaction) {
 async function handleSetupGuildCommand(interaction) {
     const guildConfig = await getGuildConfig(interaction.guildId);
     const lang = guildConfig?.language || 'tr';
-    
+
     const loncaValue = interaction.options.getString('lonca');
     const [guildId, guildName] = loncaValue.split('|');
 
@@ -484,7 +484,7 @@ async function handleSetupGuildCommand(interaction) {
         });
     }
 
-    const success = await updateGuildConfig(interaction.guildId, { 
+    const success = await updateGuildConfig(interaction.guildId, {
         albion_guild_id: guildId,
         albion_guild_name: guildName
     });
@@ -508,7 +508,7 @@ async function handleSetupGuildCommand(interaction) {
 async function handleSetupKillBoardCommand(interaction) {
     const guildConfig = await getGuildConfig(interaction.guildId);
     const lang = guildConfig?.language || 'tr';
-    
+
     // Check Subscription
     const isPremium = await isSubscriptionActive(interaction.guildId, interaction.guild.name, interaction.guild.ownerId);
     if (!isPremium) {
@@ -519,11 +519,11 @@ async function handleSetupKillBoardCommand(interaction) {
             flags: [MessageFlags.Ephemeral]
         });
     }
-    
+
     const channel = interaction.options.getChannel('kanal');
     const time = interaction.options.getString('saat') || '06:00'; // Default 06:00 UTC
 
-    const success = await updateGuildConfig(interaction.guildId, { 
+    const success = await updateGuildConfig(interaction.guildId, {
         killboard_channel_id: channel.id,
         killboard_time: time
     });
@@ -570,16 +570,16 @@ async function handleSetupRegistrationCommand(interaction) {
 
     const buttonType = guildConfig?.registration_button_type || 'both';
     const components = [];
-    
+
     if (buttonType === 'tr' || buttonType === 'both') {
         components.push(
             new ButtonBuilder()
                 .setCustomId('register_start_tr')
-                .setLabel('🇹🇷 Türkçe Kayıt Ol')
+                .setLabel('🇹🇷 Kayıt Ol')
                 .setStyle(ButtonStyle.Primary)
         );
     }
-    
+
     if (buttonType === 'en' || buttonType === 'both') {
         components.push(
             new ButtonBuilder()
@@ -633,7 +633,7 @@ async function handleForceRegistrationCommand(interaction) {
             // Skip bots and the owner
             if (member.user.bot) continue;
             if (memberId === interaction.guild.ownerId) continue;
-            
+
             // Skip users higher than or equal to the bot's highest role to avoid permission errors
             if (interaction.guild.members.me.roles.highest.position <= member.roles.highest.position) continue;
 
@@ -641,16 +641,16 @@ async function handleForceRegistrationCommand(interaction) {
                 // Change nickname
                 try {
                     const newNick = lang === 'tr' ? `[Kayıt Bekliyor]` : `[Pending Register]`;
-                    await member.setNickname(newNick).catch(()=>{});
-                } catch (nickErr) {}
+                    await member.setNickname(newNick).catch(() => { });
+                } catch (nickErr) { }
 
                 // Update roles (removes all existing roles and gives the unregistered role)
                 try {
-                    await member.roles.set([unregRole.id]).catch(()=>{});
-                } catch (roleErr) {}
+                    await member.roles.set([unregRole.id]).catch(() => { });
+                } catch (roleErr) { }
 
                 affectedCount++;
-                
+
                 // Wait slightly to avoid discord API rate limit (4-5 requests per second is safe)
                 await new Promise(r => setTimeout(r, 400));
             }
@@ -694,7 +694,7 @@ async function handleFixRegistrationCommand(interaction) {
     }
 
     const roleAction = interaction.options.getString('rol');
-    
+
     // Extract info from current nickname
     let currentNickname = targetMember.nickname || targetMember.user.username;
     let currentIgn = '', currentIsim = '', currentYas = '';
@@ -709,7 +709,7 @@ async function handleFixRegistrationCommand(interaction) {
     if (parts.length > 1) {
         let rest = parts.slice(1).join(' - ').trim();
         let lastSpaceIndex = rest.lastIndexOf(' ');
-        
+
         if (lastSpaceIndex !== -1) {
             currentIsim = rest.substring(0, lastSpaceIndex).trim();
             currentYas = rest.substring(lastSpaceIndex + 1).trim();
@@ -781,12 +781,12 @@ async function handleFixRegistrationCommand(interaction) {
         // Remove other registration roles
         for (const roleId of allRegRoles) {
             if (roleId && roleId !== givenRoleId && targetMember.roles.cache.has(roleId)) {
-                await targetMember.roles.remove(roleId).catch(() => {});
+                await targetMember.roles.remove(roleId).catch(() => { });
             }
         }
 
         // Add the target role
-        await targetMember.roles.add(givenRoleId).catch(() => {});
+        await targetMember.roles.add(givenRoleId).catch(() => { });
 
         // Format Nickname: [PREFIX] Ign - RealName Age
         let prefix = '';
@@ -802,31 +802,31 @@ async function handleFixRegistrationCommand(interaction) {
 
         const safeAge = age ? ` ${age}` : '';
         const safeRealName = realName ? ` - ${realName}` : '';
-        
+
         const fixedLength = prefix.length + safeRealName.length + safeAge.length;
         let finalIgn = ign;
-        
+
         // Truncate logic
         if (fixedLength + finalIgn.length > 32) {
             let charsToRemove = (fixedLength + finalIgn.length) - 32;
             const vowels = 'aeıioöuüAEIİOÖUÜ';
             let ignArr = finalIgn.split('');
-            
+
             for (let i = ignArr.length - 1; i >= 0 && charsToRemove > 0; i--) {
                 if (vowels.includes(ignArr[i])) {
                     ignArr.splice(i, 1);
                     charsToRemove--;
                 }
             }
-            
+
             finalIgn = ignArr.join('');
-            
+
             if (fixedLength + finalIgn.length > 32) {
                 const maxIgnLength = Math.max(0, 32 - fixedLength);
                 finalIgn = finalIgn.substring(0, maxIgnLength);
             }
         }
-        
+
         let newNickname = `${prefix}${finalIgn}${safeRealName}${safeAge}`.trim();
         if (newNickname.length > 32) {
             newNickname = newNickname.substring(0, 32);
@@ -915,8 +915,8 @@ async function handleMyPointsCommand(interaction) {
                 : `**${interaction.guild.name}** sunucusundaki drop istatistiklerin:`)
             .addFields(
                 { name: isEn ? '🏆 Total Points' : '🏆 Toplam Puan', value: `**${data.total_points}**`, inline: true },
-                { name: isEn ? '🎯 Wins'         : '🎯 Kazanılan',  value: `**${data.win_count}**`,    inline: true },
-                { name: isEn ? '⏱️ Last Win'      : '⏱️ Son Kazanma', value: lastWin,                  inline: true },
+                { name: isEn ? '🎯 Wins' : '🎯 Kazanılan', value: `**${data.win_count}**`, inline: true },
+                { name: isEn ? '⏱️ Last Win' : '⏱️ Son Kazanma', value: lastWin, inline: true },
             );
     }
 
