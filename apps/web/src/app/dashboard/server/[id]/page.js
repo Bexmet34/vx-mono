@@ -243,7 +243,20 @@ export default function ServerSettings() {
           application_enabled: s?.application_enabled === true || s?.application_enabled === 'true',
           registration_rules_text: s?.registration_rules_text || "",
           application_questions: Array.isArray(s?.application_questions) ? s.application_questions : [],
-          registration_button_type: s?.registration_button_type || 'both',
+          registration_rules_text_en: (() => {
+            let ev = s?.log_events;
+            if (typeof ev === 'string' && ev !== '[object Object]') {
+                try { ev = JSON.parse(ev); } catch(e) { ev = {}; }
+            }
+            return (ev && ev.registration_rules_text_en) ? ev.registration_rules_text_en : "";
+          })(),
+          registration_button_type: (() => {
+            let ev = s?.log_events;
+            if (typeof ev === 'string' && ev !== '[object Object]') {
+                try { ev = JSON.parse(ev); } catch(e) { ev = {}; }
+            }
+            return (ev && ev.registration_button_type) ? ev.registration_button_type : 'both';
+          })(),
         };
         setSettings(loadedSettings);
         setInitialSettings(loadedSettings);

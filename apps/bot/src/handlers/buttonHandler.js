@@ -715,7 +715,17 @@ async function handleRegisterButtons(interaction) {
 
         // Anket aktif ve kural metni var mı?
         const applicationEnabled = guildCfg?.application_enabled === true;
-        const rulesText = guildCfg?.registration_rules_text;
+        
+        let rulesTextEn = '';
+        let ev = guildCfg?.log_events;
+        if (typeof ev === 'string' && ev !== '[object Object]') {
+            try { ev = JSON.parse(ev); } catch(e) { ev = {}; }
+        }
+        if (ev && ev.registration_rules_text_en) {
+            rulesTextEn = ev.registration_rules_text_en;
+        }
+
+        const rulesText = isEng ? (rulesTextEn || guildCfg?.registration_rules_text) : guildCfg?.registration_rules_text;
 
         if (applicationEnabled && rulesText && rulesText.trim().length > 0) {
             // Önce kural onay ekranı göster

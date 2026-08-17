@@ -882,15 +882,15 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
 
                 {settings.application_enabled && (
                   <div className="flex flex-col gap-2 pt-4 border-t border-outline-variant/20">
-                    {/* Guild Rules */}
+                    {/* Guild Rules TR */}
                     <div className="bg-surface-container/20 p-3 border border-outline-variant/30 rounded-lg">
                       <label className="block text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
-                        📜 {lang === 'en' ? 'Guild Rules Text (Optional)' : 'Guild Kuralları Metni (Opsiyonel)'}
+                        📜 {lang === 'en' ? 'Guild Rules Text (TR) (Optional)' : 'Guild Kuralları Metni (TR) (Opsiyonel)'}
                       </label>
                       <textarea
                         className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md resize-y min-h-[120px]"
                         placeholder={lang === 'en'
-                          ? 'e.g. No swearing, no harassment, no theft...\n\nDo you accept? Yes / No'
+                          ? 'Turkish rules text here...'
                           : 'Örn: Küfürlü konuşmamak önemlidir.\nAgresif tavırlar sergilememek...\n\nKabul ediyor musun?'}
                         value={settings.registration_rules_text || ''}
                         onChange={(e) => setSettings({ ...settings, registration_rules_text: e.target.value })}
@@ -898,6 +898,25 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                       />
                       <p className="text-[10px] text-on-surface-variant/60 mt-1 text-right">
                         {(settings.registration_rules_text || '').length} / 4000
+                      </p>
+                    </div>
+
+                    {/* Guild Rules EN */}
+                    <div className="bg-surface-container/20 p-3 border border-outline-variant/30 rounded-lg">
+                      <label className="block text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+                        📜 {lang === 'en' ? 'Guild Rules Text (EN) (Optional)' : 'Guild Kuralları Metni (EN) (Opsiyonel)'}
+                      </label>
+                      <textarea
+                        className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md resize-y min-h-[120px]"
+                        placeholder={lang === 'en'
+                          ? 'e.g. No swearing, no harassment, no theft...\n\nDo you accept? Yes / No'
+                          : 'İngilizce kurallar metni...'}
+                        value={settings.registration_rules_text_en || ''}
+                        onChange={(e) => setSettings({ ...settings, registration_rules_text_en: e.target.value })}
+                        maxLength={4000}
+                      />
+                      <p className="text-[10px] text-on-surface-variant/60 mt-1 text-right">
+                        {(settings.registration_rules_text_en || '').length} / 4000
                       </p>
                     </div>
 

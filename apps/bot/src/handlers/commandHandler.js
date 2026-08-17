@@ -568,7 +568,11 @@ async function handleSetupRegistrationCommand(interaction) {
         .setThumbnail(guildConfig?.embed_thumbnail_url || interaction.guild.iconURL())
         .setFooter({ text: 'Veyronix Registration System' });
 
-    const buttonType = guildConfig?.registration_button_type || 'both';
+    let ev = guildConfig?.log_events;
+    if (typeof ev === 'string' && ev !== '[object Object]') {
+        try { ev = JSON.parse(ev); } catch(e) { ev = {}; }
+    }
+    const buttonType = (ev && ev.registration_button_type) ? ev.registration_button_type : (guildConfig?.registration_button_type || 'both');
     const components = [];
 
     if (buttonType === 'tr' || buttonType === 'both') {
