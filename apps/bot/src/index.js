@@ -399,6 +399,9 @@ client.on(Events.ChannelDelete, async (channel) => {
                 .eq('ticket_channel_id', channel.id)
                 .eq('status', 'pending');
                 
+            const appSvc = require('./services/applicationService');
+            appSvc.clearSession(data[0].user_id, channel.guild.id);
+                
             console.log(`[Registration] Pending ticket channel deleted for user ${data[0].user_id}. Registration cancelled.`);
         }
     } catch (err) {

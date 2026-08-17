@@ -33,7 +33,8 @@ function startSession(userId, guildId, channelId, questionList, registrationData
         answers: {},
         questionList, // Tüm sorular (rules_accept hariç)
         currentPage: 0,
-        registrationData
+        registrationData,
+        timestamp: Date.now()
     });
 }
 
@@ -66,7 +67,17 @@ function addSingleAnswer(userId, guildId, questionId, value) {
  * Mevcut oturumu döndürür
  */
 function getSession(userId, guildId) {
-    return pendingAnswers.get(`${userId}_${guildId}`) || null;
+    const key = `${userId}_${guildId}`;
+    const session = pendingAnswers.get(key);
+    if (session) {
+        // Clear sessions older than 30 minutes (30 * 60 * 1000 = 1800000)
+        if (session.timestamp && Date.now() - session.timestamp > 1800000) {
+            pendingAnswers.delete(key);
+            return null;
+        }
+        return session;
+    }
+    return null;
 }
 
 /**
