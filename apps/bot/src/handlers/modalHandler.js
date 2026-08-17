@@ -324,9 +324,11 @@ async function handleObjectiveModal(interaction) {
  * Handles registration modal submission
  */
 async function handleRegisterModal(interaction) {
-    if (interaction.customId === 'register_modal') {
+    if (interaction.customId.startsWith('register_modal')) {
         const guildConfig = await getGuildConfig(interaction.guildId);
-        const lang = (guildConfig?.language || '').toString().toLowerCase().trim() === 'en' ? 'en' : 'tr';
+        let lang = (guildConfig?.language || '').toString().toLowerCase().trim() === 'en' ? 'en' : 'tr';
+        if (interaction.customId === 'register_modal_tr') lang = 'tr';
+        else if (interaction.customId === 'register_modal_en') lang = 'en';
         
         let realName = '';
         let ign = '';

@@ -513,6 +513,22 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                 />
               </div>
 
+              <div>
+                <label className="flex items-center text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+                  {lang === 'en' ? 'Display Buttons' : 'Gösterilecek Butonlar'}
+                  <InfoTooltip text={lang === 'en' ? 'Which language buttons to show below the welcome message.' : 'Hoş geldin mesajının altında hangi dillerin kayıt butonlarının gösterileceğini seçin.'} />
+                </label>
+                <select
+                  className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+                  value={settings.registration_button_type || "both"}
+                  onChange={(e) => setSettings({ ...settings, registration_button_type: e.target.value })}
+                >
+                  <option value="both">🇹🇷 Türkçe & 🇬🇧 English</option>
+                  <option value="tr">🇹🇷 Sadece Türkçe (Only TR)</option>
+                  <option value="en">🇬🇧 Sadece İngilizce (Only EN)</option>
+                </select>
+              </div>
+
               <button 
                 className="w-full px-3 py-1 bg-primary-container text-on-primary font-label-bold uppercase tracking-widest tactical-glow rounded-sm transition-all hover:brightness-110 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed" 
                 onClick={handleSendSetup} 
@@ -1019,13 +1035,18 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                                 className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1 text-on-surface focus:outline-none focus:border-primary-container transition-colors text-[10px]"
                                 placeholder={lang === 'en' ? 'e.g. How do you earn in-game currency?' : 'Örn: Oyundaki ekonominizi nasıl sağlıyorsunuz?'}
                                 value={q.question_tr || ''}
-                                maxLength={200}
+                                maxLength={(q.type === 'text' || q.type === 'paragraph') ? 45 : 200}
                                 onChange={(e) => {
                                   const arr = [...(settings.application_questions || [])];
                                   arr[idx] = { ...arr[idx], question_tr: e.target.value };
                                   setSettings({ ...settings, application_questions: arr });
                                 }}
                               />
+                              {(q.type === 'text' || q.type === 'paragraph') && (
+                                <p className="text-[9px] text-on-surface-variant/70 mt-1">
+                                  {lang === 'en' ? 'Max 45 chars for Modals' : 'Modal (Form) sınırı: 45 karakter'} ({(q.question_tr || '').length}/45)
+                                </p>
+                              )}
                             </div>
 
                             {/* Question EN */}
@@ -1038,13 +1059,18 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                                 className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1 text-on-surface focus:outline-none focus:border-primary-container transition-colors text-[10px]"
                                 placeholder="e.g. How do you earn in-game currency?"
                                 value={q.question_en || ''}
-                                maxLength={200}
+                                maxLength={(q.type === 'text' || q.type === 'paragraph') ? 45 : 200}
                                 onChange={(e) => {
                                   const arr = [...(settings.application_questions || [])];
                                   arr[idx] = { ...arr[idx], question_en: e.target.value };
                                   setSettings({ ...settings, application_questions: arr });
                                 }}
                               />
+                              {(q.type === 'text' || q.type === 'paragraph') && (
+                                <p className="text-[9px] text-on-surface-variant/70 mt-1">
+                                  {lang === 'en' ? 'Max 45 chars for Modals' : 'Modal (Form) sınırı: 45 karakter'} ({(q.question_en || '').length}/45)
+                                </p>
+                              )}
                             </div>
 
                             {/* Options */}

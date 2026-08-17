@@ -243,6 +243,7 @@ export default function ServerSettings() {
           application_enabled: s?.application_enabled === true || s?.application_enabled === 'true',
           registration_rules_text: s?.registration_rules_text || "",
           application_questions: Array.isArray(s?.application_questions) ? s.application_questions : [],
+          registration_button_type: s?.registration_button_type || 'both',
         };
         setSettings(loadedSettings);
         setInitialSettings(loadedSettings);

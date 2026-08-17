@@ -608,18 +608,27 @@ async function handleRegisterButtons(interaction) {
     const isEn = lang === 'en';
 
     // ─── ANKET: Kural Kabul / Red ───────────────────────────────────────────
-    if (customId === 'reg_rules_accept') {
+    if (customId.startsWith('reg_rules_accept')) {
+        let selectedLang = lang;
+        if (customId === 'reg_rules_accept_tr') selectedLang = 'tr';
+        if (customId === 'reg_rules_accept_en') selectedLang = 'en';
+        
         // Kuralları kabul etti → normal kayıt modalını aç
-        return await openRegisterModal(interaction, lang);
+        return await openRegisterModal(interaction, selectedLang);
     }
 
-    if (customId === 'reg_rules_reject') {
+    if (customId.startsWith('reg_rules_reject')) {
+        let selectedLang = lang;
+        if (customId === 'reg_rules_reject_tr') selectedLang = 'tr';
+        if (customId === 'reg_rules_reject_en') selectedLang = 'en';
+        const isEng = selectedLang === 'en';
+        
         return await interaction.update({
-            content: isEn
+            content: isEng
                 ? '❌ **Registration cancelled.** You must accept the guild rules to register.'
                 : '❌ **Kayıt işlemi iptal edildi.** Guild kurallarını kabul etmeden kayıt olamazsınız.',
             embeds: [], components: []
-        }).catch(() => interaction.reply({ content: isEn ? '❌ Registration cancelled.' : '❌ Kayıt iptal edildi.', flags: [MessageFlags.Ephemeral] }));
+        }).catch(() => interaction.reply({ content: isEng ? '❌ Registration cancelled.' : '❌ Kayıt iptal edildi.', flags: [MessageFlags.Ephemeral] }));
     }
 
     // ─── ANKET: Yesno buton cevapları ──────────────────────────────────────
@@ -689,14 +698,17 @@ async function handleRegisterButtons(interaction) {
 
     // ─── Kayıt Başlat butonu ─────────────────────────────────────────────────
     // 1. User clicks "Register" button in welcome channel
-    if (customId === 'register_start' || customId === 'register_btn') {
-        // lang already resolved from guildCfg at top of function
+    if (customId === 'register_start' || customId === 'register_start_tr' || customId === 'register_start_en' || customId === 'register_btn') {
+        let selectedLang = lang; // default from guildCfg
+        if (customId === 'register_start_tr') selectedLang = 'tr';
+        else if (customId === 'register_start_en') selectedLang = 'en';
+        const isEng = selectedLang === 'en';
 
         // Check if user already has an active session
         const session = appSvc.getSession(interaction.user.id, interaction.guildId);
         if (session) {
             return await interaction.reply({
-                content: `❌ **${lang === 'tr' ? 'Devam eden bir kayıt/başvuru süreciniz bulunuyor.' : 'You have an active registration/application process.'}**`,
+                content: `❌ **${isEng ? 'You have an active registration/application process.' : 'Devam eden bir kayıt/başvuru süreciniz bulunuyor.'}**`,
                 flags: [MessageFlags.Ephemeral]
             });
         }
@@ -708,19 +720,19 @@ async function handleRegisterButtons(interaction) {
         if (applicationEnabled && rulesText && rulesText.trim().length > 0) {
             // Önce kural onay ekranı göster
             const rulesEmbed = new EmbedBuilder()
-                .setTitle(lang === 'tr' ? '📜 Guild Kuralları' : '📜 Guild Rules')
+                .setTitle(isEng ? '📜 Guild Rules' : '📜 Guild Kuralları')
                 .setDescription(rulesText.substring(0, 4000))
                 .setColor('#5865F2')
-                .setFooter({ text: lang === 'tr' ? 'Devam etmek için kuralları kabul etmeniz gerekmektedir.' : 'You must accept the rules to continue.' });
+                .setFooter({ text: isEng ? 'You must accept the rules to continue.' : 'Devam etmek için kuralları kabul etmeniz gerekmektedir.' });
 
             const rulesRow = new ActionRowBuilder().addComponents(
                 new ButtonBuilder()
-                    .setCustomId('reg_rules_accept')
-                    .setLabel(lang === 'tr' ? '✅ Kabul Ediyorum' : '✅ I Accept')
+                    .setCustomId(`reg_rules_accept_${selectedLang}`)
+                    .setLabel(isEng ? '✅ I Accept' : '✅ Kabul Ediyorum')
                     .setStyle(ButtonStyle.Success),
                 new ButtonBuilder()
-                    .setCustomId('reg_rules_reject')
-                    .setLabel(lang === 'tr' ? '❌ Kabul Etmiyorum' : '❌ I Reject')
+                    .setCustomId(`reg_rules_reject_${selectedLang}`)
+                    .setLabel(isEng ? '❌ I Reject' : '❌ Kabul Etmiyorum')
                     .setStyle(ButtonStyle.Danger)
             );
 
@@ -732,7 +744,7 @@ async function handleRegisterButtons(interaction) {
         }
 
         // Kural yok veya anket kapalı → Doğrudan modal aç
-        return await openRegisterModal(interaction, lang);
+        return await openRegisterModal(interaction, selectedLang);
     }
 
     // ─── ANKET: Select menu cevapları ───────────────────────────────────────
@@ -1141,7 +1153,7 @@ async function handleRegisterButtons(interaction) {
 async function openRegisterModal(interaction, lang = 'tr') {
     const isEn = lang === 'en';
     const modal = new ModalBuilder()
-        .setCustomId('register_modal')
+        .setCustomId(`register_modal_${lang}`)
         .setTitle(isEn ? 'Registration System' : 'Kayıt Sistemi');
 
     const realNameInput = new TextInputBuilder()

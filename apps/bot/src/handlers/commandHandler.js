@@ -568,13 +568,28 @@ async function handleSetupRegistrationCommand(interaction) {
         .setThumbnail(guildConfig?.embed_thumbnail_url || interaction.guild.iconURL())
         .setFooter({ text: 'Veyronix Registration System' });
 
-    const row = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-            .setCustomId('register_start')
-            .setLabel(lang === 'tr' ? 'Kayıt Ol / Register' : 'Register Now')
-            .setStyle(ButtonStyle.Primary)
-            .setEmoji('🛡️')
-    );
+    const buttonType = guildConfig?.registration_button_type || 'both';
+    const components = [];
+    
+    if (buttonType === 'tr' || buttonType === 'both') {
+        components.push(
+            new ButtonBuilder()
+                .setCustomId('register_start_tr')
+                .setLabel('🇹🇷 Türkçe Kayıt Ol')
+                .setStyle(ButtonStyle.Primary)
+        );
+    }
+    
+    if (buttonType === 'en' || buttonType === 'both') {
+        components.push(
+            new ButtonBuilder()
+                .setCustomId('register_start_en')
+                .setLabel('🇬🇧 Register')
+                .setStyle(ButtonStyle.Primary)
+        );
+    }
+
+    const row = new ActionRowBuilder().addComponents(components);
 
     await interaction.reply({
         content: lang === 'tr' ? '✅ Kayıt sistemi bu kanalda başlatıldı!' : '✅ Registration system started in this channel!',

@@ -81,7 +81,8 @@ export async function POST(req, { params }) {
       ticket_system_enabled, ticket_category_id, ticket_channel_id,
       ticket_staff_roles, ticket_message_title, ticket_message_desc,
       ticket_options, auto_delete_party_hours,
-      application_enabled, registration_rules_text, application_questions
+      application_enabled, registration_rules_text, application_questions,
+      registration_button_type
     } = body;
 
     // Upsert: varsa güncelle, yoksa ekle
@@ -141,6 +142,7 @@ export async function POST(req, { params }) {
           application_enabled: application_enabled ?? false,
           registration_rules_text: registration_rules_text || null,
           application_questions: Array.isArray(application_questions) ? application_questions : [],
+          registration_button_type: registration_button_type || 'both',
         },
         { onConflict: 'guild_id' }
       )

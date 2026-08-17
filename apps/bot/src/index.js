@@ -274,7 +274,7 @@ client.on('interactionCreate', async interaction => {
                 await handleVoteCommand(interaction);
             } else if (interaction.customId === 'obj_open_modal' || interaction.customId.startsWith('obj_join_')) {
                 await handleObjectiveButtons(interaction);
-            } else if (interaction.customId === 'register_start' || interaction.customId === 'register_btn' || interaction.customId.startsWith('reg_approve_') || interaction.customId.startsWith('reg_reject_') || interaction.customId.startsWith('reg_temp_') || interaction.customId === 'reg_rules_accept' || interaction.customId === 'reg_rules_reject' || interaction.customId.startsWith('app_yesno:') || interaction.customId.startsWith('app_continue:')) {
+            } else if (interaction.customId === 'register_start' || interaction.customId === 'register_start_tr' || interaction.customId === 'register_start_en' || interaction.customId === 'register_btn' || interaction.customId.startsWith('reg_approve_') || interaction.customId.startsWith('reg_reject_') || interaction.customId.startsWith('reg_temp_') || interaction.customId === 'reg_rules_accept' || interaction.customId === 'reg_rules_reject' || interaction.customId.startsWith('app_yesno:') || interaction.customId.startsWith('app_continue:')) {
                 await handleRegisterButtons(interaction);
             } else if (interaction.customId.startsWith('fc_')) {
                 const { handleFixedContentButtons } = require('./handlers/fixedContentHandler');
@@ -339,7 +339,7 @@ client.on('interactionCreate', async interaction => {
                 await handleSubscriptionModal(interaction);
             } else if (interaction.customId === 'objective_create_modal') {
                 await handleObjectiveModal(interaction);
-            } else if (interaction.customId === 'register_modal') {
+            } else if (interaction.customId.startsWith('register_modal')) {
                 await handleRegisterModal(interaction);
             } else if (interaction.customId === 'auto_premium_modal') {
                 const { handleAutoPremiumModal } = require('./handlers/modalHandler');

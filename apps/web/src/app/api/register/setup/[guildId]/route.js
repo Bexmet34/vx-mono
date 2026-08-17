@@ -39,18 +39,30 @@ export async function POST(req, { params }) {
       components: [
         {
           type: 1, // Action Row
-          components: [
-            {
-              type: 2, // Button
-              style: 3, // SUCCESS (Green)
-              label: "Kayıt Ol / Register",
-              custom_id: "register_btn",
-              emoji: { name: "📝" }
-            }
-          ]
+          components: []
         }
       ]
     };
+
+    const buttonType = settings.registration_button_type || 'both';
+    
+    if (buttonType === 'tr' || buttonType === 'both') {
+      body.components[0].components.push({
+        type: 2, // Button
+        style: 1, // Primary (Blurple)
+        label: "🇹🇷 Türkçe Kayıt Ol",
+        custom_id: "register_start_tr",
+      });
+    }
+
+    if (buttonType === 'en' || buttonType === 'both') {
+      body.components[0].components.push({
+        type: 2, // Button
+        style: 1, // Primary (Blurple)
+        label: "🇬🇧 Register",
+        custom_id: "register_start_en",
+      });
+    }
 
     try {
       const data = await sendChannelMessage(channelId, body);
