@@ -641,8 +641,9 @@ async function handleRegisterButtons(interaction) {
         const userId = interaction.user.id;
         const guildId = interaction.guildId;
 
+        const session = appSvc.getSession(userId, guildId);
         const guildCfg = await getGuildConfig(guildId);
-        const lang = (guildCfg?.language || '').toString().toLowerCase().trim() === 'en' ? 'en' : 'tr';
+        const lang = session?.lang || ((guildCfg?.language || '').toString().toLowerCase().trim() === 'en' ? 'en' : 'tr');
         const questions = (guildCfg?.application_questions || []).filter(q => q.type !== 'rules_accept');
 
         const displayAnswer = answer === 'yes'
@@ -651,8 +652,6 @@ async function handleRegisterButtons(interaction) {
 
         appSvc.addSingleAnswer(userId, guildId, questionId, displayAnswer);
 
-        // Sonraki adımı belirle
-        const session = appSvc.getSession(userId, guildId);
         const nextStep = appSvc.getNextStep(session, questions);
 
         await interaction.update({ content: `✅ Cevap kaydedildi: **${displayAnswer}**`, embeds: [], components: [] }).catch(() => {});
@@ -668,9 +667,9 @@ async function handleRegisterButtons(interaction) {
         const guildId = interaction.guildId;
 
         const guildCfg = await getGuildConfig(guildId);
-        const lang = (guildCfg?.language || '').toString().toLowerCase().trim() === 'en' ? 'en' : 'tr';
         const questions = (guildCfg?.application_questions || []).filter(q => q.type !== 'rules_accept');
         const session = appSvc.getSession(userId, guildId);
+        const lang = session?.lang || ((guildCfg?.language || '').toString().toLowerCase().trim() === 'en' ? 'en' : 'tr');
 
         if (!session) {
             return await interaction.reply({
@@ -770,8 +769,9 @@ async function handleRegisterButtons(interaction) {
         const guildId = interaction.guildId;
 
         const guildCfg = await getGuildConfig(guildId);
-        const lang = (guildCfg?.language || '').toString().toLowerCase().trim() === 'en' ? 'en' : 'tr';
         const questions = (guildCfg?.application_questions || []).filter(q => q.type !== 'rules_accept');
+        const sessionForLang = appSvc.getSession(userId, guildId);
+        const lang = sessionForLang?.lang || ((guildCfg?.language || '').toString().toLowerCase().trim() === 'en' ? 'en' : 'tr');
 
         const selectedValues = interaction.values || [];
         const displayAnswer = selectedValues.join(', ');

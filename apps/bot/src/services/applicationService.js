@@ -26,7 +26,7 @@ const pendingAnswers = new Map();
 /**
  * Kullanıcının anket oturumunu başlatır
  */
-function startSession(userId, guildId, channelId, questionList, registrationData = null) {
+function startSession(userId, guildId, channelId, questionList, registrationData = null, lang = null) {
     const key = `${userId}_${guildId}`;
     pendingAnswers.set(key, {
         channelId,
@@ -34,6 +34,7 @@ function startSession(userId, guildId, channelId, questionList, registrationData
         questionList, // Tüm sorular (rules_accept hariç)
         currentPage: 0,
         registrationData,
+        lang, // Store language in session
         timestamp: Date.now()
     });
 }

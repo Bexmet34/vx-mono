@@ -381,7 +381,7 @@ async function handleRegisterModal(interaction) {
                     ign,
                     age,
                     playerData
-                });
+                }, lang);
 
                 const continueRow = new ActionRowBuilder().addComponents(
                     new ButtonBuilder()
@@ -552,7 +552,8 @@ async function handleApplicationAnswerModal(interaction) {
     const guildId = interaction.guildId;
 
     const guildConfig = await getGuildConfig(guildId);
-    const lang = (guildConfig?.language || '').toString().toLowerCase().trim() === 'en' ? 'en' : 'tr';
+    const sessionForLang = appSvc.getSession(userId, guildId);
+    const lang = sessionForLang?.lang || ((guildConfig?.language || '').toString().toLowerCase().trim() === 'en' ? 'en' : 'tr');
     const questions = (guildConfig?.application_questions || []).filter(q => q.type !== 'rules_accept');
 
     // Modal'daki cevapları oku
