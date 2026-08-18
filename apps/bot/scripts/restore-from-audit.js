@@ -29,65 +29,95 @@ client.once('ready', async () => {
         console.log(`Son ${HOURS_AGO} saat içindeki bot işlemleri geri alınıyor...`);
 
         // 1. Rol Güncellemelerini Geri Al (MemberRoleUpdate)
-        const roleLogs = await guild.fetchAuditLogs({
-            limit: 100,
-            type: AuditLogEvent.MemberRoleUpdate,
-        });
+        let lastId = null;
+        let keepFetching = true;
+        
+        while (keepFetching) {
+            const roleLogs = await guild.fetchAuditLogs({
+                limit: 100,
+                type: AuditLogEvent.MemberRoleUpdate,
+                ...(lastId && { before: lastId })
+            });
 
-        for (const entry of roleLogs.entries.values()) {
-            if (entry.createdTimestamp < timeLimit) continue;
-            // Sadece botun yaptığı işlemleri geri al
-            if (entry.executorId !== client.user.id) continue;
-            if (entry.reason && !entry.reason.includes('Albion Guild Sync')) continue;
+            if (roleLogs.entries.size === 0) break;
 
-            const member = await guild.members.fetch(entry.targetId).catch(() => null);
-            if (!member) continue;
+            for (const entry of roleLogs.entries.values()) {
+                if (entry.createdTimestamp < timeLimit) {
+                    keepFetching = false;
+                    break;
+                }
+                
+                lastId = entry.id; // Update lastId for next iteration pagination
 
-            let changed = false;
+                // Sadece botun yaptığı işlemleri geri al
+                if (entry.executorId !== client.user.id) continue;
+                if (entry.reason && !entry.reason.includes('Albion Guild Sync')) continue;
 
-            // Rolleri geri ver (Botun sildiği rolleri)
-            for (const role of entry.changes.filter(c => c.key === '$remove').flatMap(c => c.new)) {
-                if (!member.roles.cache.has(role.id)) {
-                    await member.roles.add(role.id, "Audit Log Kurtarma: Silinen rol geri verildi");
-                    changed = true;
+                const member = await guild.members.fetch(entry.targetId).catch(() => null);
+                if (!member) continue;
+
+                let changed = false;
+
+                // Rolleri geri ver (Botun sildiği rolleri)
+                for (const role of entry.changes.filter(c => c.key === '$remove').flatMap(c => c.new)) {
+                    if (!member.roles.cache.has(role.id)) {
+                        await member.roles.add(role.id, "Audit Log Kurtarma: Silinen rol geri verildi").catch(() => {});
+                        changed = true;
+                    }
+                }
+
+                // Botun verdiği rolleri geri al (Örn: Kayıtsız rolü)
+                for (const role of entry.changes.filter(c => c.key === '$add').flatMap(c => c.new)) {
+                    if (member.roles.cache.has(role.id)) {
+                        await member.roles.remove(role.id, "Audit Log Kurtarma: Eklenen rol geri alındı").catch(() => {});
+                        changed = true;
+                    }
+                }
+
+                if (changed) {
+                    console.log(`Rolleri kurtarıldı: ${member.user.tag}`);
+                    restoredCount++;
                 }
             }
-
-            // Botun verdiği rolleri geri al (Örn: Kayıtsız rolü)
-            for (const role of entry.changes.filter(c => c.key === '$add').flatMap(c => c.new)) {
-                if (member.roles.cache.has(role.id)) {
-                    await member.roles.remove(role.id, "Audit Log Kurtarma: Eklenen rol geri alındı");
-                    changed = true;
-                }
-            }
-
-            if (changed) {
-                console.log(`Rolleri kurtarıldı: ${member.user.tag}`);
-                restoredCount++;
-            }
+            if (roleLogs.entries.size < 100) break;
         }
 
         // 2. İsim Güncellemelerini Geri Al (MemberUpdate)
-        const nameLogs = await guild.fetchAuditLogs({
-            limit: 100,
-            type: AuditLogEvent.MemberUpdate,
-        });
+        lastId = null;
+        keepFetching = true;
+        
+        while (keepFetching) {
+            const nameLogs = await guild.fetchAuditLogs({
+                limit: 100,
+                type: AuditLogEvent.MemberUpdate,
+                ...(lastId && { before: lastId })
+            });
 
-        for (const entry of nameLogs.entries.values()) {
-            if (entry.createdTimestamp < timeLimit) continue;
-            if (entry.executorId !== client.user.id) continue;
-            if (entry.reason && !entry.reason.includes('Albion Guild Sync')) continue;
+            if (nameLogs.entries.size === 0) break;
 
-            const member = await guild.members.fetch(entry.targetId).catch(() => null);
-            if (!member) continue;
+            for (const entry of nameLogs.entries.values()) {
+                if (entry.createdTimestamp < timeLimit) {
+                    keepFetching = false;
+                    break;
+                }
+                
+                lastId = entry.id;
 
-            const nickChange = entry.changes.find(c => c.key === 'nick');
-            if (nickChange && nickChange.old) {
-                if (guild.members.me.permissions.has('ManageNicknames') && member.manageable) {
-                    await member.setNickname(nickChange.old, "Audit Log Kurtarma: İsim geri alındı");
-                    console.log(`İsmi kurtarıldı: ${member.user.tag} (${nickChange.old})`);
+                if (entry.executorId !== client.user.id) continue;
+                if (entry.reason && !entry.reason.includes('Albion Guild Sync')) continue;
+
+                const member = await guild.members.fetch(entry.targetId).catch(() => null);
+                if (!member) continue;
+
+                const nickChange = entry.changes.find(c => c.key === 'nick');
+                if (nickChange && nickChange.old) {
+                    if (guild.members.me.permissions.has('ManageNicknames') && member.manageable) {
+                        await member.setNickname(nickChange.old, "Audit Log Kurtarma: İsim geri alındı").catch(() => {});
+                        console.log(`İsmi kurtarıldı: ${member.user.tag} (${nickChange.old})`);
+                    }
                 }
             }
+            if (nameLogs.entries.size < 100) break;
         }
 
         console.log(`\n🎉 Audit Log kurtarma işlemi bitti! Rolleri onarılan üye sayısı: ${restoredCount}`);
