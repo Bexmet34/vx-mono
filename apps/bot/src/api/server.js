@@ -108,11 +108,8 @@ function startApiServer(manager, port = process.env.BOT_API_PORT || 3005) {
                 const guild = client.guilds.cache.get(context.guildId);
                 if (!guild) return null;
 
-                const { createClient } = require('@supabase/supabase-js');
-                const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-                const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-                if (!supabaseUrl || !supabaseKey) return { error: 'Supabase credentials missing' };
-                const supabase = createClient(supabaseUrl, supabaseKey);
+                const { supabase } = require('@veyronix/database');
+                if (!supabase) return { error: 'Supabase client not initialized' };
 
                 // Fetch Guild Settings
                 const { data: settings } = await supabase
