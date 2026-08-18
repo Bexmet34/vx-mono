@@ -168,10 +168,7 @@ function startApiServer(manager, port = process.env.BOT_API_PORT || 3005) {
 
                                 await member.roles.remove(rolesToRemove, 'Albion Guild Sync: Left the guild');
                                 
-                                // Give Unregistered Role
-                                if (context.unregisteredRoleId) {
-                                    await member.roles.add(context.unregisteredRoleId, 'Albion Guild Sync: Left the guild');
-                                }
+                                // Removed Unregistered Role assignment here because it kicks community members out of channels
 
                                 // Update Nickname
                                 const newNickname = `[NaN] ${ign}`.substring(0, 32);
