@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabaseClient";
-import { getUserSubscription } from "@/lib/auth";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { checkDashboardAccess } from '@/utils/authUtils';
+import { supabase } from '@veyronix/database';
 
 const ALBION_API_BASE = "https://gameinfo.albiononline.com/api/gameinfo";
 const ALBION_API_BASE_EAST = "https://gameinfo-sg.albiononline.com/api/gameinfo";
@@ -14,11 +16,16 @@ function getBaseUrl(serverName) {
 
 export async function POST(req, { params }) {
   try {
-    const { guildId } = params;
-    const subscription = await getUserSubscription(req);
-
-    if (!subscription || subscription.error) {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { guildId } = await params;
+
+    const { hasAccess } = await checkDashboardAccess(guildId, session.user.id);
+    if (!hasAccess) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     // Get guild settings
