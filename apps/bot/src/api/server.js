@@ -104,38 +104,36 @@ function startApiServer(manager, port = process.env.BOT_API_PORT || 3005) {
         if (!guildId) return res.status(400).json({ error: 'Missing guildId' });
 
         try {
+            const { supabase } = require('@veyronix/database');
+            if (!supabase) return res.status(500).json({ error: 'Supabase client not initialized in bot API' });
+
+            // Fetch Guild Settings
+            const { data: settings } = await supabase
+                .from('guild_settings')
+                .select('*')
+                .eq('guild_id', guildId)
+                .single();
+
+            if (!settings || !settings.registration_enabled) return res.status(400).json({ error: 'Registration not enabled' });
+
+            // Fetch Albion Members from DB
+            const { data: albionMembers } = await supabase
+                .from('albion_guild_members')
+                .select('player_name')
+                .eq('discord_guild_id', guildId);
+
+            if (!albionMembers) return res.status(400).json({ error: 'No Albion members synced' });
+            const albionMemberNames = albionMembers.map(m => m.player_name.toLowerCase());
+
+            // Identify Roles
+            const guildRoleId = settings.registration_given_role_id;
+            if (!guildRoleId) return res.status(400).json({ error: 'Guild role not set' });
+            const unregisteredRoleId = settings.registration_unregistered_role_id;
+
             const results = await manager.broadcastEval(async (client, context) => {
                 const guild = client.guilds.cache.get(context.guildId);
                 if (!guild) return null;
 
-                const { createClient } = require('@supabase/supabase-js');
-                const supabase = createClient(context.supabaseUrl, context.supabaseKey);
-                if (!supabase) return { error: 'Supabase client failed to initialize' };
-
-                // Fetch Guild Settings
-                const { data: settings } = await supabase
-                    .from('guild_settings')
-                    .select('*')
-                    .eq('guild_id', context.guildId)
-                    .single();
-
-                if (!settings || !settings.registration_enabled) return { error: 'Registration not enabled' };
-
-                // Fetch Albion Members from DB
-                const { data: albionMembers } = await supabase
-                    .from('albion_guild_members')
-                    .select('player_name')
-                    .eq('discord_guild_id', context.guildId);
-
-                if (!albionMembers) return { error: 'No Albion members synced' };
-                const albionMemberNames = albionMembers.map(m => m.player_name.toLowerCase());
-
-                // Identify Roles
-                const guildRoleId = settings.registration_given_role_id;
-                if (!guildRoleId) return { error: 'Guild role not set' };
-                
-                const unregisteredRoleId = settings.registration_unregistered_role_id;
-                
                 // Fetch all discord members
                 await guild.members.fetch();
                 
@@ -146,7 +144,7 @@ function startApiServer(manager, port = process.env.BOT_API_PORT || 3005) {
                     if (member.user.bot) continue;
                     
                     // Only check people who actually have the guild role
-                    if (member.roles.cache.has(guildRoleId)) {
+                    if (member.roles.cache.has(context.guildRoleId)) {
                         checkedCount++;
                         
                         // Extract IGN from Nickname
@@ -157,22 +155,22 @@ function startApiServer(manager, port = process.env.BOT_API_PORT || 3005) {
                         ign = ign.trim().toLowerCase();
 
                         // If not in Albion DB
-                        if (!albionMemberNames.includes(ign)) {
+                        if (!context.albionMemberNames.includes(ign)) {
                             try {
                                 // Remove Guild Roles
                                 const rolesToRemove = [
-                                    settings.registration_given_role_id,
-                                    settings.registration_given_role_id_2,
-                                    settings.registration_given_role_id_3,
-                                    settings.registration_given_role_id_4,
-                                    settings.registration_given_role_id_5
+                                    context.settings.registration_given_role_id,
+                                    context.settings.registration_given_role_id_2,
+                                    context.settings.registration_given_role_id_3,
+                                    context.settings.registration_given_role_id_4,
+                                    context.settings.registration_given_role_id_5
                                 ].filter(Boolean);
 
                                 await member.roles.remove(rolesToRemove, 'Albion Guild Sync: Left the guild');
                                 
                                 // Give Unregistered Role
-                                if (unregisteredRoleId) {
-                                    await member.roles.add(unregisteredRoleId, 'Albion Guild Sync: Left the guild');
+                                if (context.unregisteredRoleId) {
+                                    await member.roles.add(context.unregisteredRoleId, 'Albion Guild Sync: Left the guild');
                                 }
 
                                 // Update Nickname
@@ -190,7 +188,7 @@ function startApiServer(manager, port = process.env.BOT_API_PORT || 3005) {
                 }
 
                 return { success: true, checkedCount, removedCount };
-            }, { context: { guildId, supabaseUrl: process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL, supabaseKey: process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY } });
+            }, { context: { guildId, settings, albionMemberNames, guildRoleId, unregisteredRoleId } });
 
             const validResult = results.find(r => r !== null);
             if (!validResult) return res.status(404).json({ error: 'Guild not found on any bot shard' });
@@ -199,7 +197,7 @@ function startApiServer(manager, port = process.env.BOT_API_PORT || 3005) {
             res.json(validResult);
         } catch (error) {
             console.error('[API] Error checking discord:', error);
-            res.status(500).json({ error: 'Internal Server Error' });
+            res.status(500).json({ error: error.message || 'Internal Server Error' });
         }
     });
 
