@@ -162,6 +162,9 @@ function startApiServer(manager, port = process.env.BOT_API_PORT || 3005) {
                         const tagMatch = ign.match(/^\[.*?\]\s*(.*)$/);
                         if (tagMatch) ign = tagMatch[1];
                         
+                        // Strip anything after a hyphen or pipe (e.g. "IGN - Name Age")
+                        ign = ign.split(/[-|]/)[0];
+                        
                         ign = ign.trim().toLowerCase();
                         
                         if (debugCount < 5) {
