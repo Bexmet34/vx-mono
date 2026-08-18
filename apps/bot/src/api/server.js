@@ -138,7 +138,7 @@ function startApiServer(manager, port = process.env.BOT_API_PORT || 3005) {
                 await guild.members.fetch();
                 
                 let checkedCount = 0;
-                let removedCount = 0;
+                let leavers = [];
 
                 for (const [memberId, member] of guild.members.cache) {
                     if (member.user.bot) continue;
@@ -156,35 +156,16 @@ function startApiServer(manager, port = process.env.BOT_API_PORT || 3005) {
 
                         // If not in Albion DB
                         if (!context.albionMemberNames.includes(ign)) {
-                            try {
-                                // Remove Guild Roles
-                                const rolesToRemove = [
-                                    context.settings.registration_given_role_id,
-                                    context.settings.registration_given_role_id_2,
-                                    context.settings.registration_given_role_id_3,
-                                    context.settings.registration_given_role_id_4,
-                                    context.settings.registration_given_role_id_5
-                                ].filter(Boolean);
-
-                                await member.roles.remove(rolesToRemove, 'Albion Guild Sync: Left the guild');
-                                
-                                // Removed Unregistered Role assignment here because it kicks community members out of channels
-
-                                // Update Nickname
-                                const newNickname = `[NaN] ${ign}`.substring(0, 32);
-                                if (guild.members.me.permissions.has('ManageNicknames') && member.manageable) {
-                                    await member.setNickname(newNickname, 'Albion Guild Sync: Left the guild');
-                                }
-                                
-                                removedCount++;
-                            } catch (err) {
-                                console.error(`[API Sync] Failed to update member ${member.user.tag}:`, err);
-                            }
+                            leavers.push({
+                                id: member.id,
+                                tag: member.user.tag,
+                                ign: ign
+                            });
                         }
                     }
                 }
 
-                return { success: true, checkedCount, removedCount };
+                return { success: true, checkedCount, leavers };
             }, { context: { guildId, settings, albionMemberNames, guildRoleId, unregisteredRoleId } });
 
             const validResult = results.find(r => r !== null);

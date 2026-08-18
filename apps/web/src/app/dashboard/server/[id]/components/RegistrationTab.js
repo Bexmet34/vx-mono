@@ -827,8 +827,8 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                         </h4>
                         <p className="text-[10px] font-body-md text-on-surface-variant mb-4 leading-relaxed">
                           {lang === 'en' 
-                            ? 'Checks all Discord members against the updated database. Removes roles from those who left the guild.' 
-                            : 'Discord sunucusundaki üyeleri güncel veritabanı ile karşılaştırır. Loncadan çıkmış olanların yetkilerini ve taglarını alır.'}
+                            ? 'Checks all Discord members against the updated database. Displays those who left the guild.' 
+                            : 'Discord sunucusundaki üyeleri güncel veritabanı ile karşılaştırır. Loncadan çıkmış olanları tabloda listeler.'}
                         </p>
                       </div>
 
@@ -840,8 +840,8 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                         >
                           {checkingDiscord ? <Loader2 size={14} className="animate-spin"/> : <AlertTriangle size={14}/>} 
                           {lang === 'en' 
-                            ? (checkingDiscord ? 'Checking Discord...' : 'Check Discord') 
-                            : (checkingDiscord ? 'Discord Taranıyor...' : 'Discord\'u Kontrol Et')}
+                            ? (checkingDiscord ? 'Scanning...' : 'Scan Discord Members') 
+                            : (checkingDiscord ? 'Taranıyor...' : 'Uyuşmazlıkları Tara')}
                         </button>
 
                         {discordCheckResult && (
@@ -851,7 +851,36 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                             </strong>
                             <div className="mt-1 space-y-1 text-on-surface-variant">
                               <div>{lang === 'en' ? 'Scanned Discord Members:' : 'Taranan Üye Sayısı:'} <span className="text-on-surface ml-1">{discordCheckResult.checkedCount}</span></div>
-                              <div>{lang === 'en' ? 'Roles Removed / Kicked:' : 'Yetkisi Alınanlar:'} <span className="text-error ml-1">{discordCheckResult.removedCount}</span></div>
+                              
+                              {discordCheckResult.leavers && discordCheckResult.leavers.length > 0 ? (
+                                <div className="mt-3">
+                                  <h5 className="text-error font-label-bold mb-2">
+                                    {lang === 'en' ? `Leavers Found (${discordCheckResult.leavers.length})` : `Guild'den Ayrılanlar (${discordCheckResult.leavers.length})`}
+                                  </h5>
+                                  <div className="max-h-40 overflow-y-auto rounded border border-outline-variant/30">
+                                    <table className="w-full text-[9px] text-left">
+                                      <thead className="bg-surface-container-highest sticky top-0">
+                                        <tr>
+                                          <th className="p-2 border-b border-outline-variant/30">Discord</th>
+                                          <th className="p-2 border-b border-outline-variant/30">Oyun İçi Adı</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody className="divide-y divide-outline-variant/20">
+                                        {discordCheckResult.leavers.map(l => (
+                                          <tr key={l.id} className="hover:bg-surface-container/50">
+                                            <td className="p-2">{l.tag}</td>
+                                            <td className="p-2 text-error-variant font-label-bold">{l.ign}</td>
+                                          </tr>
+                                        ))}
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="text-success mt-2 font-label-bold">
+                                  {lang === 'en' ? 'Everyone matches perfectly!' : 'Tüm üyeler eşleşiyor, sorun yok!'}
+                                </div>
+                              )}
                             </div>
                           </div>
                         )}
