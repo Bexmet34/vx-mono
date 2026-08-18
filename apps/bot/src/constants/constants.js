@@ -1,4 +1,4 @@
-import { LINKS } from '@veyronix/config';
+const { LINKS: GLOBALLINKS } = require('@veyronix/config');
 // Slot and Party Constants
 const EMPTY_SLOT = '-';
 
@@ -44,11 +44,11 @@ const LOGO_NAME = 'logo.png';
 
 // Project Links
 const LINKS = {
-    WEBSITE: '${LINKS.WEBSITE}/',
-    SUPPORT_SERVER: '${LINKS.SUPPORT_SERVER}',
+    WEBSITE: `${GLOBALLINKS.WEBSITE}/`,
+    SUPPORT_SERVER: GLOBALLINKS.SUPPORT_SERVER,
     SUPPORT_ACCOUNT: 'https://discord.com/users/335891393690140673',
     TOPGG: 'https://top.gg/bot/1082239904169336902/vote',
-    EMAIL: '${LINKS.SUPPORT_EMAIL}'
+    EMAIL: GLOBALLINKS.SUPPORT_EMAIL
 };
 
 module.exports = {
