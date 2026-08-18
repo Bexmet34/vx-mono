@@ -140,15 +140,6 @@ function startApiServer(manager, port = process.env.BOT_API_PORT || 3005) {
                 let checkedCount = 0;
                 let leavers = [];
                 let matchedIgnSet = new Set();
-                
-                // DEBUG ONLY: log the first 5 names in context
-                console.log(`[DEBUG] Check Discord Guild ${context.guildId}`);
-                console.log(`[DEBUG] Albion Members count: ${context.albionMemberNames.length}`);
-                if (context.albionMemberNames.length > 0) {
-                    console.log(`[DEBUG] Sample DB names: ${context.albionMemberNames.slice(0, 5).join(', ')}`);
-                }
-
-                let debugCount = 0;
 
                 for (const [memberId, member] of guild.members.cache) {
                     if (member.user.bot) continue;
@@ -166,12 +157,6 @@ function startApiServer(manager, port = process.env.BOT_API_PORT || 3005) {
                         ign = ign.split(/[-|]/)[0];
                         
                         ign = ign.trim().toLowerCase();
-                        
-                        if (debugCount < 5) {
-                            console.log(`[DEBUG] Member: ${member.displayName} -> IGN parsed as: '${ign}'`);
-                            console.log(`[DEBUG] Matches DB? ${context.albionMemberNames.includes(ign)}`);
-                            debugCount++;
-                        }
 
                         // If not in Albion DB
                         if (!context.albionMemberNames.includes(ign)) {
