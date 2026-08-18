@@ -108,8 +108,9 @@ function startApiServer(manager, port = process.env.BOT_API_PORT || 3005) {
                 const guild = client.guilds.cache.get(context.guildId);
                 if (!guild) return null;
 
-                const { supabase } = require('@veyronix/database');
-                if (!supabase) return { error: 'Supabase client not initialized' };
+                const { createClient } = require('@supabase/supabase-js');
+                const supabase = createClient(context.supabaseUrl, context.supabaseKey);
+                if (!supabase) return { error: 'Supabase client failed to initialize' };
 
                 // Fetch Guild Settings
                 const { data: settings } = await supabase
@@ -189,7 +190,7 @@ function startApiServer(manager, port = process.env.BOT_API_PORT || 3005) {
                 }
 
                 return { success: true, checkedCount, removedCount };
-            }, { context: { guildId } });
+            }, { context: { guildId, supabaseUrl: process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL, supabaseKey: process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY } });
 
             const validResult = results.find(r => r !== null);
             if (!validResult) return res.status(404).json({ error: 'Guild not found on any bot shard' });
