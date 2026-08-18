@@ -852,35 +852,9 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                             <div className="mt-1 space-y-1 text-on-surface-variant">
                               <div>{lang === 'en' ? 'Scanned Discord Members:' : 'Taranan Üye Sayısı:'} <span className="text-on-surface ml-1">{discordCheckResult.checkedCount}</span></div>
                               
-                              {discordCheckResult.leavers && discordCheckResult.leavers.length > 0 ? (
-                                <div className="mt-3">
-                                  <h5 className="text-error font-label-bold mb-2">
-                                    {lang === 'en' ? `Leavers Found (${discordCheckResult.leavers.length})` : `Guild'den Ayrılanlar (${discordCheckResult.leavers.length})`}
-                                  </h5>
-                                  <div className="max-h-40 overflow-y-auto rounded border border-outline-variant/30">
-                                    <table className="w-full text-[9px] text-left">
-                                      <thead className="bg-surface-container-highest sticky top-0">
-                                        <tr>
-                                          <th className="p-2 border-b border-outline-variant/30">Discord</th>
-                                          <th className="p-2 border-b border-outline-variant/30">Oyun İçi Adı</th>
-                                        </tr>
-                                      </thead>
-                                      <tbody className="divide-y divide-outline-variant/20">
-                                        {discordCheckResult.leavers.map(l => (
-                                          <tr key={l.id} className="hover:bg-surface-container/50">
-                                            <td className="p-2">{l.tag}</td>
-                                            <td className="p-2 text-error-variant font-label-bold">{l.ign}</td>
-                                          </tr>
-                                        ))}
-                                      </tbody>
-                                    </table>
-                                  </div>
-                                </div>
-                              ) : (
-                                <div className="text-success mt-2 font-label-bold">
-                                  {lang === 'en' ? 'Everyone matches perfectly!' : 'Tüm üyeler eşleşiyor, sorun yok!'}
-                                </div>
-                              )}
+                              <div className="mt-2 text-primary-container font-label-bold text-[9px]">
+                                {lang === 'en' ? 'Scroll down to see detailed reports.' : 'Detaylı liste için aşağı kaydırın.'}
+                              </div>
                             </div>
                           </div>
                         )}
@@ -888,6 +862,84 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                     </div>
                   </div>
                 </div>
+                </div>
+
+                {discordCheckResult && (
+                  <div className="mt-8 space-y-4 animate-slide-up">
+                    <h3 className="font-headline-md text-[10px] text-primary-container uppercase tracking-widest mb-4 border-b border-outline-variant/30 pb-2">
+                      {lang === 'en' ? 'Detailed Check Reports' : 'Detaylı Tarama Raporları'}
+                    </h3>
+                    
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                      {/* Leavers Table */}
+                      <div className="bg-surface-container/20 p-4 rounded-lg border border-error/30 flex flex-col h-full">
+                        <h4 className="text-[10px] font-label-bold text-error uppercase tracking-widest mb-3 flex items-center gap-2">
+                          <AlertTriangle size={14} />
+                          {lang === 'en' ? `Left Guild (${discordCheckResult.leavers?.length || 0})` : `Guild'den Ayrılanlar (${discordCheckResult.leavers?.length || 0})`}
+                        </h4>
+                        
+                        {discordCheckResult.leavers && discordCheckResult.leavers.length > 0 ? (
+                          <div className="max-h-60 overflow-y-auto rounded border border-outline-variant/30 flex-1">
+                            <table className="w-full text-[9px] text-left">
+                              <thead className="bg-surface-container-highest sticky top-0">
+                                <tr>
+                                  <th className="p-2 border-b border-outline-variant/30">Discord</th>
+                                  <th className="p-2 border-b border-outline-variant/30">Oyun İçi Adı</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-outline-variant/20">
+                                {discordCheckResult.leavers.map(l => (
+                                  <tr key={l.id} className="hover:bg-surface-container/50">
+                                    <td className="p-2 text-on-surface">{l.tag}</td>
+                                    <td className="p-2 text-error-variant font-label-bold">{l.ign}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        ) : (
+                          <div className="text-success text-[10px] font-body-md p-2 bg-success/10 rounded flex-1">
+                            {lang === 'en' ? 'No leavers found.' : 'Guildden ayrılmış ve discordda olan kimse bulunamadı.'}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Unregistered Table */}
+                      <div className="bg-surface-container/20 p-4 rounded-lg border border-secondary/30 flex flex-col h-full">
+                        <h4 className="text-[10px] font-label-bold text-secondary uppercase tracking-widest mb-1 flex items-center gap-2">
+                          <Users size={14} />
+                          {lang === 'en' ? `Missing Discord Role (${discordCheckResult.unregistered?.length || 0})` : `Kayıtlı Olmayanlar / Rolü Olmayanlar (${discordCheckResult.unregistered?.length || 0})`}
+                        </h4>
+                        <p className="text-[9px] text-on-surface-variant mb-3">
+                          {lang === 'en' ? 'In Albion database but no Discord role.' : 'Guildde olup Discord rolü bulunmayan oyuncular.'}
+                        </p>
+                        
+                        {discordCheckResult.unregistered && discordCheckResult.unregistered.length > 0 ? (
+                          <div className="max-h-60 overflow-y-auto rounded border border-outline-variant/30 flex-1">
+                            <table className="w-full text-[9px] text-left">
+                              <thead className="bg-surface-container-highest sticky top-0">
+                                <tr>
+                                  <th className="p-2 border-b border-outline-variant/30">Oyun İçi Adı</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-outline-variant/20">
+                                {discordCheckResult.unregistered.map(name => (
+                                  <tr key={name} className="hover:bg-surface-container/50">
+                                    <td className="p-2 text-secondary font-label-bold">{name}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        ) : (
+                          <div className="text-success text-[10px] font-body-md p-2 bg-success/10 rounded flex-1">
+                            {lang === 'en' ? 'Everyone is registered.' : 'Guilddeki herkes Discordda kayıtlı.'}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </>
             )}
           </div>

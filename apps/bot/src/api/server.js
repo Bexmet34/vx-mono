@@ -139,6 +139,7 @@ function startApiServer(manager, port = process.env.BOT_API_PORT || 3005) {
                 
                 let checkedCount = 0;
                 let leavers = [];
+                let matchedIgnSet = new Set();
 
                 for (const [memberId, member] of guild.members.cache) {
                     if (member.user.bot) continue;
@@ -161,11 +162,20 @@ function startApiServer(manager, port = process.env.BOT_API_PORT || 3005) {
                                 tag: member.user.tag,
                                 ign: ign
                             });
+                        } else {
+                            matchedIgnSet.add(ign);
                         }
                     }
                 }
 
-                return { success: true, checkedCount, leavers };
+                let unregistered = [];
+                for (const dbName of context.albionMemberNames) {
+                    if (!matchedIgnSet.has(dbName)) {
+                        unregistered.push(dbName);
+                    }
+                }
+
+                return { success: true, checkedCount, leavers, unregistered };
             }, { context: { guildId, settings, albionMemberNames, guildRoleId, unregisteredRoleId } });
 
             const validResult = results.find(r => r !== null);

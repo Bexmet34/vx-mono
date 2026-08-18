@@ -32,7 +32,8 @@ export async function POST(req, { params }) {
       return NextResponse.json({
         success: true,
         checkedCount: data.checkedCount,
-        leavers: data.leavers
+        leavers: data.leavers,
+        unregistered: data.unregistered
       });
     }
 
