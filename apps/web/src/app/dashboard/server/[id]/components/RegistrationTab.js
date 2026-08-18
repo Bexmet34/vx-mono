@@ -862,7 +862,6 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                     </div>
                   </div>
                 </div>
-                </div>
 
                 {discordCheckResult && (
                   <div className="mt-8 space-y-4 animate-slide-up">
