@@ -8,7 +8,7 @@ import {
   LayoutDashboard, Server, MessageSquare, Settings, 
   Users, BarChart3, Search, Clock, Infinity, Power, 
   Calendar, Trash2, ChevronRight, ArrowLeft, Gift, Plus, Send, Edit3, Eye, EyeOff, DollarSign, Check, X, Gamepad2, CreditCard,
-  Activity, TerminalSquare, Sparkles, FileText, RefreshCw
+  Activity, TerminalSquare, Sparkles, FileText, RefreshCw, Menu
 } from "lucide-react";
 import AdminBlogAutomationTab from "@/components/AdminBlogAutomationTab";
 import { useCallback } from "react";
@@ -29,6 +29,7 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("servers");
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Data States
   const [templates, setTemplates] = useState([]);
@@ -740,18 +741,42 @@ export default function AdminPage() {
 
   return (
     <div className="admin-container">
+      {/* Mobile Top App Bar */}
+      <div className="mobile-app-bar hide-on-desktop">
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <div className="text-logo" style={{fontSize: '1.25rem'}}>VEYRONIX</div>
+          <div style={{fontSize: '0.55rem', fontWeight: '800', color: 'var(--admin-accent)', letterSpacing: '1px'}}>ADMIN PANEL</div>
+        </div>
+        <button className="mobile-menu-btn" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+          {isMobileMenuOpen ? <X size={26} color="var(--admin-text)" /> : <Menu size={26} color="var(--admin-text)" />}
+        </button>
+      </div>
+
+      {/* Mobile Overlay */}
+      {isMobileMenuOpen && (
+        <div className="mobile-drawer-overlay hide-on-desktop" onClick={() => setIsMobileMenuOpen(false)}></div>
+      )}
+
       {/* Premium Sidebar */}
-      <aside className="admin-sidebar">
+      <aside className={`admin-sidebar ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
         <div className="admin-sidebar-header">
-           <div className="text-logo" style={{fontSize: '1.5rem'}}>VEYRONIX</div>
-           <div style={{fontSize: '0.65rem', fontWeight: '800', color: 'var(--admin-accent)', letterSpacing: '2px', marginTop: '0.2rem'}}>ADMIN PANEL</div>
+           <div style={{ display: "flex", flexDirection: "column" }}>
+             <div className="text-logo" style={{fontSize: '1.5rem'}}>VEYRONIX</div>
+             <div style={{fontSize: '0.65rem', fontWeight: '800', color: 'var(--admin-accent)', letterSpacing: '2px', marginTop: '0.2rem'}}>ADMIN PANEL</div>
+           </div>
+           <button className="mobile-close-btn hide-on-desktop" onClick={() => setIsMobileMenuOpen(false)}>
+             <X size={24} color="var(--admin-text-muted)" />
+           </button>
         </div>
 
         <nav className="admin-nav-group">
           {menuItems.map(item => (
             <button 
               key={item.id}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => {
+                setActiveTab(item.id);
+                setIsMobileMenuOpen(false);
+              }}
               className={`admin-nav-item ${activeTab === item.id ? 'active' : ''}`}
             >
               {item.icon}
