@@ -27,6 +27,9 @@ importers:
       '@top-gg/sdk':
         specifier: ^3.1.6
         version: 3.1.6
+      '@veyronix/config':
+        specifier: workspace:*
+        version: link:../../packages/config
       '@veyronix/database':
         specifier: workspace:*
         version: link:../../packages/database
@@ -60,6 +63,9 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.101.1
         version: 2.104.1
+      '@veyronix/config':
+        specifier: workspace:*
+        version: link:../../packages/config
       '@veyronix/database':
         specifier: workspace:*
         version: link:../../packages/database
@@ -78,6 +84,9 @@ importers:
       '@swc/helpers':
         specifier: ^0.5.15
         version: 0.5.15
+      '@veyronix/config':
+        specifier: workspace:*
+        version: link:../../packages/config
       '@veyronix/database':
         specifier: workspace:*
         version: link:../../packages/database
@@ -130,6 +139,8 @@ importers:
       tailwindcss:
         specifier: ^3.4.19
         version: 3.4.19
+
+  packages/config: {}
 
   packages/database:
     dependencies:
