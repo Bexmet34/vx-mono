@@ -1,5 +1,6 @@
 import { supabase } from '@veyronix/database';
 import { getAllPosts as getLocalMarkdownPosts, getPostBySlug as getLocalPostBySlug } from './markdown';
+import { LINKS } from '@veyronix/config';
 
 /**
  * Tüm yayınlanmış blog yazılarını getirir (Supabase + Local Markdown Yedekli)
@@ -25,7 +26,7 @@ export async function getAllBlogPosts() {
         category: post.category || 'Rehber',
         tags: Array.isArray(post.tags) ? post.tags : (post.tags ? post.tags.split(',') : []),
         authorName: post.author_name || 'Veyronix Ekibi',
-        authorAvatar: post.author_avatar || 'https://veyronix.com.tr/icon.svg',
+        authorAvatar: post.author_avatar || LINKS.LOGO_URL,
         readTimeMinutes: post.read_time_minutes || calculateReadTime(post.content),
         lang: post.lang || 'tr',
         publishedAt: post.published_at || post.created_at,
@@ -47,7 +48,7 @@ export async function getAllBlogPosts() {
     category: p.meta.category || (p.meta.tags ? p.meta.tags.split(',')[0] : 'Rehber'),
     tags: p.meta.tags ? p.meta.tags.split(',').map(t => t.trim()) : [],
     authorName: p.meta.author || 'Veyronix Ekibi',
-    authorAvatar: 'https://veyronix.com.tr/icon.svg',
+    authorAvatar: LINKS.LOGO_URL,
     readTimeMinutes: calculateReadTime(p.content),
     lang: p.meta.lang || 'tr',
     publishedAt: p.meta.date || new Date().toISOString(),
@@ -90,7 +91,7 @@ export async function getBlogPostBySlug(slug) {
         category: data.category || 'Rehber',
         tags: Array.isArray(data.tags) ? data.tags : (data.tags ? data.tags.split(',') : []),
         authorName: data.author_name || 'Veyronix Ekibi',
-        authorAvatar: data.author_avatar || 'https://veyronix.com.tr/icon.svg',
+        authorAvatar: data.author_avatar || LINKS.LOGO_URL,
         readTimeMinutes: data.read_time_minutes || calculateReadTime(data.content),
         lang: data.lang || 'tr',
         publishedAt: data.published_at || data.created_at,
@@ -114,7 +115,7 @@ export async function getBlogPostBySlug(slug) {
       category: local.meta.category || (local.meta.tags ? local.meta.tags.split(',')[0] : 'Rehber'),
       tags: local.meta.tags ? local.meta.tags.split(',').map(t => t.trim()) : [],
       authorName: local.meta.author || 'Veyronix Ekibi',
-      authorAvatar: 'https://veyronix.com.tr/icon.svg',
+      authorAvatar: LINKS.LOGO_URL,
       readTimeMinutes: calculateReadTime(local.content),
       lang: local.meta.lang || 'tr',
       publishedAt: local.meta.date || new Date().toISOString(),

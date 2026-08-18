@@ -1,11 +1,12 @@
 import { getAllBlogPosts } from '@/lib/supabaseBlog';
+import { LINKS } from '@veyronix/config';
 
 export default async function sitemap() {
   const posts = await getAllBlogPosts();
 
   const blogUrls = posts.map((post) => {
     return {
-      url: `https://veyronix.com.tr/blog/${post.slug}`,
+      url: `${LINKS.PAGE_BLOG}/${post.slug}`,
       lastModified: new Date(post.publishedAt || Date.now()),
       changeFrequency: 'daily',
       priority: 0.8,
@@ -14,68 +15,68 @@ export default async function sitemap() {
 
   return [
     {
-      url: 'https://veyronix.com.tr',
+      url: LINKS.WEBSITE,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 1,
     },
     {
-      url: 'https://veyronix.com.tr/blog',
+      url: LINKS.PAGE_BLOG,
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 0.9,
     },
     ...blogUrls,
     {
-      url: 'https://veyronix.com.tr/hakkimizda',
+      url: LINKS.PAGE_ABOUT,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
-      url: 'https://veyronix.com.tr/privacy',
+      url: LINKS.PAGE_PRIVACY,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.5,
     },
     {
-      url: 'https://veyronix.com.tr/terms',
+      url: LINKS.PAGE_TERMS,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.5,
     },
     {
-      url: 'https://veyronix.com.tr/iptal-ve-iade-kosullari',
+      url: LINKS.PAGE_REFUND,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.5,
     },
     {
-      url: 'https://veyronix.com.tr/mesafeli-satis-sozlesmesi',
+      url: LINKS.PAGE_SALES_AGREEMENT,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.5,
     },
     {
-      url: 'https://veyronix.com.tr/premium',
+      url: LINKS.PAGE_PREMIUM,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.9,
     },
     {
-      url: 'https://veyronix.com.tr/killboard',
+      url: LINKS.PAGE_KILLBOARD,
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 0.8,
     },
     {
-      url: 'https://veyronix.com.tr/vote',
+      url: LINKS.PAGE_VOTE,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     {
-      url: 'https://veyronix.com.tr/changelog',
+      url: LINKS.PAGE_CHANGELOG,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.7,

@@ -1,3 +1,4 @@
+import { LINKS } from '@veyronix/config';
 // Slot and Party Constants
 const EMPTY_SLOT = '-';
 
@@ -43,11 +44,11 @@ const LOGO_NAME = 'logo.png';
 
 // Project Links
 const LINKS = {
-    WEBSITE: 'https://veyronix.com.tr',
-    SUPPORT_SERVER: 'https://discord.gg/899GJS5MDf',
+    WEBSITE: '${LINKS.WEBSITE}/',
+    SUPPORT_SERVER: '${LINKS.SUPPORT_SERVER}',
     SUPPORT_ACCOUNT: 'https://discord.com/users/335891393690140673',
     TOPGG: 'https://top.gg/bot/1082239904169336902/vote',
-    EMAIL: 'info@veyronix.com.tr'
+    EMAIL: '${LINKS.SUPPORT_EMAIL}'
 };
 
 module.exports = {

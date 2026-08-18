@@ -1,3 +1,4 @@
+import { LINKS } from '@veyronix/config';
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
@@ -153,16 +154,16 @@ export async function POST(req) {
           `• **Status:** Active (Unlimited / Lifetime)\n` +
           `• **Expiration Date:** Never (Lifetime Access)\n` +
           `• **Top.gg Vote Requirement:** Permanently Removed\n` +
-          `• **Website:** https://veyronix.com.tr/\n` +
-          `• **Support Server:** https://discord.gg/D6T3t4beqa\n\n` +
+          `• **Website:** ${LINKS.WEBSITE}/\n` +
+          `• **Support Server:** ${LINKS.SUPPORT_SERVER}\n\n` +
           `▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n\n` +
           `🇹🇷 **Sınırsız Premium Aktif Edildi!**\n` +
           `Bireysel premium aboneliğiniz Ömür Boyu Sınırsız olarak tanımlandı.\n` +
           `• **Durum:** Aktif (Sınırsız / Ömür Boyu)\n` +
           `• **Son Kullanma Tarihi:** Süresiz (Ömür Boyu)\n` +
           `• **Top.gg Oy Verme Zorunluluğu:** Süresiz Kaldırıldı\n` +
-          `• **Web Sitesi:** https://veyronix.com.tr/\n` +
-          `• **Destek Sunucusu:** https://discord.gg/D6T3t4beqa`;
+          `• **Web Sitesi:** ${LINKS.WEBSITE}/\n` +
+          `• **Destek Sunucusu:** ${LINKS.SUPPORT_SERVER}`;
       } else {
         embedDescription = 
           `🇬🇧 **Premium Subscription Activated!**\n` +
@@ -170,16 +171,16 @@ export async function POST(req) {
           `• **Status:** Active (+${duration_days} Days Extended)\n` +
           `• **Expiration Date:** ${expiryDateStr}\n` +
           `• **Top.gg Vote Requirement:** Removed\n` +
-          `• **Website:** https://veyronix.com.tr/\n` +
-          `• **Support Server:** https://discord.gg/D6T3t4beqa\n\n` +
+          `• **Website:** ${LINKS.WEBSITE}/\n` +
+          `• **Support Server:** ${LINKS.SUPPORT_SERVER}\n\n` +
           `▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n\n` +
           `🇹🇷 **Premium Aboneliği Aktif Edildi!**\n` +
           `Bireysel premium aboneliğiniz Yönetici tarafından tanımlandı.\n` +
           `• **Durum:** Aktif (+${duration_days} Gün Uzatıldı)\n` +
           `• **Son Kullanma Tarihi:** ${expiryDateStr}\n` +
           `• **Top.gg Oy Verme Zorunluluğu:** Kaldırıldı\n` +
-          `• **Web Sitesi:** https://veyronix.com.tr/\n` +
-          `• **Destek Sunucusu:** https://discord.gg/D6T3t4beqa`;
+          `• **Web Sitesi:** ${LINKS.WEBSITE}/\n` +
+          `• **Destek Sunucusu:** ${LINKS.SUPPORT_SERVER}`;
       }
 
       await queueMessage({
@@ -290,16 +291,16 @@ export async function PATCH(req) {
           `• **Status:** Active (Unlimited / Lifetime)\n` +
           `• **Expiration Date:** Never (Lifetime Access)\n` +
           `• **Top.gg Vote Requirement:** Permanently Removed\n` +
-          `• **Website:** https://veyronix.com.tr/\n` +
-          `• **Support Server:** https://discord.gg/D6T3t4beqa\n\n` +
+          `• **Website:** ${LINKS.WEBSITE}/\n` +
+          `• **Support Server:** ${LINKS.SUPPORT_SERVER}\n\n` +
           `▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n\n` +
           `🇹🇷 **Sınırsız Premium Aktif Edildi!**\n` +
           `Bireysel premium aboneliğiniz Ömür Boyu Sınırsız olarak tanımlandı.\n` +
           `• **Durum:** Aktif (Sınırsız / Ömür Boyu)\n` +
           `• **Son Kullanma Tarihi:** Süresiz (Ömür Boyu)\n` +
           `• **Top.gg Oy Verme Zorunluluğu:** Süresiz Kaldırıldı\n` +
-          `• **Web Sitesi:** https://veyronix.com.tr/\n` +
-          `• **Destek Sunucusu:** https://discord.gg/D6T3t4beqa`;
+          `• **Web Sitesi:** ${LINKS.WEBSITE}/\n` +
+          `• **Destek Sunucusu:** ${LINKS.SUPPORT_SERVER}`;
       } else {
         const dateStr = newExpiryDate ? newExpiryDate.toLocaleDateString('tr-TR') : 'Belirtilmedi';
         const daysText = value ? `(${action === 'add_days' ? '+' : '-'}${value} Gün)` : '';
@@ -309,16 +310,16 @@ export async function PATCH(req) {
           `• **Status:** Active ${daysText}\n` +
           `• **Expiration Date:** ${dateStr}\n` +
           `• **Top.gg Vote Requirement:** Removed\n` +
-          `• **Website:** https://veyronix.com.tr/\n` +
-          `• **Support Server:** https://discord.gg/D6T3t4beqa\n\n` +
+          `• **Website:** ${LINKS.WEBSITE}/\n` +
+          `• **Support Server:** ${LINKS.SUPPORT_SERVER}\n\n` +
           `▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n\n` +
           `🇹🇷 **Premium Abonelik Süresi Güncellendi**\n` +
           `Bireysel premium son kullanma tarihiniz güncellendi.\n` +
           `• **Durum:** Aktif ${daysText}\n` +
           `• **Son Kullanma Tarihi:** ${dateStr}\n` +
           `• **Top.gg Oy Verme Zorunluluğu:** Kaldırıldı\n` +
-          `• **Web Sitesi:** https://veyronix.com.tr/\n` +
-          `• **Destek Sunucusu:** https://discord.gg/D6T3t4beqa`;
+          `• **Web Sitesi:** ${LINKS.WEBSITE}/\n` +
+          `• **Destek Sunucusu:** ${LINKS.SUPPORT_SERVER}`;
       }
 
       await queueMessage({
@@ -364,14 +365,14 @@ export async function DELETE(req) {
         `🇬🇧 **Premium Subscription Cancelled**\n` +
         `Your individual premium subscription has been cancelled.\n` +
         `• **Status:** Cancelled / Expired\n` +
-        `• **Website:** https://veyronix.com.tr/\n` +
-        `• **Support Server:** https://discord.gg/D6T3t4beqa\n\n` +
+        `• **Website:** ${LINKS.WEBSITE}/\n` +
+        `• **Support Server:** ${LINKS.SUPPORT_SERVER}\n\n` +
         `▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n\n` +
         `🇹🇷 **Premium Aboneliği İptal Edildi**\n` +
         `Bireysel premium aboneliğiniz iptal edildi.\n` +
         `• **Durum:** İptal Edildi / Sona Erdi\n` +
-        `• **Web Sitesi:** https://veyronix.com.tr/\n` +
-        `• **Destek Sunucusu:** https://discord.gg/D6T3t4beqa`;
+        `• **Web Sitesi:** ${LINKS.WEBSITE}/\n` +
+        `• **Destek Sunucusu:** ${LINKS.SUPPORT_SERVER}`;
 
       await queueMessage({
         owner_id: discordId,

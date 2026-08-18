@@ -11,6 +11,7 @@ import { Sora } from "next/font/google";
 
 import Script from "next/script";
 import LayoutWrapper from "@/components/LayoutWrapper";
+import { LINKS } from "@veyronix/config";
 
 const sora = Sora({ subsets: ["latin"], variable: "--font-sora", display: "swap" });
 
@@ -23,7 +24,7 @@ export const viewport = {
 };
 
 export const metadata = {
-  metadataBase: new URL("https://veyronix.com.tr"),
+  metadataBase: new URL(LINKS.WEBSITE),
   title: {
     default: "Veyronix – #1 Albion Online Discord Botu | Otomatik Killboard & Parti Kurucu",
     template: "%s | Veyronix Albion Online Discord Bot",
@@ -51,7 +52,7 @@ export const metadata = {
     "Albion Discord Verification",
     "Albion Online Kill Log"
   ].join(", "),
-  authors: [{ name: "Veyronix Team", url: "https://veyronix.com.tr" }],
+  authors: [{ name: "Veyronix Team", url: LINKS.WEBSITE }],
   creator: "Veyronix",
   publisher: "Veyronix",
   robots: {
@@ -66,10 +67,10 @@ export const metadata = {
     },
   },
   alternates: {
-    canonical: "https://veyronix.com.tr",
+    canonical: LINKS.WEBSITE,
     languages: {
-      "tr-TR": "https://veyronix.com.tr",
-      "en-US": "https://veyronix.com.tr",
+      "tr-TR": LINKS.WEBSITE,
+      "en-US": LINKS.WEBSITE,
     },
   },
   manifest: "/manifest.json",
@@ -81,11 +82,11 @@ export const metadata = {
   openGraph: {
     title: "Veyronix – #1 Albion Online Discord Botu | Otomatik Killboard & Parti Kurucu",
     description: "Albion Online loncanızı otomatize edin! Gelişmiş ZvZ parti kurucu, canlı Killboard takibi, otomatik rol yönetimi ve Türkçe/İngilizce web panel desteği sunan #1 Discord botu. Hemen ücretsiz deneyin!",
-    url: "https://veyronix.com.tr",
+    url: LINKS.WEBSITE,
     siteName: "Veyronix",
     images: [
       {
-        url: "https://veyronix.com.tr/og-image.png",
+        url: LINKS.OG_IMAGE_URL,
         width: 1200,
         height: 630,
         alt: "Veyronix - Discord Albion Party Finder & Killboard",
@@ -99,7 +100,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "Veyronix – #1 Albion Online Discord Botu | Otomatik Killboard & Parti Kurucu",
     description: "Albion Online loncanızı otomatize edin! Gelişmiş ZvZ parti kurucu, canlı Killboard takibi, otomatik rol yönetimi ve Türkçe/İngilizce web panel desteği sunan #1 Discord botu.",
-    images: ["https://veyronix.com.tr/og-image.png"],
+    images: [LINKS.OG_IMAGE_URL],
   },
   other: {
     cryptomus: "7e16ba27",
@@ -118,7 +119,7 @@ export default async function RootLayout({ children }) {
     operatingSystem: 'Discord, Web, iOS, Android',
     applicationCategory: 'GameApplication',
     applicationSubCategory: 'Discord Bot',
-    url: 'https://veyronix.com.tr',
+    url: LINKS.WEBSITE,
     description: 'Albion Online loncanızı otomatize edin! Gelişmiş ZvZ parti kurucu, canlı Killboard takibi, otomatik rol yönetimi ve Türkçe/İngilizce web panel desteği sunan #1 Discord botu.',
     offers: {
       '@type': 'Offer',
@@ -143,10 +144,10 @@ export default async function RootLayout({ children }) {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'Veyronix',
-    url: 'https://veyronix.com.tr',
-    logo: 'https://veyronix.com.tr/og-image.png',
+    url: LINKS.WEBSITE,
+    logo: LINKS.OG_IMAGE_URL,
     sameAs: [
-      'https://discord.gg/D6T3t4beqa',
+      LINKS.SUPPORT_SERVER,
       'https://top.gg/bot/1082239904169336902'
     ]
   };

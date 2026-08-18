@@ -1,3 +1,4 @@
+import { LINKS } from '@veyronix/config';
 "use client";
 
 import Navbar from "@/components/Navbar";
@@ -43,7 +44,7 @@ export default function AboutPage() {
                 <Mail size={14} />
                 <span style={{ fontWeight: '600' }}>{t.email}</span>
               </div>
-              <p style={{ color: 'var(--text-muted)' }}>info@veyronix.com.tr</p>
+              <p style={{ color: 'var(--text-muted)' }}>${LINKS.SUPPORT_EMAIL}</p>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -59,7 +60,7 @@ export default function AboutPage() {
                 <MessageSquare size={14} />
                 <span style={{ fontWeight: '600' }}>{t.support}</span>
               </div>
-              <a href="https://discord.gg/D6T3t4beqa" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-color)', textDecoration: 'underline' }}>{activeContent.supportVal}</a>
+              <a href="${LINKS.SUPPORT_SERVER}" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-color)', textDecoration: 'underline' }}>{activeContent.supportVal}</a>
             </div>
           </div>
         </div>

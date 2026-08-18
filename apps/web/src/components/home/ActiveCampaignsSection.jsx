@@ -1,3 +1,4 @@
+import { LINKS } from '@veyronix/config';
 "use client";
 
 import { Star } from "lucide-react";
@@ -20,7 +21,7 @@ export default function ActiveCampaignsSection({ activeCampaigns = [] }) {
             <h2 className="font-headline-md text-headline-md text-on-surface mb-3">{lang === 'tr' ? camp.title_tr : camp.title_en}</h2>
             <p className="font-body-md text-body-md text-on-surface-variant mb-3">{lang === 'tr' ? camp.description_tr : camp.description_en}</p>
             <a 
-              href="https://discord.gg/D6T3t4beqa" 
+              href="${LINKS.SUPPORT_SERVER}" 
               target="_blank" 
               rel="noopener noreferrer" 
               className="inline-flex items-center gap-2 bg-transparent border border-primary-container text-primary-container px-3 py-1 font-label-bold text-label-bold uppercase tracking-widest transition-all hover:bg-primary-container hover:text-on-primary"

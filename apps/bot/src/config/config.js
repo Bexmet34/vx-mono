@@ -1,3 +1,4 @@
+import { LINKS } from '@veyronix/config';
 require('dotenv').config();
 
 module.exports = {
@@ -34,10 +35,10 @@ module.exports = {
     SUPABASE_KEY: process.env.SUPABASE_KEY,
 
     // Support Configuration
-    SUPPORT_SERVER_LINK: 'https://discord.gg/899GJS5MDf',
+    SUPPORT_SERVER_LINK: '${LINKS.SUPPORT_SERVER}',
     SUPPORT_SERVER_ID: '1477043179936284782',
     LOG_TRANSACTION_CHANNEL_ID: '1494808768813334680',
-    WEBSITE_LINK: 'https://veyronix.com.tr',
+    WEBSITE_LINK: '${LINKS.WEBSITE}/',
     TOPGG_LINK: 'https://top.gg/bot/1082239904169336902/vote',
 };
 

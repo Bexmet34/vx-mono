@@ -14,6 +14,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@veyronix/config": "workspace:*",
     "@veyronix/database": "workspace:*",
     "@supabase/supabase-js": "^2.101.1",
     "discord.js": "^14.26.2",
