@@ -1,5 +1,5 @@
-import { LINKS } from '@veyronix/config';
 "use client";
+import { LINKS } from '@veyronix/config';
 
 import Navbar from "@/components/Navbar";
 import { useLanguage } from "@/context/LanguageContext";

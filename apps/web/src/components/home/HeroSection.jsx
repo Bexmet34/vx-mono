@@ -1,5 +1,5 @@
-import { LINKS } from '@veyronix/config';
 "use client";
+import { LINKS } from '@veyronix/config';
 
 import { Zap, Star, MessageCircle } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
