@@ -63,7 +63,7 @@ export async function POST(req, { params }) {
     const body = await req.json();
 
     const { 
-      language, auto_role_sync, embed_thumbnail_url, party_templates,
+      language, embed_thumbnail_url, party_templates,
       log_system_enabled, log_channel_id, log_events, log_exempts,
       albion_guild_id, albion_guild_name, albion_server, killboard_channel_id, killboard_time,
       registration_enabled, registration_channel_id, registration_staff_role_ids,
@@ -93,7 +93,6 @@ export async function POST(req, { params }) {
           guild_id: guildId,
           owner_id: subscription.owner_id,
           language: language ?? 'tr',
-          auto_role_sync: auto_role_sync ?? false,
           embed_thumbnail_url: embed_thumbnail_url || null,
           log_system_enabled: log_system_enabled ?? false,
           log_channel_id: log_channel_id || null,

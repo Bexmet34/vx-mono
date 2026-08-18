@@ -7,7 +7,6 @@ import InfoTooltip from "@/components/InfoTooltip";
 export default function RegistrationTab({ t, lang, settings, setSettings, discordChannels, discordRoles, handleSave, saving, guildId, registeredCount = 0, setActiveTab, isPremium }) {
   const [subTab, setSubTab] = useState("core"); // core, roles, messages, sync, questionnaire
   const [sendingSetup, setSendingSetup] = useState(false);
-  const [syncing, setSyncing] = useState(false);
   const [visibleRoleCount, setVisibleRoleCount] = useState(1);
   const textChannels = (discordChannels || []).filter(c => c.type === 0);
   const categories = (discordChannels || []).filter(c => c.type === 4);
@@ -32,44 +31,6 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
     isPremium
   ]);
 
-  // Poll for sync status if syncing is true locally or in settings
-  useEffect(() => {
-    let interval;
-    if (syncing || settings.is_syncing) {
-      interval = setInterval(async () => {
-        try {
-          const res = await fetch(`/api/guild-settings/${guildId}`);
-          if (res.ok) {
-            const data = await res.json();
-            if (data && data.settings) {
-              if (data.settings.last_sync_result) {
-                setSettings(prev => ({
-                  ...prev,
-                  last_sync_result: data.settings.last_sync_result,
-                  registered_count: data.settings.registered_count
-                }));
-              }
-
-              if (data.settings.is_syncing === false) {
-                setSettings(prev => ({
-                  ...prev,
-                  is_syncing: false
-                }));
-                setSyncing(false);
-                clearInterval(interval);
-              }
-            }
-          }
-        } catch (err) {
-          console.error("Polling error:", err);
-        }
-      }, 3000);
-    }
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [syncing, settings.is_syncing, guildId, setSettings]);
-
   const handleSendSetup = async () => {
     if (!settings.registration_channel_id) {
       alert("Please select a welcome channel first.");
@@ -89,28 +50,6 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
       alert(err.message);
     } finally {
       setSendingSetup(false);
-    }
-  };
-
-  const handleSync = async () => {
-    if (!settings.albion_guild_id) {
-      alert(lang === 'en' ? "Please set your guild in General settings first!" : "Lütfen önce Genel ayarlardan guildinizi seçin!");
-      return;
-    }
-    setSyncing(true);
-    setSettings(prev => ({ ...prev, is_syncing: true }));
-    try {
-      const res = await fetch(`/api/register/sync/${guildId}`, { method: 'POST' });
-      const data = await res.json();
-      if (!res.ok) {
-        alert(data.error || "Failed to start sync.");
-        setSyncing(false);
-        setSettings(prev => ({ ...prev, is_syncing: false }));
-      }
-    } catch (err) {
-      alert(err.message);
-      setSyncing(false);
-      setSettings(prev => ({ ...prev, is_syncing: false }));
     }
   };
 
@@ -148,7 +87,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
           { id: "core", label: lang === 'en' ? "Core Config" : "Ana Ayarlar", icon: Settings },
           { id: "roles", label: lang === 'en' ? "Roles Setup" : "Rol Ayarları", icon: Tag },
           { id: "messages", label: lang === 'en' ? "Welcome & Logs" : "Karşılama & Loglar", icon: MessageSquare },
-          { id: "sync", label: lang === 'en' ? "Leave & Sync" : "Ayrılık & Sync", icon: Users },
+          { id: "sync", label: lang === 'en' ? "Leave Check" : "Ayrılık Kontrolü", icon: Users },
           { id: "questionnaire", label: lang === 'en' ? "Questionnaire" : "Başvuru Anketi", icon: Layout },
         ].map((tab) => {
           const Icon = tab.icon;
@@ -786,44 +725,6 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                           <option key={c.id} value={c.id}>#{c.name}</option>
                         ))}
                       </select>
-                    </div>
-
-                    <div className="mt-2 pt-6 border-t border-outline-variant/50">
-                      <label className="block text-[10px] font-label-bold text-primary-container uppercase tracking-widest mb-2">
-                        {lang === 'en' ? 'Backward Compatibility Sync' : 'Geriye Dönük Senkronizasyon (Sync)'}
-                      </label>
-                      <p className="text-[10px] font-body-md text-on-surface-variant mb-2 flex flex-col gap-1 leading-relaxed">
-                        <span>{lang === 'en' 
-                          ? 'Adds existing old members to the database safely.' 
-                          : 'Eski kayıtlı üyelerinizi sisteme güvenle dahil eder.'}</span>
-                        <strong className="text-error/90 mt-1 font-label-bold">{lang === 'en'
-                          ? '⚠️ Note: This process runs in the background and may take up to 15 minutes.'
-                          : '⚠️ Not: İşlem tamamen arka planda çalışır ve 15 dakikaya kadar sürebilir.'}</strong>
-                      </p>
-                      <button 
-                        className={`w-full px-3 py-1.5 font-label-bold uppercase tracking-widest rounded-sm transition-all flex items-center justify-center gap-2 text-[10px] ${settings.albion_guild_id ? ((syncing || settings.is_syncing) ? 'bg-primary-container/20 border border-primary-container/50 text-primary-container cursor-not-allowed' : 'bg-primary-container text-on-primary hover:brightness-110 tactical-glow cursor-pointer') : 'bg-surface-container border border-outline-variant text-on-surface-variant cursor-not-allowed'}`} 
-                        onClick={handleSync} 
-                        disabled={syncing || settings.is_syncing || !settings.albion_guild_id}
-                      >
-                        {(syncing || settings.is_syncing) ? <Loader2 size={14} className="animate-spin"/> : <Users size={14}/>} 
-                        {lang === 'en' 
-                          ? (settings.albion_guild_id ? ((syncing || settings.is_syncing) ? `Syncing... ${settings.last_sync_result?.scanned || 0} / ${settings.last_sync_result?.total || '?'}` : 'Start Sync Process') : 'Set Guild in General Settings First') 
-                          : (settings.albion_guild_id ? ((syncing || settings.is_syncing) ? `Şu an Taranıyor: ${settings.last_sync_result?.scanned || 0} / ${settings.last_sync_result?.total || '?'}` : 'Senkronizasyon İşlemini Başlat') : 'Önce Genel Ayarlardan Guild Seçin')}
-                      </button>
-
-                      {settings.last_sync_result && (
-                        <div className="mt-3 p-2 bg-primary-container/5 border border-primary-container/30 rounded-sm animate-slide-up">
-                          <h4 className="text-[10px] font-label-bold text-primary-container uppercase tracking-widest mb-2">{(syncing || settings.is_syncing) ? (lang === 'en' ? 'Live Progress' : 'Canlı Tarama İlerlemesi') : (lang === 'en' ? 'Last Sync Result' : 'Son Senkronizasyon Çıktısı')}</h4>
-                          <div className="grid grid-cols-3 gap-2 text-[10px] font-body-md">
-                            <div>{lang === 'en' ? 'Scanned:' : 'Taranan:'} <strong className="text-on-surface ml-1">{settings.last_sync_result.scanned || 0} {settings.last_sync_result.total ? `/ ${settings.last_sync_result.total}` : ''}</strong></div>
-                            <div>{lang === 'en' ? 'Synced:' : 'Eklenen:'} <strong className="text-success ml-1">{settings.last_sync_result.synced || 0}</strong></div>
-                            <div>{lang === 'en' ? 'Skipped:' : 'Atlanan:'} <strong className="text-error ml-1">{settings.last_sync_result.skipped || 0}</strong></div>
-                          </div>
-                          <div className="mt-3 text-[10px] font-label-sm text-on-surface-variant/70">
-                            {new Date(settings.last_sync_result.timestamp).toLocaleString(lang === 'en' ? 'en-US' : 'tr-TR')}
-                          </div>
-                        </div>
-                      )}
                     </div>
                   </div>
                 </div>
