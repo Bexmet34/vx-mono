@@ -60,7 +60,7 @@ export default function AboutPage() {
                 <MessageSquare size={14} />
                 <span style={{ fontWeight: '600' }}>{t.support}</span>
               </div>
-              <a href="${LINKS.SUPPORT_SERVER}" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-color)', textDecoration: 'underline' }}>{activeContent.supportVal}</a>
+              <a href={LINKS.SUPPORT_SERVER} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-color)', textDecoration: 'underline' }}>{activeContent.supportVal}</a>
             </div>
           </div>
         </div>

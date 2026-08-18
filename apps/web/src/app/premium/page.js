@@ -451,7 +451,7 @@ export default function PremiumPage() {
 
                       <div className="bg-[#0B0F19]/30 border border-outline-variant/20 p-3 rounded-xl text-left text-xs text-on-surface-variant space-y-1">
                          <p>⚡ <strong>Onay Süresi:</strong> 5-15 dakika (gece saatlerinde 1 saat).</p>
-                         <p>💬 Destek için <a href="${LINKS.SUPPORT_SERVER}" target="_blank" rel="noopener noreferrer" className="text-primary-container hover:underline">Discord&apos;a katılın</a>.</p>
+                         <p>💬 Destek için <a href={LINKS.SUPPORT_SERVER} target="_blank" rel="noopener noreferrer" className="text-primary-container hover:underline">Discord&apos;a katılın</a>.</p>
                       </div>
                     </div>
 

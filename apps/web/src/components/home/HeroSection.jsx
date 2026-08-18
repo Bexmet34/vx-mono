@@ -40,7 +40,7 @@ export default function HeroSection() {
           {t.topggBtn ?? ("top.gg'de Oyla")}
         </a>
         <a
-          href="${LINKS.SUPPORT_SERVER}"
+          href={LINKS.SUPPORT_SERVER}
           target="_blank"
           rel="noopener noreferrer"
           className="w-full sm:w-auto bg-transparent border border-on-surface/20 text-on-surface hover:bg-on-surface/10 px-2 py-1 font-label-bold text-label-bold uppercase tracking-widest transition-all duration-300 active:scale-95 rounded-sm flex items-center justify-center gap-2"

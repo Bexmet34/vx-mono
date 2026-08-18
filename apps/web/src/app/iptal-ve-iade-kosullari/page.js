@@ -46,7 +46,7 @@ export default function RefundPolicy() {
               <h2 style={{ color: 'var(--text-main)', fontSize: '1.2rem', marginBottom: '1rem' }}>{active.h4}</h2>
               <p>{active.p4}</p>
               <p>{active.email}: ${LINKS.SUPPORT_EMAIL}</p>
-              <p>{active.support}: <a href="${LINKS.SUPPORT_SERVER}" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-color)' }}>Destek Sunucusu</a></p>
+              <p>{active.support}: <a href={LINKS.SUPPORT_SERVER} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-color)' }}>Destek Sunucusu</a></p>
             </section>
           </div>
         </div>
