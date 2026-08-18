@@ -2066,6 +2066,24 @@ export default function AdminPage() {
                 </div>
 
                 <div className="admin-card" style={{padding: '2.5rem'}}>
+                  <h3 style={{marginBottom: '1.5rem', fontSize: '1.2rem', fontWeight: '700'}}>Sistem Geneli Ayarlar</h3>
+                  
+                  <div style={{marginBottom: '2rem'}}>
+                     <label className="admin-label">Destek Sunucusu Davet Linki</label>
+                     <p style={{fontSize: '0.85rem', color: 'var(--admin-text-muted)', marginBottom: '1rem'}}>
+                        Sistem genelinde (Web, Bot, Bakım Modu vb.) kullanılacak ana Discord davet linki. (Değişikliklerin heryere yansıması için kaydettikten sonra sistemi yeniden başlatmanız gerekebilir.)
+                     </p>
+                     <input 
+                       className="admin-input-field" 
+                       type="text" 
+                       value={systemSettings.discord_invite_url || ''} 
+                       onChange={e => setSystemSettings({...systemSettings, discord_invite_url: e.target.value})} 
+                       style={{width: '100%', maxWidth: '400px', textAlign: 'left'}}
+                     />
+                  </div>
+                  
+                  <div style={{width: '100%', height: '1px', background: 'var(--admin-border)', margin: '2rem 0'}}></div>
+
                   <h3 style={{marginBottom: '1.5rem', fontSize: '1.2rem', fontWeight: '700'}}>Top.gg Oy Sistemi</h3>
                   
                   <div style={{marginBottom: '2rem'}}>
@@ -2078,7 +2096,7 @@ export default function AdminPage() {
                        type="number" 
                        value={systemSettings.vote_cooldown_hours || 168} 
                        onChange={e => setSystemSettings({...systemSettings, vote_cooldown_hours: parseInt(e.target.value) || 0})} 
-                       style={{width: '200px'}}
+                       style={{width: '200px', textAlign: 'left'}}
                      />
                   </div>
                 </div>

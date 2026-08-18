@@ -624,7 +624,7 @@ select.admin-input-field option {
     flex-direction: row !important;
     align-items: stretch !important;
     justify-content: center !important;
-    z-index: 9999 !important;
+    z-index: 900 !important;
     box-shadow: var(--app-shadow-bar) !important;
   }
 
