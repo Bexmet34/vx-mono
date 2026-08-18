@@ -32,7 +32,7 @@ export async function POST(req, { params }) {
       return NextResponse.json({
         success: true,
         checkedCount: data.checkedCount,
-        removedCount: data.removedCount
+        leavers: data.leavers
       });
     }
 
