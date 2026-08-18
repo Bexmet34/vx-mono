@@ -99,7 +99,113 @@ function startApiServer(manager, port = process.env.BOT_API_PORT || 3005) {
         }
     });
 
-    app.listen(port, () => {
+    app.post('/api/guild/check-discord', async (req, res) => {
+        const { guildId } = req.body;
+        if (!guildId) return res.status(400).json({ error: 'Missing guildId' });
+
+        try {
+            const results = await manager.broadcastEval(async (client, context) => {
+                const guild = client.guilds.cache.get(context.guildId);
+                if (!guild) return null;
+
+                const { createClient } = require('@supabase/supabase-js');
+                const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+                const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+                if (!supabaseUrl || !supabaseKey) return { error: 'Supabase credentials missing' };
+                const supabase = createClient(supabaseUrl, supabaseKey);
+
+                // Fetch Guild Settings
+                const { data: settings } = await supabase
+                    .from('guild_settings')
+                    .select('*')
+                    .eq('guild_id', context.guildId)
+                    .single();
+
+                if (!settings || !settings.registration_enabled) return { error: 'Registration not enabled' };
+
+                // Fetch Albion Members from DB
+                const { data: albionMembers } = await supabase
+                    .from('albion_guild_members')
+                    .select('player_name')
+                    .eq('discord_guild_id', context.guildId);
+
+                if (!albionMembers) return { error: 'No Albion members synced' };
+                const albionMemberNames = albionMembers.map(m => m.player_name.toLowerCase());
+
+                // Identify Roles
+                const guildRoleId = settings.registration_given_role_id;
+                if (!guildRoleId) return { error: 'Guild role not set' };
+                
+                const unregisteredRoleId = settings.registration_unregistered_role_id;
+                
+                // Fetch all discord members
+                await guild.members.fetch();
+                
+                let checkedCount = 0;
+                let removedCount = 0;
+
+                for (const [memberId, member] of guild.members.cache) {
+                    if (member.user.bot) continue;
+                    
+                    // Only check people who actually have the guild role
+                    if (member.roles.cache.has(guildRoleId)) {
+                        checkedCount++;
+                        
+                        // Extract IGN from Nickname
+                        let ign = member.displayName;
+                        const tagMatch = ign.match(/^\[.*?\]\s*(.*)$/);
+                        if (tagMatch) ign = tagMatch[1];
+                        
+                        ign = ign.trim().toLowerCase();
+
+                        // If not in Albion DB
+                        if (!albionMemberNames.includes(ign)) {
+                            try {
+                                // Remove Guild Roles
+                                const rolesToRemove = [
+                                    settings.registration_given_role_id,
+                                    settings.registration_given_role_id_2,
+                                    settings.registration_given_role_id_3,
+                                    settings.registration_given_role_id_4,
+                                    settings.registration_given_role_id_5
+                                ].filter(Boolean);
+
+                                await member.roles.remove(rolesToRemove, 'Albion Guild Sync: Left the guild');
+                                
+                                // Give Unregistered Role
+                                if (unregisteredRoleId) {
+                                    await member.roles.add(unregisteredRoleId, 'Albion Guild Sync: Left the guild');
+                                }
+
+                                // Update Nickname
+                                const newNickname = `[NaN] ${ign}`.substring(0, 32);
+                                if (guild.members.me.permissions.has('ManageNicknames') && member.manageable) {
+                                    await member.setNickname(newNickname, 'Albion Guild Sync: Left the guild');
+                                }
+                                
+                                removedCount++;
+                            } catch (err) {
+                                console.error(`[API Sync] Failed to update member ${member.user.tag}:`, err);
+                            }
+                        }
+                    }
+                }
+
+                return { success: true, checkedCount, removedCount };
+            }, { context: { guildId } });
+
+            const validResult = results.find(r => r !== null);
+            if (!validResult) return res.status(404).json({ error: 'Guild not found on any bot shard' });
+            if (validResult.error) return res.status(400).json({ error: validResult.error });
+
+            res.json(validResult);
+        } catch (error) {
+            console.error('[API] Error checking discord:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    });
+
+    return app.listen(port, () => {
         console.log(`[API Server] Listening on port ${port}`);
     });
 }

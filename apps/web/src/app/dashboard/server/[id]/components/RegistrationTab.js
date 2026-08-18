@@ -8,8 +8,49 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
   const [subTab, setSubTab] = useState("core"); // core, roles, messages, sync, questionnaire
   const [sendingSetup, setSendingSetup] = useState(false);
   const [visibleRoleCount, setVisibleRoleCount] = useState(1);
+  const [syncingAlbion, setSyncingAlbion] = useState(false);
+  const [checkingDiscord, setCheckingDiscord] = useState(false);
+  const [albionSyncResult, setAlbionSyncResult] = useState(null);
+  const [discordCheckResult, setDiscordCheckResult] = useState(null);
+
   const textChannels = (discordChannels || []).filter(c => c.type === 0);
   const categories = (discordChannels || []).filter(c => c.type === 4);
+
+  const handleSyncAlbion = async () => {
+    setSyncingAlbion(true);
+    setAlbionSyncResult(null);
+    try {
+      const res = await fetch(`/api/register/sync-albion/${guildId}`, { method: 'POST' });
+      const data = await res.json();
+      if (res.ok) {
+        setAlbionSyncResult(data);
+      } else {
+        alert(data.error || "Failed to sync Albion database.");
+      }
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setSyncingAlbion(false);
+    }
+  };
+
+  const handleCheckDiscord = async () => {
+    setCheckingDiscord(true);
+    setDiscordCheckResult(null);
+    try {
+      const res = await fetch(`/api/register/check-discord/${guildId}`, { method: 'POST' });
+      const data = await res.json();
+      if (res.ok) {
+        setDiscordCheckResult(data);
+      } else {
+        alert(data.error || "Failed to check Discord roles.");
+      }
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setCheckingDiscord(false);
+    }
+  };
 
   useEffect(() => {
     let count = 1;
@@ -87,7 +128,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
           { id: "core", label: lang === 'en' ? "Core Config" : "Ana Ayarlar", icon: Settings },
           { id: "roles", label: lang === 'en' ? "Roles Setup" : "Rol Ayarları", icon: Tag },
           { id: "messages", label: lang === 'en' ? "Welcome & Logs" : "Karşılama & Loglar", icon: MessageSquare },
-          { id: "sync", label: lang === 'en' ? "Leave Check" : "Ayrılık Kontrolü", icon: Users },
+          { id: "members", label: lang === 'en' ? "Guild Members" : "Üye Yönetimi", icon: Users },
           { id: "questionnaire", label: lang === 'en' ? "Questionnaire" : "Başvuru Anketi", icon: Layout },
         ].map((tab) => {
           const Icon = tab.icon;
@@ -577,12 +618,12 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
       )}
 
       {/* SUBTAB 4: Leave Check & Sync */}
-      {subTab === "sync" && (
+      {subTab === "members" && (
         <div className="glass-panel p-3 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors space-y-6">
           <div>
             <h2 className="font-headline-lg text-[10px] text-on-surface mb-2 flex items-center gap-2 uppercase tracking-tight">
               <Users className="text-primary-container" />
-              {lang === 'en' ? 'Guild Leave Check & Sync' : 'Ayrılık Kontrolü & Senkronizasyon'}
+              {lang === 'en' ? 'Guild Member Management' : 'Üye Yönetimi ve Ayrılık Kontrolü'}
             </h2>
             <p className="font-body-md text-on-surface-variant">
               {lang === 'en' 
@@ -725,6 +766,96 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                           <option key={c.id} value={c.id}>#{c.name}</option>
                         ))}
                       </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-8 pt-6 border-t border-outline-variant/50">
+                  <h3 className="font-headline-md text-[10px] text-primary-container uppercase tracking-widest mb-4">
+                    {lang === 'en' ? 'Manual Sync & Member Check' : 'Manuel Senkronizasyon & Üye Kontrolü'}
+                  </h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Albion Sync Card */}
+                    <div className="bg-surface-container/20 p-4 rounded-lg border border-outline-variant/30 flex flex-col justify-between">
+                      <div>
+                        <h4 className="text-[10px] font-label-bold text-on-surface uppercase tracking-widest mb-2 flex items-center gap-2">
+                          <Layout size={14} className="text-primary-container" />
+                          {lang === 'en' ? '1. Update Database from Albion' : '1. Veritabanını Albion\'dan Güncelle'}
+                        </h4>
+                        <p className="text-[10px] font-body-md text-on-surface-variant mb-4 leading-relaxed">
+                          {lang === 'en' 
+                            ? 'Fetches the latest guild roster from Albion API and saves it to the database. Run this first.' 
+                            : 'Albion API\'sine bağlanarak güncel lonca üyelerini çeker ve veritabanına kaydeder. Önce bu işlemi çalıştırın.'}
+                        </p>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <button 
+                          className={`w-full px-3 py-2 font-label-bold uppercase tracking-widest rounded-sm transition-all flex items-center justify-center gap-2 text-[10px] ${syncingAlbion ? 'bg-primary-container/20 border border-primary-container/50 text-primary-container cursor-not-allowed' : 'bg-primary-container text-on-primary hover:brightness-110 tactical-glow cursor-pointer'}`}
+                          onClick={handleSyncAlbion}
+                          disabled={syncingAlbion}
+                        >
+                          {syncingAlbion ? <Loader2 size={14} className="animate-spin"/> : <Users size={14}/>} 
+                          {lang === 'en' 
+                            ? (syncingAlbion ? 'Syncing...' : 'Update Database') 
+                            : (syncingAlbion ? 'Veritabanı Güncelleniyor...' : 'Veritabanını Güncelle')}
+                        </button>
+                        
+                        {albionSyncResult && (
+                          <div className="p-2 bg-primary-container/10 border border-primary-container/30 rounded-sm animate-slide-up text-[10px] font-body-md">
+                            <strong className="text-primary-container font-label-bold">
+                              {lang === 'en' ? 'Result:' : 'Sonuç:'}
+                            </strong>
+                            <div className="mt-1 space-y-1 text-on-surface-variant">
+                              <div>{lang === 'en' ? 'Previous Count:' : 'Önceki Kayıt Sayısı:'} <span className="text-on-surface ml-1">{albionSyncResult.previousCount}</span></div>
+                              <div>{lang === 'en' ? 'New Count:' : 'Güncel Kayıt Sayısı:'} <span className="text-on-surface ml-1">{albionSyncResult.newCount}</span></div>
+                              <div>{lang === 'en' ? 'Added:' : 'Eklenen:'} <span className="text-success ml-1">+{albionSyncResult.added}</span></div>
+                              <div>{lang === 'en' ? 'Removed:' : 'Silinen:'} <span className="text-error ml-1">-{albionSyncResult.removed}</span></div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Discord Check Card */}
+                    <div className="bg-surface-container/20 p-4 rounded-lg border border-outline-variant/30 flex flex-col justify-between">
+                      <div>
+                        <h4 className="text-[10px] font-label-bold text-on-surface uppercase tracking-widest mb-2 flex items-center gap-2">
+                          <MessageSquare size={14} className="text-secondary" />
+                          {lang === 'en' ? '2. Check Discord Members' : '2. Discord Üyelerini Kontrol Et'}
+                        </h4>
+                        <p className="text-[10px] font-body-md text-on-surface-variant mb-4 leading-relaxed">
+                          {lang === 'en' 
+                            ? 'Checks all Discord members against the updated database. Removes roles from those who left the guild.' 
+                            : 'Discord sunucusundaki üyeleri güncel veritabanı ile karşılaştırır. Loncadan çıkmış olanların yetkilerini ve taglarını alır.'}
+                        </p>
+                      </div>
+
+                      <div className="space-y-3">
+                        <button 
+                          className={`w-full px-3 py-2 font-label-bold uppercase tracking-widest rounded-sm transition-all flex items-center justify-center gap-2 text-[10px] ${checkingDiscord ? 'bg-secondary/20 border border-secondary/50 text-secondary cursor-not-allowed' : 'bg-secondary text-on-secondary hover:brightness-110 tactical-glow cursor-pointer'}`}
+                          onClick={handleCheckDiscord}
+                          disabled={checkingDiscord}
+                        >
+                          {checkingDiscord ? <Loader2 size={14} className="animate-spin"/> : <AlertTriangle size={14}/>} 
+                          {lang === 'en' 
+                            ? (checkingDiscord ? 'Checking Discord...' : 'Check Discord') 
+                            : (checkingDiscord ? 'Discord Taranıyor...' : 'Discord\'u Kontrol Et')}
+                        </button>
+
+                        {discordCheckResult && (
+                          <div className="p-2 bg-secondary/10 border border-secondary/30 rounded-sm animate-slide-up text-[10px] font-body-md">
+                            <strong className="text-secondary font-label-bold">
+                              {lang === 'en' ? 'Scan Complete:' : 'Tarama Tamamlandı:'}
+                            </strong>
+                            <div className="mt-1 space-y-1 text-on-surface-variant">
+                              <div>{lang === 'en' ? 'Scanned Discord Members:' : 'Taranan Üye Sayısı:'} <span className="text-on-surface ml-1">{discordCheckResult.checkedCount}</span></div>
+                              <div>{lang === 'en' ? 'Roles Removed / Kicked:' : 'Yetkisi Alınanlar:'} <span className="text-error ml-1">{discordCheckResult.removedCount}</span></div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
