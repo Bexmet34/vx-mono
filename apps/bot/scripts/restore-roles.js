@@ -1,5 +1,9 @@
 const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '../../../.env') });
+// Farklı yerlerdeki tüm .env dosyalarını yüklemeyi dene
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
+require('dotenv').config({ path: path.join(__dirname, '../../../.env') });
+require('dotenv').config({ path: path.join(__dirname, '../../../.env.local') });
+require('dotenv').config({ path: path.join(__dirname, '../../../.env.production') });
 const { Client, GatewayIntentBits, AuditLogEvent } = require('discord.js');
 const db = require('../src/services/db');
 const { getSupabaseGuildSettings } = require('@veyronix/database');
@@ -17,6 +21,14 @@ const HOURS = parseFloat(process.argv[3]) || 2; // Default to 2 hours if not spe
 
 if (!GUILD_ID) {
     console.error('Lütfen Guild ID belirtin: node scripts/restore-roles.js <GUILD_ID> [SAAT]');
+    process.exit(1);
+}
+
+const token = process.env.DISCORD_TOKEN || process.env.DISCORD_BOT_TOKEN;
+
+if (!token) {
+    console.error('HATA: DISCORD_TOKEN bulunamadı! Lütfen scripti çalıştırırken tokenı manuel verin:');
+    console.error('Örnek: DISCORD_TOKEN="sizin_token" node scripts/restore-roles.js ' + GUILD_ID + ' 2');
     process.exit(1);
 }
 
@@ -98,4 +110,4 @@ client.once('ready', async () => {
     process.exit(0);
 });
 
-client.login(process.env.DISCORD_TOKEN);
+client.login(token);
