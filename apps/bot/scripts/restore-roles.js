@@ -12,14 +12,16 @@ const client = new Client({
 });
 
 const GUILD_ID = process.argv[2];
+const HOURS = parseFloat(process.argv[3]) || 2; // Default to 2 hours if not specified
 
 if (!GUILD_ID) {
-    console.error('Lütfen Guild ID belirtin: node scripts/restore-roles.js <GUILD_ID>');
+    console.error('Lütfen Guild ID belirtin: node scripts/restore-roles.js <GUILD_ID> [SAAT]');
     process.exit(1);
 }
 
 client.once('ready', async () => {
     console.log(`Bot giriş yaptı: ${client.user.tag}`);
+    console.log(`[!] Son ${HOURS} saat içindeki rol alma işlemleri taranıyor...`);
     
     try {
         const guild = await client.guilds.fetch(GUILD_ID);
@@ -48,9 +50,9 @@ client.once('ready', async () => {
             // Sadece botumuzun yaptığı işlemleri bul
             if (entry.executor.id !== client.user.id) continue;
             
-            // Sadece son 3 saat içindeki işlemleri bul
+            // Sadece belirtilen saat içindeki işlemleri bul
             const hoursAgo = (Date.now() - entry.createdTimestamp) / (1000 * 60 * 60);
-            if (hoursAgo > 3) continue;
+            if (hoursAgo > HOURS) continue;
 
             const targetId = entry.target.id;
             const changes = entry.changes;
