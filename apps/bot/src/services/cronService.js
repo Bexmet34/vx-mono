@@ -195,11 +195,11 @@ function startCronService(client) {
     }, { timezone: "UTC" });
 
     // --- Daily Auto Guild Checks (12:00 UTC) ---
-    cron.schedule('0 12 * * *', async () => {
-        console.log('[CronService] Daily auto guild checks running (12:00 UTC)...');
-        const { runAutoCheck } = require('./autoCheckService');
-        await runAutoCheck(client);
-    }, { timezone: "UTC" });
+    // cron.schedule('0 12 * * *', async () => {
+    //     console.log('[CronService] Daily auto guild checks running (12:00 UTC)...');
+    //     const { runAutoCheck } = require('./autoCheckService');
+    //     await runAutoCheck(client);
+    // }, { timezone: "UTC" });
 
     // --- Auto Party Cleanup (Every 30 minutes) ---
     cron.schedule('*/30 * * * *', async () => {
