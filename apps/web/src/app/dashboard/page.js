@@ -12,6 +12,15 @@ import { useToast, ToastContainer } from "@/components/Toast";
 import Navbar from "@/components/Navbar";
 import Logo from "@/components/Logo";
 
+const slugify = (str) => {
+  const map = { 'ç':'c', 'ğ':'g', 'ı':'i', 'ö':'o', 'ş':'s', 'ü':'u', 'Ç':'C', 'Ğ':'G', 'İ':'I', 'Ö':'O', 'Ş':'S', 'Ü':'U' };
+  return str.replace(/[çğıöşüÇĞİÖŞÜ]/g, match => map[match])
+            .toLowerCase()
+            .replace(/[^a-z0-9\-]+/g, '-')
+            .replace(/\-+/g, '-')
+            .replace(/^-|-$/g, '') || 'server';
+}
+
 export default function Dashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -293,7 +302,7 @@ export default function Dashboard() {
                       <Key size={15} /> Redeem
                     </button>
                     <Link 
-                      href={`/dashboard/server/${server.guild_id}`} 
+                      href={`/dashboard/server/${slugify(server.guild_name)}-${server.guild_id}`} 
                       className="w-full flex items-center justify-center gap-2 font-label-bold text-xs uppercase tracking-wider bg-primary-container text-on-primary font-bold hover:brightness-110 active:scale-95 transition-all py-1.5 rounded-xl tactical-glow touch-manipulation"
                     >
                       <Settings size={15} /> {t.dashManageBtn}

@@ -56,7 +56,8 @@ function PremiumLock({ lang, t }) {
 
 export default function ServerSettings() {
   const { data: session, status } = useSession();
-  const { id: guildId } = useParams();
+  const params = useParams();
+  const guildId = params.id ? (params.id.includes('-') ? params.id.split('-').pop() : params.id) : null;
   const router = useRouter();
   const { lang, t } = useLanguage();
   const { toasts, showToast } = useToast();
