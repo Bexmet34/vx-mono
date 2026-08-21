@@ -176,8 +176,11 @@ if [ "$WEB_CHANGED" = true ]; then
   rm -f /tmp/vx_build.log
 
   info "Bakım modu kapatılıyor..."
-  kill $MAINT_PID 2>/dev/null || true
-  pkill -f "scripts/maintenance-server.js" >/dev/null 2>&1 || true
+  kill -9 $MAINT_PID 2>/dev/null || true
+  pkill -9 -f "scripts/maintenance-server.js" 2>/dev/null || true
+  pkill -9 -f "maintenance-server" 2>/dev/null || true
+  fuser -k 3000/tcp 2>/dev/null || true
+  sleep 1
 else
   skip "Web sitesinde değişiklik yok — derleme atlandı"
 fi
