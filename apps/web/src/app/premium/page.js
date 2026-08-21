@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { LINKS } from '@veyronix/config';
 
 import Navbar from "@/components/Navbar";
@@ -12,6 +12,7 @@ import {
 
 export default function PremiumPage() {
   const { lang, t } = useLanguage();
+  const { supportServer } = usePublicConfig();
   const { data: session, status } = useSession();
 
   // Accordion State
@@ -73,7 +74,7 @@ export default function PremiumPage() {
         if (data.length > 0) setSelectedBank(data[0]);
       }
     } catch (err) {
-      console.error("Banka hesapları yüklenemedi", err);
+      console.error("Banka hesaplarÄ± yÃ¼klenemedi", err);
     }
   };
 
@@ -86,19 +87,19 @@ export default function PremiumPage() {
       if (res.ok) {
         setUserServers(data);
       } else {
-        setCheckoutError("Sunucular yüklenemedi.");
+        setCheckoutError("Sunucular yÃ¼klenemedi.");
       }
     } catch (err) {
       console.error(err);
-      setCheckoutError("Sunucular yüklenirken bir hata oluştu.");
+      setCheckoutError("Sunucular yÃ¼klenirken bir hata oluÅŸtu.");
     } finally {
       setIsLoadingServers(false);
     }
   };
 
   const handleManualPurchase = async () => {
-    if (selectedPlan?.plan_type !== 'user' && !selectedServer) return setCheckoutError("Lütfen bir sunucu seçin.");
-    if (!selectedBank) return setCheckoutError("Lütfen bir banka seçin.");
+    if (selectedPlan?.plan_type !== 'user' && !selectedServer) return setCheckoutError("LÃ¼tfen bir sunucu seÃ§in.");
+    if (!selectedBank) return setCheckoutError("LÃ¼tfen bir banka seÃ§in.");
     setCheckoutError("");
     setIsProcessing(true);
 
@@ -121,10 +122,10 @@ export default function PremiumPage() {
         setGeneratedCode(data.description_code);
         setManualSuccess(true);
       } else {
-        setCheckoutError(data.error || "Ödeme başlatılamadı. Lütfen tekrar deneyin.");
+        setCheckoutError(data.error || "Ã–deme baÅŸlatÄ±lamadÄ±. LÃ¼tfen tekrar deneyin.");
       }
     } catch (err) {
-      setCheckoutError("Bağlantı hatası. Lütfen tekrar deneyin.");
+      setCheckoutError("BaÄŸlantÄ± hatasÄ±. LÃ¼tfen tekrar deneyin.");
     } finally {
       setIsProcessing(false);
     }
@@ -132,7 +133,7 @@ export default function PremiumPage() {
 
   const handleConfirmManualPayment = async () => {
     if (!senderName || senderName.trim().length < 3) {
-      alert("Lütfen kart üzerindeki isminizi giriniz.");
+      alert("LÃ¼tfen kart Ã¼zerindeki isminizi giriniz.");
       return;
     }
     
@@ -151,17 +152,17 @@ export default function PremiumPage() {
       if (res.ok && data.success) {
         setFinalSuccess(true);
       } else {
-        alert(data.error || "Onay işlemi başarısız oldu. Lütfen tekrar deneyin.");
+        alert(data.error || "Onay iÅŸlemi baÅŸarÄ±sÄ±z oldu. LÃ¼tfen tekrar deneyin.");
       }
     } catch (err) {
-      alert("Bağlantı hatası.");
+      alert("BaÄŸlantÄ± hatasÄ±.");
     } finally {
       setIsProcessing(false);
     }
   };
 
   const handleConfirmPurchase = async () => {
-    if (selectedPlan?.plan_type !== 'user' && !selectedServer) return setCheckoutError("Lütfen bir sunucu seçin.");
+    if (selectedPlan?.plan_type !== 'user' && !selectedServer) return setCheckoutError("LÃ¼tfen bir sunucu seÃ§in.");
     setCheckoutError("");
     setIsProcessing(true);
 
@@ -176,10 +177,10 @@ export default function PremiumPage() {
       if (res.ok && data.payment_url) {
         window.location.href = data.payment_url;
       } else {
-        setCheckoutError(data.error || "Ödeme oluşturulamadı.");
+        setCheckoutError(data.error || "Ã–deme oluÅŸturulamadÄ±.");
       }
     } catch (err) {
-      setCheckoutError("Bağlantı hatası.");
+      setCheckoutError("BaÄŸlantÄ± hatasÄ±.");
     } finally {
       setIsProcessing(false);
     }
@@ -267,11 +268,11 @@ export default function PremiumPage() {
                   {loadingPlans ? (
                     <div className="w-full flex flex-col items-center justify-center py-1 text-primary-container">
                       <Loader2 className="animate-spin mb-2" size={32} />
-                      <span className="font-label-bold text-xs uppercase tracking-widest">Yükleniyor...</span>
+                      <span className="font-label-bold text-xs uppercase tracking-widest">YÃ¼kleniyor...</span>
                     </div>
                   ) : plans.filter(p => p.plan_type === 'user').length === 0 ? (
                     <div className="w-full text-center py-1 text-on-surface-variant font-body-sm border border-dashed border-outline-variant rounded-md bg-surface/30">
-                      Şu anda aktif paket bulunmamaktadır.
+                      Åžu anda aktif paket bulunmamaktadÄ±r.
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
@@ -337,11 +338,11 @@ export default function PremiumPage() {
                   {loadingPlans ? (
                     <div className="w-full flex flex-col items-center justify-center py-1 text-primary-container">
                       <Loader2 className="animate-spin mb-2" size={32} />
-                      <span className="font-label-bold text-xs uppercase tracking-widest">Yükleniyor...</span>
+                      <span className="font-label-bold text-xs uppercase tracking-widest">YÃ¼kleniyor...</span>
                     </div>
                   ) : plans.filter(p => p.plan_type === 'server' || !p.plan_type).length === 0 ? (
                     <div className="w-full text-center py-1 text-on-surface-variant font-body-sm border border-dashed border-outline-variant rounded-md bg-surface/30">
-                      Şu anda aktif paket bulunmamaktadır.
+                      Åžu anda aktif paket bulunmamaktadÄ±r.
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
@@ -410,8 +411,8 @@ export default function PremiumPage() {
                        <div className="absolute inset-0 bg-primary-container/20 blur-xl rounded-full scale-150"></div>
                        <CheckCircle size={80} className="text-primary-container relative z-10 drop-shadow-[0_0_15px_rgba(255,215,0,0.8)]" />
                      </div>
-                     <h3 className="font-headline-xl text-lg md:text-4xl text-on-surface uppercase tracking-tight mb-2">Talebini Aldık!</h3>
-                     <p className="text-on-surface-variant font-body-lg mb-2 max-w-md">Ödeme bildiriminiz başarıyla admin paneline ulaştı. Ekiplerimiz kontrol edip onayladığında paketiniz otomatik olarak hesabınıza tanımlanacaktır.</p>
+                     <h3 className="font-headline-xl text-lg md:text-4xl text-on-surface uppercase tracking-tight mb-2">Talebini AldÄ±k!</h3>
+                     <p className="text-on-surface-variant font-body-lg mb-2 max-w-md">Ã–deme bildiriminiz baÅŸarÄ±yla admin paneline ulaÅŸtÄ±. Ekiplerimiz kontrol edip onayladÄ±ÄŸÄ±nda paketiniz otomatik olarak hesabÄ±nÄ±za tanÄ±mlanacaktÄ±r.</p>
                      
                      <button 
                        onClick={() => setShowCheckout(false)}
@@ -423,8 +424,8 @@ export default function PremiumPage() {
               ) : manualSuccess ? (
                 <div className="animate-slide-up w-full">
                   <div className="text-center mb-3">
-                    <h3 className="font-headline-xl text-xs md:text-[10px] text-on-surface uppercase tracking-tight mb-2">Güvenli Havale / EFT Akışı</h3>
-                    <p className="text-on-surface-variant font-body-md text-xs">Lütfen ödemenizi tamamlamak için aşağıdaki adımları izleyin.</p>
+                    <h3 className="font-headline-xl text-xs md:text-[10px] text-on-surface uppercase tracking-tight mb-2">GÃ¼venli Havale / EFT AkÄ±ÅŸÄ±</h3>
+                    <p className="text-on-surface-variant font-body-md text-xs">LÃ¼tfen Ã¶demenizi tamamlamak iÃ§in aÅŸaÄŸÄ±daki adÄ±mlarÄ± izleyin.</p>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
@@ -438,7 +439,7 @@ export default function PremiumPage() {
                          </div>
                          <div className="text-xs text-on-surface-variant space-y-2 border-t border-outline-variant/50 pt-3">
                             <div className="flex justify-between"><span>Banka:</span> <span className="font-semibold text-on-surface">{selectedBank?.bank_name}</span></div>
-                            <div className="flex justify-between"><span>Alıcı:</span> <span className="font-semibold text-on-surface">{selectedBank?.account_holder}</span></div>
+                            <div className="flex justify-between"><span>AlÄ±cÄ±:</span> <span className="font-semibold text-on-surface">{selectedBank?.account_holder}</span></div>
                             <div className="pt-1">
                                <div className="mb-1">IBAN Adresi:</div>
                                <div className="font-mono bg-[#0B0F19] p-2 rounded border border-outline-variant text-on-surface flex justify-between items-center">
@@ -450,39 +451,39 @@ export default function PremiumPage() {
                       </div>
 
                       <div className="bg-[#0B0F19]/30 border border-outline-variant/20 p-3 rounded-xl text-left text-xs text-on-surface-variant space-y-1">
-                         <p>⚡ <strong>Onay Süresi:</strong> 5-15 dakika (gece saatlerinde 1 saat).</p>
-                         <p>💬 Destek için <a href={LINKS.SUPPORT_SERVER} target="_blank" rel="noopener noreferrer" className="text-primary-container hover:underline">Discord&apos;a katılın</a>.</p>
+                         <p>âš¡ <strong>Onay SÃ¼resi:</strong> 5-15 dakika (gece saatlerinde 1 saat).</p>
+                         <p>ðŸ’¬ Destek iÃ§in <a href={supportServer} target="_blank" rel="noopener noreferrer" className="text-primary-container hover:underline">Discord&apos;a katÄ±lÄ±n</a>.</p>
                       </div>
                     </div>
 
                     <div className="space-y-4 text-left">
                       <div className="bg-[#0B0F19] p-2 border border-primary-container/40 rounded-xl shadow-lg">
-                         <div className="font-label-bold text-xs text-primary-container uppercase mb-2">Açıklama Kodu (Zorunlu)</div>
+                         <div className="font-label-bold text-xs text-primary-container uppercase mb-2">AÃ§Ä±klama Kodu (Zorunlu)</div>
                          <div className="flex items-center justify-between gap-2 mb-2">
                            <div className="font-mono text-[10px] md:text-[10px] font-bold text-on-surface tracking-widest break-all">{generatedCode}</div>
                            <button onClick={() => navigator.clipboard.writeText(generatedCode)} className="px-3 py-1 bg-primary-container/10 hover:bg-primary-container text-primary-container hover:text-on-primary border border-primary-container/30 rounded-lg shrink-0 text-xs font-bold uppercase transition-colors">
                               Kopyala
                            </button>
                          </div>
-                         <p className="text-[10px] text-error font-semibold">Bu kod dışında açıklama kısmına HİÇBİR ŞEY yazmayınız!</p>
+                         <p className="text-[10px] text-error font-semibold">Bu kod dÄ±ÅŸÄ±nda aÃ§Ä±klama kÄ±smÄ±na HÄ°Ã‡BÄ°R ÅžEY yazmayÄ±nÄ±z!</p>
                       </div>
 
                       <div>
-                         <label className="font-label-bold text-xs text-on-surface uppercase opacity-70 mb-1 block">Ödemeyi Yapan (Ad Soyad)</label>
-                         <input type="text" placeholder="Örn: Ahmet Yılmaz" value={senderName} onChange={(e) => setSenderName(e.target.value)} className="w-full bg-[#0B0F19] border border-outline-variant p-3 text-on-surface text-[10px] focus:border-primary-container outline-none rounded-lg" />
+                         <label className="font-label-bold text-xs text-on-surface uppercase opacity-70 mb-1 block">Ã–demeyi Yapan (Ad Soyad)</label>
+                         <input type="text" placeholder="Ã–rn: Ahmet YÄ±lmaz" value={senderName} onChange={(e) => setSenderName(e.target.value)} className="w-full bg-[#0B0F19] border border-outline-variant p-3 text-on-surface text-[10px] focus:border-primary-container outline-none rounded-lg" />
                       </div>
 
                       <label className="flex items-start gap-2 cursor-pointer select-none">
                          <input type="checkbox" checked={termsAccepted} onChange={(e) => setTermsAccepted(e.target.checked)} className="mt-1 w-4 h-4 text-primary-container shrink-0" />
                          <span className="text-xs text-on-surface-variant leading-tight">
-                           Sözleşmeleri kabul ediyorum.
+                           SÃ¶zleÅŸmeleri kabul ediyorum.
                          </span>
                       </label>
 
                       <div className="flex gap-1">
-                        <button onClick={() => setShowCheckout(false)} className="flex-1 py-1.5 border border-outline-variant text-on-surface-variant hover:text-on-surface rounded-lg text-xs uppercase font-bold transition-colors">İptal</button>
+                        <button onClick={() => setShowCheckout(false)} className="flex-1 py-1.5 border border-outline-variant text-on-surface-variant hover:text-on-surface rounded-lg text-xs uppercase font-bold transition-colors">Ä°ptal</button>
                         <button onClick={handleConfirmManualPayment} disabled={isProcessing || senderName.trim().length < 3 || !termsAccepted} className="flex-[2] py-1.5 bg-primary-container text-on-primary rounded-lg text-xs uppercase font-bold disabled:opacity-40 transition-colors">
-                          {isProcessing ? "İşleniyor..." : "Ödemeyi Yaptım"}
+                          {isProcessing ? "Ä°ÅŸleniyor..." : "Ã–demeyi YaptÄ±m"}
                         </button>
                       </div>
                     </div>
@@ -517,8 +518,8 @@ export default function PremiumPage() {
                       <div className="space-y-2 max-h-64 md:max-h-full overflow-y-auto pr-2 custom-scrollbar flex-grow bg-surface/30 p-2 rounded border border-outline-variant/30">
                         {status !== "authenticated" ? (
                           <div className="flex flex-col items-center justify-center h-full p-2 text-center">
-                            <p className="text-on-surface-variant font-body-md mb-2 text-[10px]">Sunucularınızı görmek için giriş yapmalısınız.</p>
-                            <button onClick={() => signIn("discord")} className="py-1 px-3 bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold rounded transition-colors text-[10px] uppercase">Discord ile Giriş Yap</button>
+                            <p className="text-on-surface-variant font-body-md mb-2 text-[10px]">SunucularÄ±nÄ±zÄ± gÃ¶rmek iÃ§in giriÅŸ yapmalÄ±sÄ±nÄ±z.</p>
+                            <button onClick={() => signIn("discord")} className="py-1 px-3 bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold rounded transition-colors text-[10px] uppercase">Discord ile GiriÅŸ Yap</button>
                           </div>
                         ) : isLoadingServers ? (
                           <div className="flex items-center justify-center h-full p-2 text-primary-container">
@@ -592,7 +593,7 @@ export default function PremiumPage() {
                         onClick={() => setPaymentMethod('crypto')} 
                         className={`flex-1 py-1.5 font-label-bold text-[10px] uppercase transition-all rounded-md ${paymentMethod === 'crypto' ? 'bg-primary-container text-on-primary shadow-[0_0_15px_rgba(255,215,0,0.2)]' : 'bg-surface border border-outline text-on-surface hover:border-primary-container/50'}`}
                       >
-                        Kripto İle Öde
+                        Kripto Ä°le Ã–de
                       </button>
                       <button 
                         onClick={() => setPaymentMethod('havale')} 
@@ -608,7 +609,7 @@ export default function PremiumPage() {
                           onClick={() => signIn("discord")}
                           className="w-full py-1 px-2 bg-[#5865F2] hover:bg-[#4752C4] text-white font-label-bold text-body-md flex items-center justify-center gap-1 transition-all duration-300 shadow-[0_10px_20px_rgba(88,101,242,0.2)] uppercase text-center rounded-md"
                         >
-                          <span>Discord İle Giriş Yap</span>
+                          <span>Discord Ä°le GiriÅŸ Yap</span>
                         </button>
                       ) : paymentMethod === 'crypto' ? (
                         <button 
@@ -625,13 +626,13 @@ export default function PremiumPage() {
                       ) : (
                         <div className="space-y-4 bg-surface p-3 border border-outline-variant rounded-md">
                            {bankAccounts.length === 0 ? (
-                             <div className="text-[10px] font-body-md text-error mb-2">Şu anda havale ile ödeme kabul edilmiyor. Lütfen kripto ödemesini kullanın.</div>
+                             <div className="text-[10px] font-body-md text-error mb-2">Åžu anda havale ile Ã¶deme kabul edilmiyor. LÃ¼tfen kripto Ã¶demesini kullanÄ±n.</div>
                            ) : (
                              <>
-                               <div className="text-[10px] font-body-md text-on-surface-variant mb-2">Ödeme adımına geçmek için işlem yapacağınız bankayı seçin ve aşağıdaki butona tıklayın. Havale/EFT bilgileri bir sonraki adımda gösterilecektir.</div>
+                               <div className="text-[10px] font-body-md text-on-surface-variant mb-2">Ã–deme adÄ±mÄ±na geÃ§mek iÃ§in iÅŸlem yapacaÄŸÄ±nÄ±z bankayÄ± seÃ§in ve aÅŸaÄŸÄ±daki butona tÄ±klayÄ±n. Havale/EFT bilgileri bir sonraki adÄ±mda gÃ¶sterilecektir.</div>
                                
                                <div className="space-y-2 mb-2">
-                                  <label className="font-label-bold text-xs text-on-surface uppercase tracking-widest opacity-70">Ödeme Yapılacak Banka</label>
+                                  <label className="font-label-bold text-xs text-on-surface uppercase tracking-widest opacity-70">Ã–deme YapÄ±lacak Banka</label>
                                   <select 
                                     className="w-full bg-[#0B0F19] border border-outline-variant rounded-md p-2 text-on-surface font-body-md focus:border-primary-container outline-none transition-colors"
                                     value={selectedBank?.id || ""}
@@ -649,9 +650,9 @@ export default function PremiumPage() {
                                  className="w-full py-1 px-2 bg-primary-container text-on-primary font-label-bold text-body-md flex items-center justify-center gap-1 transition-all duration-300 hover:brightness-110 active:scale-[0.98] shadow-[0_10px_20px_rgba(255,215,0,0.1)] disabled:opacity-50 disabled:cursor-not-allowed uppercase text-center mt-2 rounded-md"
                                >
                                  {isProcessing ? (
-                                   <><Loader2 className="animate-spin shrink-0" size={16} /> İŞLENİYOR...</>
+                                   <><Loader2 className="animate-spin shrink-0" size={16} /> Ä°ÅžLENÄ°YOR...</>
                                  ) : (
-                                   <><span>ÖDEME SAYFASINA GEÇ</span></>
+                                   <><span>Ã–DEME SAYFASINA GEÃ‡</span></>
                                  )}
                                </button>
                              </>
@@ -686,3 +687,4 @@ export default function PremiumPage() {
     </>
   );
 }
+

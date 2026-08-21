@@ -1,11 +1,13 @@
-"use client";
+﻿"use client";
 import { LINKS } from '@veyronix/config';
+import { usePublicConfig } from "@/context/PublicConfigContext";
 
 import { Zap, Star, MessageCircle } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function HeroSection() {
   const { t } = useLanguage();
+  const { supportServer } = usePublicConfig();
 
   return (
     <section className="relative px-margin-mobile md:px-margin-desktop py-20 max-w-container-max mx-auto text-center flex flex-col items-center">
@@ -40,7 +42,7 @@ export default function HeroSection() {
           {t.topggBtn ?? ("top.gg'de Oyla")}
         </a>
         <a
-          href={LINKS.SUPPORT_SERVER}
+          href={supportServer}
           target="_blank"
           rel="noopener noreferrer"
           className="w-full sm:w-auto bg-transparent border border-on-surface/20 text-on-surface hover:bg-on-surface/10 px-2 py-1 font-label-bold text-label-bold uppercase tracking-widest transition-all duration-300 active:scale-95 rounded-sm flex items-center justify-center gap-2"
@@ -52,3 +54,4 @@ export default function HeroSection() {
     </section>
   );
 }
+

@@ -1,5 +1,6 @@
-"use client";
+﻿"use client";
 import { LINKS } from '@veyronix/config';
+import { usePublicConfig } from "@/context/PublicConfigContext";
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -9,6 +10,7 @@ import { useLanguage } from "@/context/LanguageContext";
 
 export default function AboutPage() {
   const { t, lang } = useLanguage();
+  const { supportServer } = usePublicConfig();
   
   const activeContent = t.legal.about;
 
@@ -60,7 +62,7 @@ export default function AboutPage() {
                 <MessageSquare size={14} />
                 <span style={{ fontWeight: '600' }}>{t.support}</span>
               </div>
-              <a href={LINKS.SUPPORT_SERVER} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-color)', textDecoration: 'underline' }}>{activeContent.supportVal}</a>
+              <a href={supportServer} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-color)', textDecoration: 'underline' }}>{activeContent.supportVal}</a>
             </div>
           </div>
         </div>
@@ -70,3 +72,4 @@ export default function AboutPage() {
     </>
   );
 }
+
