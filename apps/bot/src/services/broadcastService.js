@@ -1,6 +1,7 @@
 const { supabase } = require('@veyronix/database');
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { LINKS } = require('../constants/constants');
+const { getSupportServerLink } = require('../utils/settingsUtils');
 
 /**
  * Starts the broadcast worker which polls the message_queue table.
@@ -159,6 +160,7 @@ function startBroadcastWorker(client) {
                 .setFooter({ text: 'Veyronix Campaign Management' })
                 .setTimestamp();
 
+            const supportLink = await getSupportServerLink();
             const row = new ActionRowBuilder().addComponents(
                 new ButtonBuilder()
                     .setLabel(lang === 'tr' ? 'Dashboard\'a Git' : 'Go to Dashboard')
@@ -166,7 +168,7 @@ function startBroadcastWorker(client) {
                     .setStyle(ButtonStyle.Link),
                 new ButtonBuilder()
                     .setLabel(lang === 'tr' ? 'Destek Sunucusu' : 'Support Server')
-                    .setURL(LINKS.SUPPORT_SERVER)
+                    .setURL(supportLink)
                     .setStyle(ButtonStyle.Link)
             );
 

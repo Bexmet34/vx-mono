@@ -51,28 +51,8 @@ export async function PATCH(req) {
 
         if (error) throw error;
 
-        // If discord_invite_url was changed, update the static config file
-        if (body.discord_invite_url) {
-            const fs = require('fs');
-            const path = require('path');
-            let baseDir = process.cwd();
-            if (baseDir.includes('apps')) {
-               baseDir = path.resolve(baseDir, '../../');
-            }
-            const configPath = path.join(baseDir, 'packages/config/src/index.js');
-            try {
-                let configContent = fs.readFileSync(configPath, 'utf8');
-                // Regex to replace the SUPPORT_SERVER value
-                configContent = configContent.replace(
-                    /SUPPORT_SERVER:\s*["'].*?["']/, 
-                    `SUPPORT_SERVER: "${body.discord_invite_url}"`
-                );
-                fs.writeFileSync(configPath, configContent);
-            } catch (err) {
-                console.error('Failed to write to config file:', err);
-                // Non-fatal, just log it. In vercel this won't work but on VPS it works perfectly.
-            }
-        }
+        // Ayarlar Supabase'e kaydedildi. Bot çalışma anında okuyacak, web ise
+        // bir sonraki `# up` (build) sırasında syncSettings.js ile güncellenecek.
 
         return NextResponse.json({ success: true });
     } catch (error) {

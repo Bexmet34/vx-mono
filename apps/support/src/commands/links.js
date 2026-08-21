@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags } = require('discord.js');
+const { LINKS } = require('@veyronix/config');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -15,15 +16,15 @@ module.exports = {
       new ButtonBuilder()
         .setLabel('Web Panel')
         .setStyle(ButtonStyle.Link)
-        .setURL('https://example.com/panel'), // Replace with actual URL
+        .setURL(LINKS.DASHBOARD),
       new ButtonBuilder()
-        .setLabel('Invite Bot')
+        .setLabel('Support Server')
         .setStyle(ButtonStyle.Link)
-        .setURL('https://discord.com/invite/example'), // Replace with actual URL
+        .setURL(LINKS.SUPPORT_SERVER),
       new ButtonBuilder()
-        .setLabel('Renew Subscription')
+        .setLabel('Premium')
         .setStyle(ButtonStyle.Link)
-        .setURL('https://example.com/renew'), // Replace with actual URL
+        .setURL(LINKS.PAGE_PREMIUM),
     );
 
     await interaction.reply({ embeds: [embed], components: [row], flags: [MessageFlags.Ephemeral] });

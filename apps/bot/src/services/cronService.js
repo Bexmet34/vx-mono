@@ -5,6 +5,7 @@ const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('
 const config = require('../config/config');
 const { getGuildConfig } = require('./guildConfig');
 const { t } = require('./i18n');
+const { getSupportServerLink } = require('../utils/settingsUtils');
 
 /**
  * Starts the cron service for automatic subscription checks
@@ -150,10 +151,11 @@ function startCronService(client) {
                         });
 
                         if (notification) {
+                            const supportLink = await getSupportServerLink();
                             const row = new ActionRowBuilder().addComponents(
                                 new ButtonBuilder()
                                     .setLabel(t('subscription.join_support', lang))
-                                    .setURL(LINKS.SUPPORT_SERVER)
+                                    .setURL(supportLink)
                                     .setStyle(ButtonStyle.Link)
                             );
 

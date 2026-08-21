@@ -1,6 +1,7 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, AttachmentBuilder } = require('discord.js');
 const { LINKS, LOGO_NAME, LOGO_PATH } = require('../constants/constants');
 const { t } = require('../services/i18n');
+const { getSupportServerLink } = require('./settingsUtils');
 
 /**
  * Sends a notification to the server owner about subscription changes.
@@ -40,6 +41,7 @@ async function sendSubscriptionNotification(client, guildId, type, days = 0, exp
         });
 
         if (notification) {
+            const supportLink = await getSupportServerLink();
             const row = new ActionRowBuilder().addComponents(
                 new ButtonBuilder()
                     .setLabel('Website')
@@ -48,7 +50,7 @@ async function sendSubscriptionNotification(client, guildId, type, days = 0, exp
                 new ButtonBuilder()
                     .setLabel('Destek / Support')
                     .setStyle(ButtonStyle.Link)
-                    .setURL(LINKS.SUPPORT_SERVER)
+                    .setURL(supportLink)
             );
 
             await owner.send({

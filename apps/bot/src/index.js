@@ -4,6 +4,7 @@ dns.setDefaultResultOrder('ipv4first'); // Force IPv4 to prevent ENETUNREACH err
 const { Client, GatewayIntentBits, ActivityType, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, Events } = require('discord.js');
 const { LINKS } = require('./constants/constants');
 const config = require('./config/config');
+const { getSupportServerLink } = require('./utils/settingsUtils');
 const fs = require('fs');
 const path = require('path');
 const { registerCommands } = require('./services/commandRegistration');
@@ -180,10 +181,11 @@ client.on('guildCreate', async (guild) => {
             });
 
             if (notification) {
+                const supportLink = await getSupportServerLink();
                 const row = new ActionRowBuilder().addComponents(
                     new ButtonBuilder()
                         .setLabel('Destek Sunucusu | Support Server')
-                        .setURL(LINKS.SUPPORT_SERVER)
+                        .setURL(supportLink)
                         .setStyle(ButtonStyle.Link),
                     new ButtonBuilder()
                         .setLabel('Web Sitesi | Website')
