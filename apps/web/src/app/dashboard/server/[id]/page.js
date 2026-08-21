@@ -572,7 +572,6 @@ export default function ServerSettings() {
             { id: 'rolemenu', label: 'Roles', icon: Users },
             { id: 'ticket', label: 'Ticket', icon: Shield },
             { id: 'events', label: 'Events', icon: Sparkles },
-            { id: 'drop', label: 'Drop', icon: Gift },
             { id: 'killboard', label: 'KillBoard', icon: Crosshair, isBeta: true },
             { id: 'templates', label: 'Templates', icon: Copy },
             { id: 'log', label: 'Logs', icon: FileText },
@@ -669,11 +668,7 @@ export default function ServerSettings() {
         )}
 
         {activeTab === 'events' && (
-          <EventsHub t={t} lang={lang} guildId={guildId} discordChannels={discordChannels} isPremium={isPremium} />
-        )}
-
-        {activeTab === 'drop' && (
-          <DropTab t={t} lang={lang} settings={dropSettings} setSettings={setDropSettings} saving={saving} saveSettings={handleSave} />
+          <EventsHub t={t} lang={lang} guildId={guildId} discordChannels={discordChannels} discordRoles={discordRoles} isPremium={isPremium} />
         )}
 
       </main>

@@ -1,8 +1,9 @@
-﻿"use client";
+"use client";
 import { LINKS } from '@veyronix/config';
 
 import Navbar from "@/components/Navbar";
 import { useLanguage } from "@/context/LanguageContext";
+import { usePublicConfig } from "@/context/PublicConfigContext";
 import { useEffect, useState } from "react";
 import { useSession, signIn } from "next-auth/react";
 import { 
