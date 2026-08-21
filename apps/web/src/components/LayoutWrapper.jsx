@@ -10,8 +10,9 @@ import MobileAppDock from "@/components/MobileAppDock";
 export default function LayoutWrapper({ children }) {
   const pathname = usePathname();
   const isDashboard = pathname?.startsWith("/dashboard");
+  const isAdmin = pathname?.startsWith("/admin");
 
-  if (isDashboard) {
+  if (isDashboard || isAdmin) {
     return (
       <div className="min-h-screen bg-background flex flex-col overflow-hidden">
         <Navbar />
