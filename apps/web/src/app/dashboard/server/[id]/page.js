@@ -301,7 +301,7 @@ export default function ServerSettings() {
     try {
       const res = await fetch(`/api/albion/search?q=${encodeURIComponent(guildSearchQuery)}&server=${encodeURIComponent(settings.albion_server || 'Europe')}`);
       const data = await res.json();
-      setGuildSearchResults(data || []);
+      setGuildSearchResults(data?.guilds || []);
     } catch (err) { console.error(err); }
     finally { setSearchingGuild(false); }
   }, [guildSearchQuery, settings.albion_server]);
