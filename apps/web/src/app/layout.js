@@ -13,7 +13,6 @@ import { Sora } from "next/font/google";
 import Script from "next/script";
 import LayoutWrapper from "@/components/LayoutWrapper";
 import { LINKS } from "@veyronix/config";
-import { supabase } from "@veyronix/database";
 
 const sora = Sora({ subsets: ["latin"], variable: "--font-sora", display: "swap" });
 
@@ -188,20 +187,6 @@ export default async function RootLayout({ children }) {
   const cookieStore = await cookies();
   const lang = cookieStore.get("NEXT_LOCALE")?.value || "tr";
 
-  // Destek sunucu linkini canlı olarak Supabase'den çek
-  let liveSupportServer = LINKS.SUPPORT_SERVER;
-  try {
-    const { data } = await supabase
-      .from('system_settings')
-      .select('value')
-      .eq('key', 'discord_invite_url')
-      .single();
-    if (data?.value) liveSupportServer = data.value;
-  } catch (e) { /* fallback */ }
-
-  // jsonLdOrg'da canlı linki kullan
-  const jsonLdOrgLive = { ...jsonLdOrg, sameAs: [liveSupportServer, 'https://top.gg/bot/1082239904169336902'] };
-
   return (
     <html lang={lang} className={`dark ${sora.variable}`} suppressHydrationWarning>
       <head>
@@ -230,7 +215,7 @@ export default async function RootLayout({ children }) {
         />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdOrgLive) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdOrg) }}
         />
         <script
           type="application/ld+json"

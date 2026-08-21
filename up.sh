@@ -1,178 +1,142 @@
 #!/usr/bin/env bash
+
 # ==============================================================================
-# VEYRONIX — Akıllı Sunucu Güncelleme & Bakım Sistemi (up)
+# Veyronix (VX-Mono) Akıllı Güncelleme, Bakım Modu & Sistem Temizliği (up)
 # ==============================================================================
-
-# Renkler
-RESET="\033[0m"
-BOLD="\033[1m"
-DIM="\033[2m"
-RED="\033[31m"
-GREEN="\033[32m"
-YELLOW="\033[33m"
-BLUE="\033[34m"
-CYAN="\033[36m"
-WHITE="\033[97m"
-
-# Yardımcı Loglama
-log_step()    { echo -e "\n${BOLD}${CYAN}▶ [$1] $2${RESET}"; }
-log_ok()      { echo -e "  ${GREEN}✔${RESET} $1"; }
-log_warn()    { echo -e "  ${YELLOW}⚠${RESET} $1"; }
-log_info()    { echo -e "  ${BLUE}ℹ${RESET} $1"; }
-log_skip()    { echo -e "  ${DIM}⏭ $1${RESET}"; }
-log_err()     { echo -e "  ${RED}✖${RESET} $1"; }
-
-echo -e "${BOLD}${CYAN}==============================================================================${RESET}"
-echo -e "${BOLD}${WHITE} 🚀 VEYRONIX SUNUCU GÜNCELLEME & BAKIM SİSTEMİ${RESET}"
-echo -e " ${DIM}Zaman: $(date '+%d.%m.%Y %H:%M:%S')${RESET}"
-echo -e "${BOLD}${CYAN}==============================================================================${RESET}"
 
 FORCE_BUILD=false
-SKIP_CLEAN=false
-for arg in "$@"; do
-  case $arg in
-    --force|-f) FORCE_BUILD=true ;;
-    --no-clean) SKIP_CLEAN=true ;;
-  esac
-done
-
-PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$PROJECT_DIR"
-
-# 1. GIT SENKRONİZASYONU
-log_step "1/6" "GitHub ile senkronizasyon yapılıyor..."
-BEFORE_HASH=$(git rev-parse HEAD 2>/dev/null || echo "NONE")
-
-# Yerel çakışan değişiklikleri temizle
-LOCAL_DIFF=$(git status --porcelain 2>/dev/null | wc -l)
-if [ "$LOCAL_DIFF" -gt 0 ]; then
-  log_warn "Yerel çakışan değişiklikler bulundu, sıfırlanıyor..."
-  git reset --hard origin/main 2>/dev/null || true
-  git clean -fd 2>/dev/null || true
+if [ "$1" == "--force" ] || [ "$1" == "-f" ]; then
+  FORCE_BUILD=true
 fi
 
-# Güncel kodları çek
+echo "🚀 [Veyronix UP] Akıllı güncelleme ve sistem temizliği başlatılıyor..."
+
+PROJECT_DIR="/root/vx-mono"
+if [ ! -d "$PROJECT_DIR" ]; then
+  PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+fi
+cd "$PROJECT_DIR"
+
+# 1. Güncelleme öncesi Git Commit Hash kaydet
+BEFORE_HASH=$(git rev-parse HEAD 2>/dev/null || echo "NONE")
+
+# 2. VPS üzerindeki tüm çakışan ve geçici dosyaları sıfırla
+echo "🧹 [1/7] Yerel çakışan dosyalar ve artıklar temizleniyor..."
+git reset --hard origin/main 2>/dev/null || true
+git clean -fd 2>/dev/null || true
+
+# 3. GitHub'dan güncel kodları çek
+echo "📥 [2/7] GitHub repodan güncel kodlar çekiliyor..."
 git fetch origin main 2>/dev/null || true
 git pull origin main --no-rebase
 
 AFTER_HASH=$(git rev-parse HEAD 2>/dev/null || echo "NONE")
 
-if [ "$BEFORE_HASH" = "$AFTER_HASH" ] && [ "$BEFORE_HASH" != "NONE" ]; then
-  log_ok "Kodlar güncel (Commit: ${CYAN}${AFTER_HASH:0:8}${RESET})"
+# Değişiklik Kontrolü
+CHANGED_FILES=""
+if [ "$BEFORE_HASH" != "NONE" ] && [ "$AFTER_HASH" != "NONE" ] && [ "$BEFORE_HASH" != "$AFTER_HASH" ]; then
+  CHANGED_FILES=$(git diff --name-only "$BEFORE_HASH" "$AFTER_HASH" 2>/dev/null || echo "ALL")
 else
-  log_ok "Kodlar güncellendi: ${DIM}${BEFORE_HASH:0:8}${RESET} → ${GREEN}${AFTER_HASH:0:8}${RESET}"
-  COMMIT_TITLE=$(git log -1 --pretty=format:"%s" 2>/dev/null || echo "")
-  [ -n "$COMMIT_TITLE" ] && log_info "Son Değişiklik: \"${COMMIT_TITLE}\""
+  CHANGED_FILES="ALL"
 fi
 
-# Değişiklik tespiti
 WEB_CHANGED=false
 BOT_CHANGED=false
 SUPPORT_CHANGED=false
 
-if [ "$FORCE_BUILD" = true ] || [ "$BEFORE_HASH" = "NONE" ] || [ "$BEFORE_HASH" = "$AFTER_HASH" ]; then
-  [ "$FORCE_BUILD" = true ] && { WEB_CHANGED=true; BOT_CHANGED=true; SUPPORT_CHANGED=true; }
+if [ "$FORCE_BUILD" = true ] || [ "$CHANGED_FILES" == "ALL" ]; then
+  WEB_CHANGED=true
+  BOT_CHANGED=true
+  SUPPORT_CHANGED=true
 else
-  CHANGED_FILES=$(git diff --name-only "$BEFORE_HASH" "$AFTER_HASH" 2>/dev/null || echo "")
-  echo "$CHANGED_FILES" | grep -qE "^(apps/web/|packages/|pnpm-lock.yaml)" && WEB_CHANGED=true
-  echo "$CHANGED_FILES" | grep -qE "^(apps/bot/|packages/|pnpm-lock.yaml)" && BOT_CHANGED=true
-  echo "$CHANGED_FILES" | grep -qE "^(apps/support/|packages/|pnpm-lock.yaml)" && SUPPORT_CHANGED=true
+  echo "$CHANGED_FILES" | grep -E "^(apps/web/|packages/|package.json|pnpm-lock.yaml|ecosystem.config.js|up.sh)" >/dev/null && WEB_CHANGED=true || true
+  echo "$CHANGED_FILES" | grep -E "^(apps/bot/|packages/|package.json|pnpm-lock.yaml|ecosystem.config.js|up.sh)" >/dev/null && BOT_CHANGED=true || true
+  echo "$CHANGED_FILES" | grep -E "^(apps/support/|packages/|package.json|pnpm-lock.yaml|ecosystem.config.js|up.sh)" >/dev/null && SUPPORT_CHANGED=true || true
 fi
 
-# 2. PAKET BAĞIMLILIKLARI
-log_step "2/6" "Paket bağımlılıkları kontrol ediliyor..."
+# 4. Paket bağımlılıklarını doğrula
+echo "📦 [3/7] Bağımlılıklar kontrol ediliyor..."
 CI=true pnpm install --no-frozen-lockfile >/dev/null 2>&1 || pnpm install >/dev/null 2>&1
-log_ok "Bağımlılıklar hazır"
 
-# 3. WEB DERLEME
-log_step "3/6" "Web sitesi durumu kontrol ediliyor..."
+# 5. Akıllı Web Build (Web veya Bağımlılık Değiştiyse)
 if [ "$WEB_CHANGED" = true ]; then
-  log_info "Bakım modu yayına alınıyor..."
-  pm2 stop vxweb >/dev/null 2>&1 || true
-  pkill -9 -f "scripts/maintenance-server.js" >/dev/null 2>&1 || true
-  pkill -9 -f "maintenance-server" >/dev/null 2>&1 || true
-  fuser -k 3000/tcp >/dev/null 2>&1 || true
+  echo "🟡 [Bakım Modu] Derleme süresince Bakım Sayfası (3 Çarklı Animasyonlu) yayına alınıyor..."
+  pm2 stop vxweb 2>/dev/null || true
+  pkill -9 -f "scripts/maintenance-server.js" 2>/dev/null || true
+  pkill -9 -f "maintenance-server" 2>/dev/null || true
+  fuser -k 3000/tcp 2>/dev/null || true
   sleep 1
 
   node "$PROJECT_DIR/scripts/maintenance-server.js" 3000 >/dev/null 2>&1 &
   MAINT_PID=$!
   sleep 1
-  log_ok "Bakım sayfası devrede (Port 3000)"
 
-  log_info "Web sitesi sıfırdan derleniyor (Next.js)..."
+  echo "🏗️ [4/7] Web sitesinde değişiklik tespit edildi, sıfırdan derleniyor (vxweb)..."
   rm -rf apps/web/.next
-  BUILD_START=$SECONDS
-  
-  if (cd apps/web && pnpm run build); then
-    BUILD_DUR=$((SECONDS - BUILD_START))
-    log_ok "Web derlemesi tamamlandı (${BUILD_DUR}s)"
-  else
-    log_err "Derleme hatası oluştu!"
-    kill -9 $MAINT_PID 2>/dev/null || true
-    pkill -9 -f "maintenance-server" 2>/dev/null || true
-    fuser -k 3000/tcp 2>/dev/null || true
-    exit 1
-  fi
+  cd apps/web
+  pnpm run build
+  cd "$PROJECT_DIR"
 
-  log_info "Bakım modu kapatılıyor..."
+  # Derleme bitti, bakım sunucusunu kapat
+  echo "🟢 [Bakım Modu] Derleme bitti, Bakım Sunucusu kapatılıyor..."
   kill -9 $MAINT_PID 2>/dev/null || true
-  pkill -9 -f "scripts/maintenance-server.js" >/dev/null 2>&1 || true
-  pkill -9 -f "maintenance-server" >/dev/null 2>&1 || true
-  fuser -k 3000/tcp >/dev/null 2>&1 || true
+  pkill -9 -f "scripts/maintenance-server.js" 2>/dev/null || true
+  pkill -9 -f "maintenance-server" 2>/dev/null || true
+  fuser -k 3000/tcp 2>/dev/null || true
   sleep 1
 else
-  log_skip "Web sitesinde değişiklik yok (Derleme adımı atlandı)"
+  echo "⏩ [4/7] Web sitesinde değişiklik yok, ağır derleme adımı es geçildi."
 fi
 
-# 4. PM2 SERVİS RESTARTLARI
-log_step "4/6" "PM2 servisleri güncelleniyor..."
-
+# 6. Akıllı PM2 Servis Restartları
+echo "🔄 [5/7] Servis durumları güncelleniyor..."
 if [ "$WEB_CHANGED" = true ]; then
-  pm2 restart vxweb >/dev/null 2>&1 || pm2 start ecosystem.config.js --only vxweb >/dev/null 2>&1
-  log_ok "Web Sitesi (vxweb) yeniden başlatıldı"
-else
-  log_skip "Web Sitesi (vxweb) — Değişiklik yok"
+  pm2 restart vxweb 2>/dev/null || pm2 start ecosystem.config.js --only vxweb
 fi
 
 if [ "$BOT_CHANGED" = true ]; then
-  pm2 restart partikur >/dev/null 2>&1 || pm2 start ecosystem.config.js --only partikur >/dev/null 2>&1
-  log_ok "Ana Bot (partikur) yeniden başlatıldı"
+  echo "🤖 [Partikur Bot] Güncellendi, yeniden başlatılıyor..."
+  pm2 restart partikur 2>/dev/null || pm2 start ecosystem.config.js --only partikur
 else
-  log_skip "Ana Bot (partikur) — Değişiklik yok"
+  echo "⏩ [Partikur Bot] Değişiklik yok, restart es geçildi."
 fi
 
 if [ "$SUPPORT_CHANGED" = true ]; then
-  pm2 restart vxdestek >/dev/null 2>&1 || pm2 start ecosystem.config.js --only vxdestek >/dev/null 2>&1
-  log_ok "Destek Botu (vxdestek) yeniden başlatıldı"
+  echo "🎧 [Destek Botu] Güncellendi, yeniden başlatılıyor..."
+  pm2 restart vxdestek 2>/dev/null || pm2 start ecosystem.config.js --only vxdestek
 else
-  log_skip "Destek Botu (vxdestek) — Değişiklik yok"
+  echo "⏩ [Destek Botu] Değişiklik yok, restart es geçildi."
 fi
 
-# 5. SİSTEM & RAM TEMİZLİĞİ
-log_step "5/6" "Sistem temizliği ve RAM optimizasyonu yapılıyor..."
-if [ "$SKIP_CLEAN" = false ]; then
-  command -v apt-get >/dev/null 2>&1 && { apt-get autoremove -y >/dev/null 2>&1 || true; apt-get clean >/dev/null 2>&1 || true; }
-  command -v journalctl >/dev/null 2>&1 && { journalctl --vacuum-time=3d >/dev/null 2>&1 || true; }
-  rm -rf /tmp/* /var/tmp/* 2>/dev/null || true
-  rm -f "$PROJECT_DIR"/*.log "$PROJECT_DIR"/*.txt 2>/dev/null || true
-  pm2 flush >/dev/null 2>&1 || true
-  pnpm store prune >/dev/null 2>&1 || true
-  git gc --prune=now --quiet 2>/dev/null || true
-  sync && (echo 3 > /proc/sys/vm/drop_caches 2>/dev/null || true)
-  log_ok "RAM & Disk temizliği yapıldı"
-else
-  log_skip "Temizlik adımı atlandı"
+# 7. VPS Makine & Sistem Temizliği (Disk & RAM Performansı)
+echo "🧼 [6/7] Genel VPS makine ve sistem temizliği yapılıyor (RAM & Disk)..."
+
+if command -v apt-get >/dev/null 2>&1; then
+  apt-get autoremove -y >/dev/null 2>&1 || true
+  apt-get autoclean -y >/dev/null 2>&1 || true
+  apt-get clean >/dev/null 2>&1 || true
 fi
 
-# 6. KISAYOL GÜNCELLEME
-log_step "6/6" "Kısayol kontrol ediliyor..."
+if command -v journalctl >/dev/null 2>&1; then
+  journalctl --vacuum-time=3d >/dev/null 2>&1 || true
+  journalctl --vacuum-size=50M >/dev/null 2>&1 || true
+fi
+
+rm -rf /tmp/* /var/tmp/* /var/log/*.gz /var/log/*.[0-9] 2>/dev/null || true
+rm -f *.log *.txt install_log.txt build_log.txt 2>/dev/null || true
+
+pnpm store prune >/dev/null 2>&1 || true
+pm2 flush >/dev/null 2>&1 || true
+git gc --prune=now --quiet 2>/dev/null || true
+sync && (echo 3 > /proc/sys/vm/drop_caches 2>/dev/null || true)
+
+# 8. Otomatik 'up' kısayol güncelleme
+echo "⚙️ [7/7] Kısayol kontrolü..."
 cp "$PROJECT_DIR/up.sh" /usr/local/bin/up 2>/dev/null || true
 chmod +x /usr/local/bin/up 2>/dev/null || true
-log_ok "up kısayolu hazır"
 
-# BİTİŞ TABLOSU
-echo -e "\n${BOLD}${CYAN}==============================================================================${RESET}"
-echo -e "${BOLD}${GREEN} ✔ GÜNCELLEME BAŞARIYLA TAMAMLANDI!${RESET}"
-echo -e "${BOLD}${CYAN}==============================================================================${RESET}\n"
-
+echo "=============================================================================="
+echo "✅ [BAŞARILI] Veyronix Sunucu Güncellemesi ve Genel Makine Temizliği Tamamlandı!"
+echo "=============================================================================="
 pm2 status
+
