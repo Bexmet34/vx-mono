@@ -2,7 +2,7 @@ const db = require('./db');
 const { getSupabaseGuildSettings, updateGuildLanguage, updateSupabaseGuildSettings } = require('@veyronix/database');
 
 const configCache = new Map();
-const CACHE_TTL_MS = 5 * 1000; // 5 seconds TTL
+const CACHE_TTL_MS = 60 * 1000; // 60 seconds TTL (reduced DB overhead)
 
 /**
  * Gets configuration for a specific guild with in-memory caching
