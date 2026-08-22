@@ -45,6 +45,7 @@ const client = new Client({
 // Register events
 require('./events/logEvents')(client);
 require('./events/voiceStateUpdate')(client);
+require('./events/presenceUpdate')(client);
 
 // Error handling to prevent crashes
 client.on('error', async error => {

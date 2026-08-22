@@ -199,11 +199,25 @@ async function handleCreatorJoin(newState, creatorConfig) {
             type: OverwriteType.Member
         });
 
+        const creatorChannel = newState.channel;
+        let positionValue;
+
+        if (creatorConfig.position === 'Üstte') {
+            positionValue = 0;
+        } else if (creatorConfig.position === 'Altta') {
+            positionValue = 999;
+        } else if (creatorConfig.position === 'Oluşturucunun hemen altında') {
+            positionValue = creatorChannel ? creatorChannel.position + 1 : 999;
+        } else {
+            positionValue = creatorChannel ? creatorChannel.position + 1 : 999;
+        }
+
         // Create the channel
         const newChannel = await guild.channels.create({
             name: channelName,
             type: ChannelType.GuildVoice,
             parent: categoryId || null,
+            position: positionValue,
             bitrate: creatorConfig.bitrate === '128kbps' ? 128000 : (creatorConfig.bitrate === '96kbps' ? 96000 : 64000),
             userLimit: parseInt(creatorConfig.userLimit) || 0,
             permissionOverwrites: filteredOverwrites,
@@ -213,7 +227,8 @@ async function handleCreatorJoin(newState, creatorConfig) {
         // Store in memory
         activeTempChannels.set(newChannel.id, {
             ownerId: member.id,
-            creatorId: creatorConfig.id
+            creatorId: creatorConfig.id,
+            count: tempChannelCount
         });
 
         // Move the user
@@ -260,5 +275,6 @@ async function handleTempChannelLeave(oldState) {
 module.exports = {
     handleCreatorJoin,
     handleTempChannelLeave,
-    activeTempChannels
+    activeTempChannels,
+    parseChannelName
 };
