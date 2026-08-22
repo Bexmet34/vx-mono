@@ -5,7 +5,7 @@ import { Settings, MessageSquare, Tag, Users, Send, Loader2, Crown, Layout, Chec
 import InfoTooltip from "@/components/InfoTooltip";
 
 export default function RegistrationTab({ t, lang, settings, setSettings, discordChannels, discordRoles, handleSave, saving, guildId, registeredCount = 0, setActiveTab, isPremium }) {
-  const [subTab, setSubTab] = useState("core"); // core, roles, messages, sync, questionnaire
+  // Setup Wizard Mode (Sub-tabs removed)
   const [sendingSetup, setSendingSetup] = useState(false);
   const [visibleRoleCount, setVisibleRoleCount] = useState(1);
   const [syncingAlbion, setSyncingAlbion] = useState(false);
@@ -122,39 +122,9 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
 
   return (
     <div className="flex flex-col gap-2 animate-slide-up">
-      {/* Sub-tab Navigation */}
-      <div className="flex flex-wrap gap-2 border-b border-outline-variant/30 pb-4 mb-2">
-        {[
-          { id: "core", label: lang === 'en' ? "Core Config" : "Ana Ayarlar", icon: Settings },
-          { id: "roles", label: lang === 'en' ? "Roles Setup" : "Rol Ayarları", icon: Tag },
-          { id: "messages", label: lang === 'en' ? "Welcome & Logs" : "Karşılama & Loglar", icon: MessageSquare },
-          { id: "members", label: lang === 'en' ? "Guild Members" : "Üye Yönetimi", icon: Users },
-          { id: "questionnaire", label: lang === 'en' ? "Questionnaire" : "Başvuru Anketi", icon: Layout },
-        ].map((tab) => {
-          const Icon = tab.icon;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setSubTab(tab.id)}
-              className={`flex items-center gap-2 px-2 py-1.5 rounded-full text-[10px] font-label-bold uppercase tracking-widest transition-all ${
-                subTab === tab.id
-                  ? "bg-primary-container text-on-primary border border-primary-container tactical-glow"
-                  : "bg-surface-container/50 border border-outline-variant/30 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
-              }`}
-            >
-              <Icon size={14} />
-              {tab.label}
-              {!isPremium && (tab.id === "sync" || tab.id === "questionnaire") && (
-                <Crown size={12} className="text-primary-container ml-1" />
-              )}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* SUBTAB 1: Core Settings */}
-      {subTab === "core" && (
-        <div className="glass-panel p-3 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors space-y-6">
+      {/* STEP 1: Temel Sistem Ayarları */}
+      <div className="glass-panel p-5 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors space-y-6 mt-4">
+        <div className="absolute -left-3 -top-3 w-8 h-8 bg-primary-container text-on-primary font-black rounded-full flex items-center justify-center shadow-lg shadow-primary-container/20 border-2 border-surface-container-high z-10">1</div>
           <div>
             <h2 className="font-headline-lg text-[10px] text-on-surface mb-2 flex items-center gap-2 uppercase tracking-tight">
               <Settings className="text-primary-container" />
@@ -191,22 +161,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
               </div>
             </div>
 
-            <div>
-              <label className="flex items-center text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
-                {lang === 'en' ? 'Welcome Channel' : 'Karşılama Kanalı'}
-                <InfoTooltip text={lang === 'en' ? 'The channel where the "Register" button message will be sent.' : '"Kayıt Ol" butonunun bulunacağı sabit mesajın gönderileceği kanal.'} />
-              </label>
-              <select
-                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
-                value={settings.registration_channel_id || ""}
-                onChange={(e) => setSettings({ ...settings, registration_channel_id: e.target.value })}
-              >
-                <option value="">{lang === 'en' ? 'Select Channel' : 'Kanal Seçin'}</option>
-                {textChannels.map(c => (
-                  <option key={c.id} value={c.id}>#{c.name}</option>
-                ))}
-              </select>
-            </div>
+            {/* Welcome Channel moved to Step 2 */}
 
             <div>
               <label className="flex items-center text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
@@ -262,14 +217,95 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
             <div className="text-[10px] font-label-bold text-on-surface uppercase tracking-wider">
               {lang === 'en' ? `Total Registered Members: ` : `Toplam Kayıtlı Üye: `}
               <span className="text-primary-container font-headline-md text-[10px] ml-1">{registeredCount}</span>
-            </div>
           </div>
         </div>
-      )}
+      </div> {/* End Step 1 */}
 
-      {/* SUBTAB 2: Roles Setup */}
-      {subTab === "roles" && (
-        <div className="glass-panel p-3 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors space-y-6">
+      {/* STEP 2: Karşılama Kanalı & Kayıt Butonu */}
+      <div className="glass-panel p-5 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors space-y-6 mt-6">
+        <div className="absolute -left-3 -top-3 w-8 h-8 bg-primary-container text-on-primary font-black rounded-full flex items-center justify-center shadow-lg shadow-primary-container/20 border-2 border-surface-container-high z-10">2</div>
+        
+        <div>
+          <h2 className="font-headline-lg text-[10px] text-on-surface mb-2 flex items-center gap-2 uppercase tracking-tight">
+            <MessageSquare className="text-primary-container" />
+            {lang === 'en' ? 'Welcome Channel & Registration Button' : 'Karşılama Kanalı & Kayıt Butonu'}
+          </h2>
+          <p className="font-body-md text-on-surface-variant">
+            {lang === 'en' 
+              ? 'Select the channel and configure the message where users will click to register.' 
+              : 'Kullanıcıların kayıt olmak için tıklayacağı butonu ve kanalını yapılandırın. Ayarları kaydedip mesajı hemen gönderebilirsiniz.'}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-outline-variant/20">
+          <div>
+            <label className="flex items-center text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+              {lang === 'en' ? 'Welcome Channel' : 'Karşılama Kanalı'}
+              <InfoTooltip text={lang === 'en' ? 'The channel where the "Register" button message will be sent.' : '"Kayıt Ol" butonunun bulunacağı sabit mesajın gönderileceği kanal.'} />
+            </label>
+            <select
+              className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+              value={settings.registration_channel_id || ""}
+              onChange={(e) => setSettings({ ...settings, registration_channel_id: e.target.value })}
+            >
+              <option value="">{lang === 'en' ? 'Select Channel' : 'Kanal Seçin'}</option>
+              {textChannels.map(c => (
+                <option key={c.id} value={c.id}>#{c.name}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="flex items-center text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+              {lang === 'en' ? 'Display Buttons' : 'Gösterilecek Butonlar'}
+              <InfoTooltip text={lang === 'en' ? 'Which language buttons to show below the welcome message.' : 'Hoş geldin mesajının altında hangi dillerin kayıt butonlarının gösterileceğini seçin.'} />
+            </label>
+            <select
+              className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+              value={settings.registration_button_type || "both"}
+              onChange={(e) => setSettings({ ...settings, registration_button_type: e.target.value })}
+            >
+              <option value="both">🇹🇷 Türkçe & 🇬🇧 English</option>
+              <option value="tr">🇹🇷 Sadece Türkçe (Only TR)</option>
+              <option value="en">🇬🇧 Sadece İngilizce (Only EN)</option>
+            </select>
+          </div>
+          
+          <div className="md:col-span-2">
+            <label className="flex items-center text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+              {lang === 'en' ? 'Message Text' : 'Buton Mesaj Metni'}
+              <InfoTooltip text={lang === 'en' ? 'The text that appears above the Register button in the Welcome channel.' : 'Karşılama kanalındaki Kayıt Ol butonunun üzerinde yazacak açıklama metni.'} />
+            </label>
+            <textarea
+              className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md resize-y"
+              rows={2}
+              placeholder={lang === 'en' ? 'Welcome! Click the button below to register.' : 'Hoşgeldiniz! Kayıt olmak için aşağıdaki butona tıklayın.'}
+              value={settings.registration_welcome_message || ""}
+              onChange={(e) => setSettings({ ...settings, registration_welcome_message: e.target.value })}
+            />
+          </div>
+
+          <div className="md:col-span-2 bg-primary-container/5 border border-primary-container/20 rounded-lg p-3 flex flex-col md:flex-row items-center justify-between gap-4 mt-2">
+            <div className="text-[10px] text-on-surface-variant leading-relaxed">
+              {lang === 'en' 
+                ? '⚠️ Make sure you save settings first, then deploy the button message.' 
+                : '⚠️ Önce sayfanın altındaki "Kaydet" butonuna basarak ayarları kaydettiğinizden emin olun, ardından butonu içeren mesajı kanala gönderin.'}
+            </div>
+            <button 
+              className="whitespace-nowrap px-4 py-2 bg-primary-container text-on-primary font-label-bold uppercase tracking-widest tactical-glow rounded-sm transition-all hover:brightness-110 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed" 
+              onClick={handleSendSetup} 
+              disabled={!settings.registration_channel_id || sendingSetup}
+            >
+              {sendingSetup ? <Loader2 size={16} className="animate-spin"/> : <Send size={16}/>} 
+              {lang === 'en' ? 'Send Button Message' : 'Kurulum Mesajını Gönder'}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* STEP 3: Roles Setup */}
+      <div className="glass-panel p-5 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors space-y-6 mt-6">
+        <div className="absolute -left-3 -top-3 w-8 h-8 bg-primary-container text-on-primary font-black rounded-full flex items-center justify-center shadow-lg shadow-primary-container/20 border-2 border-surface-container-high z-10">3</div>
           <div>
             <h2 className="font-headline-lg text-[10px] text-on-surface mb-2 flex items-center gap-2 uppercase tracking-tight">
               <Tag className="text-primary-container" />
@@ -452,80 +488,25 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                 </div>
               </div>
             </div>
-
           </div>
+        </div> {/* End Step 3 */}
+
+      {/* STEP 4: Post-Registration & Logs */}
+      <div className="glass-panel p-5 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors space-y-6 mt-6">
+        <div className="absolute -left-3 -top-3 w-8 h-8 bg-primary-container text-on-primary font-black rounded-full flex items-center justify-center shadow-lg shadow-primary-container/20 border-2 border-surface-container-high z-10">4</div>
+        <div>
+          <h2 className="font-headline-lg text-[10px] text-on-surface mb-2 flex items-center gap-2 uppercase tracking-tight">
+            <MessageSquare className="text-primary-container" />
+            {lang === 'en' ? 'Post-Registration & Logs' : 'Kayıt Sonrası & Loglar'}
+          </h2>
+          <p className="font-body-md text-on-surface-variant">
+            {lang === 'en' 
+              ? 'Configure audit log channels and public welcome messages.' 
+              : 'Kayıt sonrası genel sohbet karşılama kanallarını ve denetim kayıtlarını yapılandırın.'}
+          </p>
         </div>
-      )}
 
-      {/* SUBTAB 3: Welcome Messages & Logs */}
-      {subTab === "messages" && (
-        <div className="glass-panel p-3 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors space-y-6">
-          <div>
-            <h2 className="font-headline-lg text-[10px] text-on-surface mb-2 flex items-center gap-2 uppercase tracking-tight">
-              <MessageSquare className="text-primary-container" />
-              {lang === 'en' ? 'Welcome & Log Messages' : 'Karşılama & Log Mesajları'}
-            </h2>
-            <p className="font-body-md text-on-surface-variant">
-              {lang === 'en' 
-                ? 'Customize the button embed text, public greetings, and audit log channels.' 
-                : 'Kayıt butonunun yazısını, genel karşılama kanallarını ve denetim kayıtlarını yapılandırın.'}
-            </p>
-          </div>
-
-          {/* Welcome Message Config */}
-          <div className="pt-6 border-t border-outline-variant/20 space-y-6">
-            <div className="bg-surface-container/20 p-2 rounded-lg border border-outline-variant/30 space-y-4">
-              <h3 className="text-[10px] font-label-bold text-on-surface uppercase tracking-widest">
-                {lang === 'en' ? 'Register Button Setup' : 'Kayıt Ol Buton Kurulumu'}
-              </h3>
-              
-              <div>
-                <label className="flex items-center text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
-                  {lang === 'en' ? 'Message Text' : 'Buton Mesaj Metni'}
-                  <InfoTooltip text={lang === 'en' ? 'The text that appears above the Register button in the Welcome channel.' : 'Karşılama kanalındaki Kayıt Ol butonunun üzerinde yazacak açıklama metni.'} />
-                </label>
-                <textarea
-                  className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md resize-y"
-                  rows={3}
-                  placeholder={lang === 'en' ? 'Welcome! Click the button below to register.' : 'Hoşgeldiniz! Kayıt olmak için aşağıdaki butona tıklayın.'}
-                  value={settings.registration_welcome_message || ""}
-                  onChange={(e) => setSettings({ ...settings, registration_welcome_message: e.target.value })}
-                />
-              </div>
-
-              <div>
-                <label className="flex items-center text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
-                  {lang === 'en' ? 'Display Buttons' : 'Gösterilecek Butonlar'}
-                  <InfoTooltip text={lang === 'en' ? 'Which language buttons to show below the welcome message.' : 'Hoş geldin mesajının altında hangi dillerin kayıt butonlarının gösterileceğini seçin.'} />
-                </label>
-                <select
-                  className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
-                  value={settings.registration_button_type || "both"}
-                  onChange={(e) => setSettings({ ...settings, registration_button_type: e.target.value })}
-                >
-                  <option value="both">🇹🇷 Türkçe & 🇬🇧 English</option>
-                  <option value="tr">🇹🇷 Sadece Türkçe (Only TR)</option>
-                  <option value="en">🇬🇧 Sadece İngilizce (Only EN)</option>
-                </select>
-              </div>
-
-              <button 
-                className="w-full px-3 py-1 bg-primary-container text-on-primary font-label-bold uppercase tracking-widest tactical-glow rounded-sm transition-all hover:brightness-110 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed" 
-                onClick={handleSendSetup} 
-                disabled={!settings.registration_channel_id || sendingSetup}
-              >
-                {sendingSetup ? <Loader2 size={16} className="animate-spin"/> : <Send size={16}/>} 
-                {lang === 'en' ? 'Send Button Message to Channel' : 'Buton Mesajını Kanala Gönder'}
-              </button>
-              <p className="text-center text-[10px] text-on-surface-variant">
-                {lang === 'en' 
-                  ? '⚠️ Make sure you save settings first, then deploy the button message.' 
-                  : '⚠️ Önce ayarları kaydettiğinizden emin olun, ardından butonu içeren mesajı kanala gönderin.'}
-              </p>
-            </div>
-
-            {/* Post Registration logs */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pt-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-outline-variant/20">
               <div>
                 <label className="flex items-center text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
                   {lang === 'en' ? 'Log Channel' : 'Log Kanalı'}
@@ -613,26 +594,24 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                 </p>
               </div>
             </div>
-          </div>
+      </div> {/* End Step 4 */}
+
+      {/* STEP 5: Guild Member Management (Premium) */}
+      <div className="glass-panel p-5 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors space-y-6 mt-6">
+        <div className="absolute -left-3 -top-3 w-8 h-8 bg-primary-container text-on-primary font-black rounded-full flex items-center justify-center shadow-lg shadow-primary-container/20 border-2 border-surface-container-high z-10">5</div>
+        <div>
+          <h2 className="font-headline-lg text-[10px] text-on-surface mb-2 flex items-center gap-2 uppercase tracking-tight">
+            <Users className="text-primary-container" />
+            {lang === 'en' ? 'Guild Member Management' : 'Üye Yönetimi ve Ayrılık Kontrolü'}
+          </h2>
+          <p className="font-body-md text-on-surface-variant">
+            {lang === 'en' 
+              ? 'Track users who left the Albion Online guild roster and synchronize historical database members.' 
+              : 'Albion Online loncanızdan ayrılan oyuncuların tespit edilip yetkilerinin geri alınması ve veri senkronizasyonu.'}
+          </p>
         </div>
-      )}
 
-      {/* SUBTAB 4: Leave Check & Sync */}
-      {subTab === "members" && (
-        <div className="glass-panel p-3 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors space-y-6">
-          <div>
-            <h2 className="font-headline-lg text-[10px] text-on-surface mb-2 flex items-center gap-2 uppercase tracking-tight">
-              <Users className="text-primary-container" />
-              {lang === 'en' ? 'Guild Member Management' : 'Üye Yönetimi ve Ayrılık Kontrolü'}
-            </h2>
-            <p className="font-body-md text-on-surface-variant">
-              {lang === 'en' 
-                ? 'Track users who left the Albion Online guild roster and synchronize historical database members.' 
-                : 'Albion Online loncanızdan ayrılan oyuncuların tespit edilip yetkilerinin geri alınması ve veri senkronizasyonu.'}
-            </p>
-          </div>
-
-          <div className="pt-6 border-t border-outline-variant/20">
+        <div className="pt-6 border-t border-outline-variant/20">
             {!isPremium ? (
               renderPremiumLock(
                 lang === 'en' ? 'Guild Leave System Requires Premium' : 'Ayrılık Kontrolü Premium Gerektirir',
@@ -942,25 +921,24 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
               </>
             )}
           </div>
+        </div> {/* End Step 5 */}
+
+      {/* STEP 6: Questionnaire (Premium) */}
+      <div className="glass-panel p-5 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors space-y-6 mt-6">
+        <div className="absolute -left-3 -top-3 w-8 h-8 bg-primary-container text-on-primary font-black rounded-full flex items-center justify-center shadow-lg shadow-primary-container/20 border-2 border-surface-container-high z-10">6</div>
+        <div>
+          <h2 className="font-headline-lg text-[10px] text-on-surface mb-2 flex items-center gap-2 uppercase tracking-tight">
+            <Layout className="text-primary-container" />
+            {lang === 'en' ? 'Application Questionnaire' : 'Başvuru Anketi'}
+          </h2>
+          <p className="font-body-md text-on-surface-variant">
+            {lang === 'en' 
+              ? 'Configure rule acceptance steps and questionnaire prompts before users join registration tickets.' 
+              : 'Kullanıcılar kayıt bileti açmadan önce gösterilecek guild kurallarını ve özel başvuru sorularını yapılandırın.'}
+          </p>
         </div>
-      )}
 
-      {/* SUBTAB 5: Questionnaire with Premium Check */}
-      {subTab === "questionnaire" && (
-        <div className="glass-panel p-3 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors space-y-6">
-          <div>
-            <h2 className="font-headline-lg text-[10px] text-on-surface mb-2 flex items-center gap-2 uppercase tracking-tight">
-              <Layout className="text-primary-container" />
-              {lang === 'en' ? 'Application Questionnaire' : 'Başvuru Anketi'}
-            </h2>
-            <p className="font-body-md text-on-surface-variant">
-              {lang === 'en' 
-                ? 'Configure rule acceptance steps and questionnaire prompts before users join registration tickets.' 
-                : 'Kullanıcılar kayıt bileti açmadan önce gösterilecek guild kurallarını ve özel başvuru sorularını yapılandırın.'}
-            </p>
-          </div>
-
-          <div className="pt-6 border-t border-outline-variant/20">
+        <div className="pt-6 border-t border-outline-variant/20">
             {!isPremium ? (
               renderPremiumLock(
                 lang === 'en' ? 'Application Questionnaire Requires Premium' : 'Başvuru Anketi Premium Gerektirir',
@@ -1271,8 +1249,8 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
               </div>
             )}
           </div>
-        </div>
-      )}
+        </div> {/* End Step 6 */}
+
     </div>
   );
 }
