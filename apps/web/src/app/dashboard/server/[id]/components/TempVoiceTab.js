@@ -45,7 +45,7 @@ const CustomSelect = ({ value, options, onChange, placeholder }) => {
   );
 };
 
-export default function TempVoiceTab({ t, lang, settings, setSettings, discordChannels, discordRoles, isPremium, guildId }) {
+export default function TempVoiceTab({ t, lang, settings, setSettings, setInitialSettings, discordChannels, discordRoles, isPremium, guildId }) {
   const [editingCreatorId, setEditingCreatorId] = useState(null);
   const [activeSubTab, setActiveSubTab] = useState("overview");
   const [showVarMenu, setShowVarMenu] = useState(false);
@@ -115,6 +115,8 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
           clearInterval(pollInterval);
           setIsCreatingCreator(false);
           setEditingCreatorId(newCreator.id);
+          // Also set initial settings so save button disappears
+          if (setInitialSettings) setInitialSettings(updatedSettings);
           return;
         }
 
@@ -128,6 +130,7 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
               clearInterval(pollInterval);
               setCreationProgress(100);
               setSettings(data.settings);
+              if (setInitialSettings) setInitialSettings(data.settings);
               
               setTimeout(() => {
                 setIsCreatingCreator(false);
@@ -144,6 +147,7 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
       console.error(err);
       setIsCreatingCreator(false);
       setEditingCreatorId(newCreator.id);
+      if (setInitialSettings) setInitialSettings(updatedSettings);
     }
   };
 
@@ -283,29 +287,22 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
         )}
         
         {/* Breadcrumb & Header */}
-        <div className="flex flex-col gap-3">
-          <div className="flex items-center gap-2 text-on-surface-variant font-label-bold text-[10px] uppercase tracking-widest bg-surface-container/50 p-2 rounded-lg border border-outline-variant/30 w-fit">
-            <button onClick={() => setEditingCreatorId(null)} className="hover:text-primary-container transition-colors">
-              ...
+        <div className="flex flex-col gap-5">
+          <div className="flex items-center gap-3 text-sm font-label-bold uppercase tracking-widest bg-surface-container p-3 rounded-xl border border-outline-variant w-fit shadow-md">
+            <button onClick={() => setEditingCreatorId(null)} className="flex items-center gap-2 text-primary-container hover:brightness-125 transition-all">
+              <ArrowLeft size={16} />
+              {lang === 'tr' ? 'Geri Dön' : 'Go Back'}
             </button>
-            <span className="opacity-50">&gt;</span>
-            <button onClick={() => setEditingCreatorId(null)} className="hover:text-primary-container transition-colors">
-              {lang === 'tr' ? 'Sunucu Ayarları' : 'Server Settings'}
-            </button>
-            <span className="opacity-50">&gt;</span>
-            <span className="text-on-surface bg-surface border border-outline-variant px-2 py-0.5 rounded">
+            <span className="text-on-surface-variant/50">/</span>
+            <span className="text-on-surface">
               {lang === 'tr' ? 'Oluşturucu Ayarları' : 'Creator Settings'}
             </span>
           </div>
 
           <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-2">
-              <Plus size={36} className="text-on-surface-variant" />
-              <span className="text-on-surface-variant text-3xl font-light">•</span>
-              <h2 className="text-4xl font-headline-xl text-on-surface tracking-tight font-bold">
-                {creator.name}
-              </h2>
-            </div>
+            <h2 className="text-4xl font-headline-xl text-on-surface tracking-tight font-bold">
+              {creator.name}
+            </h2>
           </div>
         </div>
 
