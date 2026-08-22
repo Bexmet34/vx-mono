@@ -86,7 +86,27 @@ export async function POST(req, { params }) {
       tempvoice_creators
     } = body;
 
-    const needsTempVoiceSetup = Array.isArray(tempvoice_creators) && tempvoice_creators.some(c => !c.channelId);
+    let mergedTempVoiceCreators = [];
+    if (Array.isArray(tempvoice_creators)) {
+      const { data: currentSettings } = await supabase
+        .from('guild_settings')
+        .select('tempvoice_creators')
+        .eq('guild_id', guildId)
+        .single();
+        
+      mergedTempVoiceCreators = tempvoice_creators.map(incomingCreator => {
+        if (currentSettings && Array.isArray(currentSettings.tempvoice_creators)) {
+          const existing = currentSettings.tempvoice_creators.find(c => c.id === incomingCreator.id);
+          // Only preserve channelId if the dashboard didn't send one, to avoid overwriting what the bot created
+          if (existing && existing.channelId && !incomingCreator.channelId) {
+            return { ...incomingCreator, channelId: existing.channelId };
+          }
+        }
+        return incomingCreator;
+      });
+    }
+
+    const needsTempVoiceSetup = mergedTempVoiceCreators.some(c => !c.channelId);
 
     // Upsert: varsa güncelle, yoksa ekle
     const { data, error } = await supabase
@@ -144,7 +164,7 @@ export async function POST(req, { params }) {
           application_enabled: application_enabled ?? false,
           registration_rules_text: registration_rules_text || null,
           application_questions: Array.isArray(application_questions) ? application_questions : [],
-          tempvoice_creators: Array.isArray(tempvoice_creators) ? tempvoice_creators : [],
+          tempvoice_creators: mergedTempVoiceCreators,
           ...(needsTempVoiceSetup ? { trigger_tempvoice_setup: true } : {})
         },
         { onConflict: 'guild_id' }
