@@ -115,11 +115,11 @@ export default function PublicServersSection({ publicServers = [] }) {
         }
         
         .animate-scroll-left {
-          animation: scroll-left 60s linear infinite;
+          animation: scroll-left 420s linear infinite;
         }
         
         .animate-scroll-right {
-          animation: scroll-right 60s linear infinite;
+          animation: scroll-right 420s linear infinite;
         }
         
         @keyframes scroll-left {
