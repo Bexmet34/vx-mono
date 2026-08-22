@@ -19,6 +19,11 @@ async function initDbListeners(client) {
     setInterval(async () => {
         await checkUpdates(client);
     }, 60000);
+
+    // Fast check for triggers (e.g. TempVoice creation) every 3 seconds
+    setInterval(async () => {
+        await checkFastUpdates(client);
+    }, 3000);
 }
 
 /**
@@ -129,7 +134,15 @@ async function checkUpdates(client, initial = false) {
             }
         }
 
-        // --- NEW: Check TempVoice Setup Triggers ---
+        // The tempvoice check was moved to checkFastUpdates
+    } catch (err) {
+        console.error('[DbListenerService] Polling Error:', err.message);
+    }
+}
+
+async function checkFastUpdates(client) {
+    try {
+        // --- Check TempVoice Setup Triggers (Fast Path) ---
         const { data: tempVoiceConfigs, error: tvError } = await supabase
             .from('guild_settings')
             .select('guild_id, tempvoice_creators')
@@ -175,7 +188,7 @@ async function checkUpdates(client, initial = false) {
             }
         }
     } catch (err) {
-        console.error('[DbListenerService] Polling Error:', err.message);
+        console.error('[DbListenerService] Fast Polling Error:', err.message);
     }
 }
 

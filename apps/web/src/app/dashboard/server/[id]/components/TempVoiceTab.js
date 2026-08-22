@@ -62,10 +62,16 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const [isCreatingCreator, setIsCreatingCreator] = useState(false);
+  const [creationProgress, setCreationProgress] = useState(0);
+
   // Temporary local state for the creators if it's not yet in main settings
   const creators = settings.tempvoice_creators || [];
 
-  const handleAddCreator = () => {
+  const handleAddCreator = async () => {
+    setIsCreatingCreator(true);
+    setCreationProgress(10);
+
     const newCreator = {
       id: crypto.randomUUID(),
       name: "➕・Open-Audio-Channel",
@@ -79,11 +85,66 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
       privacyMode: "public",
       ownerPermissions: ["manage_channels", "disconnect_members", "create_invite"]
     };
-    setSettings({
+
+    const updatedSettings = {
       ...settings,
       tempvoice_creators: [...creators, newCreator]
-    });
-    setEditingCreatorId(newCreator.id);
+    };
+
+    setSettings(updatedSettings);
+
+    try {
+      setCreationProgress(30);
+      const res = await fetch(`/api/guild-settings/${guildId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...updatedSettings,
+          trigger_tempvoice_setup: true
+        })
+      });
+
+      if (!res.ok) throw new Error("Failed to trigger creation");
+
+      let attempts = 0;
+      const pollInterval = setInterval(async () => {
+        attempts++;
+        setCreationProgress(p => Math.min(p + 5, 90));
+
+        if (attempts > 15) { // 30s timeout
+          clearInterval(pollInterval);
+          setIsCreatingCreator(false);
+          setEditingCreatorId(newCreator.id);
+          return;
+        }
+
+        try {
+          const checkRes = await fetch(`/api/guild-settings/${guildId}`);
+          if (checkRes.ok) {
+            const data = await checkRes.json();
+            const latestCreators = data.settings?.tempvoice_creators || [];
+            const found = latestCreators.find(c => c.id === newCreator.id);
+            if (found && found.channelId) {
+              clearInterval(pollInterval);
+              setCreationProgress(100);
+              setSettings(data.settings);
+              
+              setTimeout(() => {
+                setIsCreatingCreator(false);
+                setEditingCreatorId(newCreator.id);
+              }, 500);
+            }
+          }
+        } catch (e) {
+          // ignore fetch errors on poll
+        }
+      }, 2000);
+
+    } catch (err) {
+      console.error(err);
+      setIsCreatingCreator(false);
+      setEditingCreatorId(newCreator.id);
+    }
   };
 
   const handleUpdateCreator = (id, updates) => {
@@ -203,6 +264,24 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
 
     return (
       <div className="flex flex-col gap-6 animate-fade-in">
+        {isCreatingCreator && (
+          <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[#09090b]/80 backdrop-blur-sm animate-fade-in">
+            <div className="flex flex-col items-center gap-4 p-8 bg-surface-container rounded-2xl border border-outline-variant shadow-2xl max-w-sm w-full mx-4">
+              <div className="w-12 h-12 border-4 border-primary-container border-t-transparent rounded-full animate-spin"></div>
+              <div className="flex flex-col items-center text-center gap-1">
+                <h3 className="text-lg font-headline-bold text-on-surface">{lang === 'tr' ? 'Kanal Oluşturuluyor' : 'Creating Channel'}</h3>
+                <p className="text-sm text-on-surface-variant">{lang === 'tr' ? 'Bot şu anda Discord üzerinde kanalınızı kuruyor, lütfen bekleyin...' : 'The bot is currently setting up your channel on Discord, please wait...'}</p>
+              </div>
+              <div className="w-full h-2 bg-surface-container-highest rounded-full overflow-hidden mt-2 relative">
+                <div 
+                  className="absolute top-0 left-0 h-full bg-primary-container rounded-full transition-all duration-300" 
+                  style={{ width: `${creationProgress}%` }}
+                ></div>
+              </div>
+            </div>
+          </div>
+        )}
+        
         {/* Breadcrumb & Header */}
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-2 text-on-surface-variant font-label-bold text-[10px] uppercase tracking-widest bg-surface-container/50 p-2 rounded-lg border border-outline-variant/30 w-fit">
@@ -616,6 +695,24 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
   // Initial View
   return (
     <div className="flex flex-col gap-6 animate-fade-in">
+      {isCreatingCreator && (
+        <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[#09090b]/80 backdrop-blur-sm animate-fade-in">
+          <div className="flex flex-col items-center gap-4 p-8 bg-surface-container rounded-2xl border border-outline-variant shadow-2xl max-w-sm w-full mx-4">
+            <div className="w-12 h-12 border-4 border-primary-container border-t-transparent rounded-full animate-spin"></div>
+            <div className="flex flex-col items-center text-center gap-1">
+              <h3 className="text-lg font-headline-bold text-on-surface">{lang === 'tr' ? 'Kanal Oluşturuluyor' : 'Creating Channel'}</h3>
+              <p className="text-sm text-on-surface-variant">{lang === 'tr' ? 'Bot şu anda Discord üzerinde kanalınızı kuruyor, lütfen bekleyin...' : 'The bot is currently setting up your channel on Discord, please wait...'}</p>
+            </div>
+            <div className="w-full h-2 bg-surface-container-highest rounded-full overflow-hidden mt-2 relative">
+              <div 
+                className="absolute top-0 left-0 h-full bg-primary-container rounded-full transition-all duration-300" 
+                style={{ width: `${creationProgress}%` }}
+              ></div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center gap-2 mb-2">
         <h2 className="text-lg font-headline-lg text-on-surface uppercase tracking-widest flex items-center gap-2">
           <Headphones className="text-primary-container" size={20} />
