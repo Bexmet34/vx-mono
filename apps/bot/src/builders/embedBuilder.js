@@ -257,51 +257,30 @@ function addFooterFields(embed, currentCount, totalCount, lang = 'tr') {
 }
 
 /**
- * Creates a paginated help embed
+ * Creates a paginated help embed (now single page)
  */
 function createHelpEmbed(page = 0, guild = null, lang = 'tr', thumbnailUrl = null) {
-    const embeds = [
-        // Page 0: Overview
-        new EmbedBuilder()
-            .setTitle(t('help.title_page_0', lang))
-            .setColor(15844367) // #F1C40F
-            .setDescription(t('help.desc_page_0', lang))
-            .addFields(
-                { name: t('help.field_features_title', lang), value: t('help.field_features_value', lang), inline: false },
-                { name: t('help.field_categories_title', lang), value: t('help.field_categories_value', lang), inline: false },
-                { name: t('help.field_nav_title', lang), value: t('help.field_nav_value', lang), inline: false }
-            )
-            .setFooter({ text: t('help.footer_page_0', lang) }),
-
-        // Page 1: Commands
-        new EmbedBuilder()
-            .setTitle(t('help.title_page_1', lang))
-            .setColor(3447003) // #3498DB
-            .setDescription(t('help.desc_page_1', lang))
-            .addFields(
-                { name: '🚀 /createparty', value: t('help.cmd_createparty', lang), inline: false },
-                { name: '🗳️ /vote', value: t('help.cmd_vote', lang), inline: false },
-                { name: 'ℹ️ /help', value: t('help.cmd_help', lang), inline: false },
-                { name: '🔒 /closeparty', value: lang === 'tr' ? 'Aktif partilerinizi manuel olarak kapatmanızı sağlar.' : 'Manually end your active parties.', inline: false },
-                { name: '👥 /members', value: t('help.cmd_members', lang), inline: false },
-                { name: '📊 /stats [name]', value: t('help.cmd_stats', lang), inline: false },
-                { name: '✅ /whitelistadd [user]', value: lang === 'tr' ? 'Bir kullanıcıyı beyaz listeye ekler. **Yönetici yetkisi gerekir.**' : 'Add a user to the whitelist. **Admin permission required.**', inline: false },
-                { name: '❌ /whitelistremove [user]', value: lang === 'tr' ? 'Bir kullanıcıyı beyaz listeden çıkarır. **Yönetici yetkisi gerekir.**' : 'Remove a user from the whitelist. **Admin permission required.**', inline: false },
-                { name: '⚙️ /settings', value: t('help.cmd_settings', lang) + (lang === 'tr' ? ' **Yönetici yetkisi gerekir.**' : ' **Admin permission required.**'), inline: false }
-            )
-            .setFooter({ text: t('help.footer_page_1', lang) })
-    ];
+    const embed = new EmbedBuilder()
+        .setTitle(t('help.title', lang))
+        .setColor(2829617) // #2B2D31 matching Discord dark theme closely
+        .setDescription(t('help.desc', lang))
+        .addFields(
+            { name: t('help.admin_title', lang), value: t('help.admin_value', lang), inline: false },
+            { name: t('help.general_title', lang), value: t('help.general_value', lang), inline: false },
+            { name: t('help.premium_title', lang), value: t('help.premium_value', lang), inline: false }
+        )
+        .setFooter({ text: t('help.footer', lang) });
 
     const finalThumbnail = (thumbnailUrl && typeof thumbnailUrl === 'string' && thumbnailUrl.startsWith('http') && thumbnailUrl !== 'null') ? thumbnailUrl : null;
 
     if (finalThumbnail) {
-        embeds.forEach(e => e.setThumbnail(finalThumbnail));
+        embed.setThumbnail(finalThumbnail);
     } else if (guild && typeof guild.iconURL === 'function') {
         const icon = guild.iconURL();
-        if (icon) embeds.forEach(e => e.setThumbnail(icon));
+        if (icon) embed.setThumbnail(icon);
     }
 
-    return embeds[page] || embeds[0];
+    return embed;
 }
 
 /**

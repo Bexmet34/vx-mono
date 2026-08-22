@@ -30,29 +30,19 @@ module.exports = {
         config_instruction: 'Komutları kullanabilmek için bir yöneticinin önce `/settings` komutu ile sunucu bilgilerini kaydetmesi gerekir.'
     },
     help: {
-        title_page_0: '🛡️ Veyronix | Yardım Menüsü',
-        desc_page_0: 'Albion Online sunucuları için geliştirilmiş gelişmiş yönetim ve parti botu.\n\nAşağıda botun ana özelliklerini, oyuncu komutlarını ve yönetim araçlarını düzenli bir şekilde bulabilirsiniz.\n\n> İpucu: Komutları `/` yazarak hızlıca görebilir, yönetici komutları için gerekli yetkilere sahip olmanız gerektiğini unutmayın.',
-        field_features_title: '✨ Temel Özellikler',
-        field_features_value: '• Dinamik parti alım sistemi\n• Oyuncu istatistik sorgulama\n• Lonca üye listeleme\n• Beyaz liste (Whitelist) yönetimi\n• Sunucuya özel dil ve sistem ayarları',
-        field_categories_title: '📌 Komut Kategorileri',
-        field_categories_value: '• Parti Komutları\n• Oyuncu Bilgi Komutları\n• Yönetim Komutları',
-        field_nav_title: '🧭 Hızlı Gezinme',
-        field_nav_value: 'Bu yardım menüsü 2 bölümden oluşmaktadır:\n**1. Genel Bilgiler**\n**2. Temel & Yönetim Komutları**',
-        footer_page_0: 'Sayfa 1/2 • Genel Bilgiler',
-
-        title_page_1: '⚔️ Veyronix | Temel & Yönetim Komutları',
-        desc_page_1: 'Günlük kullanım, parti yönetimi ve sunucu ayarları için aşağıdaki komutlar kullanılır.',
-        footer_page_1: 'Sayfa 2/2 • Temel & Yönetim Komutları',
-
-        page_1: 'Komut Listesi',
-        page_2: 'Yönetim',
-        cmd_createparty: 'Dinamik bir form açar. İçerik, konum ve özel rolleri belirlemenizi sağlar.',
-        cmd_stats: 'Bir Albion Online (Europe) oyuncusunun istatistiklerini gösterir.',
-        cmd_members: 'Loncanızdaki aktif üyeleri sayfa sayfa listeler.',
-        cmd_settings: 'Sistem için lonca ismini ve Albion Guild ID\'sini tanımlar.',
-        cmd_help: 'Bu interaktif menüyü açar.',
-        cmd_vote: 'Oy vererek botumuza destek olmanızı sağlar.',
-        donate_button: '🛒 Satın Al & Kirala / Abone Ol'
+        title: '❓ Veyronix Help ❓',
+        desc: 'Veyronix is a fast, easy-to-use and efficient management application designed for Discord. With an exceptional user experience, it aims to bring communities together.\n\n[Dashboard](https://veyronix.com.tr) | [Support Server](https://veyronix.com.tr/support) | [Documentation](https://veyronix.com.tr) | [Premium](https://veyronix.com.tr/premium)\n\nIt offers you the possibility to manage your server and events efficiently. It also has many advanced interaction features to make the experience smoother and more enjoyable.',
+        admin_title: '⚙️ Administration',
+        admin_value: '`/settings`',
+        general_title: '🤖 General',
+        general_value: '`/createparty`, `/vote`, `/help`, `/members`, `/stats`',
+        premium_title: '✨ Premium',
+        premium_value: '`/premium`',
+        footer: 'Veyronix | www.veyronix.com.tr',
+        btn_support: 'Get Help',
+        btn_docs: 'Documentation',
+        btn_invite: 'Install Bot',
+        btn_premium: 'Go Pro/Premium'
     },
     settings: {
         success: 'Sunucu ayarları başarıyla güncellendi!',

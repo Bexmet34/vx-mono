@@ -24,29 +24,7 @@ async function handlePartyButtons(interaction) {
     const lang = guildConfig?.language || 'tr';
     const guildName = guildConfig?.guild_name || 'Albion';
 
-    // Help Page Navigation
-    if (customId.startsWith('help_page_')) {
-        const pageIndex = parseInt(customId.split('_')[2]);
 
-        const newEmbed = createHelpEmbed(pageIndex, interaction.guild, lang, guildConfig?.embed_thumbnail_url);
-
-        const row = new ActionRowBuilder().addComponents(
-            new ButtonBuilder().setCustomId('help_page_0').setLabel('🏠').setStyle(pageIndex === 0 ? ButtonStyle.Primary : ButtonStyle.Secondary),
-            new ButtonBuilder().setCustomId('help_page_1').setLabel(`⚔️ ${t('help.page_2', lang)}`).setStyle(pageIndex === 1 ? ButtonStyle.Primary : ButtonStyle.Secondary),
-            new ButtonBuilder().setCustomId('help_page_2').setLabel(`🚨 ${t('help.page_3', lang)}`).setStyle(pageIndex === 2 ? ButtonStyle.Primary : ButtonStyle.Secondary)
-        );
-
-        const linkRow = new ActionRowBuilder().addComponents(
-            new ButtonBuilder().setLabel(`🌐 Website`).setStyle(ButtonStyle.Link).setURL(LINKS.WEBSITE),
-            new ButtonBuilder().setLabel(`🚀 ${t('help.top_gg', lang)}`).setStyle(ButtonStyle.Link).setURL(LINKS.TOPGG)
-        );
-
-
-        return await interaction.update({
-            embeds: [newEmbed],
-            components: [row, linkRow]
-        });
-    }
 
 
 

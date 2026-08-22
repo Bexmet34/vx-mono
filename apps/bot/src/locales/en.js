@@ -30,29 +30,19 @@ module.exports = {
         config_instruction: 'To use commands, an administrator must first save the server information using the `/settings` command.'
     },
     help: {
-        title_page_0: '🛡️ Veyronix | Help Menu',
-        desc_page_0: 'Advanced management and party bot developed for Albion Online servers.\n\nBelow you can find the bot\'s main features, player commands, and management tools in an organized way.\n\n> Pro tip: You can see commands quickly by typing `/`, and you must have the necessary permissions for administrator commands.',
-        field_features_title: '✨ Key Features',
-        field_features_value: '• Dynamic party recruitment system\n• Player statistics lookup\n• Guild member listing\n• Whitelist management\n• Server-specific language and system settings',
-        field_categories_title: '📌 Command Categories',
-        field_categories_value: '• Party Commands\n• Player Information Commands\n• Management Commands',
-        field_nav_title: '🧭 Quick Navigation',
-        field_nav_value: 'This help menu consists of 2 sections:\n**1. General Information**\n**2. Basic & Management Commands**',
-        footer_page_0: 'Page 1/2 • General Information',
-
-        title_page_1: '⚔️ Veyronix | Basic & Management Commands',
-        desc_page_1: 'The following commands are used for daily usage, party management, and server settings.',
-        footer_page_1: 'Page 2/2 • Basic & Management Commands',
-
-        page_1: 'Command List',
-        page_2: 'Management',
-        cmd_createparty: 'Opens a dynamic form. Allows you to set content, location, and custom roles.',
-        cmd_stats: 'Displays an Albion Online (Europe) player\'s statistics.',
-        cmd_members: 'Lists your guild\'s active members page by page.',
-        cmd_settings: 'Defines the guild name and Albion Guild ID for the system.',
-        cmd_help: 'Opens this interactive menu.',
-        cmd_vote: 'Support the bot by voting on Top.gg.',
-        donate_button: '🛒 Buy & Rent / Subscribe'
+        title: '❓ Veyronix Help ❓',
+        desc: 'Veyronix is a fast, easy-to-use and efficient management application designed for Discord. With an exceptional user experience, it aims to bring communities together.\n\n[Dashboard](https://veyronix.com.tr) | [Support Server](https://veyronix.com.tr/support) | [Documentation](https://veyronix.com.tr) | [Premium](https://veyronix.com.tr/premium)\n\nIt offers you the possibility to manage your server and events efficiently. It also has many advanced interaction features to make the experience smoother and more enjoyable.',
+        admin_title: '⚙️ Administration',
+        admin_value: '`/settings`',
+        general_title: '🤖 General',
+        general_value: '`/createparty`, `/vote`, `/help`, `/members`, `/stats`',
+        premium_title: '✨ Premium',
+        premium_value: '`/premium`',
+        footer: 'Veyronix | www.veyronix.com.tr',
+        btn_support: 'Get Help',
+        btn_docs: 'Documentation',
+        btn_invite: 'Install Bot',
+        btn_premium: 'Go Pro/Premium'
     },
     settings: {
         success: 'Server settings updated successfully!',

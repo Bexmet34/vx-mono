@@ -24,20 +24,19 @@ async function handleHelpCommand(interaction) {
 
     const embed = createHelpEmbed(0, interaction.guild, lang, guildConfig?.embed_thumbnail_url);
 
-    const row = new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setCustomId('help_page_0').setLabel('🏠').setStyle(ButtonStyle.Primary),
-        new ButtonBuilder().setCustomId('help_page_1').setLabel(`⚔️ ${t('help.page_2', lang)}`).setStyle(ButtonStyle.Secondary),
-        new ButtonBuilder().setCustomId('help_vote').setLabel(`🗳️ /vote`).setStyle(ButtonStyle.Success)
+    const row1 = new ActionRowBuilder().addComponents(
+        new ButtonBuilder().setLabel(t('help.btn_support', lang)).setEmoji('🆘').setStyle(ButtonStyle.Link).setURL('https://veyronix.com.tr/support'),
+        new ButtonBuilder().setLabel(t('help.btn_docs', lang)).setEmoji('📚').setStyle(ButtonStyle.Link).setURL('https://veyronix.com.tr/docs'),
+        new ButtonBuilder().setLabel(t('help.btn_invite', lang)).setEmoji('📨').setStyle(ButtonStyle.Link).setURL('https://discord.com/oauth2/authorize?client_id=' + interaction.client.user.id + '&permissions=8&scope=bot%20applications.commands')
     );
 
-    const linkRow = new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setLabel(`🌐 Website`).setStyle(ButtonStyle.Link).setURL(LINKS.WEBSITE),
-        new ButtonBuilder().setLabel(t('help.donate_button', lang) || 'Top.gg').setStyle(ButtonStyle.Link).setURL(LINKS.TOPGG)
+    const row2 = new ActionRowBuilder().addComponents(
+        new ButtonBuilder().setLabel(t('help.btn_premium', lang)).setEmoji('⭐').setStyle(ButtonStyle.Link).setURL('https://veyronix.com.tr/premium')
     );
 
     return await safeReply(interaction, {
         embeds: [embed],
-        components: [row, linkRow],
+        components: [row1, row2],
         flags: [MessageFlags.Ephemeral]
     });
 }
