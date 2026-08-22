@@ -72,6 +72,13 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
     isPremium
   ]);
 
+  useEffect(() => {
+    // Bakım modu - Otomatik kontrol açık olanlarda zorla kapat
+    if (settings && settings.auto_check_enabled === true) {
+      setSettings(prev => ({ ...prev, auto_check_enabled: false }));
+    }
+  }, [settings?.auto_check_enabled, setSettings]);
+
   const handleSendSetup = async () => {
     if (!settings.registration_channel_id) {
       alert("Please select a welcome channel first.");
@@ -612,6 +619,20 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
         </div>
 
         <div className="pt-6 border-t border-outline-variant/20">
+          <div className="bg-error/10 border border-error/30 rounded-lg p-4 mb-4 flex items-start gap-3">
+            <AlertTriangle className="text-error shrink-0 mt-0.5" />
+            <div>
+              <h3 className="text-error font-label-bold text-[11px] uppercase tracking-widest mb-1">
+                {lang === 'en' ? 'Module Under Maintenance' : 'Modül Bakımda'}
+              </h3>
+              <p className="text-error-variant text-[10px] leading-relaxed">
+                {lang === 'en' 
+                  ? 'The Guild Member Management system is currently under maintenance. It has been temporarily disabled for all servers.' 
+                  : 'Üye Yönetimi ve Ayrılık Kontrolü sistemi şu anda bakımda olduğundan tüm sunucular için geçici olarak devre dışı bırakılmıştır.'}
+              </p>
+            </div>
+          </div>
+          <div className="pointer-events-none opacity-50 grayscale blur-[1px]">
             {!isPremium ? (
               renderPremiumLock(
                 lang === 'en' ? 'Guild Leave System Requires Premium' : 'Ayrılık Kontrolü Premium Gerektirir',
@@ -920,6 +941,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                 )}
               </>
             )}
+          </div>
           </div>
         </div> {/* End Step 5 */}
 

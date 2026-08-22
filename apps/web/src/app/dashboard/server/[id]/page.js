@@ -569,11 +569,11 @@ export default function ServerSettings() {
           {[
             { id: 'overview', label: 'Overview', icon: Home },
             { id: 'general', label: 'General', icon: Layout },
-            { id: 'registration', label: 'Reg', icon: UserPlus, isBeta: true },
+            { id: 'registration', label: 'Reg', icon: UserPlus },
             { id: 'rolemenu', label: 'Roles', icon: Users },
             { id: 'ticket', label: 'Ticket', icon: Shield },
             { id: 'events', label: 'Events', icon: Sparkles },
-            { id: 'killboard', label: 'KillBoard', icon: Crosshair, isBeta: true },
+            { id: 'killboard', label: 'KillBoard', icon: Crosshair },
             { id: 'templates', label: 'Templates', icon: Copy },
             { id: 'log', label: 'Logs', icon: FileText },
             { id: 'embed', label: 'Branding', icon: ImageIcon },
