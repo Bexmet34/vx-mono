@@ -233,21 +233,26 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
         {/* Sub Tabs */}
         <div className="flex gap-2 mb-2">
           {[
-            { id: 'overview', label: lang === 'tr' ? 'Genel Bakış' : 'Overview', icon: FileText },
-            { id: 'permissions', label: lang === 'tr' ? 'İzinler' : 'Permissions', icon: FileText },
-            { id: 'moderation', label: lang === 'tr' ? 'Moderasyon' : 'Moderation', icon: Shield },
-            { id: 'others', label: lang === 'tr' ? 'Diğerleri' : 'Others', icon: FileText }
+            { id: 'overview', label: lang === 'tr' ? 'Genel Bakış' : 'Overview', icon: FileText, disabled: false },
+            { id: 'permissions', label: lang === 'tr' ? 'İzinler' : 'Permissions', icon: FileText, disabled: false },
+            { id: 'moderation', label: lang === 'tr' ? 'Moderasyon' : 'Moderation', icon: Shield, disabled: true },
+            { id: 'others', label: lang === 'tr' ? 'Diğerleri' : 'Others', icon: FileText, disabled: true }
           ].map(tab => (
             <button
               key={tab.id}
-              onClick={() => setActiveSubTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-label-bold uppercase tracking-widest transition-all ${activeSubTab === tab.id
-                  ? "bg-surface text-on-surface border border-outline-variant/60 shadow-sm"
-                  : "text-on-surface-variant hover:bg-white/5 border border-transparent hover:text-on-surface"
+              onClick={() => { if (!tab.disabled) setActiveSubTab(tab.id); }}
+              disabled={tab.disabled}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-label-bold uppercase tracking-widest transition-all ${
+                tab.disabled 
+                  ? "opacity-50 cursor-not-allowed text-on-surface-variant" 
+                  : activeSubTab === tab.id
+                    ? "bg-surface text-on-surface border border-outline-variant/60 shadow-sm"
+                    : "text-on-surface-variant hover:bg-white/5 border border-transparent hover:text-on-surface"
                 }`}
             >
-              <tab.icon size={14} className={activeSubTab === tab.id ? "text-on-surface" : "text-on-surface-variant"} />
+              <tab.icon size={14} className={activeSubTab === tab.id && !tab.disabled ? "text-on-surface" : "text-on-surface-variant"} />
               {tab.label}
+              {tab.disabled && <span className="text-[9px] bg-outline-variant/30 px-1.5 py-0.5 rounded ml-1">{lang === 'tr' ? 'YAKINDA' : 'SOON'}</span>}
             </button>
           ))}
         </div>
