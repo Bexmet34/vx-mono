@@ -4,45 +4,45 @@ import React, { useState, useRef, useEffect } from "react";
 import { Plus, Settings, Trash2, ArrowLeft, Headphones, Sliders, Shield, MoreHorizontal, HelpCircle, FileText, Crown } from "lucide-react";
 
 const CustomSelect = ({ value, options, onChange, placeholder }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const ref = useRef(null);
-    useEffect(() => {
-        function handleClickOutside(event) {
-            if (ref.current && !ref.current.contains(event.target)) setIsOpen(false);
-        }
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
+  const [isOpen, setIsOpen] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (ref.current && !ref.current.contains(event.target)) setIsOpen(false);
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-    const selectedOption = options.find(o => o.value === value);
+  const selectedOption = options.find(o => o.value === value);
 
-    return (
-        <div className="relative" ref={ref}>
-            <button 
-                onClick={() => setIsOpen(!isOpen)}
-                className="w-full bg-surface-container/30 border border-outline-variant rounded-lg p-3 text-sm text-left focus:border-primary-container hover:border-primary-container outline-none transition-all flex items-center justify-between"
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full bg-surface-container/30 border border-outline-variant rounded-lg p-3 text-sm text-left focus:border-primary-container hover:border-primary-container outline-none transition-all flex items-center justify-between"
+      >
+        <span className={selectedOption ? "text-on-surface" : "text-on-surface-variant"}>
+          {selectedOption ? selectedOption.label : placeholder}
+        </span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-on-surface-variant"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+      {isOpen && (
+        <div className="absolute right-0 left-0 top-[calc(100%+8px)] max-h-[300px] overflow-y-auto custom-scrollbar bg-surface-container-highest border border-outline-variant rounded-xl shadow-2xl z-[100] flex flex-col p-2 animate-fade-in">
+          {options.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => { onChange(opt.value); setIsOpen(false); }}
+              className={`flex items-center justify-between p-2.5 hover:bg-white/5 rounded-lg transition-colors text-left ${value === opt.value ? 'bg-white/5 text-on-surface' : 'text-on-surface-variant hover:text-on-surface'}`}
             >
-                <span className={selectedOption ? "text-on-surface" : "text-on-surface-variant"}>
-                    {selectedOption ? selectedOption.label : placeholder}
-                </span>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-on-surface-variant"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              <span className="text-sm">{opt.label}</span>
+              {value === opt.value && <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary-container"><polyline points="20 6 9 17 4 12"></polyline></svg>}
             </button>
-            {isOpen && (
-                <div className="absolute right-0 left-0 top-[calc(100%+8px)] max-h-[300px] overflow-y-auto custom-scrollbar bg-surface-container-highest border border-outline-variant rounded-xl shadow-2xl z-[100] flex flex-col p-2 animate-fade-in">
-                    {options.map((opt) => (
-                        <button 
-                            key={opt.value}
-                            onClick={() => { onChange(opt.value); setIsOpen(false); }}
-                            className={`flex items-center justify-between p-2.5 hover:bg-white/5 rounded-lg transition-colors text-left ${value === opt.value ? 'bg-white/5 text-on-surface' : 'text-on-surface-variant hover:text-on-surface'}`}
-                        >
-                            <span className="text-sm">{opt.label}</span>
-                            {value === opt.value && <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary-container"><polyline points="20 6 9 17 4 12"></polyline></svg>}
-                        </button>
-                    ))}
-                </div>
-            )}
+          ))}
         </div>
-    );
+      )}
+    </div>
+  );
 };
 
 export default function TempVoiceTab({ t, lang, settings, setSettings, discordChannels, discordRoles, isPremium, guildId }) {
@@ -69,7 +69,7 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
     const newCreator = {
       id: crypto.randomUUID(),
       name: "➕・Open-Audio-Channel",
-      channelNameFormat: "CONTENT - {NUMBER}",
+      channelNameFormat: "Veyronix - {NUMBER}",
       userLimit: 99,
       categoryId: "",
       bitrate: "64kbps",
@@ -110,40 +110,40 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
 
   const variables = [
     {
-        category: "Sahip",
-        items: [
-            { tag: "{OWNER_USERNAME}", desc: "Kanal sahibi olan kullanıcının kullanıcı adı" },
-            { tag: "{OWNER_NICKNAME}", desc: "Kanal sahibi olan kullanıcının görünen adı" },
-            { tag: "{OWNER_CREATED}", desc: "Kanal sahibi olan kullanıcının hesabını oluşturduğu tarih (GG/AA/YYYY)" },
-            { tag: "{OWNER_JOINED}", desc: "Kanal sahibi olan kullanıcının sunucuya katıldığı tarih (GG/AA/YYYY)" },
-        ]
+      category: "Sahip",
+      items: [
+        { tag: "{OWNER_USERNAME}", desc: "Kanal sahibi olan kullanıcının kullanıcı adı" },
+        { tag: "{OWNER_NICKNAME}", desc: "Kanal sahibi olan kullanıcının görünen adı" },
+        { tag: "{OWNER_CREATED}", desc: "Kanal sahibi olan kullanıcının hesabını oluşturduğu tarih (GG/AA/YYYY)" },
+        { tag: "{OWNER_JOINED}", desc: "Kanal sahibi olan kullanıcının sunucuya katıldığı tarih (GG/AA/YYYY)" },
+      ]
     },
     {
-        category: "Sahip Rolü",
-        items: [
-            { tag: "{ROLE_HIGHEST}", desc: "Kullanıcının sahip olduğu en yüksek rolün adı" },
-            { tag: "{ROLE_HOIST}", desc: "Üye listesinde gösterilen en üst rolün adı" },
-        ]
+      category: "Sahip Rolü",
+      items: [
+        { tag: "{ROLE_HIGHEST}", desc: "Kullanıcının sahip olduğu en yüksek rolün adı" },
+        { tag: "{ROLE_HOIST}", desc: "Üye listesinde gösterilen en üst rolün adı" },
+      ]
     },
     {
-        category: "Sayaç",
-        items: [
-            { tag: "{NUMBER}", desc: "1 2 3 4 5" },
-            { tag: "{NUMBER_ROMAN}", desc: "I II III IV V" },
-            { tag: "{NUMBER_ALPHA}", desc: "A B C D E" },
-            { tag: "{NUMBER_EXPONENT}", desc: "¹ ² ³ ⁴ ⁵" },
-            { tag: "{NUMBER_DIGIT}", desc: "001 002 003 004 005" },
-        ]
+      category: "Sayaç",
+      items: [
+        { tag: "{NUMBER}", desc: "1 2 3 4 5" },
+        { tag: "{NUMBER_ROMAN}", desc: "I II III IV V" },
+        { tag: "{NUMBER_ALPHA}", desc: "A B C D E" },
+        { tag: "{NUMBER_EXPONENT}", desc: "¹ ² ³ ⁴ ⁵" },
+        { tag: "{NUMBER_DIGIT}", desc: "001 002 003 004 005" },
+      ]
     },
     {
-        category: "Etkinlik",
-        isPremium: true,
-        items: [
-            { tag: "{ACTIVITY_NAME}", desc: "Sahibin oynadığı oyunun adı" },
-            { tag: "{ACTIVITY_NAME_MAJORITY}", desc: "Çoğunluğun oynadığı oyunun adı" },
-            { tag: "{ACTIVITY_DETAILS}", desc: "Bir etkinliğin ayrıntıları" },
-            { tag: "{ACTIVITY_STATE}", desc: "Bir etkinliğin durumu" },
-        ]
+      category: "Etkinlik",
+      isPremium: true,
+      items: [
+        { tag: "{ACTIVITY_NAME}", desc: "Sahibin oynadığı oyunun adı" },
+        { tag: "{ACTIVITY_NAME_MAJORITY}", desc: "Çoğunluğun oynadığı oyunun adı" },
+        { tag: "{ACTIVITY_DETAILS}", desc: "Bir etkinliğin ayrıntıları" },
+        { tag: "{ACTIVITY_STATE}", desc: "Bir etkinliğin durumu" },
+      ]
     }
   ];
 
@@ -173,7 +173,7 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
 
   const [ownerPermDropdownOpen, setOwnerPermDropdownOpen] = useState(false);
   const ownerPermRef = useRef(null);
-  
+
   useEffect(() => {
     function handleClickOutside(event) {
       if (ownerPermRef.current && !ownerPermRef.current.contains(event.target)) {
@@ -205,29 +205,29 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
       <div className="flex flex-col gap-6 animate-fade-in">
         {/* Breadcrumb & Header */}
         <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-2 text-on-surface-variant font-label-bold text-[10px] uppercase tracking-widest bg-surface-container/50 p-2 rounded-lg border border-outline-variant/30 w-fit">
+          <div className="flex items-center gap-2 text-on-surface-variant font-label-bold text-[10px] uppercase tracking-widest bg-surface-container/50 p-2 rounded-lg border border-outline-variant/30 w-fit">
             <button onClick={() => setEditingCreatorId(null)} className="hover:text-primary-container transition-colors">
-                ...
+              ...
             </button>
             <span className="opacity-50">&gt;</span>
             <button onClick={() => setEditingCreatorId(null)} className="hover:text-primary-container transition-colors">
-                {lang === 'tr' ? 'Sunucu Ayarları' : 'Server Settings'}
+              {lang === 'tr' ? 'Sunucu Ayarları' : 'Server Settings'}
             </button>
             <span className="opacity-50">&gt;</span>
             <span className="text-on-surface bg-surface border border-outline-variant px-2 py-0.5 rounded">
-                {lang === 'tr' ? 'Oluşturucu Ayarları' : 'Creator Settings'}
+              {lang === 'tr' ? 'Oluşturucu Ayarları' : 'Creator Settings'}
             </span>
-            </div>
+          </div>
 
-            <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-2">
-                    <Plus size={36} className="text-on-surface-variant" />
-                    <span className="text-on-surface-variant text-3xl font-light">•</span>
-                    <h2 className="text-4xl font-headline-xl text-on-surface tracking-tight font-bold">
-                        {creator.name}
-                    </h2>
-                </div>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-2">
+              <Plus size={36} className="text-on-surface-variant" />
+              <span className="text-on-surface-variant text-3xl font-light">•</span>
+              <h2 className="text-4xl font-headline-xl text-on-surface tracking-tight font-bold">
+                {creator.name}
+              </h2>
             </div>
+          </div>
         </div>
 
         {/* Sub Tabs */}
@@ -241,11 +241,10 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
             <button
               key={tab.id}
               onClick={() => setActiveSubTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-label-bold uppercase tracking-widest transition-all ${
-                activeSubTab === tab.id
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-label-bold uppercase tracking-widest transition-all ${activeSubTab === tab.id
                   ? "bg-surface text-on-surface border border-outline-variant/60 shadow-sm"
                   : "text-on-surface-variant hover:bg-white/5 border border-transparent hover:text-on-surface"
-              }`}
+                }`}
             >
               <tab.icon size={14} className={activeSubTab === tab.id ? "text-on-surface" : "text-on-surface-variant"} />
               {tab.label}
@@ -271,41 +270,41 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
                     className="flex-1 bg-surface-container/30 border border-outline-variant rounded-lg p-3 text-on-surface text-sm focus:border-primary-container outline-none transition-all shadow-inner"
                   />
                   <div className="relative" ref={varMenuRef}>
-                      <button 
-                        onClick={() => setShowVarMenu(!showVarMenu)}
-                        className={`p-3 border rounded-lg transition-all flex items-center justify-center min-w-[44px] ${showVarMenu ? 'bg-primary-container/20 border-primary-container text-primary-container' : 'bg-surface-container/30 border-outline-variant hover:border-primary-container text-on-surface hover:text-primary-container'}`}
-                      >
-                        {"{}"}
-                      </button>
-                      
-                      {showVarMenu && (
-                          <div className="absolute right-0 top-full mt-2 w-80 max-h-[400px] overflow-y-auto custom-scrollbar bg-surface-container-highest border border-outline-variant rounded-xl shadow-2xl z-50 flex flex-col p-2 animate-fade-in">
-                              {variables.map((group, idx) => (
-                                  <div key={idx} className="mb-3 last:mb-0">
-                                      <div className="flex items-center gap-2 px-2 mb-1">
-                                          <span className="text-xs font-label-bold text-on-surface-variant uppercase tracking-widest">{group.category}</span>
-                                          {group.isPremium && (
-                                              <span className="bg-primary-container/20 text-primary-container text-[8px] px-1.5 py-0.5 rounded font-bold flex items-center gap-1">
-                                                  Kendi Markanız <Crown size={10} />
-                                              </span>
-                                          )}
-                                      </div>
-                                      <div className="flex flex-col gap-1">
-                                          {group.items.map((item, i) => (
-                                              <button 
-                                                key={i} 
-                                                onClick={() => handleVarClick(item.tag)}
-                                                className="flex flex-col items-start p-2 hover:bg-white/5 rounded-lg transition-colors text-left"
-                                              >
-                                                  <span className="text-sm font-label-bold text-on-surface">{item.tag}</span>
-                                                  <span className="text-[10px] text-on-surface-variant leading-tight mt-0.5">{item.desc}</span>
-                                              </button>
-                                          ))}
-                                      </div>
-                                  </div>
+                    <button
+                      onClick={() => setShowVarMenu(!showVarMenu)}
+                      className={`p-3 border rounded-lg transition-all flex items-center justify-center min-w-[44px] ${showVarMenu ? 'bg-primary-container/20 border-primary-container text-primary-container' : 'bg-surface-container/30 border-outline-variant hover:border-primary-container text-on-surface hover:text-primary-container'}`}
+                    >
+                      {"{}"}
+                    </button>
+
+                    {showVarMenu && (
+                      <div className="absolute right-0 top-full mt-2 w-80 max-h-[400px] overflow-y-auto custom-scrollbar bg-surface-container-highest border border-outline-variant rounded-xl shadow-2xl z-50 flex flex-col p-2 animate-fade-in">
+                        {variables.map((group, idx) => (
+                          <div key={idx} className="mb-3 last:mb-0">
+                            <div className="flex items-center gap-2 px-2 mb-1">
+                              <span className="text-xs font-label-bold text-on-surface-variant uppercase tracking-widest">{group.category}</span>
+                              {group.isPremium && (
+                                <span className="bg-primary-container/20 text-primary-container text-[8px] px-1.5 py-0.5 rounded font-bold flex items-center gap-1">
+                                  Kendi Markanız <Crown size={10} />
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex flex-col gap-1">
+                              {group.items.map((item, i) => (
+                                <button
+                                  key={i}
+                                  onClick={() => handleVarClick(item.tag)}
+                                  className="flex flex-col items-start p-2 hover:bg-white/5 rounded-lg transition-colors text-left"
+                                >
+                                  <span className="text-sm font-label-bold text-on-surface">{item.tag}</span>
+                                  <span className="text-[10px] text-on-surface-variant leading-tight mt-0.5">{item.desc}</span>
+                                </button>
                               ))}
+                            </div>
                           </div>
-                      )}
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
                 <p className="text-xs text-on-surface-variant leading-relaxed">
@@ -322,24 +321,24 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
                     {creator.userLimit}
                   </span>
                 </div>
-                
+
                 <div className="flex items-center gap-4 mt-2">
-                    <input
-                        type="range"
-                        min="0"
-                        max="99"
-                        value={creator.userLimit}
-                        onChange={(e) => handleUpdateCreator(creator.id, { userLimit: parseInt(e.target.value) })}
-                        className="w-full accent-[#FF3366] h-2 bg-surface-container-highest rounded-lg appearance-none cursor-pointer"
-                        style={{
-                            background: `linear-gradient(to right, #FF3366 ${(creator.userLimit / 99) * 100}%, #2A2A2A ${(creator.userLimit / 99) * 100}%)`
-                        }}
-                    />
-                    <div className="shrink-0 p-2 bg-surface-container/30 border border-outline-variant rounded-lg text-on-surface-variant rotate-45 transform">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-                    </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="99"
+                    value={creator.userLimit}
+                    onChange={(e) => handleUpdateCreator(creator.id, { userLimit: parseInt(e.target.value) })}
+                    className="w-full accent-[#FF3366] h-2 bg-surface-container-highest rounded-lg appearance-none cursor-pointer"
+                    style={{
+                      background: `linear-gradient(to right, #FF3366 ${(creator.userLimit / 99) * 100}%, #2A2A2A ${(creator.userLimit / 99) * 100}%)`
+                    }}
+                  />
+                  <div className="shrink-0 p-2 bg-surface-container/30 border border-outline-variant rounded-lg text-on-surface-variant rotate-45 transform">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                  </div>
                 </div>
-                
+
                 <p className="text-xs text-on-surface-variant mt-1 leading-relaxed">
                   {lang === 'tr' ? 'Geçici kanalların varsayılan olarak belirleneceği kullanıcı limitini ayarlayın.' : 'Set the default user limit for temporary channels.'}
                 </p>
@@ -355,17 +354,17 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
                   {lang === 'tr' ? 'Geçici Kanalın Kategorisi' : 'Temp Channel Category'}
                 </div>
                 <div className="flex gap-2">
-                    <div className="flex-1">
-                        <CustomSelect 
-                            value={creator.categoryId}
-                            onChange={(val) => handleUpdateCreator(creator.id, { categoryId: val })}
-                            placeholder={lang === 'tr' ? 'Kategori Seçin' : 'Select Category'}
-                            options={(discordChannels?.filter(c => c.type === 4) || []).map(c => ({ value: c.id, label: c.name }))}
-                        />
-                    </div>
-                    <button className="p-3 bg-surface-container/30 border border-outline-variant rounded-lg text-[#FF3366] hover:bg-[#FF3366]/10 transition-all flex items-center justify-center min-w-[44px]">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                    </button>
+                  <div className="flex-1">
+                    <CustomSelect
+                      value={creator.categoryId}
+                      onChange={(val) => handleUpdateCreator(creator.id, { categoryId: val })}
+                      placeholder={lang === 'tr' ? 'Kategori Seçin' : 'Select Category'}
+                      options={(discordChannels?.filter(c => c.type === 4) || []).map(c => ({ value: c.id, label: c.name }))}
+                    />
+                  </div>
+                  <button className="p-3 bg-surface-container/30 border border-outline-variant rounded-lg text-[#FF3366] hover:bg-[#FF3366]/10 transition-all flex items-center justify-center min-w-[44px]">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                  </button>
                 </div>
                 <p className="text-xs text-on-surface-variant leading-relaxed">
                   {lang === 'tr' ? 'Geçici kanalların oluşturulacağı kategoriyi seçin.' : 'Select the category where temp channels will be created.'}
@@ -378,15 +377,15 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
                   <HelpCircle size={18} />
                   {lang === 'tr' ? 'Geçici Kanalın Bit Hızı' : 'Temp Channel Bitrate'}
                 </div>
-                <CustomSelect 
-                    value={creator.bitrate}
-                    onChange={(val) => handleUpdateCreator(creator.id, { bitrate: val })}
-                    placeholder={lang === 'tr' ? 'Bit Hızı Seçin' : 'Select Bitrate'}
-                    options={[
-                        { value: '64kbps', label: '64kbps' },
-                        { value: '96kbps', label: '96kbps' },
-                        { value: '128kbps', label: '128kbps' }
-                    ]}
+                <CustomSelect
+                  value={creator.bitrate}
+                  onChange={(val) => handleUpdateCreator(creator.id, { bitrate: val })}
+                  placeholder={lang === 'tr' ? 'Bit Hızı Seçin' : 'Select Bitrate'}
+                  options={[
+                    { value: '64kbps', label: '64kbps' },
+                    { value: '96kbps', label: '96kbps' },
+                    { value: '128kbps', label: '128kbps' }
+                  ]}
                 />
                 <p className="text-xs text-on-surface-variant leading-relaxed">
                   {lang === 'tr' ? 'Geçici ses kanallarının bit hızını belirleyin. Daha yüksek değerler kaliteyi artırır ancak sunucunuzun takviye seviyesi bunu karşılamıyor olabilir.' : 'Set the bitrate for temp audio channels. Higher values increase quality but your server boost level may not support it.'}
@@ -400,16 +399,16 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
                   {lang === 'tr' ? 'Geçici Kanalın Pozisyonu' : 'Temp Channel Position'}
                 </div>
                 <div className="relative">
-                    <CustomSelect 
-                        value={creator.position}
-                        onChange={(val) => handleUpdateCreator(creator.id, { position: val })}
-                        placeholder={lang === 'tr' ? 'Pozisyon Seçin' : 'Select Position'}
-                        options={[
-                            { value: 'Altta', label: lang === 'tr' ? 'Altta' : 'Bottom' },
-                            { value: 'Üstte', label: lang === 'tr' ? 'Üstte' : 'Top' },
-                            { value: 'Oluşturucunun hemen altında', label: lang === 'tr' ? 'Oluşturucunun hemen altında' : 'Right below creator' }
-                        ]}
-                    />
+                  <CustomSelect
+                    value={creator.position}
+                    onChange={(val) => handleUpdateCreator(creator.id, { position: val })}
+                    placeholder={lang === 'tr' ? 'Pozisyon Seçin' : 'Select Position'}
+                    options={[
+                      { value: 'Altta', label: lang === 'tr' ? 'Altta' : 'Bottom' },
+                      { value: 'Üstte', label: lang === 'tr' ? 'Üstte' : 'Top' },
+                      { value: 'Oluşturucunun hemen altında', label: lang === 'tr' ? 'Oluşturucunun hemen altında' : 'Right below creator' }
+                    ]}
+                  />
                 </div>
               </div>
             </div>
@@ -428,59 +427,59 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
                   <span className="bg-[#FF3366] text-white px-2 py-0.5 rounded text-[10px] ml-1 font-bold">@everyone</span>
                 </div>
                 <div className="flex gap-2">
-                    <div className="flex-1 relative" ref={rolesRef}>
-                        <button 
-                            onClick={() => setRolesDropdownOpen(!rolesDropdownOpen)}
-                            className="w-full bg-surface-container/30 border border-outline-variant rounded-lg p-3 text-sm text-left hover:border-primary-container outline-none transition-all flex items-center justify-between min-h-[46px]"
-                        >
-                            <span className="truncate pr-4 text-on-surface-variant">
-                                {(creator.allowedRoles || []).length > 0 
-                                    ? (discordRoles || []).filter(r => (creator.allowedRoles || []).includes(r.id)).map(r => r.name).join(", ")
-                                    : (lang === 'tr' ? 'Rolleri Seçin' : 'Select Roles')}
-                            </span>
-                            <div className="flex items-center gap-2 shrink-0">
-                                {creator.allowedRoles?.length > 0 && (
-                                    <span onClick={(e) => { e.stopPropagation(); handleUpdateCreator(creator.id, { allowedRoles: [] }); }} className="text-on-surface-variant hover:text-white">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                                    </span>
-                                )}
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-on-surface-variant"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                            </div>
-                        </button>
-                        
-                        {rolesDropdownOpen && (
-                            <div className="absolute right-0 left-0 top-[calc(100%+8px)] max-h-[300px] overflow-y-auto custom-scrollbar bg-surface-container-highest border border-outline-variant rounded-xl shadow-2xl z-[100] flex flex-col p-2 animate-fade-in">
-                                {discordRoles?.map((role) => {
-                                    const isChecked = (creator.allowedRoles || []).includes(role.id);
-                                    return (
-                                        <button 
-                                            key={role.id}
-                                            onClick={() => {
-                                                const current = creator.allowedRoles || [];
-                                                if (current.includes(role.id)) {
-                                                    handleUpdateCreator(creator.id, { allowedRoles: current.filter(id => id !== role.id) });
-                                                } else {
-                                                    handleUpdateCreator(creator.id, { allowedRoles: [...current, role.id] });
-                                                }
-                                            }}
-                                            className="flex items-center justify-between p-2.5 hover:bg-white/5 rounded-lg transition-colors text-left group"
-                                        >
-                                            <div className="flex items-center gap-2">
-                                                {role.color && role.color !== 0 && (
-                                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: `#${role.color.toString(16).padStart(6, '0')}` }}></div>
-                                                )}
-                                                <span className={`text-sm ${isChecked ? 'text-on-surface' : 'text-on-surface-variant group-hover:text-on-surface'}`}>{role.name}</span>
-                                            </div>
-                                            {isChecked && <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary-container"><polyline points="20 6 9 17 4 12"></polyline></svg>}
-                                        </button>
-                                    );
-                                })}
-                            </div>
+                  <div className="flex-1 relative" ref={rolesRef}>
+                    <button
+                      onClick={() => setRolesDropdownOpen(!rolesDropdownOpen)}
+                      className="w-full bg-surface-container/30 border border-outline-variant rounded-lg p-3 text-sm text-left hover:border-primary-container outline-none transition-all flex items-center justify-between min-h-[46px]"
+                    >
+                      <span className="truncate pr-4 text-on-surface-variant">
+                        {(creator.allowedRoles || []).length > 0
+                          ? (discordRoles || []).filter(r => (creator.allowedRoles || []).includes(r.id)).map(r => r.name).join(", ")
+                          : (lang === 'tr' ? 'Rolleri Seçin' : 'Select Roles')}
+                      </span>
+                      <div className="flex items-center gap-2 shrink-0">
+                        {creator.allowedRoles?.length > 0 && (
+                          <span onClick={(e) => { e.stopPropagation(); handleUpdateCreator(creator.id, { allowedRoles: [] }); }} className="text-on-surface-variant hover:text-white">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                          </span>
                         )}
-                    </div>
-                    <button className="p-3 bg-surface-container/30 border border-outline-variant rounded-lg text-on-surface-variant hover:text-primary-container transition-all flex items-center justify-center min-w-[46px]">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-on-surface-variant"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                      </div>
                     </button>
+
+                    {rolesDropdownOpen && (
+                      <div className="absolute right-0 left-0 top-[calc(100%+8px)] max-h-[300px] overflow-y-auto custom-scrollbar bg-surface-container-highest border border-outline-variant rounded-xl shadow-2xl z-[100] flex flex-col p-2 animate-fade-in">
+                        {discordRoles?.map((role) => {
+                          const isChecked = (creator.allowedRoles || []).includes(role.id);
+                          return (
+                            <button
+                              key={role.id}
+                              onClick={() => {
+                                const current = creator.allowedRoles || [];
+                                if (current.includes(role.id)) {
+                                  handleUpdateCreator(creator.id, { allowedRoles: current.filter(id => id !== role.id) });
+                                } else {
+                                  handleUpdateCreator(creator.id, { allowedRoles: [...current, role.id] });
+                                }
+                              }}
+                              className="flex items-center justify-between p-2.5 hover:bg-white/5 rounded-lg transition-colors text-left group"
+                            >
+                              <div className="flex items-center gap-2">
+                                {role.color && role.color !== 0 && (
+                                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: `#${role.color.toString(16).padStart(6, '0')}` }}></div>
+                                )}
+                                <span className={`text-sm ${isChecked ? 'text-on-surface' : 'text-on-surface-variant group-hover:text-on-surface'}`}>{role.name}</span>
+                              </div>
+                              {isChecked && <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary-container"><polyline points="20 6 9 17 4 12"></polyline></svg>}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                  <button className="p-3 bg-surface-container/30 border border-outline-variant rounded-lg text-on-surface-variant hover:text-primary-container transition-all flex items-center justify-center min-w-[46px]">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                  </button>
                 </div>
                 <p className="text-xs text-on-surface-variant leading-relaxed">
                   {lang === 'tr' ? 'Varsayılan olan @everyone iznini geçersiz kılarak geçici kanalları görebilmek veya erişebilmek için gereken rolleri seçin.' : 'Select the roles required to view or access temporary channels, overriding the default @everyone permission.'}
@@ -494,16 +493,16 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
                   {lang === 'tr' ? 'Geçici Kanal İzinleri' : 'Temp Channel Permissions'}
                 </div>
                 <div className="relative">
-                    <CustomSelect 
-                        value={creator.permissionSyncMode || "category"}
-                        onChange={(val) => handleUpdateCreator(creator.id, { permissionSyncMode: val })}
-                        placeholder={lang === 'tr' ? 'Senkronize Modu' : 'Sync Mode'}
-                        options={[
-                            { value: 'category', label: lang === 'tr' ? 'Kategoriden senkronize et' : 'Sync from category' },
-                            { value: 'creator', label: lang === 'tr' ? 'Kanal Oluşturucu\'dan senkronize et' : 'Sync from creator channel' },
-                            { value: 'none', label: lang === 'tr' ? 'Senkronize etme' : 'Do not sync' }
-                        ]}
-                    />
+                  <CustomSelect
+                    value={creator.permissionSyncMode || "category"}
+                    onChange={(val) => handleUpdateCreator(creator.id, { permissionSyncMode: val })}
+                    placeholder={lang === 'tr' ? 'Senkronize Modu' : 'Sync Mode'}
+                    options={[
+                      { value: 'category', label: lang === 'tr' ? 'Kategoriden senkronize et' : 'Sync from category' },
+                      { value: 'creator', label: lang === 'tr' ? 'Kanal Oluşturucu\'dan senkronize et' : 'Sync from creator channel' },
+                      { value: 'none', label: lang === 'tr' ? 'Senkronize etme' : 'Do not sync' }
+                    ]}
+                  />
                 </div>
                 <p className="text-xs text-on-surface-variant leading-relaxed mb-2">
                   {lang === 'tr' ? 'Geçici bir kanal oluştururken izinlerin nereden senkronize edileceğini seçin.' : 'Select where permissions should be synced from when creating a temp channel.'}
@@ -511,20 +510,20 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
 
                 {/* Info Alert Box */}
                 <div className="bg-[#FF9900]/10 border border-[#FF9900]/30 rounded-xl p-4 flex flex-col gap-3">
-                    <div className="flex items-center gap-2 text-[#FF9900] font-label-bold text-sm">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                        {lang === 'tr' ? 'Bunu bilmelisiniz:' : 'Good to know:'}
-                    </div>
-                    <p className="text-xs text-on-surface-variant leading-relaxed">
-                        {lang === 'tr' 
-                            ? "'Bağlan', 'Kanalı Görüntüle' ve 'Mesaj Gönder' izinleri @everyone için senkronize edilemez. Çünkü bu izinler kanal kilitleme ve görünürlüğünü yönetmek için ayrılmıştır."
-                            : "'Connect', 'View Channel' and 'Send Messages' permissions cannot be synced for @everyone. These are reserved for channel locking and visibility management."}
-                    </p>
-                    <p className="text-xs text-on-surface-variant leading-relaxed">
-                        {lang === 'tr'
-                            ? "Eğer @everyone'ın geçici kanallara erişimini kısıtlamak istiyorsanız lütfen bunun yerine 'Geçici Kanallara Erişim Rolleri'ni kullanın."
-                            : "If you want to restrict @everyone's access to temp channels, please use 'Allowed Roles' instead."}
-                    </p>
+                  <div className="flex items-center gap-2 text-[#FF9900] font-label-bold text-sm">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    {lang === 'tr' ? 'Bunu bilmelisiniz:' : 'Good to know:'}
+                  </div>
+                  <p className="text-xs text-on-surface-variant leading-relaxed">
+                    {lang === 'tr'
+                      ? "'Bağlan', 'Kanalı Görüntüle' ve 'Mesaj Gönder' izinleri @everyone için senkronize edilemez. Çünkü bu izinler kanal kilitleme ve görünürlüğünü yönetmek için ayrılmıştır."
+                      : "'Connect', 'View Channel' and 'Send Messages' permissions cannot be synced for @everyone. These are reserved for channel locking and visibility management."}
+                  </p>
+                  <p className="text-xs text-on-surface-variant leading-relaxed">
+                    {lang === 'tr'
+                      ? "Eğer @everyone'ın geçici kanallara erişimini kısıtlamak istiyorsanız lütfen bunun yerine 'Geçici Kanallara Erişim Rolleri'ni kullanın."
+                      : "If you want to restrict @everyone's access to temp channels, please use 'Allowed Roles' instead."}
+                  </p>
                 </div>
               </div>
             </div>
@@ -538,16 +537,16 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
                   {lang === 'tr' ? 'Geçici Kanalın Gizlilik Modu' : 'Temp Channel Privacy Mode'}
                 </div>
                 <div className="relative">
-                    <CustomSelect 
-                        value={creator.privacyMode || "public"}
-                        onChange={(val) => handleUpdateCreator(creator.id, { privacyMode: val })}
-                        placeholder={lang === 'tr' ? 'Gizlilik Modu' : 'Privacy Mode'}
-                        options={[
-                            { value: 'public', label: lang === 'tr' ? 'Herkese Açık' : 'Public' },
-                            { value: 'locked', label: lang === 'tr' ? 'Kilitli' : 'Locked' },
-                            { value: 'hidden', label: lang === 'tr' ? 'Gizli' : 'Hidden' }
-                        ]}
-                    />
+                  <CustomSelect
+                    value={creator.privacyMode || "public"}
+                    onChange={(val) => handleUpdateCreator(creator.id, { privacyMode: val })}
+                    placeholder={lang === 'tr' ? 'Gizlilik Modu' : 'Privacy Mode'}
+                    options={[
+                      { value: 'public', label: lang === 'tr' ? 'Herkese Açık' : 'Public' },
+                      { value: 'locked', label: lang === 'tr' ? 'Kilitli' : 'Locked' },
+                      { value: 'hidden', label: lang === 'tr' ? 'Gizli' : 'Hidden' }
+                    ]}
+                  />
                 </div>
                 <p className="text-xs text-on-surface-variant leading-relaxed">
                   {lang === 'tr' ? 'Geçici kanalların varsayılan olarak herkese açık, kilitli veya diğer kullanıcılardan gizli olma durumunu belirleyin.' : 'Set whether temporary channels should default to being public, locked, or hidden from other users.'}
@@ -561,42 +560,42 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
                   {lang === 'tr' ? 'Geçici Kanal Sahibinin İzinleri' : 'Temp Channel Owner Permissions'}
                 </div>
                 <div className="relative" ref={ownerPermRef}>
-                    <button 
-                        onClick={() => setOwnerPermDropdownOpen(!ownerPermDropdownOpen)}
-                        className="w-full bg-surface-container/30 border border-outline-variant rounded-lg p-3 text-on-surface text-sm text-left hover:border-primary-container outline-none transition-all flex items-center justify-between"
-                    >
-                        <span className="truncate pr-4 text-on-surface-variant">
-                            {(creator.ownerPermissions || []).length > 0 
-                                ? ownerPermOptions.filter(o => (creator.ownerPermissions || []).includes(o.value)).map(o => lang === 'en' ? o.value : o.label).join(", ")
-                                : (lang === 'tr' ? 'İzin Seçin' : 'Select Permissions')}
+                  <button
+                    onClick={() => setOwnerPermDropdownOpen(!ownerPermDropdownOpen)}
+                    className="w-full bg-surface-container/30 border border-outline-variant rounded-lg p-3 text-on-surface text-sm text-left hover:border-primary-container outline-none transition-all flex items-center justify-between"
+                  >
+                    <span className="truncate pr-4 text-on-surface-variant">
+                      {(creator.ownerPermissions || []).length > 0
+                        ? ownerPermOptions.filter(o => (creator.ownerPermissions || []).includes(o.value)).map(o => lang === 'en' ? o.value : o.label).join(", ")
+                        : (lang === 'tr' ? 'İzin Seçin' : 'Select Permissions')}
+                    </span>
+                    <div className="flex items-center gap-2 shrink-0">
+                      {creator.ownerPermissions?.length > 0 && (
+                        <span onClick={(e) => { e.stopPropagation(); handleUpdateCreator(creator.id, { ownerPermissions: [] }); }} className="text-on-surface-variant hover:text-white">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                         </span>
-                        <div className="flex items-center gap-2 shrink-0">
-                            {creator.ownerPermissions?.length > 0 && (
-                                <span onClick={(e) => { e.stopPropagation(); handleUpdateCreator(creator.id, { ownerPermissions: [] }); }} className="text-on-surface-variant hover:text-white">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                                </span>
-                            )}
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                        </div>
-                    </button>
-                    
-                    {ownerPermDropdownOpen && (
-                        <div className="absolute right-0 left-0 top-[calc(100%+8px)] max-h-[300px] overflow-y-auto custom-scrollbar bg-surface-container-highest border border-outline-variant rounded-xl shadow-2xl z-[100] flex flex-col p-2 animate-fade-in">
-                            {ownerPermOptions.map((opt) => {
-                                const isChecked = (creator.ownerPermissions || []).includes(opt.value);
-                                return (
-                                    <button 
-                                        key={opt.value}
-                                        onClick={() => toggleOwnerPerm(creator, opt.value)}
-                                        className="flex items-center justify-between p-2.5 hover:bg-white/5 rounded-lg transition-colors text-left group"
-                                    >
-                                        <span className={`text-sm ${isChecked ? 'text-on-surface' : 'text-on-surface-variant group-hover:text-on-surface'}`}>{opt.label}</span>
-                                        {isChecked && <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary-container"><polyline points="20 6 9 17 4 12"></polyline></svg>}
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    )}
+                      )}
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                  </button>
+
+                  {ownerPermDropdownOpen && (
+                    <div className="absolute right-0 left-0 top-[calc(100%+8px)] max-h-[300px] overflow-y-auto custom-scrollbar bg-surface-container-highest border border-outline-variant rounded-xl shadow-2xl z-[100] flex flex-col p-2 animate-fade-in">
+                      {ownerPermOptions.map((opt) => {
+                        const isChecked = (creator.ownerPermissions || []).includes(opt.value);
+                        return (
+                          <button
+                            key={opt.value}
+                            onClick={() => toggleOwnerPerm(creator, opt.value)}
+                            className="flex items-center justify-between p-2.5 hover:bg-white/5 rounded-lg transition-colors text-left group"
+                          >
+                            <span className={`text-sm ${isChecked ? 'text-on-surface' : 'text-on-surface-variant group-hover:text-on-surface'}`}>{opt.label}</span>
+                            {isChecked && <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary-container"><polyline points="20 6 9 17 4 12"></polyline></svg>}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
                 <p className="text-xs text-on-surface-variant leading-relaxed">
                   {lang === 'tr' ? 'Geçici kanal sahiplerine, kanal üzerinde kontrol sahibi oldukları sürece ek izinler (örn. Kanalı Yönetme, Üyeleri Taşıma) verin.' : 'Grant temporary channel owners additional permissions (e.g. Manage Channel, Move Members) as long as they have control over the channel.'}
@@ -624,8 +623,8 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
 
       {creators.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-64 border border-dashed border-outline-variant rounded-xl bg-surface-container/20 relative overflow-hidden">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary-container/5 rounded-full blur-3xl"></div>
-          <button 
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary-container/5 rounded-full blur-3xl"></div>
+          <button
             onClick={handleAddCreator}
             className="flex items-center gap-2 px-6 py-3 bg-surface border border-outline-variant hover:border-primary-container text-on-surface hover:text-primary-container rounded-lg font-label-bold tracking-wide transition-all shadow-lg hover:shadow-primary-container/20 z-10"
           >
@@ -637,11 +636,11 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-on-surface font-label-bold text-sm tracking-wide">
-                <Headphones size={18} />
-                {lang === 'tr' ? 'Kanal Oluşturucular' : 'Channel Creators'}
+              <Headphones size={18} />
+              {lang === 'tr' ? 'Kanal Oluşturucular' : 'Channel Creators'}
             </div>
           </div>
-          
+
           {creators.map(creator => (
             <div key={creator.id} className="flex items-center justify-between p-3 bg-surface-container/30 border border-outline-variant rounded-xl group hover:border-primary-container/50 transition-all">
               <div className="flex items-center gap-3">
@@ -651,13 +650,13 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <button 
+                <button
                   onClick={() => setEditingCreatorId(creator.id)}
                   className="p-2 bg-surface-container/50 border border-outline-variant hover:border-primary-container text-on-surface-variant hover:text-primary-container rounded-lg transition-all"
                 >
                   <Settings size={16} />
                 </button>
-                <button 
+                <button
                   onClick={() => handleDeleteCreator(creator.id)}
                   className="p-2 bg-surface-container/50 border border-outline-variant hover:border-[#FF3366] text-on-surface-variant hover:text-[#FF3366] rounded-lg transition-all"
                 >
@@ -667,14 +666,14 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
             </div>
           ))}
 
-            {creators.length > 0 && (
-                <button 
-                    onClick={handleAddCreator}
-                    className="flex items-center justify-center gap-2 p-3 mt-2 bg-surface border border-dashed border-outline-variant hover:border-primary-container text-on-surface-variant hover:text-primary-container rounded-xl font-label-bold tracking-wide transition-all"
-                >
-                    <Plus size={16} /> {lang === 'tr' ? 'Yeni Oluşturucu Ekle' : 'Add New Creator'}
-                </button>
-            )}
+          {creators.length > 0 && (
+            <button
+              onClick={handleAddCreator}
+              className="flex items-center justify-center gap-2 p-3 mt-2 bg-surface border border-dashed border-outline-variant hover:border-primary-container text-on-surface-variant hover:text-primary-container rounded-xl font-label-bold tracking-wide transition-all"
+            >
+              <Plus size={16} /> {lang === 'tr' ? 'Yeni Oluşturucu Ekle' : 'Add New Creator'}
+            </button>
+          )}
         </div>
       )}
     </div>
