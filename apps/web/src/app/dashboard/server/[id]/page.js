@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, useCallback, useRef } from "react";
-import { ArrowLeft, Loader2, Image as ImageIcon, Layout, Shield, X, Crop, Users, Copy, Lock, Home, Save, AlertTriangle, Swords, Crown, Gift, FileText, Crosshair, UserPlus, Sparkles } from "lucide-react";
+import { ArrowLeft, Loader2, Image as ImageIcon, Layout, Shield, X, Crop, Users, Copy, Lock, Home, Save, AlertTriangle, Swords, Crown, Gift, FileText, Crosshair, UserPlus, Sparkles, Headphones } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 import { useToast, ToastContainer } from "@/components/Toast";
@@ -26,6 +26,7 @@ import RoleMenuTab from "./components/RoleMenuTab";
 import TicketTab from "./components/TicketTab";
 import TicketHistoryTab from "./components/TicketHistoryTab";
 import EventsHub from "./components/EventsHub";
+import TempVoiceTab from "./components/TempVoiceTab";
 
 function PremiumLock({ lang, t }) {
   return (
@@ -146,6 +147,7 @@ export default function ServerSettings() {
     application_enabled: false,
     registration_rules_text: "",
     application_questions: [],
+    tempvoice_creators: [],
   });
   
   const [guildSearchQuery, setGuildSearchQuery] = useState("");
@@ -258,6 +260,7 @@ export default function ServerSettings() {
             }
             return (ev && ev.registration_button_type) ? ev.registration_button_type : 'both';
           })(),
+          tempvoice_creators: Array.isArray(s?.tempvoice_creators) ? s.tempvoice_creators : [],
         };
         setSettings(loadedSettings);
         setInitialSettings(loadedSettings);
@@ -577,6 +580,7 @@ export default function ServerSettings() {
             { id: 'templates', label: 'Templates', icon: Copy },
             { id: 'log', label: 'Logs', icon: FileText },
             { id: 'embed', label: 'Branding', icon: ImageIcon },
+            { id: 'tempvoice', label: 'TempVoice', icon: Headphones, isBeta: true },
           ].map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -670,6 +674,10 @@ export default function ServerSettings() {
 
         {activeTab === 'events' && (
           <EventsHub t={t} lang={lang} guildId={guildId} discordChannels={discordChannels} discordRoles={discordRoles} isPremium={isPremium} />
+        )}
+
+        {activeTab === 'tempvoice' && (
+          <TempVoiceTab t={t} lang={lang} settings={settings} setSettings={setSettings} discordChannels={discordChannels} isPremium={isPremium} guildId={guildId} />
         )}
 
       </main>
