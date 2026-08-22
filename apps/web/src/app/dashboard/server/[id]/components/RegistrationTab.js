@@ -253,7 +253,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                 className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md uppercase"
                 placeholder={lang === 'en' ? 'e.g. TAG (Brackets added automatically)' : 'Örn: TAG ([] parantezleri sistem ekler)'}
                 value={settings.auto_check_guild_tag || ""}
-                onChange={(e) => setSettings({ ...settings, auto_check_guild_tag: e.target.value.replace(/[\[\]]/g, '') })}
+                onChange={(e) => setSettings({ ...settings, auto_check_guild_tag: e.target.value.replace(/[\[\]]/g, '').toUpperCase() })}
               />
             </div>
           </div>

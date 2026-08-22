@@ -877,7 +877,7 @@ async function handleRegisterButtons(interaction) {
                 // Format Nickname: [TURQ] Ign - RealName Age
                 let prefix = '';
                 if (roleIndex === 1 && guildConfig?.auto_check_guild_tag) {
-                    prefix = `[${guildConfig.auto_check_guild_tag}] `;
+                    prefix = `[${guildConfig.auto_check_guild_tag.toUpperCase()}] `;
                 } else if (guildName && guildName.length > 0) {
                     prefix = `[${guildName.substring(0, 4).toUpperCase()}] `;
                 } else {

@@ -794,7 +794,7 @@ async function handleFixRegistrationCommand(interaction) {
         // Format Nickname: [PREFIX] Ign - RealName Age
         let prefix = '';
         if (roleIndex === 1 && guildConfig?.auto_check_guild_tag) {
-            prefix = `[${guildConfig.auto_check_guild_tag}] `;
+            prefix = `[${guildConfig.auto_check_guild_tag.toUpperCase()}] `;
         } else if (roleIndex !== 1 && guildConfig?.auto_check_guild_tag) {
             // For community members, we can use NAN or leave it without a prefix. 
             // In the buttonHandler, it tries to get it from the embed. Let's just use NAN or custom if not role 1.
