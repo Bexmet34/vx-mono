@@ -27,7 +27,6 @@ export async function POST(req, { params }) {
 
     // Embed and Button structure
     const body = {
-      content: "",
       embeds: [
         {
           title: "🛡️ Kayıt Sistemi / Registration",

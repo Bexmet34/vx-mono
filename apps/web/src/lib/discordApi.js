@@ -63,7 +63,10 @@ export async function sendChannelMessage(channelId, messagePayload) {
         },
         body: JSON.stringify(messagePayload)
     });
-    if (!res.ok) throw new Error(`Discord send message API error: ${res.status}`);
+    if (!res.ok) {
+        const errorText = await res.text().catch(() => '');
+        throw new Error(`Discord send message API error: ${res.status} ${errorText}`);
+    }
     return await res.json();
 }
 
