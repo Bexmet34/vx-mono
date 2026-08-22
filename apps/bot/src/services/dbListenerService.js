@@ -149,7 +149,7 @@ async function checkUpdates(client, initial = false) {
                     if (!creator.channelId) {
                         try {
                             const newChannel = await guild.channels.create({
-                                name: creator.name || '➕ Open-Audio-Channel',
+                                name: creator.name || '➕・Open-Audio-Channel',
                                 type: ChannelType.GuildVoice,
                                 parent: creator.categoryId || null,
                                 reason: 'TempVoice creator channel auto-setup from dashboard'

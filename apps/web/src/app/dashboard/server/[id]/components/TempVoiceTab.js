@@ -67,8 +67,8 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
 
   const handleAddCreator = () => {
     const newCreator = {
-      id: Date.now().toString(),
-      name: "Open-Audio-Channel",
+      id: crypto.randomUUID(),
+      name: "➕・Open-Audio-Channel",
       channelNameFormat: "CONTENT - {NUMBER}",
       userLimit: 99,
       categoryId: "",
@@ -646,9 +646,8 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
             <div key={creator.id} className="flex items-center justify-between p-3 bg-surface-container/30 border border-outline-variant rounded-xl group hover:border-primary-container/50 transition-all">
               <div className="flex items-center gap-3">
                 <Headphones size={20} className="text-on-surface-variant group-hover:text-primary-container transition-colors" />
-                <span className="font-headline-sm text-on-surface flex items-center gap-2 font-bold tracking-wide">
-                  <Plus size={16} className="text-on-surface-variant" />
-                  {creator.name}
+                <span className="font-label-bold text-sm tracking-wide text-on-surface truncate">
+                  {creator.name || '➕・Open-Audio-Channel'}
                 </span>
               </div>
               <div className="flex items-center gap-2">
