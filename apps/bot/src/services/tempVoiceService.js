@@ -4,12 +4,87 @@ const { ChannelType, PermissionFlagsBits, OverwriteType } = require('discord.js'
 const activeTempChannels = new Map();
 
 /**
+ * Converts a number to Roman numerals
+ */
+function toRoman(num) {
+    if (isNaN(num)) return NaN;
+    var digits = String(+num).split(""),
+        key = ["","C","CC","CCC","CD","D","DC","DCC","DCCC","CM",
+               "","X","XX","XXX","XL","L","LX","LXX","LXXX","XC",
+               "","I","II","III","IV","V","VI","VII","VIII","IX"],
+        roman = "",
+        i = 3;
+    while (i--)
+        roman = (key[+digits.pop() + (i * 10)] || "") + roman;
+    return Array(+digits.join("") + 1).join("M") + roman;
+}
+
+/**
+ * Converts a number to Alphabet (1=A, 2=B, 27=AA)
+ */
+function toAlpha(num) {
+    let alpha = '';
+    while (num > 0) {
+        let mod = (num - 1) % 26;
+        alpha = String.fromCharCode(65 + mod) + alpha;
+        num = Math.floor((num - mod) / 26);
+    }
+    return alpha || 'A';
+}
+
+/**
+ * Converts a number to Superscript
+ */
+function toExponent(num) {
+    const map = { '0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹' };
+    return String(num).split('').map(c => map[c]).join('');
+}
+
+/**
  * Parses the channel name from the given format
  */
 function parseChannelName(format, member, currentCount) {
     let name = format || "Kanal - {NUMBER}";
+    
+    // Numbers
     name = name.replace(/{NUMBER}/g, currentCount.toString());
+    name = name.replace(/{NUMBER_ROMAN}/g, toRoman(currentCount));
+    name = name.replace(/{NUMBER_ALPHA}/g, toAlpha(currentCount));
+    name = name.replace(/{NUMBER_EXPONENT}/g, toExponent(currentCount));
+    name = name.replace(/{NUMBER_DIGIT}/g, currentCount.toString().padStart(3, '0'));
+
+    // Owner variables
     name = name.replace(/{OWNER_USERNAME}/g, member.user.username);
+    name = name.replace(/{OWNER_NICKNAME}/g, member.displayName || member.user.username);
+    
+    if (name.includes('{OWNER_CREATED}')) {
+        const d = member.user.createdAt;
+        name = name.replace(/{OWNER_CREATED}/g, `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`);
+    }
+    if (name.includes('{OWNER_JOINED}')) {
+        const d = member.joinedAt;
+        if (d) {
+            name = name.replace(/{OWNER_JOINED}/g, `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`);
+        } else {
+            name = name.replace(/{OWNER_JOINED}/g, "Bilinmiyor");
+        }
+    }
+
+    // Role variables
+    if (name.includes('{ROLE_HIGHEST}')) {
+        name = name.replace(/{ROLE_HIGHEST}/g, member.roles.highest ? member.roles.highest.name : "Yok");
+    }
+    if (name.includes('{ROLE_HOIST}')) {
+        name = name.replace(/{ROLE_HOIST}/g, member.roles.hoist ? member.roles.hoist.name : "Yok");
+    }
+
+    // Activity variables (fallback for now, require presence intent)
+    const activity = member.presence?.activities[0];
+    name = name.replace(/{ACTIVITY_NAME}/g, activity ? activity.name : "Oyun Oynamıyor");
+    name = name.replace(/{ACTIVITY_NAME_MAJORITY}/g, activity ? activity.name : "Oyun Oynamıyor");
+    name = name.replace(/{ACTIVITY_DETAILS}/g, activity?.details ? activity.details : "");
+    name = name.replace(/{ACTIVITY_STATE}/g, activity?.state ? activity.state : "");
+
     return name;
 }
 
@@ -22,13 +97,11 @@ async function handleCreatorJoin(newState, creatorConfig) {
     const categoryId = creatorConfig.categoryId || null;
 
     try {
-        // Calculate the next number for {NUMBER} variable
-        let tempChannelCount = 1;
-        if (categoryId) {
-            tempChannelCount = guild.channels.cache.filter(c => c.parentId === categoryId && c.type === ChannelType.GuildVoice).size + 1;
-        } else {
-            tempChannelCount = activeTempChannels.size + 1;
-        }
+        // Calculate the next number for {NUMBER} variable using activeTempChannels for this creator
+        const tempChannelCount = guild.channels.cache.filter(c => 
+            activeTempChannels.has(c.id) && 
+            activeTempChannels.get(c.id).creatorId === creatorConfig.id
+        ).size + 1;
 
         const channelName = parseChannelName(creatorConfig.channelNameFormat, member, tempChannelCount);
 
