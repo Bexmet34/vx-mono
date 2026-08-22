@@ -1,11 +1,24 @@
 "use client";
 
-import React, { useState } from "react";
-import { Plus, Settings, Trash2, ArrowLeft, Headphones, Sliders, Shield, MoreHorizontal, HelpCircle, FileText } from "lucide-react";
+import React, { useState, useRef, useEffect } from "react";
+import { Plus, Settings, Trash2, ArrowLeft, Headphones, Sliders, Shield, MoreHorizontal, HelpCircle, FileText, Crown } from "lucide-react";
 
 export default function TempVoiceTab({ t, lang, settings, setSettings, discordChannels, isPremium, guildId }) {
   const [editingCreatorId, setEditingCreatorId] = useState(null);
   const [activeSubTab, setActiveSubTab] = useState("overview");
+  const [showVarMenu, setShowVarMenu] = useState(false);
+  const varMenuRef = useRef(null);
+
+  // Close var menu on outside click
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (varMenuRef.current && !varMenuRef.current.contains(event.target)) {
+        setShowVarMenu(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Temporary local state for the creators if it's not yet in main settings
   const creators = settings.tempvoice_creators || [];
@@ -40,6 +53,53 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
       tempvoice_creators: creators.filter(c => c.id !== id)
     });
   };
+
+  const handleVarClick = (tag) => {
+    const creator = creators.find(c => c.id === editingCreatorId);
+    if (creator) {
+      handleUpdateCreator(creator.id, { channelNameFormat: (creator.channelNameFormat || "") + tag });
+    }
+    setShowVarMenu(false);
+  };
+
+  const variables = [
+    {
+        category: "Sahip",
+        items: [
+            { tag: "{OWNER_USERNAME}", desc: "Kanal sahibi olan kullanıcının kullanıcı adı" },
+            { tag: "{OWNER_NICKNAME}", desc: "Kanal sahibi olan kullanıcının görünen adı" },
+            { tag: "{OWNER_CREATED}", desc: "Kanal sahibi olan kullanıcının hesabını oluşturduğu tarih (GG/AA/YYYY)" },
+            { tag: "{OWNER_JOINED}", desc: "Kanal sahibi olan kullanıcının sunucuya katıldığı tarih (GG/AA/YYYY)" },
+        ]
+    },
+    {
+        category: "Sahip Rolü",
+        items: [
+            { tag: "{ROLE_HIGHEST}", desc: "Kullanıcının sahip olduğu en yüksek rolün adı" },
+            { tag: "{ROLE_HOIST}", desc: "Üye listesinde gösterilen en üst rolün adı" },
+        ]
+    },
+    {
+        category: "Sayaç",
+        items: [
+            { tag: "{NUMBER}", desc: "1 2 3 4 5" },
+            { tag: "{NUMBER_ROMAN}", desc: "I II III IV V" },
+            { tag: "{NUMBER_ALPHA}", desc: "A B C D E" },
+            { tag: "{NUMBER_EXPONENT}", desc: "¹ ² ³ ⁴ ⁵" },
+            { tag: "{NUMBER_DIGIT}", desc: "001 002 003 004 005" },
+        ]
+    },
+    {
+        category: "Etkinlik",
+        isPremium: true,
+        items: [
+            { tag: "{ACTIVITY_NAME}", desc: "Sahibin oynadığı oyunun adı" },
+            { tag: "{ACTIVITY_NAME_MAJORITY}", desc: "Çoğunluğun oynadığı oyunun adı" },
+            { tag: "{ACTIVITY_DETAILS}", desc: "Bir etkinliğin ayrıntıları" },
+            { tag: "{ACTIVITY_STATE}", desc: "Bir etkinliğin durumu" },
+        ]
+    }
+  ];
 
   if (editingCreatorId) {
     const creator = creators.find(c => c.id === editingCreatorId);
@@ -114,13 +174,46 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
                     onChange={(e) => handleUpdateCreator(creator.id, { channelNameFormat: e.target.value })}
                     className="flex-1 bg-surface-container/30 border border-outline-variant rounded-lg p-3 text-on-surface text-sm focus:border-primary-container outline-none transition-all shadow-inner"
                   />
-                  <button className="p-3 bg-surface-container/30 border border-outline-variant rounded-lg hover:border-primary-container text-on-surface hover:text-primary-container transition-all flex items-center justify-center min-w-[44px]">
-                    {"{}"}
-                  </button>
+                  <div className="relative" ref={varMenuRef}>
+                      <button 
+                        onClick={() => setShowVarMenu(!showVarMenu)}
+                        className={`p-3 border rounded-lg transition-all flex items-center justify-center min-w-[44px] ${showVarMenu ? 'bg-primary-container/20 border-primary-container text-primary-container' : 'bg-surface-container/30 border-outline-variant hover:border-primary-container text-on-surface hover:text-primary-container'}`}
+                      >
+                        {"{}"}
+                      </button>
+                      
+                      {showVarMenu && (
+                          <div className="absolute right-0 top-full mt-2 w-80 max-h-[400px] overflow-y-auto custom-scrollbar bg-surface-container-highest border border-outline-variant rounded-xl shadow-2xl z-50 flex flex-col p-2 animate-fade-in">
+                              {variables.map((group, idx) => (
+                                  <div key={idx} className="mb-3 last:mb-0">
+                                      <div className="flex items-center gap-2 px-2 mb-1">
+                                          <span className="text-xs font-label-bold text-on-surface-variant uppercase tracking-widest">{group.category}</span>
+                                          {group.isPremium && (
+                                              <span className="bg-primary-container/20 text-primary-container text-[8px] px-1.5 py-0.5 rounded font-bold flex items-center gap-1">
+                                                  Kendi Markanız <Crown size={10} />
+                                              </span>
+                                          )}
+                                      </div>
+                                      <div className="flex flex-col gap-1">
+                                          {group.items.map((item, i) => (
+                                              <button 
+                                                key={i} 
+                                                onClick={() => handleVarClick(item.tag)}
+                                                className="flex flex-col items-start p-2 hover:bg-white/5 rounded-lg transition-colors text-left"
+                                              >
+                                                  <span className="text-sm font-label-bold text-on-surface">{item.tag}</span>
+                                                  <span className="text-[10px] text-on-surface-variant leading-tight mt-0.5">{item.desc}</span>
+                                              </button>
+                                          ))}
+                                      </div>
+                                  </div>
+                              ))}
+                          </div>
+                      )}
+                  </div>
                 </div>
                 <p className="text-xs text-on-surface-variant leading-relaxed">
-                  {lang === 'tr' ? 'Geçici kanallar oluşturulduğunda varsayılan olarak kullanılacak kanal adını belirleyin. ' : 'Set the default channel name format for temporary channels. '}
-                  <a href="#" className="text-[#FF3366] hover:underline">{lang === 'tr' ? 'Daha fazlasını öğrenin.' : 'Learn more.'}</a>
+                  {lang === 'tr' ? 'Geçici kanallar oluşturulduğunda varsayılan olarak kullanılacak kanal adını belirleyin.' : 'Set the default channel name format for temporary channels.'}
                 </p>
               </div>
 
@@ -152,8 +245,7 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
                 </div>
                 
                 <p className="text-xs text-on-surface-variant mt-1 leading-relaxed">
-                  {lang === 'tr' ? 'Geçici kanalların varsayılan olarak belirleneceği kullanıcı limitini ayarlayın. ' : 'Set the default user limit for temporary channels. '}
-                  <a href="#" className="text-[#FF3366] hover:underline bg-[#FF3366]/10 px-1 py-0.5 rounded">{lang === 'tr' ? 'Daha fazlasını öğrenin.' : 'Learn more.'}</a>
+                  {lang === 'tr' ? 'Geçici kanalların varsayılan olarak belirleneceği kullanıcı limitini ayarlayın.' : 'Set the default user limit for temporary channels.'}
                 </p>
               </div>
             </div>
@@ -182,8 +274,7 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
                     </button>
                 </div>
                 <p className="text-xs text-on-surface-variant leading-relaxed">
-                  {lang === 'tr' ? 'Geçici kanalların oluşturulacağı kategoriyi seçin. ' : 'Select the category where temp channels will be created. '}
-                  <a href="#" className="text-[#FF3366] hover:underline">{lang === 'tr' ? 'Daha fazlasını öğrenin.' : 'Learn more.'}</a>
+                  {lang === 'tr' ? 'Geçici kanalların oluşturulacağı kategoriyi seçin.' : 'Select the category where temp channels will be created.'}
                 </p>
               </div>
 
@@ -203,8 +294,7 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, discordCh
                   <option value="128kbps">128kbps</option>
                 </select>
                 <p className="text-xs text-on-surface-variant leading-relaxed">
-                  {lang === 'tr' ? 'Geçici ses kanallarının bit hızını belirleyin. Daha yüksek değerler kaliteyi artırır ancak sunucunuzun takviye seviyesi bunu karşılamıyor olabilir. ' : 'Set the bitrate for temp audio channels. Higher values increase quality but your server boost level may not support it. '}
-                  <a href="#" className="text-[#FF3366] hover:underline">{lang === 'tr' ? 'Daha fazlasını öğrenin.' : 'Learn more.'}</a>
+                  {lang === 'tr' ? 'Geçici ses kanallarının bit hızını belirleyin. Daha yüksek değerler kaliteyi artırır ancak sunucunuzun takviye seviyesi bunu karşılamıyor olabilir.' : 'Set the bitrate for temp audio channels. Higher values increase quality but your server boost level may not support it.'}
                 </p>
               </div>
 
