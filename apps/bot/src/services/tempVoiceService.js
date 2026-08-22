@@ -79,7 +79,7 @@ function parseChannelName(format, member, currentCount) {
     }
 
     // Activity variables (fallback for now, require presence intent)
-    const activity = member.presence?.activities[0];
+    const activity = member.presence?.activities?.[0];
     name = name.replace(/{ACTIVITY_NAME}/g, activity ? activity.name : "Oyun Oynamıyor");
     name = name.replace(/{ACTIVITY_NAME_MAJORITY}/g, activity ? activity.name : "Oyun Oynamıyor");
     name = name.replace(/{ACTIVITY_DETAILS}/g, activity?.details ? activity.details : "");
