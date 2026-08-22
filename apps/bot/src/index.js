@@ -42,8 +42,9 @@ const client = new Client({
     partials: [Partials.Channel, Partials.Message, Partials.Reaction],
 });
 
-// Register log events
+// Register events
 require('./events/logEvents')(client);
+require('./events/voiceStateUpdate')(client);
 
 // Error handling to prevent crashes
 client.on('error', async error => {

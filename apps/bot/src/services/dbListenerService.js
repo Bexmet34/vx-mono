@@ -128,6 +128,52 @@ async function checkUpdates(client, initial = false) {
                 }
             }
         }
+
+        // --- NEW: Check TempVoice Setup Triggers ---
+        const { data: tempVoiceConfigs, error: tvError } = await supabase
+            .from('guild_settings')
+            .select('guild_id, tempvoice_creators')
+            .eq('trigger_tempvoice_setup', true);
+
+        if (!tvError && tempVoiceConfigs && tempVoiceConfigs.length > 0) {
+            const { ChannelType } = require('discord.js');
+            for (const config of tempVoiceConfigs) {
+                const guild = client.guilds.cache.get(config.guild_id);
+                if (!guild) continue;
+                
+                let creatorsUpdated = false;
+                let updatedCreators = Array.isArray(config.tempvoice_creators) ? [...config.tempvoice_creators] : [];
+
+                for (let i = 0; i < updatedCreators.length; i++) {
+                    const creator = updatedCreators[i];
+                    if (!creator.channelId) {
+                        try {
+                            const newChannel = await guild.channels.create({
+                                name: creator.name || '➕ Open-Audio-Channel',
+                                type: ChannelType.GuildVoice,
+                                parent: creator.categoryId || null,
+                                reason: 'TempVoice creator channel auto-setup from dashboard'
+                            });
+                            
+                            updatedCreators[i] = { ...creator, channelId: newChannel.id };
+                            creatorsUpdated = true;
+                            console.log(`[TempVoice] Created creator channel ${newChannel.id} for guild ${guild.id}`);
+                        } catch (err) {
+                            console.error(`[TempVoice] Failed to create channel for guild ${guild.id}:`, err.message);
+                        }
+                    }
+                }
+
+                // Update database: save the new channelIds and turn off the trigger
+                await supabase
+                    .from('guild_settings')
+                    .update({ 
+                        tempvoice_creators: updatedCreators,
+                        trigger_tempvoice_setup: false
+                    })
+                    .eq('guild_id', config.guild_id);
+            }
+        }
     } catch (err) {
         console.error('[DbListenerService] Polling Error:', err.message);
     }

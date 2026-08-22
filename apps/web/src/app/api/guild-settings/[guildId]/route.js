@@ -82,8 +82,11 @@ export async function POST(req, { params }) {
       ticket_staff_roles, ticket_message_title, ticket_message_desc,
       ticket_options, auto_delete_party_hours,
       application_enabled, registration_rules_text, application_questions,
-      registration_button_type, registration_rules_text_en
+      registration_button_type, registration_rules_text_en,
+      tempvoice_creators
     } = body;
+
+    const needsTempVoiceSetup = Array.isArray(tempvoice_creators) && tempvoice_creators.some(c => !c.channelId);
 
     // Upsert: varsa güncelle, yoksa ekle
     const { data, error } = await supabase
@@ -141,6 +144,8 @@ export async function POST(req, { params }) {
           application_enabled: application_enabled ?? false,
           registration_rules_text: registration_rules_text || null,
           application_questions: Array.isArray(application_questions) ? application_questions : [],
+          tempvoice_creators: Array.isArray(tempvoice_creators) ? tempvoice_creators : [],
+          ...(needsTempVoiceSetup ? { trigger_tempvoice_setup: true } : {})
         },
         { onConflict: 'guild_id' }
       )
