@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { Plus, Settings, Trash2, ArrowLeft, Headphones, Sliders, Shield, MoreHorizontal, HelpCircle, FileText, Crown } from "lucide-react";
+import Logo from "@/components/Logo";
 
 const CustomSelect = ({ value, options, onChange, placeholder }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -271,8 +272,11 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, setInitia
       <div className="flex flex-col gap-6 animate-fade-in">
         {isCreatingCreator && (
           <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[#09090b]/80 backdrop-blur-sm animate-fade-in">
-            <div className="flex flex-col items-center gap-4 p-8 bg-surface-container rounded-2xl border border-outline-variant shadow-2xl max-w-sm w-full mx-4">
-              <div className="w-12 h-12 border-4 border-primary-container border-t-transparent rounded-full animate-spin"></div>
+            <div className="flex flex-col items-center gap-5 p-8 bg-surface-container rounded-2xl border border-outline-variant shadow-2xl max-w-sm w-full mx-4">
+              <div className="relative mb-2">
+                <div className="absolute inset-0 bg-primary-container/20 blur-xl rounded-full"></div>
+                <Logo width={48} height={48} className="text-primary-container animate-pulse-slow relative z-10" />
+              </div>
               <div className="flex flex-col items-center text-center gap-1">
                 <h3 className="text-lg font-headline-bold text-on-surface">{lang === 'tr' ? 'Kanal Oluşturuluyor' : 'Creating Channel'}</h3>
                 <p className="text-sm text-on-surface-variant">{lang === 'tr' ? 'Bot şu anda Discord üzerinde kanalınızı kuruyor, lütfen bekleyin...' : 'The bot is currently setting up your channel on Discord, please wait...'}</p>
@@ -695,8 +699,11 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, setInitia
     <div className="flex flex-col gap-6 animate-fade-in">
       {isCreatingCreator && (
         <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[#09090b]/80 backdrop-blur-sm animate-fade-in">
-          <div className="flex flex-col items-center gap-4 p-8 bg-surface-container rounded-2xl border border-outline-variant shadow-2xl max-w-sm w-full mx-4">
-            <div className="w-12 h-12 border-4 border-primary-container border-t-transparent rounded-full animate-spin"></div>
+          <div className="flex flex-col items-center gap-5 p-8 bg-surface-container rounded-2xl border border-outline-variant shadow-2xl max-w-sm w-full mx-4">
+            <div className="relative mb-2">
+              <div className="absolute inset-0 bg-primary-container/20 blur-xl rounded-full"></div>
+              <Logo width={48} height={48} className="text-primary-container animate-pulse-slow relative z-10" />
+            </div>
             <div className="flex flex-col items-center text-center gap-1">
               <h3 className="text-lg font-headline-bold text-on-surface">{lang === 'tr' ? 'Kanal Oluşturuluyor' : 'Creating Channel'}</h3>
               <p className="text-sm text-on-surface-variant">{lang === 'tr' ? 'Bot şu anda Discord üzerinde kanalınızı kuruyor, lütfen bekleyin...' : 'The bot is currently setting up your channel on Discord, please wait...'}</p>
