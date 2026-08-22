@@ -92,6 +92,7 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, setInitia
     };
 
     setSettings(updatedSettings);
+    if (setInitialSettings) setInitialSettings(updatedSettings);
 
     try {
       setCreationProgress(30);
