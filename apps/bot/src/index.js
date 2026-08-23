@@ -295,6 +295,9 @@ client.on('interactionCreate', async interaction => {
             } else if (interaction.customId === 'request_auto_premium') {
                 const { handleAutoPremiumButton } = require('./handlers/buttonHandler');
                 await handleAutoPremiumButton(interaction);
+            } else if (interaction.customId.startsWith('tv_')) {
+                const { handleTempVoiceButtons } = require('./handlers/tempVoiceButtonHandler');
+                await handleTempVoiceButtons(interaction);
             } else {
                 await handlePartyButtons(interaction);
             }
