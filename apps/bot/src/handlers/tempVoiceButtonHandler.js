@@ -1,4 +1,11 @@
-const { EmbedBuilder, MessageFlags } = require('discord.js');
+const { 
+    EmbedBuilder, 
+    MessageFlags, 
+    ModalBuilder, 
+    TextInputBuilder, 
+    TextInputStyle, 
+    ActionRowBuilder 
+} = require('discord.js');
 const { getGuildConfig } = require('../services/guildConfig');
 const { activeTempChannels } = require('../services/tempVoiceService');
 
@@ -53,17 +60,44 @@ async function handleTempVoiceButtons(interaction) {
         const isOwner = channelInfo && channelInfo.ownerId === member.id;
         const action = interaction.customId.replace('tv_', '');
 
-        // Temporary placeholder reply for active channel users (until specific modal/actions are plugged in)
-        const okEmbed = new EmbedBuilder()
-            .setColor(0x22C55E)
-            .setDescription(
-                lang === 'tr'
-                    ? `🎧 **<#${userVoiceChannelId}>** odasındasınız. (${action}) işlemi işleniyor...`
-                    : `🎧 You are inside **<#${userVoiceChannelId}>**. Processing (${action})...`
-            );
+        // Check creator configuration and owner permissions
+        const creatorConfig = creators.find(c => c.id === channelInfo.creatorId);
 
+        // ===== BUTTON 1: ODA İSMİ DEĞİŞTİRME (tv_name) =====
+        if (action === 'name') {
+            if (!isOwner) {
+                return await interaction.reply({
+                    content: lang === 'tr'
+                        ? '❌ Bu ses kanalının sahibi değilsiniz. Kanal ismini sadece kanal sahibi değiştirebilir.'
+                        : '❌ You are not the owner of this voice channel. Only the channel owner can change the channel name.',
+                    flags: [MessageFlags.Ephemeral]
+                });
+            }
+
+            const voiceChannel = interaction.guild.channels.cache.get(userVoiceChannelId);
+
+            const modal = new ModalBuilder()
+                .setCustomId(`tv_modal_name:${userVoiceChannelId}`)
+                .setTitle(lang === 'tr' ? 'Oda İsmini Değiştir' : 'Change Channel Name');
+
+            const nameInput = new TextInputBuilder()
+                .setCustomId('tv_input_name')
+                .setLabel(lang === 'tr' ? 'Yeni Oda İsmi' : 'New Channel Name')
+                .setPlaceholder(lang === 'tr' ? 'Örn: 🎮 Oyun Odası' : 'e.g. 🎮 Gaming Room')
+                .setValue(voiceChannel?.name || '')
+                .setStyle(TextInputStyle.Short)
+                .setMaxLength(100)
+                .setRequired(true);
+
+            modal.addComponents(new ActionRowBuilder().addComponents(nameInput));
+            return await interaction.showModal(modal);
+        }
+
+        // Placeholder for other buttons as they get implemented step-by-step
         return await interaction.reply({
-            embeds: [okEmbed],
+            content: lang === 'tr'
+                ? `⚙️ **${action}** butonu özelliği hazırlanıyor...`
+                : `⚙️ **${action}** button feature is being prepared...`,
             flags: [MessageFlags.Ephemeral]
         });
 
@@ -78,6 +112,87 @@ async function handleTempVoiceButtons(interaction) {
     }
 }
 
+/**
+ * Handles modal submissions for VoiceForge temporary channels (e.g. renaming)
+ */
+async function handleTempVoiceModal(interaction) {
+    try {
+        const guildId = interaction.guildId;
+        const member = interaction.member;
+        const config = await getGuildConfig(guildId);
+        const lang = config?.language || 'tr';
+
+        if (interaction.customId.startsWith('tv_modal_name:')) {
+            const channelId = interaction.customId.split(':')[1];
+            const channelInfo = activeTempChannels.get(channelId);
+
+            if (!channelInfo) {
+                return await interaction.reply({
+                    content: lang === 'tr' ? '❌ Bu geçici ses kanalı artık aktif değil.' : '❌ This temporary voice channel is no longer active.',
+                    flags: [MessageFlags.Ephemeral]
+                });
+            }
+
+            if (channelInfo.ownerId !== member.id) {
+                return await interaction.reply({
+                    content: lang === 'tr' ? '❌ Bu ses kanalının sahibi değilsiniz.' : '❌ You are not the owner of this voice channel.',
+                    flags: [MessageFlags.Ephemeral]
+                });
+            }
+
+            const newName = interaction.fields.getTextInputValue('tv_input_name')?.trim();
+            if (!newName) {
+                return await interaction.reply({
+                    content: lang === 'tr' ? '❌ Lütfen geçerli bir kanal ismi girin.' : '❌ Please enter a valid channel name.',
+                    flags: [MessageFlags.Ephemeral]
+                });
+            }
+
+            const voiceChannel = interaction.guild.channels.cache.get(channelId);
+            if (!voiceChannel) {
+                return await interaction.reply({
+                    content: lang === 'tr' ? '❌ Ses kanalı bulunamadı.' : '❌ Voice channel not found.',
+                    flags: [MessageFlags.Ephemeral]
+                });
+            }
+
+            try {
+                await voiceChannel.setName(newName, `VoiceForge: ${member.user.tag} changed channel name`);
+
+                const successEmbed = new EmbedBuilder()
+                    .setColor(0x22C55E)
+                    .setDescription(
+                        lang === 'tr'
+                            ? `✅ Ses kanalınızın ismi başarıyla **${newName}** olarak değiştirildi.`
+                            : `✅ Voice channel name has been successfully changed to **${newName}**.`
+                    );
+
+                return await interaction.reply({
+                    embeds: [successEmbed],
+                    flags: [MessageFlags.Ephemeral]
+                });
+            } catch (editErr) {
+                console.error('[VoiceForge] Failed to rename voice channel:', editErr);
+                return await interaction.reply({
+                    content: lang === 'tr'
+                        ? '⚠️ Discord sınırlandırması nedeniyle kanal ismi 10 dakika içinde en fazla 2 kez değiştirilebilir. Lütfen biraz bekleyip tekrar deneyin.'
+                        : '⚠️ Due to Discord rate limits, channel names can only be renamed twice every 10 minutes. Please wait and try again later.',
+                    flags: [MessageFlags.Ephemeral]
+                });
+            }
+        }
+    } catch (err) {
+        console.error('[VoiceForge] Error handling temp voice modal submit:', err);
+        if (!interaction.replied && !interaction.deferred) {
+            await interaction.reply({
+                content: 'İşlem sırasında bir hata oluştu.',
+                flags: [MessageFlags.Ephemeral]
+            }).catch(() => {});
+        }
+    }
+}
+
 module.exports = {
-    handleTempVoiceButtons
+    handleTempVoiceButtons,
+    handleTempVoiceModal
 };

@@ -356,6 +356,9 @@ client.on('interactionCreate', async interaction => {
             } else if (interaction.customId.startsWith('save_temp_modal:') || interaction.customId.startsWith('edit_temp_modal:')) {
                 const { handleSaveTempModal } = require('./handlers/modalHandler');
                 await handleSaveTempModal(interaction);
+            } else if (interaction.customId.startsWith('tv_modal_')) {
+                const { handleTempVoiceModal } = require('./handlers/tempVoiceButtonHandler');
+                await handleTempVoiceModal(interaction);
             } else {
                 await handlePartiModal(interaction);
             }
