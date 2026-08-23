@@ -580,7 +580,7 @@ export default function ServerSettings() {
             { id: 'templates', label: 'Templates', icon: Copy },
             { id: 'log', label: 'Logs', icon: FileText },
             { id: 'embed', label: 'Branding', icon: ImageIcon },
-            { id: 'tempvoice', label: 'TempVoice', icon: Headphones, isBeta: true },
+            { id: 'tempvoice', label: 'VoiceForge', icon: Headphones, isBeta: true },
           ].map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;

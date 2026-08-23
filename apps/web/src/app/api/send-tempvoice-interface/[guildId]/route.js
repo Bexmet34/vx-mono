@@ -26,7 +26,7 @@ export async function POST(req, context) {
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
-      console.log('[TempVoice] No session - Unauthorized');
+      console.log('[VoiceForge] No session - Unauthorized');
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -34,23 +34,23 @@ export async function POST(req, context) {
     const params = await Promise.resolve(context.params);
     const guildId = params?.guildId;
     if (!guildId) {
-      console.log('[TempVoice] No guildId in params');
+      console.log('[VoiceForge] No guildId in params');
       return NextResponse.json({ error: "Guild ID required" }, { status: 400 });
     }
 
     const { hasAccess } = await checkDashboardAccess(guildId, session.user.id);
     if (!hasAccess) {
-      console.log(`[TempVoice] No dashboard access for guild ${guildId}`);
+      console.log(`[VoiceForge] No dashboard access for guild ${guildId}`);
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const body = await req.json();
     const { channelId, buttons, lang = 'en', embedTitle, embedDesc, embedFooter } = body;
 
-    console.log(`[TempVoice] Send request: guild=${guildId} channel=${channelId} buttons=${buttons?.length}`);
+    console.log(`[VoiceForge] Send request: guild=${guildId} channel=${channelId} buttons=${buttons?.length}`);
 
     if (!channelId || !buttons || !Array.isArray(buttons) || buttons.length === 0) {
-      console.log(`[TempVoice] Invalid params: channelId=${channelId} buttons=${JSON.stringify(buttons)}`);
+      console.log(`[VoiceForge] Invalid params: channelId=${channelId} buttons=${JSON.stringify(buttons)}`);
       return NextResponse.json({ error: "Invalid parameters" }, { status: 400 });
     }
 
@@ -79,11 +79,11 @@ export async function POST(req, context) {
 
     // Discord message payload
     const embed = {
-      title: embedTitle || 'TempVoice Interface',
+      title: embedTitle || 'VoiceForge Interface',
       description: (embedDesc || '') + (embedFooter ? `\n\n**${embedFooter}**` : ''),
       color: 0xFF3366,
       author: {
-        name: 'TempVoice APP',
+        name: 'VoiceForge APP',
       }
     };
 
@@ -96,7 +96,7 @@ export async function POST(req, context) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error sending tempvoice interface:", error);
+    console.error("Error sending VoiceForge interface:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

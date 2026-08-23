@@ -155,7 +155,7 @@ export default function InterfaceBuilder({ lang, discordChannels, guildId }) {
             <div className="w-9 h-9 rounded-full bg-[#FF3366] flex items-center justify-center shadow">
               <Globe size={18} className="text-white" />
             </div>
-            <span className="text-white font-bold text-sm">TempVoice</span>
+            <span className="text-white font-bold text-sm">VoiceForge</span>
             <span className="bg-[#5865F2] text-white text-[9px] px-1.5 py-0.5 rounded font-bold uppercase">APP</span>
           </div>
           <div className="flex items-center gap-2">

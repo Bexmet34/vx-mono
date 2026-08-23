@@ -20,7 +20,7 @@ async function initDbListeners(client) {
         await checkUpdates(client);
     }, 60000);
 
-    // Fast check for triggers (e.g. TempVoice creation) every 3 seconds
+    // Fast check for triggers (e.g. VoiceForge creation) every 3 seconds
     setInterval(async () => {
         await checkFastUpdates(client);
     }, 3000);
@@ -134,7 +134,7 @@ async function checkUpdates(client, initial = false) {
             }
         }
 
-        // The tempvoice check was moved to checkFastUpdates
+        // The VoiceForge check was moved to checkFastUpdates
     } catch (err) {
         console.error('[DbListenerService] Polling Error:', err.message);
     }
@@ -142,20 +142,20 @@ async function checkUpdates(client, initial = false) {
 
 async function checkFastUpdates(client) {
     try {
-        // --- Check TempVoice Setup Triggers (Fast Path) ---
-        const { data: tempVoiceConfigs, error: tvError } = await supabase
+        // --- Check VoiceForge Setup Triggers (Fast Path) ---
+        const { data: VoiceForgeConfigs, error: tvError } = await supabase
             .from('guild_settings')
-            .select('guild_id, tempvoice_creators')
-            .eq('trigger_tempvoice_setup', true);
+            .select('guild_id, VoiceForge_creators')
+            .eq('trigger_VoiceForge_setup', true);
 
-        if (!tvError && tempVoiceConfigs && tempVoiceConfigs.length > 0) {
+        if (!tvError && VoiceForgeConfigs && VoiceForgeConfigs.length > 0) {
             const { ChannelType } = require('discord.js');
-            for (const config of tempVoiceConfigs) {
+            for (const config of VoiceForgeConfigs) {
                 const guild = client.guilds.cache.get(config.guild_id);
                 if (!guild) continue;
                 
                 let creatorsUpdated = false;
-                let updatedCreators = Array.isArray(config.tempvoice_creators) ? [...config.tempvoice_creators] : [];
+                let updatedCreators = Array.isArray(config.VoiceForge_creators) ? [...config.VoiceForge_creators] : [];
 
                 for (let i = 0; i < updatedCreators.length; i++) {
                     const creator = updatedCreators[i];
@@ -165,14 +165,14 @@ async function checkFastUpdates(client) {
                                 name: creator.name || '➕・Open-Audio-Channel',
                                 type: ChannelType.GuildVoice,
                                 parent: creator.categoryId || null,
-                                reason: 'TempVoice creator channel auto-setup from dashboard'
+                                reason: 'VoiceForge creator channel auto-setup from dashboard'
                             });
                             
                             updatedCreators[i] = { ...creator, channelId: newChannel.id };
                             creatorsUpdated = true;
-                            console.log(`[TempVoice] Created creator channel ${newChannel.id} for guild ${guild.id}`);
+                            console.log(`[VoiceForge] Created creator channel ${newChannel.id} for guild ${guild.id}`);
                         } catch (err) {
-                            console.error(`[TempVoice] Failed to create channel for guild ${guild.id}:`, err.message);
+                            console.error(`[VoiceForge] Failed to create channel for guild ${guild.id}:`, err.message);
                         }
                     }
                 }
@@ -181,8 +181,8 @@ async function checkFastUpdates(client) {
                 await supabase
                     .from('guild_settings')
                     .update({ 
-                        tempvoice_creators: updatedCreators,
-                        trigger_tempvoice_setup: false
+                        VoiceForge_creators: updatedCreators,
+                        trigger_VoiceForge_setup: false
                     })
                     .eq('guild_id', config.guild_id);
             }

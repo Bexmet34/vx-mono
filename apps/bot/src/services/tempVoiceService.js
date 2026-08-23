@@ -221,7 +221,7 @@ async function handleCreatorJoin(newState, creatorConfig) {
             bitrate: creatorConfig.bitrate === '128kbps' ? 128000 : (creatorConfig.bitrate === '96kbps' ? 96000 : 64000),
             userLimit: parseInt(creatorConfig.userLimit) || 0,
             permissionOverwrites: filteredOverwrites,
-            reason: 'TempVoice channel created'
+            reason: 'VoiceForge channel created'
         });
 
         // Store in memory
@@ -233,7 +233,7 @@ async function handleCreatorJoin(newState, creatorConfig) {
 
         // Move the user
         await member.voice.setChannel(newChannel.id).catch(err => {
-            console.error(`[TempVoice] Failed to move user ${member.id}:`, err.message);
+            console.error(`[VoiceForge] Failed to move user ${member.id}:`, err.message);
             setTimeout(() => {
                 if (newChannel.members.size === 0) {
                     activeTempChannels.delete(newChannel.id);
@@ -243,7 +243,7 @@ async function handleCreatorJoin(newState, creatorConfig) {
         });
 
     } catch (err) {
-        console.error(`[TempVoice] Error creating temp channel for ${member.user.tag}:`, err);
+        console.error(`[VoiceForge] Error creating temp channel for ${member.user.tag}:`, err);
     }
 }
 
@@ -263,10 +263,10 @@ async function handleTempChannelLeave(oldState) {
 
         if (channel.members.size === 0) {
             try {
-                await channel.delete('TempVoice channel empty');
+                await channel.delete('VoiceForge channel empty');
                 activeTempChannels.delete(channelId);
             } catch (err) {
-                console.error(`[TempVoice] Failed to delete empty temp channel ${channelId}:`, err.message);
+                console.error(`[VoiceForge] Failed to delete empty temp channel ${channelId}:`, err.message);
             }
         }
     }
