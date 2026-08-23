@@ -22,21 +22,35 @@ const BUTTON_CONFIGS = {
   'region': { label: { tr: 'BÖLGE', en: 'REGION' }, emoji: '🌍', style: 2, custom_id: 'tv_region' }
 };
 
-export async function POST(req, { params }) {
+export async function POST(req, context) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session) {
+      console.log('[TempVoice] No session - Unauthorized');
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-    const guildId = params.guildId;
-    if (!guildId) return NextResponse.json({ error: "Guild ID required" }, { status: 400 });
+    // Next.js 15: params may be a Promise
+    const params = await Promise.resolve(context.params);
+    const guildId = params?.guildId;
+    if (!guildId) {
+      console.log('[TempVoice] No guildId in params');
+      return NextResponse.json({ error: "Guild ID required" }, { status: 400 });
+    }
 
     const { hasAccess } = await checkDashboardAccess(guildId, session.user.id);
-    if (!hasAccess) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (!hasAccess) {
+      console.log(`[TempVoice] No dashboard access for guild ${guildId}`);
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
 
     const body = await req.json();
     const { channelId, buttons, lang = 'en', embedTitle, embedDesc, embedFooter } = body;
 
+    console.log(`[TempVoice] Send request: guild=${guildId} channel=${channelId} buttons=${buttons?.length}`);
+
     if (!channelId || !buttons || !Array.isArray(buttons) || buttons.length === 0) {
+      console.log(`[TempVoice] Invalid params: channelId=${channelId} buttons=${JSON.stringify(buttons)}`);
       return NextResponse.json({ error: "Invalid parameters" }, { status: 400 });
     }
 

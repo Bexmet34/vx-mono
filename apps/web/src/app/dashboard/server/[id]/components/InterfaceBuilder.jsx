@@ -34,6 +34,10 @@ const DEFAULT_ACTIVE_BUTTONS = [
   'block', 'unblock', 'claim', 'transfer', 'delete'
 ];
 
+const DEFAULT_TITLE = 'Veyronix Voice Management';
+const DEFAULT_DESC = 'You can customize and manage your temporary voice channel through this panel.\nUse commands for more options.';
+const DEFAULT_FOOTER = 'Click the appropriate buttons below to perform actions.';
+
 export default function InterfaceBuilder({ lang, discordChannels, guildId }) {
   const [activeButtons, setActiveButtons] = useState(DEFAULT_ACTIVE_BUTTONS);
   const [draggedItemIdx, setDraggedItemIdx] = useState(null);
@@ -42,13 +46,9 @@ export default function InterfaceBuilder({ lang, discordChannels, guildId }) {
   const [sendSuccess, setSendSuccess] = useState(false);
 
   // Editable Embed Content States
-  const [embedTitle, setEmbedTitle] = useState(lang === 'tr' ? 'Veyronix Ses Yönetimi' : 'Veyronix Voice Management');
-  const [embedDesc, setEmbedDesc] = useState(lang === 'tr' 
-    ? 'Bu panel üzerinden geçici ses kanalınızı dilediğiniz gibi özelleştirebilir ve yönetebilirsiniz.\nDaha fazla seçenek için komutları kullanabilirsiniz.' 
-    : 'You can customize and manage your temporary voice channel through this panel.\nUse commands for more options.');
-  const [embedFooter, setEmbedFooter] = useState(lang === 'tr' 
-    ? 'İşlem yapmak için aşağıdaki uygun butonlara tıklayın.' 
-    : 'Click the appropriate buttons below to perform actions.');
+  const [embedTitle, setEmbedTitle] = useState(DEFAULT_TITLE);
+  const [embedDesc, setEmbedDesc] = useState(DEFAULT_DESC);
+  const [embedFooter, setEmbedFooter] = useState(DEFAULT_FOOTER);
 
   // Inactive buttons are all INTERFACE_BUTTONS not currently in activeButtons
   const inactiveButtons = INTERFACE_BUTTONS.filter(b => !activeButtons.includes(b.id)).map(b => b.id);
@@ -61,29 +61,29 @@ export default function InterfaceBuilder({ lang, discordChannels, guildId }) {
     }
   };
 
+  const handleReset = () => {
+    setActiveButtons(DEFAULT_ACTIVE_BUTTONS);
+    setEmbedTitle(DEFAULT_TITLE);
+    setEmbedDesc(DEFAULT_DESC);
+    setEmbedFooter(DEFAULT_FOOTER);
+  };
+
   const handleDragStart = (e, index) => {
     setDraggedItemIdx(index);
     e.dataTransfer.effectAllowed = "move";
-    e.dataTransfer.setData("text/html", e.currentTarget);
-    // Remove drag image logic for simplicity if it causes issues, but it should be fine
+    e.dataTransfer.setData("text/plain", String(index));
   };
 
   const handleDragOver = (e, index) => {
     e.preventDefault();
-    if (draggedItemIdx === null) return;
-    const draggedOverItemIdx = index;
-    
-    if (draggedItemIdx === draggedOverItemIdx) {
-      return;
-    }
+    if (draggedItemIdx === null || draggedItemIdx === index) return;
     
     const items = [...activeButtons];
     const draggedItem = items[draggedItemIdx];
-    
     items.splice(draggedItemIdx, 1);
-    items.splice(draggedOverItemIdx, 0, draggedItem);
+    items.splice(index, 0, draggedItem);
     
-    setDraggedItemIdx(draggedOverItemIdx);
+    setDraggedItemIdx(index);
     setActiveButtons(items);
   };
 
@@ -127,94 +127,86 @@ export default function InterfaceBuilder({ lang, discordChannels, guildId }) {
     <div className="flex flex-col gap-6 h-full">
       <style>{`
         @keyframes popIn {
-          0% { opacity: 0; transform: scale(0.9) translateY(10px); }
+          0% { opacity: 0; transform: scale(0.9) translateY(8px); }
           100% { opacity: 1; transform: scale(1) translateY(0); }
         }
         .animate-pop-in {
-          animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+          animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
       `}</style>
+
       <div className="flex flex-col gap-1">
         <h2 className="text-xl font-headline-bold text-on-surface">
           {lang === 'tr' ? 'Arayüz Görünümü' : 'Interface View'}
         </h2>
         <p className="text-sm text-on-surface-variant">
           {lang === 'tr' 
-            ? 'TempVoice Arayüzü ile etkileşime geçerek özelleştirme yapabilirsiniz. Bazı özellikler Premium gerektirir.' 
-            : 'You can interact with and customize the TempVoice Interface. Some features require Premium.'}
+            ? 'Embed içeriğini düzenleyin, butonları seçip sıralayın, ardından gönderin.' 
+            : 'Edit embed content, select & reorder buttons, then send.'}
         </p>
       </div>
 
-      {/* Embed Preview Box */}
-      <div className="bg-[#2B2D31] rounded-xl border border-outline-variant p-4 relative flex flex-col gap-4 shadow-xl">
-        {/* Header (Author) */}
+      {/* ===== DISCORD EMBED PREVIEW ===== */}
+      <div className="bg-[#313338] rounded-xl border border-[#1E1F22] p-4 flex flex-col gap-3 shadow-xl">
+
+        {/* Bot Header */}
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-full bg-[#FF3366] flex items-center justify-center shadow-lg">
-              <Globe size={20} className="text-white" />
+            <div className="w-9 h-9 rounded-full bg-[#FF3366] flex items-center justify-center shadow">
+              <Globe size={18} className="text-white" />
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-white font-bold text-sm tracking-wide">TempVoice</span>
-              <span className="bg-[#5865F2] text-white text-[9px] px-1.5 py-0.5 rounded font-bold uppercase">APP</span>
-              <button 
-                onClick={() => setActiveButtons(DEFAULT_ACTIVE_BUTTONS)}
-                className="text-[#B5BAC1] hover:text-[#DBDEE1] hover:bg-[#383A40] p-1 rounded transition-colors ml-1"
-                title={lang === 'tr' ? 'Varsayılan Düzene Sıfırla' : 'Reset to Default Layout'}
-              >
-                <RotateCcw size={14} />
-              </button>
-            </div>
+            <span className="text-white font-bold text-sm">TempVoice</span>
+            <span className="bg-[#5865F2] text-white text-[9px] px-1.5 py-0.5 rounded font-bold uppercase">APP</span>
           </div>
-          <div className="bg-[#FF9900]/20 text-[#FF9900] text-[10px] px-2 py-1 rounded font-bold flex items-center gap-1 border border-[#FF9900]/30 shadow-inner">
-            <Crown size={12} /> PREMIUM
+          <div className="flex items-center gap-2">
+            <div className="bg-[#FF9900]/20 text-[#FF9900] text-[10px] px-2 py-1 rounded font-bold flex items-center gap-1 border border-[#FF9900]/30">
+              <Crown size={11} /> PREMIUM
+            </div>
+            <button
+              onClick={handleReset}
+              className="text-[#B5BAC1] hover:text-white hover:bg-[#383A40] p-1.5 rounded transition-colors"
+              title={lang === 'tr' ? 'Varsayılana Sıfırla' : 'Reset to Default'}
+            >
+              <RotateCcw size={14} />
+            </button>
           </div>
         </div>
 
-        {/* Embed Content */}
-        <div className="flex gap-4 bg-[#2B2D31] rounded-lg">
-          {/* Left Border */}
-          <div className="w-1.5 bg-[#FF3366] rounded-l-lg shrink-0 self-stretch"></div>
-          
-          <div className="flex flex-col gap-3 p-3 pl-1 w-full bg-[#2B2D31] rounded-r-lg">
-            <input 
-              type="text"
-              value={embedTitle}
-              onChange={(e) => setEmbedTitle(e.target.value)}
-              className="bg-transparent border-none outline-none text-white text-xl font-bold tracking-wide w-full hover:bg-white/5 focus:bg-white/5 rounded px-1 -ml-1 transition-colors"
-              placeholder={lang === 'tr' ? 'Başlık girin...' : 'Enter title...'}
-            />
-            <textarea
-              value={embedDesc}
-              onChange={(e) => setEmbedDesc(e.target.value)}
-              rows={3}
-              className="bg-transparent border-none outline-none text-[#DBDEE1] text-sm leading-relaxed w-full resize-none hover:bg-white/5 focus:bg-white/5 rounded px-1 -ml-1 transition-colors"
-              placeholder={lang === 'tr' ? 'Açıklama girin...' : 'Enter description...'}
-            />
-            
-            {/* Active Buttons Legend (Inside Canvas - Simulating the Image) */}
+        {/* ===== CANVAS: Embed box (READ-ONLY image-like preview) ===== */}
+        <div className="flex gap-0 rounded-lg overflow-hidden bg-[#2B2D31] pointer-events-none select-none">
+          {/* Red left border stripe */}
+          <div className="w-1 bg-[#FF3366] shrink-0" />
+
+          {/* Embed body */}
+          <div className="flex flex-col gap-2 px-3 py-3 w-full">
+            {/* Title */}
+            <p className="text-white text-base font-bold tracking-wide leading-tight">
+              {embedTitle || 'Voice Management'}
+            </p>
+
+            {/* Description */}
+            <p className="text-[#DBDEE1] text-[13px] leading-relaxed whitespace-pre-line">
+              {embedDesc}
+            </p>
+
+            {/* Active buttons rendered as image-like legend inside canvas */}
             {activeButtons.length > 0 && (
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-1.5 mt-1">
                 {Array.from({ length: Math.ceil(activeButtons.length / 5) }).map((_, rowIdx) => (
-                  <div key={rowIdx} className="grid grid-cols-5 gap-2">
-                    {activeButtons.slice(rowIdx * 5, (rowIdx + 1) * 5).map((btnId, idxInRow) => {
-                      const index = rowIdx * 5 + idxInRow;
+                  <div key={rowIdx} className="grid grid-cols-5 gap-1.5">
+                    {activeButtons.slice(rowIdx * 5, (rowIdx + 1) * 5).map((btnId) => {
                       const btn = INTERFACE_BUTTONS.find(b => b.id === btnId);
                       if (!btn) return null;
                       const Icon = btn.icon;
-                      
                       return (
                         <div
                           key={btn.id}
-                          draggable
-                          onDragStart={(e) => handleDragStart(e, index)}
-                          onDragOver={(e) => handleDragOver(e, index)}
-                          onDragEnd={handleDragEnd}
-                          onDrop={handleDragEnd}
-                          onClick={() => toggleButton(btn.id)}
-                          className={`animate-pop-in flex items-center justify-center gap-1.5 bg-[#2B2D31] hover:bg-[#383A40] transition-colors rounded shadow-sm py-2 px-1 cursor-grab active:cursor-grabbing select-none border border-[#1E1F22] hover:border-[#1E1F22] ${draggedItemIdx === index ? 'opacity-50 ring-1 ring-[#FF3366]' : ''}`}
+                          className="flex items-center justify-center gap-1 bg-[#232428] rounded py-1.5 px-1 border border-[#1E1F22]"
                         >
-                          <Icon size={14} className={btn.color + " shrink-0"} />
-                          <span className="text-[#DBDEE1] text-[10px] font-bold uppercase tracking-wider truncate">{btn.label[lang] || btn.label.en}</span>
+                          <Icon size={12} className={btn.color + " shrink-0"} />
+                          <span className="text-[#DBDEE1] text-[9px] font-bold uppercase tracking-wider truncate">
+                            {btn.label.en}
+                          </span>
                         </div>
                       );
                     })}
@@ -223,78 +215,142 @@ export default function InterfaceBuilder({ lang, discordChannels, guildId }) {
               </div>
             )}
 
-            <input 
-              type="text"
-              value={embedFooter}
-              onChange={(e) => setEmbedFooter(e.target.value)}
-              className="bg-transparent border-none outline-none text-[#949BA4] text-xs mt-2 w-full hover:bg-white/5 focus:bg-white/5 rounded px-1 -ml-1 transition-colors"
-              placeholder={lang === 'tr' ? 'Alt başlık girin...' : 'Enter footer...'}
-            />
+            {/* Footer */}
+            {embedFooter && (
+              <p className="text-[#949BA4] text-[11px] mt-1 border-t border-[#1E1F22] pt-1.5">
+                {embedFooter}
+              </p>
+            )}
           </div>
         </div>
 
-        {/* Active Buttons (Outside Embed - Real Discord Components Simulation) */}
-        {activeButtons.length > 0 && (
-          <div className="flex flex-col gap-2 mt-2">
-            {Array.from({ length: Math.ceil(activeButtons.length / 5) }).map((_, rowIdx) => (
-              <div key={rowIdx} className="grid grid-cols-5 gap-2">
-                {activeButtons.slice(rowIdx * 5, (rowIdx + 1) * 5).map((btnId) => {
-                  const btn = INTERFACE_BUTTONS.find(b => b.id === btnId);
-                  if (!btn) return null;
-                  const Icon = btn.icon;
-                  return (
-                    <div
-                      key={btn.id}
-                      className="w-full h-10 rounded flex items-center justify-center bg-[#2B2D31] border border-[#1E1F22] shadow-sm"
-                      title={btn.label[lang] || btn.label.en}
-                    >
-                      <Icon size={18} className={btn.color} />
-                    </div>
-                  );
-                })}
-              </div>
-            ))}
+        {/* ===== EDITABLE FIELDS (below the embed) ===== */}
+        <div className="flex flex-col gap-2 pt-1">
+          <label className="text-[#949BA4] text-[10px] uppercase tracking-wider font-bold">
+            {lang === 'tr' ? 'Embed İçeriği' : 'Embed Content'}
+          </label>
+          <input
+            type="text"
+            value={embedTitle}
+            onChange={(e) => setEmbedTitle(e.target.value)}
+            className="bg-[#1E1F22] border border-[#3A3C40] rounded-lg px-3 py-2 text-white text-sm outline-none focus:border-[#FF3366] transition-colors placeholder:text-[#4E5058]"
+            placeholder="Title..."
+          />
+          <textarea
+            value={embedDesc}
+            onChange={(e) => setEmbedDesc(e.target.value)}
+            rows={2}
+            className="bg-[#1E1F22] border border-[#3A3C40] rounded-lg px-3 py-2 text-[#DBDEE1] text-sm outline-none focus:border-[#FF3366] transition-colors resize-none placeholder:text-[#4E5058]"
+            placeholder="Description..."
+          />
+          <input
+            type="text"
+            value={embedFooter}
+            onChange={(e) => setEmbedFooter(e.target.value)}
+            className="bg-[#1E1F22] border border-[#3A3C40] rounded-lg px-3 py-2 text-[#949BA4] text-xs outline-none focus:border-[#FF3366] transition-colors placeholder:text-[#4E5058]"
+            placeholder="Footer..."
+          />
+        </div>
+
+        {/* ===== DIVIDER ===== */}
+        <div className="w-full h-px bg-[#1E1F22]" />
+
+        {/* ===== ACTIVE BUTTONS POOL (draggable + click to remove) ===== */}
+        <div className="flex flex-col gap-2">
+          <label className="text-[#949BA4] text-[10px] uppercase tracking-wider font-bold">
+            {lang === 'tr' ? 'Aktif Butonlar' : 'Active Buttons'}
+            <span className="ml-1 text-[#5865F2]">({activeButtons.length}/15)</span>
+          </label>
+
+          {activeButtons.length === 0 ? (
+            <p className="text-[#4E5058] text-xs italic text-center py-3">
+              {lang === 'tr' ? 'Henüz aktif buton yok.' : 'No active buttons yet.'}
+            </p>
+          ) : (
+            <div className="flex flex-col gap-1.5">
+              {Array.from({ length: Math.ceil(activeButtons.length / 5) }).map((_, rowIdx) => (
+                <div key={rowIdx} className="grid grid-cols-5 gap-1.5">
+                  {activeButtons.slice(rowIdx * 5, (rowIdx + 1) * 5).map((btnId, idxInRow) => {
+                    const index = rowIdx * 5 + idxInRow;
+                    const btn = INTERFACE_BUTTONS.find(b => b.id === btnId);
+                    if (!btn) return null;
+                    const Icon = btn.icon;
+                    return (
+                      <button
+                        key={btn.id}
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, index)}
+                        onDragOver={(e) => handleDragOver(e, index)}
+                        onDragEnd={handleDragEnd}
+                        onDrop={handleDragEnd}
+                        onClick={() => toggleButton(btn.id)}
+                        title={`${btn.label[lang] || btn.label.en} — ${lang === 'tr' ? 'kaldırmak için tıkla' : 'click to remove'}`}
+                        className={`animate-pop-in flex items-center justify-center gap-1 rounded py-2 px-1 cursor-grab active:cursor-grabbing select-none border transition-colors ${
+                          draggedItemIdx === index
+                            ? 'bg-[#FF3366]/20 border-[#FF3366] opacity-70'
+                            : 'bg-[#232428] border-[#3A3C40] hover:border-red-500/60 hover:bg-red-500/10'
+                        }`}
+                      >
+                        <Icon size={13} className={btn.color + " shrink-0"} />
+                        <span className="text-[#DBDEE1] text-[9px] font-bold uppercase tracking-wider truncate">
+                          {btn.label.en}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          )}
+          <p className="text-[#4E5058] text-[10px]">
+            {lang === 'tr' 
+              ? 'Sürükleyerek sırala • Tıklayarak kaldır' 
+              : 'Drag to reorder • Click to remove'}
+          </p>
+        </div>
+
+        {/* ===== INACTIVE BUTTONS POOL ===== */}
+        {inactiveButtons.length > 0 && (
+          <div className="flex flex-col gap-2">
+            <label className="text-[#949BA4] text-[10px] uppercase tracking-wider font-bold">
+              {lang === 'tr' ? 'Pasif Butonlar' : 'Inactive Buttons'}
+            </label>
+            <div className="flex flex-wrap gap-1.5">
+              {inactiveButtons.map((btnId) => {
+                const btn = INTERFACE_BUTTONS.find(b => b.id === btnId);
+                if (!btn) return null;
+                const Icon = btn.icon;
+                return (
+                  <button
+                    key={btn.id}
+                    onClick={() => toggleButton(btn.id)}
+                    title={`${btn.label[lang] || btn.label.en} — ${lang === 'tr' ? 'eklemek için tıkla' : 'click to add'}`}
+                    className="animate-pop-in flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-[#1E1F22] border border-[#3A3C40] hover:border-green-500/60 hover:bg-green-500/10 transition-colors"
+                  >
+                    <Icon size={13} className={btn.color} />
+                    <span className="text-[#6D6F78] text-[9px] font-bold uppercase tracking-wider">
+                      {btn.label.en}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-[#4E5058] text-[10px]">
+              {lang === 'tr' ? 'Eklemek için tıkla' : 'Click to add'}
+            </p>
           </div>
         )}
-
-        {/* Divider */}
-        <div className="w-full h-px bg-[#1E1F22]"></div>
-
-        {/* Inactive Buttons Pool */}
-        <div className="flex flex-wrap gap-2 mt-2">
-          {inactiveButtons.map((btnId) => {
-            const btn = INTERFACE_BUTTONS.find(b => b.id === btnId);
-            if (!btn) return null;
-            const Icon = btn.icon;
-            return (
-              <button
-                key={btn.id}
-                onClick={() => toggleButton(btn.id)}
-                className="animate-pop-in w-11 h-9 rounded flex items-center justify-center bg-[#2B2D31] border border-[#1E1F22] hover:bg-[#383A40] transition-colors shadow-sm"
-                title={btn.label[lang] || btn.label.en}
-              >
-                <Icon size={18} className={btn.color} />
-              </button>
-            );
-          })}
-        </div>
-
-        <p className="text-[#949BA4] text-[11px] mt-1">
-          {lang === 'tr' 
-            ? 'İstediğiniz bir butonu devre dışı bırakmak için üzerine tıklayın. Yerlerini düzenlemek için sürüklemeyi deneyin.' 
-            : 'Click on a button to disable it. Try dragging to rearrange their positions.'}
-        </p>
       </div>
 
-      {/* Send Section */}
-      <div className="mt-auto pt-4 flex flex-col gap-3">
+      {/* ===== SEND SECTION ===== */}
+      <div className="mt-auto pt-2 flex flex-col gap-3">
         <div className="flex items-center gap-2 text-on-surface font-label-bold text-sm tracking-wide">
-          <Send size={18} />
+          <Send size={16} />
           {lang === 'tr' ? 'Arayüzü Gönder' : 'Send Interface'}
         </div>
         
         <div className="flex gap-2">
-          <select 
+          <select
             className="flex-1 bg-surface-container/30 border border-outline-variant rounded-lg p-3 text-sm text-on-surface focus:border-primary-container hover:border-primary-container outline-none transition-all shadow-inner"
             value={selectedChannel}
             onChange={(e) => setSelectedChannel(e.target.value)}
@@ -309,7 +365,7 @@ export default function InterfaceBuilder({ lang, discordChannels, guildId }) {
             ))}
           </select>
           
-          <button 
+          <button
             onClick={handleSend}
             disabled={!selectedChannel || isSending || activeButtons.length === 0}
             className={`w-14 rounded-lg flex items-center justify-center transition-all ${
@@ -321,11 +377,11 @@ export default function InterfaceBuilder({ lang, discordChannels, guildId }) {
             }`}
           >
             {isSending ? (
-              <span className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
+              <span className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
             ) : sendSuccess ? (
               <UserCheck size={20} />
             ) : (
-              <Send size={20} className={!selectedChannel || activeButtons.length === 0 ? '' : 'ml-1'} />
+              <Send size={20} />
             )}
           </button>
         </div>
