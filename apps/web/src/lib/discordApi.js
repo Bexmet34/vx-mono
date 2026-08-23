@@ -119,3 +119,35 @@ export async function createDMChannel(userId) {
 export async function sendSupportMessage(messagePayload) {
     return await sendChannelMessage('1490798764427051088', messagePayload);
 }
+
+export async function getApplicationEmojis() {
+    try {
+        const appRes = await fetch(`https://discord.com/api/v10/oauth2/applications/@me`, {
+            headers: { 'Authorization': `Bot ${process.env.DISCORD_BOT_TOKEN}` }
+        });
+        if (!appRes.ok) return {};
+        const appData = await appRes.json();
+        const appId = appData.id;
+
+        const emojisRes = await fetch(`https://discord.com/api/v10/applications/${appId}/emojis`, {
+            headers: { 'Authorization': `Bot ${process.env.DISCORD_BOT_TOKEN}` }
+        });
+        if (!emojisRes.ok) return {};
+        const emojisData = await emojisRes.json();
+        const items = emojisData.items || [];
+        
+        const emojiMap = {};
+        for (const item of items) {
+            emojiMap[item.name.toLowerCase()] = {
+                id: item.id,
+                name: item.name,
+                url: `https://cdn.discordapp.com/emojis/${item.id}.png`
+            };
+        }
+        return emojiMap;
+    } catch (e) {
+        console.error('Error fetching application emojis:', e);
+        return {};
+    }
+}
+

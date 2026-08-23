@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { checkDashboardAccess } from '@/utils/authUtils';
-import { sendChannelMessage } from "@/lib/discordApi";
+import { sendChannelMessage, getApplicationEmojis } from "@/lib/discordApi";
 import { generateInterfaceImage } from "@/lib/generateInterfaceImage";
 import { BUTTON_DATA } from "@/lib/buttonConfigs";
 
@@ -38,11 +38,15 @@ export async function POST(req, context) {
       return NextResponse.json({ error: "Invalid parameters" }, { status: 400 });
     }
 
+    // 0. Fetch dynamic Application Emojis from Discord Developer Portal
+    const emojiMap = await getApplicationEmojis();
+    console.log(`[VoiceForge] Loaded ${Object.keys(emojiMap).length} custom application emojis from Discord`);
+
     // 1. Generate the sleek canvas image for embed
     let files = [];
     let imageAttachmentUrl = null;
     try {
-      const imageBuffer = await generateInterfaceImage(buttons, lang);
+      const imageBuffer = await generateInterfaceImage(buttons, lang, emojiMap);
       if (imageBuffer) {
         files.push({
           name: 'interface.png',
@@ -55,17 +59,24 @@ export async function POST(req, context) {
       console.error('[VoiceForge] Failed to generate interface image:', imgErr);
     }
 
-    // 2. Build clean Discord interactive ActionRows (max 5 per row)
+    // 2. Build Discord interactive ActionRows with Custom Application Emojis
     const actionRows = [];
     for (let i = 0; i < buttons.length; i += 5) {
       const rowButtons = buttons.slice(i, i + 5).map(btnId => {
         const config = BUTTON_DATA[btnId];
         if (!config) return null;
+        
+        // Find custom emoji from bot developer portal
+        const appEmoji = config.emojiName ? emojiMap[config.emojiName.toLowerCase()] : null;
+        const emojiPayload = appEmoji 
+          ? { id: appEmoji.id, name: appEmoji.name }
+          : { name: config.fallbackEmoji || '⚙️' };
+
         return {
           type: 2,
-          style: 2, // Secondary / Gray for sleek look
+          style: 2, // Secondary / Gray for sleek uniform look
           custom_id: `tv_${btnId}`,
-          emoji: { name: config.emoji }
+          emoji: emojiPayload
         };
       }).filter(Boolean);
 

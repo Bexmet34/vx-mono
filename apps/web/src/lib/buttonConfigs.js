@@ -4,8 +4,9 @@ export const BUTTON_DATA = {
   name: {
     id: 'name',
     label: { tr: 'ODA İSMİ', en: 'NAME' },
+    emojiName: 'editt',
+    fallbackEmoji: '✏️',
     color: '#ffffff',
-    emoji: '✏️',
     icon: (color = '#ffffff') => (
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
@@ -16,8 +17,9 @@ export const BUTTON_DATA = {
   limit: {
     id: 'limit',
     label: { tr: 'ODA LİMİTİ', en: 'LIMIT' },
+    emojiName: 'userss',
+    fallbackEmoji: '👥',
     color: '#ffffff',
-    emoji: '👥',
     icon: (color = '#ffffff') => (
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -30,8 +32,9 @@ export const BUTTON_DATA = {
   privacy: {
     id: 'privacy',
     label: { tr: 'GİZLİLİK', en: 'PRIVACY' },
+    emojiName: 'shieldd',
+    fallbackEmoji: '🛡️',
     color: '#ffffff',
-    emoji: '🛡️',
     icon: (color = '#ffffff') => (
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
@@ -43,8 +46,9 @@ export const BUTTON_DATA = {
   waiting_room: {
     id: 'waiting_room',
     label: { tr: 'BEKLEME ODASI', en: 'WAITING ROOM' },
+    emojiName: 'clockk',
+    fallbackEmoji: '⏳',
     color: '#facc15',
-    emoji: '⏳',
     icon: (color = '#facc15') => (
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="12" r="10" />
@@ -55,8 +59,9 @@ export const BUTTON_DATA = {
   chat: {
     id: 'chat',
     label: { tr: 'SOHBET', en: 'CHAT' },
+    emojiName: 'chatt',
+    fallbackEmoji: '💬',
     color: '#ffffff',
-    emoji: '💬',
     icon: (color = '#ffffff') => (
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
@@ -66,8 +71,9 @@ export const BUTTON_DATA = {
   trusted: {
     id: 'trusted',
     label: { tr: 'GÜVENİLİR', en: 'TRUSTED' },
+    emojiName: 'userpluss',
+    fallbackEmoji: '✅',
     color: '#22c55e',
-    emoji: '✅',
     icon: (color = '#22c55e') => (
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -80,8 +86,9 @@ export const BUTTON_DATA = {
   untrusted: {
     id: 'untrusted',
     label: { tr: 'GÜVENSİZ', en: 'UNTRUSTED' },
+    emojiName: 'userminuss',
+    fallbackEmoji: '❌',
     color: '#ef4444',
-    emoji: '❌',
     icon: (color = '#ef4444') => (
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -95,8 +102,9 @@ export const BUTTON_DATA = {
   invite: {
     id: 'invite',
     label: { tr: 'DAVET', en: 'INVITE' },
+    emojiName: 'phonee',
+    fallbackEmoji: '📞',
     color: '#22c55e',
-    emoji: '📞',
     icon: (color = '#22c55e') => (
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
@@ -107,8 +115,9 @@ export const BUTTON_DATA = {
   kick: {
     id: 'kick',
     label: { tr: 'SESTEN AT', en: 'KICK' },
+    emojiName: 'disconnectedd',
+    fallbackEmoji: '📴',
     color: '#ef4444',
-    emoji: '📴',
     icon: (color = '#ef4444') => (
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-3.33-2.67m-2.67-3.34a19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91" />
@@ -119,8 +128,9 @@ export const BUTTON_DATA = {
   region: {
     id: 'region',
     label: { tr: 'BÖLGE', en: 'REGION' },
+    emojiName: 'globee',
+    fallbackEmoji: '🌐',
     color: '#ffffff',
-    emoji: '🌐',
     icon: (color = '#ffffff') => (
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="12" r="10" />
@@ -132,8 +142,9 @@ export const BUTTON_DATA = {
   block: {
     id: 'block',
     label: { tr: 'ENGELLE', en: 'BLOCK' },
+    emojiName: 'blockk',
+    fallbackEmoji: '🚫',
     color: '#ef4444',
-    emoji: '🚫',
     icon: (color = '#ef4444') => (
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -146,8 +157,9 @@ export const BUTTON_DATA = {
   unblock: {
     id: 'unblock',
     label: { tr: 'ENGELİ KALDIR', en: 'UNBLOCK' },
+    emojiName: 'opensolidd',
+    fallbackEmoji: '🔓',
     color: '#22c55e',
-    emoji: '🔓',
     icon: (color = '#22c55e') => (
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -160,8 +172,9 @@ export const BUTTON_DATA = {
   claim: {
     id: 'claim',
     label: { tr: 'SAHİPLEN', en: 'CLAIM' },
+    emojiName: 'crownn',
+    fallbackEmoji: '👑',
     color: '#f59e0b',
-    emoji: '👑',
     icon: (color = '#f59e0b') => (
       <svg width="14" height="14" viewBox="0 0 24 24" fill={color} stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14v2H5v-2z" />
@@ -171,8 +184,9 @@ export const BUTTON_DATA = {
   transfer: {
     id: 'transfer',
     label: { tr: 'ODAYI DEVRET', en: 'TRANSFER' },
+    emojiName: 'rightleftsolidd',
+    fallbackEmoji: '🔁',
     color: '#f97316',
-    emoji: '🔁',
     icon: (color = '#f97316') => (
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
         <polyline points="17 1 21 5 17 9" />
@@ -185,8 +199,9 @@ export const BUTTON_DATA = {
   delete: {
     id: 'delete',
     label: { tr: 'SİL', en: 'DELETE' },
+    emojiName: 'deletee',
+    fallbackEmoji: '🗑️',
     color: '#ef4444',
-    emoji: '🗑️',
     icon: (color = '#ef4444') => (
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
         <polyline points="3 6 5 6 21 6" />

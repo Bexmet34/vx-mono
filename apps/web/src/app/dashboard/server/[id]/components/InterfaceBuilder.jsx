@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Globe, Send, UserCheck, RotateCcw, Crown } from "lucide-react";
 import { BUTTON_DATA } from "@/lib/buttonConfigs";
 
@@ -18,6 +18,16 @@ export default function InterfaceBuilder({ lang = 'tr', discordChannels, guildId
   const [selectedChannel, setSelectedChannel] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [sendSuccess, setSendSuccess] = useState(false);
+  const [emojiMap, setEmojiMap] = useState({});
+
+  useEffect(() => {
+    fetch('/api/discord/emojis')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.emojis) setEmojiMap(data.emojis);
+      })
+      .catch(() => {});
+  }, []);
 
   const defaultTitle = lang === 'tr' ? 'VoiceForge Arayüzü' : 'VoiceForge Interface';
   const defaultDesc = lang === 'tr'
@@ -103,6 +113,20 @@ export default function InterfaceBuilder({ lang = 'tr', discordChannels, guildId
     } finally {
       setIsSending(false);
     }
+  };
+
+  const renderButtonIcon = (config) => {
+    const appEmoji = config.emojiName ? emojiMap[config.emojiName.toLowerCase()] : null;
+    if (appEmoji && appEmoji.url) {
+      return (
+        <img
+          src={appEmoji.url}
+          alt={config.emojiName}
+          className="w-4 h-4 object-contain shrink-0"
+        />
+      );
+    }
+    return config.icon(config.color);
   };
 
   return (
@@ -197,7 +221,7 @@ export default function InterfaceBuilder({ lang = 'tr', discordChannels, guildId
                           className="h-8 bg-[#111214] border border-white/5 rounded-[6px] flex items-center px-1.5 gap-1.5 shadow-sm transition-all"
                         >
                           <div className="shrink-0 flex items-center justify-center">
-                            {config.icon(config.color)}
+                            {renderButtonIcon(config)}
                           </div>
                           <span className="text-white text-[9.5px] font-bold uppercase tracking-tight truncate leading-none">
                             {label}
@@ -263,7 +287,7 @@ export default function InterfaceBuilder({ lang = 'tr', discordChannels, guildId
                         }`}
                       >
                         <div className="shrink-0 flex items-center justify-center">
-                          {config.icon(config.color)}
+                          {renderButtonIcon(config)}
                         </div>
                         <span className="text-white text-[10px] font-bold uppercase tracking-wide truncate">
                           {label}
@@ -303,7 +327,7 @@ export default function InterfaceBuilder({ lang = 'tr', discordChannels, guildId
                     className="animate-pop-in h-9 px-3 rounded-[7px] bg-[#1E1F22] border border-[#3A3C40] hover:border-green-500/50 hover:bg-green-500/10 flex items-center gap-2 transition-all"
                   >
                     <div className="shrink-0 flex items-center justify-center opacity-60">
-                      {config.icon(config.color)}
+                      {renderButtonIcon(config)}
                     </div>
                     <span className="text-[#80848E] text-[10px] font-bold uppercase tracking-wide">
                       {label}

@@ -3,9 +3,9 @@ import { BUTTON_DATA } from './buttonConfigs';
 
 /**
  * Generates an ultra-crisp PNG image buffer using next/og ImageResponse
- * Dimensions: 740px wide, compact font sizing so long words like "BEKLEME ODASI", "ENGELİ KALDIR", "ODAYI DEVRET" never truncate
+ * Renders Custom Application Emojis or Vector Icons in 740px width pills
  */
-export async function generateInterfaceImage(activeButtons, lang = 'tr') {
+export async function generateInterfaceImage(activeButtons, lang = 'tr', emojiMap = {}) {
   if (!activeButtons || activeButtons.length === 0) {
     return null;
   }
@@ -49,6 +49,8 @@ export async function generateInterfaceImage(activeButtons, lang = 'tr') {
               const config = BUTTON_DATA[btnId];
               if (!config) return null;
               const label = config.label[lang] || config.label.en;
+              const appEmoji = config.emojiName ? emojiMap[config.emojiName.toLowerCase()] : null;
+
               return (
                 <div
                   key={btnId}
@@ -74,7 +76,17 @@ export async function generateInterfaceImage(activeButtons, lang = 'tr') {
                       flexShrink: 0,
                     }}
                   >
-                    {config.icon(config.color)}
+                    {appEmoji ? (
+                      <img
+                        src={appEmoji.url}
+                        alt={config.emojiName}
+                        width="16"
+                        height="16"
+                        style={{ objectFit: 'contain' }}
+                      />
+                    ) : (
+                      config.icon(config.color)
+                    )}
                   </div>
                   <span
                     style={{
