@@ -1,31 +1,31 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  MessageSquare, UserX, Clock, Trash2, UserPlus,
-  Shield, Lock, Unlock, EyeOff, Eye, Users, Type,
-  Ban, ShieldCheck, Crown, ArrowRightLeft, ShieldAlert,
-  Globe, Send, PhoneOff, UserCheck, RotateCcw
-} from "lucide-react";
+import { Globe, Send, UserCheck, RotateCcw, Crown } from "lucide-react";
+
+// Emoji set must match route.js BUTTON_CONFIGS exactly
+const EMOJI = {
+  name: '✏️', limit: '👤', privacy: '🔒', waiting_room: '⏳', chat: '💬',
+  trusted: '✅', untrusted: '❌', invite: '📨', kick: '🔇', region: '🌐',
+  block: '🚫', unblock: '🔓', claim: '👑', transfer: '🔁', delete: '🗑️'
+};
 
 const INTERFACE_BUTTONS = [
-  { id: 'name', label: { tr: 'ODA İSMİ', en: 'NAME' }, icon: Type, color: 'text-gray-300' },
-  { id: 'limit', label: { tr: 'ODA LİMİTİ', en: 'LIMIT' }, icon: Users, color: 'text-gray-300' },
-  { id: 'privacy', label: { tr: 'GİZLİLİK', en: 'PRIVACY' }, icon: Shield, color: 'text-gray-300' },
-  { id: 'waiting_room', label: { tr: 'BEKLEME ODASI', en: 'WAITING ROOM' }, icon: Clock, color: 'text-yellow-400' },
-  { id: 'chat', label: { tr: 'SOHBET', en: 'CHAT' }, icon: MessageSquare, color: 'text-gray-300' },
-  
-  { id: 'trusted', label: { tr: 'GÜVENİLİR', en: 'TRUSTED' }, icon: ShieldCheck, color: 'text-green-400' },
-  { id: 'untrusted', label: { tr: 'GÜVENSİZ', en: 'UNTRUSTED' }, icon: ShieldAlert, color: 'text-red-400' },
-  { id: 'invite', label: { tr: 'DAVET', en: 'INVITE' }, icon: UserPlus, color: 'text-green-400' },
-  { id: 'kick', label: { tr: 'SESTEN AT', en: 'KICK' }, icon: PhoneOff, color: 'text-red-400' },
-  { id: 'region', label: { tr: 'BÖLGE', en: 'REGION' }, icon: Globe, color: 'text-gray-300' },
-  
-  { id: 'block', label: { tr: 'ENGELLE', en: 'BLOCK' }, icon: Ban, color: 'text-red-400' },
-  { id: 'unblock', label: { tr: 'ENGELİ KALDIR', en: 'UNBLOCK' }, icon: UserCheck, color: 'text-green-400' },
-  { id: 'claim', label: { tr: 'SAHİPLİK', en: 'CLAIM' }, icon: Crown, color: 'text-yellow-500' },
-  { id: 'transfer', label: { tr: 'ODAYI DEVRET', en: 'TRANSFER' }, icon: ArrowRightLeft, color: 'text-orange-400' },
-  { id: 'delete', label: { tr: 'SİL', en: 'DELETE' }, icon: Trash2, color: 'text-red-500' },
+  { id: 'name',         label: { tr: 'ODA İSMİ',      en: 'NAME'         } },
+  { id: 'limit',        label: { tr: 'ODA LİMİTİ',    en: 'LIMIT'        } },
+  { id: 'privacy',      label: { tr: 'GİZLİLİK',      en: 'PRIVACY'      } },
+  { id: 'waiting_room', label: { tr: 'BEKLEME ODASI', en: 'WAITING ROOM' } },
+  { id: 'chat',         label: { tr: 'SOHBET',         en: 'CHAT'         } },
+  { id: 'trusted',      label: { tr: 'GÜVENİLİR',     en: 'TRUSTED'      } },
+  { id: 'untrusted',    label: { tr: 'GÜVENSİZ',      en: 'UNTRUSTED'    } },
+  { id: 'invite',       label: { tr: 'DAVET',          en: 'INVITE'       } },
+  { id: 'kick',         label: { tr: 'SESTEN AT',      en: 'KICK'         } },
+  { id: 'region',       label: { tr: 'BÖLGE',          en: 'REGION'       } },
+  { id: 'block',        label: { tr: 'ENGELLE',        en: 'BLOCK'        } },
+  { id: 'unblock',      label: { tr: 'ENGELİ KALDIR', en: 'UNBLOCK'      } },
+  { id: 'claim',        label: { tr: 'SAHİPLİK',       en: 'CLAIM'        } },
+  { id: 'transfer',     label: { tr: 'ODAYI DEVRET',   en: 'TRANSFER'     } },
+  { id: 'delete',       label: { tr: 'SİL',            en: 'DELETE'       } },
 ];
 
 const DEFAULT_ACTIVE_BUTTONS = [
@@ -189,25 +189,18 @@ export default function InterfaceBuilder({ lang, discordChannels, guildId }) {
               {embedDesc}
             </p>
 
-            {/* Active buttons rendered as image-like legend inside canvas */}
+            {/* Active buttons — text-based legend like Discord (emoji + name per row of 5) */}
             {activeButtons.length > 0 && (
-              <div className="flex flex-col gap-1.5 mt-1">
+              <div className="flex flex-col gap-1 mt-1 font-mono">
                 {Array.from({ length: Math.ceil(activeButtons.length / 5) }).map((_, rowIdx) => (
-                  <div key={rowIdx} className="grid grid-cols-5 gap-1.5">
+                  <div key={rowIdx} className="flex gap-3">
                     {activeButtons.slice(rowIdx * 5, (rowIdx + 1) * 5).map((btnId) => {
                       const btn = INTERFACE_BUTTONS.find(b => b.id === btnId);
                       if (!btn) return null;
-                      const Icon = btn.icon;
                       return (
-                        <div
-                          key={btn.id}
-                          className="flex items-center justify-center gap-1 bg-[#232428] rounded py-1.5 px-1 border border-[#1E1F22]"
-                        >
-                          <Icon size={12} className={btn.color + " shrink-0"} />
-                          <span className="text-[#DBDEE1] text-[9px] font-bold uppercase tracking-wider truncate">
-                            {btn.label.en}
-                          </span>
-                        </div>
+                        <span key={btn.id} className="text-[#DBDEE1] text-[11px] font-bold uppercase tracking-wide whitespace-nowrap">
+                          {EMOJI[btn.id]} {btn.label.en}
+                        </span>
                       );
                     })}
                   </div>
@@ -217,7 +210,7 @@ export default function InterfaceBuilder({ lang, discordChannels, guildId }) {
 
             {/* Footer */}
             {embedFooter && (
-              <p className="text-[#949BA4] text-[11px] mt-1 border-t border-[#1E1F22] pt-1.5">
+              <p className="text-[#949BA4] text-[10px] mt-1 border-t border-[#1E1F22] pt-1.5 italic">
                 {embedFooter}
               </p>
             )}
@@ -291,7 +284,7 @@ export default function InterfaceBuilder({ lang, discordChannels, guildId }) {
                             : 'bg-[#232428] border-[#3A3C40] hover:border-red-500/60 hover:bg-red-500/10'
                         }`}
                       >
-                        <Icon size={13} className={btn.color + " shrink-0"} />
+                        <span className="text-sm leading-none shrink-0">{EMOJI[btn.id]}</span>
                         <span className="text-[#DBDEE1] text-[9px] font-bold uppercase tracking-wider truncate">
                           {btn.label.en}
                         </span>
@@ -327,7 +320,7 @@ export default function InterfaceBuilder({ lang, discordChannels, guildId }) {
                     title={`${btn.label[lang] || btn.label.en} — ${lang === 'tr' ? 'eklemek için tıkla' : 'click to add'}`}
                     className="animate-pop-in flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-[#1E1F22] border border-[#3A3C40] hover:border-green-500/60 hover:bg-green-500/10 transition-colors"
                   >
-                    <Icon size={13} className={btn.color} />
+                    <span className="text-sm leading-none">{EMOJI[btn.id]}</span>
                     <span className="text-[#6D6F78] text-[9px] font-bold uppercase tracking-wider">
                       {btn.label.en}
                     </span>

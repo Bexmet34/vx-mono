@@ -4,23 +4,49 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { checkDashboardAccess } from '@/utils/authUtils';
 import { sendChannelMessage } from "@/lib/discordApi";
 
+// All buttons use style: 2 (gray/secondary) for a clean, uniform look
 const BUTTON_CONFIGS = {
-  'chat': { label: { tr: 'SOHBET', en: 'CHAT' }, emoji: '💬', style: 2, custom_id: 'tv_chat' },
-  'kick': { label: { tr: 'SESTEN AT', en: 'KICK' }, emoji: '📵', style: 4, custom_id: 'tv_kick' },
-  'waiting_room': { label: { tr: 'BEKLEME ODASI', en: 'WAITING ROOM' }, emoji: '🕒', style: 2, custom_id: 'tv_waiting_room' },
-  'delete': { label: { tr: 'SİL', en: 'DELETE' }, emoji: '🗑️', style: 4, custom_id: 'tv_delete' },
-  'invite': { label: { tr: 'DAVET', en: 'INVITE' }, emoji: '📩', style: 2, custom_id: 'tv_invite' },
-  'privacy': { label: { tr: 'GİZLİLİK', en: 'PRIVACY' }, emoji: '🛡️', style: 2, custom_id: 'tv_privacy' },
-  'limit': { label: { tr: 'ODA LİMİTİ', en: 'LIMIT' }, emoji: '👥', style: 2, custom_id: 'tv_limit' },
-  'name': { label: { tr: 'ODA İSMİ', en: 'NAME' }, emoji: '📝', style: 2, custom_id: 'tv_name' },
-  'block': { label: { tr: 'ENGELLE', en: 'BLOCK' }, emoji: '🚫', style: 4, custom_id: 'tv_block' },
-  'unblock': { label: { tr: 'ENGELİ KALDIR', en: 'UNBLOCK' }, emoji: '✅', style: 3, custom_id: 'tv_unblock' },
-  'claim': { label: { tr: 'SAHİPLEN', en: 'CLAIM' }, emoji: '👑', style: 2, custom_id: 'tv_claim' },
-  'transfer': { label: { tr: 'ODAYI DEVRET', en: 'TRANSFER' }, emoji: '🔀', style: 2, custom_id: 'tv_transfer' },
-  'untrusted': { label: { tr: 'GÜVENSİZ', en: 'UNTRUSTED' }, emoji: '⚠️', style: 4, custom_id: 'tv_untrusted' },
-  'trusted': { label: { tr: 'GÜVENİLİR', en: 'TRUSTED' }, emoji: '🤝', style: 3, custom_id: 'tv_trusted' },
-  'region': { label: { tr: 'BÖLGE', en: 'REGION' }, emoji: '🌍', style: 2, custom_id: 'tv_region' }
+  'name':         { label: { tr: 'ODA İSMİ',      en: 'NAME'         }, emoji: '✏️',  style: 2, custom_id: 'tv_name' },
+  'limit':        { label: { tr: 'ODA LİMİTİ',    en: 'LIMIT'        }, emoji: '👤',  style: 2, custom_id: 'tv_limit' },
+  'privacy':      { label: { tr: 'GİZLİLİK',      en: 'PRIVACY'      }, emoji: '🔒',  style: 2, custom_id: 'tv_privacy' },
+  'waiting_room': { label: { tr: 'BEKLEME ODASI', en: 'WAITING ROOM' }, emoji: '⏳',  style: 2, custom_id: 'tv_waiting_room' },
+  'chat':         { label: { tr: 'SOHBET',         en: 'CHAT'         }, emoji: '💬',  style: 2, custom_id: 'tv_chat' },
+  'trusted':      { label: { tr: 'GÜVENİLİR',     en: 'TRUSTED'      }, emoji: '✅',  style: 2, custom_id: 'tv_trusted' },
+  'untrusted':    { label: { tr: 'GÜVENSİZ',      en: 'UNTRUSTED'    }, emoji: '❌',  style: 2, custom_id: 'tv_untrusted' },
+  'invite':       { label: { tr: 'DAVET',          en: 'INVITE'       }, emoji: '📨',  style: 2, custom_id: 'tv_invite' },
+  'kick':         { label: { tr: 'SESTEN AT',      en: 'KICK'         }, emoji: '🔇',  style: 2, custom_id: 'tv_kick' },
+  'region':       { label: { tr: 'BÖLGE',          en: 'REGION'       }, emoji: '🌐',  style: 2, custom_id: 'tv_region' },
+  'block':        { label: { tr: 'ENGELLE',        en: 'BLOCK'        }, emoji: '🚫',  style: 2, custom_id: 'tv_block' },
+  'unblock':      { label: { tr: 'ENGELİ KALDIR', en: 'UNBLOCK'      }, emoji: '🔓',  style: 2, custom_id: 'tv_unblock' },
+  'claim':        { label: { tr: 'SAHİPLİK',       en: 'CLAIM'        }, emoji: '👑',  style: 2, custom_id: 'tv_claim' },
+  'transfer':     { label: { tr: 'ODAYI DEVRET',   en: 'TRANSFER'     }, emoji: '🔁',  style: 2, custom_id: 'tv_transfer' },
+  'delete':       { label: { tr: 'SİL',            en: 'DELETE'       }, emoji: '🗑️', style: 2, custom_id: 'tv_delete' },
 };
+
+/**
+ * Builds a text-based legend grid (like the reference bot's embed image)
+ * Shows 5 buttons per row: "emoji LABEL"
+ */
+function buildButtonLegend(buttons, lang) {
+  if (!buttons || buttons.length === 0) return '';
+
+  const rows = [];
+  for (let i = 0; i < buttons.length; i += 5) {
+    const rowIds = buttons.slice(i, i + 5);
+    const rowText = rowIds
+      .map(id => {
+        const config = BUTTON_CONFIGS[id];
+        if (!config) return null;
+        const label = config.label[lang] || config.label.en;
+        return `${config.emoji} **${label}**`;
+      })
+      .filter(Boolean)
+      .join('   ');
+    rows.push(rowText);
+  }
+
+  return rows.join('\n');
+}
 
 export async function POST(req, context) {
   try {
@@ -54,7 +80,16 @@ export async function POST(req, context) {
       return NextResponse.json({ error: "Invalid parameters" }, { status: 400 });
     }
 
-    // Chunk buttons into rows of max 5
+    // Build the text legend (inside the embed, like the reference bot)
+    const legend = buildButtonLegend(buttons, lang);
+
+    // Assemble embed description: user text + separator + button legend + footer
+    let description = '';
+    if (embedDesc) description += embedDesc + '\n';
+    description += '\n' + legend;
+    if (embedFooter) description += '\n\n-# ' + embedFooter;
+
+    // Chunk active buttons into Discord action rows (max 5 per row, max 5 rows)
     const actionRows = [];
     for (let i = 0; i < buttons.length; i += 5) {
       const rowButtons = buttons.slice(i, i + 5).map(btnId => {
@@ -62,37 +97,26 @@ export async function POST(req, context) {
         if (!config) return null;
         return {
           type: 2,
-          style: config.style,
+          style: 2, // All gray for uniform look
           custom_id: config.custom_id,
-          // Only send emoji to Discord (like the reference bot)
           emoji: { name: config.emoji }
         };
       }).filter(Boolean);
 
       if (rowButtons.length > 0) {
-        actionRows.push({
-          type: 1,
-          components: rowButtons
-        });
+        actionRows.push({ type: 1, components: rowButtons });
       }
     }
 
     // Discord message payload
     const embed = {
       title: embedTitle || 'VoiceForge Interface',
-      description: (embedDesc || '') + (embedFooter ? `\n\n**${embedFooter}**` : ''),
+      description: description.trim(),
       color: 0xFF3366,
-      author: {
-        name: 'VoiceForge APP',
-      }
+      author: { name: 'VoiceForge APP' }
     };
 
-    const messagePayload = {
-      embeds: [embed],
-      components: actionRows
-    };
-
-    await sendChannelMessage(channelId, messagePayload);
+    await sendChannelMessage(channelId, { embeds: [embed], components: actionRows });
 
     return NextResponse.json({ success: true });
   } catch (error) {
