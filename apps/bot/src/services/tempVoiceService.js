@@ -389,11 +389,43 @@ async function cleanupEmptyTempChannels(client) {
         console.error('[VoiceForge] Error during temporary channel sweep:', err);
     }
 }
+async function updateOwnerPermissions(vc, newOwnerId, creatorId, guildId) {
+    const { getGuildConfig } = require('./db');
+    const config = await getGuildConfig(guildId);
+    const creators = Array.isArray(config?.tempvoice_creators) ? config.tempvoice_creators : [];
+    const creatorConfig = creators.find(c => c.id === creatorId);
+    
+    const ownerAllowObj = {};
+    if (creatorConfig && Array.isArray(creatorConfig.ownerPermissions)) {
+        const permStrMap = {
+            'manage_roles': 'ManageRoles',
+            'manage_channels': 'ManageChannels',
+            'manage_messages': 'ManageMessages',
+            'disconnect_members': 'MoveMembers',
+            'create_invite': 'CreateInstantInvite',
+            'create_poll': 'SendPolls',
+            'send_voice_messages': 'SendVoiceMessages',
+            'stream': 'Stream',
+            'priority_speaker': 'PrioritySpeaker',
+            'use_voice_activity': 'UseVAD',
+            'set_voice_channel_status': 'SetVoiceChannelStatus',
+            'use_soundboard': 'UseSoundboard'
+        };
+        for (const p of creatorConfig.ownerPermissions) {
+            if (permStrMap[p]) ownerAllowObj[permStrMap[p]] = true;
+        }
+    }
+    ownerAllowObj['ViewChannel'] = true;
+    ownerAllowObj['Connect'] = true;
+    
+    await vc.permissionOverwrites.edit(newOwnerId, ownerAllowObj);
+}
 
 module.exports = {
     handleCreatorJoin,
     handleTempChannelLeave,
     cleanupEmptyTempChannels,
     activeTempChannels,
-    parseChannelName
+    parseChannelName,
+    updateOwnerPermissions
 };
