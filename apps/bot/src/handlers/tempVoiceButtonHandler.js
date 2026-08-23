@@ -137,6 +137,38 @@ async function handleTempVoiceButtons(interaction) {
             return await interaction.showModal(modal);
         }
 
+        // ===== BUTTON 2: ODA LİMİTİ AYARLAMA (tv_limit) =====
+        if (action === 'limit') {
+            if (!isOwner) {
+                return await interaction.reply({
+                    content: lang === 'tr'
+                        ? '❌ Bu ses kanalının sahibi değilsiniz. Oda limitini sadece kanal sahibi değiştirebilir.'
+                        : '❌ You are not the owner of this voice channel. Only the channel owner can change the user limit.',
+                    flags: [MessageFlags.Ephemeral]
+                });
+            }
+
+            const voiceChannel = interaction.guild.channels.cache.get(userVoiceChannelId) || await interaction.guild.channels.fetch(userVoiceChannelId).catch(() => null);
+            const currentLimit = voiceChannel?.userLimit ? String(voiceChannel.userLimit) : '0';
+
+            const modal = new ModalBuilder()
+                .setCustomId(`tv_modal_limit:${userVoiceChannelId}`)
+                .setTitle(lang === 'tr' ? 'Oda Limitini Ayarla' : 'Set User Limit');
+
+            const limitInput = new TextInputBuilder()
+                .setCustomId('tv_input_limit')
+                .setLabel(lang === 'tr' ? 'Kullanıcı Limiti (0 - 99)' : 'User Limit (0 - 99)')
+                .setPlaceholder('0 = Sınırsız / Unlimited (0 - 99)')
+                .setValue(currentLimit)
+                .setStyle(TextInputStyle.Short)
+                .setMinLength(1)
+                .setMaxLength(2)
+                .setRequired(true);
+
+            modal.addComponents(new ActionRowBuilder().addComponents(limitInput));
+            return await interaction.showModal(modal);
+        }
+
         // Placeholder for other buttons as they get implemented step-by-step
         return await interaction.reply({
             content: lang === 'tr'
@@ -157,7 +189,7 @@ async function handleTempVoiceButtons(interaction) {
 }
 
 /**
- * Handles modal submissions for VoiceForge temporary channels (e.g. renaming)
+ * Handles modal submissions for VoiceForge temporary channels (renaming, user limit, etc.)
  */
 async function handleTempVoiceModal(interaction) {
     try {
@@ -167,6 +199,7 @@ async function handleTempVoiceModal(interaction) {
         const lang = config?.language || 'tr';
         const creators = Array.isArray(config?.tempvoice_creators) ? config.tempvoice_creators : [];
 
+        // 1. ODA İSMİ MODAL
         if (interaction.customId.startsWith('tv_modal_name:')) {
             const channelId = interaction.customId.split(':')[1];
             let channelInfo = await resolveChannelInfo(interaction.guild, channelId, member, creators);
@@ -226,6 +259,80 @@ async function handleTempVoiceModal(interaction) {
                 });
             }
         }
+
+        // 2. ODA LİMİTİ MODAL
+        if (interaction.customId.startsWith('tv_modal_limit:')) {
+            const channelId = interaction.customId.split(':')[1];
+            let channelInfo = await resolveChannelInfo(interaction.guild, channelId, member, creators);
+
+            if (!channelInfo) {
+                return await interaction.reply({
+                    content: lang === 'tr' ? '❌ Bu geçici ses kanalı artık aktif değil.' : '❌ This temporary voice channel is no longer active.',
+                    flags: [MessageFlags.Ephemeral]
+                });
+            }
+
+            if (channelInfo.ownerId !== member.id) {
+                return await interaction.reply({
+                    content: lang === 'tr' ? '❌ Bu ses kanalının sahibi değilsiniz.' : '❌ You are not the owner of this voice channel.',
+                    flags: [MessageFlags.Ephemeral]
+                });
+            }
+
+            const rawLimit = interaction.fields.getTextInputValue('tv_input_limit')?.trim();
+            if (!rawLimit || !/^\d+$/.test(rawLimit)) {
+                return await interaction.reply({
+                    content: lang === 'tr'
+                        ? '❌ Lütfen sadece 0 ile 99 arasında bir rakam girin.'
+                        : '❌ Please enter a valid number between 0 and 99 only.',
+                    flags: [MessageFlags.Ephemeral]
+                });
+            }
+
+            const limit = parseInt(rawLimit, 10);
+            if (isNaN(limit) || limit < 0 || limit > 99) {
+                return await interaction.reply({
+                    content: lang === 'tr'
+                        ? '❌ Limit 0 (Sınırsız) ile 99 arasında olmalıdır.'
+                        : '❌ Limit must be between 0 (Unlimited) and 99.',
+                    flags: [MessageFlags.Ephemeral]
+                });
+            }
+
+            const voiceChannel = interaction.guild.channels.cache.get(channelId) || await interaction.guild.channels.fetch(channelId).catch(() => null);
+            if (!voiceChannel) {
+                return await interaction.reply({
+                    content: lang === 'tr' ? '❌ Ses kanalı bulunamadı.' : '❌ Voice channel not found.',
+                    flags: [MessageFlags.Ephemeral]
+                });
+            }
+
+            try {
+                await voiceChannel.setUserLimit(limit, `VoiceForge: ${member.user.tag} changed user limit`);
+
+                const successEmbed = new EmbedBuilder()
+                    .setColor(0x22C55E)
+                    .setDescription(
+                        limit === 0
+                            ? (lang === 'tr' ? '✅ Ses kanalınızın kişi limiti kaldırıldı (**Sınırsız** yapıldı).' : '✅ Voice channel user limit has been removed (**Unlimited**).')
+                            : (lang === 'tr' ? `✅ Ses kanalınızın kişi limiti **${limit}** kişi olarak ayarlandı.` : `✅ Voice channel user limit has been set to **${limit}** users.`)
+                    );
+
+                return await interaction.reply({
+                    embeds: [successEmbed],
+                    flags: [MessageFlags.Ephemeral]
+                });
+            } catch (editErr) {
+                console.error('[VoiceForge] Failed to update user limit:', editErr);
+                return await interaction.reply({
+                    content: lang === 'tr'
+                        ? '❌ Limit ayarlanırken bir hata oluştu.'
+                        : '❌ An error occurred while setting user limit.',
+                    flags: [MessageFlags.Ephemeral]
+                });
+            }
+        }
+
     } catch (err) {
         console.error('[VoiceForge] Error handling temp voice modal submit:', err);
         if (!interaction.replied && !interaction.deferred) {
