@@ -115,13 +115,21 @@ async function handleCreatorJoin(newState, creatorConfig) {
     if (!member || !creatorConfig) return;
 
     try {
-        // Calculate new channel count
-        let tempChannelCount = 1;
+        // Calculate new channel count by finding the lowest available number
+        let usedNumbers = new Set();
         guild.channels.cache.forEach(ch => {
             if (ch.type === ChannelType.GuildVoice && activeTempChannels.has(ch.id)) {
-                tempChannelCount++;
+                const data = activeTempChannels.get(ch.id);
+                if (data && data.creatorId === creatorConfig.id && data.count) {
+                    usedNumbers.add(data.count);
+                }
             }
         });
+
+        let tempChannelCount = 1;
+        while (usedNumbers.has(tempChannelCount)) {
+            tempChannelCount++;
+        }
 
         // Determine channel name (support channelNameFormat, channelNameTemplate, channelName)
         const template = creatorConfig.channelNameFormat || creatorConfig.channelNameTemplate || creatorConfig.channelName || creatorConfig.nameFormat || "Kanal - {NUMBER}";
