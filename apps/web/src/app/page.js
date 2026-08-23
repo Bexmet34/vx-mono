@@ -3,6 +3,7 @@ import { supabase } from "@veyronix/database";
 import HeroSection from "@/components/home/HeroSection";
 import PublicServersSection from "@/components/home/PublicServersSection";
 import FeaturesSection from "@/components/home/FeaturesSection";
+import ComparisonSection from "@/components/home/ComparisonSection";
 import StatsBanner from "@/components/home/StatsBanner";
 import FaqSection from "@/components/home/FaqSection";
 import CtaBanner from "@/components/home/CtaBanner";
@@ -35,23 +36,26 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen">
-        {/* HERO — Full screen impact */}
-        <HeroSection />
+      {/* HERO — Full screen impact */}
+      <HeroSection />
 
-        {/* TRUSTED BY — Scrolling server marquee */}
-        <PublicServersSection publicServers={publicServers} />
+      {/* TRUSTED BY — Scrolling server marquee */}
+      <PublicServersSection publicServers={publicServers} />
 
-        {/* FEATURES — 6-card Bento Grid */}
-        <FeaturesSection />
+      {/* FEATURES — 6-card Bento Grid */}
+      <FeaturesSection />
 
-        {/* STATS — Animated counter banner */}
-        <StatsBanner />
+      {/* COMPARISON — Diğer Botlar vs Veyronix (All-In-One Powerhouse) */}
+      <ComparisonSection />
 
-        {/* FAQ — Accordion style */}
-        <FaqSection />
+      {/* STATS — Animated counter banner */}
+      <StatsBanner />
 
-        {/* CTA — Final call to action */}
-        <CtaBanner />
-      </main>
+      {/* FAQ — Accordion style */}
+      <FaqSection />
+
+      {/* CTA — Final call to action */}
+      <CtaBanner />
+    </main>
   );
 }
