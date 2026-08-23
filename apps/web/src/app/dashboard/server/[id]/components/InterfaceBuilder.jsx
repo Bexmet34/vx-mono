@@ -172,43 +172,43 @@ export default function InterfaceBuilder({ lang, discordChannels, guildId }) {
                 : 'This interface can be used to manage temporary voice channels. More options are available with /voice commands.'}
             </p>
             
-            <p className="text-[#949BA4] text-xs mt-1">
+            <p className="text-[#949BA4] text-xs mt-1 mb-1">
               {lang === 'tr' ? 'Arayüzü kullanmak için aşağıdaki butonlara basın.' : 'Press the buttons below to use the interface.'}
             </p>
+
+            {/* Active Buttons (Inside Canvas) */}
+            {activeButtons.length > 0 && (
+              <div className="flex flex-col gap-2">
+                {Array.from({ length: Math.ceil(activeButtons.length / 5) }).map((_, rowIdx) => (
+                  <div key={rowIdx} className="grid grid-cols-5 gap-2">
+                    {activeButtons.slice(rowIdx * 5, (rowIdx + 1) * 5).map((btnId, idxInRow) => {
+                      const index = rowIdx * 5 + idxInRow;
+                      const btn = INTERFACE_BUTTONS.find(b => b.id === btnId);
+                      if (!btn) return null;
+                      const Icon = btn.icon;
+                      
+                      return (
+                        <div
+                          key={btn.id}
+                          draggable
+                          onDragStart={(e) => handleDragStart(e, index)}
+                          onDragOver={(e) => handleDragOver(e, index)}
+                          onDragEnd={handleDragEnd}
+                          onDrop={handleDragEnd}
+                          onClick={() => toggleButton(btn.id)}
+                          className={`animate-pop-in flex items-center justify-center gap-1.5 bg-[#2B2D31] hover:bg-[#383A40] transition-colors rounded shadow-sm py-2 px-1 cursor-grab active:cursor-grabbing select-none border border-[#1E1F22] hover:border-[#1E1F22] ${draggedItemIdx === index ? 'opacity-50 ring-1 ring-[#FF3366]' : ''}`}
+                        >
+                          <Icon size={14} className={btn.color + " shrink-0"} />
+                          <span className="text-[#DBDEE1] text-[10px] font-bold uppercase tracking-wider truncate">{btn.label[lang] || btn.label.en}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
-
-        {/* Active Buttons (Discord Action Rows Simulation) */}
-        {activeButtons.length > 0 && (
-          <div className="flex flex-col gap-2 mt-1">
-            {Array.from({ length: Math.ceil(activeButtons.length / 5) }).map((_, rowIdx) => (
-              <div key={rowIdx} className="grid grid-cols-5 gap-2">
-                {activeButtons.slice(rowIdx * 5, (rowIdx + 1) * 5).map((btnId, idxInRow) => {
-                  const index = rowIdx * 5 + idxInRow;
-                  const btn = INTERFACE_BUTTONS.find(b => b.id === btnId);
-                  if (!btn) return null;
-                  const Icon = btn.icon;
-                  
-                  return (
-                    <div
-                      key={btn.id}
-                      draggable
-                      onDragStart={(e) => handleDragStart(e, index)}
-                      onDragOver={(e) => handleDragOver(e, index)}
-                      onDragEnd={handleDragEnd}
-                      onDrop={handleDragEnd}
-                      onClick={() => toggleButton(btn.id)}
-                      className={`animate-pop-in flex items-center justify-center gap-1.5 bg-[#2B2D31] hover:bg-[#383A40] transition-colors rounded shadow-sm py-2 px-1 cursor-grab active:cursor-grabbing select-none border border-[#1E1F22] hover:border-[#1E1F22] ${draggedItemIdx === index ? 'opacity-50 ring-1 ring-[#FF3366]' : ''}`}
-                    >
-                      <Icon size={14} className={btn.color + " shrink-0"} />
-                      <span className="text-[#DBDEE1] text-[10px] font-bold uppercase tracking-wider truncate">{btn.label[lang] || btn.label.en}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            ))}
-          </div>
-        )}
 
         {/* Divider */}
         <div className="w-full h-px bg-[#1E1F22]"></div>
