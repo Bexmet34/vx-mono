@@ -335,11 +335,16 @@ client.on('interactionCreate', async interaction => {
                 await handleTicketInteraction(interaction);
             } else if (interaction.customId.startsWith('app_select:')) {
                 await handleRegisterButtons(interaction);
-
+            } else if (interaction.customId.startsWith('tv_select_')) {
+                const { handleTempVoiceSelectMenu } = require('./handlers/tempVoiceButtonHandler');
+                await handleTempVoiceSelectMenu(interaction);
             }
         } else if (interaction.isUserSelectMenu()) {
             if (interaction.customId.startsWith('add_member_user_select_')) {
                 await handleAddMemberUserSelect(interaction);
+            } else if (interaction.customId.startsWith('tv_select_')) {
+                const { handleTempVoiceSelectMenu } = require('./handlers/tempVoiceButtonHandler');
+                await handleTempVoiceSelectMenu(interaction);
             }
         } else if (interaction.isModalSubmit()) {
             if (interaction.customId.startsWith('edit_party_modal:')) {
