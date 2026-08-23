@@ -54,7 +54,29 @@ export async function getGuildChannels(guildId) {
     return await res.json();
 }
 
-export async function sendChannelMessage(channelId, messagePayload) {
+export async function sendChannelMessage(channelId, messagePayload, files = []) {
+    if (files && files.length > 0) {
+        const formData = new FormData();
+        formData.append('payload_json', JSON.stringify(messagePayload));
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const blob = new Blob([file.buffer], { type: file.contentType || 'image/png' });
+            formData.append(`files[${i}]`, blob, file.name || `file_${i}.png`);
+        }
+        const res = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bot ${process.env.DISCORD_BOT_TOKEN}`
+            },
+            body: formData
+        });
+        if (!res.ok) {
+            const errorText = await res.text().catch(() => '');
+            throw new Error(`Discord send message API error: ${res.status} ${errorText}`);
+        }
+        return await res.json();
+    }
+
     const res = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
         method: 'POST',
         headers: {
