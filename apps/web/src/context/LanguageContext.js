@@ -9,26 +9,42 @@ const en = {
   login: "Login with Discord",
   
   // Home - Hero
-  heroTitle1: "Ultimate Party Management",
-  heroTitle2: "for Albion Online",
-  heroDesc: "Easily build your GvG, ZvZ, or Dungeon parties directly from your Discord server. Manage roles, track attendance, and always enter the battlefield prepared.",
-  heroBtn: "Add to Server",
+  heroTitle1: "The Command Center",
+  heroTitle2: "for Your Albion Guild",
+  heroDesc: "Party builder, killboard tracker, temporary voice channels, registration system, moderation tools and full web dashboard — all in one powerful Discord bot.",
+  heroBtn: "Add to Discord",
   supportBtn: "Support Server",
+  heroDashBtn: "Explore Dashboard",
 
-  featuresSectionTitle: "Powerful & Innovative Features",
-  featuresSectionDesc: "Managing your Albion Online guild and parties has never been this professional.",
+  featuresSectionTitle: "Everything Your Guild Needs",
+  featuresSectionDesc: "6 powerful systems, one bot. Manage your entire Albion Online community from Discord.",
   securePayment: "Your payments are processed 100% securely.",
   faqTitle2: "Frequently Asked Questions",
   
-  // Home - Features
-  feat1Title: "Advanced Registration",
-  feat1Desc: "Auto-detect guild members. Synchronize Discord roles with in-game roles (Tank, Healer, DPS).",
-  feat2Title: "Dynamic Party Builder",
-  feat2Desc: "Create a party with a few clicks. Members can join or leave via Discord buttons.",
-  feat3Title: "Web Dashboard",
-  feat3Desc: "Control your Discord server settings, events, and member attendance stats from the web interface.",
-  feat4Title: "Comprehensive KillBoard (Premium)",
-  feat4Desc: "Automatically fetches Albion Online KillBoard data at your specified time, listing your guild's top performing players and announcing them on Discord.",
+  // Home - Features (6 Bento Cards)
+  feat1Title: "ZvZ Party Builder",
+  feat1Desc: "Create dynamic party compositions with Tank, Healer, DPS and Support roles. Members join with one click via Discord buttons. Track attendance in real-time.",
+  feat2Title: "Killboard Tracker",
+  feat2Desc: "Automatically pulls your guild's kill & death data from Albion API and posts rich visual reports to your Discord channel every day.",
+  feat3Title: "VoiceForge",
+  feat3Desc: "Temporary voice channels with 15-button control panel. Rename, set limits, lock, transfer ownership — all from Discord buttons.",
+  feat4Title: "Registration & Tickets",
+  feat4Desc: "Albion API-powered guild verification, automatic role assignment, and a complete ticket system for guild applications.",
+  feat5Title: "Moderation Suite",
+  feat5Desc: "Auto-role sync, warning system, detailed audit logs, scheduled messages, and role menus to keep your server organized.",
+  feat6Title: "Web Dashboard",
+  feat6Desc: "Full control panel accessible from any browser. Configure every feature, view analytics, and manage your server without typing a single command.",
+
+  // Stats Banner
+  statServers: "Active Servers",
+  statMembers: "Total Members",
+  statParties: "Parties Created",
+  statUptime: "Uptime",
+
+  // CTA Banner
+  ctaTitle: "Ready to Upgrade Your Guild?",
+  ctaDesc: "Join hundreds of Albion Online communities already using Veyronix.",
+  ctaBtn: "Add to Discord — Free",
   
   // Home - Commands
   cmdTitle: "Command List",
@@ -290,25 +306,41 @@ const tr = {
   logout: "Çıkış Yap",
   login: "Discord ile Giriş Yap",
   
-  heroTitle1: "Albion Online İçin",
-  heroTitle2: "Nihai Parti Yönetimi",
-  heroDesc: "GvG, ZvZ veya Dungeon partilerinizi doğrudan Discord sunucunuz üzerinden kolayca kurun. Rolleri yönetin, katılımı takip edin ve savaş alanına her zaman hazırlıklı girin.",
-  heroBtn: "Sunucuya Ekle",
+  heroTitle1: "Albion Online Topluluğunuzun",
+  heroTitle2: "Güç Merkezi",
+  heroDesc: "Parti kurucu, killboard takibi, geçici ses kanalları, kayıt sistemi, moderasyon araçları ve tam web paneli — hepsi tek bir Discord botunda.",
+  heroBtn: "Discord'a Ekle",
   supportBtn: "Destek Sunucusu",
+  heroDashBtn: "Paneli Keşfet",
 
-  featuresSectionTitle: "Güçlü & Yenilikçi Özellikler",
-  featuresSectionDesc: "Albion Online loncanızı ve partilerinizi yönetmek hiç bu kadar profesyonel olmamıştı.",
+  featuresSectionTitle: "Loncana Gereken Her Şey",
+  featuresSectionDesc: "6 güçlü sistem, tek bot. Tüm Albion Online topluluğunu Discord'dan yönet.",
   securePayment: "Ödemeleriniz %100 güvenli bir şekilde gerçekleştirilmektedir.",
   faqTitle2: "Sıkça Sorulan Sorular",
 
-  feat1Title: "Gelişmiş Kayıt Sistemi",
-  feat1Desc: "Guild üyelerinizi otomatik algılayın. Discord rolleriyle oyun içi rolleri (Tank, Healer, DPS) senkronize edin.",
-  feat2Title: "Dinamik Party Builder",
-  feat2Desc: "Birkaç tıklamayla parti kurun. Üyeler Discord üzerinden butonlarla partiye katılıp ayrılsın.",
-  feat3Title: "Yönetim Paneli (Dashboard)",
-  feat3Desc: "Web arayüzünden Discord sunucu ayarlarını, etkinlikleri ve üyelerin katılım istatistiklerini kontrol edin.",
-  feat4Title: "Tam Kapsamlı KillBoard (Premium)",
-  feat4Desc: "Belirlediğiniz saatte Albion Online KillBoard verilerini çekerek, loncanızın en iyi performans gösteren oyuncularını otomatik olarak listeler ve Discord üzerinden duyurur.",
+  feat1Title: "ZvZ Parti Kurucu",
+  feat1Desc: "Tank, Healer, DPS ve Support rolleriyle dinamik parti kompozisyonları oluşturun. Üyeler Discord butonlarıyla tek tıkla katılsın. Katılımı anlık takip edin.",
+  feat2Title: "Killboard Takibi",
+  feat2Desc: "Loncanızın kill ve death verilerini Albion API'den otomatik çeker, Discord kanalınıza her gün zengin görsel raporlar gönderir.",
+  feat3Title: "VoiceForge",
+  feat3Desc: "15 butonlu kontrol paneli ile geçici ses kanalları. İsim değiştirme, limit koyma, kilitleme, sahiplik devri — hepsi Discord butonlarından.",
+  feat4Title: "Kayıt & Ticket Sistemi",
+  feat4Desc: "Albion API destekli lonca doğrulama, otomatik rol atama ve lonca başvuruları için eksiksiz ticket sistemi.",
+  feat5Title: "Moderasyon Araçları",
+  feat5Desc: "Otomatik rol senkronizasyonu, uyarı sistemi, detaylı denetim logları, zamanlanmış mesajlar ve sunucunuzu düzenli tutmak için rol menüleri.",
+  feat6Title: "Web Dashboard",
+  feat6Desc: "Her tarayıcıdan erişilebilir tam kontrol paneli. Tüm özellikleri yapılandırın, analizleri görüntüleyin, tek komut yazmadan sunucunuzu yönetin.",
+
+  // Stats Banner
+  statServers: "Aktif Sunucu",
+  statMembers: "Toplam Üye",
+  statParties: "Oluşturulan Parti",
+  statUptime: "Çalışma Süresi",
+
+  // CTA Banner
+  ctaTitle: "Loncanızı Güçlendirmeye Hazır mısınız?",
+  ctaDesc: "Veyronix kullanan yüzlerce Albion Online topluluğuna katılın.",
+  ctaBtn: "Discord'a Ekle — Ücretsiz",
   
   cmdTitle: "Komut Listesi",
   cmdUser: "Genel Kullanıcı Komutları",

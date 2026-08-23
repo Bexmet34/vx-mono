@@ -1,91 +1,86 @@
 "use client";
 
-import { Shield, Users, Sword, Activity } from "lucide-react";
+import { Swords, Skull, Mic2, ClipboardList, ShieldCheck, LayoutDashboard } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
-import VideoSection from "./VideoSection";
 import FadeIn from "@/components/ui/FadeIn";
+
+const featureIcons = [Swords, Skull, Mic2, ClipboardList, ShieldCheck, LayoutDashboard];
+const featureColors = [
+  { border: 'border-blue-500/20', bg: 'bg-blue-500/10', text: 'text-blue-400', glow: 'group-hover:shadow-[0_0_30px_rgba(59,130,246,0.15)]' },
+  { border: 'border-red-500/20', bg: 'bg-red-500/10', text: 'text-red-400', glow: 'group-hover:shadow-[0_0_30px_rgba(239,68,68,0.15)]' },
+  { border: 'border-emerald-500/20', bg: 'bg-emerald-500/10', text: 'text-emerald-400', glow: 'group-hover:shadow-[0_0_30px_rgba(16,185,129,0.15)]' },
+  { border: 'border-amber-500/20', bg: 'bg-amber-500/10', text: 'text-amber-400', glow: 'group-hover:shadow-[0_0_30px_rgba(245,158,11,0.15)]' },
+  { border: 'border-violet-500/20', bg: 'bg-violet-500/10', text: 'text-violet-400', glow: 'group-hover:shadow-[0_0_30px_rgba(139,92,246,0.15)]' },
+  { border: 'border-primary-container/20', bg: 'bg-primary-container/10', text: 'text-primary-container', glow: 'group-hover:shadow-[0_0_30px_rgba(255,215,0,0.15)]' },
+];
 
 export default function FeaturesSection() {
   const { t, lang } = useLanguage();
 
+  const features = [
+    { titleKey: 'feat1Title', descKey: 'feat1Desc', large: true },
+    { titleKey: 'feat2Title', descKey: 'feat2Desc', large: false },
+    { titleKey: 'feat3Title', descKey: 'feat3Desc', large: false },
+    { titleKey: 'feat4Title', descKey: 'feat4Desc', large: false },
+    { titleKey: 'feat5Title', descKey: 'feat5Desc', large: false },
+    { titleKey: 'feat6Title', descKey: 'feat6Desc', large: true },
+  ];
+
   return (
-    <section className="px-margin-mobile md:px-margin-desktop py-32 max-w-container-max mx-auto">
-      <div className="text-center mb-24">
+    <section className="px-margin-mobile md:px-margin-desktop py-28 md:py-36 max-w-container-max mx-auto">
+      <div className="text-center mb-20">
         <FadeIn delay={100} direction="up" distance={30}>
-          <h2 className="font-headline-lg text-4xl md:text-5xl text-on-surface uppercase tracking-tight mb-4">
-            {t.featuresSectionTitle || (lang === 'tr' ? 'Neden Veyronix?' : 'Why Veyronix?')}
+          <h2 className="font-headline-xl text-3xl sm:text-4xl md:text-5xl text-on-surface tracking-tight mb-5 font-bold">
+            {t.featuresSectionTitle}
           </h2>
         </FadeIn>
-        <FadeIn delay={200} direction="up" distance={30}>
-          <p className="font-body-lg text-lg text-on-surface-variant max-w-2xl mx-auto font-light leading-relaxed">
-            {t.featuresSectionDesc || (lang === 'tr' ? 'Topluluğunuzu yönetmek, korumak ve büyütmek için ihtiyacınız olan tüm profesyonel araçlar tek bir platformda.' : 'All the professional tools you need to manage, protect, and grow your community in one platform.')}
+        <FadeIn delay={200} direction="up" distance={25}>
+          <p className="font-body-lg text-lg text-on-surface-variant max-w-xl mx-auto font-light leading-relaxed">
+            {t.featuresSectionDesc}
           </p>
         </FadeIn>
       </div>
       
-      {/* Promotional Video */}
-      <FadeIn delay={300} direction="up" distance={40}>
-        <div className="mb-24">
-          <VideoSection />
-        </div>
-      </FadeIn>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:auto-rows-[minmax(260px,auto)] max-w-6xl mx-auto">
-        
-        <FadeIn delay={100} direction="up" distance={20} className="md:col-span-2">
-          <div className="h-full glass-panel p-8 flex flex-col justify-end relative overflow-hidden group border border-outline-variant/30 hover:border-primary-container/40 hover:bg-surface-container-high transition-all duration-500 rounded-3xl">
-            <div className="absolute top-10 right-10 text-on-surface-variant/5 group-hover:text-primary-container/10 transition-colors duration-500 transform group-hover:scale-110">
-              <Users size={160} />
-            </div>
-            <div className="relative z-10">
-              <div className="w-14 h-14 rounded-2xl bg-surface border border-outline-variant/50 flex items-center justify-center text-on-surface mb-6 group-hover:bg-primary-container/10 group-hover:text-primary-container group-hover:border-primary-container/30 transition-all duration-500">
-                <Users size={24} />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-6xl mx-auto">
+        {features.map((feat, idx) => {
+          const Icon = featureIcons[idx];
+          const color = featureColors[idx];
+          const isLarge = feat.large;
+          
+          return (
+            <FadeIn key={idx} delay={100 + idx * 80} direction="up" distance={25} className={isLarge ? 'md:col-span-2' : ''}>
+              <div className={`group h-full rounded-2xl p-7 md:p-8 flex flex-col justify-end relative overflow-hidden transition-all duration-500 cursor-default
+                bg-surface-container/40 border border-outline-variant/20 backdrop-blur-sm
+                hover:bg-surface-container-high/60 hover:border-outline-variant/40 hover:-translate-y-1
+                ${color.glow}
+              `}>
+                {/* Subtle gradient overlay on hover */}
+                <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl`}
+                  style={{ background: `radial-gradient(ellipse at top left, ${color.bg.includes('blue') ? 'rgba(59,130,246,0.05)' : color.bg.includes('red') ? 'rgba(239,68,68,0.05)' : color.bg.includes('emerald') ? 'rgba(16,185,129,0.05)' : color.bg.includes('amber') ? 'rgba(245,158,11,0.05)' : color.bg.includes('violet') ? 'rgba(139,92,246,0.05)' : 'rgba(255,215,0,0.05)'}, transparent 70%)` }}
+                />
+                
+                {/* Large background icon */}
+                {isLarge && (
+                  <div className="absolute top-8 right-8 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-500 pointer-events-none">
+                    <Icon size={160} strokeWidth={1} />
+                  </div>
+                )}
+                
+                <div className="relative z-10">
+                  <div className={`w-12 h-12 rounded-xl ${color.bg} ${color.border} border flex items-center justify-center mb-5 transition-all duration-500 group-hover:scale-110`}>
+                    <Icon size={22} className={color.text} />
+                  </div>
+                  <h3 className="font-headline-md text-xl md:text-2xl text-on-surface mb-2.5 tracking-tight font-semibold">
+                    {t[feat.titleKey]}
+                  </h3>
+                  <p className={`font-body-md text-on-surface-variant font-light leading-relaxed ${isLarge ? 'max-w-lg' : ''}`}>
+                    {t[feat.descKey]}
+                  </p>
+                </div>
               </div>
-              <h3 className="font-headline-md text-2xl text-on-surface mb-3 tracking-tight">{t.feat1Title}</h3>
-              <p className="font-body-md text-on-surface-variant max-w-md font-light leading-relaxed">{t.feat1Desc}</p>
-            </div>
-          </div>
-        </FadeIn>
-        
-        <FadeIn delay={200} direction="up" distance={20} className="col-span-1">
-          <div className="h-full glass-panel p-8 flex flex-col justify-end relative overflow-hidden group border border-outline-variant/30 hover:border-primary-container/40 hover:bg-surface-container-high transition-all duration-500 rounded-3xl">
-            <div className="relative z-10">
-              <div className="w-14 h-14 rounded-2xl bg-surface border border-outline-variant/50 flex items-center justify-center text-on-surface mb-6 group-hover:bg-primary-container/10 group-hover:text-primary-container group-hover:border-primary-container/30 transition-all duration-500">
-                <Sword size={24} />
-              </div>
-              <h3 className="font-headline-md text-2xl text-on-surface mb-3 tracking-tight">{t.feat2Title}</h3>
-              <p className="font-body-md text-on-surface-variant font-light leading-relaxed">{t.feat2Desc}</p>
-            </div>
-          </div>
-        </FadeIn>
-        
-        <FadeIn delay={300} direction="up" distance={20} className="col-span-1">
-          <div className="h-full glass-panel p-8 flex flex-col justify-end relative overflow-hidden group border border-outline-variant/30 hover:border-primary-container/40 hover:bg-surface-container-high transition-all duration-500 rounded-3xl">
-            <div className="relative z-10">
-              <div className="w-14 h-14 rounded-2xl bg-surface border border-outline-variant/50 flex items-center justify-center text-on-surface mb-6 group-hover:bg-primary-container/10 group-hover:text-primary-container group-hover:border-primary-container/30 transition-all duration-500">
-                <Shield size={24} />
-              </div>
-              <h3 className="font-headline-md text-2xl text-on-surface mb-3 tracking-tight">{t.feat3Title}</h3>
-              <p className="font-body-md text-on-surface-variant font-light leading-relaxed">{t.feat3Desc}</p>
-            </div>
-          </div>
-        </FadeIn>
-        
-        <FadeIn delay={400} direction="up" distance={20} className="md:col-span-2">
-          <div className="h-full glass-panel p-8 flex flex-col justify-end relative overflow-hidden group border border-primary-container/20 bg-primary-container/[0.03] hover:bg-primary-container/[0.08] hover:border-primary-container/50 transition-all duration-500 rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
-            <div className="scanline opacity-20"></div>
-            <div className="absolute top-10 right-10 text-primary-container/5 group-hover:text-primary-container/20 transition-colors duration-500 transform group-hover:scale-110">
-              <Activity size={160} />
-            </div>
-            <div className="relative z-10">
-              <div className="w-14 h-14 rounded-2xl bg-primary-container/10 border border-primary-container/30 flex items-center justify-center text-primary-container mb-6 shadow-[0_0_20px_rgba(255,215,0,0.1)] group-hover:shadow-[0_0_30px_rgba(255,215,0,0.3)] transition-all duration-500">
-                <Activity size={24} />
-              </div>
-              <h3 className="font-headline-md text-2xl text-primary-container mb-3 tracking-tight">{t.feat4Title}</h3>
-              <p className="font-body-md text-on-surface-variant max-w-md font-light leading-relaxed">{t.feat4Desc}</p>
-            </div>
-          </div>
-        </FadeIn>
+            </FadeIn>
+          );
+        })}
       </div>
     </section>
   );

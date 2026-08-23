@@ -58,14 +58,14 @@ export default {
         "surface-container-low": "#111c2d"
       },
       borderRadius: {
-        "DEFAULT": "0px",
-        "sm": "0px",
-        "md": "0px",
-        "lg": "0px",
-        "xl": "0px",
-        "2xl": "0px",
-        "3xl": "0px",
-        "full": "0px"
+        "DEFAULT": "8px",
+        "sm": "6px",
+        "md": "8px",
+        "lg": "12px",
+        "xl": "16px",
+        "2xl": "20px",
+        "3xl": "24px",
+        "full": "9999px"
       },
       spacing: {
         "container-max": "1440px",
