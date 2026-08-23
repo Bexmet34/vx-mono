@@ -3,7 +3,7 @@ import { BUTTON_DATA } from './buttonConfigs';
 
 /**
  * Generates an ultra-crisp PNG image buffer using next/og ImageResponse
- * Dimensions: 720px wide, dynamic height based on row count
+ * Dimensions: 740px wide, compact font sizing so long words like "BEKLEME ODASI", "ENGELİ KALDIR", "ODAYI DEVRET" never truncate
  */
 export async function generateInterfaceImage(activeButtons, lang = 'tr') {
   if (!activeButtons || activeButtons.length === 0) {
@@ -11,9 +11,9 @@ export async function generateInterfaceImage(activeButtons, lang = 'tr') {
   }
 
   const rowCount = Math.ceil(activeButtons.length / 5);
-  // Enlarged pill heights: 38px height + 7px gap + 6px padding = 50px (1 row), 96px (2 rows), 142px (3 rows)
-  const height = rowCount === 1 ? 50 : rowCount === 2 ? 96 : 142;
-  const width = 720;
+  // Heights: 1 row = 48px, 2 rows = 92px, 3 rows = 136px
+  const height = rowCount === 1 ? 48 : rowCount === 2 ? 92 : 136;
+  const width = 740;
 
   const rows = [];
   for (let i = 0; i < rowCount; i++) {
@@ -29,9 +29,9 @@ export async function generateInterfaceImage(activeButtons, lang = 'tr') {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
-          gap: '7px',
+          gap: '6px',
           backgroundColor: '#18191c',
-          padding: '6px 8px',
+          padding: '5px 8px',
           boxSizing: 'border-box',
           fontFamily: 'sans-serif',
         }}
@@ -42,7 +42,7 @@ export async function generateInterfaceImage(activeButtons, lang = 'tr') {
             style={{
               display: 'flex',
               width: '100%',
-              gap: '7px',
+              gap: '6px',
             }}
           >
             {rowButtons.map((btnId) => {
@@ -54,14 +54,14 @@ export async function generateInterfaceImage(activeButtons, lang = 'tr') {
                   key={btnId}
                   style={{
                     flex: 1,
-                    height: '38px',
+                    height: '36px',
                     backgroundColor: '#111214',
-                    border: '1px solid rgba(255, 255, 255, 0.09)',
-                    borderRadius: '8px',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    borderRadius: '7px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'flex-start',
-                    padding: '0 10px',
+                    padding: '0 8px',
                     boxSizing: 'border-box',
                   }}
                 >
@@ -70,7 +70,7 @@ export async function generateInterfaceImage(activeButtons, lang = 'tr') {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      marginRight: '8px',
+                      marginRight: '6px',
                       flexShrink: 0,
                     }}
                   >
@@ -79,12 +79,10 @@ export async function generateInterfaceImage(activeButtons, lang = 'tr') {
                   <span
                     style={{
                       color: '#ffffff',
-                      fontSize: '12px',
-                      fontWeight: 700,
-                      letterSpacing: '0.4px',
+                      fontSize: '10.5px',
+                      fontWeight: 800,
+                      letterSpacing: '0.1px',
                       whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
                     }}
                   >
                     {label}
@@ -94,7 +92,7 @@ export async function generateInterfaceImage(activeButtons, lang = 'tr') {
             })}
             {/* Fill empty spots in row if less than 5 to maintain flex layout */}
             {Array.from({ length: 5 - rowButtons.length }).map((_, emptyIdx) => (
-              <div key={`empty-${emptyIdx}`} style={{ flex: 1, height: '38px' }} />
+              <div key={`empty-${emptyIdx}`} style={{ flex: 1, height: '36px' }} />
             ))}
           </div>
         ))}

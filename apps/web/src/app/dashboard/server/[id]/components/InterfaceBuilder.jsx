@@ -184,9 +184,9 @@ export default function InterfaceBuilder({ lang = 'tr', discordChannels, guildId
 
             {/* ===== CANVAS IMAGE PREVIEW (Exact Discord generated image preview) ===== */}
             {activeButtons.length > 0 && (
-              <div className="w-full bg-[#18191c] rounded-lg p-2.5 flex flex-col gap-2 border border-black/40 shadow-inner mt-1 select-none">
+              <div className="w-full bg-[#18191c] rounded-lg p-2 flex flex-col gap-1.5 border border-black/40 shadow-inner mt-1 select-none">
                 {Array.from({ length: Math.ceil(activeButtons.length / 5) }).map((_, rowIdx) => (
-                  <div key={rowIdx} className="grid grid-cols-5 gap-2">
+                  <div key={rowIdx} className="grid grid-cols-5 gap-1.5">
                     {activeButtons.slice(rowIdx * 5, (rowIdx + 1) * 5).map((btnId) => {
                       const config = BUTTON_DATA[btnId];
                       if (!config) return null;
@@ -194,12 +194,12 @@ export default function InterfaceBuilder({ lang = 'tr', discordChannels, guildId
                       return (
                         <div
                           key={btnId}
-                          className="h-[38px] bg-[#111214] border border-white/5 rounded-[8px] flex items-center px-3 gap-2.5 shadow-sm transition-all"
+                          className="h-8 bg-[#111214] border border-white/5 rounded-[6px] flex items-center px-1.5 gap-1.5 shadow-sm transition-all"
                         >
                           <div className="shrink-0 flex items-center justify-center">
                             {config.icon(config.color)}
                           </div>
-                          <span className="text-white text-xs font-bold uppercase tracking-wider truncate">
+                          <span className="text-white text-[9.5px] font-bold uppercase tracking-tight truncate leading-none">
                             {label}
                           </span>
                         </div>
