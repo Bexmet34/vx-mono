@@ -38,7 +38,7 @@ export async function POST(req, context) {
       return NextResponse.json({ error: "Invalid parameters" }, { status: 400 });
     }
 
-    // 1. Generate the sleek, professional canvas image for embed
+    // 1. Generate the sleek canvas image for embed
     let files = [];
     let imageAttachmentUrl = null;
     try {
@@ -63,7 +63,7 @@ export async function POST(req, context) {
         if (!config) return null;
         return {
           type: 2,
-          style: 2, // Secondary / Gray for sleek, uniform look
+          style: 2, // Secondary / Gray for sleek look
           custom_id: `tv_${btnId}`,
           emoji: { name: config.emoji }
         };
@@ -74,10 +74,10 @@ export async function POST(req, context) {
       }
     }
 
-    // 3. Assemble Discord Embed
+    // 3. Assemble Discord Embed (Footer is positioned strictly below the image!)
     const embed = {
       title: embedTitle || (lang === 'tr' ? 'VoiceForge Arayüzü' : 'VoiceForge Interface'),
-      description: (embedDesc || '') + (embedFooter ? `\n\n${embedFooter}` : ''),
+      description: embedDesc || '',
       color: 0xFF3366,
       author: {
         name: 'VoiceForge APP'
@@ -86,6 +86,10 @@ export async function POST(req, context) {
 
     if (imageAttachmentUrl) {
       embed.image = { url: imageAttachmentUrl };
+    }
+
+    if (embedFooter) {
+      embed.footer = { text: embedFooter };
     }
 
     const messagePayload = {

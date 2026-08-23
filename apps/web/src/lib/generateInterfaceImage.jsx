@@ -3,7 +3,7 @@ import { BUTTON_DATA } from './buttonConfigs';
 
 /**
  * Generates an ultra-crisp PNG image buffer using next/og ImageResponse
- * Dimensions: 705px wide, dynamic height based on row count
+ * Dimensions: 720px wide, dynamic height based on row count
  */
 export async function generateInterfaceImage(activeButtons, lang = 'tr') {
   if (!activeButtons || activeButtons.length === 0) {
@@ -11,10 +11,9 @@ export async function generateInterfaceImage(activeButtons, lang = 'tr') {
   }
 
   const rowCount = Math.ceil(activeButtons.length / 5);
-  // Heights matching user exact specifications:
-  // 1 row: ~42px, 2 rows: ~80px, 3 rows: ~118px
-  const height = rowCount === 1 ? 42 : rowCount === 2 ? 80 : 118;
-  const width = 705;
+  // Enlarged pill heights: 38px height + 7px gap + 6px padding = 50px (1 row), 96px (2 rows), 142px (3 rows)
+  const height = rowCount === 1 ? 50 : rowCount === 2 ? 96 : 142;
+  const width = 720;
 
   const rows = [];
   for (let i = 0; i < rowCount; i++) {
@@ -30,9 +29,9 @@ export async function generateInterfaceImage(activeButtons, lang = 'tr') {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
-          gap: '6px',
+          gap: '7px',
           backgroundColor: '#18191c',
-          padding: '4px 6px',
+          padding: '6px 8px',
           boxSizing: 'border-box',
           fontFamily: 'sans-serif',
         }}
@@ -43,7 +42,7 @@ export async function generateInterfaceImage(activeButtons, lang = 'tr') {
             style={{
               display: 'flex',
               width: '100%',
-              gap: '6px',
+              gap: '7px',
             }}
           >
             {rowButtons.map((btnId) => {
@@ -55,14 +54,14 @@ export async function generateInterfaceImage(activeButtons, lang = 'tr') {
                   key={btnId}
                   style={{
                     flex: 1,
-                    height: '32px',
+                    height: '38px',
                     backgroundColor: '#111214',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
-                    borderRadius: '7px',
+                    border: '1px solid rgba(255, 255, 255, 0.09)',
+                    borderRadius: '8px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'flex-start',
-                    padding: '0 8px',
+                    padding: '0 10px',
                     boxSizing: 'border-box',
                   }}
                 >
@@ -71,7 +70,7 @@ export async function generateInterfaceImage(activeButtons, lang = 'tr') {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      marginRight: '6px',
+                      marginRight: '8px',
                       flexShrink: 0,
                     }}
                   >
@@ -80,7 +79,7 @@ export async function generateInterfaceImage(activeButtons, lang = 'tr') {
                   <span
                     style={{
                       color: '#ffffff',
-                      fontSize: '11px',
+                      fontSize: '12px',
                       fontWeight: 700,
                       letterSpacing: '0.4px',
                       whiteSpace: 'nowrap',
@@ -95,7 +94,7 @@ export async function generateInterfaceImage(activeButtons, lang = 'tr') {
             })}
             {/* Fill empty spots in row if less than 5 to maintain flex layout */}
             {Array.from({ length: 5 - rowButtons.length }).map((_, emptyIdx) => (
-              <div key={`empty-${emptyIdx}`} style={{ flex: 1, height: '32px' }} />
+              <div key={`empty-${emptyIdx}`} style={{ flex: 1, height: '38px' }} />
             ))}
           </div>
         ))}
