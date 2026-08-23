@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import SystemStatusWidget from "@/components/SystemStatusWidget";
 import ScrollToTop from "@/components/ScrollToTop";
 import MobileAppDock from "@/components/MobileAppDock";
+import CookieConsent from "@/components/CookieConsent";
 
 export default function LayoutWrapper({ children }) {
   const pathname = usePathname();
@@ -19,6 +20,7 @@ export default function LayoutWrapper({ children }) {
         <div className="flex-1 pt-14 h-screen overflow-hidden">
           {children}
         </div>
+        <CookieConsent />
       </div>
     );
   }
@@ -33,6 +35,7 @@ export default function LayoutWrapper({ children }) {
       <SystemStatusWidget />
       <ScrollToTop />
       <MobileAppDock />
+      <CookieConsent />
     </div>
   );
 }

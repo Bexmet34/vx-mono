@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSession, signIn, signOut } from "next-auth/react";
 import Image from "next/image";
-import { LogIn, LogOut, LayoutDashboard, Globe, Menu, X, ChevronRight, ChevronDown, Shield, CreditCard, Clock, CheckCircle, XCircle, Loader2, AlertCircle, Sparkles, Swords } from "lucide-react";
+import { LogIn, LogOut, LayoutDashboard, Globe, Menu, X, ChevronRight, ChevronDown, Shield, CreditCard, Clock, CheckCircle, XCircle, Loader2, AlertCircle, Sparkles, Swords, Check } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
@@ -12,9 +12,10 @@ import GlobalSearch from "@/components/GlobalSearch";
 
 export default function Navbar({ isStatic = false }) {
   const { data: session } = useSession();
-  const { lang, toggleLanguage, t } = useLanguage();
+  const { lang, toggleLanguage, setLanguage, t } = useLanguage();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isLangOpen, setIsLangOpen] = useState(false);
   const [isMobileExploreOpen, setIsMobileExploreOpen] = useState(false);
   const pathname = usePathname();
 
@@ -67,10 +68,15 @@ export default function Navbar({ isStatic = false }) {
   }, [isMenuOpen]);
 
   const profileRef = useRef(null);
+  const langRef = useRef(null);
+
   useEffect(() => {
     function handleClickOutside(event) {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
         setIsProfileOpen(false);
+      }
+      if (langRef.current && !langRef.current.contains(event.target)) {
+        setIsLangOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -86,15 +92,15 @@ export default function Navbar({ isStatic = false }) {
 
   return (
     <>
-      <nav className={`${isStatic ? 'absolute' : 'fixed'} top-0 w-full z-40 bg-surface/80 backdrop-blur-md border-b border-on-surface/10 shadow-[0_0_15px_rgba(255,215,0,0.15)] transition-all`}>
-        <div className="flex justify-between items-center px-2 md:px-margin-desktop py-1 max-w-container-max mx-auto">
+      <nav className={`${isStatic ? 'absolute' : 'fixed'} top-0 w-full z-40 bg-surface/85 backdrop-blur-xl border-b border-on-surface/10 shadow-[0_4px_25px_rgba(0,0,0,0.4)] transition-all`}>
+        <div className="flex justify-between items-center px-3 md:px-margin-desktop py-2 max-w-container-max mx-auto">
           <div className="flex items-center gap-1">
-            <Link href="/" className="flex items-center gap-2 font-headline-md text-headline-md font-bold tracking-tighter text-primary-container">
-              <Logo className="w-10 h-7" />
-              Veyronix
+            <Link href="/" className="flex items-center gap-2.5 font-headline-md text-headline-md font-bold tracking-tighter text-primary-container group">
+              <Logo className="w-9 h-7 transition-transform group-hover:scale-105" />
+              <span className="bg-gradient-to-r from-primary-container to-secondary bg-clip-text text-transparent">Veyronix</span>
             </Link>
             
-            <div className="hidden md:flex space-x-6 lg:space-x-8 items-center border-l border-on-surface/10 pl-6">
+            <div className="hidden md:flex space-x-6 lg:space-x-8 items-center border-l border-on-surface/10 pl-6 ml-2">
               
               <Link href="/killboard" className="flex items-center gap-1.5 font-body-md text-body-md text-primary-container font-bold hover:brightness-110 transition-all py-1">
                 <Swords size={16} />
@@ -103,38 +109,35 @@ export default function Navbar({ isStatic = false }) {
 
               {/* Dropdown for Page Sections */}
               <div className="relative group cursor-pointer">
-                <div className="flex items-center gap-1 font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors py-1">
+                <div className="flex items-center gap-1.5 font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors py-1">
                   {lang === 'tr' ? 'Keşfet' : 'Explore'}
-                  <ChevronDown size={14} className="text-on-surface-variant group-hover:text-primary transition-transform group-hover:rotate-180" />
+                  <ChevronDown size={14} className="text-on-surface-variant group-hover:text-primary-container transition-transform group-hover:rotate-180" />
                 </div>
-                <div className="absolute top-[100%] left-0 mt-0 w-48 bg-surface-container border border-outline-variant/50 p-2 shadow-[0_10px_40px_rgba(0,0,0,0.8)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 rounded-md">
+                <div className="absolute top-[100%] left-0 mt-2 w-52 bg-[#081425]/95 backdrop-blur-2xl border border-outline-variant/50 p-2 shadow-[0_15px_40px_rgba(0,0,0,0.8),0_0_20px_rgba(255,215,0,0.1)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 rounded-xl">
                   <div className="flex flex-col gap-1">
-                    <Link href="/killboard" className="px-2 py-1 text-[10px] text-primary-container font-bold hover:bg-primary-container/10 transition-colors rounded-sm flex items-center gap-2">
+                    <Link href="/killboard" className="px-3 py-1.5 text-xs text-primary-container font-bold hover:bg-primary-container/10 transition-colors rounded-lg flex items-center gap-2">
                       <Swords size={14} /> Killboard
                     </Link>
-                    <Link href="/#features" className="px-2 py-1 text-[10px] text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm">
-                      {lang === 'tr' ? 'Özellikler' : 'Features'}
+                    <Link href="/#features" className="px-3 py-1.5 text-xs text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-lg">
+                      {lang === 'tr' ? '✨ Özellikler (Bento)' : '✨ Features (Bento)'}
                     </Link>
-                    <Link href="/#dashboard" className="px-2 py-1 text-[10px] text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm">
-                      Dashboard
+                    <Link href="/#comparison" className="px-3 py-1.5 text-xs text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-lg">
+                      {lang === 'tr' ? '⚡ Neden Veyronix?' : '⚡ Why Veyronix?'}
                     </Link>
-                    <Link href="/#commands" className="px-2 py-1 text-[10px] text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm">
-                      {lang === 'tr' ? 'Komuta Merkezi' : 'Commands'}
+                    <Link href="/#stats" className="px-3 py-1.5 text-xs text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-lg">
+                      {lang === 'tr' ? '📊 İstatistikler' : '📊 Statistics'}
                     </Link>
-                    <Link href="/#pricing" className="px-2 py-1 text-[10px] text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm">
-                      {lang === 'tr' ? 'Fiyatlar' : 'Pricing'}
-                    </Link>
-                    <Link href="/#faq" className="px-2 py-1 text-[10px] text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm">
-                      {lang === 'tr' ? 'SSS' : 'FAQ'}
+                    <Link href="/#faq" className="px-3 py-1.5 text-xs text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-lg">
+                      {lang === 'tr' ? '❓ SSS' : '❓ FAQ'}
                     </Link>
                     <div className="h-[1px] bg-outline-variant/30 my-1"></div>
-                    <Link href="/blog" className="px-2 py-1 text-[10px] text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm">
+                    <Link href="/blog" className="px-3 py-1.5 text-xs text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-lg">
                       {t.blog}
                     </Link>
-                    <a href="https://docs.veyronix.com.tr/" target="_blank" rel="noopener noreferrer" className="px-2 py-1 text-[10px] text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm">
+                    <a href="https://docs.veyronix.com.tr/" target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 text-xs text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-lg">
                       Wiki
                     </a>
-                    <Link href="/changelog" className="px-2 py-1 text-[10px] text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm">
+                    <Link href="/changelog" className="px-3 py-1.5 text-xs text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-lg">
                       {t.changelog}
                     </Link>
                   </div>
@@ -143,33 +146,72 @@ export default function Navbar({ isStatic = false }) {
             </div>
           </div>
           
-          <div className="flex items-center gap-1 md:gap-2">
+          <div className="flex items-center gap-2 md:gap-3">
             {/* Premium Button */}
             <Link 
               href="/premium" 
-              className="hidden md:flex items-center gap-2 px-2 py-1.5 rounded-full border border-primary-container/50 bg-primary-container/10 text-primary-container hover:bg-primary-container hover:text-on-primary transition-all font-label-bold shadow-[0_0_15px_rgba(255,215,0,0.1)] hover:shadow-[0_0_20px_rgba(255,215,0,0.3)]"
+              className="hidden md:flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-primary-container/40 bg-primary-container/10 text-primary-container hover:bg-primary-container hover:text-on-primary transition-all font-label-bold text-xs uppercase tracking-wider shadow-[0_0_15px_rgba(255,215,0,0.1)] hover:shadow-[0_0_25px_rgba(255,215,0,0.3)]"
             >
               <span>{t.premiumBtnNavbar}</span>
-              <Sparkles size={16} />
+              <Sparkles size={15} />
             </Link>
 
-            {/* Language Toggle */}
-            <button 
-              onClick={toggleLanguage} 
-              className="flex items-center justify-center gap-2 px-3 py-1.5 rounded-full bg-surface-container/80 border border-outline-variant/30 text-on-surface-variant hover:text-primary-container hover:border-primary-container/50 hover:bg-primary-container/10 transition-all font-label-bold shadow-sm"
-              title="Change Language"
-            >
-              <Globe size={16} className={lang === 'en' ? 'text-[#ffb4ab]' : 'text-primary-container'} />
-              <span className="text-xs uppercase tracking-wider">{lang === 'en' ? 'TR' : 'EN'}</span>
-            </button>
+            {/* Language Select Dropdown */}
+            <div ref={langRef} className="relative">
+              <button 
+                onClick={() => setIsLangOpen(!isLangOpen)} 
+                className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container/80 border border-outline-variant/30 text-on-surface hover:text-primary-container hover:border-primary-container/50 hover:bg-primary-container/10 transition-all font-label-bold shadow-sm"
+                title={lang === 'tr' ? 'Dili Değiştir' : 'Change Language'}
+                aria-expanded={isLangOpen}
+              >
+                <Globe size={15} className="text-primary-container" />
+                <span className="text-xs uppercase tracking-wider font-bold">
+                  {lang === 'tr' ? 'TR' : 'EN'}
+                </span>
+                <ChevronDown size={13} className={`text-on-surface-variant transition-transform duration-200 ${isLangOpen ? 'rotate-180 text-primary-container' : ''}`} />
+              </button>
+
+              {isLangOpen && (
+                <div className="absolute top-full right-0 mt-2 w-44 bg-[#081425]/95 border border-primary-container/30 backdrop-blur-2xl rounded-xl p-1.5 shadow-[0_15px_40px_rgba(0,0,0,0.8),0_0_20px_rgba(255,215,0,0.15)] z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="flex flex-col gap-1">
+                    <button
+                      onClick={() => { setLanguage('tr'); setIsLangOpen(false); }}
+                      className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
+                        lang === 'tr'
+                          ? 'bg-primary-container/15 text-primary-container border border-primary-container/30 font-bold'
+                          : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60'
+                      }`}
+                    >
+                      <span className="flex items-center gap-2">
+                        <span className="text-sm">🇹🇷</span> Türkçe (TR)
+                      </span>
+                      {lang === 'tr' && <Check size={14} className="text-primary-container stroke-[2.5]" />}
+                    </button>
+
+                    <button
+                      onClick={() => { setLanguage('en'); setIsLangOpen(false); }}
+                      className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
+                        lang === 'en'
+                          ? 'bg-primary-container/15 text-primary-container border border-primary-container/30 font-bold'
+                          : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60'
+                      }`}
+                    >
+                      <span className="flex items-center gap-2">
+                        <span className="text-sm">🇬🇧</span> English (EN)
+                      </span>
+                      {lang === 'en' && <Check size={14} className="text-primary-container stroke-[2.5]" />}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Desktop Auth */}
             <div className="hidden md:flex items-center gap-2">
               {session ? (
                 <div className="flex items-center gap-2 pl-4 border-l border-on-surface/10">
-                  <Link href="/dashboard" className="group relative hidden md:flex items-center gap-2 px-2 py-1 bg-primary-container text-on-primary font-headline-md text-[10px] uppercase tracking-wider hover:brightness-110 transition-all duration-300 shadow-[0_0_15px_rgba(255,215,0,0.15)] hover:shadow-[0_0_25px_rgba(255,215,0,0.3)]">
-                    <div className="absolute inset-0 border border-primary-container group-hover:scale-[1.04] transition-transform duration-300"></div>
-                    <LayoutDashboard size={16} strokeWidth={2.5} />
+                  <Link href="/dashboard" className="group relative hidden md:flex items-center gap-2 px-3 py-1.5 bg-primary-container text-on-primary font-headline-md text-xs uppercase tracking-wider hover:brightness-110 transition-all duration-300 rounded-lg shadow-[0_0_15px_rgba(255,215,0,0.15)] hover:shadow-[0_0_25px_rgba(255,215,0,0.3)]">
+                    <LayoutDashboard size={15} strokeWidth={2.5} />
                     {t.dashboard}
                   </Link>
 
@@ -471,34 +513,60 @@ export default function Navbar({ isStatic = false }) {
               </button>
               
               <div className={`overflow-hidden transition-all duration-300 ease-in-out flex flex-col gap-2 ${isMobileExploreOpen ? 'max-h-[500px] mt-2 opacity-100' : 'max-h-0 opacity-0'}`}>
-                <Link href="/#features" className="pl-4 py-1 text-[10px] text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
-                  {lang === 'tr' ? 'Özellikler' : 'Features'}
+                <Link href="/#features" className="pl-4 py-1 text-xs text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
+                  {lang === 'tr' ? '✨ Özellikler' : '✨ Features'}
                 </Link>
-                <Link href="/#dashboard" className="pl-4 py-1 text-[10px] text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
-                  Dashboard
+                <Link href="/#comparison" className="pl-4 py-1 text-xs text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
+                  {lang === 'tr' ? '⚡ Neden Veyronix?' : '⚡ Why Veyronix?'}
                 </Link>
-                <Link href="/#commands" className="pl-4 py-1 text-[10px] text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
-                  {lang === 'tr' ? 'Komuta Merkezi' : 'Command Center'}
+                <Link href="/#stats" className="pl-4 py-1 text-xs text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
+                  {lang === 'tr' ? '📊 İstatistikler' : '📊 Stats'}
                 </Link>
-                <Link href="/#pricing" className="pl-4 py-1 text-[10px] text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
-                  {lang === 'tr' ? 'Fiyatlandırma' : 'Pricing'}
+                <Link href="/#faq" className="pl-4 py-1 text-xs text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
+                  {lang === 'tr' ? '❓ SSS' : '❓ FAQ'}
                 </Link>
-                <Link href="/#faq" className="pl-4 py-1 text-[10px] text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
-                  {lang === 'tr' ? 'SSS' : 'FAQ'}
-                </Link>
-                <Link href="/blog" className="pl-4 py-1 text-[10px] text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
+                <Link href="/blog" className="pl-4 py-1 text-xs text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
                   {t.blog}
                 </Link>
-                <a href="https://docs.veyronix.com.tr/" target="_blank" rel="noopener noreferrer" className="pl-4 py-1 text-[10px] text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
+                <a href="https://docs.veyronix.com.tr/" target="_blank" rel="noopener noreferrer" className="pl-4 py-1 text-xs text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
                   Wiki
                 </a>
-                <Link href="/changelog" className="pl-4 py-1 text-[10px] text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
+                <Link href="/changelog" className="pl-4 py-1 text-xs text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
                   {t.changelog}
                 </Link>
               </div>
               <div className="indicator mt-2"></div>
             </div>
             
+            {/* Mobile Language Selector */}
+            <div className="menu-item-group">
+              <span className="text-[10px] font-label-bold text-outline uppercase tracking-[0.2em] mb-2 block">
+                {lang === 'tr' ? 'Dil Seçimi' : 'Language'}
+              </span>
+              <div className="grid grid-cols-2 gap-2 mt-1">
+                <button
+                  onClick={() => setLanguage('tr')}
+                  className={`py-2 px-3 rounded-xl text-xs font-label-bold flex items-center justify-center gap-1.5 transition-all ${
+                    lang === 'tr'
+                      ? 'bg-primary-container text-on-primary shadow-[0_0_15px_rgba(255,215,0,0.2)]'
+                      : 'bg-surface-container-high/60 border border-outline-variant/30 text-on-surface-variant'
+                  }`}
+                >
+                  <span>🇹🇷</span> Türkçe
+                </button>
+                <button
+                  onClick={() => setLanguage('en')}
+                  className={`py-2 px-3 rounded-xl text-xs font-label-bold flex items-center justify-center gap-1.5 transition-all ${
+                    lang === 'en'
+                      ? 'bg-primary-container text-on-primary shadow-[0_0_15px_rgba(255,215,0,0.2)]'
+                      : 'bg-surface-container-high/60 border border-outline-variant/30 text-on-surface-variant'
+                  }`}
+                >
+                  <span>🇬🇧</span> English
+                </button>
+              </div>
+            </div>
+
             {isAdmin && (
               <div className="menu-item-group">
                 <span className="text-[10px] font-label-bold text-error uppercase tracking-[0.2em] mb-2 block">Admin</span>
@@ -511,21 +579,21 @@ export default function Navbar({ isStatic = false }) {
             )}
           </nav>
           
-          <div className="px-3 py-1 bg-surface-container-low border-t border-on-surface/10 space-y-8 relative z-10">
+          <div className="px-3 py-3 bg-surface-container-low border-t border-on-surface/10 space-y-4 relative z-10">
             {session ? (
               <button 
                 onClick={() => { signOut(); setIsMenuOpen(false); }} 
-                className="w-full h-9 border border-error/30 text-error hover:bg-error/10 font-label-bold text-label-bold uppercase tracking-widest active:scale-95 transition-all flex items-center justify-center gap-1"
+                className="w-full h-10 border border-error/30 text-error hover:bg-error/10 rounded-xl font-label-bold text-xs uppercase tracking-widest active:scale-95 transition-all flex items-center justify-center gap-1.5"
               >
-                <LogOut size={14} />
+                <LogOut size={15} />
                 {t.logout}
               </button>
             ) : (
               <button 
                 onClick={() => { signIn("discord"); setIsMenuOpen(false); }} 
-                className="w-full h-9 bg-primary-container text-on-primary font-label-bold text-label-bold uppercase tracking-widest active:scale-95 transition-all flex items-center justify-center gap-1 tactical-glow"
+                className="w-full h-10 bg-primary-container text-on-primary rounded-xl font-label-bold text-xs uppercase tracking-widest active:scale-95 transition-all flex items-center justify-center gap-1.5 tactical-glow"
               >
-                <LogIn size={14} />
+                <LogIn size={15} />
                 {t.login}
               </button>
             )}

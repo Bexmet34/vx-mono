@@ -687,10 +687,17 @@ export function LanguageProvider({ children, initialLang = "tr" }) {
     });
   };
 
+  const setLanguage = (target) => {
+    if (target !== "en" && target !== "tr") return;
+    setLang(target);
+    localStorage.setItem("appLang", target);
+    document.cookie = `NEXT_LOCALE=${target}; path=/; max-age=31536000`;
+  };
+
   const t = lang === "en" ? en : tr;
 
   return (
-    <LanguageContext.Provider value={{ lang, toggleLanguage, t }}>
+    <LanguageContext.Provider value={{ lang, toggleLanguage, setLanguage, t }}>
       {children}
     </LanguageContext.Provider>
   );
