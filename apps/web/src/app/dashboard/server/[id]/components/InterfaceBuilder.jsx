@@ -37,10 +37,18 @@ const DEFAULT_ACTIVE_BUTTONS = [
 export default function InterfaceBuilder({ lang, discordChannels, guildId }) {
   const [activeButtons, setActiveButtons] = useState(DEFAULT_ACTIVE_BUTTONS);
   const [draggedItemIdx, setDraggedItemIdx] = useState(null);
-  
   const [selectedChannel, setSelectedChannel] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [sendSuccess, setSendSuccess] = useState(false);
+
+  // Editable Embed Content States
+  const [embedTitle, setEmbedTitle] = useState(lang === 'tr' ? 'Veyronix Ses Yönetimi' : 'Veyronix Voice Management');
+  const [embedDesc, setEmbedDesc] = useState(lang === 'tr' 
+    ? 'Bu panel üzerinden geçici ses kanalınızı dilediğiniz gibi özelleştirebilir ve yönetebilirsiniz.\nDaha fazla seçenek için komutları kullanabilirsiniz.' 
+    : 'You can customize and manage your temporary voice channel through this panel.\nUse commands for more options.');
+  const [embedFooter, setEmbedFooter] = useState(lang === 'tr' 
+    ? 'İşlem yapmak için aşağıdaki uygun butonlara tıklayın.' 
+    : 'Click the appropriate buttons below to perform actions.');
 
   // Inactive buttons are all INTERFACE_BUTTONS not currently in activeButtons
   const inactiveButtons = INTERFACE_BUTTONS.filter(b => !activeButtons.includes(b.id)).map(b => b.id);
@@ -95,7 +103,10 @@ export default function InterfaceBuilder({ lang, discordChannels, guildId }) {
         body: JSON.stringify({
           channelId: selectedChannel,
           buttons: activeButtons,
-          lang: lang
+          lang: lang,
+          embedTitle: embedTitle,
+          embedDesc: embedDesc,
+          embedFooter: embedFooter
         })
       });
 
@@ -165,18 +176,22 @@ export default function InterfaceBuilder({ lang, discordChannels, guildId }) {
           <div className="w-1.5 bg-[#FF3366] rounded-l-lg shrink-0 self-stretch"></div>
           
           <div className="flex flex-col gap-3 p-3 pl-1 w-full bg-[#2B2D31] rounded-r-lg">
-            <h3 className="text-white text-xl font-bold tracking-wide">TempVoice Interface</h3>
-            <p className="text-[#DBDEE1] text-sm leading-relaxed">
-              {lang === 'tr' 
-                ? 'Bu arayüz geçici ses kanallarını yönetmek için kullanılabilir. Daha fazla seçenek /voice komutlarıyla mevcuttur.' 
-                : 'This interface can be used to manage temporary voice channels. More options are available with /voice commands.'}
-            </p>
+            <input 
+              type="text"
+              value={embedTitle}
+              onChange={(e) => setEmbedTitle(e.target.value)}
+              className="bg-transparent border-none outline-none text-white text-xl font-bold tracking-wide w-full hover:bg-white/5 focus:bg-white/5 rounded px-1 -ml-1 transition-colors"
+              placeholder={lang === 'tr' ? 'Başlık girin...' : 'Enter title...'}
+            />
+            <textarea
+              value={embedDesc}
+              onChange={(e) => setEmbedDesc(e.target.value)}
+              rows={3}
+              className="bg-transparent border-none outline-none text-[#DBDEE1] text-sm leading-relaxed w-full resize-none hover:bg-white/5 focus:bg-white/5 rounded px-1 -ml-1 transition-colors"
+              placeholder={lang === 'tr' ? 'Açıklama girin...' : 'Enter description...'}
+            />
             
-            <p className="text-[#949BA4] text-xs mt-1 mb-1">
-              {lang === 'tr' ? 'Arayüzü kullanmak için aşağıdaki butonlara basın.' : 'Press the buttons below to use the interface.'}
-            </p>
-
-            {/* Active Buttons (Inside Canvas) */}
+            {/* Active Buttons Legend (Inside Canvas - Simulating the Image) */}
             {activeButtons.length > 0 && (
               <div className="flex flex-col gap-2">
                 {Array.from({ length: Math.ceil(activeButtons.length / 5) }).map((_, rowIdx) => (
@@ -207,8 +222,40 @@ export default function InterfaceBuilder({ lang, discordChannels, guildId }) {
                 ))}
               </div>
             )}
+
+            <input 
+              type="text"
+              value={embedFooter}
+              onChange={(e) => setEmbedFooter(e.target.value)}
+              className="bg-transparent border-none outline-none text-[#949BA4] text-xs mt-2 w-full hover:bg-white/5 focus:bg-white/5 rounded px-1 -ml-1 transition-colors"
+              placeholder={lang === 'tr' ? 'Alt başlık girin...' : 'Enter footer...'}
+            />
           </div>
         </div>
+
+        {/* Active Buttons (Outside Embed - Real Discord Components Simulation) */}
+        {activeButtons.length > 0 && (
+          <div className="flex flex-col gap-2 mt-2">
+            {Array.from({ length: Math.ceil(activeButtons.length / 5) }).map((_, rowIdx) => (
+              <div key={rowIdx} className="grid grid-cols-5 gap-2">
+                {activeButtons.slice(rowIdx * 5, (rowIdx + 1) * 5).map((btnId) => {
+                  const btn = INTERFACE_BUTTONS.find(b => b.id === btnId);
+                  if (!btn) return null;
+                  const Icon = btn.icon;
+                  return (
+                    <div
+                      key={btn.id}
+                      className="w-full h-10 rounded flex items-center justify-center bg-[#2B2D31] border border-[#1E1F22] shadow-sm"
+                      title={btn.label[lang] || btn.label.en}
+                    >
+                      <Icon size={18} className={btn.color} />
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Divider */}
         <div className="w-full h-px bg-[#1E1F22]"></div>

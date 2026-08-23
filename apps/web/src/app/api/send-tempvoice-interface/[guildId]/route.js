@@ -34,7 +34,7 @@ export async function POST(req, { params }) {
     if (!hasAccess) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     const body = await req.json();
-    const { channelId, buttons, lang = 'en' } = body;
+    const { channelId, buttons, lang = 'en', embedTitle, embedDesc, embedFooter } = body;
 
     if (!channelId || !buttons || !Array.isArray(buttons) || buttons.length === 0) {
       return NextResponse.json({ error: "Invalid parameters" }, { status: 400 });
@@ -50,7 +50,7 @@ export async function POST(req, { params }) {
           type: 2,
           style: config.style,
           custom_id: config.custom_id,
-          label: config.label[lang] || config.label.en,
+          // Only send emoji to Discord (like the reference bot)
           emoji: { name: config.emoji }
         };
       }).filter(Boolean);
@@ -65,10 +65,8 @@ export async function POST(req, { params }) {
 
     // Discord message payload
     const embed = {
-      title: 'TempVoice Interface',
-      description: lang === 'tr' 
-        ? 'Bu arayüz, geçici ses kanallarını yönetmek için kullanılabilir. Daha fazla seçenek `/voice` komutlarıyla mevcuttur.\n\n👇 **Arayüzü kullanmak için aşağıdaki butonlara basın.**'
-        : 'This interface can be used to manage temporary voice channels. More options are available with `/voice` commands.\n\n👇 **Press the buttons below to use the interface.**',
+      title: embedTitle || 'TempVoice Interface',
+      description: (embedDesc || '') + (embedFooter ? `\n\n**${embedFooter}**` : ''),
       color: 0xFF3366,
       author: {
         name: 'TempVoice APP',
