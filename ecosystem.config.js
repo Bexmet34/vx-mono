@@ -20,7 +20,7 @@ module.exports = {
     },
     {
       name: 'vxweb',
-      script: '../../node_modules/next/dist/bin/next',
+      script: 'pnpm',
       args: 'start -p 3000',
       cwd: './apps/web',
       watch: false,
