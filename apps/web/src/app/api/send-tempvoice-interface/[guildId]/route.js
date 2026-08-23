@@ -3,7 +3,8 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { checkDashboardAccess } from '@/utils/authUtils';
 import { sendChannelMessage } from "@/lib/discordApi";
-import { generateInterfaceImage, BUTTON_DATA } from "@/lib/generateInterfaceImage";
+import { generateInterfaceImage } from "@/lib/generateInterfaceImage";
+import { BUTTON_DATA } from "@/lib/buttonConfigs";
 
 export async function POST(req, context) {
   try {

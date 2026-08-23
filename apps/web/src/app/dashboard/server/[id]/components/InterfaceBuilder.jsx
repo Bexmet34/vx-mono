@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Globe, Send, UserCheck, RotateCcw, Crown } from "lucide-react";
-import { BUTTON_DATA } from "@/lib/generateInterfaceImage";
+import { BUTTON_DATA } from "@/lib/buttonConfigs";
 
 const BUTTON_IDS = [
   'name', 'limit', 'privacy', 'waiting_room', 'chat',
