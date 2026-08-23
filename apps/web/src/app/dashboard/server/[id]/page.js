@@ -550,71 +550,117 @@ export default function ServerSettings() {
     <div className="flex bg-background relative w-full h-[calc(100vh-56px)] overflow-hidden" suppressHydrationWarning>
       <ToastContainer toasts={toasts} />
       
-      {/* Vertical Sidebar */}
-      <nav className="fixed left-0 top-[56px] h-[calc(100vh-56px)] z-30 w-[56px] hover:w-[200px] transition-all duration-300 bg-surface-container-highest/95 backdrop-blur-xl border-r border-outline-variant/30 flex flex-col group overflow-y-auto custom-scrollbar shadow-2xl">
-        <div className="flex flex-col items-center p-2 gap-1.5 w-full mt-2">
+      {/* Vertical Categorized SaaS Sidebar */}
+      <nav className="fixed left-0 top-[56px] h-[calc(100vh-56px)] z-30 w-16 md:w-60 bg-[#081425]/95 backdrop-blur-2xl border-r border-outline-variant/30 flex flex-col justify-between overflow-y-auto custom-scrollbar shadow-2xl transition-all duration-300">
+        <div className="flex flex-col p-2 md:p-3 gap-4">
           
-          <Link
-            href="/dashboard"
-            title="Dashboard"
-            className="flex items-center h-9 w-9 group-hover:w-full rounded-lg transition-all duration-200 text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent shrink-0 overflow-hidden"
-          >
-             <div className="w-9 h-9 shrink-0 flex items-center justify-center">
-               <ArrowLeft size={16} />
-             </div>
-             <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap text-xs font-label-bold pr-3">
-               Dashboard
-             </span>
-          </Link>
-          
-          <div className="w-6 group-hover:w-full h-px bg-outline-variant/30 my-1 transition-all"></div>
+          {/* Back Button & Server Identity */}
+          <div className="flex flex-col gap-2">
+            <Link
+              href="/dashboard"
+              className="flex items-center gap-2 px-2.5 py-2 rounded-xl text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 border border-outline-variant/30 transition-all text-xs font-label-bold"
+              title={lang === 'tr' ? 'Panellere Dön' : 'Back to Dashboard'}
+            >
+              <ArrowLeft size={16} className="shrink-0 text-primary-container" />
+              <span className="hidden md:inline truncate">{lang === 'tr' ? 'Panellere Dön' : 'Dashboard'}</span>
+            </Link>
 
-          {[
-            { id: 'overview', label: 'Overview', icon: Home },
-            { id: 'general', label: 'General', icon: Layout },
-            { id: 'registration', label: 'Reg', icon: UserPlus },
-            { id: 'rolemenu', label: 'Roles', icon: Users },
-            { id: 'ticket', label: 'Ticket', icon: Shield },
-            { id: 'events', label: 'Events', icon: Sparkles },
-            { id: 'killboard', label: 'KillBoard', icon: Crosshair },
-            { id: 'templates', label: 'Templates', icon: Copy },
-            { id: 'log', label: 'Logs', icon: FileText },
-            { id: 'embed', label: 'Branding', icon: ImageIcon },
-            { id: 'tempvoice', label: 'VoiceForge', icon: Headphones, isBeta: true },
-          ].map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                title={tab.label}
-                className={`relative flex items-center h-9 w-9 group-hover:w-full rounded-lg transition-all duration-200 shrink-0 overflow-hidden ${
-                  isActive
-                    ? 'bg-primary-container/15 text-primary-container border border-primary-container/40 shadow-[0_0_12px_rgba(255,215,0,0.15)] font-bold'
-                    : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5 border border-transparent'
-                }`}
-              >
-                <div className="w-9 h-9 shrink-0 flex items-center justify-center">
-                  <Icon size={16} className={isActive ? 'text-primary-container' : ''} />
+            {/* Current Server Mini Card */}
+            <div className="hidden md:flex items-center gap-2.5 p-2 rounded-xl bg-surface-container/60 border border-outline-variant/20">
+              <div className="w-8 h-8 rounded-lg bg-surface-container-high border border-outline-variant/40 flex items-center justify-center font-bold text-xs text-primary-container shrink-0 uppercase">
+                {guildDetail?.Name ? guildDetail.Name.charAt(0) : "V"}
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="font-headline-md text-xs font-bold text-on-surface truncate" title={guildDetail?.Name}>
+                  {guildDetail?.Name || guildId}
                 </div>
-                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap text-xs font-label-bold pr-3 flex items-center gap-1.5">
-                  {tab.label}
-                  {tab.isBeta && (
-                    <span className="bg-primary-container text-on-primary text-[8px] px-1 py-0.5 rounded font-black uppercase tracking-widest">
-                      BETA
+                <div className="flex items-center gap-1 text-[10px] text-primary-container font-label-bold uppercase tracking-wider">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                  {isPremium ? (lang === 'tr' ? 'Premium Aktif' : 'Premium Active') : 'Freemium'}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="h-px bg-outline-variant/20 w-full"></div>
+
+          {/* Categorized Navigation Groups */}
+          {[
+            {
+              category: lang === 'tr' ? 'GENEL YÖNETİM' : 'GENERAL',
+              items: [
+                { id: 'overview', label: lang === 'tr' ? 'Genel Bakış' : 'Overview', icon: Home },
+                { id: 'general', label: lang === 'tr' ? 'Temel Ayarlar' : 'Settings', icon: Layout },
+                { id: 'embed', label: lang === 'tr' ? 'Görsel & Marka' : 'Branding', icon: ImageIcon },
+              ]
+            },
+            {
+              category: lang === 'tr' ? 'ALBION & SES' : 'ALBION & VOICE',
+              items: [
+                { id: 'tempvoice', label: 'VoiceForge', icon: Headphones, isBeta: true },
+                { id: 'killboard', label: lang === 'tr' ? 'KillBoard' : 'KillBoard', icon: Crosshair },
+                { id: 'templates', label: lang === 'tr' ? 'Parti Şablonları' : 'Party Templates', icon: Copy },
+                { id: 'events', label: lang === 'tr' ? 'Etkinlikler' : 'Events', icon: Sparkles },
+              ]
+            },
+            {
+              category: lang === 'tr' ? 'TOPLULUK & GÜVENLİK' : 'COMMUNITY',
+              items: [
+                { id: 'registration', label: lang === 'tr' ? 'Kayıt & Rol' : 'Registration', icon: UserPlus },
+                { id: 'rolemenu', label: lang === 'tr' ? 'Rol Menüleri' : 'Role Menus', icon: Users },
+                { id: 'ticket', label: lang === 'tr' ? 'Ticket & Destek' : 'Ticket System', icon: Shield },
+                { id: 'log', label: lang === 'tr' ? 'Denetim Logları' : 'Audit Logs', icon: FileText },
+              ]
+            }
+          ].map((group, groupIdx) => (
+            <div key={groupIdx} className="flex flex-col gap-1">
+              <span className="hidden md:block text-[10px] font-label-bold text-on-surface-variant/60 uppercase tracking-widest px-2.5 mb-1">
+                {group.category}
+              </span>
+              
+              {group.items.map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    title={tab.label}
+                    className={`relative flex items-center gap-2.5 px-2.5 py-2 rounded-xl transition-all duration-200 w-full text-left touch-manipulation active:scale-[0.98] ${
+                      isActive
+                        ? 'bg-primary-container text-on-primary font-bold shadow-[0_0_15px_rgba(255,215,0,0.25)]'
+                        : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60 border border-transparent'
+                    }`}
+                  >
+                    <Icon size={16} className={`shrink-0 ${isActive ? 'text-on-primary' : 'text-on-surface-variant group-hover:text-primary-container'}`} />
+                    <span className="hidden md:flex items-center justify-between flex-1 text-xs font-semibold truncate">
+                      <span className="truncate">{tab.label}</span>
+                      {tab.isBeta && (
+                        <span className={`text-[9px] px-1.5 py-0.2 rounded font-black tracking-wider uppercase ${isActive ? 'bg-black/25 text-on-primary' : 'bg-primary-container/20 text-primary-container border border-primary-container/30'}`}>
+                          BETA
+                        </span>
+                      )}
                     </span>
-                  )}
-                </span>
-              </button>
-            );
-          })}
+                  </button>
+                );
+              })}
+            </div>
+          ))}
+
+        </div>
+
+        {/* Bottom System Status Indicator */}
+        <div className="p-3 border-t border-outline-variant/20 hidden md:block">
+          <div className="flex items-center gap-2 text-[11px] text-on-surface-variant/70">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Bot Çevrimiçi</span>
+          </div>
         </div>
       </nav>
 
       {/* Main Content Area */}
-      <div className="flex-1 ml-[52px] h-[calc(100vh-56px)] overflow-y-auto custom-scrollbar p-4 pb-20">
-        <main className="w-full max-w-[1200px] mx-auto px-2 md:px-2 flex flex-col">
+      <div className="flex-1 ml-16 md:ml-60 h-[calc(100vh-56px)] overflow-y-auto custom-scrollbar p-4 md:p-6 pb-24">
+        <main className="w-full max-w-[1200px] mx-auto flex flex-col">
         <header className="flex flex-col md:flex-row items-center md:items-end justify-between mb-3 pb-8 border-b border-outline-variant/50">
           <div className="flex flex-col md:flex-row items-center gap-2 text-center md:text-left">
             <div className="w-24 h-24 rounded-2xl bg-surface border border-outline-variant flex items-center justify-center text-[10px] font-headline-xl text-primary-container shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
