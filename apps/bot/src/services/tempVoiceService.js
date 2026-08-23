@@ -115,24 +115,24 @@ async function handleCreatorJoin(newState, creatorConfig) {
     if (!member || !creatorConfig) return;
 
     try {
-        // Calculate new channel count by finding the lowest available number
-        let usedNumbers = new Set();
-        guild.channels.cache.forEach(ch => {
-            if (ch.type === ChannelType.GuildVoice && activeTempChannels.has(ch.id)) {
-                const data = activeTempChannels.get(ch.id);
-                if (data && data.creatorId === creatorConfig.id && data.count) {
-                    usedNumbers.add(data.count);
-                }
-            }
-        });
-
+        const template = creatorConfig.channelNameFormat || creatorConfig.channelNameTemplate || creatorConfig.channelName || creatorConfig.nameFormat || "Kanal - {NUMBER}";
         let tempChannelCount = 1;
-        while (usedNumbers.has(tempChannelCount)) {
+        
+        // Find the lowest available number that produces a unique channel name
+        while (true) {
+            const proposedName = parseChannelName(template, member, tempChannelCount);
+            
+            // Check if a channel with this exact name already exists
+            const nameExists = guild.channels.cache.some(ch => 
+                ch.type === ChannelType.GuildVoice && ch.name === proposedName
+            );
+            
+            if (!nameExists) {
+                break;
+            }
             tempChannelCount++;
         }
 
-        // Determine channel name (support channelNameFormat, channelNameTemplate, channelName)
-        const template = creatorConfig.channelNameFormat || creatorConfig.channelNameTemplate || creatorConfig.channelName || creatorConfig.nameFormat || "Kanal - {NUMBER}";
         const channelName = parseChannelName(template, member, tempChannelCount);
 
         // Determine category
