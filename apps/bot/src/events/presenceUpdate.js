@@ -1,5 +1,5 @@
 const { Events } = require('discord.js');
-const { activeTempChannels, parseChannelName } = require('../services/VoiceForgeService');
+const { activeTempChannels, parseChannelName } = require('../services/tempVoiceService');
 const { getGuildConfig } = require('../services/guildConfig');
 
 // We need a rate limiter map to avoid Discord API 429
@@ -22,7 +22,7 @@ module.exports = (client) => {
         if (channelIdsToRename.length === 0) return;
 
         const guildSettings = await getGuildConfig(member.guild.id);
-        const creators = guildSettings?.VoiceForge_creators || [];
+        const creators = guildSettings?.tempvoice_creators || [];
 
         for (const info of channelIdsToRename) {
             const creatorConfig = creators.find(c => c.id === info.creatorId);

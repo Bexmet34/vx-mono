@@ -142,11 +142,11 @@ async function checkUpdates(client, initial = false) {
 
 async function checkFastUpdates(client) {
     try {
-        // --- Check VoiceForge Setup Triggers (Fast Path) ---
+        // --- Check TempVoice Setup Triggers (Fast Path) ---
         const { data: VoiceForgeConfigs, error: tvError } = await supabase
             .from('guild_settings')
-            .select('guild_id, VoiceForge_creators')
-            .eq('trigger_VoiceForge_setup', true);
+            .select('guild_id, tempvoice_creators')
+            .eq('trigger_tempvoice_setup', true);
 
         if (!tvError && VoiceForgeConfigs && VoiceForgeConfigs.length > 0) {
             const { ChannelType } = require('discord.js');
@@ -155,7 +155,7 @@ async function checkFastUpdates(client) {
                 if (!guild) continue;
                 
                 let creatorsUpdated = false;
-                let updatedCreators = Array.isArray(config.VoiceForge_creators) ? [...config.VoiceForge_creators] : [];
+                let updatedCreators = Array.isArray(config.tempvoice_creators) ? [...config.tempvoice_creators] : [];
 
                 for (let i = 0; i < updatedCreators.length; i++) {
                     const creator = updatedCreators[i];
@@ -181,8 +181,8 @@ async function checkFastUpdates(client) {
                 await supabase
                     .from('guild_settings')
                     .update({ 
-                        VoiceForge_creators: updatedCreators,
-                        trigger_VoiceForge_setup: false
+                        tempvoice_creators: updatedCreators,
+                        trigger_tempvoice_setup: false
                     })
                     .eq('guild_id', config.guild_id);
             }
