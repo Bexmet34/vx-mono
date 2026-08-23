@@ -218,12 +218,12 @@ export default function InterfaceBuilder({ lang = 'tr', discordChannels, guildId
                       return (
                         <div
                           key={btnId}
-                          className="h-8 bg-[#111214] border border-white/5 rounded-[6px] flex items-center px-1.5 gap-1.5 shadow-sm transition-all"
+                          className="h-[34px] bg-[#2b2d31] border border-white/10 rounded-[7px] flex items-center px-2 gap-1.5 shadow-sm transition-all"
                         >
                           <div className="shrink-0 flex items-center justify-center">
                             {renderButtonIcon(config)}
                           </div>
-                          <span className="text-white text-[9.5px] font-bold uppercase tracking-tight truncate leading-none">
+                          <span className="text-white text-[9.5px] font-extrabold uppercase tracking-tight truncate leading-none">
                             {label}
                           </span>
                         </div>
