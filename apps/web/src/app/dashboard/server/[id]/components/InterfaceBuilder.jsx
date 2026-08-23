@@ -123,8 +123,8 @@ export default function InterfaceBuilder({ lang = 'tr', discordChannels, guildId
         </h2>
         <p className="text-sm text-on-surface-variant">
           {lang === 'tr' 
-            ? 'Discord sunucunuzda görünecek arayüzün başlığını, açıklamasını ve aktif butonlarını özelleştirin.' 
-            : 'Customize the title, description, and active buttons for your Discord interface.'}
+            ? 'Metinlerin üzerine tıklayarak düzenleyin, butonları sürükleyip sıralayın ve kanala gönderin.' 
+            : 'Click on texts to edit directly, drag buttons to reorder, then send to channel.'}
         </p>
       </div>
 
@@ -162,17 +162,25 @@ export default function InterfaceBuilder({ lang = 'tr', discordChannels, guildId
           {/* Left Stripe */}
           <div className="w-1.5 bg-[#FF3366] shrink-0" />
 
-          {/* Embed Body */}
+          {/* Embed Body with Inline Editable Fields */}
           <div className="flex flex-col gap-2.5 p-3.5 w-full">
-            {/* Title */}
-            <h3 className="text-white text-base font-bold tracking-wide">
-              {embedTitle || 'VoiceForge Interface'}
-            </h3>
+            {/* Inline Editable Title */}
+            <input
+              type="text"
+              value={embedTitle}
+              onChange={(e) => setEmbedTitle(e.target.value)}
+              className="bg-transparent border border-transparent hover:border-white/10 focus:border-[#FF3366]/60 rounded px-1.5 py-0.5 -ml-1.5 text-white text-base font-bold tracking-wide outline-none transition-colors placeholder:text-[#4E5058] w-full"
+              placeholder={lang === 'tr' ? 'Başlık girin...' : 'Enter title...'}
+            />
 
-            {/* Description */}
-            <p className="text-[#DBDEE1] text-[13px] leading-relaxed whitespace-pre-line">
-              {embedDesc}
-            </p>
+            {/* Inline Editable Description */}
+            <textarea
+              value={embedDesc}
+              onChange={(e) => setEmbedDesc(e.target.value)}
+              rows={3}
+              className="bg-transparent border border-transparent hover:border-white/10 focus:border-[#FF3366]/60 rounded px-1.5 py-1 -ml-1.5 text-[#DBDEE1] text-[13px] leading-relaxed outline-none transition-colors resize-none placeholder:text-[#4E5058] w-full"
+              placeholder={lang === 'tr' ? 'Açıklama girin...' : 'Enter description...'}
+            />
 
             {/* ===== CANVAS IMAGE PREVIEW (Exact Discord generated image preview) ===== */}
             {activeButtons.length > 0 && (
@@ -202,64 +210,15 @@ export default function InterfaceBuilder({ lang = 'tr', discordChannels, guildId
               </div>
             )}
 
-            {/* Footer Text */}
-            {embedFooter && (
-              <p className="text-[#949BA4] text-[11px] mt-1">
-                {embedFooter}
-              </p>
-            )}
+            {/* Inline Editable Footer */}
+            <input
+              type="text"
+              value={embedFooter}
+              onChange={(e) => setEmbedFooter(e.target.value)}
+              className="bg-transparent border border-transparent hover:border-white/10 focus:border-[#FF3366]/60 rounded px-1.5 py-0.5 -ml-1.5 text-[#949BA4] text-[11px] outline-none transition-colors placeholder:text-[#4E5058] w-full mt-1"
+              placeholder={lang === 'tr' ? 'Alt başlık girin...' : 'Enter footer...'}
+            />
           </div>
-        </div>
-
-        {/* ===== DISCORD INTERACTIVE BUTTONS SIMULATION (Real Discord components below embed) ===== */}
-        {activeButtons.length > 0 && (
-          <div className="flex flex-col gap-1.5 mt-1">
-            {Array.from({ length: Math.ceil(activeButtons.length / 5) }).map((_, rowIdx) => (
-              <div key={rowIdx} className="grid grid-cols-5 gap-2">
-                {activeButtons.slice(rowIdx * 5, (rowIdx + 1) * 5).map((btnId) => {
-                  const config = BUTTON_DATA[btnId];
-                  if (!config) return null;
-                  return (
-                    <div
-                      key={btnId}
-                      className="h-9 rounded flex items-center justify-center bg-[#2B2D31] border border-[#1E1F22] shadow-sm text-base"
-                      title={config.label[lang] || config.label.en}
-                    >
-                      <span>{config.emoji}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* ===== EDITABLE FIELDS ACCORDION / INPUTS ===== */}
-        <div className="flex flex-col gap-2 pt-2 border-t border-[#1E1F22]">
-          <label className="text-[#949BA4] text-[11px] uppercase tracking-wider font-bold">
-            {lang === 'tr' ? 'Embed Metinlerini Düzenle' : 'Edit Embed Texts'}
-          </label>
-          <input
-            type="text"
-            value={embedTitle}
-            onChange={(e) => setEmbedTitle(e.target.value)}
-            className="bg-[#1E1F22] border border-[#3A3C40] rounded-lg px-3 py-2 text-white text-sm outline-none focus:border-[#FF3366] transition-colors placeholder:text-[#4E5058]"
-            placeholder={lang === 'tr' ? 'Başlık...' : 'Title...'}
-          />
-          <textarea
-            value={embedDesc}
-            onChange={(e) => setEmbedDesc(e.target.value)}
-            rows={3}
-            className="bg-[#1E1F22] border border-[#3A3C40] rounded-lg px-3 py-2 text-[#DBDEE1] text-sm outline-none focus:border-[#FF3366] transition-colors resize-none placeholder:text-[#4E5058]"
-            placeholder={lang === 'tr' ? 'Açıklama...' : 'Description...'}
-          />
-          <input
-            type="text"
-            value={embedFooter}
-            onChange={(e) => setEmbedFooter(e.target.value)}
-            className="bg-[#1E1F22] border border-[#3A3C40] rounded-lg px-3 py-2 text-[#949BA4] text-xs outline-none focus:border-[#FF3366] transition-colors placeholder:text-[#4E5058]"
-            placeholder={lang === 'tr' ? 'Alt başlık...' : 'Footer...'}
-          />
         </div>
 
         {/* ===== ACTIVE BUTTONS POOL (Draggable + Click to Remove) ===== */}
