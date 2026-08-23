@@ -84,8 +84,19 @@ fi
 
 # 2. PAKET BAĞIMLILIKLARI
 log_step "2/6" "Paket bağımlılıkları kontrol ediliyor..."
-pnpm install --prefer-offline >/dev/null 2>&1 || pnpm install >/dev/null 2>&1
-log_ok "Bağımlılıklar hazır"
+PKGS_CHANGED=false
+if [ ! -d "node_modules" ]; then
+  PKGS_CHANGED=true
+elif [ -n "$CHANGED_FILES" ] && echo "$CHANGED_FILES" | grep -qE "(package\.json|pnpm-lock\.yaml)"; then
+  PKGS_CHANGED=true
+fi
+
+if [ "$PKGS_CHANGED" = true ]; then
+  pnpm install --prefer-offline >/dev/null 2>&1 || pnpm install >/dev/null 2>&1
+  log_ok "Bağımlılıklar hazır"
+else
+  log_ok "Bağımlılıklar güncel (Hızlı geçildi)"
+fi
 
 # 3. WEB DERLEME
 log_step "3/6" "Web sitesi durumu kontrol ediliyor..."
