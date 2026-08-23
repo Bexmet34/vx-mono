@@ -84,7 +84,7 @@ fi
 
 # 2. PAKET BAĞIMLILIKLARI
 log_step "2/6" "Paket bağımlılıkları kontrol ediliyor..."
-pnpm install --no-frozen-lockfile >/dev/null 2>&1 || pnpm install >/dev/null 2>&1
+echo "y" | pnpm install --no-frozen-lockfile >/dev/null 2>&1 || echo "y" | pnpm install >/dev/null 2>&1
 log_ok "Bağımlılıklar hazır"
 
 # 3. WEB DERLEME
