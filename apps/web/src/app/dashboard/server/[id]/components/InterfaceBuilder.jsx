@@ -9,25 +9,23 @@ import {
 } from "lucide-react";
 
 const INTERFACE_BUTTONS = [
-  { id: 'chat', label: { tr: 'SOHBET', en: 'CHAT' }, icon: MessageSquare, color: 'text-gray-300' },
-  { id: 'kick', label: { tr: 'SESTEN AT', en: 'KICK' }, icon: PhoneOff, color: 'text-red-400' },
-  { id: 'waiting_room', label: { tr: 'BEKLEME ODASI', en: 'WAITING ROOM' }, icon: Clock, color: 'text-yellow-400' },
-  { id: 'delete', label: { tr: 'SİL', en: 'DELETE' }, icon: Trash2, color: 'text-red-500' },
-  { id: 'invite', label: { tr: 'DAVET', en: 'INVITE' }, icon: UserPlus, color: 'text-green-400' },
-  { id: 'privacy', label: { tr: 'GİZLİLİK', en: 'PRIVACY' }, icon: Shield, color: 'text-gray-300' },
-  { id: 'lock', label: { tr: 'KİLİTLE', en: 'LOCK' }, icon: Lock, color: 'text-gray-300' },
-  { id: 'unlock', label: { tr: 'KİLİDİ AÇ', en: 'UNLOCK' }, icon: Unlock, color: 'text-gray-300' },
-  { id: 'hide', label: { tr: 'GİZLE', en: 'HIDE' }, icon: EyeOff, color: 'text-gray-300' },
-  { id: 'unhide', label: { tr: 'GÖRÜNÜR YAP', en: 'UNHIDE' }, icon: Eye, color: 'text-gray-300' },
-  { id: 'limit', label: { tr: 'ODA LİMİTİ', en: 'LIMIT' }, icon: Users, color: 'text-gray-300' },
   { id: 'name', label: { tr: 'ODA İSMİ', en: 'NAME' }, icon: Type, color: 'text-gray-300' },
+  { id: 'limit', label: { tr: 'ODA LİMİTİ', en: 'LIMIT' }, icon: Users, color: 'text-gray-300' },
+  { id: 'privacy', label: { tr: 'GİZLİLİK', en: 'PRIVACY' }, icon: Shield, color: 'text-gray-300' },
+  { id: 'waiting_room', label: { tr: 'BEKLEME ODASI', en: 'WAITING ROOM' }, icon: Clock, color: 'text-yellow-400' },
+  { id: 'chat', label: { tr: 'SOHBET', en: 'CHAT' }, icon: MessageSquare, color: 'text-gray-300' },
+  
+  { id: 'trusted', label: { tr: 'GÜVENİLİR', en: 'TRUSTED' }, icon: ShieldCheck, color: 'text-green-400' },
+  { id: 'untrusted', label: { tr: 'GÜVENSİZ', en: 'UNTRUSTED' }, icon: ShieldAlert, color: 'text-red-400' },
+  { id: 'invite', label: { tr: 'DAVET', en: 'INVITE' }, icon: UserPlus, color: 'text-green-400' },
+  { id: 'kick', label: { tr: 'SESTEN AT', en: 'KICK' }, icon: PhoneOff, color: 'text-red-400' },
+  { id: 'region', label: { tr: 'BÖLGE', en: 'REGION' }, icon: Globe, color: 'text-gray-300' },
+  
   { id: 'block', label: { tr: 'ENGELLE', en: 'BLOCK' }, icon: Ban, color: 'text-red-400' },
   { id: 'unblock', label: { tr: 'ENGELİ KALDIR', en: 'UNBLOCK' }, icon: UserCheck, color: 'text-green-400' },
-  { id: 'claim', label: { tr: 'SAHİPLEN', en: 'CLAIM' }, icon: Crown, color: 'text-yellow-500' },
+  { id: 'claim', label: { tr: 'SAHİPLİK', en: 'CLAIM' }, icon: Crown, color: 'text-yellow-500' },
   { id: 'transfer', label: { tr: 'ODAYI DEVRET', en: 'TRANSFER' }, icon: ArrowRightLeft, color: 'text-orange-400' },
-  { id: 'untrusted', label: { tr: 'GÜVENSİZ', en: 'UNTRUSTED' }, icon: ShieldAlert, color: 'text-red-400' },
-  { id: 'trusted', label: { tr: 'GÜVENİLİR', en: 'TRUSTED' }, icon: ShieldCheck, color: 'text-green-400' },
-  { id: 'region', label: { tr: 'BÖLGE', en: 'REGION' }, icon: Globe, color: 'text-gray-300' },
+  { id: 'delete', label: { tr: 'SİL', en: 'DELETE' }, icon: Trash2, color: 'text-red-500' },
 ];
 
 const DEFAULT_ACTIVE_BUTTONS = [
@@ -164,34 +162,42 @@ export default function InterfaceBuilder({ lang, discordChannels, guildId }) {
                 : 'This interface can be used to manage temporary voice channels. More options are available with /voice commands.'}
             </p>
             
-            {/* Active Buttons Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-2 mt-2">
-              {activeButtons.map((btnId, index) => {
-                const btn = INTERFACE_BUTTONS.find(b => b.id === btnId);
-                if (!btn) return null;
-                const Icon = btn.icon;
-                
-                return (
-                  <div
-                    key={btn.id}
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, index)}
-                    onDragOver={(e) => handleDragOver(e, index)}
-                    onDragEnd={handleDragEnd}
-                    onClick={() => toggleButton(btn.id)}
-                    className={`flex items-center justify-center gap-2 bg-[#2B2D31] hover:bg-[#383A40] transition-colors rounded shadow-sm p-2 cursor-grab active:cursor-grabbing select-none border border-[#1E1F22] hover:border-[#1E1F22] ${draggedItemIdx === index ? 'opacity-30' : ''}`}
-                  >
-                    <Icon size={14} className={btn.color} />
-                    <span className="text-[#DBDEE1] text-[10px] font-bold uppercase tracking-wider truncate">{btn.label[lang] || btn.label.en}</span>
-                  </div>
-                );
-              })}
-            </div>
             <p className="text-[#949BA4] text-xs mt-1">
               {lang === 'tr' ? 'Arayüzü kullanmak için aşağıdaki butonlara basın.' : 'Press the buttons below to use the interface.'}
             </p>
           </div>
         </div>
+
+        {/* Active Buttons (Discord Action Rows Simulation) */}
+        {activeButtons.length > 0 && (
+          <div className="flex flex-col gap-2 mt-1">
+            {Array.from({ length: Math.ceil(activeButtons.length / 5) }).map((_, rowIdx) => (
+              <div key={rowIdx} className="grid grid-cols-5 gap-2">
+                {activeButtons.slice(rowIdx * 5, (rowIdx + 1) * 5).map((btnId, idxInRow) => {
+                  const index = rowIdx * 5 + idxInRow;
+                  const btn = INTERFACE_BUTTONS.find(b => b.id === btnId);
+                  if (!btn) return null;
+                  const Icon = btn.icon;
+                  
+                  return (
+                    <div
+                      key={btn.id}
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, index)}
+                      onDragOver={(e) => handleDragOver(e, index)}
+                      onDragEnd={handleDragEnd}
+                      onClick={() => toggleButton(btn.id)}
+                      className={`flex items-center justify-center gap-1.5 bg-[#2B2D31] hover:bg-[#383A40] transition-colors rounded shadow-sm py-2 px-1 cursor-grab active:cursor-grabbing select-none border border-[#1E1F22] hover:border-[#1E1F22] ${draggedItemIdx === index ? 'opacity-30' : ''}`}
+                    >
+                      <Icon size={14} className={btn.color + " shrink-0"} />
+                      <span className="text-[#DBDEE1] text-[10px] font-bold uppercase tracking-wider truncate">{btn.label[lang] || btn.label.en}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Divider */}
         <div className="w-full h-px bg-[#1E1F22]"></div>
