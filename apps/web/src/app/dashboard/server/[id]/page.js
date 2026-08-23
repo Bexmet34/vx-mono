@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, useCallback, useRef } from "react";
-import { ArrowLeft, Loader2, Image as ImageIcon, Layout, Shield, X, Crop, Users, Copy, Lock, Home, Save, AlertTriangle, Swords, Crown, Gift, FileText, Crosshair, UserPlus, Sparkles, Headphones } from "lucide-react";
+import { ArrowLeft, Loader2, Image as ImageIcon, Layout, Shield, X, Crop, Users, Copy, Lock, Home, Save, AlertTriangle, Swords, Crown, Gift, FileText, Crosshair, UserPlus, Sparkles, Headphones, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 import { useToast, ToastContainer } from "@/components/Toast";
@@ -66,6 +66,15 @@ export default function ServerSettings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
+  const [collapsedCategories, setCollapsedCategories] = useState({});
+
+  const toggleCategory = (key) => {
+    setCollapsedCategories((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
+
   const [subscription, setSubscription] = useState(null);
   const isPremium = !!(subscription && (
     subscription.is_unlimited || 
@@ -587,6 +596,7 @@ export default function ServerSettings() {
           {/* Categorized Navigation Groups */}
           {[
             {
+              id: 'general_group',
               category: lang === 'tr' ? 'GENEL YÖNETİM' : 'GENERAL',
               items: [
                 { id: 'overview', label: lang === 'tr' ? 'Genel Bakış' : 'Overview', icon: Home },
@@ -595,6 +605,7 @@ export default function ServerSettings() {
               ]
             },
             {
+              id: 'albion_group',
               category: lang === 'tr' ? 'ALBION & SES' : 'ALBION & VOICE',
               items: [
                 { id: 'tempvoice', label: 'VoiceForge', icon: Headphones, isBeta: true },
@@ -604,6 +615,7 @@ export default function ServerSettings() {
               ]
             },
             {
+              id: 'community_group',
               category: lang === 'tr' ? 'TOPLULUK & GÜVENLİK' : 'COMMUNITY',
               items: [
                 { id: 'registration', label: lang === 'tr' ? 'Kayıt & Rol' : 'Registration', icon: UserPlus },
@@ -612,40 +624,54 @@ export default function ServerSettings() {
                 { id: 'log', label: lang === 'tr' ? 'Denetim Logları' : 'Audit Logs', icon: FileText },
               ]
             }
-          ].map((group, groupIdx) => (
-            <div key={groupIdx} className="flex flex-col gap-1">
-              <span className="hidden md:block text-[10px] font-label-bold text-on-surface-variant/60 uppercase tracking-widest px-2.5 mb-1">
-                {group.category}
-              </span>
-              
-              {group.items.map((tab) => {
-                const Icon = tab.icon;
-                const isActive = activeTab === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    title={tab.label}
-                    className={`relative flex items-center gap-2.5 px-2.5 py-2 rounded-xl transition-all duration-200 w-full text-left touch-manipulation active:scale-[0.98] ${
-                      isActive
-                        ? 'bg-primary-container text-on-primary font-bold shadow-[0_0_15px_rgba(255,215,0,0.25)]'
-                        : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60 border border-transparent'
-                    }`}
-                  >
-                    <Icon size={16} className={`shrink-0 ${isActive ? 'text-on-primary' : 'text-on-surface-variant group-hover:text-primary-container'}`} />
-                    <span className="hidden md:flex items-center justify-between flex-1 text-xs font-semibold truncate">
-                      <span className="truncate">{tab.label}</span>
-                      {tab.isBeta && (
-                        <span className={`text-[9px] px-1.5 py-0.2 rounded font-black tracking-wider uppercase ${isActive ? 'bg-black/25 text-on-primary' : 'bg-primary-container/20 text-primary-container border border-primary-container/30'}`}>
-                          BETA
+          ].map((group) => {
+            const isCollapsed = !!collapsedCategories[group.id];
+            return (
+              <div key={group.id} className="flex flex-col gap-1">
+                {/* Collapsible Accordion Header */}
+                <button
+                  onClick={() => toggleCategory(group.id)}
+                  className="hidden md:flex items-center justify-between w-full text-[10px] font-label-bold text-on-surface-variant/70 hover:text-primary-container uppercase tracking-widest px-2.5 py-1.5 rounded-lg hover:bg-surface-container-high/50 transition-colors group cursor-pointer"
+                >
+                  <span className="truncate">{group.category}</span>
+                  <ChevronDown 
+                    size={13} 
+                    className={`shrink-0 transition-transform duration-200 ${isCollapsed ? '-rotate-90 text-on-surface-variant/40' : 'rotate-0 text-primary-container'}`} 
+                  />
+                </button>
+                
+                {/* Category Items List */}
+                <div className={`flex flex-col gap-1 transition-all duration-300 ease-in-out ${isCollapsed ? 'md:max-h-0 md:opacity-0 md:overflow-hidden' : 'max-h-96 opacity-100'}`}>
+                  {group.items.map((tab) => {
+                    const Icon = tab.icon;
+                    const isActive = activeTab === tab.id;
+                    return (
+                      <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        title={tab.label}
+                        className={`relative flex items-center gap-2.5 px-2.5 py-2 rounded-xl transition-all duration-200 w-full text-left touch-manipulation active:scale-[0.98] ${
+                          isActive
+                            ? 'bg-primary-container text-on-primary font-bold shadow-[0_0_15px_rgba(255,215,0,0.25)]'
+                            : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60 border border-transparent'
+                        }`}
+                      >
+                        <Icon size={16} className={`shrink-0 ${isActive ? 'text-on-primary' : 'text-on-surface-variant group-hover:text-primary-container'}`} />
+                        <span className="hidden md:flex items-center justify-between flex-1 text-xs font-semibold truncate">
+                          <span className="truncate">{tab.label}</span>
+                          {tab.isBeta && (
+                            <span className={`text-[9px] px-1.5 py-0.2 rounded font-black tracking-wider uppercase ${isActive ? 'bg-black/25 text-on-primary' : 'bg-primary-container/20 text-primary-container border border-primary-container/30'}`}>
+                              BETA
+                            </span>
+                          )}
                         </span>
-                      )}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          ))}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
 
         </div>
 
