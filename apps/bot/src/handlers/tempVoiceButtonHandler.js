@@ -102,7 +102,10 @@ async function handleTempVoiceButtons(interaction) {
 
         // 4. User IS in an active temp channel: Check if they are the owner
         const isOwner = channelInfo && channelInfo.ownerId === member.id;
-        const action = interaction.customId.replace('tv_', '');
+        const action = interaction.customId
+            .replace('tv_', '')
+            .replace('tempvoice_', '')
+            .replace('voice_', '');
 
         // ===== BUTTON 1: ODA İSMİ DEĞİŞTİRME (tv_name) =====
         if (action === 'name') {

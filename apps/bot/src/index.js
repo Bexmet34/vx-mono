@@ -295,7 +295,7 @@ client.on('interactionCreate', async interaction => {
             } else if (interaction.customId === 'request_auto_premium') {
                 const { handleAutoPremiumButton } = require('./handlers/buttonHandler');
                 await handleAutoPremiumButton(interaction);
-            } else if (interaction.customId.startsWith('tv_')) {
+            } else if (interaction.customId.startsWith('tv_') || interaction.customId.startsWith('tempvoice_') || interaction.customId.startsWith('voice_')) {
                 const { handleTempVoiceButtons } = require('./handlers/tempVoiceButtonHandler');
                 await handleTempVoiceButtons(interaction);
             } else {
