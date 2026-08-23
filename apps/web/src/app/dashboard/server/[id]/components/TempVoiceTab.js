@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Plus, Settings, Trash2, ArrowLeft, Headphones, Sliders, Shield, MoreHorizontal, HelpCircle, FileText, Crown } from "lucide-react";
 import Logo from "@/components/Logo";
-
+import InterfaceBuilder from "./InterfaceBuilder";
 const CustomSelect = ({ value, options, onChange, placeholder }) => {
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef(null);
@@ -696,7 +696,7 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, setInitia
 
   // Initial View
   return (
-    <div className="flex flex-col gap-6 animate-fade-in">
+    <div className="flex flex-col gap-6 animate-fade-in h-full">
       {isCreatingCreator && (
         <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[#09090b]/80 backdrop-blur-sm animate-fade-in">
           <div className="flex flex-col items-center gap-5 p-8 bg-surface-container rounded-2xl border border-outline-variant shadow-2xl max-w-sm w-full mx-4">
@@ -728,19 +728,9 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, setInitia
         </span>
       </div>
 
-      {creators.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-64 border border-dashed border-outline-variant rounded-xl bg-surface-container/20 relative overflow-hidden">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary-container/5 rounded-full blur-3xl"></div>
-          <button
-            onClick={handleAddCreator}
-            className="flex items-center gap-2 px-6 py-3 bg-surface border border-outline-variant hover:border-primary-container text-on-surface hover:text-primary-container rounded-lg font-label-bold tracking-wide transition-all shadow-lg hover:shadow-primary-container/20 z-10"
-          >
-            <Plus size={20} />
-            Open Audio Channel
-          </button>
-        </div>
-      ) : (
-        <div className="flex flex-col gap-4">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 h-full">
+        {/* Sol Taraf: Kanal Oluşturucular */}
+        <div className="flex flex-col gap-4 border-r-0 xl:border-r border-outline-variant/30 xl:pr-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-on-surface font-label-bold text-sm tracking-wide">
               <Headphones size={18} />
@@ -748,41 +738,59 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, setInitia
             </div>
           </div>
 
-          {creators.map(creator => (
-            <div key={creator.id} className="flex items-center justify-between p-3 bg-surface-container/30 border border-outline-variant rounded-xl group hover:border-primary-container/50 transition-all">
-              <div className="flex items-center gap-3">
-                <Headphones size={20} className="text-on-surface-variant group-hover:text-primary-container transition-colors" />
-                <span className="font-label-bold text-sm tracking-wide text-on-surface truncate">
-                  {creator.name || '➕・Open-Audio-Channel'}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setEditingCreatorId(creator.id)}
-                  className="p-2 bg-surface-container/50 border border-outline-variant hover:border-primary-container text-on-surface-variant hover:text-primary-container rounded-lg transition-all"
-                >
-                  <Settings size={16} />
-                </button>
-                <button
-                  onClick={() => handleDeleteCreator(creator.id)}
-                  className="p-2 bg-surface-container/50 border border-outline-variant hover:border-[#FF3366] text-on-surface-variant hover:text-[#FF3366] rounded-lg transition-all"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
+          {creators.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-64 border border-dashed border-outline-variant rounded-xl bg-surface-container/20 relative overflow-hidden mt-2">
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary-container/5 rounded-full blur-3xl"></div>
+              <button
+                onClick={handleAddCreator}
+                className="flex items-center gap-2 px-6 py-3 bg-surface border border-outline-variant hover:border-primary-container text-on-surface hover:text-primary-container rounded-lg font-label-bold tracking-wide transition-all shadow-lg hover:shadow-primary-container/20 z-10"
+              >
+                <Plus size={20} />
+                Open Audio Channel
+              </button>
             </div>
-          ))}
+          ) : (
+            <div className="flex flex-col gap-3 mt-2">
+              {creators.map(creator => (
+                <div key={creator.id} className="flex items-center justify-between p-3 bg-surface-container/30 border border-outline-variant rounded-xl group hover:border-primary-container/50 transition-all">
+                  <div className="flex items-center gap-3">
+                    <Headphones size={20} className="text-on-surface-variant group-hover:text-primary-container transition-colors" />
+                    <span className="font-label-bold text-sm tracking-wide text-on-surface truncate">
+                      {creator.name || '➕・Open-Audio-Channel'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setEditingCreatorId(creator.id)}
+                      className="p-2 bg-surface-container/50 border border-outline-variant hover:border-primary-container text-on-surface-variant hover:text-primary-container rounded-lg transition-all"
+                    >
+                      <Settings size={16} />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteCreator(creator.id)}
+                      className="p-2 bg-surface-container/50 border border-outline-variant hover:border-[#FF3366] text-on-surface-variant hover:text-[#FF3366] rounded-lg transition-all"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </div>
+              ))}
 
-          {creators.length > 0 && (
-            <button
-              onClick={handleAddCreator}
-              className="flex items-center justify-center gap-2 p-3 mt-2 bg-surface border border-dashed border-outline-variant hover:border-primary-container text-on-surface-variant hover:text-primary-container rounded-xl font-label-bold tracking-wide transition-all"
-            >
-              <Plus size={16} /> {lang === 'tr' ? 'Yeni Oluşturucu Ekle' : 'Add New Creator'}
-            </button>
+              <button
+                onClick={handleAddCreator}
+                className="flex items-center justify-center gap-2 p-3 mt-2 bg-surface border border-dashed border-outline-variant hover:border-primary-container text-on-surface-variant hover:text-primary-container rounded-xl font-label-bold tracking-wide transition-all"
+              >
+                <Plus size={16} /> {lang === 'tr' ? 'Yeni Oluşturucu Ekle' : 'Add New Creator'}
+              </button>
+            </div>
           )}
         </div>
-      )}
+
+        {/* Sağ Taraf: Arayüz Görünümü */}
+        <div className="flex flex-col h-full">
+          <InterfaceBuilder lang={lang} discordChannels={discordChannels} guildId={guildId} />
+        </div>
+      </div>
     </div>
   );
 }
