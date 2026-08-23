@@ -5,7 +5,7 @@ import {
   MessageSquare, UserX, Clock, Trash2, UserPlus,
   Shield, Lock, Unlock, EyeOff, Eye, Users, Type,
   Ban, ShieldCheck, Crown, ArrowRightLeft, ShieldAlert,
-  Globe, Send, PhoneOff, UserCheck
+  Globe, Send, PhoneOff, UserCheck, RotateCcw
 } from "lucide-react";
 
 const INTERFACE_BUTTONS = [
@@ -30,10 +30,14 @@ const INTERFACE_BUTTONS = [
   { id: 'region', label: { tr: 'BÖLGE', en: 'REGION' }, icon: Globe, color: 'text-gray-300' },
 ];
 
+const DEFAULT_ACTIVE_BUTTONS = [
+  'name', 'limit', 'privacy', 'waiting_room', 'chat',
+  'trusted', 'untrusted', 'invite', 'kick', 'region',
+  'block', 'unblock', 'claim', 'transfer', 'delete'
+];
+
 export default function InterfaceBuilder({ lang, discordChannels, guildId }) {
-  const [activeButtons, setActiveButtons] = useState([
-    'chat', 'kick', 'waiting_room', 'delete', 'invite', 'privacy'
-  ]);
+  const [activeButtons, setActiveButtons] = useState(DEFAULT_ACTIVE_BUTTONS);
   const [draggedItemIdx, setDraggedItemIdx] = useState(null);
   
   const [selectedChannel, setSelectedChannel] = useState('');
@@ -133,6 +137,13 @@ export default function InterfaceBuilder({ lang, discordChannels, guildId }) {
             <div className="flex items-center gap-2">
               <span className="text-white font-bold text-sm tracking-wide">TempVoice</span>
               <span className="bg-[#5865F2] text-white text-[9px] px-1.5 py-0.5 rounded font-bold uppercase">APP</span>
+              <button 
+                onClick={() => setActiveButtons(DEFAULT_ACTIVE_BUTTONS)}
+                className="text-[#B5BAC1] hover:text-[#DBDEE1] hover:bg-[#383A40] p-1 rounded transition-colors ml-1"
+                title={lang === 'tr' ? 'Varsayılan Düzene Sıfırla' : 'Reset to Default Layout'}
+              >
+                <RotateCcw size={14} />
+              </button>
             </div>
           </div>
           <div className="bg-[#FF9900]/20 text-[#FF9900] text-[10px] px-2 py-1 rounded font-bold flex items-center gap-1 border border-[#FF9900]/30 shadow-inner">

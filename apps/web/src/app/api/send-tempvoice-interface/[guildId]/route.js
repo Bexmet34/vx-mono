@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { checkGuildAccess } from "@/lib/auth";
+import { checkDashboardAccess } from '@/utils/authUtils';
 import { sendChannelMessage } from "@/lib/discordApi";
 
 const BUTTON_CONFIGS = {
@@ -34,7 +34,7 @@ export async function POST(req, { params }) {
     const guildId = params.guildId;
     if (!guildId) return NextResponse.json({ error: "Guild ID required" }, { status: 400 });
 
-    const hasAccess = await checkGuildAccess(session, guildId);
+    const { hasAccess } = await checkDashboardAccess(guildId, session.user.id);
     if (!hasAccess) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     const body = await req.json();
