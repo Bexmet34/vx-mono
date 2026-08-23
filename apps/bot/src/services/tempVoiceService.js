@@ -1,6 +1,7 @@
 const { ChannelType, PermissionFlagsBits, OverwriteType } = require('discord.js');
+const { getGuildConfig } = require('./guildConfig');
 
-// Memory map to track active temp channels: Map<channelId, { ownerId: string, creatorId: string }>
+// Memory map to track active temp channels: Map<channelId, { ownerId: string, creatorId: string, count: number }>
 const activeTempChannels = new Map();
 
 /**
@@ -58,54 +59,62 @@ function parseChannelName(format, member, currentCount) {
     name = name.replace(/{OWNER_NICKNAME}/g, member.displayName || member.user.username);
     
     if (name.includes('{OWNER_CREATED}')) {
-        const d = member.user.createdAt;
-        name = name.replace(/{OWNER_CREATED}/g, `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`);
+        const createdDate = new Date(member.user.createdTimestamp);
+        const day = String(createdDate.getDate()).padStart(2, '0');
+        const month = String(createdDate.getMonth() + 1).padStart(2, '0');
+        const year = createdDate.getFullYear();
+        name = name.replace(/{OWNER_CREATED}/g, `${day}.${month}.${year}`);
     }
+    
     if (name.includes('{OWNER_JOINED}')) {
-        const d = member.joinedAt;
-        if (d) {
-            name = name.replace(/{OWNER_JOINED}/g, `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`);
-        } else {
-            name = name.replace(/{OWNER_JOINED}/g, "Bilinmiyor");
+        const joinedDate = new Date(member.joinedTimestamp);
+        const day = String(joinedDate.getDate()).padStart(2, '0');
+        const month = String(joinedDate.getMonth() + 1).padStart(2, '0');
+        const year = joinedDate.getFullYear();
+        name = name.replace(/{OWNER_JOINED}/g, `${day}.${month}.${year}`);
+    }
+
+    // Default Game Name if available
+    let gameName = "Oyun Yok";
+    if (member.presence && member.presence.activities) {
+        const gameActivity = member.presence.activities.find(a => a.type === 0); // Playing
+        if (gameActivity && gameActivity.name) {
+            gameName = gameActivity.name;
         }
     }
-
-    // Role variables
-    if (name.includes('{ROLE_HIGHEST}')) {
-        name = name.replace(/{ROLE_HIGHEST}/g, member.roles.highest ? member.roles.highest.name : "Yok");
-    }
-    if (name.includes('{ROLE_HOIST}')) {
-        name = name.replace(/{ROLE_HOIST}/g, member.roles.hoist ? member.roles.hoist.name : "Yok");
-    }
-
-    // Activity variables (fallback for now, require presence intent)
-    const activity = member.presence?.activities?.[0];
-    name = name.replace(/{ACTIVITY_NAME}/g, activity ? activity.name : "Oyun Oynamıyor");
-    name = name.replace(/{ACTIVITY_NAME_MAJORITY}/g, activity ? activity.name : "Oyun Oynamıyor");
-    name = name.replace(/{ACTIVITY_DETAILS}/g, activity?.details ? activity.details : "");
-    name = name.replace(/{ACTIVITY_STATE}/g, activity?.state ? activity.state : "");
+    name = name.replace(/{GAME_NAME}/g, gameName);
 
     return name;
 }
 
 /**
- * Handles logic when a user joins a creator channel
+ * Handles logic when a user joins a creator voice channel
  */
 async function handleCreatorJoin(newState, creatorConfig) {
     const member = newState.member;
     const guild = newState.guild;
-    const categoryId = creatorConfig.categoryId || null;
+
+    if (!member || !creatorConfig) return;
 
     try {
-        // Calculate the next number for {NUMBER} variable using activeTempChannels for this creator
-        const tempChannelCount = guild.channels.cache.filter(c => 
-            activeTempChannels.has(c.id) && 
-            activeTempChannels.get(c.id).creatorId === creatorConfig.id
-        ).size + 1;
+        // Calculate new channel count
+        let tempChannelCount = 1;
+        guild.channels.cache.forEach(ch => {
+            if (ch.type === ChannelType.GuildVoice && activeTempChannels.has(ch.id)) {
+                tempChannelCount++;
+            }
+        });
 
-        const channelName = parseChannelName(creatorConfig.channelNameFormat, member, tempChannelCount);
+        // Determine channel name
+        const channelName = parseChannelName(creatorConfig.channelNameTemplate, member, tempChannelCount);
 
-        // Prepare Permissions
+        // Determine category
+        let categoryId = creatorConfig.categoryId;
+        if (categoryId === 'Oluşturucunun kategorisi' || !categoryId) {
+            categoryId = newState.channel ? newState.channel.parentId : null;
+        }
+
+        // Build base permissions
         const permissionOverwrites = [];
 
         // 1. Sync Mode (Category or Creator)
@@ -233,7 +242,8 @@ async function handleCreatorJoin(newState, creatorConfig) {
 
         // Move the user
         await member.voice.setChannel(newChannel.id).catch(err => {
-            console.error(`[VoiceForge] Failed to move user ${member.id}:`, err.message);
+            console.error(`[VoiceForge] Failed to move user ${member.user.tag} to ${newChannel.name}:`, err);
+            // If move fails and channel is empty, cleanup
             setTimeout(() => {
                 if (newChannel.members.size === 0) {
                     activeTempChannels.delete(newChannel.id);
@@ -248,33 +258,115 @@ async function handleCreatorJoin(newState, creatorConfig) {
 }
 
 /**
- * Handles logic when a user leaves a temp channel
+ * Handles logic when a user leaves a voice channel (auto-cleanup empty temporary channels)
  */
 async function handleTempChannelLeave(oldState) {
     const channelId = oldState.channelId;
     if (!channelId) return;
 
-    if (activeTempChannels.has(channelId)) {
-        const channel = oldState.channel;
-        if (!channel) {
-            activeTempChannels.delete(channelId);
-            return;
-        }
+    const guild = oldState.guild;
+    const channel = oldState.channel || guild.channels.cache.get(channelId);
+    if (!channel) {
+        activeTempChannels.delete(channelId);
+        return;
+    }
 
-        if (channel.members.size === 0) {
-            try {
-                await channel.delete('VoiceForge channel empty');
-                activeTempChannels.delete(channelId);
-            } catch (err) {
-                console.error(`[VoiceForge] Failed to delete empty temp channel ${channelId}:`, err.message);
+    // Check if channel is a tracked temp channel OR an orphan temp channel created by VoiceForge
+    let isTempChannel = activeTempChannels.has(channelId);
+
+    if (!isTempChannel) {
+        try {
+            const config = await getGuildConfig(guild.id);
+            if (config && Array.isArray(config.tempvoice_creators)) {
+                const isCreatorItself = config.tempvoice_creators.some(c => c.channelId === channelId);
+                if (!isCreatorItself) {
+                    const isUnderCreatorCategory = config.tempvoice_creators.some(c => 
+                        (c.categoryId && channel.parentId === c.categoryId) ||
+                        (c.channelId && channel.parentId && channel.parentId === guild.channels.cache.get(c.channelId)?.parentId)
+                    );
+                    if (isUnderCreatorCategory) {
+                        isTempChannel = true;
+                    }
+                }
+            }
+        } catch (e) {
+            console.error('[VoiceForge] Error checking temp channel origin on leave:', e);
+        }
+    }
+
+    if (isTempChannel && channel.members.size === 0) {
+        try {
+            activeTempChannels.delete(channelId);
+            await channel.delete('VoiceForge channel empty');
+            console.log(`[VoiceForge] Cleaned up empty channel: ${channel.name} (${channelId}) in ${guild.name}`);
+        } catch (err) {
+            console.error(`[VoiceForge] Failed to delete empty temp channel ${channelId}:`, err.message);
+        }
+    }
+}
+
+/**
+ * Scans all guilds and cleans up any abandoned empty temporary voice channels (e.g. on bot restart)
+ */
+async function cleanupEmptyTempChannels(client) {
+    try {
+        console.log('[VoiceForge] Starting automatic sweep for empty temporary voice channels...');
+        let deletedCount = 0;
+        let recoveredCount = 0;
+
+        for (const guild of client.guilds.cache.values()) {
+            const config = await getGuildConfig(guild.id).catch(() => null);
+            if (!config || !Array.isArray(config.tempvoice_creators) || config.tempvoice_creators.length === 0) {
+                continue;
+            }
+
+            const creatorChannelIds = new Set(config.tempvoice_creators.map(c => c.channelId));
+            const creatorCategoryIds = new Set(config.tempvoice_creators.map(c => c.categoryId).filter(Boolean));
+
+            // Also include parent categories of creator channels
+            config.tempvoice_creators.forEach(c => {
+                const ch = guild.channels.cache.get(c.channelId);
+                if (ch && ch.parentId) creatorCategoryIds.add(ch.parentId);
+            });
+
+            for (const channel of guild.channels.cache.values()) {
+                if (channel.type !== ChannelType.GuildVoice) continue;
+                if (creatorChannelIds.has(channel.id)) continue; // Never delete the creator join channel itself!
+
+                // Check if this channel is in one of the creator categories
+                if (channel.parentId && creatorCategoryIds.has(channel.parentId)) {
+                    if (channel.members.size === 0) {
+                        // EMPTY: Delete it!
+                        activeTempChannels.delete(channel.id);
+                        await channel.delete('VoiceForge: startup sweep empty channel cleanup').catch(() => {});
+                        deletedCount++;
+                    } else {
+                        // ACTIVE: Register into activeTempChannels so room owner keeps full control
+                        const memberOverwrite = channel.permissionOverwrites.cache.find(ow => ow.type === 1);
+                        const firstMember = channel.members.first();
+                        const ownerId = memberOverwrite ? memberOverwrite.id : firstMember?.id;
+
+                        activeTempChannels.set(channel.id, {
+                            ownerId: ownerId,
+                            creatorId: config.tempvoice_creators[0]?.id,
+                            count: 1
+                        });
+                        recoveredCount++;
+                    }
+                }
             }
         }
+
+        console.log(`[VoiceForge] Sweep complete! Deleted ${deletedCount} empty channels, restored ${recoveredCount} active rooms.`);
+    } catch (err) {
+        console.error('[VoiceForge] Error during temporary channel sweep:', err);
     }
 }
 
 module.exports = {
     handleCreatorJoin,
     handleTempChannelLeave,
+    cleanupEmptyTempChannels,
     activeTempChannels,
     parseChannelName
 };

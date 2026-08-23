@@ -120,6 +120,11 @@ client.once('clientReady', async (c) => {
         console.log('[PrimaryShard] Background services initialized.');
     }
 
+    // VoiceForge Automatic Empty Channel Cleanup (Runs on startup & every 3 mins)
+    const { cleanupEmptyTempChannels } = require('./services/tempVoiceService');
+    cleanupEmptyTempChannels(client);
+    setInterval(() => cleanupEmptyTempChannels(client), 3 * 60 * 1000);
+
 
     // Auto-Poster for Top.gg is now handled in sharding.js
 
