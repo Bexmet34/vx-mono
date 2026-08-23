@@ -10,21 +10,66 @@ const { getGuildConfig } = require('../services/guildConfig');
 const { activeTempChannels } = require('../services/tempVoiceService');
 
 /**
+ * Helper to resolve active temporary voice channel info with auto-recovery across bot reboots
+ */
+async function resolveChannelInfo(guild, userVoiceChannelId, member, creators) {
+    if (!userVoiceChannelId) return null;
+    
+    let channelInfo = activeTempChannels.get(userVoiceChannelId);
+    if (channelInfo) return channelInfo;
+
+    // Auto-recovery if bot restarted
+    try {
+        const voiceChannel = guild.channels.cache.get(userVoiceChannelId) || await guild.channels.fetch(userVoiceChannelId).catch(() => null);
+        if (voiceChannel) {
+            // Check if it belongs to one of the creator categories
+            const matchedCreator = creators.find(c => 
+                (c.categoryId && voiceChannel.parentId === c.categoryId) ||
+                (c.channelId && voiceChannel.parentId && voiceChannel.parentId === guild.channels.cache.get(c.channelId)?.parentId)
+            );
+
+            if (matchedCreator || (creators.length > 0 && voiceChannel.parentId)) {
+                // Find member-specific permission overwrite (the room owner)
+                const memberOverwrite = voiceChannel.permissionOverwrites.cache.find(ow => ow.type === 1);
+                const ownerId = memberOverwrite ? memberOverwrite.id : member.id;
+                
+                channelInfo = {
+                    ownerId: ownerId,
+                    creatorId: matchedCreator ? matchedCreator.id : creators[0]?.id,
+                    count: 1
+                };
+                activeTempChannels.set(userVoiceChannelId, channelInfo);
+                return channelInfo;
+            }
+        }
+    } catch (e) {
+        console.error('[VoiceForge] Error during channel auto-recovery:', e);
+    }
+    return null;
+}
+
+/**
  * Handles clicks on all VoiceForge interface buttons (tv_name, tv_limit, tv_privacy, etc.)
  */
 async function handleTempVoiceButtons(interaction) {
     try {
         const guildId = interaction.guildId;
-        const member = interaction.member;
+        
+        // 1. Reliably resolve guild member with voice state
+        let member = interaction.member;
+        if (!member || !member.voice || !member.voice.channelId) {
+            member = await interaction.guild.members.fetch(interaction.user.id).catch(() => interaction.member);
+        }
         const userVoiceChannelId = member?.voice?.channelId;
 
-        // 1. Fetch server language & creator settings
+        // 2. Fetch server language & creator settings
         const config = await getGuildConfig(guildId);
         const lang = config?.language || 'tr';
         const creators = Array.isArray(config?.tempvoice_creators) ? config.tempvoice_creators : [];
 
-        // 2. Check if user is currently inside an active VoiceForge temporary channel
-        const isInsideTempChannel = userVoiceChannelId && activeTempChannels.has(userVoiceChannelId);
+        // 3. Resolve temporary channel info
+        const channelInfo = await resolveChannelInfo(interaction.guild, userVoiceChannelId, member, creators);
+        const isInsideTempChannel = !!channelInfo;
 
         if (!isInsideTempChannel) {
             // Build creator voice channel clickable mentions: <#123456789>
@@ -55,13 +100,9 @@ async function handleTempVoiceButtons(interaction) {
             });
         }
 
-        // 3. User IS in an active temp channel: Check if they are the owner
-        const channelInfo = activeTempChannels.get(userVoiceChannelId);
+        // 4. User IS in an active temp channel: Check if they are the owner
         const isOwner = channelInfo && channelInfo.ownerId === member.id;
         const action = interaction.customId.replace('tv_', '');
-
-        // Check creator configuration and owner permissions
-        const creatorConfig = creators.find(c => c.id === channelInfo.creatorId);
 
         // ===== BUTTON 1: ODA İSMİ DEĞİŞTİRME (tv_name) =====
         if (action === 'name') {
@@ -74,7 +115,7 @@ async function handleTempVoiceButtons(interaction) {
                 });
             }
 
-            const voiceChannel = interaction.guild.channels.cache.get(userVoiceChannelId);
+            const voiceChannel = interaction.guild.channels.cache.get(userVoiceChannelId) || await interaction.guild.channels.fetch(userVoiceChannelId).catch(() => null);
 
             const modal = new ModalBuilder()
                 .setCustomId(`tv_modal_name:${userVoiceChannelId}`)
@@ -121,10 +162,11 @@ async function handleTempVoiceModal(interaction) {
         const member = interaction.member;
         const config = await getGuildConfig(guildId);
         const lang = config?.language || 'tr';
+        const creators = Array.isArray(config?.tempvoice_creators) ? config.tempvoice_creators : [];
 
         if (interaction.customId.startsWith('tv_modal_name:')) {
             const channelId = interaction.customId.split(':')[1];
-            const channelInfo = activeTempChannels.get(channelId);
+            let channelInfo = await resolveChannelInfo(interaction.guild, channelId, member, creators);
 
             if (!channelInfo) {
                 return await interaction.reply({
@@ -148,7 +190,7 @@ async function handleTempVoiceModal(interaction) {
                 });
             }
 
-            const voiceChannel = interaction.guild.channels.cache.get(channelId);
+            const voiceChannel = interaction.guild.channels.cache.get(channelId) || await interaction.guild.channels.fetch(channelId).catch(() => null);
             if (!voiceChannel) {
                 return await interaction.reply({
                     content: lang === 'tr' ? '❌ Ses kanalı bulunamadı.' : '❌ Voice channel not found.',
