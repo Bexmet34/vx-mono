@@ -202,20 +202,23 @@ export default function InterfaceBuilder({ lang, discordChannels, guildId }) {
         {/* Divider */}
         <div className="w-full h-px bg-[#1E1F22]"></div>
 
-        {/* Inactive Buttons (The Discord Buttons simulation) */}
-        <div className="flex flex-wrap gap-2">
-          {inactiveButtons.map((btnId) => {
-            const btn = INTERFACE_BUTTONS.find(b => b.id === btnId);
-            if (!btn) return null;
+        {/* All Buttons Pool (Toggle switches) */}
+        <div className="grid grid-cols-5 gap-2 mt-2">
+          {INTERFACE_BUTTONS.map((btn) => {
+            const isActive = activeButtons.includes(btn.id);
             const Icon = btn.icon;
             return (
               <button
                 key={btn.id}
                 onClick={() => toggleButton(btn.id)}
-                className="w-11 h-9 rounded flex items-center justify-center bg-[#2B2D31] border border-[#1E1F22] hover:bg-[#383A40] transition-colors shadow-sm"
+                className={`w-full h-10 rounded flex items-center justify-center border transition-all ${
+                  isActive 
+                    ? 'bg-[#2B2D31] border-[#1E1F22] opacity-30 shadow-inner' 
+                    : 'bg-[#2B2D31] border-[#1E1F22] hover:bg-[#383A40] shadow-sm'
+                }`}
                 title={btn.label[lang] || btn.label.en}
               >
-                <Icon size={16} className={btn.color} />
+                <Icon size={18} className={btn.color} />
               </button>
             );
           })}
