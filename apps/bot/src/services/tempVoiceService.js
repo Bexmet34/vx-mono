@@ -74,15 +74,33 @@ function parseChannelName(format, member, currentCount) {
         name = name.replace(/{OWNER_JOINED}/g, `${day}.${month}.${year}`);
     }
 
-    // Default Game Name if available
+    // Roles
+    if (name.includes('{ROLE_HIGHEST}')) {
+        const highestRole = member.roles?.highest?.name || '@everyone';
+        name = name.replace(/{ROLE_HIGHEST}/g, highestRole);
+    }
+    if (name.includes('{ROLE_HOIST}')) {
+        const hoistRole = member.roles?.hoist?.name || member.roles?.highest?.name || '@everyone';
+        name = name.replace(/{ROLE_HOIST}/g, hoistRole);
+    }
+
+    // Default Game / Activity Name if available
     let gameName = "Oyun Yok";
-    if (member.presence && member.presence.activities) {
-        const gameActivity = member.presence.activities.find(a => a.type === 0); // Playing
-        if (gameActivity && gameActivity.name) {
-            gameName = gameActivity.name;
+    let gameDetails = "";
+    let gameState = "";
+    if (member.presence && member.presence.activities && member.presence.activities.length > 0) {
+        const gameActivity = member.presence.activities.find(a => a.type === 0) || member.presence.activities[0];
+        if (gameActivity) {
+            if (gameActivity.name) gameName = gameActivity.name;
+            if (gameActivity.details) gameDetails = gameActivity.details;
+            if (gameActivity.state) gameState = gameActivity.state;
         }
     }
     name = name.replace(/{GAME_NAME}/g, gameName);
+    name = name.replace(/{ACTIVITY_NAME}/g, gameName);
+    name = name.replace(/{ACTIVITY_NAME_MAJORITY}/g, gameName);
+    name = name.replace(/{ACTIVITY_DETAILS}/g, gameDetails);
+    name = name.replace(/{ACTIVITY_STATE}/g, gameState);
 
     return name;
 }
@@ -105,8 +123,9 @@ async function handleCreatorJoin(newState, creatorConfig) {
             }
         });
 
-        // Determine channel name
-        const channelName = parseChannelName(creatorConfig.channelNameTemplate, member, tempChannelCount);
+        // Determine channel name (support channelNameFormat, channelNameTemplate, channelName)
+        const template = creatorConfig.channelNameFormat || creatorConfig.channelNameTemplate || creatorConfig.channelName || creatorConfig.nameFormat || "Kanal - {NUMBER}";
+        const channelName = parseChannelName(template, member, tempChannelCount);
 
         // Determine category
         let categoryId = creatorConfig.categoryId;
