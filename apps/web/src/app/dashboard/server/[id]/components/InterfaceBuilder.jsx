@@ -42,6 +42,7 @@ export default function InterfaceBuilder({ lang, discordChannels, guildId }) {
   const [isSending, setIsSending] = useState(false);
   const [sendSuccess, setSendSuccess] = useState(false);
 
+  // Inactive buttons are all INTERFACE_BUTTONS not currently in activeButtons
   const inactiveButtons = INTERFACE_BUTTONS.filter(b => !activeButtons.includes(b.id)).map(b => b.id);
 
   const toggleButton = (id) => {
@@ -113,6 +114,15 @@ export default function InterfaceBuilder({ lang, discordChannels, guildId }) {
 
   return (
     <div className="flex flex-col gap-6 h-full">
+      <style>{`
+        @keyframes popIn {
+          0% { opacity: 0; transform: scale(0.9) translateY(10px); }
+          100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .animate-pop-in {
+          animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+      `}</style>
       <div className="flex flex-col gap-1">
         <h2 className="text-xl font-headline-bold text-on-surface">
           {lang === 'tr' ? 'Arayüz Görünümü' : 'Interface View'}
@@ -186,8 +196,9 @@ export default function InterfaceBuilder({ lang, discordChannels, guildId }) {
                       onDragStart={(e) => handleDragStart(e, index)}
                       onDragOver={(e) => handleDragOver(e, index)}
                       onDragEnd={handleDragEnd}
+                      onDrop={handleDragEnd}
                       onClick={() => toggleButton(btn.id)}
-                      className={`flex items-center justify-center gap-1.5 bg-[#2B2D31] hover:bg-[#383A40] transition-colors rounded shadow-sm py-2 px-1 cursor-grab active:cursor-grabbing select-none border border-[#1E1F22] hover:border-[#1E1F22] ${draggedItemIdx === index ? 'opacity-30' : ''}`}
+                      className={`animate-pop-in flex items-center justify-center gap-1.5 bg-[#2B2D31] hover:bg-[#383A40] transition-colors rounded shadow-sm py-2 px-1 cursor-grab active:cursor-grabbing select-none border border-[#1E1F22] hover:border-[#1E1F22] ${draggedItemIdx === index ? 'opacity-50 ring-1 ring-[#FF3366]' : ''}`}
                     >
                       <Icon size={14} className={btn.color + " shrink-0"} />
                       <span className="text-[#DBDEE1] text-[10px] font-bold uppercase tracking-wider truncate">{btn.label[lang] || btn.label.en}</span>
@@ -202,20 +213,17 @@ export default function InterfaceBuilder({ lang, discordChannels, guildId }) {
         {/* Divider */}
         <div className="w-full h-px bg-[#1E1F22]"></div>
 
-        {/* All Buttons Pool (Toggle switches) */}
-        <div className="grid grid-cols-5 gap-2 mt-2">
-          {INTERFACE_BUTTONS.map((btn) => {
-            const isActive = activeButtons.includes(btn.id);
+        {/* Inactive Buttons Pool */}
+        <div className="flex flex-wrap gap-2 mt-2">
+          {inactiveButtons.map((btnId) => {
+            const btn = INTERFACE_BUTTONS.find(b => b.id === btnId);
+            if (!btn) return null;
             const Icon = btn.icon;
             return (
               <button
                 key={btn.id}
                 onClick={() => toggleButton(btn.id)}
-                className={`w-full h-10 rounded flex items-center justify-center border transition-all ${
-                  isActive 
-                    ? 'bg-[#2B2D31] border-[#1E1F22] opacity-30 shadow-inner' 
-                    : 'bg-[#2B2D31] border-[#1E1F22] hover:bg-[#383A40] shadow-sm'
-                }`}
+                className="animate-pop-in w-11 h-9 rounded flex items-center justify-center bg-[#2B2D31] border border-[#1E1F22] hover:bg-[#383A40] transition-colors shadow-sm"
                 title={btn.label[lang] || btn.label.en}
               >
                 <Icon size={18} className={btn.color} />
