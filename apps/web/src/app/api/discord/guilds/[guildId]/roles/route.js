@@ -27,6 +27,27 @@ export async function GET(req, { params }) {
       return NextResponse.json({ error: "DISCORD_BOT_TOKEN is missing" }, { status: 500 });
     }
 
+    // 0. Fetch Real-Time Guild Detail (Name, Icon, Member count)
+    let guildInfo = null;
+    try {
+      const guildRes = await fetch(`https://discord.com/api/v10/guilds/${guildId}?with_counts=true`, {
+        headers: { 'Authorization': `Bot ${token}` },
+        next: { revalidate: 0 }
+      });
+      if (guildRes.ok) {
+        const gData = await guildRes.json();
+        guildInfo = {
+          id: gData.id,
+          name: gData.name,
+          icon: gData.icon ? `https://cdn.discordapp.com/icons/${gData.id}/${gData.icon}.${gData.icon.startsWith('a_') ? 'gif' : 'png'}?size=256` : null,
+          approximate_member_count: gData.approximate_member_count || null
+        };
+      }
+    } catch (e) {
+      console.error("[API] Guild Detail Fetch Exception:", e);
+    }
+
+    // 1. Fetch Roles
     let roles = [];
     try {
       roles = await getGuildRoles(guildId);
@@ -69,7 +90,8 @@ export async function GET(req, { params }) {
     }
 
     return NextResponse.json({ 
-      guildId, // Returning guildId for verification
+      guildId,
+      guild: guildInfo,
       roles: formattedRoles, 
       members: formattedMembers,
       channels: formattedChannels

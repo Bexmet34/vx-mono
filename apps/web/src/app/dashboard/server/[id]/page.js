@@ -187,6 +187,13 @@ export default function ServerSettings() {
         const { settings: s, subscription: sub, isOwner: ownerStatus } = data;
         setSubscription(sub);
         setIsOwner(ownerStatus);
+        if (sub?.guild_name) {
+          setGuildDetail(prev => ({
+            ...(prev || {}),
+            name: prev?.name || sub.guild_name,
+            id: guildId
+          }));
+        }
         const loadedSettings = {
           language: s?.language || "tr",
           embed_thumbnail_url: s?.embed_thumbnail_url || "",
@@ -304,6 +311,9 @@ export default function ServerSettings() {
         setDiscordRoles(data.roles || []);
         setDiscordMembers(data.members || []);
         setDiscordChannels(data.channels || []);
+        if (data.guild) {
+          setGuildDetail(data.guild);
+        }
       }
     } catch (err) { console.error(err); }
   }, [guildId]);
@@ -576,12 +586,16 @@ export default function ServerSettings() {
 
             {/* Current Server Mini Card */}
             <div className="hidden md:flex items-center gap-2.5 p-2 rounded-xl bg-surface-container/60 border border-outline-variant/20">
-              <div className="w-8 h-8 rounded-lg bg-surface-container-high border border-outline-variant/40 flex items-center justify-center font-bold text-xs text-primary-container shrink-0 uppercase">
-                {guildDetail?.Name ? guildDetail.Name.charAt(0) : "V"}
+              <div className="w-8 h-8 rounded-lg overflow-hidden bg-surface-container-high border border-outline-variant/40 flex items-center justify-center font-bold text-xs text-primary-container shrink-0 uppercase">
+                {guildDetail?.icon ? (
+                  <img src={guildDetail.icon} alt={guildDetail?.name || "Icon"} className="w-full h-full object-cover" />
+                ) : (
+                  (guildDetail?.name || guildDetail?.Name || guildId).charAt(0).toUpperCase()
+                )}
               </div>
               <div className="min-w-0 flex-1">
-                <div className="font-headline-md text-xs font-bold text-on-surface truncate" title={guildDetail?.Name}>
-                  {guildDetail?.Name || guildId}
+                <div className="font-headline-md text-xs font-bold text-on-surface truncate" title={guildDetail?.name || guildDetail?.Name || guildId}>
+                  {guildDetail?.name || guildDetail?.Name || guildId}
                 </div>
                 <div className="flex items-center gap-1 text-[10px] text-primary-container font-label-bold uppercase tracking-wider">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
@@ -687,15 +701,43 @@ export default function ServerSettings() {
       {/* Main Content Area */}
       <div className="flex-1 ml-16 md:ml-60 h-[calc(100vh-56px)] overflow-y-auto custom-scrollbar p-4 md:p-6 pb-24">
         <main className="w-full max-w-[1200px] mx-auto flex flex-col">
-        <header className="flex flex-col md:flex-row items-center md:items-end justify-between mb-3 pb-8 border-b border-outline-variant/50">
-          <div className="flex flex-col md:flex-row items-center gap-2 text-center md:text-left">
-            <div className="w-24 h-24 rounded-2xl bg-surface border border-outline-variant flex items-center justify-center text-[10px] font-headline-xl text-primary-container shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
-              {guildDetail?.Name?.charAt(0) || guildId.charAt(0).toUpperCase()}
+        <header className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-4 pb-4 border-b border-outline-variant/30">
+          <div className="flex items-center gap-3 text-left w-full sm:w-auto">
+            <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl overflow-hidden bg-surface-container-high border border-outline-variant/50 flex items-center justify-center font-headline-xl text-lg md:text-xl text-primary-container font-bold shadow-[0_4px_20px_rgba(0,0,0,0.3)] shrink-0">
+              {guildDetail?.icon ? (
+                <img 
+                  src={guildDetail.icon} 
+                  alt={guildDetail?.name || "Server Icon"} 
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span>{(guildDetail?.name || guildDetail?.Name || guildId).charAt(0).toUpperCase()}</span>
+              )}
             </div>
-            <div>
-              <h1 className="font-headline-xl text-[10px] md:text-5xl text-on-surface mb-2 uppercase tracking-tight">{guildDetail?.Name || 'Server Settings'}</h1>
-              <div className="flex items-center justify-center md:justify-start gap-2 text-on-surface-variant font-label-bold uppercase tracking-widest text-[10px]">
-                 <Shield size={16} className="text-primary-container" /> Administrator Access
+            <div className="flex flex-col min-w-0">
+              <h1 className="font-headline-xl text-lg sm:text-xl md:text-2xl text-on-surface font-bold truncate tracking-tight" title={guildDetail?.name || guildDetail?.Name}>
+                {guildDetail?.name || guildDetail?.Name || subscription?.guild_name || 'Server Settings'}
+              </h1>
+              <div className="flex items-center gap-2 text-on-surface-variant font-label-bold uppercase tracking-wider text-[10px] mt-0.5">
+                 <span className="flex items-center gap-1 text-primary-container">
+                   <Shield size={13} /> {lang === 'tr' ? 'Yönetici Erişimi' : 'Administrator Access'}
+                 </span>
+                 <span className="text-outline-variant/50">•</span>
+                 <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
+                   isPremium 
+                     ? 'bg-primary-container/20 text-primary-container border border-primary-container/30' 
+                     : 'bg-surface-container-high text-on-surface-variant'
+                 }`}>
+                   {isPremium ? (lang === 'tr' ? '⭐ Premium Aktif' : '⭐ Premium Active') : 'Freemium'}
+                 </span>
+                 {guildDetail?.approximate_member_count && (
+                   <>
+                     <span className="text-outline-variant/50">•</span>
+                     <span className="text-on-surface-variant/80">
+                       {guildDetail.approximate_member_count} {lang === 'tr' ? 'Üye' : 'Members'}
+                     </span>
+                   </>
+                 )}
               </div>
             </div>
           </div>
