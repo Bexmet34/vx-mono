@@ -277,64 +277,61 @@ export async function PATCH(req) {
       throw updateError;
     }
 
-    // Queue DM notification to User (Stacked EN top / TR bottom format)
-    try {
-      let embedTitle = isUnlimited 
-        ? "💎 Veyronix Premium Activated / Aktif Edildi!" 
-        : "⚡ Veyronix Premium Duration Updated / Süre Güncellendi";
-      let embedDescription = "";
+    // Queue DM notification to User using Database Templates
+    let templateId = '';
+    if (action === 'toggle_unlimited') {
+      templateId = value ? 'user_sub_unlimited' : 'user_sub_extended';
+    } else if (action === 'add_days') {
+      templateId = 'user_sub_extended';
+    } else if (action === 'remove_days') {
+      templateId = 'user_sub_reduced';
+    }
 
-      if (isUnlimited) {
-        embedDescription = 
-          `🇬🇧 **Unlimited Premium Activated!**\n` +
-          `Your individual premium subscription has been upgraded to Unlimited Lifetime.\n` +
-          `• **Status:** Active (Unlimited / Lifetime)\n` +
-          `• **Expiration Date:** Never (Lifetime Access)\n` +
-          `• **Top.gg Vote Requirement:** Permanently Removed\n` +
-          `• **Website:** ${LINKS.WEBSITE}/\n` +
-          `• **Support Server:** ${LINKS.SUPPORT_SERVER}\n\n` +
-          `▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n\n` +
-          `🇹🇷 **Sınırsız Premium Aktif Edildi!**\n` +
-          `Bireysel premium aboneliğiniz Ömür Boyu Sınırsız olarak tanımlandı.\n` +
-          `• **Durum:** Aktif (Sınırsız / Ömür Boyu)\n` +
-          `• **Son Kullanma Tarihi:** Süresiz (Ömür Boyu)\n` +
-          `• **Top.gg Oy Verme Zorunluluğu:** Süresiz Kaldırıldı\n` +
-          `• **Web Sitesi:** ${LINKS.WEBSITE}/\n` +
-          `• **Destek Sunucusu:** ${LINKS.SUPPORT_SERVER}`;
-      } else {
-        const dateStr = newExpiryDate ? newExpiryDate.toLocaleDateString('tr-TR') : 'Belirtilmedi';
-        const daysText = value ? `(${action === 'add_days' ? '+' : '-'}${value} Gün)` : '';
-        embedDescription = 
-          `🇬🇧 **Premium Subscription Duration Updated**\n` +
-          `Your individual premium expiration date has been updated.\n` +
-          `• **Status:** Active ${daysText}\n` +
-          `• **Expiration Date:** ${dateStr}\n` +
-          `• **Top.gg Vote Requirement:** Removed\n` +
-          `• **Website:** ${LINKS.WEBSITE}/\n` +
-          `• **Support Server:** ${LINKS.SUPPORT_SERVER}\n\n` +
-          `▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n\n` +
-          `🇹🇷 **Premium Abonelik Süresi Güncellendi**\n` +
-          `Bireysel premium son kullanma tarihiniz güncellendi.\n` +
-          `• **Durum:** Aktif ${daysText}\n` +
-          `• **Son Kullanma Tarihi:** ${dateStr}\n` +
-          `• **Top.gg Oy Verme Zorunluluğu:** Kaldırıldı\n` +
-          `• **Web Sitesi:** ${LINKS.WEBSITE}/\n` +
-          `• **Destek Sunucusu:** ${LINKS.SUPPORT_SERVER}`;
+    if (templateId) {
+      let placeholders = { kullanici: `<@${discord_id}>` };
+      
+      let finalExpiry = updateData.premium_until ? new Date(updateData.premium_until) : (userProfile.premium_until ? new Date(userProfile.premium_until) : new Date());
+      let isUnlimitedFinal = updateData.is_unlimited !== undefined ? updateData.is_unlimited : userProfile.is_unlimited;
+
+      if (isUnlimitedFinal) {
+        placeholders.tarih = 'Süresiz';
+        placeholders.saat = 'Süresiz';
+        placeholders.gun = 0;
+      } else if (finalExpiry && !isNaN(finalExpiry.getTime())) {
+        const trTime = new Date(finalExpiry.getTime() + (3 * 60 * 60 * 1000));
+        const dd = String(trTime.getUTCDate()).padStart(2, '0');
+        const mm = String(trTime.getUTCMonth() + 1).padStart(2, '0');
+        const yyyy = trTime.getUTCFullYear();
+        const hh = String(trTime.getUTCHours()).padStart(2, '0');
+        const min = String(trTime.getUTCMinutes()).padStart(2, '0');
+        
+        placeholders.tarih = `${dd}.${mm}.${yyyy}`;
+        placeholders.saat = `${hh}:${min}`;
+        
+        const now = new Date();
+        placeholders.gun = Math.abs(Math.round((finalExpiry - now) / (1000 * 60 * 60 * 24)));
       }
 
-      await queueMessage({
-        owner_id: discord_id,
-        message_content: JSON.stringify({
-          embeds: [{
-            title: embedTitle,
-            description: embedDescription,
-            color: isUnlimited ? 0xfca311 : 0x3498db,
-            timestamp: new Date().toISOString()
-          }]
-        })
-      });
-    } catch (queueErr) {
-      console.error("[Admin Users PATCH] Error queueing DM notification:", queueErr.message);
+      const parsed = await getParsedTemplate(templateId, placeholders);
+      if (parsed) {
+        try {
+          await queueMessage({
+            owner_id: discord_id,
+            message_content: JSON.stringify({
+              embeds: [{
+                title: parsed.title,
+                description: parsed.content,
+                color: parsed.color ? parseInt(parsed.color.replace('#', ''), 16) : (isUnlimitedFinal ? 0xfca311 : 0x3498db),
+                timestamp: new Date().toISOString()
+              }]
+            })
+          });
+        } catch (queueErr) {
+          console.error("[Admin Users PATCH] Error queueing DM notification:", queueErr.message);
+        }
+      } else {
+        console.warn(`[Admin Users PATCH] Template ${templateId} not found in database. Notification skipped.`);
+      }
     }
 
     return NextResponse.json({ success: true, updatedData: updateData });
