@@ -211,10 +211,10 @@ export default function PremiumPage() {
 
   return (
     <>
-      <main className="min-h-screen pt-20 sm:pt-24 md:pt-28 pb-32 px-4 sm:px-6 md:px-8 max-w-4xl mx-auto">
-        <section className="relative text-center flex flex-col items-center">
+      <main className="min-h-screen pt-20 sm:pt-24 md:pt-28 pb-32 px-3.5 sm:px-6 md:px-8 max-w-4xl mx-auto w-full overflow-x-hidden">
+        <section className="relative text-center flex flex-col items-center w-full overflow-hidden">
           {/* Ambient Glow */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-primary-container/10 blur-[140px] pointer-events-none rounded-full"></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm sm:max-w-md h-[250px] bg-primary-container/10 blur-[90px] pointer-events-none rounded-full"></div>
           
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary-container/10 border border-primary-container/30 text-primary-container font-label-bold text-xs uppercase tracking-widest mb-3 shadow-[0_0_15px_rgba(255,215,0,0.15)] relative z-10">
             <Sparkles size={14} />
