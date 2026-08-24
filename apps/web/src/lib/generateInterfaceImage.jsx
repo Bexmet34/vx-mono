@@ -204,15 +204,16 @@ export async function generateInterfaceImage(activeButtons, lang = 'tr', emojiMa
                       justifyContent: 'center',
                       marginRight: '12px',
                       flexShrink: 0,
+                      width: '30px',
+                      height: '30px',
                     }}
                   >
                     {customEmojiB64 ? (
                       <img
                         src={customEmojiB64}
-                        alt={config.emojiName}
                         width="30"
                         height="30"
-                        style={{ objectFit: 'contain' }}
+                        style={{ display: 'block' }}
                       />
                     ) : (
                       vectorIcon
