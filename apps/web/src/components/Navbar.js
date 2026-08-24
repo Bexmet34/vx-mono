@@ -299,10 +299,12 @@ export default function Navbar({ isStatic = false }) {
                 <button 
                   onClick={() => signIn("discord")} 
                   className="bg-primary-container text-on-primary px-3 py-1.5 font-label-bold text-xs uppercase tracking-wider transition-all duration-300 ease-in-out active:scale-95 hover:brightness-110 hover:shadow-[0_0_20px_rgba(255,215,0,0.2)] rounded-xl"
+                  aria-label="Discord Login"
                 >
                   <span className="flex items-center gap-1.5">
-                    <LogIn size={13} />
-                    {t.login}
+                    <LogIn size={13} className="shrink-0" />
+                    <span className="sm:hidden font-bold">{lang === 'tr' ? 'Giriş' : 'Login'}</span>
+                    <span className="hidden sm:inline">{t.login}</span>
                   </span>
                 </button>
               )}
@@ -429,7 +431,7 @@ export default function Navbar({ isStatic = false }) {
       )}
 
       {/* Mobile Navigation Overlay */}
-      <div className={`fixed inset-0 z-50 transform ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'} transition-transform duration-300 ease-out flex`}>
+      <div className={`fixed inset-0 z-[120] transform ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'} transition-transform duration-300 ease-out flex`}>
         {/* Backdrop */}
         <div 
           className={`flex-grow bg-black/85 backdrop-blur-md transition-opacity duration-300 ${isMenuOpen ? 'opacity-100' : 'opacity-0'}`} 
@@ -650,22 +652,22 @@ export default function Navbar({ isStatic = false }) {
           </nav>
           
           {/* Drawer Bottom Actions */}
-          <div className="p-4 bg-surface-container-lowest border-t border-outline-variant/20 space-y-3 relative z-10">
+          <div className="p-4 pb-24 sm:pb-6 bg-[#060812] border-t border-outline-variant/20 space-y-3 relative z-10">
             {session ? (
               <button 
                 onClick={() => { signOut(); setIsMenuOpen(false); }} 
-                className="w-full h-11 border border-error/40 text-error hover:bg-error/10 rounded-2xl font-label-bold text-xs uppercase tracking-widest active:scale-95 transition-all flex items-center justify-center gap-2"
+                className="w-full py-2.5 px-4 border border-error/40 text-error hover:bg-error/10 rounded-xl font-bold text-xs uppercase tracking-wider active:scale-95 transition-all flex items-center justify-center gap-2"
               >
-                <LogOut size={16} />
-                {t.logout}
+                <LogOut size={15} />
+                <span>{t.logout}</span>
               </button>
             ) : (
               <button 
                 onClick={() => { signIn("discord"); setIsMenuOpen(false); }} 
-                className="w-full h-11 bg-primary-container text-on-primary rounded-2xl font-label-bold text-xs uppercase tracking-widest active:scale-95 transition-all flex items-center justify-center gap-2 tactical-glow"
+                className="w-full py-2.5 px-4 bg-primary-container text-on-primary rounded-xl font-bold text-xs uppercase tracking-wider active:scale-95 transition-all flex items-center justify-center gap-2 tactical-glow"
               >
-                <LogIn size={16} />
-                {t.login}
+                <LogIn size={15} />
+                <span>{lang === 'tr' ? 'Discord ile Giriş' : 'Login with Discord'}</span>
               </button>
             )}
             

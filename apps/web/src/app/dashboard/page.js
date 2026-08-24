@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -23,7 +23,8 @@ import {
   Users,
   Shield,
   Layers,
-  Sparkle
+  Sparkle,
+  LogIn
 } from "lucide-react";
 import { formatDistanceToNow, isPast } from "date-fns";
 import { tr, enUS } from "date-fns/locale";
@@ -60,11 +61,7 @@ export default function Dashboard() {
   const { toasts, showToast } = useToast();
   const locale = lang === 'tr' ? tr : enUS;
 
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/");
-    }
-  }, [status, router]);
+
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -130,10 +127,43 @@ export default function Dashboard() {
     return true;
   });
 
-  if (status === "loading" || !session) {
+  if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#081425]">
         <Logo className="w-16 h-16 animate-pulse drop-shadow-[0_0_20px_rgba(255,215,0,0.4)]" />
+      </div>
+    );
+  }
+
+  if (status === "unauthenticated" || !session) {
+    return (
+      <div className="min-h-[80vh] flex flex-col items-center justify-center px-4 pt-20 pb-32 text-center max-w-lg mx-auto">
+        <div className="w-16 h-16 rounded-2xl bg-primary-container/15 border border-primary-container/30 flex items-center justify-center text-primary-container mb-4 shadow-[0_0_25px_rgba(255,215,0,0.15)]">
+          <LayoutDashboard size={30} />
+        </div>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-white mb-2">
+          {lang === 'tr' ? 'Yönetim Paneline Giriş Yapın' : 'Access Your Dashboard'}
+        </h1>
+        <p className="text-xs sm:text-sm text-on-surface-variant max-w-md mx-auto mb-6 leading-relaxed font-light">
+          {lang === 'tr' 
+            ? 'Discord sunucularınızı yönetmek, bot ayarlarını yapılandırmak ve istatistiklerinizi görmek için Discord hesabınızla giriş yapın.' 
+            : 'Login with your Discord account to manage your servers, bot features, and analytics.'}
+        </p>
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full justify-center">
+          <button 
+            onClick={() => signIn("discord", { callbackUrl: "/dashboard" })}
+            className="w-full sm:w-auto px-6 py-3 bg-primary-container text-on-primary font-bold text-xs uppercase tracking-wider rounded-xl transition-all hover:brightness-110 active:scale-95 flex items-center justify-center gap-2 tactical-glow touch-manipulation"
+          >
+            <LogIn size={16} />
+            <span>{lang === 'tr' ? 'Discord ile Giriş Yap' : 'Login with Discord'}</span>
+          </button>
+          <Link 
+            href="/"
+            className="w-full sm:w-auto px-6 py-3 bg-surface-container-high border border-outline-variant/30 text-on-surface-variant hover:text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all text-center"
+          >
+            {lang === 'tr' ? 'Anasayfaya Dön' : 'Back to Home'}
+          </Link>
+        </div>
       </div>
     );
   }
