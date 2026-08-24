@@ -565,13 +565,47 @@ export default function ServerSettings() {
     );
   }
 
+  const navGroups = [
+    {
+      id: 'general_group',
+      category: lang === 'tr' ? 'GENEL YÖNETİM' : 'GENERAL',
+      items: [
+        { id: 'overview', label: lang === 'tr' ? 'Genel Bakış' : 'Overview', icon: Home },
+        { id: 'general', label: lang === 'tr' ? 'Temel Ayarlar' : 'Settings', icon: Layout },
+        { id: 'embed', label: lang === 'tr' ? 'Görsel & Marka' : 'Branding', icon: ImageIcon },
+      ]
+    },
+    {
+      id: 'albion_group',
+      category: lang === 'tr' ? 'ALBION & SES' : 'ALBION & VOICE',
+      items: [
+        { id: 'tempvoice', label: 'VoiceForge', icon: Headphones, isBeta: true },
+        { id: 'killboard', label: lang === 'tr' ? 'KillBoard' : 'KillBoard', icon: Crosshair },
+        { id: 'templates', label: lang === 'tr' ? 'Parti Şablonları' : 'Party Templates', icon: Copy },
+        { id: 'events', label: lang === 'tr' ? 'Etkinlikler' : 'Events', icon: Sparkles },
+      ]
+    },
+    {
+      id: 'community_group',
+      category: lang === 'tr' ? 'TOPLULUK & GÜVENLİK' : 'COMMUNITY',
+      items: [
+        { id: 'registration', label: lang === 'tr' ? 'Kayıt & Rol' : 'Registration', icon: UserPlus },
+        { id: 'rolemenu', label: lang === 'tr' ? 'Rol Menüleri' : 'Role Menus', icon: Users },
+        { id: 'ticket', label: lang === 'tr' ? 'Ticket & Destek' : 'Ticket System', icon: Shield },
+        { id: 'log', label: lang === 'tr' ? 'Denetim Logları' : 'Audit Logs', icon: FileText },
+      ]
+    }
+  ];
+
+  const allNavItems = navGroups.flatMap((g) => g.items);
+
   return (
     <div className="flex bg-background relative w-full h-[calc(100vh-56px)] overflow-hidden" suppressHydrationWarning>
       <ToastContainer toasts={toasts} />
       
-      {/* Vertical Categorized SaaS Sidebar */}
-      <nav className="fixed left-0 top-[56px] h-[calc(100vh-56px)] z-30 w-16 md:w-60 bg-[#081425]/95 backdrop-blur-2xl border-r border-outline-variant/30 flex flex-col justify-between overflow-y-auto custom-scrollbar shadow-2xl transition-all duration-300">
-        <div className="flex flex-col p-2 md:p-3 gap-4">
+      {/* Desktop / Tablet Vertical Sidebar */}
+      <nav className="hidden md:flex fixed left-0 top-[56px] h-[calc(100vh-56px)] z-30 md:w-60 bg-[#081425]/95 backdrop-blur-2xl border-r border-outline-variant/30 flex-col justify-between overflow-y-auto custom-scrollbar shadow-2xl transition-all duration-300">
+        <div className="flex flex-col p-3 gap-4">
           
           {/* Back Button & Server Identity */}
           <div className="flex flex-col gap-2">
@@ -581,11 +615,11 @@ export default function ServerSettings() {
               title={lang === 'tr' ? 'Panellere Dön' : 'Back to Dashboard'}
             >
               <ArrowLeft size={16} className="shrink-0 text-primary-container" />
-              <span className="hidden md:inline truncate">{lang === 'tr' ? 'Panellere Dön' : 'Dashboard'}</span>
+              <span className="truncate">{lang === 'tr' ? 'Panellere Dön' : 'Dashboard'}</span>
             </Link>
 
             {/* Current Server Mini Card */}
-            <div className="hidden md:flex items-center gap-2.5 p-2 rounded-xl bg-surface-container/60 border border-outline-variant/20">
+            <div className="flex items-center gap-2.5 p-2 rounded-xl bg-surface-container/60 border border-outline-variant/20">
               <div className="w-8 h-8 rounded-lg overflow-hidden bg-surface-container-high border border-outline-variant/40 flex items-center justify-center font-bold text-xs text-primary-container shrink-0 uppercase">
                 {guildDetail?.icon ? (
                   <img src={guildDetail.icon} alt={guildDetail?.name || "Icon"} className="w-full h-full object-cover" />
@@ -608,44 +642,14 @@ export default function ServerSettings() {
           <div className="h-px bg-outline-variant/20 w-full"></div>
 
           {/* Categorized Navigation Groups */}
-          {[
-            {
-              id: 'general_group',
-              category: lang === 'tr' ? 'GENEL YÖNETİM' : 'GENERAL',
-              items: [
-                { id: 'overview', label: lang === 'tr' ? 'Genel Bakış' : 'Overview', icon: Home },
-                { id: 'general', label: lang === 'tr' ? 'Temel Ayarlar' : 'Settings', icon: Layout },
-                { id: 'embed', label: lang === 'tr' ? 'Görsel & Marka' : 'Branding', icon: ImageIcon },
-              ]
-            },
-            {
-              id: 'albion_group',
-              category: lang === 'tr' ? 'ALBION & SES' : 'ALBION & VOICE',
-              items: [
-                { id: 'tempvoice', label: 'VoiceForge', icon: Headphones, isBeta: true },
-                { id: 'killboard', label: lang === 'tr' ? 'KillBoard' : 'KillBoard', icon: Crosshair },
-                { id: 'templates', label: lang === 'tr' ? 'Parti Şablonları' : 'Party Templates', icon: Copy },
-                { id: 'events', label: lang === 'tr' ? 'Etkinlikler' : 'Events', icon: Sparkles },
-              ]
-            },
-            {
-              id: 'community_group',
-              category: lang === 'tr' ? 'TOPLULUK & GÜVENLİK' : 'COMMUNITY',
-              items: [
-                { id: 'registration', label: lang === 'tr' ? 'Kayıt & Rol' : 'Registration', icon: UserPlus },
-                { id: 'rolemenu', label: lang === 'tr' ? 'Rol Menüleri' : 'Role Menus', icon: Users },
-                { id: 'ticket', label: lang === 'tr' ? 'Ticket & Destek' : 'Ticket System', icon: Shield },
-                { id: 'log', label: lang === 'tr' ? 'Denetim Logları' : 'Audit Logs', icon: FileText },
-              ]
-            }
-          ].map((group) => {
+          {navGroups.map((group) => {
             const isCollapsed = !!collapsedCategories[group.id];
             return (
               <div key={group.id} className="flex flex-col gap-1">
                 {/* Collapsible Accordion Header */}
                 <button
                   onClick={() => toggleCategory(group.id)}
-                  className="hidden md:flex items-center justify-between w-full text-[10px] font-label-bold text-on-surface-variant/70 hover:text-primary-container uppercase tracking-widest px-2.5 py-1.5 rounded-lg hover:bg-surface-container-high/50 transition-colors group cursor-pointer"
+                  className="flex items-center justify-between w-full text-[10px] font-label-bold text-on-surface-variant/70 hover:text-primary-container uppercase tracking-widest px-2.5 py-1.5 rounded-lg hover:bg-surface-container-high/50 transition-colors group cursor-pointer"
                 >
                   <span className="truncate">{group.category}</span>
                   <ChevronDown 
@@ -655,7 +659,7 @@ export default function ServerSettings() {
                 </button>
                 
                 {/* Category Items List */}
-                <div className={`flex flex-col gap-1 transition-all duration-300 ease-in-out ${isCollapsed ? 'md:max-h-0 md:opacity-0 md:overflow-hidden' : 'max-h-96 opacity-100'}`}>
+                <div className={`flex flex-col gap-1 transition-all duration-300 ease-in-out ${isCollapsed ? 'max-h-0 opacity-0 overflow-hidden' : 'max-h-96 opacity-100'}`}>
                   {group.items.map((tab) => {
                     const Icon = tab.icon;
                     const isActive = activeTab === tab.id;
@@ -671,7 +675,7 @@ export default function ServerSettings() {
                         }`}
                       >
                         <Icon size={16} className={`shrink-0 ${isActive ? 'text-on-primary' : 'text-on-surface-variant group-hover:text-primary-container'}`} />
-                        <span className="hidden md:flex items-center justify-between flex-1 text-xs font-semibold truncate">
+                        <span className="flex items-center justify-between flex-1 text-xs font-semibold truncate">
                           <span className="truncate">{tab.label}</span>
                           {tab.isBeta && (
                             <span className={`text-[9px] px-1.5 py-0.2 rounded font-black tracking-wider uppercase ${isActive ? 'bg-black/25 text-on-primary' : 'bg-primary-container/20 text-primary-container border border-primary-container/30'}`}>
@@ -690,7 +694,7 @@ export default function ServerSettings() {
         </div>
 
         {/* Bottom System Status Indicator */}
-        <div className="p-3 border-t border-outline-variant/20 hidden md:block">
+        <div className="p-3 border-t border-outline-variant/20">
           <div className="flex items-center gap-2 text-[11px] text-on-surface-variant/70">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
             <span>Bot Çevrimiçi</span>
@@ -698,12 +702,21 @@ export default function ServerSettings() {
         </div>
       </nav>
 
-      {/* Main Content Area */}
-      <div className="flex-1 ml-16 md:ml-60 h-[calc(100vh-56px)] overflow-y-auto custom-scrollbar p-4 md:p-6 pb-24">
+      {/* Main Content Area - Full width on Mobile, padded on Desktop */}
+      <div className="flex-1 ml-0 md:ml-60 w-full h-[calc(100vh-56px)] overflow-y-auto custom-scrollbar p-3 sm:p-4 md:p-6 pb-28 md:pb-24">
         <main className="w-full max-w-[1200px] mx-auto flex flex-col">
-        <header className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-4 pb-4 border-b border-outline-variant/30">
+        <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3 pb-3 md:mb-4 md:pb-4 border-b border-outline-variant/30">
           <div className="flex items-center gap-3 text-left w-full sm:w-auto">
-            <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl overflow-hidden bg-surface-container-high border border-outline-variant/50 flex items-center justify-center font-headline-xl text-lg md:text-xl text-primary-container font-bold shadow-[0_4px_20px_rgba(0,0,0,0.3)] shrink-0">
+            {/* Mobile Back Button */}
+            <Link
+              href="/dashboard"
+              className="md:hidden p-2 rounded-xl bg-surface-container-high/80 border border-outline-variant/40 text-primary-container hover:bg-primary-container/10 transition-all shrink-0"
+              title={lang === 'tr' ? 'Panellere Dön' : 'Dashboard'}
+            >
+              <ArrowLeft size={18} />
+            </Link>
+
+            <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-2xl overflow-hidden bg-surface-container-high border border-outline-variant/50 flex items-center justify-center font-headline-xl text-base sm:text-lg md:text-xl text-primary-container font-bold shadow-[0_4px_20px_rgba(0,0,0,0.3)] shrink-0">
               {guildDetail?.icon ? (
                 <img 
                   src={guildDetail.icon} 
@@ -714,13 +727,13 @@ export default function ServerSettings() {
                 <span>{(guildDetail?.name || guildDetail?.Name || guildId).charAt(0).toUpperCase()}</span>
               )}
             </div>
-            <div className="flex flex-col min-w-0">
-              <h1 className="font-headline-xl text-lg sm:text-xl md:text-2xl text-on-surface font-bold truncate tracking-tight" title={guildDetail?.name || guildDetail?.Name}>
+            <div className="flex flex-col min-w-0 flex-1">
+              <h1 className="font-headline-xl text-base sm:text-lg md:text-2xl text-on-surface font-bold truncate tracking-tight" title={guildDetail?.name || guildDetail?.Name}>
                 {guildDetail?.name || guildDetail?.Name || subscription?.guild_name || 'Server Settings'}
               </h1>
-              <div className="flex items-center gap-2 text-on-surface-variant font-label-bold uppercase tracking-wider text-[10px] mt-0.5">
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-on-surface-variant font-label-bold uppercase tracking-wider text-[9px] sm:text-[10px] mt-0.5">
                  <span className="flex items-center gap-1 text-primary-container">
-                   <Shield size={13} /> {lang === 'tr' ? 'Yönetici Erişimi' : 'Administrator Access'}
+                   <Shield size={12} /> {lang === 'tr' ? 'Yönetici' : 'Admin'}
                  </span>
                  <span className="text-outline-variant/50">•</span>
                  <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
@@ -728,12 +741,12 @@ export default function ServerSettings() {
                      ? 'bg-primary-container/20 text-primary-container border border-primary-container/30' 
                      : 'bg-surface-container-high text-on-surface-variant'
                  }`}>
-                   {isPremium ? (lang === 'tr' ? '⭐ Premium Aktif' : '⭐ Premium Active') : 'Freemium'}
+                   {isPremium ? (lang === 'tr' ? '⭐ Premium' : '⭐ Premium') : 'Freemium'}
                  </span>
                  {guildDetail?.approximate_member_count && (
                    <>
-                     <span className="text-outline-variant/50">•</span>
-                     <span className="text-on-surface-variant/80">
+                     <span className="text-outline-variant/50 hidden xs:inline">•</span>
+                     <span className="text-on-surface-variant/80 hidden xs:inline">
                        {guildDetail.approximate_member_count} {lang === 'tr' ? 'Üye' : 'Members'}
                      </span>
                    </>
@@ -742,6 +755,35 @@ export default function ServerSettings() {
             </div>
           </div>
         </header>
+
+        {/* Mobile Horizontal Swipeable Tab Navigation */}
+        <div className="md:hidden w-full overflow-x-auto custom-scrollbar flex items-center gap-2 pb-2.5 mb-3.5 border-b border-outline-variant/20 -mx-1 px-1 touch-pan-x scroll-smooth">
+          {allNavItems.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all touch-manipulation active:scale-95 ${
+                  isActive
+                    ? 'bg-primary-container text-on-primary font-bold shadow-[0_0_15px_rgba(255,215,0,0.25)]'
+                    : 'bg-surface-container-high/80 text-on-surface-variant hover:text-on-surface border border-outline-variant/30'
+                }`}
+              >
+                <Icon size={14} className={isActive ? 'text-on-primary' : 'text-primary-container'} />
+                <span className="whitespace-nowrap">{tab.label}</span>
+                {tab.isBeta && (
+                  <span className={`text-[8px] px-1 py-0.2 rounded font-black uppercase ${
+                    isActive ? 'bg-black/30 text-on-primary' : 'bg-primary-container/20 text-primary-container'
+                  }`}>
+                    BETA
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
 
         {/* Tab Content Rendering with Bento Grids */}
         {activeTab === 'overview' && <OverviewTab t={t} lang={lang} subscription={subscription} setActiveTab={setActiveTab} showToast={showToast} settings={settings} />}

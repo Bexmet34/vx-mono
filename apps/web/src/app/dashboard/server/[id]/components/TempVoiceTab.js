@@ -312,7 +312,7 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, setInitia
         </div>
 
         {/* Sub Tabs */}
-        <div className="flex gap-2 mb-2">
+        <div className="flex gap-2 mb-2 overflow-x-auto custom-scrollbar pb-2 -mx-1 px-1 touch-pan-x">
           {[
             { id: 'overview', label: lang === 'tr' ? 'Genel Bakış' : 'Overview', icon: FileText, disabled: false },
             { id: 'permissions', label: lang === 'tr' ? 'İzinler' : 'Permissions', icon: FileText, disabled: false },
@@ -323,7 +323,7 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, setInitia
               key={tab.id}
               onClick={() => { if (!tab.disabled) setActiveSubTab(tab.id); }}
               disabled={tab.disabled}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-label-bold uppercase tracking-widest transition-all ${
+              className={`shrink-0 flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-full text-xs font-label-bold uppercase tracking-wider transition-all touch-manipulation active:scale-95 ${
                 tab.disabled 
                   ? "opacity-50 cursor-not-allowed text-on-surface-variant" 
                   : activeSubTab === tab.id
@@ -332,7 +332,7 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, setInitia
                 }`}
             >
               <tab.icon size={14} className={activeSubTab === tab.id && !tab.disabled ? "text-on-surface" : "text-on-surface-variant"} />
-              {tab.label}
+              <span className="whitespace-nowrap">{tab.label}</span>
               {tab.disabled && <span className="text-[9px] bg-outline-variant/30 px-1.5 py-0.5 rounded ml-1">{lang === 'tr' ? 'YAKINDA' : 'SOON'}</span>}
             </button>
           ))}
