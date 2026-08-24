@@ -1,5 +1,4 @@
 import { getBlogPostBySlug, getAllBlogPosts, getRelatedPosts } from '@/lib/supabaseBlog';
-import Navbar from "@/components/Navbar";
 import BlogPostDetailClient from "@/components/BlogPostDetailClient";
 import { notFound } from 'next/navigation';
 
@@ -37,10 +36,5 @@ export default async function BlogPostPage({ params }) {
 
   const related = await getRelatedPosts(post.slug, post.category, 3);
 
-  return (
-    <>
-      <Navbar />
-      <BlogPostDetailClient post={post} relatedPosts={related} />
-    </>
-  );
+  return <BlogPostDetailClient post={post} relatedPosts={related} />;
 }

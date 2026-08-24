@@ -4,8 +4,6 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 // removed supabase import
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import { Save, ArrowLeft, PlusCircle, Trash2, Eye, Languages, Sparkles, Loader2 } from "lucide-react";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
@@ -193,9 +191,7 @@ export default function ChangelogAdmin() {
   if (status === "loading") return <p style={{ padding: '2rem' }}>Yükleniyor...</p>;
 
   return (
-    <main style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-      <Navbar />
-      
+    <main style={{ minHeight: "70vh", display: "flex", flexDirection: "column" }}>
       <div className="container" style={{ padding: "4rem 1.5rem", flex: 1 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
           <h1 style={{ fontSize: "2.5rem", fontWeight: "800" }}>🚀 Güncelleme Yayınla</h1>
@@ -343,8 +339,6 @@ export default function ChangelogAdmin() {
           )}
         </div>
       </div>
-
-      <Footer />
 
       <style jsx global>{`
         .markdown-content p { margin-bottom: 1rem; }

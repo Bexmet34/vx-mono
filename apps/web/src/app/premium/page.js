@@ -1,7 +1,6 @@
 "use client";
 import { LINKS } from '@veyronix/config';
 
-import Navbar from "@/components/Navbar";
 import { useLanguage } from "@/context/LanguageContext";
 import { usePublicConfig } from "@/context/PublicConfigContext";
 import { useEffect, useState } from "react";
@@ -193,7 +192,6 @@ export default function PremiumPage() {
 
   return (
     <>
-      <Navbar />
       <main className="pt-32 min-h-screen pb-20 px-2 md:px-0">
         <section className="relative max-w-3xl mx-auto text-center flex flex-col items-center">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-primary-container/5 blur-[120px] pointer-events-none rounded-full"></div>

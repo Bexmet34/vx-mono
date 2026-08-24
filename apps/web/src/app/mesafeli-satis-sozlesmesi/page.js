@@ -1,7 +1,5 @@
 "use client";
 
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import { useLanguage } from "@/context/LanguageContext";
 import { FileText, Shield, Cookie, UserCheck, History, Package, Scale, Building2, User, HelpCircle } from "lucide-react";
 import Link from "next/link";
@@ -12,9 +10,7 @@ export default function DistanceSalesAgreement() {
   const active = t?.legal?.sales || {};
 
   return (
-    <>
-      <Navbar />
-      <main className="max-w-4xl mx-auto my-12 px-4 sm:px-6">
+    <main className="max-w-4xl mx-auto my-12 px-4 sm:px-6">
         {/* Header */}
         <div className="text-center mb-10">
           <div className="inline-flex p-3 bg-primary-container/20 rounded-2xl border border-primary-container/30 text-primary mb-4">
@@ -144,7 +140,5 @@ export default function DistanceSalesAgreement() {
           </div>
         </div>
       </main>
-      <Footer />
-    </>
   );
 }

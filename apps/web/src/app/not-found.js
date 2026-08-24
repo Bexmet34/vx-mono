@@ -1,17 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import Navbar from "@/components/Navbar";
 import { FileQuestion, Home, ArrowLeft } from "lucide-react";
-import Footer from "@/components/Footer";
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function NotFound() {
   const { t, lang } = useLanguage();
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <Navbar />
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '70vh' }}>
       <main style={{ 
         flex: 1, 
         display: 'flex', 
@@ -95,7 +92,6 @@ export default function NotFound() {
           }
         `}</style>
       </main>
-      <Footer />
     </div>
   );
 }

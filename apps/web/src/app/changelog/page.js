@@ -3,8 +3,6 @@
 import { useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import { Calendar, ChevronDown, History } from "lucide-react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -104,9 +102,7 @@ export default function ChangelogPage() {
   const [expandedIndex, setExpandedIndex] = useState(0);
 
   return (
-    <main style={{ backgroundColor: "var(--bg-color)", minHeight: "100vh", color: "white" }}>
-      <Navbar />
-      
+    <main style={{ backgroundColor: "var(--bg-color)", minHeight: "70vh", color: "white" }}>
       <div className="container" style={{ padding: "4rem 1rem" }}>
         <div style={{ textAlign: "center", marginBottom: "4rem" }}>
           <div className="changelog-badge">
@@ -164,8 +160,6 @@ export default function ChangelogPage() {
           })}
         </div>
       </div>
-
-      <Footer />
       
       <style jsx>{`
         .changelog-badge {

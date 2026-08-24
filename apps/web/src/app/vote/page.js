@@ -2,8 +2,6 @@
 
 import { useSession, signIn } from "next-auth/react";
 import { useState, useEffect } from "react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import { Award, CheckCircle2, ShieldAlert, Sparkles, Clock } from "lucide-react";
 
 export default function VotePage() {
@@ -64,10 +62,7 @@ export default function VotePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0d0f17] text-white flex flex-col font-sans">
-      <Navbar />
-
-      <main className="flex-1 container mx-auto px-2 py-1 flex flex-col items-center justify-center max-w-2xl">
+    <main className="container mx-auto px-2 py-8 flex flex-col items-center justify-center max-w-2xl min-h-[70vh]">
         <div className="text-center mb-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 mb-3">
             <Sparkles className="w-4 h-4" />
@@ -151,8 +146,5 @@ export default function VotePage() {
           </p>
         )}
       </main>
-
-      <Footer />
-    </div>
   );
 }

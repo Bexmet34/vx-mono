@@ -1,5 +1,4 @@
 import { getAllBlogPosts } from '@/lib/supabaseBlog';
-import Navbar from "@/components/Navbar";
 import BlogListClient from "@/components/BlogListClient";
 
 export const metadata = {
@@ -12,10 +11,5 @@ export const revalidate = 60; // 60 saniyede bir yeni yazıları kontrol et (ISR
 export default async function BlogIndex() {
   const posts = await getAllBlogPosts();
 
-  return (
-    <>
-      <Navbar />
-      <BlogListClient allPosts={posts} />
-    </>
-  );
+  return <BlogListClient allPosts={posts} />;
 }

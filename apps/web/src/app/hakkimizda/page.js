@@ -1,7 +1,5 @@
 "use client";
 
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import { useLanguage } from "@/context/LanguageContext";
 import { usePublicConfig } from "@/context/PublicConfigContext";
 import { Mail, Phone, MapPin, MessageSquare, Sparkles, Target, Shield, Users, Award, HelpCircle, Cookie, FileText, History, Package, UserCheck } from "lucide-react";
@@ -13,9 +11,7 @@ export default function AboutPage() {
   const { supportServer } = usePublicConfig();
 
   return (
-    <>
-      <Navbar />
-      <main className="max-w-4xl mx-auto my-12 px-4 sm:px-6">
+    <main className="max-w-4xl mx-auto my-12 px-4 sm:px-6">
         {/* Header */}
         <div className="text-center mb-10">
           <div className="inline-flex p-3 bg-primary-container/20 rounded-2xl border border-primary-container/30 text-primary mb-4">
@@ -174,7 +170,5 @@ export default function AboutPage() {
           </div>
         </div>
       </main>
-      <Footer />
-    </>
   );
 }
