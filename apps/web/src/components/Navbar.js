@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSession, signIn, signOut } from "next-auth/react";
 import Image from "next/image";
-import { LogIn, LogOut, LayoutDashboard, Globe, Menu, X, ChevronRight, ChevronDown, Shield, CreditCard, Clock, CheckCircle, XCircle, Loader2, AlertCircle, Sparkles, Swords, Check } from "lucide-react";
+import { LogIn, LogOut, LayoutDashboard, Globe, Menu, X, ChevronRight, ChevronDown, Shield, CreditCard, Clock, CheckCircle, XCircle, Loader2, AlertCircle, Sparkles, Swords, Check, Home, Compass, BookOpen, ExternalLink } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
@@ -206,19 +206,19 @@ export default function Navbar({ isStatic = false }) {
               )}
             </div>
 
-            {/* Desktop Auth */}
-            <div className="hidden md:flex items-center gap-2">
+            {/* Auth & Profile (Desktop & Mobile) */}
+            <div className="flex items-center gap-2">
               {session ? (
-                <div className="flex items-center gap-2 pl-4 border-l border-on-surface/10">
+                <div className="flex items-center gap-2 pl-2 md:pl-4 border-l border-on-surface/10">
                   <Link href="/dashboard" className="group relative hidden md:flex items-center gap-2 px-3 py-1.5 bg-primary-container text-on-primary font-headline-md text-xs uppercase tracking-wider hover:brightness-110 transition-all duration-300 rounded-lg shadow-[0_0_15px_rgba(255,215,0,0.15)] hover:shadow-[0_0_25px_rgba(255,215,0,0.3)]">
                     <LayoutDashboard size={15} strokeWidth={2.5} />
                     {t.dashboard}
                   </Link>
 
-                  <div ref={profileRef} className="relative border-l border-on-surface/10 pl-4 md:pl-6 ml-1 md:ml-2">
+                  <div ref={profileRef} className="relative md:border-l md:border-on-surface/10 md:pl-4 md:ml-1">
                     <button 
                       onClick={() => setIsProfileOpen(!isProfileOpen)}
-                      className="flex items-center gap-1 group focus:outline-none"
+                      className="flex items-center gap-1 group focus:outline-none touch-manipulation active:scale-95"
                     >
                       <div className="hidden md:flex flex-col items-end">
                         <span className="font-label-bold text-[10px] text-on-surface group-hover:text-primary-container transition-colors">
@@ -234,45 +234,50 @@ export default function Navbar({ isStatic = false }) {
                         <img 
                           src={session.user?.image || 'https://cdn.discordapp.com/embed/avatars/0.png'} 
                           alt="Avatar" 
-                          width="40"
-                          height="40"
+                          width="32"
+                          height="32"
                           onError={(e) => { e.currentTarget.src = 'https://cdn.discordapp.com/embed/avatars/0.png'; }}
-                          className="w-10 h-7 rounded-full border-2 border-outline-variant group-hover:border-primary-container relative z-10 transition-colors duration-300 object-cover" 
+                          className="w-8 h-8 md:w-9 md:h-9 rounded-full border-2 border-outline-variant group-hover:border-primary-container relative z-10 transition-colors duration-300 object-cover shadow-sm" 
                         />
                       </div>
                     </button>
 
                     {isProfileOpen && (
-                        <div className="absolute top-full right-0 mt-2 w-64 bg-surface-container border border-outline-variant/50 p-2 z-50 shadow-[0_10px_40px_rgba(0,0,0,0.8)] animate-in fade-in slide-in-from-top-2 rounded-sm">
+                        <div className="absolute top-full right-0 mt-2 w-56 md:w-64 bg-surface-container border border-outline-variant/50 p-2 z-50 shadow-[0_10px_40px_rgba(0,0,0,0.8)] animate-in fade-in slide-in-from-top-2 rounded-2xl">
                           <div className="flex flex-col gap-1">
+                            <div className="px-2 py-1 md:hidden border-b border-outline-variant/30 mb-1">
+                              <div className="text-xs font-bold text-on-surface truncate">{session.user?.name}</div>
+                              {isAdmin && <span className="text-[9px] text-[#ffb4ab] uppercase font-bold">Admin</span>}
+                            </div>
+
                             <Link 
                               href="/dashboard" 
-                              className="md:hidden flex items-center gap-1 px-2 py-1.5 text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm"
+                              className="flex items-center gap-2 px-2.5 py-2 text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-xl text-xs font-label-bold"
                               onClick={() => setIsProfileOpen(false)}
                             >
-                              <LayoutDashboard size={16} />
-                              <span className="font-label-bold text-xs uppercase tracking-wider">{t.dashboard}</span>
+                              <LayoutDashboard size={15} />
+                              <span className="uppercase tracking-wider">{t.dashboard}</span>
                             </Link>
 
                             {/* #14 — Odeme Gecmisi Butonu */}
                             <button
                               onClick={openPaymentHistory}
-                              className="flex items-center gap-1 px-2 py-1.5 text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-sm w-full text-left"
+                              className="flex items-center gap-2 px-2.5 py-2 text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-xl w-full text-left text-xs font-label-bold"
                             >
-                              <CreditCard size={16} />
-                              <span className="font-label-bold text-xs uppercase tracking-wider">
-                                {lang === 'tr' ? 'Odeme Gecmisim' : 'Payment History'}
+                              <CreditCard size={15} />
+                              <span className="uppercase tracking-wider">
+                                {lang === 'tr' ? 'Ödeme Geçmişim' : 'Payment History'}
                               </span>
                             </button>
                             
                             {isAdmin && (
                               <Link 
                                 href="/admin" 
-                                className="flex items-center gap-1 px-2 py-1.5 text-[#ffb4ab]/80 hover:text-[#ffb4ab] hover:bg-[#ffb4ab]/10 transition-colors rounded-sm"
+                                className="flex items-center gap-2 px-2.5 py-2 text-[#ffb4ab]/90 hover:text-[#ffb4ab] hover:bg-[#ffb4ab]/10 transition-colors rounded-xl text-xs font-label-bold"
                                 onClick={() => setIsProfileOpen(false)}
                               >
-                                <Shield size={16} />
-                                <span className="font-label-bold text-xs uppercase tracking-wider">Admin Panel</span>
+                                <Shield size={15} />
+                                <span className="uppercase tracking-wider">Admin Panel</span>
                               </Link>
                             )}
                             
@@ -280,10 +285,10 @@ export default function Navbar({ isStatic = false }) {
                             
                             <button 
                               onClick={() => { signOut(); setIsProfileOpen(false); }} 
-                              className="flex items-center gap-1 px-2 py-1.5 text-on-surface-variant hover:text-[#ffb4ab] hover:bg-[#ffb4ab]/10 transition-colors rounded-sm w-full text-left"
+                              className="flex items-center gap-2 px-2.5 py-2 text-error/90 hover:text-error hover:bg-error/10 transition-colors rounded-xl w-full text-left text-xs font-label-bold"
                             >
-                              <LogOut size={16} />
-                              <span className="font-label-bold text-xs uppercase tracking-wider">{t.logout}</span>
+                              <LogOut size={15} />
+                              <span className="uppercase tracking-wider">{t.logout}</span>
                             </button>
                           </div>
                         </div>
@@ -293,24 +298,15 @@ export default function Navbar({ isStatic = false }) {
               ) : (
                 <button 
                   onClick={() => signIn("discord")} 
-                  className="bg-primary-container text-on-primary px-3 py-1 font-label-bold text-label-bold transition-all duration-300 ease-in-out active:scale-95 hover:brightness-110 hover:shadow-[0_0_20px_rgba(255,215,0,0.2)] rounded"
+                  className="bg-primary-container text-on-primary px-3 py-1.5 font-label-bold text-xs uppercase tracking-wider transition-all duration-300 ease-in-out active:scale-95 hover:brightness-110 hover:shadow-[0_0_20px_rgba(255,215,0,0.2)] rounded-xl"
                 >
-                  <span className="flex items-center gap-2">
-                    <LogIn size={14} />
+                  <span className="flex items-center gap-1.5">
+                    <LogIn size={13} />
                     {t.login}
                   </span>
                 </button>
               )}
             </div>
-
-            {/* Mobile Menu Toggle */}
-            <button 
-              className="md:hidden p-2 text-primary-container active:scale-95 transition-transform" 
-              onClick={() => setIsMenuOpen(true)}
-              aria-label="Open menu"
-            >
-              <Menu size={32} />
-            </button>
           </div>
         </div>
       </nav>
@@ -433,180 +429,251 @@ export default function Navbar({ isStatic = false }) {
       )}
 
       {/* Mobile Navigation Overlay */}
-      <div className={`fixed inset-0 z-50 transform ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'} transition-transform duration-500 ease-out flex`}>
+      <div className={`fixed inset-0 z-50 transform ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'} transition-transform duration-300 ease-out flex`}>
         {/* Backdrop */}
         <div 
-          className={`flex-grow bg-background/50 backdrop-blur-sm transition-opacity duration-500 ${isMenuOpen ? 'opacity-100' : 'opacity-0'}`} 
+          className={`flex-grow bg-black/85 backdrop-blur-md transition-opacity duration-300 ${isMenuOpen ? 'opacity-100' : 'opacity-0'}`} 
           onClick={() => setIsMenuOpen(false)}
         ></div>
         
         {/* Sliding Content Area */}
-        <div className="w-[85%] max-w-sm glass-panel flex flex-col relative h-full">
-          <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-right from-transparent via-primary-container/30 to-transparent"></div>
+        <div className="w-[88%] sm:w-[380px] max-w-sm bg-[#060812] border-l border-outline-variant/30 flex flex-col relative h-full shadow-2xl z-50">
+          <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary-container/40 to-transparent"></div>
           
-          <div className="flex justify-between items-center px-3 py-1.5 border-b border-on-surface/10">
-            <span className="flex items-center gap-2 font-headline-md text-headline-md font-bold tracking-tighter text-primary-container">
-              <Logo className="w-8 h-8" />
-              Veyronix
+          {/* Drawer Top Header */}
+          <div className="flex justify-between items-center px-4 py-3.5 border-b border-outline-variant/20 bg-surface-container-lowest/60">
+            <span className="flex items-center gap-2.5 font-headline-md text-base font-bold tracking-tight text-on-surface">
+              <Logo className="w-7 h-7" />
+              <span>Veyronix</span>
             </span>
             <button 
-              className="w-10 h-7 flex items-center justify-center text-on-surface-variant hover:text-primary-container transition-colors" 
+              className="p-2 rounded-xl bg-surface-container-high/60 border border-outline-variant/30 text-on-surface-variant hover:text-primary-container hover:bg-surface-container-high transition-colors" 
               onClick={() => setIsMenuOpen(false)}
+              aria-label="Close menu"
             >
-              <X size={16} />
+              <X size={18} />
             </button>
           </div>
           
-          <nav className="flex-grow px-3 py-1 flex flex-col gap-y-6 overflow-y-auto relative z-10">
-            <div className="menu-item-group">
-              <span className="text-[10px] font-label-bold text-outline uppercase tracking-[0.2em] mb-2 block">Central Hub</span>
-              <Link href="/" className="menu-item-hover group flex items-center justify-between py-1 cursor-pointer" onClick={() => setIsMenuOpen(false)}>
-                <span className="font-headline-lg-mobile text-headline-lg-mobile text-primary-container transition-transform group-active:translate-x-2 pointer-events-none">{lang === 'tr' ? 'Ana Sayfa' : 'Home'}</span>
-                <ChevronRight className="text-primary-container/20 group-hover:text-primary-container transition-colors pointer-events-none" />
-              </Link>
-              <div className="indicator"></div>
-              
-              <Link href="/dashboard" className="menu-item-hover group flex items-center justify-between py-1 mt-2 cursor-pointer" onClick={() => setIsMenuOpen(false)}>
-                <span className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant hover:text-primary-container transition-all group-active:translate-x-2 pointer-events-none">{t.dashboard}</span>
-                <ChevronRight className="text-primary-container/0 group-hover:text-primary-container transition-colors pointer-events-none" />
-              </Link>
-              <div className="indicator"></div>
-
-              {/* Premium Button Mobile */}
-              <Link href="/premium" className="menu-item-hover group flex items-center justify-between py-1 mt-2 cursor-pointer" onClick={() => setIsMenuOpen(false)}>
-                <span className="font-headline-lg-mobile text-headline-lg-mobile text-primary-container hover:brightness-110 transition-all group-active:translate-x-2 pointer-events-none flex items-center gap-2">
-                  {t.premiumBtnNavbar} <Sparkles size={14} />
+          {/* Drawer Navigation List */}
+          <nav className="flex-grow px-3.5 py-4 flex flex-col gap-y-5 overflow-y-auto custom-scrollbar relative z-10">
+            
+            {/* SECTION 1: ANA NAVİGASYON */}
+            <div>
+              <div className="flex items-center gap-1.5 px-2.5 py-1 mb-2.5 rounded-lg bg-primary-container/10 border border-primary-container/20 w-fit">
+                <span className="text-[10px] font-label-bold text-primary-container uppercase tracking-[0.2em]">
+                  {lang === 'tr' ? '📍 Ana Menü' : '📍 Navigation'}
                 </span>
-                <ChevronRight className="text-primary-container/0 group-hover:text-primary-container transition-colors pointer-events-none" />
-              </Link>
-              <div className="indicator"></div>
+              </div>
 
-              {/* #14 Mobile - Payment History */}
-              {session && (
-                <>
-                  <button
-                    className="menu-item-hover group flex items-center justify-between py-1 mt-2 w-full text-left"
-                    onClick={() => { setIsMenuOpen(false); openPaymentHistory(); }}
-                  >
-                    <span className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant hover:text-primary-container transition-all group-active:translate-x-2 pointer-events-none">
-                      {lang === 'tr' ? 'Odeme Gecmisim' : 'Payment History'}
+              <div className="space-y-2">
+                <Link 
+                  href="/" 
+                  className="w-full flex items-center justify-between p-3 rounded-2xl bg-surface-container-high/50 hover:bg-primary-container/15 border border-outline-variant/30 hover:border-primary-container/50 transition-all group touch-manipulation active:scale-[0.98]"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-primary-container/10 border border-primary-container/30 flex items-center justify-center text-primary-container group-hover:scale-105 transition-transform">
+                      <Home size={16} />
+                    </div>
+                    <span className="text-xs font-semibold text-on-surface group-hover:text-primary-container transition-colors">
+                      {lang === 'tr' ? 'Ana Sayfa' : 'Home'}
                     </span>
-                    <ChevronRight className="text-primary-container/0 group-hover:text-primary-container transition-colors pointer-events-none" />
+                  </div>
+                  <ChevronRight size={15} className="text-on-surface-variant group-hover:text-primary-container group-hover:translate-x-1 transition-all" />
+                </Link>
+
+                <Link 
+                  href="/dashboard" 
+                  className="w-full flex items-center justify-between p-3 rounded-2xl bg-surface-container-high/50 hover:bg-primary-container/15 border border-outline-variant/30 hover:border-primary-container/50 transition-all group touch-manipulation active:scale-[0.98]"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400 group-hover:scale-105 transition-transform">
+                      <LayoutDashboard size={16} />
+                    </div>
+                    <span className="text-xs font-semibold text-on-surface group-hover:text-primary-container transition-colors">
+                      {t.dashboard}
+                    </span>
+                  </div>
+                  <ChevronRight size={15} className="text-on-surface-variant group-hover:text-primary-container group-hover:translate-x-1 transition-all" />
+                </Link>
+
+                <Link 
+                  href="/premium" 
+                  className="w-full flex items-center justify-between p-3 rounded-2xl bg-gradient-to-r from-primary-container/10 via-surface-container-high/60 to-surface-container-high/60 border border-primary-container/40 shadow-[0_0_20px_rgba(255,215,0,0.1)] group touch-manipulation active:scale-[0.98]"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-primary-container/20 border border-primary-container/50 flex items-center justify-center text-primary-container group-hover:scale-105 transition-transform">
+                      <Sparkles size={16} />
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs font-bold text-primary-container">
+                        {t.premiumBtnNavbar}
+                      </span>
+                      <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-primary-container text-on-primary">
+                        PRO
+                      </span>
+                    </div>
+                  </div>
+                  <ChevronRight size={15} className="text-primary-container group-hover:translate-x-1 transition-all" />
+                </Link>
+
+                {session && (
+                  <button
+                    onClick={() => { setIsMenuOpen(false); openPaymentHistory(); }}
+                    className="w-full flex items-center justify-between p-3 rounded-2xl bg-surface-container-high/50 hover:bg-primary-container/15 border border-outline-variant/30 hover:border-primary-container/50 transition-all group touch-manipulation active:scale-[0.98] text-left"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 group-hover:scale-105 transition-transform">
+                        <CreditCard size={16} />
+                      </div>
+                      <span className="text-xs font-semibold text-on-surface group-hover:text-primary-container transition-colors">
+                        {lang === 'tr' ? 'Ödeme Geçmişim' : 'Payment History'}
+                      </span>
+                    </div>
+                    <ChevronRight size={15} className="text-on-surface-variant group-hover:text-primary-container group-hover:translate-x-1 transition-all" />
                   </button>
-                  <div className="indicator"></div>
-                </>
-              )}
+                )}
+              </div>
             </div>
 
-            <div className="menu-item-group">
-              <span className="text-[10px] font-label-bold text-outline uppercase tracking-[0.2em] mb-2 block">Resources</span>
-              
-              {/* Mobile Accordion for Page Sections */}
-              <button 
-                className="menu-item-hover w-full group flex items-center justify-between py-1 cursor-pointer" 
-                onClick={() => setIsMobileExploreOpen(!isMobileExploreOpen)}
-              >
-                <span className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant group-hover:text-primary-container transition-all">
-                  {lang === 'tr' ? 'Keşfet' : 'Explore'}
+            {/* SECTION 2: KEŞFET & SAYFALAR (ACCORDION) */}
+            <div>
+              <div className="flex items-center gap-1.5 px-2.5 py-1 mb-2.5 rounded-lg bg-white/[0.04] border border-white/10 w-fit">
+                <span className="text-[10px] font-label-bold text-on-surface-variant uppercase tracking-[0.2em]">
+                  {lang === 'tr' ? '🧭 Keşfet & Kaynaklar' : '🧭 Resources'}
                 </span>
-                <ChevronDown className={`text-primary-container/50 transition-transform duration-300 ${isMobileExploreOpen ? 'rotate-180' : ''}`} size={14} />
-              </button>
-              
-              <div className={`overflow-hidden transition-all duration-300 ease-in-out flex flex-col gap-2 ${isMobileExploreOpen ? 'max-h-[500px] mt-2 opacity-100' : 'max-h-0 opacity-0'}`}>
-                <Link href="/#features" className="pl-4 py-1 text-xs text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
-                  {lang === 'tr' ? '✨ Özellikler' : '✨ Features'}
-                </Link>
-                <Link href="/#comparison" className="pl-4 py-1 text-xs text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
-                  {lang === 'tr' ? '⚡ Neden Veyronix?' : '⚡ Why Veyronix?'}
-                </Link>
-                <Link href="/#stats" className="pl-4 py-1 text-xs text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
-                  {lang === 'tr' ? '📊 İstatistikler' : '📊 Stats'}
-                </Link>
-                <Link href="/#faq" className="pl-4 py-1 text-xs text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
-                  {lang === 'tr' ? '❓ SSS' : '❓ FAQ'}
-                </Link>
-                <Link href="/blog" className="pl-4 py-1 text-xs text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
-                  {t.blog}
-                </Link>
-                <a href="https://docs.veyronix.com.tr/" target="_blank" rel="noopener noreferrer" className="pl-4 py-1 text-xs text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
-                  Wiki
-                </a>
-                <Link href="/changelog" className="pl-4 py-1 text-xs text-on-surface-variant hover:text-primary-container border-l-2 border-primary-container/20 hover:border-primary-container transition-all" onClick={() => setIsMenuOpen(false)}>
-                  {t.changelog}
-                </Link>
               </div>
-              <div className="indicator mt-2"></div>
+
+              <div className="rounded-2xl border border-outline-variant/30 bg-surface-container-low/60 overflow-hidden">
+                <button 
+                  className="w-full p-3 flex items-center justify-between hover:bg-surface-container-high/40 transition-colors text-left"
+                  onClick={() => setIsMobileExploreOpen(!isMobileExploreOpen)}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Compass size={16} className="text-primary-container" />
+                    <span className="text-xs font-semibold text-on-surface">
+                      {lang === 'tr' ? 'Sayfa Bölümleri & Wiki' : 'Explore Sections'}
+                    </span>
+                  </div>
+                  <ChevronDown className={`text-on-surface-variant transition-transform duration-300 ${isMobileExploreOpen ? 'rotate-180 text-primary-container' : ''}`} size={16} />
+                </button>
+
+                <div className={`overflow-hidden transition-all duration-300 ease-in-out px-3 pb-2 flex flex-col gap-1 ${isMobileExploreOpen ? 'max-h-[500px] border-t border-outline-variant/20 pt-2 opacity-100' : 'max-h-0 opacity-0'}`}>
+                  <Link href="/#features" className="py-2 px-3 rounded-xl text-xs text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-all flex items-center justify-between" onClick={() => setIsMenuOpen(false)}>
+                    <span>{lang === 'tr' ? '✨ Özellikler' : '✨ Features'}</span>
+                    <ChevronRight size={13} className="opacity-50" />
+                  </Link>
+                  <Link href="/#comparison" className="py-2 px-3 rounded-xl text-xs text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-all flex items-center justify-between" onClick={() => setIsMenuOpen(false)}>
+                    <span>{lang === 'tr' ? '⚡ Neden Veyronix?' : '⚡ Why Veyronix?'}</span>
+                    <ChevronRight size={13} className="opacity-50" />
+                  </Link>
+                  <Link href="/#stats" className="py-2 px-3 rounded-xl text-xs text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-all flex items-center justify-between" onClick={() => setIsMenuOpen(false)}>
+                    <span>{lang === 'tr' ? '📊 İstatistikler' : '📊 Stats'}</span>
+                    <ChevronRight size={13} className="opacity-50" />
+                  </Link>
+                  <Link href="/#faq" className="py-2 px-3 rounded-xl text-xs text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-all flex items-center justify-between" onClick={() => setIsMenuOpen(false)}>
+                    <span>{lang === 'tr' ? '❓ SSS' : '❓ FAQ'}</span>
+                    <ChevronRight size={13} className="opacity-50" />
+                  </Link>
+                  <Link href="/blog" className="py-2 px-3 rounded-xl text-xs text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-all flex items-center justify-between" onClick={() => setIsMenuOpen(false)}>
+                    <span>{t.blog}</span>
+                    <ChevronRight size={13} className="opacity-50" />
+                  </Link>
+                  <a href="https://docs.veyronix.com.tr/" target="_blank" rel="noopener noreferrer" className="py-2 px-3 rounded-xl text-xs text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-all flex items-center justify-between" onClick={() => setIsMenuOpen(false)}>
+                    <span>📚 Wiki & Dokümantasyon</span>
+                    <ExternalLink size={12} className="opacity-50" />
+                  </a>
+                  <Link href="/changelog" className="py-2 px-3 rounded-xl text-xs text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-all flex items-center justify-between" onClick={() => setIsMenuOpen(false)}>
+                    <span>{t.changelog}</span>
+                    <ChevronRight size={13} className="opacity-50" />
+                  </Link>
+                </div>
+              </div>
             </div>
             
-            {/* Mobile Language Selector */}
-            <div className="menu-item-group">
-              <span className="text-[10px] font-label-bold text-outline uppercase tracking-[0.2em] mb-2 block">
-                {lang === 'tr' ? 'Dil Seçimi' : 'Language'}
-              </span>
-              <div className="grid grid-cols-2 gap-2 mt-1">
+            {/* SECTION 3: DİL SEÇİMİ */}
+            <div>
+              <div className="flex items-center gap-1.5 px-2.5 py-1 mb-2.5 rounded-lg bg-white/[0.04] border border-white/10 w-fit">
+                <span className="text-[10px] font-label-bold text-on-surface-variant uppercase tracking-[0.2em]">
+                  {lang === 'tr' ? '🌐 Dil Seçimi' : '🌐 Language'}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={() => setLanguage('tr')}
-                  className={`py-2 px-3 rounded-xl text-xs font-label-bold flex items-center justify-center gap-1.5 transition-all ${
+                  className={`py-2.5 px-3 rounded-xl text-xs font-label-bold flex items-center justify-center gap-2 transition-all touch-manipulation active:scale-95 ${
                     lang === 'tr'
-                      ? 'bg-primary-container text-on-primary shadow-[0_0_15px_rgba(255,215,0,0.2)]'
-                      : 'bg-surface-container-high/60 border border-outline-variant/30 text-on-surface-variant'
+                      ? 'bg-primary-container text-on-primary shadow-[0_0_15px_rgba(255,215,0,0.25)] font-bold'
+                      : 'bg-surface-container-high/50 border border-outline-variant/30 text-on-surface-variant hover:text-on-surface'
                   }`}
                 >
-                  <span>🇹🇷</span> Türkçe
+                  <span className="text-base">🇹🇷</span> Türkçe
                 </button>
                 <button
                   onClick={() => setLanguage('en')}
-                  className={`py-2 px-3 rounded-xl text-xs font-label-bold flex items-center justify-center gap-1.5 transition-all ${
+                  className={`py-2.5 px-3 rounded-xl text-xs font-label-bold flex items-center justify-center gap-2 transition-all touch-manipulation active:scale-95 ${
                     lang === 'en'
-                      ? 'bg-primary-container text-on-primary shadow-[0_0_15px_rgba(255,215,0,0.2)]'
-                      : 'bg-surface-container-high/60 border border-outline-variant/30 text-on-surface-variant'
+                      ? 'bg-primary-container text-on-primary shadow-[0_0_15px_rgba(255,215,0,0.25)] font-bold'
+                      : 'bg-surface-container-high/50 border border-outline-variant/30 text-on-surface-variant hover:text-on-surface'
                   }`}
                 >
-                  <span>🇬🇧</span> English
+                  <span className="text-base">🇬🇧</span> English
                 </button>
               </div>
             </div>
 
+            {/* SECTION 4: ADMIN (IF ADMIN) */}
             {isAdmin && (
-              <div className="menu-item-group">
-                <span className="text-[10px] font-label-bold text-error uppercase tracking-[0.2em] mb-2 block">Admin</span>
-                <Link href="/admin" className="menu-item-hover group flex items-center justify-between py-1 cursor-pointer" onClick={() => setIsMenuOpen(false)}>
-                  <span className="font-headline-lg-mobile text-headline-lg-mobile text-error hover:text-error-container transition-all group-active:translate-x-2 pointer-events-none">Admin Panel</span>
-                  <ChevronRight className="text-error/0 group-hover:text-error transition-colors pointer-events-none" />
+              <div>
+                <div className="flex items-center gap-1.5 px-2.5 py-1 mb-2.5 rounded-lg bg-error/10 border border-error/20 w-fit">
+                  <span className="text-[10px] font-label-bold text-error uppercase tracking-[0.2em]">
+                    🛡️ Admin
+                  </span>
+                </div>
+                <Link 
+                  href="/admin" 
+                  className="w-full flex items-center justify-between p-3 rounded-2xl bg-error/10 hover:bg-error/20 border border-error/30 transition-all text-left"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Shield size={16} className="text-error" />
+                    <span className="text-xs font-bold text-error">Admin Panel</span>
+                  </div>
+                  <ChevronRight size={15} className="text-error" />
                 </Link>
-                <div className="indicator !bg-error"></div>
               </div>
             )}
           </nav>
           
-          <div className="px-3 py-3 bg-surface-container-low border-t border-on-surface/10 space-y-4 relative z-10">
+          {/* Drawer Bottom Actions */}
+          <div className="p-4 bg-surface-container-lowest border-t border-outline-variant/20 space-y-3 relative z-10">
             {session ? (
               <button 
                 onClick={() => { signOut(); setIsMenuOpen(false); }} 
-                className="w-full h-10 border border-error/30 text-error hover:bg-error/10 rounded-xl font-label-bold text-xs uppercase tracking-widest active:scale-95 transition-all flex items-center justify-center gap-1.5"
+                className="w-full h-11 border border-error/40 text-error hover:bg-error/10 rounded-2xl font-label-bold text-xs uppercase tracking-widest active:scale-95 transition-all flex items-center justify-center gap-2"
               >
-                <LogOut size={15} />
+                <LogOut size={16} />
                 {t.logout}
               </button>
             ) : (
               <button 
                 onClick={() => { signIn("discord"); setIsMenuOpen(false); }} 
-                className="w-full h-10 bg-primary-container text-on-primary rounded-xl font-label-bold text-xs uppercase tracking-widest active:scale-95 transition-all flex items-center justify-center gap-1.5 tactical-glow"
+                className="w-full h-11 bg-primary-container text-on-primary rounded-2xl font-label-bold text-xs uppercase tracking-widest active:scale-95 transition-all flex items-center justify-center gap-2 tactical-glow"
               >
-                <LogIn size={15} />
+                <LogIn size={16} />
                 {t.login}
               </button>
             )}
             
-            <div className="flex flex-col gap-1">
-              <p className="font-label-sm text-label-sm text-on-surface-variant/40 max-w-[200px]">
-                &copy; 2024 Veyronix Tactical Command. All rights reserved.
+            <div className="text-center">
+              <p className="text-[10px] text-on-surface-variant/40 font-mono">
+                &copy; 2026 Veyronix Platform
               </p>
             </div>
-          </div>
-          
-          <div className="absolute inset-0 pointer-events-none opacity-10">
-            <div className="scanline"></div>
           </div>
         </div>
       </div>
