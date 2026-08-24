@@ -29,7 +29,7 @@ inner_main = inner_main.replace(
 // Replace Servers tab correctly using regex
 inner_main = inner_main.replace(
   /\{\/\* SERVER MANAGEMENT TAB \*\/\}[\s\S]*?(?=\{\/\* PLANS TAB \*\/\})/,
-  '{activeTab === "servers" && <AdminServersTab servers={servers} loading={loading} setLoading={setLoading} fetchServers={fetchServers} showToast={showToast} />}\n        '
+  '{activeTab === "servers" && <AdminServersTab servers={servers} loading={loading} setLoading={setLoading} fetchServers={fetchServers} showToast={showToast} users={users} fetchUsers={fetchUsers} savingId={savingId} handleServerAction={handleServerAction} handleUserAction={handleUserAction} setShowRulesModal={setShowRulesModal} setShowUserModal={setShowUserModal} userSearchTerm={userSearchTerm} setUserSearchTerm={setUserSearchTerm} />}\n        '
 );
 
 
