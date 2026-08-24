@@ -1,0 +1,1052 @@
+/* ==========================================================================
+   ADMIN PANEL - PROFESSIONAL NATIVE APP CSS
+   Renk değişkenleri: --admin-* token'ları ana siteden miras alınır
+   ========================================================================== */
+
+:root {
+  --admin-bg: var(--background);
+  --admin-card: var(--surface);
+  --admin-accent: var(--primary);
+  --admin-accent-muted: rgba(var(--primary-rgb), 0.15);
+  --admin-border: var(--border);
+  --admin-text: var(--text-primary);
+  --admin-text-muted: var(--text-secondary);
+  --admin-success: var(--success);
+  --admin-error: var(--error);
+  --admin-unlimited: #a855f7;
+  /* App-specific */
+  --app-bottom-bar-height: 72px;
+  --app-radius-card: 20px;
+  --app-radius-btn: 14px;
+  --app-radius-input: 16px;
+  --app-shadow-card: 0 4px 24px rgba(0, 0, 0, 0.28);
+  --app-shadow-bar: 0 -2px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* ==========================================================================
+   1. LAYOUT TEMEL - Desktop ve Genel İskelet
+   ========================================================================== */
+.admin-container {
+  display: flex;
+  height: 100vh;
+  background-color: var(--admin-bg);
+  color: var(--admin-text);
+  overflow: hidden;
+  font-family: 'Outfit', sans-serif;
+}
+
+/* DESKTOP SIDEBAR */
+.admin-sidebar {
+  width: 260px;
+  background: var(--surface);
+  border-right: 1px solid var(--admin-border);
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  flex-shrink: 0;
+  overflow-y: auto;
+  max-height: 100vh;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.admin-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.admin-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+
+.admin-sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.admin-nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 1;
+}
+
+.admin-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.85rem 1.25rem;
+  border-radius: 12px;
+  color: var(--admin-text-muted);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  background: transparent;
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
+  border: none;
+  text-align: left;
+  width: 100%;
+}
+
+.admin-nav-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--admin-text);
+  transform: translateX(4px);
+}
+
+.admin-nav-item.active {
+  background: var(--admin-accent-muted);
+  color: var(--admin-accent);
+  font-weight: 700;
+}
+
+/* MAIN CONTENT AREA */
+.admin-main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 2.5rem 3rem;
+  background-image:
+    radial-gradient(circle at top right, rgba(var(--primary-rgb), 0.06) 0%, transparent 50%),
+    radial-gradient(circle at bottom left, rgba(var(--secondary-rgb, 120, 80, 255), 0.04) 0%, transparent 50%);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.admin-main::-webkit-scrollbar {
+  width: 6px;
+}
+
+.admin-main::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-main::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+}
+
+.admin-main::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+/* HEADER */
+.admin-header {
+  margin-bottom: 3rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.admin-title h1 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(to right, #fff, #94a3b8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.admin-title p {
+  color: var(--admin-text-muted);
+  font-size: 1rem;
+}
+
+/* ==========================================================================
+   2. DESKTOP KARTLAR & TABLOLAR
+   ========================================================================== */
+.admin-card {
+  background: var(--surface);
+  border: 1px solid var(--admin-border);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Sticky column for actions */
+.admin-table th.sticky-action,
+.admin-table td.sticky-action {
+  position: sticky;
+  right: 0;
+  background: var(--surface);
+  z-index: 10;
+  box-shadow: -4px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.admin-card-header {
+  padding: 1.25rem 1.5rem;
+}
+
+.server-tab-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.server-stats-row {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.stat-mini-card {
+  background: var(--surface);
+  border: 1px solid var(--admin-border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  min-width: 150px;
+}
+
+.stat-mini-card .label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--admin-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.stat-mini-card .value {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--admin-text);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th {
+  text-align: left;
+  padding: 1.1rem 1.5rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--admin-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  border-bottom: 1px solid var(--admin-border);
+  background: rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
+}
+
+.admin-table td {
+  padding: 1.1rem 1.5rem;
+  vertical-align: middle;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.admin-tr-hover:hover {
+  background: rgba(255, 255, 255, 0.015);
+}
+
+/* Column helper */
+.hide-on-tablet {
+  display: table-cell;
+}
+
+/* ==========================================================================
+   3. BADGES
+   ========================================================================== */
+.admin-badge {
+  padding: 0.3rem 0.75rem;
+  border-radius: 30px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.badge-active   { background: rgba(46, 204, 113, 0.1);  color: var(--admin-success);   border: 1px solid rgba(46, 204, 113, 0.25); }
+.badge-expired  { background: rgba(231, 76, 60, 0.1);   color: var(--admin-error);     border: 1px solid rgba(231, 76, 60, 0.25); }
+.badge-unlimited{ background: rgba(155, 89, 182, 0.1);  color: var(--admin-unlimited); border: 1px solid rgba(155, 89, 182, 0.25); }
+.badge-passive  { background: rgba(255, 255, 255, 0.05); color: #888;                  border: 1px solid rgba(255, 255, 255, 0.1); }
+
+/* ==========================================================================
+   4. ACTION BUTTONS (Desktop)
+   ========================================================================== */
+.admin-action-btn {
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--admin-text-muted);
+  border-radius: 10px;
+  border: 1px solid var(--admin-border);
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.admin-action-btn:hover         { background: var(--admin-accent-muted); color: var(--admin-accent); border-color: var(--admin-accent); transform: scale(1.08); }
+.admin-action-btn.active        { background: rgba(155, 89, 182, 0.15); color: var(--admin-unlimited); border-color: var(--admin-unlimited); }
+.admin-action-btn.party-unlimited       { background: rgba(252, 163, 17, 0.15); color: var(--admin-accent); border-color: var(--admin-accent); }
+.admin-action-btn.party-unlimited:hover { background: rgba(252, 163, 17, 0.28); transform: scale(1.08); }
+.admin-action-btn.danger:hover  { background: rgba(231, 76, 60, 0.15); color: var(--admin-error); border-color: var(--admin-error); }
+
+.table-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+}
+
+/* ==========================================================================
+   5. SEARCH BOX
+   ========================================================================== */
+.admin-search-container {
+  position: relative;
+  max-width: 450px;
+  margin-bottom: 2rem;
+}
+
+.admin-search-input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--admin-border);
+  color: white;
+  padding: 0.85rem 1rem 0.85rem 3rem;
+  border-radius: 14px;
+  outline: none;
+  font-size: 0.95rem;
+  transition: all 0.3s;
+  font-family: 'Outfit', sans-serif;
+}
+
+.admin-search-input:focus {
+  border-color: var(--admin-accent);
+  background: rgba(0, 0, 0, 0.45);
+  box-shadow: 0 0 0 4px var(--admin-accent-muted);
+}
+
+/* ==========================================================================
+   6. MODALS (Desktop)
+   ========================================================================== */
+.admin-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.admin-modal {
+  width: 100%;
+  max-width: 420px;
+  background: #0b0c10;
+  border: 1px solid var(--admin-border);
+  border-radius: 24px;
+  padding: 2.5rem;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+}
+
+.admin-input-field {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--admin-border);
+  color: white;
+  padding: 1rem;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  outline: none;
+  font-family: 'Outfit', sans-serif;
+  transition: border-color 0.2s;
+}
+
+.admin-input-field:focus { border-color: var(--admin-accent); }
+
+select.admin-input-field {
+  text-align-last: center;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1.2rem;
+  padding-right: 3rem !important;
+}
+
+select.admin-input-field option {
+  background-color: var(--admin-bg);
+  color: white;
+  text-align: left;
+  padding: 10px;
+}
+
+.admin-btn-group {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.admin-btn-secondary {
+  flex: 1;
+  min-width: 100px;
+  padding: 0.9rem;
+  background: rgba(255, 255, 255, 0.06);
+  color: white;
+  border-radius: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  border: 1px solid var(--admin-border);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.admin-btn-secondary:hover { background: rgba(255, 255, 255, 0.1); }
+
+.admin-btn-primary {
+  flex: 1;
+  min-width: 120px;
+  padding: 0.9rem;
+  background: var(--admin-accent);
+  color: var(--admin-bg);
+  border-radius: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+}
+.admin-btn-primary:hover { opacity: 0.88; transform: scale(0.99); }
+
+/* ==========================================================================
+   7. MISC COMPONENTS
+   ========================================================================== */
+.admin-tpl-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--admin-border);
+  border-radius: 18px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.admin-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--admin-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-slide-up { animation: slideUp 0.45s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+
+/* Stats + Filters */
+.stat-mini-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--admin-border);
+  padding: 0.75rem 1.25rem;
+  border-radius: 14px;
+  min-width: 110px;
+  text-align: center;
+  transition: all 0.25s;
+  cursor: default;
+}
+.stat-mini-card:hover { background: rgba(255, 255, 255, 0.07); transform: translateY(-2px); }
+.stat-mini-card .label { font-size: 0.68rem; font-weight: 800; text-transform: uppercase; color: var(--admin-text-muted); letter-spacing: 1px; margin-bottom: 0.2rem; }
+.stat-mini-card .value { font-size: 1.25rem; font-weight: 900; color: white; }
+
+.filter-btn {
+  padding: 0.5rem 1.2rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--admin-border);
+  color: var(--admin-text-muted);
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  font-family: 'Outfit', sans-serif;
+}
+.filter-btn.active { background: var(--admin-accent-muted); color: var(--admin-accent); border-color: var(--admin-accent); }
+.filter-btn:hover  { background: rgba(255, 255, 255, 0.07); color: white; }
+
+.server-tab-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+}
+.server-tab-header > div:first-child { flex: 1; min-width: 200px; }
+
+.server-stats-row  { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+
+.server-filter-row {
+  display: flex;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 0.5rem;
+}
+.server-filter-row::-webkit-scrollbar { display: none; }
+
+/* Modal Tabs */
+.modal-tab-bar {
+  display: flex;
+  gap: 0.5rem;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 0.4rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+}
+.modal-tab-btn {
+  flex: 1;
+  padding: 0.6rem 0.4rem;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: white;
+  font-weight: 700;
+  transition: all 0.2s;
+  font-size: 0.85rem;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: 'Outfit', sans-serif;
+}
+
+/* ==========================================================================
+   8. TABLET LAYOUT (769px – 1024px) — Yatay Top Bar
+   ========================================================================== */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .admin-container {
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .admin-sidebar {
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--admin-border);
+    flex-direction: row;
+    align-items: center;
+    padding: 0.75rem 1.25rem;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background: rgba(var(--surface-rgb, 15, 17, 23), 0.9);
+  }
+
+  .admin-sidebar-header { margin-bottom: 0 !important; padding: 0 1rem 0 0 !important; border-right: 1px solid var(--admin-border); margin-right: 1rem; flex-shrink: 0; }
+  .admin-nav-group      { flex-direction: row !important; flex: 1; gap: 0.25rem; overflow-x: auto; }
+  .admin-nav-group::-webkit-scrollbar { display: none; }
+  .admin-nav-item       { padding: 0.55rem 1rem !important; white-space: nowrap; font-size: 0.82rem !important; border-radius: 10px !important; }
+  .admin-nav-item:hover { transform: none !important; }
+  .admin-sidebar > div:last-child { display: none !important; }
+
+  .admin-main { padding: 2rem 1.5rem; overflow-y: auto; }
+
+  .hide-on-tablet { display: none !important; }
+
+  .server-tab-header   { flex-wrap: wrap; gap: 1rem; }
+  .server-stats-row    { flex-wrap: wrap; }
+  .server-filter-row   { flex-wrap: wrap; }
+}
+
+/* ==========================================================================
+   9. MOBILE APP EXPERIENCE (≤ 768px) — Tam Native App Hissiyatı
+   ========================================================================== */
+@media (max-width: 768px) {
+
+  /* — APP KAPSAYICI — */
+  .admin-container {
+    flex-direction: column;
+    height: 100dvh;
+    overflow: hidden;
+    position: relative;
+    background: var(--admin-bg);
+  }
+
+  /* — ANA SCROLL ALANI — */
+  .admin-main {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    padding: 1.25rem 1rem calc(env(safe-area-inset-bottom) + 1rem) 1rem;
+    background: var(--admin-bg);
+  }
+
+  /* — MOBILE TOP APP BAR — */
+  .mobile-app-bar {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: rgba(10, 11, 15, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    z-index: 100;
+  }
+
+  .mobile-menu-btn, .mobile-close-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+  }
+
+  .mobile-drawer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 900;
+    animation: fadeIn 0.2s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* — DRAWER SIDEBAR — */
+  .admin-sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 280px !important;
+    height: 100dvh !important;
+    padding: 1.5rem !important;
+    background: #0b0d13 !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    z-index: 999 !important;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important;
+    border-radius: 0 !important;
+    box-shadow: 10px 0 30px rgba(0,0,0,0.5) !important;
+    overflow-y: auto;
+  }
+
+  .admin-sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  .admin-sidebar-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin-bottom: 2rem !important;
+  }
+  
+  .admin-sidebar > div:last-child { display: flex !important; }
+
+  .admin-nav-group {
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    gap: 0.5rem !important;
+    flex: 1;
+    padding-top: 0;
+  }
+
+  /* — NATIVE TAB BUTTON — */
+  .admin-nav-item {
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 12px !important;
+    padding: 12px 16px !important;
+    background: transparent !important;
+    border-radius: 14px !important;
+    border: none !important;
+    color: rgba(255, 255, 255, 0.7) !important;
+    flex: none !important;
+    min-height: 48px;
+    transform: none !important;
+    position: relative;
+    transition: all 0.2s ease !important;
+    font-size: 0.95rem !important;
+    text-align: left;
+  }
+
+  .admin-nav-item svg {
+    width: 22px !important;
+    height: 22px !important;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  }
+
+  .admin-nav-item span {
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.2px !important;
+    display: block !important;
+    line-height: 1 !important;
+  }
+
+  /* Aktif tab: */
+  .admin-nav-item.active {
+    color: var(--admin-accent) !important;
+    background: var(--admin-accent-muted) !important;
+  }
+  .admin-nav-item.active svg {
+    transform: scale(1.1) !important;
+    filter: drop-shadow(0 4px 10px var(--admin-accent-muted)) !important;
+  }
+
+  /* Aktif dot indicator - Kapatıyoruz çünkü background verdik */
+  .admin-nav-item.active::after {
+    display: none;
+  }
+
+  /* Tıklama geri bildirimi */
+  .admin-nav-item:active svg { transform: scale(0.88) !important; }
+
+  /* — SAYFA BAŞLIĞI (App-style) — */
+  .admin-header {
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin-bottom: 1.5rem !important;
+    padding: 0 !important;
+    gap: 0.75rem !important;
+  }
+
+  .admin-title h1 {
+    font-size: 1.6rem !important;
+    font-weight: 800;
+    letter-spacing: -0.6px;
+    margin-bottom: 0.15rem !important;
+  }
+
+  .admin-title p {
+    font-size: 0.8rem !important;
+  }
+
+  /* — ARAMA KUTUSU — */
+  .admin-search-container {
+    max-width: 100% !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .admin-search-input {
+    background: rgba(255, 255, 255, 0.06) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: var(--app-radius-input) !important;
+    padding: 0.85rem 1rem 0.85rem 3rem !important;
+    font-size: 16px !important; /* Zoom engelleme */
+  }
+
+  /* — FİLTRE HAPI BUTONLARI (Pill Buttons) — */
+  .server-filter-row {
+    gap: 0.6rem !important;
+    margin-bottom: 1rem !important;
+    padding: 0 0 0.5rem 0 !important;
+    margin-left: -1rem;
+    margin-right: -1rem;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    scroll-snap-type: x mandatory;
+  }
+
+  .filter-btn {
+    padding: 0.55rem 1.1rem !important;
+    border-radius: 99px !important;
+    font-size: 0.78rem !important;
+    font-weight: 700 !important;
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.07) !important;
+  }
+
+  .filter-btn.active {
+    background: var(--admin-accent) !important;
+    color: #fff !important;
+    border-color: var(--admin-accent) !important;
+    box-shadow: 0 3px 14px var(--admin-accent-muted) !important;
+  }
+
+  /* — İSTATİSTİK KARTLARI — */
+  .server-stats-row {
+    gap: 0.75rem !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    margin-left: -1rem;
+    margin-right: -1rem;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    padding-bottom: 0.25rem !important;
+    scroll-snap-type: x mandatory;
+  }
+  .server-stats-row::-webkit-scrollbar { display: none; }
+
+  .stat-mini-card {
+    scroll-snap-align: start;
+    flex-shrink: 0 !important;
+    min-width: 100px !important;
+    padding: 0.85rem 1rem !important;
+    border-radius: 18px !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.07) !important;
+    transform: none !important;
+  }
+  .stat-mini-card .label { font-size: 0.62rem !important; }
+  .stat-mini-card .value { font-size: 1.1rem !important; }
+
+  /* — SERVER TAB HEADER — */
+  .server-tab-header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.75rem !important;
+    margin-bottom: 1.25rem !important;
+  }
+
+  /* — TABLO → UYGULAMA KARTLARI — */
+  .admin-card {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  .admin-table,
+  .admin-table thead,
+  .admin-table tbody,
+  .admin-table tfoot,
+  .admin-table tr,
+  .admin-table td {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  .admin-table thead { display: none !important; }
+
+  /* Her satır = premium uygulama kartı */
+  .admin-table tr {
+    background: var(--admin-card) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border-radius: var(--app-radius-card) !important;
+    margin-bottom: 0.85rem !important;
+    padding: 0 !important;
+    box-shadow: var(--app-shadow-card) !important;
+    overflow: hidden !important;
+    transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+  }
+
+  .admin-table tr:active {
+    transform: scale(0.985) !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  /* İlk td = Kart başlığı (full width, öne çıkan alan) */
+  .admin-table td:first-child {
+    padding: 1.1rem 1.1rem 0.75rem 1.1rem !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  }
+
+  /* Orta td'ler = Bilgi satırları */
+  .admin-table td {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 0.6rem 1.1rem !important;
+    border: none !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
+    min-height: 40px !important;
+    gap: 0.75rem !important;
+  }
+
+  /* Sol etiket */
+  .admin-table td::before {
+    content: attr(data-label) !important;
+    font-size: 0.7rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.4px !important;
+    color: var(--admin-text-muted) !important;
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+  }
+
+  /* Sağ değer */
+  .admin-table td > div,
+  .admin-table td > span,
+  .admin-table td > code {
+    text-align: right !important;
+    justify-content: flex-end !important;
+    margin-left: auto !important;
+    font-size: 0.88rem !important;
+    font-weight: 600 !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* Son td = Aksiyon Çubuğu */
+  .admin-table td:last-child {
+    padding: 0.85rem 1.1rem !important;
+    border-bottom: none !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
+    flex-direction: row !important;
+    gap: 0.6rem !important;
+    background: rgba(0, 0, 0, 0.12) !important;
+  }
+
+  .admin-table td:last-child::before { display: none !important; }
+
+  /* Aksiyon butonları eşit büyüklükte, büyük dokunma alanı */
+  .admin-table td:last-child .table-actions {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 0.6rem !important;
+    width: 100% !important;
+    justify-content: flex-start !important;
+  }
+
+  .admin-table td:last-child .table-actions .admin-action-btn {
+    flex: 1 1 auto !important;
+    min-height: 44px !important;
+    min-width: 44px !important;
+    width: auto !important;
+    height: auto !important;
+    border-radius: 12px !important;
+    font-size: 0.8rem !important;
+    padding: 0 0.75rem !important;
+    gap: 0.35rem !important;
+  }
+
+  /* Küçük butonlarda ikon artı yazı yanyana */
+  .admin-action-btn span { display: inline !important; font-size: 0.75rem !important; font-weight: 700 !important; }
+
+  /* — MODAL / BOTTOM SHEET — */
+  .admin-modal-overlay {
+    align-items: flex-end !important;
+    padding: 0 !important;
+    background: rgba(0, 0, 0, 0.65) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+  }
+
+  .admin-modal {
+    border-radius: 30px 30px 0 0 !important;
+    margin: 0 !important;
+    max-height: 92dvh !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 0 1.5rem calc(1.5rem + env(safe-area-inset-bottom)) 1.5rem !important;
+    background: #0b0d13 !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+    border-bottom: none !important;
+    animation: appSheetUp 0.38s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+    max-width: 100% !important;
+    position: relative !important;
+  }
+
+  /* Modal indicator çizgisi */
+  .admin-modal::before {
+    content: "";
+    display: block;
+    width: 40px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.18);
+    border-radius: 99px;
+    margin: 1rem auto 1.5rem auto;
+  }
+
+  @keyframes appSheetUp {
+    from { transform: translateY(100%); opacity: 0.6; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+
+  .admin-modal h2 { font-size: 1.25rem !important; }
+
+  .admin-input-field {
+    font-size: 16px !important;
+    border-radius: var(--app-radius-input) !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+    padding: 1rem !important;
+  }
+
+  .admin-btn-group { gap: 0.75rem !important; }
+
+  .admin-btn-primary,
+  .admin-btn-secondary {
+    min-height: 52px !important;
+    border-radius: var(--app-radius-input) !important;
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+  }
+
+  .modal-tab-bar   { border-radius: 14px !important; }
+  .modal-tab-btn   { font-size: 0.78rem !important; padding: 0.6rem 0.3rem !important; }
+
+  /* — KISALTMALAR — */
+  .hide-on-tablet { display: none !important; }
+
+  .admin-table th:nth-child(4),
+  .admin-table td:nth-child(4) { display: none !important; }
+}
+
+/* ==========================================================================
+   10. KÜÇÜK TELEFON DÜZELTMELER (≤ 390px)
+   ========================================================================== */
+@media (max-width: 390px) {
+  .admin-main { padding-left: 0.85rem !important; padding-right: 0.85rem !important; }
+  .admin-title h1 { font-size: 1.35rem !important; }
+  .stat-mini-card { min-width: 85px !important; }
+  .admin-modal { padding-left: 1.1rem !important; padding-right: 1.1rem !important; }
+}
+
+/* ==========================================================================
+   11. DESKTOP HIDES
+   ========================================================================== */
+@media (min-width: 769px) {
+  .admin-container .hide-on-desktop {
+    display: none !important;
+  }
+}

@@ -6,15 +6,8 @@ code = code.replace(
   'import "./admin.css";\nimport AdminSidebar from "./components/AdminSidebar";\nimport AdminHeader from "./components/AdminHeader";\nimport AdminStatsTab from "./tabs/AdminStatsTab";\nimport AdminServersTab from "./tabs/AdminServersTab";'
 );
 
-const returnStr = '<div className="admin-container">';
-let returnIndex = code.lastIndexOf(returnStr);
-
-// To ensure we get the main return, let's find the one after the mobile overlay
-const mobileAppBar = code.indexOf('mobile-app-bar');
-if (mobileAppBar !== -1) {
-    // The closest return before mobile-app-bar
-    returnIndex = code.lastIndexOf('return (', mobileAppBar);
-}
+const returnStr = '  return (\n    <div className="admin-container">\n      {/* Mobile Top App Bar */}';
+let returnIndex = code.indexOf(returnStr);
 
 const mainContentIndex = code.indexOf('<main className="admin-main">');
 
@@ -45,8 +38,7 @@ if (returnIndex !== -1 && mainContentIndex !== -1) {
       mainContentPart.substring(serversEnd2);
   }
   
-  const newLayout = `
-  return (
+  const newLayout = `  return (
     <div className="flex h-screen bg-[#0f1011] overflow-hidden">
       <AdminSidebar 
         activeTab={activeTab} 
@@ -89,5 +81,5 @@ if (returnIndex !== -1 && mainContentIndex !== -1) {
   fs.writeFileSync('apps/web/src/app/admin/page.js', finalCode);
   console.log('Successfully injected new layout into page.js');
 } else {
-  console.log('Could not find returnIndex or mainContentIndex', { returnIndex, mainContentIndex });
+  console.log('Could not find returnIndex or mainContentIndex');
 }
