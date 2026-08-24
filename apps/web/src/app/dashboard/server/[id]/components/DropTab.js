@@ -236,14 +236,44 @@ export default function DropTab({ lang, t, settings, setSettings, saving, saveSe
 
               {/* hourly_chance */}
               {scheduleType === "hourly_chance" && (
-                <div className="bg-surface/50 p-6 rounded-2xl border border-white/5 animate-fade-in">
-                  <h3 className="text-base font-bold mb-1">{isEn ? "Hourly Drop Probability" : "Saatlik Düşme İhtimali"}</h3>
-                  <p className="text-xs text-on-surface-variant mb-5">
-                    {isEn
-                      ? "Every hour at xx:00, the bot rolls the dice. Drop occurs only if it hits."
-                      : "Her saat başı (xx:00) zar atılır. Sadece ayarladığınız yüzdede düşer."}
-                  </p>
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-6">
+                <div className="bg-surface/50 p-6 rounded-2xl border border-white/5 animate-fade-in space-y-4">
+                  <div>
+                    <h3 className="text-base font-bold mb-1">{isEn ? "Hourly Drop Probability" : "Saatlik Düşme İhtimali"}</h3>
+                    <p className="text-xs text-on-surface-variant">
+                      {isEn
+                        ? "Every hour at xx:00, the bot rolls the dice strictly once. Drop occurs only if it hits."
+                        : "Her saat başı (xx:00) bot tam 1 kez zar atar. Yalnızca zar tuttuğunda drop düşer."}
+                    </p>
+                  </div>
+
+                  {/* Preset Pills */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-[11px] text-on-surface-variant font-label-bold uppercase tracking-wider mr-1">
+                      {isEn ? "Presets:" : "Hazır Şablonlar:"}
+                    </span>
+                    {[
+                      { val: 10, label: isEn ? "10% (Rare ~2/day)" : "%10 (Nadir ~2/gün)" },
+                      { val: 25, label: isEn ? "25% (Balanced ~6/day)" : "%25 (Dengeli ~6/gün)" },
+                      { val: 50, label: isEn ? "50% (Active ~12/day)" : "%50 (Aktif ~12/gün)" },
+                      { val: 75, label: isEn ? "75% (Frequent ~18/day)" : "%75 (Sık ~18/gün)" },
+                      { val: 100, label: isEn ? "100% (Every Hour)" : "%100 (Her Saat Başı)" },
+                    ].map(p => (
+                      <button
+                        key={p.val}
+                        type="button"
+                        onClick={() => updateSettings("hourly_chance_pct", p.val)}
+                        className={`px-3 py-1 rounded-xl text-xs font-semibold transition-all ${
+                          (settings.hourly_chance_pct || 25) === p.val
+                            ? "bg-primary-container text-on-primary font-bold shadow-[0_0_12px_rgba(255,215,0,0.3)]"
+                            : "bg-surface-container-high text-on-surface-variant hover:text-on-surface border border-outline-variant/30"
+                        }`}
+                      >
+                        {p.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-6 pt-2">
                     <div className="w-full sm:w-64 shrink-0">
                       <input
                         type="range" min="1" max="100"
@@ -266,37 +296,68 @@ export default function DropTab({ lang, t, settings, setSettings, saving, saveSe
 
               {/* percent_based */}
               {scheduleType === "percent_based" && (
-                <div className="bg-surface/50 p-6 rounded-2xl border border-white/5 animate-fade-in">
-                  <h3 className="text-base font-bold mb-1">{isEn ? "Per-Message Drop Chance" : "Mesaj Başına Drop Şansı"}</h3>
-                  <p className="text-xs text-on-surface-variant mb-5">
-                    {isEn
-                      ? "Every message sent in the selected channels has this % chance to trigger a drop."
-                      : "Seçili kanallara gönderilen her mesajda bu yüzde ihtimalle drop tetiklenir."}
-                  </p>
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-6">
+                <div className="bg-surface/50 p-6 rounded-2xl border border-white/5 animate-fade-in space-y-4">
+                  <div>
+                    <h3 className="text-base font-bold mb-1">{isEn ? "Per-Message Drop Chance" : "Mesaj Başına Drop Şansı"}</h3>
+                    <p className="text-xs text-on-surface-variant">
+                      {isEn
+                        ? "Every message sent in selected channels has this % chance to trigger a drop."
+                        : "Seçili kanallara gönderilen her mesajda bu yüzde ihtimalle drop tetiklenir."}
+                    </p>
+                  </div>
+
+                  {/* Preset Pills */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-[11px] text-on-surface-variant font-label-bold uppercase tracking-wider mr-1">
+                      {isEn ? "Presets:" : "Hazır Şablonlar:"}
+                    </span>
+                    {[
+                      { val: 0.5, label: isEn ? "0.5% (~1 in 200 msgs)" : "%0.5 (~200 mesajda 1)" },
+                      { val: 1.0, label: isEn ? "1.0% (~1 in 100 msgs)" : "%1.0 (~100 mesajda 1)" },
+                      { val: 2.0, label: isEn ? "2.0% (~1 in 50 msgs)" : "%2.0 (~50 mesajda 1)" },
+                      { val: 5.0, label: isEn ? "5.0% (~1 in 20 msgs)" : "%5.0 (~20 mesajda 1)" },
+                      { val: 10.0, label: isEn ? "10% (Fast)" : "%10 (Çok Hızlı)" },
+                    ].map(p => (
+                      <button
+                        key={p.val}
+                        type="button"
+                        onClick={() => updateSettings("drop_chance_pct", p.val)}
+                        className={`px-3 py-1 rounded-xl text-xs font-semibold transition-all ${
+                          Number((settings.drop_chance_pct || 2.0).toFixed(1)) === p.val
+                            ? "bg-primary-container text-on-primary font-bold shadow-[0_0_12px_rgba(255,215,0,0.3)]"
+                            : "bg-surface-container-high text-on-surface-variant hover:text-on-surface border border-outline-variant/30"
+                        }`}
+                      >
+                        {p.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-6 pt-2">
                     <div className="w-full sm:w-64 shrink-0">
                       <input
-                        type="range" min="0.1" max="100" step="0.1"
-                        value={settings.drop_chance_pct || 5}
+                        type="range" min="0.1" max="50" step="0.1"
+                        value={settings.drop_chance_pct || 2.0}
                         onChange={e => updateSettings("drop_chance_pct", parseFloat(e.target.value))}
                         className="w-full h-2 bg-white/10 rounded-full appearance-none cursor-pointer accent-primary"
                       />
                       <div className="flex justify-between text-xs text-on-surface-variant mt-2">
                         <span>0.1%</span>
+                        <span>25%</span>
                         <span>50%</span>
-                        <span>100%</span>
                       </div>
                     </div>
                     <div className="bg-surface px-4 py-3 rounded-xl border border-white/5 font-bold text-xl text-primary w-24 text-center">
-                      %{(settings.drop_chance_pct || 5).toFixed(1)}
+                      %{(settings.drop_chance_pct || 2.0).toFixed(1)}
                     </div>
                   </div>
-                  <div className="mt-4 p-3 bg-primary/10 border border-primary/20 rounded-lg text-xs text-primary flex items-start gap-2">
-                    <AlertCircle size={14} className="mt-0.5 flex-shrink-0" />
+
+                  <div className="p-3 bg-primary/10 border border-primary/20 rounded-xl text-xs text-primary flex items-start gap-2.5">
+                    <AlertCircle size={15} className="mt-0.5 shrink-0" />
                     <span>
                       {isEn
-                        ? "Minimum 60s cooldown between drops per channel to prevent spam."
-                        : "Spam önlemek için kanal başına droplar arasında minimum 60 saniye bekleme uygulanır."}
+                        ? "Spam protection: 3-minute global cooldown and 12-message activity buffer are applied between drops."
+                        : "Spam koruması: Art arda drop yağmasını engellemek için droplar arasında sunucu çapında 3 dakika bekleme ve 12 mesaj aktiflik eşiği uygulanır."}
                     </span>
                   </div>
                 </div>

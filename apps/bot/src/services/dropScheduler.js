@@ -1,19 +1,22 @@
+const crypto = require('crypto');
 const { supabase } = require('@veyronix/database');
 const { publishDrop } = require('./dropEngine');
 const { getGuildConfig } = require('./guildConfig');
 
 /**
- * dropScheduler.js — Zaman Tabanlı Drop Tetikleyici (v2)
+ * dropScheduler.js — Zaman Tabanlı Drop Tetikleyici (v2.1)
  *
  * cronService tarafından her dakika çağrılır.
  * Desteklenen modlar:
  *   - exact_minutes  : Her saatin seçili dakikasında kesin olarak düşer
  *   - random_interval: Min~Max dakika arasında rastgele düşer
- *   - hourly_chance  : Her saat başı (xx:00) % ihtimalle düşer
+ *   - hourly_chance  : Her saat başı (xx:00) kesinlikle 1 kez % ihtimalle düşer
  *
  * NOT: percent_based modu burada DEĞİL, index.js messageCreate içinde işlenir.
- * NOT: activity modu v2'de tamamen kaldırıldı.
  */
+
+// Her sunucu için son saatlik zar atılan saat anahtarı: Map<`${guild_id}`, 'YYYY-MM-DD-HH'>
+const lastHourlyRollMap = new Map();
 
 /**
  * channel_ids alanını güvenli biçimde diziye çevirir
@@ -77,11 +80,16 @@ async function processTimeBasedDrops(client) {
             shouldDrop = true;
           }
 
-        // ── hourly_chance ─────────────────────────────────────────────────────
+        // ── hourly_chance (Kesinlikle Saatte 1 Kez Kriptografik Zar) ─────────
         } else if (schedType === 'hourly_chance') {
-          if (currentMinute === 0) {
+          const hourKey = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}-${now.getHours()}`;
+          if (currentMinute === 0 && lastHourlyRollMap.get(settings.guild_id) !== hourKey) {
+            lastHourlyRollMap.set(settings.guild_id, hourKey);
             const chance = parseFloat(settings.hourly_chance_pct) || 25;
-            if (Math.random() * 100 < chance) {
+            const roll   = crypto.randomInt(0, 1_000_000) / 10_000;
+            
+            console.log(`[DropScheduler] Guild ${settings.guild_id} hourly roll: ${roll.toFixed(3)}% vs chance: ${chance}%`);
+            if (roll < chance) {
               shouldDrop = true;
             }
           }
