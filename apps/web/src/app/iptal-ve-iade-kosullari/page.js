@@ -110,7 +110,7 @@ export default function RefundPolicy() {
                 <div>
                   <span className="text-xs text-on-surface-variant block font-medium">{isEn ? "Discord Support Ticket" : "Discord Destek Bileti"}</span>
                   <a
-                    href={supportServer || "https://discord.gg/veyronix"}
+                    href={supportServer || "https://veyronix.com.tr/support"}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="font-bold text-primary hover:underline text-sm"

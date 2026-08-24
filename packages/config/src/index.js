@@ -6,7 +6,7 @@ const LINKS = {
   DASHBOARD: "https://veyronix.com.tr/dashboard",
 
   // Global Discord Support Server URL
-  SUPPORT_SERVER: "https://discord.gg/veyronix",
+  SUPPORT_SERVER: "https://veyronix.com.tr/support",
 
   // Static Assets (Logos, Banners)
   LOGO_URL: "https://veyronix.com.tr/icon.svg",

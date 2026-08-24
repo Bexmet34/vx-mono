@@ -5,7 +5,7 @@ const path = require('path');
 const PORT = process.argv[2] || process.env.PORT || 3000;
 const HTML_PATH = path.join(__dirname, '../apps/web/public/maintenance.html');
 
-let supportUrl = 'https://discord.gg/veyronix';
+let supportUrl = 'https://veyronix.com.tr/support';
 
 try {
   const { LINKS } = require('../packages/config/src/index.js');
