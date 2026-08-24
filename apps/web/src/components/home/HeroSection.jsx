@@ -10,7 +10,7 @@ export default function HeroSection() {
   const { supportServer } = usePublicConfig();
 
   return (
-    <section className="relative flex items-center justify-center px-margin-mobile md:px-margin-desktop overflow-hidden pt-4 pb-14 md:pt-8 md:pb-18">
+    <section className="relative flex flex-col items-center justify-center min-h-[calc(100vh-3.5rem)] md:min-h-[calc(100vh-4rem)] px-margin-mobile md:px-margin-desktop overflow-hidden py-8 md:py-12">
       {/* Animated gradient orbs */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-[450px] h-[450px] bg-primary-container/10 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '4s' }} />
