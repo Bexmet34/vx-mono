@@ -1,5 +1,6 @@
 "use client";
-import { AlertCircle, Clock, CalendarClock, Zap, Dices, MessageSquare, Gift, Hash, Users, Save, CheckCircle2, RefreshCw } from "lucide-react";
+import { AlertCircle, Clock, CalendarClock, Zap, Dices, MessageSquare, Gift, Hash, Users, Save, CheckCircle2, RefreshCw, Trophy } from "lucide-react";
+import DropLeaderboard from "./DropLeaderboard";
 
 /**
  * DropTab v2 — Manuel Drop Oranı Sistemi
@@ -510,6 +511,27 @@ export default function DropTab({ lang, t, settings, setSettings, saving, saveSe
           </button>
         </div>
       )}
+
+      {/* ── Drop Liderlik Sıralaması (Ayrı Bölüm Div'i) ── */}
+      <div className="pt-6 border-t border-white/10 space-y-4">
+        <div className="flex items-center gap-2.5">
+          <div className="p-2 bg-yellow-500/10 rounded-xl border border-yellow-500/20 text-yellow-400">
+            <Trophy size={18} />
+          </div>
+          <div>
+            <h3 className="text-base font-bold text-white">
+              {isEn ? "Drop Leaderboard & Statistics" : "Drop Liderlik Sıralaması"}
+            </h3>
+            <p className="text-xs text-on-surface-variant">
+              {isEn
+                ? "Top players who claimed the most drops in this server."
+                : "Bu sunucuda en çok drop kazanan kullanıcıların puan sıralaması."}
+            </p>
+          </div>
+        </div>
+
+        <DropLeaderboard guildId={guildId} lang={lang} />
+      </div>
     </div>
   );
 }
