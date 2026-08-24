@@ -91,19 +91,32 @@ export async function PATCH(req) {
     
     updateData.expires_at = newExpiry.toISOString();
     updateData.one_day_notified = false;
-    
-    // Format for notification (TR Timezone - assuming bot user is in TR)
-    const trTime = new Date(newExpiry.getTime() + (3 * 60 * 60 * 1000));
-    const dd = String(trTime.getUTCDate()).padStart(2, '0');
-    const mm = String(trTime.getUTCMonth() + 1).padStart(2, '0');
-    const yyyy = trTime.getUTCFullYear();
-    const hh = String(trTime.getUTCHours()).padStart(2, '0');
-    const min = String(trTime.getUTCMinutes()).padStart(2, '0');
-    
-    placeholders.tarih = `${dd}.${mm}.${yyyy}`;
-    placeholders.saat = `${hh}:${min}`;
-    placeholders.gun = Math.abs(dayDelta);
-    
+  }
+
+  // Populate date placeholders if needed
+  if (templateId) {
+    let finalExpiry = updateData.expires_at ? new Date(updateData.expires_at) : (currentSub.expires_at ? new Date(currentSub.expires_at) : new Date());
+    let isUnlimitedFinal = updateData.is_unlimited !== undefined ? updateData.is_unlimited : currentSub.is_unlimited;
+
+    if (isUnlimitedFinal) {
+      placeholders.tarih = 'Süresiz';
+      placeholders.saat = 'Süresiz';
+      placeholders.gun = 0;
+    } else if (finalExpiry && !isNaN(finalExpiry.getTime())) {
+      const trTime = new Date(finalExpiry.getTime() + (3 * 60 * 60 * 1000));
+      const dd = String(trTime.getUTCDate()).padStart(2, '0');
+      const mm = String(trTime.getUTCMonth() + 1).padStart(2, '0');
+      const yyyy = trTime.getUTCFullYear();
+      const hh = String(trTime.getUTCHours()).padStart(2, '0');
+      const min = String(trTime.getUTCMinutes()).padStart(2, '0');
+      
+      placeholders.tarih = `${dd}.${mm}.${yyyy}`;
+      placeholders.saat = `${hh}:${min}`;
+      
+      // Calculate day diff from now for placeholder if gun wasn't set by action
+      const now = new Date();
+      placeholders.gun = Math.abs(Math.round((finalExpiry - now) / (1000 * 60 * 60 * 24)));
+    }
     console.log(`[AdminAPI] Final Placeholders:`, placeholders);
   }
 

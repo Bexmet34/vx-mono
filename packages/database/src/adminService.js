@@ -73,13 +73,14 @@ async function getParsedTemplate(templateId, placeholders = {}) {
     const template = await getNotificationTemplate(templateId);
     if (!template) return null;
 
-    let title = template.title_tr;
-    let content = template.content_tr;
+    let title = template.title_tr || '';
+    let content = template.content_tr || '';
 
     Object.keys(placeholders).forEach(key => {
-        const regex = new RegExp(`{${key}}`, 'g');
-        title = title?.replace(regex, placeholders[key]);
-        content = content?.replace(regex, placeholders[key]);
+        const searchVal = `{${key}}`;
+        const replaceVal = String(placeholders[key]);
+        title = title.split(searchVal).join(replaceVal);
+        content = content.split(searchVal).join(replaceVal);
     });
 
     return { title, content, color: template.color, is_embed: template.is_embed };
