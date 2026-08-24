@@ -90,63 +90,8 @@ export default function ComparisonSection() {
       {/* 2-Column Comparison Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto relative z-10 items-stretch">
         
-        {/* LEFT COLUMN: DIĞER BOTLAR */}
+        {/* LEFT COLUMN: VEYRONIX (ALL-IN-ONE) */}
         <FadeIn delay={250} direction="up" distance={30} className="h-full">
-          <div className="h-full rounded-3xl p-6 sm:p-8 md:p-10 bg-surface-container-low/70 border border-outline-variant/30 backdrop-blur-md flex flex-col justify-between relative overflow-hidden">
-            {/* Top Tag */}
-            <div>
-              <div className="flex items-center justify-between gap-4 mb-6 pb-6 border-b border-outline-variant/20">
-                <div>
-                  <span className="text-[11px] font-label-bold uppercase tracking-widest text-red-400 bg-red-500/10 border border-red-500/20 px-3 py-1 rounded-full">
-                    {t.compBadgeOthers}
-                  </span>
-                  <h3 className="font-headline-xl text-2xl text-on-surface mt-3 font-bold">
-                    {t.compOthersTitle}
-                  </h3>
-                  <p className="text-xs text-on-surface-variant mt-1">
-                    {t.compOthersDesc}
-                  </p>
-                </div>
-                <div className="w-12 h-12 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 flex-shrink-0">
-                  <XCircle size={26} />
-                </div>
-              </div>
-
-              {/* Items List */}
-              <div className="space-y-4">
-                {comparisonItems.map((item, idx) => (
-                  <div 
-                    key={idx}
-                    className="p-3.5 rounded-xl bg-surface/50 border border-outline-variant/20 flex items-start gap-3 transition-colors hover:bg-surface/80"
-                  >
-                    <div className="w-7 h-7 rounded-lg bg-red-500/10 text-red-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <XCircle size={15} />
-                    </div>
-                    <div>
-                      <div className="text-xs font-semibold text-on-surface flex items-center gap-1.5">
-                        <item.icon size={13} className="text-on-surface-variant" />
-                        {item.title}
-                      </div>
-                      <p className="text-[11px] text-on-surface-variant/80 font-light mt-0.5 leading-normal">
-                        {item.others}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Bottom Note */}
-            <div className="mt-8 pt-4 border-t border-outline-variant/20 text-center">
-              <span className="text-xs text-on-surface-variant/70 italic">
-                {lang === 'tr' ? '⚠️ Yüksek toplam maliyet, birden fazla bot yetkisi ve sunucu kargaşası' : '⚠️ Multiple bot fees, permissions nightmare and server clutter'}
-              </span>
-            </div>
-          </div>
-        </FadeIn>
-
-        {/* RIGHT COLUMN: VEYRONIX (ALL-IN-ONE) */}
-        <FadeIn delay={350} direction="up" distance={30} className="h-full">
           <div className="h-full rounded-3xl p-6 sm:p-8 md:p-10 bg-gradient-to-b from-surface-container-high/90 via-surface-container/90 to-surface-container-high/90 border-2 border-primary-container/50 shadow-[0_0_50px_rgba(255,215,0,0.15)] backdrop-blur-md flex flex-col justify-between relative overflow-hidden">
             {/* Ambient gold glow inside */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary-container/10 rounded-full blur-3xl pointer-events-none" />
@@ -210,6 +155,61 @@ export default function ComparisonSection() {
                 {t.heroBtn}
                 <ArrowRight size={13} />
               </a>
+            </div>
+          </div>
+        </FadeIn>
+
+        {/* RIGHT COLUMN: DIĞER BOTLAR */}
+        <FadeIn delay={350} direction="up" distance={30} className="h-full">
+          <div className="h-full rounded-3xl p-6 sm:p-8 md:p-10 bg-surface-container-low/70 border border-outline-variant/30 backdrop-blur-md flex flex-col justify-between relative overflow-hidden">
+            {/* Top Tag */}
+            <div>
+              <div className="flex items-center justify-between gap-4 mb-6 pb-6 border-b border-outline-variant/20">
+                <div>
+                  <span className="text-[11px] font-label-bold uppercase tracking-widest text-red-400 bg-red-500/10 border border-red-500/20 px-3 py-1 rounded-full">
+                    {t.compBadgeOthers}
+                  </span>
+                  <h3 className="font-headline-xl text-2xl text-on-surface mt-3 font-bold">
+                    {t.compOthersTitle}
+                  </h3>
+                  <p className="text-xs text-on-surface-variant mt-1">
+                    {t.compOthersDesc}
+                  </p>
+                </div>
+                <div className="w-12 h-12 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 flex-shrink-0">
+                  <XCircle size={26} />
+                </div>
+              </div>
+
+              {/* Items List */}
+              <div className="space-y-4">
+                {comparisonItems.map((item, idx) => (
+                  <div 
+                    key={idx}
+                    className="p-3.5 rounded-xl bg-surface/50 border border-outline-variant/20 flex items-start gap-3 transition-colors hover:bg-surface/80"
+                  >
+                    <div className="w-7 h-7 rounded-lg bg-red-500/10 text-red-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <XCircle size={15} />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-on-surface flex items-center gap-1.5">
+                        <item.icon size={13} className="text-on-surface-variant" />
+                        {item.title}
+                      </div>
+                      <p className="text-[11px] text-on-surface-variant/80 font-light mt-0.5 leading-normal">
+                        {item.others}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Bottom Note */}
+            <div className="mt-8 pt-4 border-t border-outline-variant/20 text-center">
+              <span className="text-xs text-on-surface-variant/70 italic">
+                {lang === 'tr' ? '⚠️ Yüksek toplam maliyet, birden fazla bot yetkisi ve sunucu kargaşası' : '⚠️ Multiple bot fees, permissions nightmare and server clutter'}
+              </span>
             </div>
           </div>
         </FadeIn>
