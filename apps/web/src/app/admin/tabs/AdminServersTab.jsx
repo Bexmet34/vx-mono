@@ -22,6 +22,12 @@ export default function AdminServersTab({
   const [serverSubTab, setServerSubTab] = useState("guilds");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [dayAmounts, setDayAmounts] = useState({});
+
+  const handleDayChange = (id, val) => {
+    setDayAmounts(prev => ({ ...prev, [id]: val }));
+  };
+  const getDayAmount = (id) => dayAmounts[id] !== undefined ? dayAmounts[id] : 30;
 
   const filteredServers = (servers || []).filter(s => {
     if (searchTerm && !s.guild_name.toLowerCase().includes(searchTerm.toLowerCase()) && !s.guild_id.includes(searchTerm) && !s.owner_id.includes(searchTerm)) return false;
@@ -198,21 +204,32 @@ export default function AdminServersTab({
                         </div>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <div className="flex justify-end gap-2">
+                        <div className="flex justify-end gap-2 items-center">
+                           <div className="flex items-center bg-[#1e1f22] rounded-lg px-2 py-1.5 border border-[#2b2d31]">
+                             <input 
+                               type="number" 
+                               className="w-10 bg-transparent text-white text-xs text-center focus:outline-none hide-arrows" 
+                               value={getDayAmount(s.guild_id)}
+                               onChange={(e) => handleDayChange(s.guild_id, parseInt(e.target.value) || 0)}
+                               min="1"
+                             />
+                             <span className="text-[10px] text-[#949ba4] ml-1 font-bold">GÜN</span>
+                           </div>
+                           
                            <button 
                              className="p-2 bg-[#2ecc71]/10 hover:bg-[#2ecc71]/20 text-[#2ecc71] rounded-lg transition-colors border border-transparent hover:border-[#2ecc71]/30 disabled:opacity-50"
-                             title="+30 Gün Ekle" 
+                             title={`+${getDayAmount(s.guild_id)} Gün Ekle`} 
                              disabled={savingId === s.guild_id}
-                             onClick={() => handleServerAction(s.guild_id, 'add_days', 30)}
+                             onClick={() => handleServerAction(s.guild_id, 'add_days', getDayAmount(s.guild_id))}
                            >
                              {savingId === s.guild_id ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
                            </button>
                            
                            <button 
                              className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors border border-transparent hover:border-red-500/30 disabled:opacity-50"
-                             title="-30 Gün Çıkar" 
+                             title={`-${getDayAmount(s.guild_id)} Gün Çıkar`} 
                              disabled={savingId === s.guild_id}
-                             onClick={() => handleServerAction(s.guild_id, 'remove_days', 30)}
+                             onClick={() => handleServerAction(s.guild_id, 'remove_days', getDayAmount(s.guild_id))}
                            >
                              {savingId === s.guild_id ? <Loader2 size={16} className="animate-spin" /> : <Clock size={16} />}
                            </button>
@@ -312,11 +329,21 @@ export default function AdminServersTab({
                   </div>
                   
                   {/* Actions mobile */}
-                  <div className="flex justify-end gap-2 pt-2 border-t border-[#2b2d31]/50 mt-1">
-                     <button className="p-2 bg-[#2ecc71]/10 text-[#2ecc71] rounded-lg disabled:opacity-50" disabled={savingId === s.guild_id} onClick={() => handleServerAction(s.guild_id, 'add_days', 30)}>
+                  <div className="flex justify-end items-center gap-2 pt-2 border-t border-[#2b2d31]/50 mt-1 flex-wrap">
+                     <div className="flex items-center bg-[#2b2d31]/50 rounded-lg px-2 py-1 border border-[#2b2d31] mr-auto">
+                       <input 
+                         type="number" 
+                         className="w-10 bg-transparent text-white text-xs text-center focus:outline-none hide-arrows" 
+                         value={getDayAmount(s.guild_id)}
+                         onChange={(e) => handleDayChange(s.guild_id, parseInt(e.target.value) || 0)}
+                         min="1"
+                       />
+                       <span className="text-[10px] text-[#949ba4] ml-1 font-bold">GÜN</span>
+                     </div>
+                     <button className="p-2 bg-[#2ecc71]/10 text-[#2ecc71] rounded-lg disabled:opacity-50" disabled={savingId === s.guild_id} onClick={() => handleServerAction(s.guild_id, 'add_days', getDayAmount(s.guild_id))}>
                        {savingId === s.guild_id ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
                      </button>
-                     <button className="p-2 bg-red-500/10 text-red-400 rounded-lg disabled:opacity-50" disabled={savingId === s.guild_id} onClick={() => handleServerAction(s.guild_id, 'remove_days', 30)}>
+                     <button className="p-2 bg-red-500/10 text-red-400 rounded-lg disabled:opacity-50" disabled={savingId === s.guild_id} onClick={() => handleServerAction(s.guild_id, 'remove_days', getDayAmount(s.guild_id))}>
                        {savingId === s.guild_id ? <Loader2 size={16} className="animate-spin" /> : <Clock size={16} />}
                      </button>
                      <button className={`p-2 rounded-lg disabled:opacity-50 ${s.unlimited_party ? 'bg-[#fca311]/20 text-[#fca311]' : 'bg-[#2b2d31] text-[#949ba4]'}`} disabled={savingId === s.guild_id} onClick={() => handleServerAction(s.guild_id, 'toggle_unlimited_party', !s.unlimited_party)}>
@@ -451,22 +478,32 @@ export default function AdminServersTab({
                         )}
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <div className="flex justify-end gap-2">
+                        <div className="flex justify-end gap-2 items-center">
                            {!u.is_auto_premium && (
                              <>
+                               <div className="flex items-center bg-[#1e1f22] rounded-lg px-2 py-1.5 border border-[#2b2d31]">
+                                 <input 
+                                   type="number" 
+                                   className="w-10 bg-transparent text-white text-xs text-center focus:outline-none hide-arrows" 
+                                   value={getDayAmount(u.discord_id)}
+                                   onChange={(e) => handleDayChange(u.discord_id, parseInt(e.target.value) || 0)}
+                                   min="1"
+                                 />
+                                 <span className="text-[10px] text-[#949ba4] ml-1 font-bold">GÜN</span>
+                               </div>
                                <button 
                                  className="p-2 bg-[#2ecc71]/10 hover:bg-[#2ecc71]/20 text-[#2ecc71] rounded-lg transition-colors border border-transparent hover:border-[#2ecc71]/30 disabled:opacity-50"
-                                 title="+30 Gün Ekle" 
+                                 title={`+${getDayAmount(u.discord_id)} Gün Ekle`} 
                                  disabled={savingId === u.discord_id}
-                                 onClick={() => handleUserAction(u.discord_id, 'add_days', 30)}
+                                 onClick={() => handleUserAction(u.discord_id, 'add_days', getDayAmount(u.discord_id))}
                                >
                                  {savingId === u.discord_id ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
                                </button>
                                <button 
                                  className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors border border-transparent hover:border-red-500/30 disabled:opacity-50"
-                                 title="-30 Gün Çıkar" 
+                                 title={`-${getDayAmount(u.discord_id)} Gün Çıkar`} 
                                  disabled={savingId === u.discord_id}
-                                 onClick={() => handleUserAction(u.discord_id, 'remove_days', 30)}
+                                 onClick={() => handleUserAction(u.discord_id, 'remove_days', getDayAmount(u.discord_id))}
                                >
                                  {savingId === u.discord_id ? <Loader2 size={16} className="animate-spin" /> : <Clock size={16} />}
                                </button>
@@ -537,13 +574,23 @@ export default function AdminServersTab({
                      </div>
                    </div>
                    
-                   <div className="flex justify-end gap-2 pt-2 border-t border-[#2b2d31]/50 mt-1">
+                   <div className="flex justify-end items-center gap-2 pt-2 border-t border-[#2b2d31]/50 mt-1 flex-wrap">
                      {!u.is_auto_premium && (
                        <>
-                         <button className="p-2 bg-[#2ecc71]/10 text-[#2ecc71] rounded-lg disabled:opacity-50" disabled={savingId === u.discord_id} onClick={() => handleUserAction(u.discord_id, 'add_days', 30)}>
+                         <div className="flex items-center bg-[#2b2d31]/50 rounded-lg px-2 py-1 border border-[#2b2d31] mr-auto">
+                           <input 
+                             type="number" 
+                             className="w-10 bg-transparent text-white text-xs text-center focus:outline-none hide-arrows" 
+                             value={getDayAmount(u.discord_id)}
+                             onChange={(e) => handleDayChange(u.discord_id, parseInt(e.target.value) || 0)}
+                             min="1"
+                           />
+                           <span className="text-[10px] text-[#949ba4] ml-1 font-bold">GÜN</span>
+                         </div>
+                         <button className="p-2 bg-[#2ecc71]/10 text-[#2ecc71] rounded-lg disabled:opacity-50" disabled={savingId === u.discord_id} onClick={() => handleUserAction(u.discord_id, 'add_days', getDayAmount(u.discord_id))}>
                            {savingId === u.discord_id ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
                          </button>
-                         <button className="p-2 bg-red-500/10 text-red-400 rounded-lg disabled:opacity-50" disabled={savingId === u.discord_id} onClick={() => handleUserAction(u.discord_id, 'remove_days', 30)}>
+                         <button className="p-2 bg-red-500/10 text-red-400 rounded-lg disabled:opacity-50" disabled={savingId === u.discord_id} onClick={() => handleUserAction(u.discord_id, 'remove_days', getDayAmount(u.discord_id))}>
                            {savingId === u.discord_id ? <Loader2 size={16} className="animate-spin" /> : <Clock size={16} />}
                          </button>
                          <button className={`p-2 rounded-lg disabled:opacity-50 ${u.is_unlimited ? 'bg-[#5865F2]/20 text-[#5865F2]' : 'bg-[#2b2d31] text-[#949ba4]'}`} disabled={savingId === u.discord_id} onClick={() => handleUserAction(u.discord_id, 'toggle_unlimited', !u.is_unlimited)}>
