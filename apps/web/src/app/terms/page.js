@@ -3,7 +3,7 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/context/LanguageContext";
-import { Gavel, CheckCircle, AlertCircle, Info, Shield, Users } from "lucide-react";
+import { Gavel, CheckCircle, AlertCircle, Info, Shield, Users, Cookie, FileText, UserCheck, History, Package } from "lucide-react";
 import Link from "next/link";
 
 export default function TermsPage() {
@@ -82,16 +82,25 @@ export default function TermsPage() {
             </p>
           </section>
 
-          {/* Links */}
-          <div className="pt-6 border-t border-white/10 flex flex-wrap gap-4 text-xs">
-            <Link href="/privacy" className="text-primary hover:underline flex items-center gap-1">
-              <Shield size={14} /> {isEn ? "Privacy Policy" : "Gizlilik Politikası"}
+          {/* Legal Navigation Cross-Links */}
+          <div className="pt-6 border-t border-white/10 flex flex-wrap gap-x-6 gap-y-3 text-xs">
+            <Link href="/privacy" className="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5">
+              <Shield size={14} className="text-primary" /> {isEn ? "Privacy Policy" : "Gizlilik Politikası"}
             </Link>
-            <Link href="/cerez-politikasi" className="text-primary hover:underline flex items-center gap-1">
-              <Info size={14} /> {isEn ? "Cookie Policy" : "Çerez Politikası"}
+            <Link href="/cerez-politikasi" className="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5">
+              <Cookie size={14} className="text-primary" /> {isEn ? "Cookie Policy" : "Çerez Politikası"}
             </Link>
-            <Link href="/hakkimizda" className="text-primary hover:underline flex items-center gap-1">
-              <Users size={14} /> {isEn ? "About Us & Contact" : "Hakkımızda & İletişim"}
+            <Link href="/mesafeli-satis-sozlesmesi" className="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5">
+              <FileText size={14} className="text-primary" /> {isEn ? "Distance Sales" : "Mesafeli Satış Sözleşmesi"}
+            </Link>
+            <Link href="/iptal-ve-iade-kosullari" className="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5">
+              <History size={14} className="text-primary" /> {isEn ? "Cancellation & Refund" : "İptal ve İade Koşulları"}
+            </Link>
+            <Link href="/teslimat-kosullari" className="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5">
+              <Package size={14} className="text-primary" /> {isEn ? "Delivery Terms" : "Teslimat Koşulları"}
+            </Link>
+            <Link href="/hakkimizda" className="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5">
+              <UserCheck size={14} className="text-primary" /> {isEn ? "About Us & Contact" : "Hakkımızda & İletişim"}
             </Link>
           </div>
         </div>

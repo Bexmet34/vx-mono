@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/context/LanguageContext";
 import { usePublicConfig } from "@/context/PublicConfigContext";
-import { Mail, Phone, MapPin, MessageSquare, Sparkles, Target, Shield, Users, Award, HelpCircle } from "lucide-react";
+import { Mail, Phone, MapPin, MessageSquare, Sparkles, Target, Shield, Users, Award, HelpCircle, Cookie, FileText, History, Package, UserCheck } from "lucide-react";
 import Link from "next/link";
 
 export default function AboutPage() {
@@ -148,16 +148,28 @@ export default function AboutPage() {
             </p>
           </section>
 
-          {/* Links */}
-          <div className="pt-4 border-t border-white/10 flex flex-wrap gap-4 text-xs">
-            <Link href="/privacy" className="text-primary hover:underline flex items-center gap-1">
-              <Shield size={14} /> {isEn ? "Privacy Policy" : "Gizlilik Politikası"}
+          {/* Legal Navigation Cross-Links */}
+          <div className="pt-6 border-t border-white/10 flex flex-wrap gap-x-6 gap-y-3 text-xs">
+            <Link href="/privacy" className="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5">
+              <Shield size={14} className="text-primary" /> {isEn ? "Privacy Policy" : "Gizlilik Politikası"}
             </Link>
-            <Link href="/cerez-politikasi" className="text-primary hover:underline flex items-center gap-1">
-              <Sparkles size={14} /> {isEn ? "Cookie Policy" : "Çerez Politikası"}
+            <Link href="/cerez-politikasi" className="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5">
+              <Cookie size={14} className="text-primary" /> {isEn ? "Cookie Policy" : "Çerez Politikası"}
             </Link>
-            <Link href="/terms" className="text-primary hover:underline flex items-center gap-1">
-              <Award size={14} /> {isEn ? "Terms of Service" : "Kullanım Şartları"}
+            <Link href="/terms" className="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5">
+              <FileText size={14} className="text-primary" /> {isEn ? "Terms of Service" : "Kullanım Şartları"}
+            </Link>
+            <Link href="/mesafeli-satis-sozlesmesi" className="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5">
+              <FileText size={14} className="text-primary" /> {isEn ? "Distance Sales" : "Mesafeli Satış Sözleşmesi"}
+            </Link>
+            <Link href="/iptal-ve-iade-kosullari" className="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5">
+              <History size={14} className="text-primary" /> {isEn ? "Cancellation & Refund" : "İptal ve İade Koşulları"}
+            </Link>
+            <Link href="/teslimat-kosullari" className="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5">
+              <Package size={14} className="text-primary" /> {isEn ? "Delivery Terms" : "Teslimat Koşulları"}
+            </Link>
+            <Link href="/hakkimizda" className="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5">
+              <UserCheck size={14} className="text-primary" /> {isEn ? "About Us & Contact" : "Hakkımızda & İletişim"}
             </Link>
           </div>
         </div>
