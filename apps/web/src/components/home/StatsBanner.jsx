@@ -50,7 +50,7 @@ export default function StatsBanner() {
   ];
 
   return (
-    <section className="relative py-20 overflow-hidden">
+    <section id="stats" className="relative py-10 md:py-12 overflow-hidden">
       {/* Gradient background */}
       <div className="absolute inset-0 bg-gradient-to-r from-surface-container-low via-surface-container to-surface-container-low" />
       <div className="absolute inset-0 opacity-[0.02]"

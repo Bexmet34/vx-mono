@@ -65,18 +65,18 @@ export default function PublicServersSection({ publicServers = [] }) {
   );
 
   return (
-    <section className="py-12 bg-surface overflow-hidden relative border-y border-outline-variant/10">
-      <div className="max-w-7xl mx-auto px-4 mb-8 text-center relative z-10">
-        <h2 className="font-headline-md text-primary-container text-sm md:text-base uppercase tracking-[0.2em]">
+    <section className="py-6 bg-surface overflow-hidden relative border-y border-outline-variant/10">
+      <div className="max-w-7xl mx-auto px-4 mb-3 text-center relative z-10">
+        <h2 className="font-headline-md text-primary-container text-xs md:text-sm uppercase tracking-[0.2em]">
           {t.marqueeTitle || (lang === 'tr' ? 'Seçkin Topluluklar' : 'Top Communities')}
         </h2>
-        <p className="text-on-surface-variant text-xs md:text-sm mt-2 max-w-xl mx-auto">
+        <p className="text-on-surface-variant text-xs mt-1 max-w-xl mx-auto">
           {lang === 'tr' ? 'Platformumuzu kullanan on binlerce üyeli seçkin topluluklar' : 'Elite communities with tens of thousands of members using our platform'}
         </p>
       </div>
 
       {/* Fade Mask Container */}
-      <div className="w-full relative fade-edges flex flex-col gap-4 py-4">
+      <div className="w-full relative fade-edges flex flex-col gap-3 py-2">
         
         {/* Row 1: Scrolls to the right */}
         <div className="flex gap-4 min-w-full hover-pause">

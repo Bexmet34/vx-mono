@@ -27,15 +27,15 @@ export default function FeaturesSection() {
   ];
 
   return (
-    <section className="px-margin-mobile md:px-margin-desktop py-28 md:py-36 max-w-container-max mx-auto">
-      <div className="text-center mb-20">
-        <FadeIn delay={100} direction="up" distance={30}>
-          <h2 className="font-headline-xl text-3xl sm:text-4xl md:text-5xl text-on-surface tracking-tight mb-5 font-bold">
+    <section className="px-margin-mobile md:px-margin-desktop py-12 md:py-16 max-w-container-max mx-auto">
+      <div className="text-center mb-10">
+        <FadeIn delay={100} direction="up" distance={20}>
+          <h2 className="font-headline-xl text-2xl sm:text-3xl md:text-4xl text-on-surface tracking-tight mb-3 font-bold">
             {t.featuresSectionTitle}
           </h2>
         </FadeIn>
-        <FadeIn delay={200} direction="up" distance={25}>
-          <p className="font-body-lg text-lg text-on-surface-variant max-w-xl mx-auto font-light leading-relaxed">
+        <FadeIn delay={200} direction="up" distance={15}>
+          <p className="font-body-lg text-sm sm:text-base text-on-surface-variant max-w-xl mx-auto font-light leading-relaxed">
             {t.featuresSectionDesc}
           </p>
         </FadeIn>

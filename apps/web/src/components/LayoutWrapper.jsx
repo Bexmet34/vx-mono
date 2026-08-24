@@ -26,9 +26,9 @@ export default function LayoutWrapper({ children }) {
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", paddingBottom: "70px" }}>
+    <div className="flex flex-col min-h-screen pb-16 md:pb-0">
       <Navbar />
-      <div style={{ flex: 1, paddingTop: "80px" }}>
+      <div className="flex-1 pt-14 md:pt-16">
         {children}
       </div>
       <Footer />

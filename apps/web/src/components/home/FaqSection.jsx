@@ -46,14 +46,14 @@ export default function FaqSection() {
   ];
 
   return (
-    <section className="px-margin-mobile md:px-margin-desktop py-28 md:py-36">
+    <section id="faq" className="px-margin-mobile md:px-margin-desktop py-12 md:py-16">
       <div className="max-w-3xl mx-auto">
-        <FadeIn delay={100} direction="up" distance={30}>
-          <div className="text-center mb-14">
-            <h2 className="font-headline-xl text-3xl md:text-4xl text-on-surface tracking-tight mb-4 font-bold">
+        <FadeIn delay={100} direction="up" distance={20}>
+          <div className="text-center mb-8">
+            <h2 className="font-headline-xl text-2xl md:text-3xl text-on-surface tracking-tight mb-2.5 font-bold">
               {t.faqTitle2}
             </h2>
-            <p className="font-body-lg text-on-surface-variant max-w-lg mx-auto font-light">
+            <p className="font-body-lg text-sm text-on-surface-variant max-w-lg mx-auto font-light">
               {t.faqMainDesc}
             </p>
           </div>

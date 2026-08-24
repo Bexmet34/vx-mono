@@ -66,22 +66,22 @@ export default function ComparisonSection() {
   ];
 
   return (
-    <section className="px-margin-mobile md:px-margin-desktop py-28 md:py-36 max-w-container-max mx-auto relative overflow-hidden">
+    <section id="comparison" className="px-margin-mobile md:px-margin-desktop py-12 md:py-16 max-w-container-max mx-auto relative overflow-hidden">
       {/* Background glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-primary-container/5 rounded-full blur-[160px] pointer-events-none" />
 
-      <div className="text-center mb-20 relative z-10">
-        <FadeIn delay={100} direction="up" distance={30}>
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-container/10 border border-primary-container/30 text-primary-container text-xs font-label-bold uppercase tracking-widest mb-4">
+      <div className="text-center mb-10 relative z-10">
+        <FadeIn delay={100} direction="up" distance={20}>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary-container/10 border border-primary-container/30 text-primary-container text-xs font-label-bold uppercase tracking-widest mb-3">
             <Layers size={14} />
             {lang === 'tr' ? '6+ Bot Yerine Tek Çözüm' : '1 Bot Replaces 6+ Tools'}
           </div>
-          <h2 className="font-headline-xl text-3xl sm:text-4xl md:text-5xl text-on-surface tracking-tight mb-4 font-bold">
+          <h2 className="font-headline-xl text-2xl sm:text-3xl md:text-4xl text-on-surface tracking-tight mb-3 font-bold">
             {t.compTitle}
           </h2>
         </FadeIn>
-        <FadeIn delay={200} direction="up" distance={25}>
-          <p className="font-body-lg text-lg text-on-surface-variant max-w-2xl mx-auto font-light leading-relaxed">
+        <FadeIn delay={200} direction="up" distance={15}>
+          <p className="font-body-lg text-sm sm:text-base text-on-surface-variant max-w-2xl mx-auto font-light leading-relaxed">
             {t.compSubtitle}
           </p>
         </FadeIn>
