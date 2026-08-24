@@ -190,7 +190,7 @@ export default function Dashboard() {
             }`}
           >
             <User size={16} />
-            <span>{lang === 'tr' ? '👤 Bireysel Alanım (Şablonlar)' : '👤 Personal Space'}</span>
+            <span>{lang === 'tr' ? '👤 Bireysel Alanım' : '👤 Personal Space'}</span>
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
           </button>
         </div>
