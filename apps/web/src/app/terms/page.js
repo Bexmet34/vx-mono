@@ -1,51 +1,102 @@
 "use client";
 
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import { useLanguage } from "@/context/LanguageContext";
-import { Gavel, CheckCircle, AlertCircle, Info } from "lucide-react";
+import { Gavel, CheckCircle, AlertCircle, Info, Shield, Users } from "lucide-react";
+import Link from "next/link";
 
 export default function TermsPage() {
-  const { lang, t } = useLanguage();
-
-  const active = t.legal.terms;
+  const { lang } = useLanguage();
+  const isEn = lang === "en";
 
   return (
     <>
       <Navbar />
-      <main style={{ maxWidth: '800px', margin: '4rem auto', padding: '0 2rem' }}>
-        <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-          <Gavel size={64} color="var(--accent-color)" style={{ marginBottom: '1.5rem' }} />
-          <h1 style={{ fontSize: '3rem', fontWeight: '800' }}>{t.terms}</h1>
-          <p style={{ color: 'var(--text-muted)' }}>{active.lastUpdated}</p>
-        </div>
-
-        <div className="glass-panel" style={{ padding: '3rem', lineHeight: '1.8', color: 'var(--text-muted)' }}>
-          <section style={{ marginBottom: '2.5rem' }}>
-            <h2 style={{ color: 'var(--text-main)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <CheckCircle size={16} /> {active.h1}
-            </h2>
-            <p>{active.p1}</p>
-          </section>
-
-          <section style={{ marginBottom: '2.5rem' }}>
-            <h2 style={{ color: 'var(--text-main)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <AlertCircle size={16} /> {active.h2}
-            </h2>
-            <p>{active.p2}</p>
-          </section>
-
-          <section style={{ marginBottom: '2.5rem' }}>
-            <h2 style={{ color: 'var(--text-main)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Info size={16} /> {active.h3}
-            </h2>
-            <p>{active.p3}</p>
-          </section>
-          
-          <p style={{ marginTop: '3rem', fontStyle: 'italic', borderTop: '1px solid var(--border-color)', paddingTop: '2rem' }}>
-            {active.footer}
+      <main className="max-w-4xl mx-auto my-12 px-4 sm:px-6">
+        {/* Header */}
+        <div className="text-center mb-10">
+          <div className="inline-flex p-3 bg-primary-container/20 rounded-2xl border border-primary-container/30 text-primary mb-4">
+            <Gavel size={40} />
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-2">
+            {isEn ? "Terms of Service" : "Kullanım Şartları ve Hizmet Sözleşmesi"}
+          </h1>
+          <p className="text-xs sm:text-sm text-on-surface-variant">
+            {isEn ? "Last Updated: August 24, 2026 • Effective for all Veyronix users & visitors" : "Son Güncelleme: 24 Ağustos 2026 • Tüm Veyronix kullanıcıları ve ziyaretçileri için geçerlidir"}
           </p>
         </div>
+
+        {/* Content Container */}
+        <div className="bg-surface/80 backdrop-blur-md rounded-2xl border border-white/10 p-6 sm:p-10 space-y-8 text-on-surface-variant text-sm sm:text-base leading-relaxed">
+          
+          {/* Section 1 */}
+          <section className="space-y-3">
+            <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+              <CheckCircle className="text-primary" size={20} />
+              {isEn ? "1. Acceptance of Terms" : "1. Şartların Kabulü ve Hizmet Tanımı"}
+            </h2>
+            <p>
+              {isEn
+                ? "By accessing or using Veyronix website (veyronix.com.tr), inviting the Veyronix Discord Bot to your server, or using our web dashboard, you agree to be bound by these Terms of Service, our Privacy Policy, and Discord's Terms of Service. If you do not agree with any part of these terms, you must discontinue using our services immediately."
+                : "Veyronix web sitesine (veyronix.com.tr) erişerek, Veyronix Discord Botunu sunucunuza ekleyerek veya web kontrol panelimizi kullanarak bu Kullanım Şartlarını, Gizlilik Politikamızı ve Discord Hizmet Koşullarını peşinen kabul etmiş sayılırsınız. Bu şartların herhangi birini kabul etmiyorsanız platformu ve botu kullanmayı derhal sonlandırmalısınız."}
+            </p>
+          </section>
+
+          {/* Section 2 */}
+          <section className="space-y-3">
+            <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+              <AlertCircle className="text-primary" size={20} />
+              {isEn ? "2. Acceptable Use & Fair Play" : "2. Kabul Edilebilir Kullanım ve Sorumluluklar"}
+            </h2>
+            <p>
+              {isEn
+                ? "You agree not to misuse Veyronix services. Prohibited actions include: attempting to bypass rate limits, exploiting vulnerabilities, using automated scripts to spam bot commands, using the bot for illegal activities, harassment, or distributing malicious content."
+                : "Kullanıcılar platformu ve bot komutlarını kötüye kullanmayacağını taahhüt eder. API limitlerini aşmaya çalışmak, güvenlik açığı aramak/istismar etmek, spam komut göndermek, zararlı yazılım dağıtmak veya botu yasa dışı faaliyetler için kullanmak kesinlikle yasaktır."}
+            </p>
+          </section>
+
+          {/* Section 3 */}
+          <section className="space-y-3">
+            <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+              <Shield className="text-primary" size={20} />
+              {isEn ? "3. Intellectual Property & Disclaimer" : "3. Fikri Mülkiyet ve Yasal Sorumluluk Reddi (Disclaimer)"}
+            </h2>
+            <p>
+              {isEn
+                ? "Veyronix is an independent Discord automation, statistics and party management platform. Veyronix is NOT affiliated with, endorsed by, or sponsored by Discord Inc. or Sandbox Interactive GmbH (developers of Albion Online). All trademarks, game assets, and logos belong to their respective owners."
+                : "Veyronix, bağımsız bir topluluk yönetimi, parti organizasyonu ve istatistik takip platformudur. Veyronix'in Discord Inc. veya Albion Online yapımcısı Sandbox Interactive GmbH ile doğrudan veya dolaylı hiçbir resmi bağı, sponsorluğu veya ortaklığı bulunmamaktadır. Tüm oyun içi telifler ve ticari markalar hak sahiplerine aittir."}
+            </p>
+          </section>
+
+          {/* Section 4 */}
+          <section className="space-y-3">
+            <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+              <Users className="text-primary" size={20} />
+              {isEn ? "4. Premium Subscriptions & Uptime" : "4. Premium Abonelikler ve Hizmet Sürekliliği (SLA)"}
+            </h2>
+            <p>
+              {isEn
+                ? "We strive to provide 99.9% uptime for all bot and web services. However, maintenance, API changes by Discord or Albion Online, or third-party network issues may cause temporary interruptions. Premium features are provided on an 'as-is' and 'as-available' basis."
+                : "Platformun 7/24 kesintisiz çalışması için gerekli tüm teknik önlemler alınmaktadır. Ancak Discord API güncellemeleri, Albion Online sunucu bakımları veya internet omurga arızaları gibi mücbir sebeplerden kaynaklanan geçici kesintilerden dolayı Veyronix sorumlu tutulamaz."}
+            </p>
+          </section>
+
+          {/* Links */}
+          <div className="pt-6 border-t border-white/10 flex flex-wrap gap-4 text-xs">
+            <Link href="/privacy" className="text-primary hover:underline flex items-center gap-1">
+              <Shield size={14} /> {isEn ? "Privacy Policy" : "Gizlilik Politikası"}
+            </Link>
+            <Link href="/cerez-politikasi" className="text-primary hover:underline flex items-center gap-1">
+              <Info size={14} /> {isEn ? "Cookie Policy" : "Çerez Politikası"}
+            </Link>
+            <Link href="/hakkimizda" className="text-primary hover:underline flex items-center gap-1">
+              <Users size={14} /> {isEn ? "About Us & Contact" : "Hakkımızda & İletişim"}
+            </Link>
+          </div>
+        </div>
       </main>
+      <Footer />
     </>
   );
 }

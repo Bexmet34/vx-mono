@@ -34,16 +34,28 @@ export default async function sitemap() {
       priority: 0.8,
     },
     {
-      url: LINKS.PAGE_PRIVACY,
+      url: `${LINKS.WEBSITE}/privacy`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.5,
+      priority: 0.7,
     },
     {
-      url: LINKS.PAGE_TERMS,
+      url: `${LINKS.WEBSITE}/cerez-politikasi`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.5,
+      priority: 0.7,
+    },
+    {
+      url: `${LINKS.WEBSITE}/cookie-policy`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${LINKS.WEBSITE}/terms`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.7,
     },
     {
       url: LINKS.PAGE_REFUND,
