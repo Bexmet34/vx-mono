@@ -549,6 +549,8 @@ async function handleRegisterModal(interaction) {
             return await interaction.editReply({
                 content: `❌ **${lang === 'tr' ? 'Bir hata oluştu!' : 'An error occurred!'}**`
             });
+        }
+        
         } finally {
             activeRegistrations.delete(lockKey);
         }
