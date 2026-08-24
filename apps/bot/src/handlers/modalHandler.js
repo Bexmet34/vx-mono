@@ -18,6 +18,9 @@ const { createObjectiveButtons } = require('../builders/componentBuilder');
 const { parseTimeToMs, getNow } = require('../utils/timeUtils');
 const { getSubscription, isUserPremium } = require('@veyronix/database');
 const { addUserTemplate, updateUserTemplate, getUserTemplates } = require('@veyronix/database');
+
+const activeRegistrations = new Set();
+
 const config = require('../config/config');
 
 async function handlePartiModal(interaction) {
@@ -330,17 +333,27 @@ async function handleRegisterModal(interaction) {
         if (interaction.customId === 'register_modal_tr') lang = 'tr';
         else if (interaction.customId === 'register_modal_en') lang = 'en';
         
-        let realName = '';
-        let ign = '';
-        let age = '';
-        try {
-            realName = interaction.fields.getTextInputValue('real_name');
-            ign = interaction.fields.getTextInputValue('ingame_name');
-            age = interaction.fields.getTextInputValue('age');
-        } catch (e) {
-            // Fallback for older modal versions if they existed
-            ign = interaction.fields.getTextInputValue('register_ign');
+        const lockKey = `${interaction.guildId}-${interaction.user.id}`;
+        if (activeRegistrations.has(lockKey)) {
+            return await interaction.reply({
+                content: lang === 'tr' ? '⏳ İşleminiz zaten devam ediyor, lütfen bekleyin...' : '⏳ Your request is already being processed, please wait...',
+                flags: [MessageFlags.Ephemeral]
+            });
         }
+        activeRegistrations.add(lockKey);
+
+        try {
+            let realName = '';
+            let ign = '';
+            let age = '';
+            try {
+                realName = interaction.fields.getTextInputValue('real_name');
+                ign = interaction.fields.getTextInputValue('ingame_name');
+                age = interaction.fields.getTextInputValue('age');
+            } catch (e) {
+                // Fallback for older modal versions if they existed
+                ign = interaction.fields.getTextInputValue('register_ign');
+            }
 
         await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
 
@@ -536,6 +549,8 @@ async function handleRegisterModal(interaction) {
             return await interaction.editReply({
                 content: `❌ **${lang === 'tr' ? 'Bir hata oluştu!' : 'An error occurred!'}**`
             });
+        } finally {
+            activeRegistrations.delete(lockKey);
         }
     }
 }
