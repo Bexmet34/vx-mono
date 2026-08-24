@@ -66,10 +66,17 @@ async function handleClosePartyCommand(interaction) {
 
         if (!parties || parties.length === 0) {
             console.log(`[CommandHandler] No active parties found for ${interaction.user.tag} in both JSON and SQL DB`);
-            return await safeReply(interaction, {
-                content: `❌ **${t('common.no_party', lang)}**`,
+            const noPartyText = `❌ **${t('common.no_party', lang)}**`;
+            if (interaction.replied || interaction.deferred) {
+                return await interaction.followUp({
+                    content: noPartyText,
+                    flags: [MessageFlags.Ephemeral]
+                }).catch(() => {});
+            }
+            return await interaction.reply({
+                content: noPartyText,
                 flags: [MessageFlags.Ephemeral]
-            });
+            }).catch(() => {});
         }
 
         console.log(`[CommandHandler] Closing ${parties.length} parties for ${interaction.user.tag}`);

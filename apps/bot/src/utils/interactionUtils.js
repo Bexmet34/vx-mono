@@ -2,10 +2,12 @@ const { MessageFlags, AttachmentBuilder } = require('discord.js');
 const { LOGO_PATH, LOGO_NAME } = require('../constants/constants');
 
 /**
- * Safely replies to an interaction and returns the message object when possible.
- * Guarantees that ephemeral messages are NEVER duplicated or leaked to channel.send fallback.
+ * Safely replies to an interaction.
+ * Guaranteed to never leak messages into public channel.send.
  */
 async function safeReply(interaction, payload) {
+    if (!interaction) return null;
+
     // Automatically add logo file ONLY if at least one embed uses it as a thumbnail
     if (payload.embeds && payload.embeds.length > 0) {
         const usesLogo = payload.embeds.some(embed => {
@@ -32,51 +34,21 @@ async function safeReply(interaction, payload) {
         allowedMentions: { parse: ['everyone', 'roles', 'users'] }
     };
 
-    let replySent = false;
-
     try {
-        // 1. Send the response
         if (interaction.replied || interaction.deferred) {
-            await interaction.followUp({ ...options });
+            return await interaction.followUp(options);
         } else {
-            await interaction.reply({ ...options });
+            return await interaction.reply(options);
         }
-
-        replySent = true;
-
-        // Ephemeral messages cannot and should not be fetched as public message objects
-        if (isEphemeral) {
-            return null;
-        }
-
-        // For public messages, fetch the actual Message object
-        return await interaction.fetchReply().catch(() => null);
-
     } catch (error) {
-        // If the reply was already sent successfully or acknowledged, do nothing
-        if (replySent || interaction.replied || interaction.deferred) {
-            return null;
-        }
-
-        // If the interaction is already dead/acknowledged, ignore
+        // Suppress common acknowledged / timed out interaction errors
         if (error.code === 10062 || error.code === 40060 || error.message?.includes('already acknowledged')) {
             return null;
         }
-
-        // Fallback: ONLY for non-ephemeral messages when interaction completely failed before acknowledging
-        if (!isEphemeral && interaction.channel) {
-            try {
-                const legacyMsg = await interaction.channel.send(options);
-                return legacyMsg;
-            } catch (sendError) {
-                console.error('[SafeReply] Channel send fallback failed:', sendError.message);
-            }
-        }
-
-        throw error;
+        console.error('[SafeReply] Failed to send interaction reply:', error.message);
+        return null;
     }
 }
-
 
 const { t } = require('../services/i18n');
 
@@ -127,7 +99,6 @@ async function handleInteractionError(interaction, error, lang = 'tr') {
         }
     } catch (err) { }
 }
-
 
 module.exports = {
     safeReply,
