@@ -1,14 +1,16 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Gift, Zap, RefreshCw, Save, CheckCircle2, Clock, Sparkles } from "lucide-react";
+import { Gift, Zap, RefreshCw, Sparkles, Trophy } from "lucide-react";
 import GiveawayTab from "./GiveawayTab";
 import DropTab from "./DropTab";
+import DropLeaderboard from "./DropLeaderboard";
 
 // ─── Sub-tab definitions ──────────────────────────────────────────────────────
 const SUB_TABS = [
-  { id: "giveaway",    labelTr: "Çekiliş",     labelEn: "Giveaway",    icon: Gift },
-  { id: "random_drop", labelTr: "Random Drop", labelEn: "Random Drop", icon: Zap  },
+  { id: "giveaway",    labelTr: "🎁 Çekiliş",            labelEn: "🎁 Giveaway",            icon: Gift   },
+  { id: "random_drop", labelTr: "⚡ Random Drop Ayarları", labelEn: "⚡ Random Drop Settings", icon: Zap    },
+  { id: "leaderboard", labelTr: "🏆 Liderlik Sıralaması", labelEn: "🏆 Drop Leaderboard",     icon: Trophy },
 ];
 
 // ─── RandomDropTab: DropTab bileşenini saran wrapper ─────────────────────────
@@ -24,7 +26,7 @@ function RandomDropTab({ lang, guildId, discordChannels }) {
     random_interval_min:  30,
     random_interval_max:  120,
     hourly_chance_pct:    25,
-    drop_chance_pct:      5.0,
+    drop_chance_pct:      2.0,
     drop_points:          10,
     code_expire_seconds:  60,
   };
@@ -32,7 +34,6 @@ function RandomDropTab({ lang, guildId, discordChannels }) {
   const [settings, setSettings] = useState(defaultSettings);
   const [loading, setLoading]   = useState(true);
   const [saving, setSaving]     = useState(false);
-  const [saved, setSaved]       = useState(false);
 
   const fetchSettings = useCallback(async () => {
     try {
@@ -60,8 +61,7 @@ function RandomDropTab({ lang, guildId, discordChannels }) {
         body: JSON.stringify(settings),
       });
       if (res.ok) {
-        setSaved(true);
-        setTimeout(() => setSaved(false), 2500);
+        // Success
       }
     } catch (e) {
       console.error("Error saving drop settings:", e);
@@ -80,8 +80,8 @@ function RandomDropTab({ lang, guildId, discordChannels }) {
   }
 
   return (
-    <div className="space-y-5">
-      {/* Tüm UI DropTab bileşeninden geliyor */}
+    <div className="space-y-4">
+      {/* Tüm UI ve Kaydet butonu DropTab bileşeninden geliyor */}
       <DropTab
         lang={lang}
         settings={settings}
@@ -91,28 +91,13 @@ function RandomDropTab({ lang, guildId, discordChannels }) {
         discordChannels={discordChannels}
         guildId={guildId}
       />
-
-      {/* Kaydet Butonu */}
-      <button
-        onClick={handleSave}
-        disabled={saving}
-        className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-black font-bold py-3.5 px-6 rounded-2xl transition-all shadow-xl hover:shadow-yellow-500/25 flex items-center justify-center gap-2 text-sm disabled:opacity-50"
-      >
-        {saving ? (
-          <RefreshCw className="w-5 h-5 animate-spin" />
-        ) : saved ? (
-          <><CheckCircle2 className="w-5 h-5" /> {isEn ? "Saved!" : "Kaydedildi!"}</>
-        ) : (
-          <><Save className="w-5 h-5" /> {isEn ? "Save Drop Settings" : "Drop Ayarlarını Kaydet"}</>
-        )}
-      </button>
     </div>
   );
 }
 
 // ─── EventsHub ────────────────────────────────────────────────────────────────
 export default function EventsHub({ t, lang, guildId, discordChannels, discordRoles }) {
-  const [subTab, setSubTab] = useState("giveaway");
+  const [subTab, setSubTab] = useState("random_drop");
 
   return (
     <div className="flex flex-col gap-4 animate-slide-up">
@@ -128,8 +113,8 @@ export default function EventsHub({ t, lang, guildId, discordChannels, discordRo
           </h1>
           <p className="text-[11px] text-slate-400 mt-0.5">
             {lang === "tr"
-              ? "Çekilişler, rastgele ganimetler ve daha fazlası tek çatı altında."
-              : "Giveaways, random drops, and more — all in one place."}
+              ? "Çekilişler, rastgele ganimetler ve drop liderlik sıralaması tek çatı altında."
+              : "Giveaways, random drops, and drop leaderboard — all in one place."}
           </p>
         </div>
       </div>
@@ -144,13 +129,13 @@ export default function EventsHub({ t, lang, guildId, discordChannels, discordRo
             <button
               key={tab.id}
               onClick={() => setSubTab(tab.id)}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-label-bold uppercase tracking-widest transition-all ${
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-label-bold uppercase tracking-wider transition-all ${
                 isActive
-                  ? "bg-primary-container text-on-primary border border-primary-container tactical-glow"
+                  ? "bg-primary-container text-on-primary font-bold shadow-[0_0_15px_rgba(255,215,0,0.25)]"
                   : "bg-surface-container/50 border border-outline-variant/30 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
               }`}
             >
-              <Icon size={13} />
+              <Icon size={14} />
               {label}
             </button>
           );
@@ -174,6 +159,12 @@ export default function EventsHub({ t, lang, guildId, discordChannels, discordRo
           guildId={guildId}
           discordChannels={discordChannels}
         />
+      )}
+
+      {subTab === "leaderboard" && (
+        <div className="space-y-4">
+          <DropLeaderboard guildId={guildId} lang={lang} />
+        </div>
       )}
     </div>
   );

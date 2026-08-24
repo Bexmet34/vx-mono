@@ -1,6 +1,5 @@
 "use client";
-import { AlertCircle, Clock, CalendarClock, Zap, Dices, MessageSquare, Gift, Hash, Users } from "lucide-react";
-import DropLeaderboard from "./DropLeaderboard";
+import { AlertCircle, Clock, CalendarClock, Zap, Dices, MessageSquare, Gift, Hash, Users, Save, CheckCircle2, RefreshCw } from "lucide-react";
 
 /**
  * DropTab v2 — Manuel Drop Oranı Sistemi
@@ -492,8 +491,25 @@ export default function DropTab({ lang, t, settings, setSettings, saving, saveSe
         </div>
       )}
 
-      {/* Leaderboard */}
-      <DropLeaderboard guildId={guildId} lang={lang} />
+      {/* Save Settings Button */}
+      {saveSettings && (
+        <div className="pt-2">
+          <button
+            onClick={saveSettings}
+            disabled={saving}
+            className="w-full bg-gradient-to-r from-primary-container via-yellow-400 to-amber-500 hover:brightness-110 text-on-primary font-bold py-3.5 px-6 rounded-2xl transition-all shadow-xl hover:shadow-[0_0_25px_rgba(255,215,0,0.35)] flex items-center justify-center gap-2 text-sm disabled:opacity-50 active:scale-[0.99]"
+          >
+            {saving ? (
+              <RefreshCw className="w-5 h-5 animate-spin" />
+            ) : (
+              <>
+                <Save className="w-5 h-5" />
+                <span>{isEn ? "Save Drop Settings" : "Drop Ayarlarını Kaydet"}</span>
+              </>
+            )}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
