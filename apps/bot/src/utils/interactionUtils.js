@@ -2,13 +2,13 @@ const { MessageFlags, AttachmentBuilder } = require('discord.js');
 const { LOGO_PATH, LOGO_NAME } = require('../constants/constants');
 
 /**
- * Safely replies to an interaction and ALWAYS returns the message object
+ * Safely replies to an interaction and returns the message object when possible.
+ * Guarantees that ephemeral messages are NEVER duplicated or leaked to channel.send fallback.
  */
 async function safeReply(interaction, payload) {
     // Automatically add logo file ONLY if at least one embed uses it as a thumbnail
     if (payload.embeds && payload.embeds.length > 0) {
         const usesLogo = payload.embeds.some(embed => {
-            // EmbedBuilder stores data in .data, while plain objects have them at root
             const thumbnail = (embed.data && embed.data.thumbnail) || (typeof embed.thumbnail === 'object' ? embed.thumbnail : null);
             return thumbnail && thumbnail.url === `attachment://${LOGO_NAME}`;
         });
@@ -21,12 +21,18 @@ async function safeReply(interaction, payload) {
         }
     }
 
+    const isEphemeral = Boolean(
+        payload.ephemeral ||
+        (Array.isArray(payload.flags) && payload.flags.includes(MessageFlags.Ephemeral)) ||
+        payload.flags === MessageFlags.Ephemeral
+    );
+
     const options = {
         ...payload,
         allowedMentions: { parse: ['everyone', 'roles', 'users'] }
     };
 
-    let initiated = false;
+    let replySent = false;
 
     try {
         // 1. Send the response
@@ -36,29 +42,34 @@ async function safeReply(interaction, payload) {
             await interaction.reply({ ...options });
         }
 
-        initiated = true;
-        // Always fetch the reply to get the actual Message object with the correct Discord ID
-        return await interaction.fetchReply();
+        replySent = true;
 
-    } catch (error) {
-        // Handle Aborted error specifically
-        if (error.code === 20 || error.message?.includes('aborted')) {
-            console.log('[SafeReply] Operation aborted, attempting fetchReply fallback...');
-            try {
-                return await interaction.fetchReply();
-            } catch (e) {
-                if (interaction.replied || interaction.deferred) return null;
-            }
+        // Ephemeral messages cannot and should not be fetched as public message objects
+        if (isEphemeral) {
+            return null;
         }
 
-        // Final fallback: channel.send ONLY if we haven't initiated a reply yet
-        if (!initiated && interaction.channel) {
+        // For public messages, fetch the actual Message object
+        return await interaction.fetchReply().catch(() => null);
+
+    } catch (error) {
+        // If the reply was already sent successfully or acknowledged, do nothing
+        if (replySent || interaction.replied || interaction.deferred) {
+            return null;
+        }
+
+        // If the interaction is already dead/acknowledged, ignore
+        if (error.code === 10062 || error.code === 40060 || error.message?.includes('already acknowledged')) {
+            return null;
+        }
+
+        // Fallback: ONLY for non-ephemeral messages when interaction completely failed before acknowledging
+        if (!isEphemeral && interaction.channel) {
             try {
                 const legacyMsg = await interaction.channel.send(options);
-                // console.log('[SafeReply] Fallback successful via channel.send');
                 return legacyMsg;
             } catch (sendError) {
-                // console.error('[SafeReply] All delivery methods failed.');
+                console.error('[SafeReply] Channel send fallback failed:', sendError.message);
             }
         }
 
@@ -80,10 +91,8 @@ async function handleInteractionError(interaction, error, lang = 'tr') {
         error.message?.includes('JSON') ||
         error.message?.includes('525');
 
-    // Discord bazen error.code yerine error.errors objesi ile dönüyor
     const errorCode = error.code ?? error.errors?.[0]?.code;
 
-    // Interaction zaman aşımı (10062) veya zaten cevaplanmış (40060) hatalari
     const isUnknownInteraction = error.message?.includes('Unknown interaction') ||
         error.message?.includes('already been acknowledged') ||
         error.message?.includes('Interaction has already been');
