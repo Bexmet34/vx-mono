@@ -355,33 +355,26 @@ export async function DELETE(req) {
       return NextResponse.json({ error: "Discord ID is required" }, { status: 400 });
     }
 
-    // Queue cancellation notification before deleting
+    // Queue cancellation notification before deleting using Database Template
     try {
-      const embedTitle = "⚠️ Veyronix Premium Cancelled / İptal Edildi";
-      const embedDescription = 
-        `🇬🇧 **Premium Subscription Cancelled**\n` +
-        `Your individual premium subscription has been cancelled.\n` +
-        `• **Status:** Cancelled / Expired\n` +
-        `• **Website:** ${LINKS.WEBSITE}/\n` +
-        `• **Support Server:** ${LINKS.SUPPORT_SERVER}\n\n` +
-        `▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n\n` +
-        `🇹🇷 **Premium Aboneliği İptal Edildi**\n` +
-        `Bireysel premium aboneliğiniz iptal edildi.\n` +
-        `• **Durum:** İptal Edildi / Sona Erdi\n` +
-        `• **Web Sitesi:** ${LINKS.WEBSITE}/\n` +
-        `• **Destek Sunucusu:** ${LINKS.SUPPORT_SERVER}`;
-
-      await queueMessage({
-        owner_id: discordId,
-        message_content: JSON.stringify({
-          embeds: [{
-            title: embedTitle,
-            description: embedDescription,
-            color: 0xe74c3c,
-            timestamp: new Date().toISOString()
-          }]
-        })
-      });
+      const placeholders = { kullanici: `<@${discordId}>`, tarih: 'İptal Edildi', saat: '-', gun: 0 };
+      const parsed = await getParsedTemplate('user_sub_cancelled', placeholders);
+      
+      if (parsed) {
+        await queueMessage({
+          owner_id: discordId,
+          message_content: JSON.stringify({
+            embeds: [{
+              title: parsed.title,
+              description: parsed.content,
+              color: parsed.color ? parseInt(parsed.color.replace('#', ''), 16) : 0xe74c3c,
+              timestamp: new Date().toISOString()
+            }]
+          })
+        });
+      } else {
+        console.warn(`[Admin Users DELETE] Template user_sub_cancelled not found in database. Notification skipped.`);
+      }
     } catch (cancelQueueErr) {
       console.error("[Admin Users DELETE] Error queueing cancellation DM:", cancelQueueErr.message);
     }
