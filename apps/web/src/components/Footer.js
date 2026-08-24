@@ -11,7 +11,7 @@ export default function Footer() {
   return (
     <footer className="mt-12 border-t border-outline-variant/30 bg-surface-container-lowest pt-10 pb-8 relative z-10 overflow-x-hidden">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8">
-        
+
         {/* Brand Section */}
         <div className="flex flex-col items-center md:items-start text-center md:text-left mb-8 pb-6 border-b border-outline-variant/20">
           <Link href="/" className="inline-flex items-center gap-2.5 text-xl font-bold tracking-tight text-primary-container uppercase">
@@ -26,7 +26,7 @@ export default function Footer() {
         {/* Mobile: 2-column Grid for Resources & Legal, with Contact Centered Below */}
         {/* Desktop: 3-column or 4-column wide grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
-          
+
           {/* 1. Resources Section (Solda - Left) */}
           <div className="text-left">
             <h4 className="font-label-bold text-xs text-primary-container uppercase tracking-wider mb-3 flex items-center gap-1.5">
@@ -43,11 +43,6 @@ export default function Footer() {
                 <a href="https://docs.veyronix.com.tr/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs text-on-surface-variant hover:text-primary-container transition-colors">
                   <span className="text-on-surface-variant/50">•</span> {t.wiki}
                 </a>
-              </li>
-              <li>
-                <Link href="/#features" className="flex items-center gap-2 text-xs text-on-surface-variant hover:text-primary-container transition-colors">
-                  <span className="text-on-surface-variant/50">•</span> {t.features}
-                </Link>
               </li>
               <li>
                 <Link href="/dashboard" className="flex items-center gap-2 text-xs text-on-surface-variant hover:text-primary-container transition-colors">
@@ -132,10 +127,10 @@ export default function Footer() {
           <div className="flex flex-wrap justify-center items-center gap-2.5">
             {/* SSL Logo */}
             <div className="inline-flex items-center gap-1.5 text-primary-container font-bold text-[11px] uppercase tracking-wider px-3.5 py-1 rounded-full border border-primary-container/30 bg-primary-container/10">
-              <Shield size={13} /> 
+              <Shield size={13} />
               <span>256-Bit SSL Güvencesiyle</span>
             </div>
-            
+
             {/* Payment Methods */}
             <div className="inline-flex items-center gap-2 border border-outline-variant/30 px-3 py-1 bg-surface-container-high rounded-full">
               <span className="font-extrabold text-[10px] text-white">VISA</span>
