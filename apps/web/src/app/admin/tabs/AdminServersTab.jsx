@@ -146,9 +146,9 @@ export default function AdminServersTab({
           </div>
 
           {/* Data Display - Responsive Cards for Mobile, Table for Desktop */}
-          <div className="hidden lg:block bg-[#1e1f22] border border-[#2b2d31] rounded-xl overflow-hidden">
+          <div className="hidden lg:block bg-[#1e1f22] border border-[#2b2d31] rounded-xl overflow-x-auto custom-scrollbar">
             <table className="w-full text-left text-sm">
-              <thead className="bg-[#2b2d31]/50 text-[#949ba4] font-semibold text-xs uppercase tracking-wider">
+              <thead className="bg-[#2b2d31]/50 text-[#949ba4] font-semibold text-xs uppercase tracking-wider whitespace-nowrap">
                 <tr>
                   <th className="px-6 py-4">Sunucu Bilgisi</th>
                   <th className="px-6 py-4">Sahip ID</th>
@@ -157,7 +157,7 @@ export default function AdminServersTab({
                   <th className="px-6 py-4 text-right">İşlemler</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#2b2d31]">
+              <tbody className="divide-y divide-[#2b2d31] whitespace-nowrap">
                 {filteredServers.map(s => {
                   const isExpired = !s.is_unlimited && new Date(s.expires_at) < new Date();
                   const isPassive = !s.is_active;
@@ -401,9 +401,9 @@ export default function AdminServersTab({
             </div>
           </div>
 
-          <div className="hidden lg:block bg-[#1e1f22] border border-[#2b2d31] rounded-xl overflow-hidden">
+          <div className="hidden lg:block bg-[#1e1f22] border border-[#2b2d31] rounded-xl overflow-x-auto custom-scrollbar">
             <table className="w-full text-left text-sm">
-              <thead className="bg-[#2b2d31]/50 text-[#949ba4] font-semibold text-xs uppercase tracking-wider">
+              <thead className="bg-[#2b2d31]/50 text-[#949ba4] font-semibold text-xs uppercase tracking-wider whitespace-nowrap">
                 <tr>
                   <th className="px-6 py-4">Discord Kullanıcı Bilgisi</th>
                   <th className="px-6 py-4">Durum</th>
@@ -412,7 +412,7 @@ export default function AdminServersTab({
                   <th className="px-6 py-4 text-right">İşlemler</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#2b2d31]">
+              <tbody className="divide-y divide-[#2b2d31] whitespace-nowrap">
                 {filteredUsers.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="px-6 py-12 text-center text-[#949ba4]">Bireysel premium kullanan üye bulunamadı.</td>
