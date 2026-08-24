@@ -1,8 +1,7 @@
 import { notFound } from "next/navigation";
-import styles from "@/components/KillMatch.module.css";
 import CtaBanner from "@/components/CtaBanner";
 import Link from "next/link";
-import { Shield, Users, Sword, Skull } from "lucide-react";
+import { Shield, Users, Sword, Skull, Trophy } from "lucide-react";
 
 import { fetchAlbion } from "@/utils/albion";
 
@@ -53,89 +52,97 @@ export default async function GuildProfilePage({ params }) {
   const topMembers = members ? members.sort((a, b) => (b.KillFame || 0) - (a.KillFame || 0)).slice(0, 15) : [];
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <h1>{guild.Name} Lonca Profili</h1>
-        <p>Albion Online {server.toUpperCase()} Sunucusu</p>
+    <div className="max-w-4xl mx-auto px-3 sm:px-6 pt-20 sm:pt-24 pb-32 text-white">
+      
+      {/* Header */}
+      <div className="text-center mb-8">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-container/15 border border-primary-container/30 text-primary-container text-xs font-bold uppercase tracking-wider mb-2">
+          <Shield size={14} /> {server.toUpperCase()} SUNUCUSU
+        </div>
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight break-words">
+          {guild.Name}
+        </h1>
+        {guild.AllianceName && (
+          <p className="text-on-surface-variant text-sm mt-1">
+            [{guild.AllianceTag}] {guild.AllianceName}
+          </p>
+        )}
       </div>
 
-      <div style={{ maxWidth: '800px', margin: '0 auto', marginBottom: '4rem' }}>
-        <div className={`${styles.playerCard} ${styles.killerCard}`} style={{ width: '100%', borderColor: '#fca311' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', marginBottom: '1rem' }}>
-            <Shield size={40} color="#fca311" />
-            <div className={styles.playerTitle} style={{ margin: 0, color: '#fca311', fontSize: '2rem' }}>
-              {guild.Name}
-            </div>
-          </div>
-          {guild.AllianceName && <div className={styles.guildName}>[{guild.AllianceTag}] {guild.AllianceName}</div>}
+      {/* Guild Stats Card */}
+      <div className="bg-[#12141c]/95 border border-primary-container/30 rounded-2xl p-5 sm:p-8 mb-10 shadow-2xl">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
           
-          <div style={{ display: 'flex', gap: '2rem', marginTop: '2rem', textAlign: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
-            <div style={{ background: 'rgba(255,255,255,0.05)', padding: '1rem 2rem', borderRadius: '12px' }}>
-              <div style={{ color: '#aaa', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center' }}>
-                <Sword size={16} /> Kill Fame
-              </div>
-              <div className={styles.fame} style={{ color: '#2ecc71', margin: '0.5rem 0' }}>{guild.killFame?.toLocaleString()}</div>
+          <div className="bg-black/40 border border-emerald-500/30 rounded-xl p-4">
+            <div className="text-xs font-bold text-on-surface-variant flex items-center justify-center gap-1.5 mb-1">
+              <Sword size={15} className="text-emerald-400" /> Kill Fame
             </div>
-            
-            <div style={{ background: 'rgba(255,255,255,0.05)', padding: '1rem 2rem', borderRadius: '12px' }}>
-              <div style={{ color: '#aaa', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center' }}>
-                <Skull size={16} /> Death Fame
-              </div>
-              <div className={styles.fame} style={{ color: '#e74c3c', margin: '0.5rem 0' }}>{guild.DeathFame?.toLocaleString()}</div>
+            <div className="text-xl sm:text-2xl font-extrabold text-emerald-400">
+              {guild.killFame?.toLocaleString()}
             </div>
           </div>
-          
-          <div style={{ marginTop: '2rem', padding: '1rem 3rem', background: 'rgba(0,0,0,0.5)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', display: 'inline-flex', alignItems: 'center', gap: '1rem' }}>
-            <Users size={16} color="#aaa" />
-            <div>
-              <p style={{ color: '#aaa', fontSize: '0.9rem', marginBottom: '0.2rem', textAlign: 'left' }}>Üye Sayısı</p>
-              <div style={{ fontSize: '1.5rem', color: '#fff', fontWeight: 'bold' }}>{guild.MemberCount || members?.length || 0}</div>
+
+          <div className="bg-black/40 border border-red-500/30 rounded-xl p-4">
+            <div className="text-xs font-bold text-on-surface-variant flex items-center justify-center gap-1.5 mb-1">
+              <Skull size={15} className="text-red-400" /> Death Fame
+            </div>
+            <div className="text-xl sm:text-2xl font-extrabold text-red-400">
+              {guild.DeathFame?.toLocaleString()}
             </div>
           </div>
+
+          <div className="bg-black/40 border border-primary-container/30 rounded-xl p-4">
+            <div className="text-xs font-bold text-on-surface-variant flex items-center justify-center gap-1.5 mb-1">
+              <Users size={15} className="text-primary-container" /> Üye Sayısı
+            </div>
+            <div className="text-xl sm:text-2xl font-extrabold text-primary-container">
+              {guild.MemberCount || members?.length || 0}
+            </div>
+          </div>
+
         </div>
       </div>
 
-      <div className={styles.header}>
-        <h2>En Çok Kill Alan Üyeler (Top 15 Killers)</h2>
-      </div>
+      {/* Top 15 Killers Section */}
+      <div className="mb-12">
+        <div className="flex items-center gap-2 mb-4">
+          <Trophy size={20} className="text-primary-container" />
+          <h2 className="text-lg sm:text-xl font-bold text-white">
+            En Çok Kill Alan Üyeler (Top 15 Killers)
+          </h2>
+        </div>
 
-      <div style={{ maxWidth: '800px', margin: '0 auto', marginBottom: '4rem' }}>
         {topMembers.length > 0 ? (
-          <div style={{ background: 'rgba(15,15,20,0.8)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', overflow: 'hidden' }}>
+          <div className="bg-[#0f1118]/90 border border-outline-variant/30 rounded-2xl overflow-hidden divide-y divide-white/5 shadow-xl">
             {topMembers.map((member, index) => (
               <Link 
                 href={`/player/${server}/${member.Id}`} 
                 key={member.Id}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '1rem 1.5rem',
-                  borderBottom: index !== topMembers.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
-                  textDecoration: 'none',
-                  color: 'inherit',
-                  transition: 'background 0.2s ease'
-                }}
-                className="hover:bg-white/5"
+                className="flex items-center justify-between p-3.5 sm:p-4 hover:bg-white/5 transition-colors"
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                  <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'rgba(252, 163, 17, 0.2)', color: '#fca311', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-7 h-7 rounded-full bg-primary-container/20 text-primary-container flex items-center justify-center font-bold text-xs shrink-0">
                     {index + 1}
                   </div>
-                  <div>
-                    <div style={{ fontWeight: 'bold', color: '#fff', fontSize: '1.1rem' }}>{member.Name}</div>
-                    <div style={{ fontSize: '0.8rem', color: '#aaa' }}>Fame Oranı: {member.FameRatio?.toFixed(2) || 0}</div>
+                  <div className="truncate">
+                    <div className="font-bold text-white text-xs sm:text-sm truncate hover:text-primary-container">{member.Name}</div>
+                    <div className="text-[10px] text-on-surface-variant">Fame Oranı: {member.FameRatio?.toFixed(2) || 0}</div>
                   </div>
                 </div>
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ color: '#2ecc71', fontWeight: 'bold' }}>{member.KillFame?.toLocaleString()}</div>
-                  <div style={{ fontSize: '0.8rem', color: '#aaa' }}>Kill Fame</div>
+
+                <div className="text-right shrink-0 ml-3">
+                  <div className="text-xs sm:text-sm font-bold text-emerald-400 font-mono">
+                    {member.KillFame?.toLocaleString()}
+                  </div>
+                  <div className="text-[10px] text-on-surface-variant">Kill Fame</div>
                 </div>
               </Link>
             ))}
           </div>
         ) : (
-          <p style={{ textAlign: 'center', color: '#aaa' }}>Üye verisi bulunamadı.</p>
+          <div className="p-8 text-center bg-surface-container-high/40 rounded-2xl border border-outline-variant/30 text-on-surface-variant text-xs">
+            Üye verisi bulunamadı.
+          </div>
         )}
       </div>
 

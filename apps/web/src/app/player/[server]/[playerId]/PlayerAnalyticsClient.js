@@ -67,10 +67,8 @@ function calculateEstSilver(event, fame) {
   const victim = event.Victim || {};
   const ip = victim.AverageItemPower || 1000;
   
-  // Base realistic market multiplier (~12.8x Fame)
   let est = fame * 12.8;
 
-  // High IP gear multiplier
   if (ip >= 1500) {
     est *= 1.4;
   } else if (ip >= 1350) {
@@ -257,112 +255,88 @@ export default function PlayerAnalyticsClient({ player, initialMatches, server }
   }, [filteredMatches, currentPage, itemsPerPage]);
 
   return (
-    <div style={{ maxWidth: "1250px", margin: "0 auto", padding: "2rem 1rem", color: "#fff" }}>
+    <div className="max-w-6xl mx-auto px-3 sm:px-6 pt-20 sm:pt-24 pb-32 text-white">
       
       {/* Header & Financial Overview Row */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "2rem", marginBottom: "2.5rem" }}>
+      <div className="flex flex-col lg:flex-row items-start justify-between gap-6 mb-8">
         
         {/* Player Badge Info */}
-        <div>
-          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-            <h1 style={{ fontSize: "2.8rem", fontWeight: "900", color: "#fff", margin: 0, letterSpacing: "0.5px" }}>
+        <div className="w-full lg:w-auto">
+          <div className="flex items-center gap-3 flex-wrap">
+            <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight break-all">
               {player.Name}
             </h1>
-            <span style={{ background: "rgba(252, 163, 17, 0.2)", border: "1px solid rgba(252, 163, 17, 0.4)", color: "#fca311", padding: "0.3rem 0.8rem", borderRadius: "12px", fontSize: "0.85rem", fontWeight: "bold" }}>
+            <span className="bg-primary-container/20 border border-primary-container/40 text-primary-container px-2.5 py-0.5 rounded-xl text-xs font-bold uppercase tracking-wider">
               {server.toUpperCase()}
             </span>
           </div>
 
           {player.GuildName && (
-            <div style={{ fontSize: "1.2rem", color: "#aaa", marginTop: "0.5rem" }}>
-              <Link href={`/guild/${server}/${player.GuildId}`} style={{ color: "#fca311", textDecoration: "none", fontWeight: "bold" }} className="hover:underline">
+            <div className="text-sm sm:text-base text-on-surface-variant mt-1.5 font-medium">
+              <Link href={`/guild/${server}/${player.GuildId}`} className="text-primary-container hover:underline font-bold">
                 [{player.AllianceTag || player.AllianceName || ""}] {player.GuildName}
               </Link>
             </div>
           )}
 
-          <div style={{ display: "flex", gap: "1.5rem", marginTop: "1rem", color: "#888", fontSize: "0.9rem" }}>
-            <div>Kill Fame: <strong style={{ color: "#2ecc71" }}>{(player.KillFame || 0).toLocaleString()}</strong></div>
-            <div>Death Fame: <strong style={{ color: "#e74c3c" }}>{(player.DeathFame || 0).toLocaleString()}</strong></div>
-            <div>Ratio: <strong style={{ color: "#fca311" }}>{(player.FameRatio || 0).toFixed(2)}</strong></div>
+          <div className="flex items-center gap-4 mt-3 text-xs text-on-surface-variant flex-wrap">
+            <div>Kill Fame: <strong className="text-emerald-400">{(player.KillFame || 0).toLocaleString()}</strong></div>
+            <div>Death Fame: <strong className="text-red-400">{(player.DeathFame || 0).toLocaleString()}</strong></div>
+            <div>Ratio: <strong className="text-primary-container">{(player.FameRatio || 0).toFixed(2)}</strong></div>
           </div>
         </div>
 
-        {/* Financial KPI Summary Cards (EST. PROFIT TODAY, LOST TODAY, etc.) */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: "0.75rem", flex: 1, maxWidth: "680px" }}>
+        {/* Financial KPI Summary Cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 w-full lg:w-auto lg:max-w-2xl">
           
           {/* EST. PROFIT TODAY */}
-          <div style={{
-            background: "rgba(18, 22, 32, 0.9)",
-            border: "1px solid rgba(46, 204, 113, 0.3)",
-            borderRadius: "10px",
-            padding: "1rem",
-            textAlign: "center"
-          }}>
-            <div style={{ fontSize: "0.7rem", fontWeight: "bold", color: "#aaa", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-              {isTr ? "Bugün Kazanılan" : "Est. Profit Today"}
+          <div className="bg-[#121620]/90 border border-emerald-500/30 rounded-xl p-3 text-center shadow-md">
+            <div className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
+              {isTr ? "Bugün Kazanılan" : "Profit Today"}
             </div>
-            <div style={{ fontSize: "1.4rem", fontWeight: "900", color: "#2ecc71", margin: "0.3rem 0" }}>
+            <div className="text-base sm:text-xl font-extrabold text-emerald-400 my-1">
               {formatNumber(financialStats.profitToday)}
             </div>
-            <div style={{ fontSize: "0.65rem", color: "#888", textTransform: "uppercase" }}>
-              {financialStats.killsTodayCount} {isTr ? "Kill & Asist" : "Kills & Assists"}
+            <div className="text-[9px] text-on-surface-variant uppercase">
+              {financialStats.killsTodayCount} {isTr ? "Kill / Asist" : "Kills"}
             </div>
           </div>
 
           {/* LOST TODAY */}
-          <div style={{
-            background: "rgba(25, 18, 22, 0.9)",
-            border: "1px solid rgba(231, 76, 60, 0.3)",
-            borderRadius: "10px",
-            padding: "1rem",
-            textAlign: "center"
-          }}>
-            <div style={{ fontSize: "0.7rem", fontWeight: "bold", color: "#ff6b6b", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+          <div className="bg-[#191216]/90 border border-red-500/30 rounded-xl p-3 text-center shadow-md">
+            <div className="text-[10px] font-bold text-red-400 uppercase tracking-wider">
               {isTr ? "Bugün Kaybedilen" : "Lost Today"}
             </div>
-            <div style={{ fontSize: "1.4rem", fontWeight: "900", color: "#e74c3c", margin: "0.3rem 0" }}>
+            <div className="text-base sm:text-xl font-extrabold text-red-400 my-1">
               {formatNumber(financialStats.lostToday)}
             </div>
-            <div style={{ fontSize: "0.65rem", color: "#888", textTransform: "uppercase" }}>
+            <div className="text-[9px] text-on-surface-variant uppercase">
               {financialStats.lossesTodayCount} {isTr ? "Ölüm" : "Losses"}
             </div>
           </div>
 
           {/* PROFIT YESTERDAY */}
-          <div style={{
-            background: "rgba(18, 22, 32, 0.9)",
-            border: "1px solid rgba(52, 152, 219, 0.3)",
-            borderRadius: "10px",
-            padding: "1rem",
-            textAlign: "center"
-          }}>
-            <div style={{ fontSize: "0.7rem", fontWeight: "bold", color: "#aaa", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+          <div className="bg-[#121620]/90 border border-blue-500/30 rounded-xl p-3 text-center shadow-md">
+            <div className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
               {isTr ? "Dün Kazanılan" : "Profit Yesterday"}
             </div>
-            <div style={{ fontSize: "1.4rem", fontWeight: "900", color: "#3498db", margin: "0.3rem 0" }}>
+            <div className="text-base sm:text-xl font-extrabold text-blue-400 my-1">
               {formatNumber(financialStats.profitYesterday)}
             </div>
-            <div style={{ fontSize: "0.65rem", color: "#888", textTransform: "uppercase" }}>
-              {financialStats.killsYesterdayCount} {isTr ? "Kill & Asist" : "Kills & Assists"}
+            <div className="text-[9px] text-on-surface-variant uppercase">
+              {financialStats.killsYesterdayCount} {isTr ? "Kill / Asist" : "Kills"}
             </div>
           </div>
 
           {/* LOST YESTERDAY */}
-          <div style={{
-            background: "rgba(25, 18, 22, 0.9)",
-            border: "1px solid rgba(231, 76, 60, 0.3)",
-            borderRadius: "10px",
-            padding: "1rem",
-            textAlign: "center"
-          }}>
-            <div style={{ fontSize: "0.7rem", fontWeight: "bold", color: "#e74c3c", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+          <div className="bg-[#191216]/90 border border-red-500/30 rounded-xl p-3 text-center shadow-md">
+            <div className="text-[10px] font-bold text-red-400 uppercase tracking-wider">
               {isTr ? "Dün Kaybedilen" : "Lost Yesterday"}
             </div>
-            <div style={{ fontSize: "1.4rem", fontWeight: "900", color: "#e74c3c", margin: "0.3rem 0" }}>
+            <div className="text-base sm:text-xl font-extrabold text-red-400 my-1">
               {formatNumber(financialStats.lostYesterday)}
             </div>
-            <div style={{ fontSize: "0.65rem", color: "#888", textTransform: "uppercase" }}>
+            <div className="text-[9px] text-on-surface-variant uppercase">
               {financialStats.lossesYesterdayCount} {isTr ? "Ölüm" : "Losses"}
             </div>
           </div>
@@ -371,73 +345,44 @@ export default function PlayerAnalyticsClient({ player, initialMatches, server }
       </div>
 
       {/* Activity Ranking Category Pills Row */}
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
-        gap: "0.75rem",
-        marginBottom: "2.5rem"
-      }}>
-        {/* Solo Card */}
-        <div style={{ background: "rgba(255, 255, 255, 0.03)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "10px", padding: "0.8rem 1rem", textAlign: "center" }}>
-          <div style={{ fontSize: "0.8rem", fontWeight: "bold", color: "#aaa" }}>Solo 1v1</div>
-          <div style={{ fontSize: "1.1rem", fontWeight: "bold", color: "#fff", margin: "0.2rem 0" }}>{formatNumber(activityRankings.soloFame)} Fame</div>
-          <div style={{ fontSize: "0.7rem", color: "#666" }}>{activityRankings.soloFights} {isTr ? "Savaş" : "fights"}</div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-8">
+        <div className="bg-white/[0.03] border border-outline-variant/30 rounded-xl p-3 text-center">
+          <div className="text-xs font-bold text-on-surface-variant">Solo 1v1</div>
+          <div className="text-sm sm:text-base font-bold text-white my-1">{formatNumber(activityRankings.soloFame)} Fame</div>
+          <div className="text-[10px] text-on-surface-variant/70">{activityRankings.soloFights} {isTr ? "Savaş" : "fights"}</div>
         </div>
 
-        {/* Small Group Card */}
-        <div style={{ background: "rgba(255, 255, 255, 0.03)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "10px", padding: "0.8rem 1rem", textAlign: "center" }}>
-          <div style={{ fontSize: "0.8rem", fontWeight: "bold", color: "#aaa" }}>Small Group (Ganking)</div>
-          <div style={{ fontSize: "1.1rem", fontWeight: "bold", color: "#fff", margin: "0.2rem 0" }}>{formatNumber(activityRankings.smallGroupFame)} Fame</div>
-          <div style={{ fontSize: "0.7rem", color: "#666" }}>{activityRankings.smallGroupFights} {isTr ? "Savaş" : "fights"}</div>
+        <div className="bg-white/[0.03] border border-outline-variant/30 rounded-xl p-3 text-center">
+          <div className="text-xs font-bold text-on-surface-variant">Small Group</div>
+          <div className="text-sm sm:text-base font-bold text-white my-1">{formatNumber(activityRankings.smallGroupFame)} Fame</div>
+          <div className="text-[10px] text-on-surface-variant/70">{activityRankings.smallGroupFights} {isTr ? "Savaş" : "fights"}</div>
         </div>
 
-        {/* ZvZ / Large Group */}
-        <div style={{ background: "rgba(255, 255, 255, 0.03)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "10px", padding: "0.8rem 1rem", textAlign: "center" }}>
-          <div style={{ fontSize: "0.8rem", fontWeight: "bold", color: "#aaa" }}>ZvZ / Large Group</div>
-          <div style={{ fontSize: "1.1rem", fontWeight: "bold", color: "#fff", margin: "0.2rem 0" }}>{formatNumber(activityRankings.largeFame)} Fame</div>
-          <div style={{ fontSize: "0.7rem", color: "#666" }}>{activityRankings.largeFights} {isTr ? "Savaş" : "fights"}</div>
+        <div className="bg-white/[0.03] border border-outline-variant/30 rounded-xl p-3 text-center">
+          <div className="text-xs font-bold text-on-surface-variant">ZvZ / Large</div>
+          <div className="text-sm sm:text-base font-bold text-white my-1">{formatNumber(activityRankings.largeFame)} Fame</div>
+          <div className="text-[10px] text-on-surface-variant/70">{activityRankings.largeFights} {isTr ? "Savaş" : "fights"}</div>
         </div>
 
-        {/* Hellgate / Corrupted */}
-        <div style={{ background: "rgba(255, 255, 255, 0.03)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "10px", padding: "0.8rem 1rem", textAlign: "center" }}>
-          <div style={{ fontSize: "0.8rem", fontWeight: "bold", color: "#aaa" }}>2v2 / 5v5 Hellgate</div>
-          <div style={{ fontSize: "1.1rem", fontWeight: "bold", color: "#888", margin: "0.2rem 0" }}>-</div>
-          <div style={{ fontSize: "0.7rem", color: "#666" }}>{isTr ? "Savaş yok" : "no fights"}</div>
+        <div className="bg-white/[0.03] border border-outline-variant/30 rounded-xl p-3 text-center">
+          <div className="text-xs font-bold text-on-surface-variant">Hellgate</div>
+          <div className="text-sm sm:text-base font-bold text-on-surface-variant/50 my-1">-</div>
+          <div className="text-[10px] text-on-surface-variant/70">{isTr ? "Savaş yok" : "no fights"}</div>
         </div>
       </div>
 
       {/* Filter & Controls Bar */}
-      <div style={{
-        background: "rgba(20, 22, 32, 0.9)",
-        border: "1px solid rgba(255, 255, 255, 0.08)",
-        borderRadius: "12px",
-        padding: "1rem 1.5rem",
-        marginBottom: "1.5rem",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        flexWrap: "wrap",
-        gap: "1rem"
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "1.25rem", flexWrap: "wrap" }}>
-          
+      <div className="bg-[#141620]/90 border border-outline-variant/30 rounded-2xl p-4 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
+        <div className="flex items-center gap-3 flex-wrap w-full sm:w-auto">
           {/* Weapon Filter Dropdown */}
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <span style={{ fontSize: "0.85rem", color: "#aaa", fontWeight: "bold" }}>Weapon:</span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-on-surface-variant font-bold">Silah:</span>
             <select
               value={weaponFilter}
               onChange={(e) => { setWeaponFilter(e.target.value); setCurrentPage(1); }}
-              style={{
-                background: "rgba(0, 0, 0, 0.6)",
-                border: "1px solid rgba(255, 255, 255, 0.15)",
-                color: "#fff",
-                borderRadius: "6px",
-                padding: "0.35rem 0.75rem",
-                fontSize: "0.85rem",
-                outline: "none"
-              }}
+              className="bg-black/60 border border-outline-variant/40 text-white rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-primary-container"
             >
-              <option value="Any">Any</option>
+              <option value="Any">Tümü (Any)</option>
               <option value="Swords">Swords</option>
               <option value="Bows">Bows</option>
               <option value="Daggers">Daggers</option>
@@ -450,59 +395,43 @@ export default function PlayerAnalyticsClient({ player, initialMatches, server }
           </div>
 
           {/* Fight Type Filter */}
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <span style={{ fontSize: "0.85rem", color: "#aaa", fontWeight: "bold" }}>Fight Type:</span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-on-surface-variant font-bold">Tür:</span>
             <select
               value={fightTypeFilter}
               onChange={(e) => { setFightTypeFilter(e.target.value); setCurrentPage(1); }}
-              style={{
-                background: "rgba(0, 0, 0, 0.6)",
-                border: "1px solid rgba(255, 255, 255, 0.15)",
-                color: "#fff",
-                borderRadius: "6px",
-                padding: "0.35rem 0.75rem",
-                fontSize: "0.85rem",
-                outline: "none"
-              }}
+              className="bg-black/60 border border-outline-variant/40 text-white rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-primary-container"
             >
-              <option value="Any">Any</option>
+              <option value="Any">Tümü (Any)</option>
               <option value="Solo">Solo (1v1)</option>
               <option value="Small Group">Small Group (2-5)</option>
-              <option value="Large ZvZ">ZvZ / Large Group (5+)</option>
+              <option value="Large ZvZ">ZvZ / Large (5+)</option>
             </select>
           </div>
 
           {/* Juicy Checkbox */}
-          <label style={{ display: "flex", alignItems: "center", gap: "0.4rem", cursor: "pointer", fontSize: "0.85rem", color: "#fca311", fontWeight: "bold" }}>
+          <label className="flex items-center gap-1.5 cursor-pointer text-xs text-primary-container font-bold select-none">
             <input
               type="checkbox"
               checked={juicyOnly}
               onChange={(e) => { setJuicyOnly(e.target.checked); setCurrentPage(1); }}
-              style={{ accentColor: "#fca311", cursor: "pointer" }}
+              className="accent-amber-400 w-3.5 h-3.5 cursor-pointer"
             />
-            Yüksek Değerli (Juicy) 🔥
+            <span>Juicy 🔥</span>
           </label>
         </div>
 
         {/* Pagination Navigation */}
-        <div style={{ display: "flex", alignItems: "center", gap: "0.35rem", flexWrap: "wrap" }}>
+        <div className="flex items-center gap-1.5 flex-wrap">
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
             <button
               key={pageNum}
               onClick={() => setCurrentPage(pageNum)}
-              style={{
-                background: currentPage === pageNum ? "#fca311" : "rgba(255, 255, 255, 0.05)",
-                color: currentPage === pageNum ? "#000" : "#aaa",
-                border: "none",
-                borderRadius: "4px",
-                minWidth: "28px",
-                height: "28px",
-                padding: "0 0.4rem",
-                fontWeight: "bold",
-                fontSize: "0.8rem",
-                cursor: "pointer",
-                transition: "all 0.2s"
-              }}
+              className={`min-w-[28px] h-7 px-1.5 rounded-lg text-xs font-bold transition-all ${
+                currentPage === pageNum 
+                  ? 'bg-primary-container text-on-primary' 
+                  : 'bg-white/5 text-on-surface-variant hover:text-white'
+              }`}
             >
               {pageNum}
             </button>
@@ -510,8 +439,8 @@ export default function PlayerAnalyticsClient({ player, initialMatches, server }
         </div>
       </div>
 
-      {/* Match Rows Table List (Detaylı PvP Savaş Listesi) */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+      {/* Match Rows Table List */}
+      <div className="space-y-3">
         {paginatedMatches.length > 0 ? (
           paginatedMatches.map((m) => {
             const killer = m.Killer || {};
@@ -521,7 +450,7 @@ export default function PlayerAnalyticsClient({ player, initialMatches, server }
             const isDeath = m.matchType === "DEATH";
             const isAssist = m.matchType === "ASSIST";
 
-            const badgeBg = isKill ? "#2ecc71" : isDeath ? "#e74c3c" : "#3498db";
+            const badgeBg = isKill ? "bg-emerald-500 text-black" : isDeath ? "bg-red-500 text-white" : "bg-blue-500 text-black";
             const badgeLabel = isKill ? "KILL" : isDeath ? "DEATH" : "ASSIST";
 
             const killerItemImg = getItemImageUrl(killer.Equipment?.MainHand?.Type);
@@ -530,120 +459,98 @@ export default function PlayerAnalyticsClient({ player, initialMatches, server }
             return (
               <div
                 key={m.EventId}
-                style={{
-                  background: "rgba(18, 20, 28, 0.95)",
-                  border: `1px solid ${isKill ? "rgba(46, 204, 113, 0.2)" : isDeath ? "rgba(231, 76, 60, 0.2)" : "rgba(52, 152, 219, 0.2)"}`,
-                  borderRadius: "10px",
-                  padding: "0.85rem 1.25rem",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: "1rem",
-                  flexWrap: "wrap",
-                  transition: "all 0.2s"
-                }}
-                className="hover:bg-white/5"
+                className={`bg-[#12141c]/95 border rounded-2xl p-3.5 sm:p-4 transition-all hover:bg-white/5 ${
+                  isKill ? "border-emerald-500/25" : isDeath ? "border-red-500/25" : "border-blue-500/25"
+                }`}
               >
-                {/* Status Badge (Sol Etiket & Zaman) */}
-                <div style={{ display: "flex", alignItems: "center", gap: "1rem", minWidth: "120px" }}>
-                  <div style={{
-                    background: badgeBg,
-                    color: "#000",
-                    fontWeight: "900",
-                    fontSize: "0.75rem",
-                    padding: "0.25rem 0.6rem",
-                    borderRadius: "4px",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.5px"
-                  }}>
-                    {badgeLabel}
-                  </div>
-                  <div style={{ fontSize: "0.8rem", color: "#888", whiteSpace: "nowrap" }} suppressHydrationWarning>
-                    {isMounted ? timeAgo(m.TimeStamp, isTr) : ""}
-                  </div>
-                </div>
-
-                {/* Match Versus Section (Katil vs Kurban) */}
-                <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", flex: 1, minWidth: "320px", justifyContent: "center" }}>
+                {/* Mobile / Tablet Responsive Layout */}
+                <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
                   
-                  {/* Killer Info */}
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", minWidth: "140px", justifyContent: "flex-end" }}>
-                    <img src={killerItemImg} alt="Weapon" style={{ width: "36px", height: "36px", objectFit: "contain", borderRadius: "6px", background: "rgba(0,0,0,0.4)" }} />
-                    <div style={{ textAlign: "right" }}>
-                      <div style={{ color: "#fff", fontWeight: "bold", fontSize: "0.95rem" }}>
-                        {killer.Name} <span style={{ fontSize: "0.7rem", color: "#aaa", fontWeight: "normal" }}>{Math.round(killer.AverageItemPower || 0)} IP</span>
+                  {/* Top Bar on Mobile: Badge + Time + Values */}
+                  <div className="flex items-center justify-between md:justify-start gap-3">
+                    <div className="flex items-center gap-2">
+                      <span className={`${badgeBg} font-black text-[10px] px-2 py-0.5 rounded-md uppercase tracking-wider shrink-0`}>
+                        {badgeLabel}
+                      </span>
+                      <span className="text-xs text-on-surface-variant/80 whitespace-nowrap" suppressHydrationWarning>
+                        {isMounted ? timeAgo(m.TimeStamp, isTr) : ""}
+                      </span>
+                    </div>
+
+                    {/* Mobile-only Values */}
+                    <div className="flex md:hidden items-center gap-2 text-right">
+                      <div className="text-xs font-bold text-emerald-400">{formatNumber(m.fame)} F</div>
+                      <span className="text-outline-variant/40">•</span>
+                      <div className="text-xs font-bold text-primary-container">{formatNumber(m.estSilver)} S</div>
+                    </div>
+                  </div>
+
+                  {/* Versus Section (Killer vs Victim) */}
+                  <div className="flex items-center justify-between md:justify-center gap-3 py-1 md:py-0 flex-1 min-w-0">
+                    {/* Killer */}
+                    <div className="flex items-center gap-2 min-w-0 flex-1 md:justify-end">
+                      <img src={killerItemImg} alt="Weapon" className="w-8 h-8 sm:w-9 sm:h-9 object-contain rounded-lg bg-black/40 border border-outline-variant/30 shrink-0" />
+                      <div className="truncate md:text-right">
+                        <div className="text-xs sm:text-sm font-bold text-white truncate">
+                          {killer.Name} <span className="text-[10px] text-on-surface-variant font-normal">{Math.round(killer.AverageItemPower || 0)} IP</span>
+                        </div>
+                        <div className="text-[10px] text-on-surface-variant truncate">
+                          {killer.GuildName ? `[${killer.AllianceTag || killer.AllianceName || ''}] ${killer.GuildName}` : 'Loncasız'}
+                        </div>
                       </div>
-                      <div style={{ fontSize: "0.75rem", color: "#888" }}>
-                        {killer.GuildName ? `[${killer.AllianceTag || killer.AllianceName || ''}] ${killer.GuildName}` : 'Loncasız'}
+                    </div>
+
+                    {/* VS Divider */}
+                    <span className="text-[10px] font-bold text-on-surface-variant/50 italic px-1 shrink-0">vs</span>
+
+                    {/* Victim */}
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      <img src={victimItemImg} alt="Weapon" className="w-8 h-8 sm:w-9 sm:h-9 object-contain rounded-lg bg-black/40 border border-outline-variant/30 shrink-0" />
+                      <div className="truncate">
+                        <div className="text-xs sm:text-sm font-bold text-white truncate">
+                          {victim.Name} <span className="text-[10px] text-on-surface-variant font-normal">{Math.round(victim.AverageItemPower || 0)} IP</span>
+                        </div>
+                        <div className="text-[10px] text-on-surface-variant truncate">
+                          {victim.GuildName ? `[${victim.AllianceTag || victim.AllianceName || ''}] ${victim.GuildName}` : 'Loncasız'}
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* VS Divider */}
-                  <span style={{ fontSize: "0.8rem", color: "#555", fontWeight: "bold", fontStyle: "italic" }}>vs.</span>
+                  {/* Desktop Right Side: Participant Count + Fame/Silver + Inspect CTA */}
+                  <div className="flex items-center justify-between md:justify-end gap-3 pt-2 md:pt-0 border-t md:border-t-0 border-outline-variant/20">
+                    <div className="flex items-center gap-1.5 bg-black/40 px-2 py-1 rounded-lg text-[10px] text-on-surface-variant">
+                      <Users size={12} className="text-primary-container" /> 
+                      <span>+{m.participantCount}</span>
+                    </div>
 
-                  {/* Victim Info */}
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", minWidth: "140px" }}>
-                    <img src={victimItemImg} alt="Weapon" style={{ width: "36px", height: "36px", objectFit: "contain", borderRadius: "6px", background: "rgba(0,0,0,0.4)" }} />
-                    <div>
-                      <div style={{ color: "#fff", fontWeight: "bold", fontSize: "0.95rem" }}>
-                        {victim.Name} <span style={{ fontSize: "0.7rem", color: "#aaa", fontWeight: "normal" }}>{Math.round(victim.AverageItemPower || 0)} IP</span>
+                    {/* Desktop Values */}
+                    <div className="hidden md:block text-right min-w-[85px]">
+                      <div className="text-xs font-bold text-emerald-400">
+                        {formatNumber(m.fame)} <span className="text-[10px] text-on-surface-variant font-normal">Fame</span>
                       </div>
-                      <div style={{ fontSize: "0.75rem", color: "#888" }}>
-                        {victim.GuildName ? `[${victim.AllianceTag || victim.AllianceName || ''}] ${victim.GuildName}` : 'Loncasız'}
+                      <div className="text-[11px] font-bold text-primary-container">
+                        {formatNumber(m.estSilver)} <span className="text-[9px] text-on-surface-variant font-normal">Silver</span>
                       </div>
                     </div>
+
+                    {/* Inspect Link */}
+                    <Link
+                      href={`/killboard/${server}/${m.EventId}`}
+                      className="inline-flex items-center gap-1.5 bg-primary-container/15 hover:bg-primary-container text-primary-container hover:text-on-primary border border-primary-container/40 px-3 py-1.5 rounded-xl text-xs font-bold uppercase transition-all active:scale-95 touch-manipulation shrink-0"
+                    >
+                      <Eye size={13} />
+                      <span>{isTr ? "İncele" : "Inspect"}</span>
+                    </Link>
                   </div>
 
                 </div>
-
-                {/* Allied Group Badge & Fame/Silver Values (Sağ Taraf) */}
-                <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
-                  
-                  {/* Group Count Badge */}
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.3rem", background: "rgba(0,0,0,0.4)", padding: "0.2rem 0.5rem", borderRadius: "6px", fontSize: "0.75rem", color: "#aaa" }}>
-                    <Users size={14} color="#fca311" /> +{m.participantCount}
-                  </div>
-
-                  {/* Fame & Est. Silver Values */}
-                  <div style={{ textAlign: "right", minWidth: "90px" }}>
-                    <div style={{ color: "#2ecc71", fontWeight: "bold", fontSize: "0.9rem" }}>
-                      {formatNumber(m.fame)} <span style={{ fontSize: "0.75rem", color: "#888" }}>Fame</span>
-                    </div>
-                    <div style={{ color: m.estSilver >= 500000 ? "#fca311" : "#aaa", fontWeight: "bold", fontSize: "0.85rem" }}>
-                      {formatNumber(m.estSilver)} <span style={{ fontSize: "0.7rem", color: "#666" }}>Silver</span>
-                    </div>
-                  </div>
-
-                  {/* Inspect Button */}
-                  <Link
-                    href={`/killboard/${server}/${m.EventId}`}
-                    style={{
-                      background: "rgba(252, 163, 17, 0.15)",
-                      border: "1px solid rgba(252, 163, 17, 0.4)",
-                      color: "#fca311",
-                      padding: "0.4rem 0.75rem",
-                      borderRadius: "6px",
-                      fontSize: "0.85rem",
-                      fontWeight: "bold",
-                      textDecoration: "none",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "0.3rem",
-                      transition: "all 0.2s"
-                    }}
-                    className="hover:bg-amber-500 hover:text-black"
-                  >
-                    <Eye size={14} /> {isTr ? "İncele" : "Inspect"}
-                  </Link>
-                </div>
-
               </div>
             );
           })
         ) : (
-          <div style={{ padding: "3rem", textAlign: "center", background: "rgba(0,0,0,0.3)", borderRadius: "10px", color: "#888" }}>
-            Filtreleme kriterlerine uygun PvP maçı bulunamadı.
+          <div className="p-8 text-center bg-surface-container-high/40 rounded-2xl border border-outline-variant/30 text-on-surface-variant text-xs">
+            {isTr ? "Filtreleme kriterlerine uygun PvP maçı bulunamadı." : "No matches found matching criteria."}
           </div>
         )}
       </div>

@@ -91,10 +91,6 @@ export default async function KillboardEventPage({ params }) {
   const totalDamage = participants.reduce((sum, p) => sum + (p.DamageDone || 0), 0);
   const totalHealing = participants.reduce((sum, p) => sum + (p.SupportHealingDone || p.HealingDone || 0), 0);
 
-  // Group Players by Side (Killer Allies vs Victim Allies)
-  const killerTeam = participants.filter(p => !p.GuildName || p.GuildName === killer.GuildName || p.DamageDone > 0);
-  const victimTeam = [victim];
-
   const dateStr = new Date(event.TimeStamp).toLocaleString('tr-TR', {
     day: 'numeric',
     month: 'long',
@@ -125,122 +121,90 @@ export default async function KillboardEventPage({ params }) {
   };
 
   return (
-    <div className={styles.container} style={{ paddingTop: '2rem', paddingBottom: '4rem' }}>
+    <div className="max-w-6xl mx-auto px-3 sm:px-6 pt-20 sm:pt-24 pb-32 text-white">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       
       {/* Top Navigation & Share Bar */}
-      <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
         <Link 
           href={`/player/${server}/${killer.Id || victim.Id || ''}`}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            color: '#aaa',
-            textDecoration: 'none',
-            fontSize: '0.9rem',
-            transition: 'color 0.2s',
-          }}
-          className="hover:text-white"
+          className="inline-flex items-center gap-2 text-on-surface-variant hover:text-primary-container text-xs font-semibold transition-colors"
         >
-          <ArrowLeft size={16} /> Oyuncu Profiline Dön
+          <ArrowLeft size={16} /> 
+          <span>Oyuncu Profiline Dön</span>
         </Link>
-        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+        <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
           <a
             href={ogImageUrl}
             target="_blank"
             rel="noopener noreferrer"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              background: 'linear-gradient(135deg, rgba(46, 204, 113, 0.2), rgba(39, 174, 96, 0.1))',
-              border: '1px solid rgba(46, 204, 113, 0.4)',
-              color: '#2ecc71',
-              padding: '0.35rem 0.85rem',
-              borderRadius: '6px',
-              fontSize: '0.85rem',
-              fontWeight: 'bold',
-              textDecoration: 'none',
-              transition: 'all 0.2s'
-            }}
-            className="hover:brightness-125"
+            className="inline-flex items-center gap-1.5 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-400 px-3 py-1.5 rounded-xl text-xs font-bold transition-all active:scale-95 touch-manipulation"
           >
-            <Download size={14} /> Savaş Kartını Görsel Olarak İndir / Paylaş
+            <Download size={13} /> 
+            <span>Savaş Kartını İndir</span>
           </a>
-          <span style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', padding: '0.35rem 0.75rem', borderRadius: '6px', fontSize: '0.8rem', color: '#fca311', fontWeight: 'bold' }}>
+          <span className="bg-surface-container-high border border-outline-variant/30 px-3 py-1.5 rounded-xl text-[10px] sm:text-xs text-primary-container font-bold uppercase tracking-wider">
             {server.toUpperCase()} SUNUCUSU
           </span>
-          <span style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', padding: '0.35rem 0.75rem', borderRadius: '6px', fontSize: '0.8rem', color: '#888' }}>
-            Event #{event.EventId}
+          <span className="bg-surface-container-high border border-outline-variant/30 px-3 py-1.5 rounded-xl text-[10px] sm:text-xs text-on-surface-variant font-mono">
+            #{event.EventId}
           </span>
         </div>
       </div>
 
       {/* Main Tactical Overview Banner */}
-      <div style={{
-        background: 'linear-gradient(135deg, rgba(20, 20, 28, 0.95), rgba(12, 12, 18, 0.98))',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-        borderRadius: '12px',
-        padding: '1.5rem 2rem',
-        marginBottom: '2rem',
-        boxShadow: '0 10px 30px rgba(0,0,0,0.4)',
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-        gap: '1.5rem',
-        alignItems: 'center'
-      }}>
+      <div className="bg-gradient-to-r from-[#14141c] to-[#0c0c12] border border-outline-variant/30 rounded-2xl p-4 sm:p-6 mb-8 shadow-2xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Fame */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '10px', background: 'rgba(231, 76, 60, 0.15)', border: '1px solid rgba(231, 76, 60, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#e74c3c' }}>
-            <Trophy size={16} />
+        <div className="flex items-center gap-3.5 bg-black/30 p-3.5 rounded-xl border border-outline-variant/20">
+          <div className="w-11 h-11 rounded-xl bg-red-500/15 border border-red-500/30 flex items-center justify-center text-red-400 shrink-0">
+            <Trophy size={18} />
           </div>
           <div>
-            <div style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase', letterSpacing: '1px' }}>Kazanılan Fame</div>
-            <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#e74c3c' }}>
+            <div className="text-[10px] text-on-surface-variant uppercase tracking-wider">Kazanılan Fame</div>
+            <div className="text-lg sm:text-xl font-bold text-red-400">
               {event.TotalVictimKillFame ? event.TotalVictimKillFame.toLocaleString() : 0}
             </div>
           </div>
         </div>
 
         {/* IP Difference */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '10px', background: ipDiff >= 0 ? 'rgba(46, 204, 113, 0.15)' : 'rgba(155, 89, 182, 0.15)', border: `1px solid ${ipDiff >= 0 ? 'rgba(46, 204, 113, 0.3)' : 'rgba(155, 89, 182, 0.3)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: ipDiff >= 0 ? '#2ecc71' : '#9b59b6' }}>
-            <Shield size={16} />
+        <div className="flex items-center gap-3.5 bg-black/30 p-3.5 rounded-xl border border-outline-variant/20">
+          <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${ipDiff >= 0 ? 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-400' : 'bg-purple-500/15 border border-purple-500/30 text-purple-400'}`}>
+            <Shield size={18} />
           </div>
           <div>
-            <div style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase', letterSpacing: '1px' }}>IP Farkı (Üstünlük)</div>
-            <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: ipDiff >= 0 ? '#2ecc71' : '#9b59b6' }}>
-              {ipDiff >= 0 ? `+${ipDiff} IP Üstünlük` : `${ipDiff} IP (Kahramanca)`}
+            <div className="text-[10px] text-on-surface-variant uppercase tracking-wider">IP Farkı</div>
+            <div className={`text-base sm:text-lg font-bold ${ipDiff >= 0 ? 'text-emerald-400' : 'text-purple-400'}`}>
+              {ipDiff >= 0 ? `+${ipDiff} IP Üstünlük` : `${ipDiff} IP`}
             </div>
           </div>
         </div>
 
         {/* Zone & Map Location */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '10px', background: 'rgba(252, 163, 17, 0.15)', border: '1px solid rgba(252, 163, 17, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fca311' }}>
-            <MapPin size={16} />
+        <div className="flex items-center gap-3.5 bg-black/30 p-3.5 rounded-xl border border-outline-variant/20">
+          <div className="w-11 h-11 rounded-xl bg-primary-container/15 border border-primary-container/30 flex items-center justify-center text-primary-container shrink-0">
+            <MapPin size={18} />
           </div>
           <div>
-            <div style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase', letterSpacing: '1px' }}>Savaş Alanı / Bölge</div>
-            <div style={{ fontSize: '1.05rem', fontWeight: 'bold', color: '#fca311' }}>
+            <div className="text-[10px] text-on-surface-variant uppercase tracking-wider">Savaş Alanı</div>
+            <div className="text-xs sm:text-sm font-bold text-primary-container truncate max-w-[160px]">
               {zoneText}
             </div>
           </div>
         </div>
 
         {/* Date & Time */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '10px', background: 'rgba(52, 152, 219, 0.15)', border: '1px solid rgba(52, 152, 219, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3498db' }}>
-            <Users size={16} />
+        <div className="flex items-center gap-3.5 bg-black/30 p-3.5 rounded-xl border border-outline-variant/20">
+          <div className="w-11 h-11 rounded-xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0">
+            <Users size={18} />
           </div>
           <div>
-            <div style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase', letterSpacing: '1px' }}>Tarih & Katılım</div>
-            <div style={{ fontSize: '0.9rem', fontWeight: 'bold', color: '#ddd' }}>
-              {dateStr} ({participants.length} Kişi)
+            <div className="text-[10px] text-on-surface-variant uppercase tracking-wider">Tarih & Katılım</div>
+            <div className="text-xs sm:text-sm font-bold text-on-surface">
+              {dateStr} <span className="text-on-surface-variant">({participants.length} Kişi)</span>
             </div>
           </div>
         </div>
@@ -250,81 +214,47 @@ export default async function KillboardEventPage({ params }) {
       <KillMatch event={event} server={server} />
 
       {/* Item 1: Dropped vs Destroyed Trash Loot Breakdown */}
-      <div style={{
-        background: 'rgba(15, 15, 22, 0.85)',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
-        borderRadius: '12px',
-        padding: '2rem',
-        marginBottom: '3rem',
-        boxShadow: '0 8px 25px rgba(0, 0, 0, 0.3)'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <Package size={22} style={{ color: '#fca311' }} />
-            <h3 style={{ margin: 0, fontSize: '1.3rem', fontWeight: 'bold', color: '#fff' }}>
-              Kurbanın Envanteri (Düşen vs. Kırılan Loot Ayrımı)
+      <div className="bg-[#0f0f16]/90 border border-outline-variant/30 rounded-2xl p-4 sm:p-6 md:p-8 mb-8 shadow-2xl">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-outline-variant/20">
+          <div className="flex items-center gap-2.5">
+            <Package size={22} className="text-primary-container" />
+            <h3 className="text-base sm:text-lg font-bold text-white">
+              Kurbanın Envanteri (Düşen vs. Kırılan Loot)
             </h3>
           </div>
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <span style={{ background: 'rgba(46, 204, 113, 0.15)', border: '1px solid rgba(46, 204, 113, 0.3)', padding: '0.3rem 0.8rem', borderRadius: '20px', fontSize: '0.85rem', color: '#2ecc71', fontWeight: 'bold', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
-              <CheckCircle2 size={14} /> {droppedItems.length} Sağlam Düşen
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="bg-emerald-500/15 border border-emerald-500/30 px-3 py-1 rounded-full text-xs text-emerald-400 font-bold inline-flex items-center gap-1.5">
+              <CheckCircle2 size={13} /> {droppedItems.length} Sağlam Düşen
             </span>
-            <span style={{ background: 'rgba(231, 76, 60, 0.15)', border: '1px solid rgba(231, 76, 60, 0.3)', padding: '0.3rem 0.8rem', borderRadius: '20px', fontSize: '0.85rem', color: '#e74c3c', fontWeight: 'bold', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
-              <AlertTriangle size={14} /> {destroyedItems.length} Kırılan (Trash)
+            <span className="bg-red-500/15 border border-red-500/30 px-3 py-1 rounded-full text-xs text-red-400 font-bold inline-flex items-center gap-1.5">
+              <AlertTriangle size={13} /> {destroyedItems.length} Kırılan (Trash)
             </span>
           </div>
         </div>
 
-        {/* Section 1: Dropped Items (Sağlam Düşen Eşyalar) */}
-        <div style={{ marginBottom: '2rem' }}>
-          <h4 style={{ color: '#2ecc71', fontSize: '1rem', fontWeight: 'bold', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            🟢 Yere Sağlam Düşen Eşyalar (Dropped Loot) ({droppedItems.length})
+        {/* Section 1: Dropped Items */}
+        <div className="mb-6">
+          <h4 className="text-emerald-400 text-xs sm:text-sm font-bold mb-3 flex items-center gap-1.5">
+            🟢 Yere Sağlam Düşen Eşyalar ({droppedItems.length})
           </h4>
           {droppedItems.length > 0 ? (
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))',
-              gap: '12px'
-            }}>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5 sm:gap-3">
               {droppedItems.map((item, idx) => {
                 const quality = item.Quality ? `?quality=${item.Quality}` : '';
                 const imageUrl = `https://render.albiononline.com/v1/item/${item.Type}.png${quality}`;
                 const nameClean = formatItemName(item.Type);
 
                 return (
-                  <div key={idx} style={{
-                    background: 'rgba(46, 204, 113, 0.04)',
-                    border: '1px solid rgba(46, 204, 113, 0.25)',
-                    borderRadius: '8px',
-                    padding: '0.75rem 0.5rem',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    position: 'relative',
-                    transition: 'all 0.2s ease',
-                  }}
-                  className="hover:border-emerald-500/60 hover:bg-emerald-500/10"
-                  >
-                    <div style={{ width: '60px', height: '60px', position: 'relative', marginBottom: '0.5rem' }}>
-                      <Image src={imageUrl} alt={item.Type} fill unoptimized style={{ objectFit: 'contain' }} />
+                  <div key={idx} className="bg-emerald-500/5 border border-emerald-500/20 hover:border-emerald-500/50 rounded-xl p-3 flex flex-col items-center justify-center text-center transition-all">
+                    <div className="w-12 h-12 relative mb-2">
+                      <Image src={imageUrl} alt={item.Type} fill unoptimized className="object-contain" />
                       {item.Count > 1 && (
-                        <span style={{
-                          position: 'absolute',
-                          bottom: '-2px',
-                          right: '-2px',
-                          background: '#2ecc71',
-                          color: '#000',
-                          fontSize: '0.75rem',
-                          fontWeight: 'bold',
-                          padding: '1px 5px',
-                          borderRadius: '4px',
-                          boxShadow: '0 2px 4px rgba(0,0,0,0.5)'
-                        }}>
+                        <span className="absolute -bottom-1 -right-1 bg-emerald-500 text-black text-[10px] font-black px-1.5 py-0.2 rounded shadow">
                           x{item.Count}
                         </span>
                       )}
                     </div>
-                    <span style={{ fontSize: '0.75rem', color: '#e0e0e0', textAlign: 'center', lineHeight: '1.2', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                    <span className="text-[11px] text-on-surface line-clamp-2 leading-tight">
                       {nameClean || item.Type}
                     </span>
                   </div>
@@ -332,59 +262,33 @@ export default async function KillboardEventPage({ params }) {
               })}
             </div>
           ) : (
-            <p style={{ fontSize: '0.85rem', color: '#666', fontStyle: 'italic', margin: 0 }}>Sağlam düşen ek eşya bulunamadı.</p>
+            <p className="text-xs text-on-surface-variant/60 italic">Sağlam düşen ek eşya bulunamadı.</p>
           )}
         </div>
 
-        {/* Section 2: Destroyed/Trash Items (Kırılan / Çöp Olmuş Eşyalar) */}
+        {/* Section 2: Destroyed/Trash Items */}
         <div>
-          <h4 style={{ color: '#e74c3c', fontSize: '1rem', fontWeight: 'bold', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            🔴 Ölüm Anında Kırılan / Çöp Olan Eşyalar (Destroyed / Trash) ({destroyedItems.length})
+          <h4 className="text-red-400 text-xs sm:text-sm font-bold mb-3 flex items-center gap-1.5">
+            🔴 Ölüm Anında Kırılan / Çöp Olan Eşyalar ({destroyedItems.length})
           </h4>
           {destroyedItems.length > 0 ? (
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))',
-              gap: '12px'
-            }}>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5 sm:gap-3">
               {destroyedItems.map((item, idx) => {
                 const quality = item.Quality ? `?quality=${item.Quality}` : '';
                 const imageUrl = `https://render.albiononline.com/v1/item/${item.Type}.png${quality}`;
                 const nameClean = formatItemName(item.Type);
 
                 return (
-                  <div key={idx} style={{
-                    background: 'rgba(231, 76, 60, 0.04)',
-                    border: '1px solid rgba(231, 76, 60, 0.25)',
-                    borderRadius: '8px',
-                    padding: '0.75rem 0.5rem',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    position: 'relative',
-                    opacity: 0.85
-                  }}
-                  className="hover:opacity-100 hover:border-red-500/60"
-                  >
-                    <div style={{ width: '60px', height: '60px', position: 'relative', marginBottom: '0.5rem' }}>
-                      <Image src={imageUrl} alt={item.Type} fill unoptimized style={{ objectFit: 'contain', filter: 'grayscale(30%)' }} />
+                  <div key={idx} className="bg-red-500/5 border border-red-500/20 hover:border-red-500/50 rounded-xl p-3 flex flex-col items-center justify-center text-center transition-all opacity-80 hover:opacity-100">
+                    <div className="w-12 h-12 relative mb-2">
+                      <Image src={imageUrl} alt={item.Type} fill unoptimized className="object-contain grayscale-[30%]" />
                       {item.Count > 1 && (
-                        <span style={{
-                          position: 'absolute',
-                          bottom: '-2px',
-                          right: '-2px',
-                          background: '#e74c3c',
-                          color: '#fff',
-                          fontSize: '0.75rem',
-                          fontWeight: 'bold',
-                          padding: '1px 5px',
-                          borderRadius: '4px'
-                        }}>
+                        <span className="absolute -bottom-1 -right-1 bg-red-500 text-white text-[10px] font-black px-1.5 py-0.2 rounded shadow">
                           x{item.Count}
                         </span>
                       )}
                     </div>
-                    <span style={{ fontSize: '0.75rem', color: '#ff9999', textAlign: 'center', lineHeight: '1.2', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                    <span className="text-[11px] text-red-300 line-clamp-2 leading-tight">
                       {nameClean || item.Type}
                     </span>
                   </div>
@@ -392,33 +296,26 @@ export default async function KillboardEventPage({ params }) {
               })}
             </div>
           ) : (
-            <p style={{ fontSize: '0.85rem', color: '#666', fontStyle: 'italic', margin: 0 }}>Bu savaşta kırılan çöp eşya yok.</p>
+            <p className="text-xs text-on-surface-variant/60 italic">Bu savaşta kırılan çöp eşya yok.</p>
           )}
         </div>
       </div>
 
-      {/* Item 2 & 5: Damage & Healing Breakdown & Team Comparison */}
-      <div style={{
-        background: 'rgba(15, 15, 22, 0.85)',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
-        borderRadius: '12px',
-        padding: '2rem',
-        marginBottom: '3rem',
-        boxShadow: '0 8px 25px rgba(0, 0, 0, 0.3)'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <Swords size={22} style={{ color: '#e74c3c' }} />
-            <h3 style={{ margin: 0, fontSize: '1.3rem', fontWeight: 'bold', color: '#fff' }}>
-              Hasar & Destek Grafiği (Damage & Healing Breakdown)
+      {/* Item 2 & 5: Damage & Healing Breakdown */}
+      <div className="bg-[#0f0f16]/90 border border-outline-variant/30 rounded-2xl p-4 sm:p-6 md:p-8 mb-8 shadow-2xl">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-outline-variant/20">
+          <div className="flex items-center gap-2.5">
+            <Swords size={22} className="text-red-400" />
+            <h3 className="text-base sm:text-lg font-bold text-white">
+              Hasar & Destek Katkısı (Damage Breakdown)
             </h3>
           </div>
-          <span style={{ background: 'rgba(231, 76, 60, 0.15)', border: '1px solid rgba(231, 76, 60, 0.3)', padding: '0.3rem 0.8rem', borderRadius: '20px', fontSize: '0.85rem', color: '#e74c3c', fontWeight: 'bold' }}>
+          <span className="bg-red-500/15 border border-red-500/30 px-3 py-1 rounded-full text-xs text-red-400 font-bold">
             Toplam Hasar: {Math.round(totalDamage).toLocaleString()}
           </span>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.25rem' }}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {participants.map((p, idx) => {
             const isMainKiller = p.Name === killer.Name;
             const dmgDone = p.DamageDone || 0;
@@ -427,54 +324,48 @@ export default async function KillboardEventPage({ params }) {
             const healPct = totalHealing > 0 ? Math.min(100, Math.round((healDone / totalHealing) * 100)) : 0;
 
             return (
-              <div key={idx} style={{
-                background: isMainKiller ? 'rgba(231, 76, 60, 0.08)' : 'rgba(255, 255, 255, 0.03)',
-                border: isMainKiller ? '1px solid rgba(231, 76, 60, 0.3)' : '1px solid rgba(255, 255, 255, 0.06)',
-                borderRadius: '10px',
-                padding: '1.25rem',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.75rem'
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div 
+                key={idx} 
+                className={`rounded-xl p-4 flex flex-col gap-2.5 ${isMainKiller ? 'bg-red-500/10 border border-red-500/30' : 'bg-surface-container-high/40 border border-outline-variant/20'}`}
+              >
+                <div className="flex justify-between items-center">
                   <Link 
                     href={`/player/${server}/${p.Id || ''}`}
-                    style={{ color: isMainKiller ? '#e74c3c' : '#fff', fontWeight: 'bold', fontSize: '1.05rem', textDecoration: 'none' }}
-                    className="hover:underline"
+                    className={`font-bold text-xs sm:text-sm hover:underline truncate mr-2 ${isMainKiller ? 'text-red-400' : 'text-white'}`}
                   >
-                    {p.Name} {isMainKiller && '👑 (Katil)'}
+                    {p.Name} {isMainKiller && '👑'}
                   </Link>
-                  <span style={{ background: 'rgba(0,0,0,0.4)', padding: '0.2rem 0.6rem', borderRadius: '12px', fontSize: '0.8rem', color: '#aaa', border: '1px solid rgba(255,255,255,0.08)' }}>
+                  <span className="bg-black/40 px-2 py-0.5 rounded-lg text-[10px] text-on-surface-variant border border-outline-variant/20 shrink-0 font-mono">
                     IP: {Math.round(p.AverageItemPower || 0)}
                   </span>
                 </div>
 
                 {p.GuildName && (
-                  <div style={{ fontSize: '0.85rem', color: '#888' }}>
+                  <div className="text-[11px] text-on-surface-variant truncate">
                     [{p.AllianceName || ''}] {p.GuildName}
                   </div>
                 )}
 
                 {/* Damage Progress Bar */}
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: '#ff7675', marginBottom: '0.25rem' }}>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}><Zap size={12} /> Hasar Katkısı</span>
-                    <span style={{ fontWeight: 'bold' }}>{Math.round(dmgDone).toLocaleString()} (%{dmgPct})</span>
+                <div className="mt-1">
+                  <div className="flex justify-between text-[10px] text-red-400 mb-1">
+                    <span className="flex items-center gap-1"><Zap size={11} /> Hasar</span>
+                    <span className="font-bold">{Math.round(dmgDone).toLocaleString()} (%{dmgPct})</span>
                   </div>
-                  <div style={{ width: '100%', height: '8px', background: 'rgba(0,0,0,0.5)', borderRadius: '4px', overflow: 'hidden' }}>
-                    <div style={{ width: `${dmgPct}%`, height: '100%', background: 'linear-gradient(90deg, #e74c3c, #ff7675)', borderRadius: '4px' }} />
+                  <div className="w-full h-2 bg-black/50 rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-red-600 to-red-400 rounded-full" style={{ width: `${dmgPct}%` }} />
                   </div>
                 </div>
 
                 {/* Healing Progress Bar if present */}
                 {healDone > 0 && (
                   <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: '#55efc4', marginBottom: '0.25rem' }}>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}><HeartPulse size={12} /> İyileştirme Katkısı</span>
-                      <span style={{ fontWeight: 'bold' }}>{Math.round(healDone).toLocaleString()} (%{healPct})</span>
+                    <div className="flex justify-between text-[10px] text-emerald-400 mb-1">
+                      <span className="flex items-center gap-1"><HeartPulse size={11} /> Şifa</span>
+                      <span className="font-bold">{Math.round(healDone).toLocaleString()} (%{healPct})</span>
                     </div>
-                    <div style={{ width: '100%', height: '8px', background: 'rgba(0,0,0,0.5)', borderRadius: '4px', overflow: 'hidden' }}>
-                      <div style={{ width: `${healPct}%`, height: '100%', background: 'linear-gradient(90deg, #2ecc71, #55efc4)', borderRadius: '4px' }} />
+                    <div className="w-full h-2 bg-black/50 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-emerald-600 to-emerald-400 rounded-full" style={{ width: `${healPct}%` }} />
                     </div>
                   </div>
                 )}

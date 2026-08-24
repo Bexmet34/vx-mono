@@ -171,18 +171,24 @@
 }
 
 @media (max-width: 768px) {
+  .container {
+    padding: 1rem 0.5rem;
+  }
   .headerWrapper {
     flex-direction: column;
     gap: 1rem;
     text-align: center;
+    padding: 0 0.5rem;
   }
   .headerButtons {
     flex-direction: column;
     gap: 0.5rem;
     justify-content: center;
+    width: 100%;
   }
   .header h1, .header h2 {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
+    word-break: break-word;
   }
   .fame {
     font-size: 1.2rem;
@@ -190,9 +196,27 @@
   }
   .versusContainer {
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.25rem;
+    padding: 1rem 0.5rem;
+    border-radius: 12px;
+  }
+  .playerCard {
+    padding: 1rem 0.5rem;
+    width: 100%;
+  }
+  .playerTitle {
+    font-size: 1.2rem;
+    word-break: break-word;
+  }
+  .equipmentGrid {
+    gap: 5px;
+  }
+  .itemSlot {
+    width: 56px;
+    height: 56px;
   }
   .vsBadge {
-    padding: 1rem 0;
+    padding: 0.5rem 0;
+    font-size: 1.5rem;
   }
 }
