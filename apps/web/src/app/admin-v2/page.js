@@ -86,7 +86,7 @@ export default function AdminPageV2() {
           <div className="max-w-7xl mx-auto w-full">
             
             {message && (
-              <div className={\`mb-6 p-4 rounded-xl flex items-start gap-3 \${message.type === 'error' ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-[#2ecc71]/10 text-[#2ecc71] border border-[#2ecc71]/20'}\`}>
+              <div className={`mb-6 p-4 rounded-xl flex items-start gap-3 ${message.type === 'error' ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-[#2ecc71]/10 text-[#2ecc71] border border-[#2ecc71]/20'}`}>
                 {message.type === 'error' ? <AlertCircle size={20} className="mt-0.5 shrink-0" /> : <CheckCircle size={20} className="mt-0.5 shrink-0" />}
                 <p className="font-medium text-sm">{message.text}</p>
               </div>
