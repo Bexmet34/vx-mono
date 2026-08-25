@@ -16,59 +16,42 @@ export default function BlogListClient({ allPosts = [] }) {
     setSelectedCategory('all');
   }, [lang]);
 
-  // Normalize posts from both Supabase & Markdown formats
-  const normalizedPosts = useMemo(() => {
-    return allPosts.map(p => {
-      // Determine language reliably
-      const postLang = p.lang || p.meta?.lang || (p.slug.endsWith('-en') ? 'en' : 'tr');
-      
-      return {
-        slug: p.slug,
-        title: p.title || p.meta?.title || p.slug,
-        description: p.description || p.meta?.description || '',
-        date: p.publishedAt || p.meta?.date || p.meta?.publishedAt || new Date().toISOString(),
-        category: p.category || p.meta?.category || (p.meta?.tags ? (Array.isArray(p.meta.tags) ? p.meta.tags[0] : p.meta.tags.split(',')[0]) : (isTr ? 'Rehber' : 'Guide')),
-        tags: Array.isArray(p.tags) ? p.tags : (p.meta?.tags ? (Array.isArray(p.meta.tags) ? p.meta.tags : p.meta.tags.split(',').map(t => t.trim())) : []),
-        readTimeMinutes: p.readTimeMinutes || 5,
-        coverImage: p.coverImage || p.meta?.coverImage || null,
-        lang: postLang,
-        authorName: p.authorName || p.meta?.author || (isTr ? 'Veyronix Ekibi' : 'Veyronix Team'),
-        authorAvatar: p.authorAvatar || 'https://veyronix.com.tr/icon.svg',
-      };
-    });
-  }, [allPosts, isTr]);
-
   // Extract categories dynamically for the current language with counts
   const categories = useMemo(() => {
     const map = new Map();
-    normalizedPosts
-      .filter(p => p.lang === lang)
+    allPosts
+      .filter(p => {
+        const postLang = p.lang || (p.slug?.endsWith('-en') ? 'en' : 'tr');
+        return postLang === lang;
+      })
       .forEach(p => {
         const cat = p.category || (isTr ? 'Rehber' : 'Guide');
         map.set(cat, (map.get(cat) || 0) + 1);
       });
     return Array.from(map.entries()).map(([name, count]) => ({ name, count }));
-  }, [normalizedPosts, lang, isTr]);
+  }, [allPosts, lang, isTr]);
 
   // Filter posts based on strictly matching language, search query and selected category
   const filteredPosts = useMemo(() => {
-    return normalizedPosts.filter(post => {
+    return allPosts.filter(post => {
+      const postLang = post.lang || (post.slug?.endsWith('-en') ? 'en' : 'tr');
+      
       // Strict language match
-      const matchesLang = post.lang === lang;
+      const matchesLang = postLang === lang;
       
       // Category filter
-      const matchesCategory = selectedCategory === 'all' || post.category.toLowerCase() === selectedCategory.toLowerCase();
+      const matchesCategory = selectedCategory === 'all' || (post.category || '').toLowerCase() === selectedCategory.toLowerCase();
 
       // Search query filter
       const query = searchQuery.toLowerCase().trim();
       const matchesSearch = !query || 
-        post.title.toLowerCase().includes(query) || 
-        post.description.toLowerCase().includes(query) ||
-        post.tags.some(t => t.toLowerCase().includes(query));
+        (post.title || '').toLowerCase().includes(query) || 
+        (post.description || '').toLowerCase().includes(query) ||
+        (Array.isArray(post.tags) ? post.tags.some(t => t.toLowerCase().includes(query)) : false);
 
       return matchesLang && matchesCategory && matchesSearch;
     });
-  }, [normalizedPosts, lang, selectedCategory, searchQuery]);
+  }, [allPosts, lang, selectedCategory, searchQuery]);
 
   const featuredPost = useMemo(() => {
     if (selectedCategory === 'all' && !searchQuery && filteredPosts.length > 0) {
@@ -93,7 +76,7 @@ export default function BlogListClient({ allPosts = [] }) {
     allCategories: "Tüm Yazılar",
     featuredBadge: "Öne Çıkan Rehber",
     emptyTitle: "Sonuç Bulunamadı",
-    emptyDesc: "Aradığınız kriterlere uygun makale bulunamadı. Lütfen farklı anahtar kelimeler deneyin.",
+    emptyDesc: "Aradığınız kriterlere uygun makale bulunamadı veya henüz bu dilde yazı eklenmedi.",
     clearSearch: "Aramayı Temizle",
     readMore: "Rehberi Oku",
     readTime: "dk okuma",
@@ -107,7 +90,7 @@ export default function BlogListClient({ allPosts = [] }) {
     allCategories: "All Articles",
     featuredBadge: "Featured Guide",
     emptyTitle: "No Articles Found",
-    emptyDesc: "No articles match your current search or category filter. Try refining your keywords.",
+    emptyDesc: "No articles match your current search or category filter.",
     clearSearch: "Clear Search",
     readMore: "Read Guide",
     readTime: "min read",
@@ -223,16 +206,16 @@ export default function BlogListClient({ allPosts = [] }) {
                 <div className="flex items-center justify-between pt-4 border-t border-outline-variant/20 flex-wrap gap-4">
                   <div className="flex items-center gap-3">
                     <img
-                      src={featuredPost.authorAvatar}
-                      alt={featuredPost.authorName}
+                      src={featuredPost.authorAvatar || 'https://veyronix.com.tr/icon.svg'}
+                      alt={featuredPost.authorName || 'Veyronix'}
                       className="w-8 h-8 rounded-full border border-primary-container/40 object-cover"
                     />
                     <div>
-                      <div className="text-xs font-bold text-white">{featuredPost.authorName}</div>
+                      <div className="text-xs font-bold text-white">{featuredPost.authorName || (isTr ? 'Veyronix Ekibi' : 'Veyronix Team')}</div>
                       <div className="text-[11px] text-on-surface-variant flex items-center gap-2">
-                        <span>{new Date(featuredPost.date).toLocaleDateString(isTr ? 'tr-TR' : 'en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                        <span>{new Date(featuredPost.publishedAt || featuredPost.date).toLocaleDateString(isTr ? 'tr-TR' : 'en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
                         <span>•</span>
-                        <span className="flex items-center gap-1"><Clock size={11} /> {featuredPost.readTimeMinutes} {t.readTime}</span>
+                        <span className="flex items-center gap-1"><Clock size={11} /> {featuredPost.readTimeMinutes || 5} {t.readTime}</span>
                       </div>
                     </div>
                   </div>
@@ -312,11 +295,11 @@ export default function BlogListClient({ allPosts = [] }) {
               <div className="px-6 pb-6 pt-0 flex items-center justify-between border-t border-outline-variant/10 mt-auto text-[11px] text-on-surface-variant">
                 <div className="flex items-center gap-1.5">
                   <Calendar size={13} />
-                  <span>{new Date(post.date).toLocaleDateString(isTr ? 'tr-TR' : 'en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                  <span>{new Date(post.publishedAt || post.date).toLocaleDateString(isTr ? 'tr-TR' : 'en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
                 </div>
 
                 <div className="flex items-center gap-1 font-semibold text-primary-container group-hover:translate-x-1 transition-transform">
-                  <span>{post.readTimeMinutes} {t.readTime}</span>
+                  <span>{post.readTimeMinutes || 5} {t.readTime}</span>
                   <ArrowRight size={13} />
                 </div>
               </div>
