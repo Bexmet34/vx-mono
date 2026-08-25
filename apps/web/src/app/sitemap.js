@@ -9,7 +9,7 @@ export default async function sitemap() {
       url: `${LINKS.PAGE_BLOG}/${post.slug}`,
       lastModified: new Date(post.publishedAt || Date.now()),
       changeFrequency: 'daily',
-      priority: 0.8,
+      priority: 0.85,
     };
   });
 
@@ -18,7 +18,32 @@ export default async function sitemap() {
       url: LINKS.WEBSITE,
       lastModified: new Date(),
       changeFrequency: 'weekly',
-      priority: 1,
+      priority: 1.0,
+    },
+    // Core Feature Landing Pages (High Priority for Search Intent)
+    {
+      url: `${LINKS.WEBSITE}/ozellikler/gecici-ses-kanali`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.95,
+    },
+    {
+      url: `${LINKS.WEBSITE}/ozellikler/kayit-sistemi`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.95,
+    },
+    {
+      url: `${LINKS.WEBSITE}/ozellikler/parti-kurucu`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.95,
+    },
+    {
+      url: `${LINKS.WEBSITE}/ozellikler/ticket-destek`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.90,
     },
     {
       url: LINKS.PAGE_BLOG,
@@ -79,7 +104,7 @@ export default async function sitemap() {
       url: LINKS.PAGE_KILLBOARD,
       lastModified: new Date(),
       changeFrequency: 'daily',
-      priority: 0.8,
+      priority: 0.85,
     },
     {
       url: LINKS.PAGE_VOTE,

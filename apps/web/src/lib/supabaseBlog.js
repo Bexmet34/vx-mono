@@ -2,6 +2,22 @@ import { supabase } from '@veyronix/database';
 import { getAllPosts as getLocalMarkdownPosts, getPostBySlug as getLocalPostBySlug } from './markdown';
 import { LINKS } from '@veyronix/config';
 
+// Helper to query with a fast timeout
+async function fetchWithTimeout(promise, timeoutMs = 2500) {
+  let timeoutHandle;
+  const timeoutPromise = new Promise((_, reject) => {
+    timeoutHandle = setTimeout(() => reject(new Error('Fetch timeout')), timeoutMs);
+  });
+  try {
+    const result = await Promise.race([promise, timeoutPromise]);
+    clearTimeout(timeoutHandle);
+    return result;
+  } catch (err) {
+    clearTimeout(timeoutHandle);
+    throw err;
+  }
+}
+
 /**
  * Tüm yayınlanmış blog yazılarını getirir (Supabase + Local Markdown Yedekli)
  */
@@ -9,11 +25,14 @@ export async function getAllBlogPosts() {
   let supabasePosts = [];
   
   try {
-    const { data, error } = await supabase
-      .from('blog_posts')
-      .select('*')
-      .eq('status', 'published')
-      .order('published_at', { ascending: false });
+    const { data, error } = await fetchWithTimeout(
+      supabase
+        .from('blog_posts')
+        .select('*')
+        .eq('status', 'published')
+        .order('published_at', { ascending: false }),
+      2500
+    );
 
     if (!error && data && data.length > 0) {
       supabasePosts = data.map(post => ({
@@ -34,7 +53,7 @@ export async function getAllBlogPosts() {
       }));
     }
   } catch (err) {
-    console.warn('Supabase blog fetch warning:', err);
+    // Gracefully fallback to local posts
   }
 
   // Yerel markdown dosyalarını da dönüştür ve ekle
@@ -72,13 +91,19 @@ export async function getAllBlogPosts() {
  * Slug'a göre tek bir blog yazısını getirir
  */
 export async function getBlogPostBySlug(slug) {
+  // Önce yerel dosyayı hızlıca kontrol et
+  const local = getLocalPostBySlug(slug);
+
   try {
-    const { data, error } = await supabase
-      .from('blog_posts')
-      .select('*')
-      .eq('slug', slug)
-      .eq('status', 'published')
-      .single();
+    const { data, error } = await fetchWithTimeout(
+      supabase
+        .from('blog_posts')
+        .select('*')
+        .eq('slug', slug)
+        .eq('status', 'published')
+        .single(),
+      2000
+    );
 
     if (!error && data) {
       return {
@@ -99,11 +124,10 @@ export async function getBlogPostBySlug(slug) {
       };
     }
   } catch (err) {
-    console.warn(`Supabase fetch failed for slug ${slug}:`, err);
+    // Fallback to local
   }
 
-  // Yerel dosyaya düş
-  const local = getLocalPostBySlug(slug);
+  // Yerel dosyaya dön
   if (local) {
     return {
       id: local.slug,

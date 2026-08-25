@@ -27,11 +27,23 @@ export const viewport = {
 export const metadata = {
   metadataBase: new URL(LINKS.WEBSITE),
   title: {
-    default: "Veyronix – #1 Albion Online Discord Botu | Otomatik Killboard & Parti Kurucu",
-    template: "%s | Veyronix Albion Online Discord Bot",
+    default: "Veyronix – Discord Kayıt, Geçici Ses Kanalı & Albion Online Botu",
+    template: "%s | Veyronix Discord Bot",
   },
-  description: "Albion Online loncanızı otomatize edin! Gelişmiş ZvZ parti kurucu, canlı Killboard takibi, otomatik rol yönetimi, oyuncu istatistikleri ve Türkçe/İngilizce web panel desteği sunan #1 Discord botu. Hemen ücretsiz deneyin!",
+  description: "Discord sunucunuzu tek bir güçlü botla yönetin: 15 butonlu geçici ses kanalları (VoiceForge), butonlu kayıt & otomatik rol, Albion Online ZvZ parti kurucu, canlı Killboard ve Türkçe/İngilizce web panel desteği!",
   keywords: [
+    "Discord Kayıt Botu",
+    "Discord Geçici Ses Kanalı",
+    "Discord Geçici Oda Botu",
+    "Discord Butonlu Kayıt",
+    "Discord Otomatik Rol Botu",
+    "Discord Ses Kanalı Açma Botu",
+    "Discord Join to Create",
+    "Discord VoiceForge",
+    "Discord Ticket Botu",
+    "Discord Destek Sistemi",
+    "Discord Çekiliş Drop Botu",
+    "Discord Sunucu Otomasyonu",
     "Albion Online Discord Bot",
     "Albion Online Bot",
     "Albion Online Killboard Bot",
@@ -45,13 +57,8 @@ export const metadata = {
     "Albion Online Discord Kayıt",
     "Albion Online Player Tracker",
     "Albion Online PvP Stats Bot",
-    "Veyronix Albion Bot",
     "Veyronix Discord Bot",
-    "Albion Guild Bot",
-    "Albion Online Loot Split Bot",
-    "Albion Event Manager",
-    "Albion Discord Verification",
-    "Albion Online Kill Log"
+    "Veyronix Albion Bot"
   ].join(", "),
   authors: [{ name: "Veyronix Team", url: LINKS.WEBSITE }],
   creator: "Veyronix",
@@ -81,8 +88,8 @@ export const metadata = {
     title: "Veyronix",
   },
   openGraph: {
-    title: "Veyronix – #1 Albion Online Discord Botu | Otomatik Killboard & Parti Kurucu",
-    description: "Albion Online loncanızı otomatize edin! Gelişmiş ZvZ parti kurucu, canlı Killboard takibi, otomatik rol yönetimi ve Türkçe/İngilizce web panel desteği sunan #1 Discord botu. Hemen ücretsiz deneyin!",
+    title: "Veyronix – Discord Kayıt, Geçici Ses Kanalı & Albion Online Botu",
+    description: "Discord sunucunuzu tek bir güçlü botla yönetin: Geçici ses kanalları (VoiceForge), butonlu kayıt & otomatik rol sistemi, ZvZ parti kurucu, Killboard takibi ve web paneli!",
     url: LINKS.WEBSITE,
     siteName: "Veyronix",
     images: [
@@ -90,7 +97,7 @@ export const metadata = {
         url: LINKS.OG_IMAGE_URL,
         width: 1200,
         height: 630,
-        alt: "Veyronix - Discord Albion Party Finder & Killboard",
+        alt: "Veyronix - Discord Kayıt, Geçici Ses Kanalı ve Albion Online Botu",
       },
     ],
     locale: "tr_TR",
@@ -99,8 +106,8 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Veyronix – #1 Albion Online Discord Botu | Otomatik Killboard & Parti Kurucu",
-    description: "Albion Online loncanızı otomatize edin! Gelişmiş ZvZ parti kurucu, canlı Killboard takibi, otomatik rol yönetimi ve Türkçe/İngilizce web panel desteği sunan #1 Discord botu.",
+    title: "Veyronix – Discord Kayıt, Geçici Ses Kanalı & Albion Online Botu",
+    description: "Discord sunucunuzu tek bir güçlü botla yönetin: Geçici ses kanalları, butonlu kayıt & otomatik rol sistemi, ZvZ parti kurucu, canlı Killboard ve web paneli!",
     images: [LINKS.OG_IMAGE_URL],
   },
   other: {
@@ -116,12 +123,12 @@ export default async function RootLayout({ children }) {
   const jsonLdSoftware = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'Veyronix - Albion Online Discord Bot',
+    name: 'Veyronix - All-In-One Discord Bot & Albion Online Platform',
     operatingSystem: 'Discord, Web, iOS, Android',
-    applicationCategory: 'GameApplication',
+    applicationCategory: 'UtilitiesApplication',
     applicationSubCategory: 'Discord Bot',
     url: LINKS.WEBSITE,
-    description: 'Albion Online loncanızı otomatize edin! Gelişmiş ZvZ parti kurucu, canlı Killboard takibi, otomatik rol yönetimi ve Türkçe/İngilizce web panel desteği sunan #1 Discord botu.',
+    description: 'Discord sunucuları için hepsi bir arada otomasyon: Dinamik geçici ses kanalları (VoiceForge), butonlu kayıt ve otomatik rol, Albion Online ZvZ parti kurucu, Killboard takibi ve web paneli.',
     offers: {
       '@type': 'Offer',
       price: '0.00',
@@ -130,14 +137,16 @@ export default async function RootLayout({ children }) {
     aggregateRating: {
       '@type': 'AggregateRating',
       ratingValue: '4.9',
-      reviewCount: '128',
+      reviewCount: '154',
     },
     featureList: [
-      'Otomatik Killboard Takibi & Duyuru',
-      'ZvZ & PvE Parti Kurucu (Party Finder)',
-      'Otomatik Discord Rol Yönetimi & API Kayıt',
-      'Türkçe & İngilizce Web Kontrol Paneli',
-      'Lonca Başvuru & Ticket Yönetimi'
+      'Dinamik Geçici Ses Kanalları & VoiceForge (Join to Create, Oda Kilitleme, Kişi Limiti)',
+      'Butonlu Modal Discord Kayıt Sistemi & Otomatik Rol / İsim Formatlama',
+      'Albion Online ZvZ & PvE Parti Kurucu (Party Finder)',
+      'Otomatik Canlı Killboard Takibi & Günlük Grafik Raporlama',
+      'Butonlu Ticket & Lonca Başvuru Sistemi',
+      'Çekiliş & Drop Puanı Topluluk Etkinlik Motoru',
+      'Türkçe ve İngilizce Destekli Web Kontrol Paneli'
     ]
   };
 
@@ -159,26 +168,34 @@ export default async function RootLayout({ children }) {
     mainEntity: [
       {
         '@type': 'Question',
-        name: 'Veyronix Albion Online Botu Nasıl Kurulur?',
+        name: 'Veyronix Discord Botu Nasıl Kurulur ve Eklenir?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Veyronix botunu Discord sunucunuza davet etmek için "Discord\'a Ekle" butonuna tıklayın. Yönetici yetkisine sahip olduğunuz sunucuyu seçerek saniyeler içinde ücretsiz kurulum yapabilirsiniz.'
+          text: 'Veyronix botunu Discord sunucunuza davet etmek için "Discord\'a Ekle" butonuna tıklayın. Yönetici yetkisine sahip olduğunuz sunucuyu seçerek saniyeler içinde tamamen ücretsiz kurulum yapabilirsiniz.'
         }
       },
       {
         '@type': 'Question',
-        name: 'Otomatik Killboard Özelliği Nedir ve Nasıl Çalışır?',
+        name: 'Discord Geçici Ses Kanalı (VoiceForge) Sistemi Nasıl Çalışır?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Veyronix, Albion Online resmi API bağlantısı ile loncanızın anlık Kill, Death ve Fame istatistiklerini çeker, otomatik olarak Discord kanalınızda görsel raporlar halinde duyurur.'
+          text: 'Üyeler tek bir "Oda Oluştur" ana kanalına katıldıklarında bot anında onlara özel bir geçici ses odası açar ve üyeyi oraya taşır. Oda sahibi 15 butonlu interaktif panelden odayı kilitleyebilir, isim değiştirebilir, kişi limiti koyabilir veya odayı gizleyebilir. Oda boşaldığında otomatik olarak silinir.'
         }
       },
       {
         '@type': 'Question',
-        name: 'ZvZ ve Parti Yönetim Sistemi Neler Sunar?',
+        name: 'Discord Butonlu Kayıt ve Otomatik Rol Sistemi Nedir?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Guild etkinlikleriniz için özel parti kompozisyonları (Tank, Healer, DPS, Support) oluşturabilirsiniz. Üyeler tek tıkla rollerini seçer, katılım durumunu yönetici web panelinden canlı izleyebilirsiniz.'
+          text: 'Sunucunuza yeni katılan üyeler /setup-registration komutuyla oluşturulan butona tıklar ve açılan formda bilgilerini (İsim, Yaş, Oyun İçi Nick veya Lonca) girer. Bot anında kurallara uygun rolü verir, takma adı otomatik düzenler ve kayıtsız rolünü temizler.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'Albion Online Killboard ve ZvZ Parti Kurucu Özellikleri Nelerdir?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Veyronix, resmi Albion Online API\'si ile loncanızın anlık Kill/Death/Fame istatistiklerini kanala görsel olarak aktarır. Ayrıca Tank, Healer, DPS ve Destek rollerinden oluşan ZvZ parti kompozisyonlarını tek tıkla kurup yönetmenizi sağlar.'
         }
       }
     ]

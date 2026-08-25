@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@veyronix/config": ["../../packages/config/src/index.js"],
+      "@veyronix/database": ["../../packages/database/src/index.js"]
     }
   }
 }

@@ -115,30 +115,44 @@ export default function Navbar({ isStatic = false }) {
                 </div>
                 <div className="absolute top-[100%] left-0 mt-2 w-52 bg-[#081425]/95 backdrop-blur-2xl border border-outline-variant/50 p-2 shadow-[0_15px_40px_rgba(0,0,0,0.8),0_0_20px_rgba(255,215,0,0.1)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 rounded-xl">
                   <div className="flex flex-col gap-1">
-                    <Link href="/killboard" className="px-3 py-1.5 text-xs text-primary-container font-bold hover:bg-primary-container/10 transition-colors rounded-lg flex items-center gap-2">
+                    <div className="px-3 py-1 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest">
+                      {lang === 'tr' ? 'Öne Çıkan Sistemler' : 'Core Systems'}
+                    </div>
+                    <Link href="/ozellikler/gecici-ses-kanali" className="px-3 py-1.5 text-xs text-primary-container font-semibold hover:bg-primary-container/10 transition-colors rounded-lg flex items-center gap-2">
+                      <span>🎙️ {lang === 'tr' ? 'Geçici Ses Kanalı' : 'Temp Voice'}</span>
+                    </Link>
+                    <Link href="/ozellikler/kayit-sistemi" className="px-3 py-1.5 text-xs text-emerald-400 font-semibold hover:bg-emerald-500/10 transition-colors rounded-lg flex items-center gap-2">
+                      <span>📝 {lang === 'tr' ? 'Kayıt & Oto Rol' : 'Registration'}</span>
+                    </Link>
+                    <Link href="/ozellikler/parti-kurucu" className="px-3 py-1.5 text-xs text-blue-400 font-semibold hover:bg-blue-500/10 transition-colors rounded-lg flex items-center gap-2">
+                      <span>⚔️ {lang === 'tr' ? 'ZvZ Parti Kurucu' : 'Party Finder'}</span>
+                    </Link>
+                    <Link href="/ozellikler/ticket-destek" className="px-3 py-1.5 text-xs text-purple-400 font-semibold hover:bg-purple-500/10 transition-colors rounded-lg flex items-center gap-2">
+                      <span>🎧 {lang === 'tr' ? 'Ticket & Destek' : 'Ticket System'}</span>
+                    </Link>
+                    <Link href="/killboard" className="px-3 py-1.5 text-xs text-amber-400 font-semibold hover:bg-amber-500/10 transition-colors rounded-lg flex items-center gap-2">
                       <Swords size={14} /> Killboard
                     </Link>
+
+                    <div className="h-[1px] bg-outline-variant/30 my-1"></div>
+
+                    <div className="px-3 py-1 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest">
+                      {lang === 'tr' ? 'Kaynaklar' : 'Resources'}
+                    </div>
                     <Link href="/#features" className="px-3 py-1.5 text-xs text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-lg">
                       {lang === 'tr' ? '✨ Özellikler (Bento)' : '✨ Features (Bento)'}
                     </Link>
                     <Link href="/#comparison" className="px-3 py-1.5 text-xs text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-lg">
                       {lang === 'tr' ? '⚡ Neden Veyronix?' : '⚡ Why Veyronix?'}
                     </Link>
-                    <Link href="/#stats" className="px-3 py-1.5 text-xs text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-lg">
-                      {lang === 'tr' ? '📊 İstatistikler' : '📊 Statistics'}
-                    </Link>
-                    <Link href="/#faq" className="px-3 py-1.5 text-xs text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-lg">
-                      {lang === 'tr' ? '❓ SSS' : '❓ FAQ'}
-                    </Link>
-                    <div className="h-[1px] bg-outline-variant/30 my-1"></div>
                     <Link href="/blog" className="px-3 py-1.5 text-xs text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-lg">
-                      {t.blog}
+                      {t.blog || 'Blog'}
                     </Link>
                     <a href="https://docs.veyronix.com.tr/" target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 text-xs text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-lg">
                       Wiki
                     </a>
                     <Link href="/changelog" className="px-3 py-1.5 text-xs text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-colors rounded-lg">
-                      {t.changelog}
+                      {t.changelog || 'Changelog'}
                     </Link>
                   </div>
                 </div>
@@ -563,25 +577,29 @@ export default function Navbar({ isStatic = false }) {
                   <ChevronDown className={`text-on-surface-variant transition-transform duration-300 ${isMobileExploreOpen ? 'rotate-180 text-primary-container' : ''}`} size={16} />
                 </button>
 
-                <div className={`overflow-hidden transition-all duration-300 ease-in-out px-3 pb-2 flex flex-col gap-1 ${isMobileExploreOpen ? 'max-h-[500px] border-t border-outline-variant/20 pt-2 opacity-100' : 'max-h-0 opacity-0'}`}>
+                <div className={`overflow-hidden transition-all duration-300 ease-in-out px-3 pb-2 flex flex-col gap-1 ${isMobileExploreOpen ? 'max-h-[600px] border-t border-outline-variant/20 pt-2 opacity-100' : 'max-h-0 opacity-0'}`}>
+                  <Link href="/ozellikler/gecici-ses-kanali" className="py-2 px-3 rounded-xl text-xs text-primary-container font-semibold hover:bg-primary-container/10 transition-all flex items-center justify-between" onClick={() => setIsMenuOpen(false)}>
+                    <span>🎙️ {lang === 'tr' ? 'Geçici Ses Kanalı' : 'Temp Voice'}</span>
+                    <ChevronRight size={13} className="opacity-50" />
+                  </Link>
+                  <Link href="/ozellikler/kayit-sistemi" className="py-2 px-3 rounded-xl text-xs text-emerald-400 font-semibold hover:bg-emerald-500/10 transition-all flex items-center justify-between" onClick={() => setIsMenuOpen(false)}>
+                    <span>📝 {lang === 'tr' ? 'Kayıt & Oto Rol' : 'Registration'}</span>
+                    <ChevronRight size={13} className="opacity-50" />
+                  </Link>
+                  <Link href="/ozellikler/parti-kurucu" className="py-2 px-3 rounded-xl text-xs text-blue-400 font-semibold hover:bg-blue-500/10 transition-all flex items-center justify-between" onClick={() => setIsMenuOpen(false)}>
+                    <span>⚔️ {lang === 'tr' ? 'ZvZ Parti Kurucu' : 'Party Finder'}</span>
+                    <ChevronRight size={13} className="opacity-50" />
+                  </Link>
+                  <Link href="/ozellikler/ticket-destek" className="py-2 px-3 rounded-xl text-xs text-purple-400 font-semibold hover:bg-purple-500/10 transition-all flex items-center justify-between" onClick={() => setIsMenuOpen(false)}>
+                    <span>🎧 {lang === 'tr' ? 'Ticket & Destek' : 'Ticket System'}</span>
+                    <ChevronRight size={13} className="opacity-50" />
+                  </Link>
                   <Link href="/#features" className="py-2 px-3 rounded-xl text-xs text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-all flex items-center justify-between" onClick={() => setIsMenuOpen(false)}>
-                    <span>{lang === 'tr' ? '✨ Özellikler' : '✨ Features'}</span>
-                    <ChevronRight size={13} className="opacity-50" />
-                  </Link>
-                  <Link href="/#comparison" className="py-2 px-3 rounded-xl text-xs text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-all flex items-center justify-between" onClick={() => setIsMenuOpen(false)}>
-                    <span>{lang === 'tr' ? '⚡ Neden Veyronix?' : '⚡ Why Veyronix?'}</span>
-                    <ChevronRight size={13} className="opacity-50" />
-                  </Link>
-                  <Link href="/#stats" className="py-2 px-3 rounded-xl text-xs text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-all flex items-center justify-between" onClick={() => setIsMenuOpen(false)}>
-                    <span>{lang === 'tr' ? '📊 İstatistikler' : '📊 Stats'}</span>
-                    <ChevronRight size={13} className="opacity-50" />
-                  </Link>
-                  <Link href="/#faq" className="py-2 px-3 rounded-xl text-xs text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-all flex items-center justify-between" onClick={() => setIsMenuOpen(false)}>
-                    <span>{lang === 'tr' ? '❓ SSS' : '❓ FAQ'}</span>
+                    <span>{lang === 'tr' ? '✨ Özellikler (Bento)' : '✨ Features'}</span>
                     <ChevronRight size={13} className="opacity-50" />
                   </Link>
                   <Link href="/blog" className="py-2 px-3 rounded-xl text-xs text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-all flex items-center justify-between" onClick={() => setIsMenuOpen(false)}>
-                    <span>{t.blog}</span>
+                    <span>{t.blog || 'Blog'}</span>
                     <ChevronRight size={13} className="opacity-50" />
                   </Link>
                   <a href="https://docs.veyronix.com.tr/" target="_blank" rel="noopener noreferrer" className="py-2 px-3 rounded-xl text-xs text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-all flex items-center justify-between" onClick={() => setIsMenuOpen(false)}>
@@ -589,7 +607,7 @@ export default function Navbar({ isStatic = false }) {
                     <ExternalLink size={12} className="opacity-50" />
                   </a>
                   <Link href="/changelog" className="py-2 px-3 rounded-xl text-xs text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 transition-all flex items-center justify-between" onClick={() => setIsMenuOpen(false)}>
-                    <span>{t.changelog}</span>
+                    <span>{t.changelog || 'Changelog'}</span>
                     <ChevronRight size={13} className="opacity-50" />
                   </Link>
                 </div>
