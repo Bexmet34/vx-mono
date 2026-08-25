@@ -390,7 +390,7 @@ async function cleanupEmptyTempChannels(client) {
     }
 }
 async function updateOwnerPermissions(vc, newOwnerId, creatorId, guildId) {
-    const { getGuildConfig } = require('./db');
+    const { getGuildConfig } = require('./guildConfig');
     const config = await getGuildConfig(guildId);
     const creators = Array.isArray(config?.tempvoice_creators) ? config.tempvoice_creators : [];
     const creatorConfig = creators.find(c => c.id === creatorId);
