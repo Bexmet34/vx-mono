@@ -5,6 +5,25 @@ import Link from 'next/link';
 import { Calendar, ArrowRight, BookOpen, Search, Clock, Tag, Sparkles, X, User, Newspaper, Flame } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
+/**
+ * Kategori isimlerini TR ve EN için standart, temiz ve düzenli hale getirir.
+ */
+function normalizeCategory(rawCategory = '', lang = 'tr') {
+  const cat = (rawCategory || '').toLowerCase().trim();
+  const isTr = lang === 'tr';
+
+  if (cat.includes('albion')) {
+    return 'Albion Online';
+  }
+  if (cat.includes('discord') || cat.includes('topluluk') || cat.includes('community') || cat.includes('automation') || cat.includes('otomasyon')) {
+    return isTr ? 'Discord Otomasyonu' : 'Discord Automation';
+  }
+  if (cat.includes('veyronix') || cat.includes('haber') || cat.includes('update') || cat.includes('platform')) {
+    return 'Veyronix';
+  }
+  return isTr ? 'Rehberler' : 'Guides';
+}
+
 export default function BlogListClient({ allPosts = [] }) {
   const { lang } = useLanguage();
   const isTr = lang === 'tr';
@@ -16,31 +35,43 @@ export default function BlogListClient({ allPosts = [] }) {
     setSelectedCategory('all');
   }, [lang]);
 
+  // Normalize all posts with unified categories and languages
+  const processedPosts = useMemo(() => {
+    return allPosts.map(p => {
+      const postLang = p.lang || (p.slug?.endsWith('-en') ? 'en' : 'tr');
+      const normalizedCat = normalizeCategory(p.category, postLang);
+      
+      return {
+        ...p,
+        lang: postLang,
+        category: normalizedCat,
+        readTimeMinutes: p.readTimeMinutes || 5,
+        authorName: p.authorName || (postLang === 'tr' ? 'Veyronix Ekibi' : 'Veyronix Team'),
+        authorAvatar: p.authorAvatar || 'https://veyronix.com.tr/icon.svg',
+      };
+    });
+  }, [allPosts]);
+
   // Extract categories dynamically for the current language with counts
   const categories = useMemo(() => {
     const map = new Map();
-    allPosts
-      .filter(p => {
-        const postLang = p.lang || (p.slug?.endsWith('-en') ? 'en' : 'tr');
-        return postLang === lang;
-      })
+    processedPosts
+      .filter(p => p.lang === lang)
       .forEach(p => {
-        const cat = p.category || (isTr ? 'Rehber' : 'Guide');
+        const cat = p.category;
         map.set(cat, (map.get(cat) || 0) + 1);
       });
     return Array.from(map.entries()).map(([name, count]) => ({ name, count }));
-  }, [allPosts, lang, isTr]);
+  }, [processedPosts, lang]);
 
   // Filter posts based on strictly matching language, search query and selected category
   const filteredPosts = useMemo(() => {
-    return allPosts.filter(post => {
-      const postLang = post.lang || (post.slug?.endsWith('-en') ? 'en' : 'tr');
-      
+    return processedPosts.filter(post => {
       // Strict language match
-      const matchesLang = postLang === lang;
+      const matchesLang = post.lang === lang;
       
-      // Category filter
-      const matchesCategory = selectedCategory === 'all' || (post.category || '').toLowerCase() === selectedCategory.toLowerCase();
+      // Category filter (case-insensitive on normalized category)
+      const matchesCategory = selectedCategory === 'all' || post.category.toLowerCase() === selectedCategory.toLowerCase();
 
       // Search query filter
       const query = searchQuery.toLowerCase().trim();
@@ -51,7 +82,7 @@ export default function BlogListClient({ allPosts = [] }) {
 
       return matchesLang && matchesCategory && matchesSearch;
     });
-  }, [allPosts, lang, selectedCategory, searchQuery]);
+  }, [processedPosts, lang, selectedCategory, searchQuery]);
 
   const featuredPost = useMemo(() => {
     if (selectedCategory === 'all' && !searchQuery && filteredPosts.length > 0) {
