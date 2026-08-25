@@ -158,13 +158,14 @@ export default function BlogPostDetailClient({ post, relatedPosts = [] }) {
                 : 'Empower your community with dynamic voice rooms, button registration, and advanced Albion Online party finder tools.'}
             </p>
             <a
-              href={LINKS.BOT_INVITE}
+              href={LINKS.BOT_INVITE || "https://discord.com/oauth2/authorize?client_id=1082239904169336902&permissions=510977&scope=bot+applications.commands"}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-primary-container text-black font-black text-xs uppercase tracking-wider hover:brightness-110 transition-all shadow-[0_0_25px_rgba(255,215,0,0.25)]"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl !bg-[#ffd700] !text-black font-extrabold text-xs sm:text-sm uppercase tracking-wider hover:brightness-110 transition-all shadow-[0_0_30px_rgba(255,215,0,0.35)]"
+              style={{ backgroundColor: '#ffd700', color: '#000000' }}
             >
-              <Sparkles size={15} />
-              <span>{isTr ? "Hemen Ücretsiz Discord'a Ekle" : "Add to Discord Free"}</span>
+              <Sparkles size={16} className="!text-black" />
+              <span className="!text-black font-extrabold">{isTr ? "Hemen Ücretsiz Discord'a Ekle" : "Add to Discord Free"}</span>
             </a>
           </div>
         </article>
