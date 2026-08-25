@@ -4,18 +4,33 @@ import { LINKS } from '@veyronix/config';
 export const revalidate = 3600; // Sitemap'i her saat başı otomatik yenile
 
 export default async function sitemap() {
-  const posts = await getAllBlogPosts();
+  let blogUrls = [];
 
-  const blogUrls = posts.map((post) => {
-    return {
-      url: `${LINKS.PAGE_BLOG}/${post.slug}`,
-      lastModified: new Date(post.publishedAt || Date.now()),
-      changeFrequency: 'daily',
-      priority: 0.85,
-    };
-  });
+  try {
+    const posts = await getAllBlogPosts();
+    if (Array.isArray(posts)) {
+      blogUrls = posts.map((post) => {
+        let lastModDate = new Date();
+        if (post.publishedAt) {
+          const parsed = new Date(post.publishedAt);
+          if (!isNaN(parsed.getTime())) {
+            lastModDate = parsed;
+          }
+        }
 
-  return [
+        return {
+          url: `${LINKS.PAGE_BLOG}/${post.slug}`,
+          lastModified: lastModDate,
+          changeFrequency: 'daily',
+          priority: 0.85,
+        };
+      });
+    }
+  } catch (error) {
+    console.error('[Sitemap] Error fetching blog posts:', error);
+  }
+
+  const staticUrls = [
     {
       url: LINKS.WEBSITE,
       lastModified: new Date(),
@@ -51,56 +66,56 @@ export default async function sitemap() {
       url: LINKS.PAGE_BLOG,
       lastModified: new Date(),
       changeFrequency: 'daily',
-      priority: 0.9,
+      priority: 0.90,
     },
     ...blogUrls,
     {
       url: LINKS.PAGE_ABOUT,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.8,
+      priority: 0.80,
     },
     {
       url: `${LINKS.WEBSITE}/privacy`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.7,
+      priority: 0.70,
     },
     {
       url: `${LINKS.WEBSITE}/cerez-politikasi`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.7,
+      priority: 0.70,
     },
     {
       url: `${LINKS.WEBSITE}/cookie-policy`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.7,
+      priority: 0.70,
     },
     {
       url: `${LINKS.WEBSITE}/terms`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.7,
+      priority: 0.70,
     },
     {
       url: LINKS.PAGE_REFUND,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.5,
+      priority: 0.50,
     },
     {
       url: LINKS.PAGE_SALES_AGREEMENT,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.5,
+      priority: 0.50,
     },
     {
       url: LINKS.PAGE_PREMIUM,
       lastModified: new Date(),
       changeFrequency: 'weekly',
-      priority: 0.9,
+      priority: 0.90,
     },
     {
       url: LINKS.PAGE_KILLBOARD,
@@ -112,13 +127,15 @@ export default async function sitemap() {
       url: LINKS.PAGE_VOTE,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.7,
+      priority: 0.70,
     },
     {
       url: LINKS.PAGE_CHANGELOG,
       lastModified: new Date(),
       changeFrequency: 'weekly',
-      priority: 0.7,
+      priority: 0.70,
     },
   ];
+
+  return staticUrls;
 }
