@@ -1,6 +1,8 @@
 import { getAllBlogPosts } from '@/lib/supabaseBlog';
 import { LINKS } from '@veyronix/config';
 
+export const revalidate = 3600; // Sitemap'i her saat başı otomatik yenile
+
 export default async function sitemap() {
   const posts = await getAllBlogPosts();
 
