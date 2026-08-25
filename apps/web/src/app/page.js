@@ -1,3 +1,4 @@
+// Veyronix Web - Ana Sayfa ve Topluluk Vitrini
 import { supabase } from "@veyronix/database";
 
 import HeroSection from "@/components/home/HeroSection";

@@ -53,3 +53,19 @@ Veyronix Platform | Discord Otomasyon & Topluluk Yönetim Sistemi
 📚 Dokümantasyon: https://docs.veyronix.com.tr
 ✉️ E-posta: info@veyronix.com.tr
 ```
+
+---
+
+# Git Commit Mesajı Kuralları
+
+Tüm Git commit mesajları, özetleri ve IDE commit başlıkları (Generate butonu dahil) oluşturulurken:
+
+1. **Dil:** Her zaman **Türkçe** olarak yazılmalıdır.
+2. **Format:** Conventional Commits standardına uygun olmalıdır:
+   - `feat: <yeni özellik veya ekleme>` (Örn: `feat: discord geçici ses kanalı ve seo sayfaları eklendi`)
+   - `fix: <hata düzeltmesi>` (Örn: `fix: sitemap bağlantı hatası giderildi`)
+   - `docs: <dokümantasyon veya blog yazıları>` (Örn: `docs: yeni kayıt sistemi rehberi eklendi`)
+   - `refactor: <kod düzenlemesi ve mimari iyileştirme>` (Örn: `refactor: admin bileşenleri modüler hale getirildi`)
+   - `style: <tasarım ve css güncellemeleri>` (Örn: `style: navbar ve footer tasarımı yenilendi`)
+   - `chore: <bağımlılık, yapılandırma ve derleme güncellemeleri>` (Örn: `chore: jsconfig yol eşlemeleri eklendi`)
+
