@@ -120,7 +120,7 @@ export default function TempVoiceClient() {
             href={LINKS.BOT_INVITE}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-6 py-3.5 rounded-xl bg-primary-container text-on-primary font-bold text-sm uppercase tracking-wider hover:brightness-110 transition-all shadow-[0_0_25px_rgba(255,215,0,0.25)] flex items-center gap-2"
+            className="px-6 py-3.5 rounded-xl bg-primary-container text-black font-extrabold text-sm uppercase tracking-wider hover:brightness-110 transition-all shadow-[0_0_25px_rgba(255,215,0,0.25)] flex items-center gap-2"
           >
             <span>{t.addBotBtn}</span>
             <ArrowRight size={16} />
@@ -243,7 +243,7 @@ export default function TempVoiceClient() {
 
         <div className="space-y-6">
           <div className="flex gap-4">
-            <div className="w-8 h-8 rounded-full bg-primary-container text-on-primary font-bold flex items-center justify-center shrink-0">1</div>
+            <div className="w-8 h-8 rounded-full bg-primary-container text-black font-extrabold flex items-center justify-center shrink-0">1</div>
             <div>
               <h3 className="font-bold text-white text-sm mb-1">{t.step1Title}</h3>
               <p className="text-xs text-on-surface-variant">
@@ -253,7 +253,7 @@ export default function TempVoiceClient() {
           </div>
 
           <div className="flex gap-4">
-            <div className="w-8 h-8 rounded-full bg-primary-container text-on-primary font-bold flex items-center justify-center shrink-0">2</div>
+            <div className="w-8 h-8 rounded-full bg-primary-container text-black font-extrabold flex items-center justify-center shrink-0">2</div>
             <div>
               <h3 className="font-bold text-white text-sm mb-1">{t.step2Title}</h3>
               <p className="text-xs text-on-surface-variant">
@@ -263,7 +263,7 @@ export default function TempVoiceClient() {
           </div>
 
           <div className="flex gap-4">
-            <div className="w-8 h-8 rounded-full bg-primary-container text-on-primary font-bold flex items-center justify-center shrink-0">3</div>
+            <div className="w-8 h-8 rounded-full bg-primary-container text-black font-extrabold flex items-center justify-center shrink-0">3</div>
             <div>
               <h3 className="font-bold text-white text-sm mb-1">{t.step3Title}</h3>
               <p className="text-xs text-on-surface-variant">
@@ -318,7 +318,7 @@ export default function TempVoiceClient() {
           href={LINKS.BOT_INVITE}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-primary-container text-on-primary font-bold text-sm uppercase tracking-wider hover:brightness-110 transition-all shadow-[0_0_30px_rgba(255,215,0,0.3)]"
+          className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-primary-container text-black font-extrabold text-sm uppercase tracking-wider hover:brightness-110 transition-all shadow-[0_0_30px_rgba(255,215,0,0.3)]"
         >
           <span>{t.ctaBtn}</span>
           <ArrowRight size={16} />

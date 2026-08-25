@@ -7,13 +7,15 @@ import Link from 'next/link';
 import { Calendar, ArrowLeft, Clock, Share2, Copy, Check, Sparkles, Bot, BookOpen, ChevronRight, Tag } from "lucide-react";
 import AdSenseUnit from "@/components/AdSenseUnit";
 import { LINKS } from '@veyronix/config';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function BlogPostDetailClient({ post, relatedPosts = [] }) {
   const [copied, setCopied] = useState(false);
+  const { lang } = useLanguage();
 
   if (!post) return null;
 
-  const isTr = post.lang !== 'en';
+  const isTr = lang === 'tr';
 
   // Extract Table of Contents from markdown content (headings)
   const headings = [];
@@ -84,7 +86,7 @@ export default function BlogPostDetailClient({ post, relatedPosts = [] }) {
               className="w-10 h-10 rounded-full border border-primary-container/40 object-cover"
             />
             <div>
-              <div className="text-xs font-bold text-white">{post.authorName || 'Veyronix Ekibi'}</div>
+              <div className="text-xs font-bold text-white">{post.authorName || (isTr ? 'Veyronix Ekibi' : 'Veyronix Team')}</div>
               <div className="text-[11px] text-on-surface-variant flex items-center gap-1.5">
                 <Calendar size={12} />
                 <span>{new Date(post.publishedAt).toLocaleDateString(isTr ? 'tr-TR' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
@@ -159,10 +161,10 @@ export default function BlogPostDetailClient({ post, relatedPosts = [] }) {
               href={LINKS.BOT_INVITE}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-primary-container text-on-primary font-bold text-xs uppercase tracking-wider hover:brightness-110 transition-all shadow-[0_0_25px_rgba(255,215,0,0.25)]"
+              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-primary-container text-black font-black text-xs uppercase tracking-wider hover:brightness-110 transition-all shadow-[0_0_25px_rgba(255,215,0,0.25)]"
             >
               <Sparkles size={15} />
-              <span>{isTr ? 'Hemen Ücretsiz Discord\'a Ekle' : 'Add to Discord Free'}</span>
+              <span>{isTr ? "Hemen Ücretsiz Discord'a Ekle" : "Add to Discord Free"}</span>
             </a>
           </div>
         </article>

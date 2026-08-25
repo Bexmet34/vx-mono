@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { Calendar, ArrowRight, BookOpen, Search, Clock, Tag, Sparkles, X, User, Newspaper, Flame } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
@@ -11,31 +11,38 @@ export default function BlogListClient({ allPosts = [] }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
+  // Reset category filter when site language switches
+  useEffect(() => {
+    setSelectedCategory('all');
+  }, [lang]);
+
   // Normalize posts from both Supabase & Markdown formats
   const normalizedPosts = useMemo(() => {
     return allPosts.map(p => {
-      const isSupabase = p.isFromSupabase !== false && !p.meta;
+      // Determine language reliably
+      const postLang = p.lang || p.meta?.lang || (p.slug.endsWith('-en') ? 'en' : 'tr');
+      
       return {
         slug: p.slug,
-        title: isSupabase ? p.title : (p.meta?.title || p.title),
-        description: isSupabase ? p.description : (p.meta?.description || p.description),
-        date: isSupabase ? p.publishedAt : (p.meta?.date || p.publishedAt || new Date()),
-        category: isSupabase ? (p.category || 'Rehber') : (p.meta?.category || (p.meta?.tags ? p.meta.tags.split(',')[0] : 'Rehber')),
-        tags: isSupabase ? (p.tags || []) : (p.meta?.tags ? p.meta.tags.split(',').map(t => t.trim()) : []),
+        title: p.title || p.meta?.title || p.slug,
+        description: p.description || p.meta?.description || '',
+        date: p.publishedAt || p.meta?.date || p.meta?.publishedAt || new Date().toISOString(),
+        category: p.category || p.meta?.category || (p.meta?.tags ? (Array.isArray(p.meta.tags) ? p.meta.tags[0] : p.meta.tags.split(',')[0]) : (isTr ? 'Rehber' : 'Guide')),
+        tags: Array.isArray(p.tags) ? p.tags : (p.meta?.tags ? (Array.isArray(p.meta.tags) ? p.meta.tags : p.meta.tags.split(',').map(t => t.trim())) : []),
         readTimeMinutes: p.readTimeMinutes || 5,
-        coverImage: isSupabase ? p.coverImage : (p.meta?.coverImage || null),
-        lang: isSupabase ? (p.lang || 'tr') : (p.meta?.lang || 'tr'),
-        authorName: p.authorName || (p.meta?.author || 'Veyronix Ekibi'),
+        coverImage: p.coverImage || p.meta?.coverImage || null,
+        lang: postLang,
+        authorName: p.authorName || p.meta?.author || (isTr ? 'Veyronix Ekibi' : 'Veyronix Team'),
         authorAvatar: p.authorAvatar || 'https://veyronix.com.tr/icon.svg',
       };
     });
-  }, [allPosts]);
+  }, [allPosts, isTr]);
 
-  // Extract categories dynamically with post count
+  // Extract categories dynamically for the current language with counts
   const categories = useMemo(() => {
     const map = new Map();
     normalizedPosts
-      .filter(p => !p.lang || p.lang === lang)
+      .filter(p => p.lang === lang)
       .forEach(p => {
         const cat = p.category || (isTr ? 'Rehber' : 'Guide');
         map.set(cat, (map.get(cat) || 0) + 1);
@@ -43,11 +50,11 @@ export default function BlogListClient({ allPosts = [] }) {
     return Array.from(map.entries()).map(([name, count]) => ({ name, count }));
   }, [normalizedPosts, lang, isTr]);
 
-  // Filter posts based on language, search query and selected category
+  // Filter posts based on strictly matching language, search query and selected category
   const filteredPosts = useMemo(() => {
     return normalizedPosts.filter(post => {
-      // Language filter
-      const matchesLang = !post.lang || post.lang === lang;
+      // Strict language match
+      const matchesLang = post.lang === lang;
       
       // Category filter
       const matchesCategory = selectedCategory === 'all' || post.category.toLowerCase() === selectedCategory.toLowerCase();
@@ -154,12 +161,12 @@ export default function BlogListClient({ allPosts = [] }) {
             onClick={() => setSelectedCategory('all')}
             className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 ${
               selectedCategory === 'all'
-                ? 'bg-primary-container text-on-primary shadow-[0_0_20px_rgba(255,215,0,0.25)] font-bold scale-105'
+                ? 'bg-primary-container text-black shadow-[0_0_20px_rgba(255,215,0,0.25)] font-bold scale-105'
                 : 'bg-surface-container/60 border border-outline-variant/30 text-on-surface-variant hover:text-on-surface hover:border-outline-variant/60'
             }`}
           >
             <span>{t.allCategories}</span>
-            <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${selectedCategory === 'all' ? 'bg-black/20 text-black font-bold' : 'bg-surface-container-high text-on-surface-variant'}`}>
+            <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${selectedCategory === 'all' ? 'bg-black/20 text-black' : 'bg-surface-container-high text-on-surface-variant'}`}>
               {filteredPosts.length}
             </span>
           </button>
@@ -170,12 +177,12 @@ export default function BlogListClient({ allPosts = [] }) {
               onClick={() => setSelectedCategory(cat.name)}
               className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 ${
                 selectedCategory.toLowerCase() === cat.name.toLowerCase()
-                  ? 'bg-primary-container text-on-primary shadow-[0_0_20px_rgba(255,215,0,0.25)] font-bold scale-105'
+                  ? 'bg-primary-container text-black shadow-[0_0_20px_rgba(255,215,0,0.25)] font-bold scale-105'
                   : 'bg-surface-container/60 border border-outline-variant/30 text-on-surface-variant hover:text-on-surface hover:border-outline-variant/60'
               }`}
             >
               <span>{cat.name}</span>
-              <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${selectedCategory.toLowerCase() === cat.name.toLowerCase() ? 'bg-black/20 text-black font-bold' : 'bg-surface-container-high text-on-surface-variant'}`}>
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${selectedCategory.toLowerCase() === cat.name.toLowerCase() ? 'bg-black/20 text-black' : 'bg-surface-container-high text-on-surface-variant'}`}>
                 {cat.count}
               </span>
             </button>
@@ -329,7 +336,7 @@ export default function BlogListClient({ allPosts = [] }) {
           {(searchQuery || selectedCategory !== 'all') && (
             <button
               onClick={() => { setSearchQuery(''); setSelectedCategory('all'); }}
-              className="px-5 py-2.5 rounded-xl bg-primary-container text-on-primary font-bold text-xs uppercase tracking-wider hover:brightness-110 transition-all shadow-md"
+              className="px-5 py-2.5 rounded-xl bg-primary-container text-black font-extrabold text-xs uppercase tracking-wider hover:brightness-110 transition-all shadow-md"
             >
               {t.clearSearch}
             </button>

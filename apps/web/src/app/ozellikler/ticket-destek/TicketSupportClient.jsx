@@ -87,7 +87,7 @@ export default function TicketSupportClient() {
             href={LINKS.BOT_INVITE}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-6 py-3.5 rounded-xl bg-primary-container text-on-primary font-bold text-sm uppercase tracking-wider hover:brightness-110 transition-all shadow-[0_0_25px_rgba(255,215,0,0.25)] flex items-center gap-2"
+            className="px-6 py-3.5 rounded-xl bg-primary-container text-black font-extrabold text-sm uppercase tracking-wider hover:brightness-110 transition-all shadow-[0_0_25px_rgba(255,215,0,0.25)] flex items-center gap-2"
           >
             <span>{t.addBotBtn}</span>
             <ArrowRight size={16} />
@@ -172,7 +172,7 @@ export default function TicketSupportClient() {
           href={LINKS.BOT_INVITE}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-primary-container text-on-primary font-bold text-sm uppercase tracking-wider hover:brightness-110 transition-all shadow-[0_0_30px_rgba(255,215,0,0.3)]"
+          className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-primary-container text-black font-extrabold text-sm uppercase tracking-wider hover:brightness-110 transition-all shadow-[0_0_30px_rgba(255,215,0,0.3)]"
         >
           <span>{t.ctaBtn}</span>
           <ArrowRight size={16} />
