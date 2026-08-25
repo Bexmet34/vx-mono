@@ -41,8 +41,8 @@ async function resolveChannelInfo(guild, userVoiceChannelId, member, creators) {
             );
 
             if (matchedCreator || (creators.length > 0 && voiceChannel.parentId)) {
-                // Find member-specific permission overwrite (the room owner)
-                const memberOverwrite = voiceChannel.permissionOverwrites.cache.find(ow => ow.type === 1);
+                // Find member-specific permission overwrite (the room owner) - ensure they have Connect/ViewChannel
+                const memberOverwrite = voiceChannel.permissionOverwrites.cache.find(ow => ow.type === 1 && ow.allow.has(PermissionFlagsBits.Connect));
                 const ownerId = memberOverwrite ? memberOverwrite.id : member.id;
                 
                 channelInfo = {
@@ -295,19 +295,28 @@ async function handleTempVoiceButtons(interaction) {
 
         // ===== BUTTON 13: SAHİPLEN (tv_claim) =====
         if (action === 'claim') {
+            await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
+            
             const vc = interaction.guild.channels.cache.get(userVoiceChannelId) || await interaction.guild.channels.fetch(userVoiceChannelId).catch(() => null);
+            if (!vc) {
+                return await interaction.editReply({ content: lang === 'tr' ? '❌ Ses kanalı bulunamadı.' : '❌ Voice channel not found.' });
+            }
             if (channelInfo.ownerId === member.id) {
-                return await interaction.reply({ content: lang === 'tr' ? '❌ Zaten bu kanalın sahibisiniz.' : '❌ You are already the owner.', flags: [MessageFlags.Ephemeral] });
+                return await interaction.editReply({ content: lang === 'tr' ? '❌ Zaten bu kanalın sahibisiniz.' : '❌ You are already the owner.' });
             }
             if (vc.members.has(channelInfo.ownerId)) {
-                return await interaction.reply({ content: lang === 'tr' ? '❌ Kanal sahibi hala odada bulunuyor. Sahiplenemezsiniz.' : '❌ The channel owner is still in the room. You cannot claim it.', flags: [MessageFlags.Ephemeral] });
+                return await interaction.editReply({ content: lang === 'tr' ? '❌ Kanal sahibi hala odada bulunuyor. Sahiplenemezsiniz.' : '❌ The channel owner is still in the room. You cannot claim it.' });
             }
             
             const { updateOwnerPermissions } = require('../services/tempVoiceService');
+            // Remove previous owner permissions
+            if (channelInfo.ownerId) {
+                await vc.permissionOverwrites.delete(channelInfo.ownerId).catch(() => {});
+            }
             await updateOwnerPermissions(vc, member.id, channelInfo.creatorId, interaction.guildId);
             channelInfo.ownerId = member.id;
             
-            return await interaction.reply({ content: lang === 'tr' ? '👑 Kanal sahipliğini başarıyla devraldınız!' : '👑 You have successfully claimed ownership of the channel!', flags: [MessageFlags.Ephemeral] });
+            return await interaction.editReply({ content: lang === 'tr' ? '👑 Kanal sahipliğini başarıyla devraldınız!' : '👑 You have successfully claimed ownership of the channel!' });
         }
 
         // ===== BUTTON 14: ODAYI DEVRET (tv_transfer) =====
@@ -485,14 +494,10 @@ async function handleTempVoiceModal(interaction) {
                 });
             }
         }
-
     } catch (err) {
-        console.error('[VoiceForge] Error handling temp voice modal submit:', err);
+        console.error('[VoiceForge] Error handling temp voice modal:', err);
         if (!interaction.replied && !interaction.deferred) {
-            await interaction.reply({
-                content: 'İşlem sırasında bir hata oluştu.',
-                flags: [MessageFlags.Ephemeral]
-            }).catch(() => {});
+            await interaction.reply({ content: 'İşlem sırasında bir hata oluştu.', flags: [MessageFlags.Ephemeral] }).catch(() => {});
         }
     }
 }
@@ -502,6 +507,8 @@ async function handleTempVoiceModal(interaction) {
  */
 async function handleTempVoiceSelectMenu(interaction) {
     try {
+        await interaction.deferUpdate();
+        
         const guildId = interaction.guildId;
         const member = interaction.member;
         const config = await getGuildConfig(guildId);
@@ -513,16 +520,21 @@ async function handleTempVoiceSelectMenu(interaction) {
         
         let channelInfo = await resolveChannelInfo(interaction.guild, channelId, member, creators);
         if (!channelInfo) {
-            return await interaction.reply({ content: lang === 'tr' ? '❌ Bu geçici ses kanalı artık aktif değil.' : '❌ This temporary voice channel is no longer active.', flags: [MessageFlags.Ephemeral] });
+            return await interaction.editReply({ content: lang === 'tr' ? '❌ Bu geçici ses kanalı artık aktif değil.' : '❌ This temporary voice channel is no longer active.', components: [] });
         }
         
         if (channelInfo.ownerId !== member.id && action !== 'claim') {
-            return sendOwnerError(interaction, lang);
+            return await interaction.editReply({
+                content: lang === 'tr' 
+                    ? '❌ Bu işlem için kanalın sahibi olmalısınız.' 
+                    : '❌ You must be the channel owner for this action.',
+                components: []
+            });
         }
 
         const vc = interaction.guild.channels.cache.get(channelId) || await interaction.guild.channels.fetch(channelId).catch(() => null);
         if (!vc) {
-            return await interaction.reply({ content: lang === 'tr' ? '❌ Ses kanalı bulunamadı.' : '❌ Voice channel not found.', flags: [MessageFlags.Ephemeral] });
+            return await interaction.editReply({ content: lang === 'tr' ? '❌ Ses kanalı bulunamadı.' : '❌ Voice channel not found.', components: [] });
         }
 
         if (action === 'privacy') {
@@ -533,13 +545,13 @@ async function handleTempVoiceSelectMenu(interaction) {
             else if (mode === 'hidden') perms = { ViewChannel: false, Connect: false };
             
             await vc.permissionOverwrites.edit(interaction.guild.id, perms);
-            return await interaction.reply({ content: lang === 'tr' ? `🔒 Kanal gizliliği başarıyla ayarlandı.` : `🔒 Channel privacy set successfully.`, flags: [MessageFlags.Ephemeral] });
+            return await interaction.editReply({ content: lang === 'tr' ? `🔒 Kanal gizliliği başarıyla ayarlandı.` : `🔒 Channel privacy set successfully.`, components: [] });
         }
 
         if (action === 'region') {
             const region = interaction.values[0];
             await vc.setRTCRegion(region === 'auto' ? null : region);
-            return await interaction.reply({ content: lang === 'tr' ? `🌐 Kanal bölgesi başarıyla ayarlandı.` : `🌐 Channel region set successfully.`, flags: [MessageFlags.Ephemeral] });
+            return await interaction.editReply({ content: lang === 'tr' ? `🌐 Kanal bölgesi başarıyla ayarlandı.` : `🌐 Channel region set successfully.`, components: [] });
         }
 
         const users = interaction.values;
@@ -549,14 +561,14 @@ async function handleTempVoiceSelectMenu(interaction) {
             for (const uId of users) {
                 await vc.permissionOverwrites.edit(uId, { ViewChannel: true, Connect: true, Speak: true });
             }
-            return await interaction.reply({ content: lang === 'tr' ? '✅ Seçilen kullanıcılar güvenilir listesine eklendi.' : '✅ Selected users trusted.', flags: [MessageFlags.Ephemeral] });
+            return await interaction.editReply({ content: lang === 'tr' ? '✅ Seçilen kullanıcılar güvenilir listesine eklendi.' : '✅ Selected users trusted.', components: [] });
         }
 
         if (action === 'untrusted') {
             for (const uId of users) {
                 await vc.permissionOverwrites.delete(uId).catch(() => {});
             }
-            return await interaction.reply({ content: lang === 'tr' ? '❌ Seçilen kullanıcılar güvenilir listesinden çıkarıldı.' : '❌ Selected users untrusted.', flags: [MessageFlags.Ephemeral] });
+            return await interaction.editReply({ content: lang === 'tr' ? '❌ Seçilen kullanıcılar güvenilir listesinden çıkarıldı.' : '❌ Selected users untrusted.', components: [] });
         }
 
         if (action === 'block') {
@@ -567,14 +579,14 @@ async function handleTempVoiceSelectMenu(interaction) {
                     await m.voice.disconnect().catch(() => {});
                 }
             }
-            return await interaction.reply({ content: lang === 'tr' ? '🚫 Seçilen kullanıcılar engellendi ve sesten atıldı.' : '🚫 Selected users blocked and kicked.', flags: [MessageFlags.Ephemeral] });
+            return await interaction.editReply({ content: lang === 'tr' ? '🚫 Seçilen kullanıcılar engellendi ve sesten atıldı.' : '🚫 Selected users blocked and kicked.', components: [] });
         }
 
         if (action === 'unblock') {
             for (const uId of users) {
                 await vc.permissionOverwrites.delete(uId).catch(() => {});
             }
-            return await interaction.reply({ content: lang === 'tr' ? '🔓 Seçilen kullanıcıların engeli kaldırıldı.' : '🔓 Selected users unblocked.', flags: [MessageFlags.Ephemeral] });
+            return await interaction.editReply({ content: lang === 'tr' ? '🔓 Seçilen kullanıcıların engeli kaldırıldı.' : '🔓 Selected users unblocked.', components: [] });
         }
 
         if (action === 'kick') {
@@ -586,19 +598,19 @@ async function handleTempVoiceSelectMenu(interaction) {
                     kickedCount++;
                 }
             }
-            return await interaction.reply({ content: lang === 'tr' ? `📴 **${kickedCount}** kullanıcı sesten atıldı.` : `📴 **${kickedCount}** users kicked from voice.`, flags: [MessageFlags.Ephemeral] });
+            return await interaction.editReply({ content: lang === 'tr' ? `📴 **${kickedCount}** kullanıcı sesten atıldı.` : `📴 **${kickedCount}** users kicked from voice.`, components: [] });
         }
 
         if (action === 'transfer') {
             const newOwnerId = users[0];
             if (!vc.members.has(newOwnerId)) {
-                return await interaction.reply({ content: lang === 'tr' ? '❌ Odayı devredeceğiniz kişi şu an ses kanalında değil!' : '❌ The user must be in the voice channel to transfer ownership.', flags: [MessageFlags.Ephemeral] });
+                return await interaction.editReply({ content: lang === 'tr' ? '❌ Odayı devredeceğiniz kişi şu an ses kanalında değil!' : '❌ The user must be in the voice channel to transfer ownership.', components: [] });
             }
             const { updateOwnerPermissions } = require('../services/tempVoiceService');
             await vc.permissionOverwrites.delete(channelInfo.ownerId).catch(() => {});
             await updateOwnerPermissions(vc, newOwnerId, channelInfo.creatorId, interaction.guildId);
             channelInfo.ownerId = newOwnerId;
-            return await interaction.reply({ content: lang === 'tr' ? '👑 Kanalın sahipliği başarıyla devredildi.' : '👑 Channel ownership successfully transferred.', flags: [MessageFlags.Ephemeral] });
+            return await interaction.editReply({ content: lang === 'tr' ? '👑 Kanalın sahipliği başarıyla devredildi.' : '👑 Channel ownership successfully transferred.', components: [] });
         }
 
     } catch (err) {
