@@ -30,12 +30,13 @@ export default function BlogListClient({ allPosts = [] }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
-  // Reset category filter when site language switches
+  // Dil değiştiğinde aramayı ve kategori filtresini otomatik sıfırla
   useEffect(() => {
     setSelectedCategory('all');
+    setSearchQuery('');
   }, [lang]);
 
-  // Normalize all posts with unified categories and languages
+  // Tüm yazıları standartlaştırılmış kategori ve dil ile normalize et
   const processedPosts = useMemo(() => {
     return allPosts.map(p => {
       const postLang = p.lang || (p.slug?.endsWith('-en') ? 'en' : 'tr');
@@ -52,37 +53,37 @@ export default function BlogListClient({ allPosts = [] }) {
     });
   }, [allPosts]);
 
-  // Extract categories dynamically for the current language with counts
-  const categories = useMemo(() => {
-    const map = new Map();
-    processedPosts
-      .filter(p => p.lang === lang)
-      .forEach(p => {
-        const cat = p.category;
-        map.set(cat, (map.get(cat) || 0) + 1);
-      });
-    return Array.from(map.entries()).map(([name, count]) => ({ name, count }));
+  // Seçili dildeki tüm yazılar (filtresiz)
+  const currentLangPosts = useMemo(() => {
+    return processedPosts.filter(p => p.lang === lang);
   }, [processedPosts, lang]);
 
-  // Filter posts based on strictly matching language, search query and selected category
+  // Seçili dilin kategorilerini ve her kategorideki yazı sayısını hesapla
+  const categories = useMemo(() => {
+    const map = new Map();
+    currentLangPosts.forEach(p => {
+      const cat = p.category;
+      map.set(cat, (map.get(cat) || 0) + 1);
+    });
+    return Array.from(map.entries()).map(([name, count]) => ({ name, count }));
+  }, [currentLangPosts]);
+
+  // Arama ve Kategoriye göre filtrelenmiş aktif yazılar
   const filteredPosts = useMemo(() => {
-    return processedPosts.filter(post => {
-      // Strict language match
-      const matchesLang = post.lang === lang;
-      
-      // Category filter (case-insensitive on normalized category)
+    return currentLangPosts.filter(post => {
+      // Kategori filtresi
       const matchesCategory = selectedCategory === 'all' || post.category.toLowerCase() === selectedCategory.toLowerCase();
 
-      // Search query filter
+      // Arama filtresi
       const query = searchQuery.toLowerCase().trim();
       const matchesSearch = !query || 
         (post.title || '').toLowerCase().includes(query) || 
         (post.description || '').toLowerCase().includes(query) ||
         (Array.isArray(post.tags) ? post.tags.some(t => t.toLowerCase().includes(query)) : false);
 
-      return matchesLang && matchesCategory && matchesSearch;
+      return matchesCategory && matchesSearch;
     });
-  }, [processedPosts, lang, selectedCategory, searchQuery]);
+  }, [currentLangPosts, selectedCategory, searchQuery]);
 
   const featuredPost = useMemo(() => {
     if (selectedCategory === 'all' && !searchQuery && filteredPosts.length > 0) {
@@ -107,7 +108,9 @@ export default function BlogListClient({ allPosts = [] }) {
     allCategories: "Tüm Yazılar",
     featuredBadge: "Öne Çıkan Rehber",
     emptyTitle: "Sonuç Bulunamadı",
-    emptyDesc: "Aradığınız kriterlere uygun makale bulunamadı veya henüz bu dilde yazı eklenmedi.",
+    emptyDesc: searchQuery 
+      ? `"${searchQuery}" araması için Türkçe makale bulunamadı.` 
+      : "Bu kategoride henüz yayınlanmış bir makale bulunmuyor.",
     clearSearch: "Aramayı Temizle",
     readMore: "Rehberi Oku",
     readTime: "dk okuma",
@@ -121,7 +124,9 @@ export default function BlogListClient({ allPosts = [] }) {
     allCategories: "All Articles",
     featuredBadge: "Featured Guide",
     emptyTitle: "No Articles Found",
-    emptyDesc: "No articles match your current search or category filter.",
+    emptyDesc: searchQuery
+      ? `No English articles found matching "${searchQuery}".`
+      : "No articles found in this category.",
     clearSearch: "Clear Search",
     readMore: "Read Guide",
     readTime: "min read",
@@ -181,7 +186,7 @@ export default function BlogListClient({ allPosts = [] }) {
           >
             <span>{t.allCategories}</span>
             <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${selectedCategory === 'all' ? 'bg-black/20 text-black' : 'bg-surface-container-high text-on-surface-variant'}`}>
-              {filteredPosts.length}
+              {currentLangPosts.length}
             </span>
           </button>
 
