@@ -2,12 +2,12 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { Calendar, ArrowRight, BookOpen, Search, Clock, Tag, Sparkles } from "lucide-react";
-import styles from "../app/page.module.css";
+import { Calendar, ArrowRight, BookOpen, Search, Clock, Tag, Sparkles, X, User, Newspaper, Flame } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function BlogListClient({ allPosts = [] }) {
   const { lang } = useLanguage();
+  const isTr = lang === 'tr';
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
@@ -24,19 +24,24 @@ export default function BlogListClient({ allPosts = [] }) {
         tags: isSupabase ? (p.tags || []) : (p.meta?.tags ? p.meta.tags.split(',').map(t => t.trim()) : []),
         readTimeMinutes: p.readTimeMinutes || 5,
         coverImage: isSupabase ? p.coverImage : (p.meta?.coverImage || null),
-        lang: isSupabase ? (p.lang || 'tr') : (p.meta?.lang || 'tr')
+        lang: isSupabase ? (p.lang || 'tr') : (p.meta?.lang || 'tr'),
+        authorName: p.authorName || (p.meta?.author || 'Veyronix Ekibi'),
+        authorAvatar: p.authorAvatar || 'https://veyronix.com.tr/icon.svg',
       };
     });
   }, [allPosts]);
 
-  // Extract categories dynamically
+  // Extract categories dynamically with post count
   const categories = useMemo(() => {
-    const set = new Set();
-    normalizedPosts.forEach(p => {
-      if (p.category) set.add(p.category);
-    });
-    return Array.from(set);
-  }, [normalizedPosts]);
+    const map = new Map();
+    normalizedPosts
+      .filter(p => !p.lang || p.lang === lang)
+      .forEach(p => {
+        const cat = p.category || (isTr ? 'Rehber' : 'Guide');
+        map.set(cat, (map.get(cat) || 0) + 1);
+      });
+    return Array.from(map.entries()).map(([name, count]) => ({ name, count }));
+  }, [normalizedPosts, lang, isTr]);
 
   // Filter posts based on language, search query and selected category
   const filteredPosts = useMemo(() => {
@@ -58,167 +63,280 @@ export default function BlogListClient({ allPosts = [] }) {
     });
   }, [normalizedPosts, lang, selectedCategory, searchQuery]);
 
-  const t = lang === 'en' ? {
-    badge: "Guides & Knowledge Base",
-    title: "Veyronix",
-    highlight: "Blog",
-    desc: "In-depth guides, Albion Online tactics, Discord bot automation tips, and guild management strategies.",
-    searchPlaceholder: "Search articles or keywords...",
-    allCategories: "All Categories",
-    empty: "No matching articles found.",
-    readMore: "Read Article",
-    readTime: "min read"
+  const featuredPost = useMemo(() => {
+    if (selectedCategory === 'all' && !searchQuery && filteredPosts.length > 0) {
+      return filteredPosts[0];
+    }
+    return null;
+  }, [filteredPosts, selectedCategory, searchQuery]);
+
+  const gridPosts = useMemo(() => {
+    if (featuredPost) {
+      return filteredPosts.slice(1);
+    }
+    return filteredPosts;
+  }, [filteredPosts, featuredPost]);
+
+  const t = isTr ? {
+    badge: "Bilgi Merkezi & Rehberler",
+    title1: "Veyronix",
+    highlight: "Blog & Rehberler",
+    desc: "Discord bot otomasyonu, geçici ses odaları, butonlu kayıt sistemleri ve Albion Online lonca stratejileri hakkında uzman rehberleri.",
+    searchPlaceholder: "Makale, rehber veya anahtar kelime ara...",
+    allCategories: "Tüm Yazılar",
+    featuredBadge: "Öne Çıkan Rehber",
+    emptyTitle: "Sonuç Bulunamadı",
+    emptyDesc: "Aradığınız kriterlere uygun makale bulunamadı. Lütfen farklı anahtar kelimeler deneyin.",
+    clearSearch: "Aramayı Temizle",
+    readMore: "Rehberi Oku",
+    readTime: "dk okuma",
+    totalArticles: "yazı",
   } : {
-    badge: "Rehberler ve Bilgi Bankası",
-    title: "Veyronix",
-    highlight: "Blog",
-    desc: "Albion Online taktikleri, Discord bot otomasyon rehberleri ve topluluk yönetimi stratejileri.",
-    searchPlaceholder: "Makale veya anahtar kelime ara...",
-    allCategories: "Tüm Kategoriler",
-    empty: "Aradığınız kriterlere uygun makale bulunamadı.",
-    readMore: "Devamını Oku",
-    readTime: "dk okuma"
+    badge: "Knowledge Hub & Guides",
+    title1: "Veyronix",
+    highlight: "Blog & Insights",
+    desc: "Expert guides on Discord bot automation, temporary voice channels, registration systems, and Albion Online guild tactics.",
+    searchPlaceholder: "Search articles, guides, or keywords...",
+    allCategories: "All Articles",
+    featuredBadge: "Featured Guide",
+    emptyTitle: "No Articles Found",
+    emptyDesc: "No articles match your current search or category filter. Try refining your keywords.",
+    clearSearch: "Clear Search",
+    readMore: "Read Guide",
+    readTime: "min read",
+    totalArticles: "articles",
   };
 
   return (
-    <main className={styles.main}>
+    <main className="min-h-screen pt-24 pb-24 px-4 sm:px-6 md:px-8 max-w-7xl mx-auto">
+      
       {/* Hero Section */}
-      <div className={`${styles.hero} animate-fade-in`} style={{ paddingBottom: '2rem', paddingTop: '2rem' }}>
-        <div className={styles.badge}>
-          <BookOpen size={14} className={styles.badgeHighlight} />
-          {t.badge}
+      <section className="text-center mb-14 relative">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary-container/10 border border-primary-container/30 text-primary-container text-xs font-bold uppercase tracking-wider mb-5 shadow-[0_0_20px_rgba(255,215,0,0.15)]">
+          <BookOpen size={14} />
+          <span>{t.badge}</span>
         </div>
-        <h1 className={styles.title} style={{ fontSize: 'clamp(2.5rem, 6vw, 4rem)' }}>
-          {t.title} <span className={styles.highlight}>{t.highlight}</span>
+
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-on-surface tracking-tight leading-tight mb-5">
+          {t.title1} <span className="bg-gradient-to-r from-primary-container via-amber-300 to-primary-container bg-clip-text text-transparent">{t.highlight}</span>
         </h1>
-        <p className={styles.description}>
+
+        <p className="text-base sm:text-lg text-on-surface-variant max-w-2xl mx-auto font-light leading-relaxed mb-8">
           {t.desc}
         </p>
 
-        {/* Search Bar & Filter Controls */}
-        <div style={{ maxWidth: '700px', width: '100%', marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem', margin: '2rem auto 0' }}>
-          <div style={{ position: 'relative', width: '100%' }}>
-            <Search size={18} style={{ position: 'absolute', left: '1.2rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+        {/* Search Bar */}
+        <div className="max-w-xl mx-auto relative mb-8">
+          <div className="relative flex items-center">
+            <Search size={18} className="absolute left-4 text-on-surface-variant pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t.searchPlaceholder}
-              style={{
-                width: '100%',
-                padding: '0.9rem 1rem 0.9rem 3.2rem',
-                borderRadius: '12px',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
-                background: 'rgba(15, 23, 42, 0.6)',
-                backdropFilter: 'blur(10px)',
-                color: '#fff',
-                fontSize: '1rem',
-                outline: 'none',
-                transition: 'border-color 0.2s, box-shadow 0.2s'
-              }}
+              className="w-full pl-11 pr-10 py-3.5 rounded-2xl bg-surface-container-low/70 border border-outline-variant/40 text-on-surface placeholder:text-on-surface-variant/60 backdrop-blur-xl text-sm focus:outline-none focus:border-primary-container/70 focus:ring-2 focus:ring-primary-container/20 transition-all shadow-lg"
             />
-          </div>
-
-          {/* Category Filter Pills */}
-          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-            <button
-              onClick={() => setSelectedCategory('all')}
-              style={{
-                padding: '0.4rem 1rem',
-                borderRadius: '50px',
-                border: selectedCategory === 'all' ? '1px solid var(--accent-color)' : '1px solid rgba(255,255,255,0.1)',
-                background: selectedCategory === 'all' ? 'rgba(88, 101, 242, 0.2)' : 'rgba(255,255,255,0.03)',
-                color: selectedCategory === 'all' ? '#fff' : 'var(--text-muted)',
-                fontSize: '0.85rem',
-                cursor: 'pointer',
-                fontWeight: selectedCategory === 'all' ? 'bold' : 'normal',
-                transition: 'all 0.2s ease'
-              }}
-            >
-              {t.allCategories}
-            </button>
-            {categories.map(cat => (
+            {searchQuery && (
               <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                style={{
-                  padding: '0.4rem 1rem',
-                  borderRadius: '50px',
-                  border: selectedCategory.toLowerCase() === cat.toLowerCase() ? '1px solid var(--accent-color)' : '1px solid rgba(255,255,255,0.1)',
-                  background: selectedCategory.toLowerCase() === cat.toLowerCase() ? 'rgba(88, 101, 242, 0.2)' : 'rgba(255,255,255,0.03)',
-                  color: selectedCategory.toLowerCase() === cat.toLowerCase() ? '#fff' : 'var(--text-muted)',
-                  fontSize: '0.85rem',
-                  cursor: 'pointer',
-                  fontWeight: selectedCategory.toLowerCase() === cat.toLowerCase() ? 'bold' : 'normal',
-                  transition: 'all 0.2s ease'
-                }}
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3.5 p-1 rounded-full text-on-surface-variant hover:text-white hover:bg-surface-container-high transition-colors"
+                aria-label="Clear Search"
               >
-                {cat}
+                <X size={16} />
               </button>
-            ))}
+            )}
           </div>
         </div>
-      </div>
 
-      {/* Blog Grid Section */}
-      <section className="animate-fade-in delay-2" style={{ width: '100%', padding: '0 1.5rem', marginBottom: '8rem' }}>
-        {filteredPosts.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '5rem 1rem', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
-            <p style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>{t.empty}</p>
-          </div>
-        ) : (
-          <div className={styles.blogGrid}>
-            {filteredPosts.map((post) => (
-              <Link href={`/blog/${post.slug}`} key={post.slug} style={{ textDecoration: 'none' }}>
-                <div className={`${styles.bentoCard}`} style={{ height: '100%', display: 'flex', flexDirection: 'column', cursor: 'pointer', overflow: 'hidden', transition: 'transform 0.2s ease, border-color 0.2s ease' }}>
-                  {post.coverImage && (
-                    <div style={{ width: '100%', height: '180px', marginBottom: '1.2rem', borderRadius: '10px', overflow: 'hidden', position: 'relative' }}>
-                      <img src={post.coverImage} alt={post.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      <span style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(5px)', color: '#5865F2', border: '1px solid rgba(88, 101, 242, 0.4)', padding: '0.2rem 0.6rem', borderRadius: '50px', fontSize: '0.75rem', fontWeight: 'bold' }}>
-                        {post.category}
-                      </span>
+        {/* Category Filter Pills */}
+        <div className="flex items-center justify-center gap-2 flex-wrap max-w-3xl mx-auto">
+          <button
+            onClick={() => setSelectedCategory('all')}
+            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 ${
+              selectedCategory === 'all'
+                ? 'bg-primary-container text-on-primary shadow-[0_0_20px_rgba(255,215,0,0.25)] font-bold scale-105'
+                : 'bg-surface-container/60 border border-outline-variant/30 text-on-surface-variant hover:text-on-surface hover:border-outline-variant/60'
+            }`}
+          >
+            <span>{t.allCategories}</span>
+            <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${selectedCategory === 'all' ? 'bg-black/20 text-black font-bold' : 'bg-surface-container-high text-on-surface-variant'}`}>
+              {filteredPosts.length}
+            </span>
+          </button>
+
+          {categories.map((cat) => (
+            <button
+              key={cat.name}
+              onClick={() => setSelectedCategory(cat.name)}
+              className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 ${
+                selectedCategory.toLowerCase() === cat.name.toLowerCase()
+                  ? 'bg-primary-container text-on-primary shadow-[0_0_20px_rgba(255,215,0,0.25)] font-bold scale-105'
+                  : 'bg-surface-container/60 border border-outline-variant/30 text-on-surface-variant hover:text-on-surface hover:border-outline-variant/60'
+              }`}
+            >
+              <span>{cat.name}</span>
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${selectedCategory.toLowerCase() === cat.name.toLowerCase() ? 'bg-black/20 text-black font-bold' : 'bg-surface-container-high text-on-surface-variant'}`}>
+                {cat.count}
+              </span>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* Featured Hero Article */}
+      {featuredPost && (
+        <section className="mb-14">
+          <Link
+            href={`/blog/${featuredPost.slug}`}
+            className="group block relative rounded-3xl overflow-hidden border border-primary-container/30 bg-surface-container-low/70 backdrop-blur-xl shadow-[0_15px_45px_rgba(0,0,0,0.6)] hover:border-primary-container/60 transition-all duration-500 hover:-translate-y-1"
+          >
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 p-6 sm:p-8 md:p-10 items-center">
+              
+              {/* Left Details */}
+              <div className="lg:col-span-7 flex flex-col justify-between space-y-4 relative z-10">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-container/20 border border-primary-container/40 text-primary-container text-xs font-bold uppercase tracking-wider">
+                    <Flame size={13} className="animate-pulse" />
+                    <span>{t.featuredBadge}</span>
+                  </span>
+                  <span className="text-xs px-2.5 py-1 rounded-lg bg-surface-container-high border border-outline-variant/30 text-on-surface-variant font-medium">
+                    {featuredPost.category}
+                  </span>
+                </div>
+
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white group-hover:text-primary-container transition-colors tracking-tight leading-tight">
+                  {featuredPost.title}
+                </h2>
+
+                <p className="text-sm sm:text-base text-on-surface-variant font-light leading-relaxed line-clamp-3">
+                  {featuredPost.description}
+                </p>
+
+                {/* Author & Meta */}
+                <div className="flex items-center justify-between pt-4 border-t border-outline-variant/20 flex-wrap gap-4">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={featuredPost.authorAvatar}
+                      alt={featuredPost.authorName}
+                      className="w-8 h-8 rounded-full border border-primary-container/40 object-cover"
+                    />
+                    <div>
+                      <div className="text-xs font-bold text-white">{featuredPost.authorName}</div>
+                      <div className="text-[11px] text-on-surface-variant flex items-center gap-2">
+                        <span>{new Date(featuredPost.date).toLocaleDateString(isTr ? 'tr-TR' : 'en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                        <span>•</span>
+                        <span className="flex items-center gap-1"><Clock size={11} /> {featuredPost.readTimeMinutes} {t.readTime}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <span className="inline-flex items-center gap-2 text-xs font-bold text-primary-container group-hover:translate-x-1 transition-transform">
+                    <span>{t.readMore}</span>
+                    <ArrowRight size={15} />
+                  </span>
+                </div>
+              </div>
+
+              {/* Right Cover Image */}
+              <div className="lg:col-span-5 relative h-64 sm:h-80 w-full rounded-2xl overflow-hidden border border-outline-variant/30 bg-[#080d1a]">
+                {featuredPost.coverImage ? (
+                  <img
+                    src={featuredPost.coverImage}
+                    alt={featuredPost.title}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-container/10 via-surface-container to-surface-container-lowest">
+                    <Newspaper size={64} className="text-primary-container/30" />
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0b0f19]/80 via-transparent to-transparent"></div>
+              </div>
+
+            </div>
+          </Link>
+        </section>
+      )}
+
+      {/* Grid of Articles */}
+      {gridPosts.length > 0 ? (
+        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {gridPosts.map((post) => (
+            <Link
+              key={post.slug}
+              href={`/blog/${post.slug}`}
+              className="group flex flex-col justify-between rounded-2xl border border-outline-variant/30 bg-surface-container-low/50 hover:bg-surface-container-high/60 hover:border-primary-container/40 transition-all duration-300 hover:-translate-y-1.5 overflow-hidden shadow-lg"
+            >
+              <div>
+                {/* Thumbnail Image */}
+                <div className="relative h-48 w-full overflow-hidden bg-[#0a0f1d] border-b border-outline-variant/20">
+                  {post.coverImage ? (
+                    <img
+                      src={post.coverImage}
+                      alt={post.title}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-container/10 via-surface-container to-surface-container-lowest">
+                      <Newspaper size={40} className="text-primary-container/30" />
                     </div>
                   )}
-
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '1rem', color: 'var(--text-muted)', fontSize: '0.82rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                      <Calendar size={13} />
-                      {new Date(post.date).toLocaleDateString(lang === 'en' ? 'en-US' : 'tr-TR', { year: 'numeric', month: 'short', day: 'numeric' })}
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                      <Clock size={13} />
-                      {post.readTimeMinutes} {t.readTime}
-                    </div>
-                    {!post.coverImage && post.category && (
-                      <span style={{ marginLeft: 'auto', background: 'rgba(88, 101, 242, 0.15)', color: '#5865F2', padding: '0.2rem 0.6rem', borderRadius: '50px', fontSize: '0.75rem', fontWeight: 'bold' }}>
-                        {post.category}
-                      </span>
-                    )}
-                  </div>
-
-                  <h2 style={{ fontSize: '1.35rem', marginBottom: '0.8rem', color: '#fff', lineHeight: '1.4' }}>{post.title}</h2>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.92rem', lineHeight: '1.6', flex: 1, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                    {post.description}
-                  </p>
-
-                  <div style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '1rem' }}>
-                    <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
-                      {post.tags.slice(0, 2).map(tag => (
-                        <span key={tag} style={{ fontSize: '0.75rem', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.04)', padding: '0.15rem 0.5rem', borderRadius: '4px' }}>
-                          #{tag}
-                        </span>
-                      ))}
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--accent-color)', fontWeight: 'bold', fontSize: '0.88rem' }}>
-                      {t.readMore} <ArrowRight size={15} />
-                    </div>
+                  
+                  {/* Category Pill Tag Overlay */}
+                  <div className="absolute top-3 left-3">
+                    <span className="px-2.5 py-1 rounded-md bg-[#0B0F19]/90 border border-outline-variant/40 backdrop-blur-md text-[11px] font-bold text-primary-container">
+                      {post.category}
+                    </span>
                   </div>
                 </div>
-              </Link>
-            ))}
+
+                {/* Article Info */}
+                <div className="p-6">
+                  <h3 className="text-lg font-bold text-white group-hover:text-primary-container transition-colors tracking-tight line-clamp-2 mb-2.5">
+                    {post.title}
+                  </h3>
+                  <p className="text-xs text-on-surface-variant font-light leading-relaxed line-clamp-3 mb-4">
+                    {post.description}
+                  </p>
+                </div>
+              </div>
+
+              {/* Card Footer Meta */}
+              <div className="px-6 pb-6 pt-0 flex items-center justify-between border-t border-outline-variant/10 mt-auto text-[11px] text-on-surface-variant">
+                <div className="flex items-center gap-1.5">
+                  <Calendar size={13} />
+                  <span>{new Date(post.date).toLocaleDateString(isTr ? 'tr-TR' : 'en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                </div>
+
+                <div className="flex items-center gap-1 font-semibold text-primary-container group-hover:translate-x-1 transition-transform">
+                  <span>{post.readTimeMinutes} {t.readTime}</span>
+                  <ArrowRight size={13} />
+                </div>
+              </div>
+            </Link>
+          ))}
+        </section>
+      ) : (
+        /* Empty Search State */
+        <div className="text-center py-16 px-6 rounded-3xl bg-surface-container-low/40 border border-outline-variant/20 max-w-lg mx-auto">
+          <div className="w-14 h-14 rounded-2xl bg-primary-container/10 border border-primary-container/30 text-primary-container flex items-center justify-center mx-auto mb-4">
+            <Search size={24} />
           </div>
-        )}
-      </section>
+          <h3 className="text-lg font-bold text-white mb-2">{t.emptyTitle}</h3>
+          <p className="text-xs text-on-surface-variant max-w-sm mx-auto mb-6 leading-relaxed">
+            {t.emptyDesc}
+          </p>
+          {(searchQuery || selectedCategory !== 'all') && (
+            <button
+              onClick={() => { setSearchQuery(''); setSelectedCategory('all'); }}
+              className="px-5 py-2.5 rounded-xl bg-primary-container text-on-primary font-bold text-xs uppercase tracking-wider hover:brightness-110 transition-all shadow-md"
+            >
+              {t.clearSearch}
+            </button>
+          )}
+        </div>
+      )}
+
     </main>
   );
 }
