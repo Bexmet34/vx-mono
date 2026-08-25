@@ -6,22 +6,21 @@ import { Calendar, ArrowRight, BookOpen, Search, Clock, Tag, Sparkles, X, User, 
 import { useLanguage } from "@/context/LanguageContext";
 
 /**
- * Kategori isimlerini TR ve EN için standart, temiz ve düzenli hale getirir.
+ * Standardize category names cleanly for the unified blog feed
  */
-function normalizeCategory(rawCategory = '', lang = 'tr') {
+function normalizeCategory(rawCategory = '') {
   const cat = (rawCategory || '').toLowerCase().trim();
-  const isTr = lang === 'tr';
 
   if (cat.includes('albion')) {
     return 'Albion Online';
   }
-  if (cat.includes('discord') || cat.includes('topluluk') || cat.includes('community') || cat.includes('automation') || cat.includes('otomasyon')) {
-    return isTr ? 'Discord Otomasyonu' : 'Discord Automation';
+  if (cat.includes('discord') || cat.includes('community') || cat.includes('automation') || cat.includes('otomasyon') || cat.includes('topluluk')) {
+    return 'Discord Automation';
   }
-  if (cat.includes('veyronix') || cat.includes('haber') || cat.includes('update') || cat.includes('platform')) {
+  if (cat.includes('veyronix') || cat.includes('platform') || cat.includes('update') || cat.includes('haber')) {
     return 'Veyronix';
   }
-  return isTr ? 'Rehberler' : 'Guides';
+  return 'Guides';
 }
 
 export default function BlogListClient({ allPosts = [] }) {
@@ -30,51 +29,44 @@ export default function BlogListClient({ allPosts = [] }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
-  // Dil değiştiğinde aramayı ve kategori filtresini otomatik sıfırla
+  // Reset category filter when site language switches
   useEffect(() => {
     setSelectedCategory('all');
     setSearchQuery('');
   }, [lang]);
 
-  // Tüm yazıları standartlaştırılmış kategori ve dil ile normalize et
+  // Normalize all posts into a single, unified English/Global feed
   const processedPosts = useMemo(() => {
     return allPosts.map(p => {
-      const postLang = p.lang || (p.slug?.endsWith('-en') ? 'en' : 'tr');
-      const normalizedCat = normalizeCategory(p.category, postLang);
+      const normalizedCat = normalizeCategory(p.category);
       
       return {
         ...p,
-        lang: postLang,
         category: normalizedCat,
         readTimeMinutes: p.readTimeMinutes || 5,
-        authorName: p.authorName || (postLang === 'tr' ? 'Veyronix Ekibi' : 'Veyronix Team'),
+        authorName: p.authorName || 'Veyronix Team',
         authorAvatar: p.authorAvatar || 'https://veyronix.com.tr/icon.svg',
       };
     });
   }, [allPosts]);
 
-  // Seçili dildeki tüm yazılar (filtresiz)
-  const currentLangPosts = useMemo(() => {
-    return processedPosts.filter(p => p.lang === lang);
-  }, [processedPosts, lang]);
-
-  // Seçili dilin kategorilerini ve her kategorideki yazı sayısını hesapla
+  // Unified Categories with counts
   const categories = useMemo(() => {
     const map = new Map();
-    currentLangPosts.forEach(p => {
+    processedPosts.forEach(p => {
       const cat = p.category;
       map.set(cat, (map.get(cat) || 0) + 1);
     });
     return Array.from(map.entries()).map(([name, count]) => ({ name, count }));
-  }, [currentLangPosts]);
+  }, [processedPosts]);
 
-  // Arama ve Kategoriye göre filtrelenmiş aktif yazılar
+  // Filtered posts based on category and search query (Unified across all languages)
   const filteredPosts = useMemo(() => {
-    return currentLangPosts.filter(post => {
-      // Kategori filtresi
+    return processedPosts.filter(post => {
+      // Category filter
       const matchesCategory = selectedCategory === 'all' || post.category.toLowerCase() === selectedCategory.toLowerCase();
 
-      // Arama filtresi
+      // Search filter
       const query = searchQuery.toLowerCase().trim();
       const matchesSearch = !query || 
         (post.title || '').toLowerCase().includes(query) || 
@@ -83,8 +75,9 @@ export default function BlogListClient({ allPosts = [] }) {
 
       return matchesCategory && matchesSearch;
     });
-  }, [currentLangPosts, selectedCategory, searchQuery]);
+  }, [processedPosts, selectedCategory, searchQuery]);
 
+  // Latest post is always the featured article
   const featuredPost = useMemo(() => {
     if (selectedCategory === 'all' && !searchQuery && filteredPosts.length > 0) {
       return filteredPosts[0];
@@ -99,38 +92,23 @@ export default function BlogListClient({ allPosts = [] }) {
     return filteredPosts;
   }, [filteredPosts, featuredPost]);
 
-  const t = isTr ? {
-    badge: "Bilgi Merkezi & Rehberler",
+  const t = {
+    badge: isTr ? "Bilgi Merkezi & Rehberler" : "Knowledge Hub & Guides",
     title1: "Veyronix",
-    highlight: "Blog & Rehberler",
-    desc: "Discord bot otomasyonu, geçici ses odaları, butonlu kayıt sistemleri ve Albion Online lonca stratejileri hakkında uzman rehberleri.",
-    searchPlaceholder: "Makale, rehber veya anahtar kelime ara...",
-    allCategories: "Tüm Yazılar",
-    featuredBadge: "Öne Çıkan Rehber",
-    emptyTitle: "Sonuç Bulunamadı",
-    emptyDesc: searchQuery 
-      ? `"${searchQuery}" araması için Türkçe makale bulunamadı.` 
-      : "Bu kategoride henüz yayınlanmış bir makale bulunmuyor.",
-    clearSearch: "Aramayı Temizle",
-    readMore: "Rehberi Oku",
-    readTime: "dk okuma",
-    totalArticles: "yazı",
-  } : {
-    badge: "Knowledge Hub & Guides",
-    title1: "Veyronix",
-    highlight: "Blog & Insights",
-    desc: "Expert guides on Discord bot automation, temporary voice channels, registration systems, and Albion Online guild tactics.",
-    searchPlaceholder: "Search articles, guides, or keywords...",
-    allCategories: "All Articles",
-    featuredBadge: "Featured Guide",
-    emptyTitle: "No Articles Found",
+    highlight: isTr ? "Blog & Rehberler" : "Blog & Insights",
+    desc: isTr 
+      ? "Discord bot otomasyonu, geçici ses odaları, kayıt sistemleri ve Albion Online lonca stratejileri hakkında uzman rehberleri."
+      : "Expert guides on Discord bot automation, temporary voice channels, registration systems, and Albion Online guild tactics.",
+    searchPlaceholder: isTr ? "Makale, rehber veya anahtar kelime ara..." : "Search articles, guides, or keywords...",
+    allCategories: isTr ? "Tüm Yazılar" : "All Articles",
+    featuredBadge: isTr ? "Öne Çıkan Rehber" : "Featured Guide",
+    emptyTitle: isTr ? "Sonuç Bulunamadı" : "No Articles Found",
     emptyDesc: searchQuery
-      ? `No English articles found matching "${searchQuery}".`
-      : "No articles found in this category.",
-    clearSearch: "Clear Search",
-    readMore: "Read Guide",
-    readTime: "min read",
-    totalArticles: "articles",
+      ? (isTr ? `"${searchQuery}" araması için makale bulunamadı.` : `No articles found matching "${searchQuery}".`)
+      : (isTr ? "Bu kategoride henüz yayınlanmış bir makale bulunmuyor." : "No articles found in this category."),
+    clearSearch: isTr ? "Aramayı Temizle" : "Clear Search",
+    readMore: isTr ? "Rehberi Oku" : "Read Guide",
+    readTime: isTr ? "dk okuma" : "min read",
   };
 
   return (
@@ -186,7 +164,7 @@ export default function BlogListClient({ allPosts = [] }) {
           >
             <span>{t.allCategories}</span>
             <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${selectedCategory === 'all' ? 'bg-black/20 text-black' : 'bg-surface-container-high text-on-surface-variant'}`}>
-              {currentLangPosts.length}
+              {processedPosts.length}
             </span>
           </button>
 
@@ -247,7 +225,7 @@ export default function BlogListClient({ allPosts = [] }) {
                       className="w-8 h-8 rounded-full border border-primary-container/40 object-cover"
                     />
                     <div>
-                      <div className="text-xs font-bold text-white">{featuredPost.authorName || (isTr ? 'Veyronix Ekibi' : 'Veyronix Team')}</div>
+                      <div className="text-xs font-bold text-white">{featuredPost.authorName || 'Veyronix Team'}</div>
                       <div className="text-[11px] text-on-surface-variant flex items-center gap-2">
                         <span>{new Date(featuredPost.publishedAt || featuredPost.date).toLocaleDateString(isTr ? 'tr-TR' : 'en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
                         <span>•</span>
