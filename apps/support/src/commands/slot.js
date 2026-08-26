@@ -145,10 +145,11 @@ module.exports = {
       const col2 = getCol(c2);
       const col3 = getCol(c3);
 
-      // \u2800 is a Braille blank (invisible) used to align the top/bottom rows with the middle row that has ▶
-      return `\u2800\u2800\u2800${col1[0]} ┊ ${col2[0]} ┊ ${col3[0]}
+      // \u3000 is an ideographic full-width space. It exactly matches the width of the ▶ emoji.
+      const pad = '\u3000 ';
+      return `${pad}${col1[0]} ┊ ${col2[0]} ┊ ${col3[0]}
 ▶ **${col1[1]} ┊ ${col2[1]} ┊ ${col3[1]}** ◀
-\u2800\u2800\u2800${col1[2]} ┊ ${col2[2]} ┊ ${col3[2]}`;
+${pad}${col1[2]} ┊ ${col2[2]} ┊ ${col3[2]}`;
     };
 
     const playSlot = async (currentInteraction, isEdit = false) => {
@@ -235,16 +236,30 @@ ${result.freeSpins > 0 ? `🎁 **Free Spins Won:** \`${result.freeSpins}\`` : ''
 
         if (i.customId === 'payouts') {
           const payoutEmbed = new EmbedBuilder()
-            .setTitle('📜 Slot Payouts')
+            .setTitle('📜 Casino Payouts & Rules')
             .setColor('#3498DB')
-            .setDescription(
-              SYMBOLS.map(s => {
-                let desc = `**3x** = x${s.multiplier}`;
-                if (s.type === 'WILD') desc = '**WILD** (Substitutes any, 3x = x15)';
-                if (s.type === 'SCATTER') desc = '**SCATTER** (2x = 3 Free Spins, 3x = 10 Free Spins)';
-                return `${s.emoji} : ${desc}`;
-              }).join('\\n\\n')
-            );
+            .addFields(
+              {
+                name: '💎 Standard Symbols (3x Match)',
+                value: 
+                  '> 7️⃣ **Jackpot:** `x100`\n' +
+                  '> 💎 **Diamond:** `x25`\n' +
+                  '> 🔔 **Bell:** `x10`\n' +
+                  '> 🍇 **Grape:** `x5`\n' +
+                  '> 🍋 **Lemon:** `x3`\n' +
+                  '> 🍒 **Cherry:** `x2`'
+              },
+              {
+                name: '⭐ WILD (Joker)',
+                value: '> Substitutes for ANY symbol to complete a match.\n> **3x WILD:** `x15` Multiplier'
+              },
+              {
+                name: '🌀 SCATTER (Free Spins)',
+                value: '> Scatters payout anywhere on the screen.\n> **2x SCATTER:** `Refund Bet + 3 Free Spins`\n> **3x SCATTER:** `x5 Multiplier + 10 Free Spins`'
+              }
+            )
+            .setFooter({ text: 'Note: 2x Matches give half payout of the symbol!' });
+            
           return i.reply({ embeds: [payoutEmbed], ephemeral: true });
         }
 
