@@ -42,8 +42,9 @@ const getCardString = (client, card, hidden = false) => {
     return customEmoji.toString();
   }
   
-  // Bulunamazsa fallback (eski stil)
-  return `\`${card.rank}\` ${card.suit}`;
+  // Bulunamazsa fallback ve HATA AYIKLAMA (DEBUG) bilgisi
+  let appSize = (client.application && client.application.emojis) ? client.application.emojis.cache.size : 0;
+  return `\`${card.rank}\` ${card.suit} (Ad: ${emojiName}, Yüklü: ${appSize})`;
 };
 
 // Deste oluştur ve karıştır
