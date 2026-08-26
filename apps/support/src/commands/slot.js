@@ -145,12 +145,10 @@ module.exports = {
       const col2 = getCol(c2);
       const col3 = getCol(c3);
 
-      // \u200B (Zero-width space) prevents Discord from stripping the leading space.
-      // \u3000 (Ideographic space) is exactly one emoji wide.
-      const pad = '\u200B\u3000 ';
-      return `${pad}${col1[0]} ┊ ${col2[0]} ┊ ${col3[0]}
-▶ **${col1[1]} ┊ ${col2[1]} ┊ ${col3[1]}** ◀
-${pad}${col1[2]} ┊ ${col2[2]} ┊ ${col3[2]}`;
+      // Sola dayalı ve blockquote (>) kullanarak %100 kusursuz hizalama (tüm cihazlarda)
+      return `> ${col1[0]} ┊ ${col2[0]} ┊ ${col3[0]}
+> **${col1[1]} ┊ ${col2[1]} ┊ ${col3[1]}** 👈
+> ${col1[2]} ┊ ${col2[2]} ┊ ${col3[2]}`;
     };
 
     const playSlot = async (currentInteraction, isEdit = false) => {
