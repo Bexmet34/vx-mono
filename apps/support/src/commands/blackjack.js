@@ -292,7 +292,6 @@ module.exports = {
             mockBalance -= bet;
             embed = buildEmbed(currentInteraction.client, playerHand, dealerHand, bet, status, false);
             embed.setDescription(embed.data.description + `\n\n> 💥 **BUST!** You went over 21. Lost \`${bet}\` Points.`);
-            collector.stop('ended');
             return i.editReply({ embeds: [embed], components: [getGameOverRow()] });
           } else if (val === 21) {
             i.customId = 'stand'; // Auto stand on 21
@@ -312,7 +311,6 @@ module.exports = {
             mockBalance -= bet;
             embed = buildEmbed(currentInteraction.client, playerHand, dealerHand, bet, status, false);
             embed.setDescription(embed.data.description + `\n\n> 💥 **BUST!** You went over 21. Lost \`${bet}\` Points.`);
-            collector.stop('ended');
             return i.editReply({ embeds: [embed], components: [getGameOverRow()] });
           }
           i.customId = 'stand';
@@ -348,7 +346,6 @@ module.exports = {
 
           embed = buildEmbed(currentInteraction.client, playerHand, dealerHand, bet, status, false);
           embed.setDescription(embed.data.description + `\n\n> ${resultMsg}`);
-          collector.stop('ended');
           return i.editReply({ embeds: [embed], components: [getGameOverRow()] });
         }
       });
