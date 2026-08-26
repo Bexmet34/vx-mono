@@ -43,7 +43,7 @@ function calculatePayout(s1, s2, s3, bet) {
       won: bet * 5,
       freeSpins: 10,
       type: 'SCATTER',
-      message: '🌀 **BOOM! 3x Scatter!** 10 Free Spin + 5x Bahis Kazandın!',
+      message: '🌀 **BOOM! 3x Scatter!** 10 Free Spins + 5x Bet Won!',
       color: '#9B59B6'
     };
   } else if (scatterCount === 2) {
@@ -51,7 +51,7 @@ function calculatePayout(s1, s2, s3, bet) {
       won: bet,
       freeSpins: 3,
       type: 'SCATTER',
-      message: '🌀 **2x Scatter!** Bahsin İade Edildi + 3 Free Spin Kazandın!',
+      message: '🌀 **2x Scatter!** Bet Refunded + 3 Free Spins Won!',
       color: '#8E44AD'
     };
   }
@@ -65,7 +65,7 @@ function calculatePayout(s1, s2, s3, bet) {
       won: bet * 15,
       freeSpins: 0,
       type: 'JACKPOT',
-      message: '⭐ **SUPER WILD JACKPOT!** x15 Çarpan!',
+      message: '⭐ **SUPER WILD JACKPOT!** x15 Multiplier!',
       color: '#F1C40F'
     };
   }
@@ -80,7 +80,7 @@ function calculatePayout(s1, s2, s3, bet) {
       won: wonAmount,
       freeSpins: 0,
       type: 'JACKPOT',
-      message: `🎉 **3x ${targetSymbol.emoji} Eşleşti!** x${targetSymbol.multiplier} Çarpan!`,
+      message: `🎉 **3x ${targetSymbol.emoji} Matched!** x${targetSymbol.multiplier} Multiplier!`,
       color: '#2ECC71'
     };
   }
@@ -99,7 +99,7 @@ function calculatePayout(s1, s2, s3, bet) {
       won: wonAmount,
       freeSpins: 0,
       type: 'WIN',
-      message: `✨ **2x ${matchSymbol.emoji} Eşleşti!** ${wonAmount} Puan Kazandın!`,
+      message: `✨ **2x ${matchSymbol.emoji} Matched!** You won ${wonAmount} Points!`,
       color: '#3498DB'
     };
   }
@@ -109,7 +109,7 @@ function calculatePayout(s1, s2, s3, bet) {
     won: 0,
     freeSpins: 0,
     type: 'LOSE',
-    message: '💥 **Tüh!** Hiçbir kombinasyon yakalanamadı.',
+    message: '💥 **Ouch!** No combinations matched.',
     color: '#E74C3C'
   };
 }
@@ -117,19 +117,19 @@ function calculatePayout(s1, s2, s3, bet) {
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('slot')
-    .setDescription('🎰 Gelişmiş Slot Makinesi')
+    .setDescription('🎰 Advanced Slot Machine')
     .addIntegerOption(option => 
-      option.setName('bahis')
-        .setDescription('Yatıralacak puan miktarı')
+      option.setName('bet')
+        .setDescription('Amount of points to bet')
         .setRequired(false)
     ),
 
   async execute(interaction) {
-    let bet = interaction.options.getInteger('bahis') || 10;
+    let bet = interaction.options.getInteger('bet') || 10;
     let mockBalance = 500;
 
     if (bet > mockBalance || bet <= 0) {
-      return interaction.reply({ content: 'Geçersiz bahis miktarı!', ephemeral: true });
+      return interaction.reply({ content: 'Invalid bet amount!', ephemeral: true });
     }
 
     const generateGrid = (c1, c2, c3) => {
@@ -145,9 +145,10 @@ module.exports = {
       const col2 = getCol(c2);
       const col3 = getCol(c3);
 
-      return `> ⬛ ${col1[0]} ┊ ${col2[0]} ┊ ${col3[0]} ⬛
-> 🏆 **${col1[1]} ┊ ${col2[1]} ┊ ${col3[1]}** 🏆 ◀
-> ⬛ ${col1[2]} ┊ ${col2[2]} ┊ ${col3[2]} ⬛`;
+      // \u2800 is a Braille blank (invisible) used to align the top/bottom rows with the middle row that has ▶
+      return `\u2800\u2800\u2800${col1[0]} ┊ ${col2[0]} ┊ ${col3[0]}
+▶ **${col1[1]} ┊ ${col2[1]} ┊ ${col3[1]}** ◀
+\u2800\u2800\u2800${col1[2]} ┊ ${col2[2]} ┊ ${col3[2]}`;
     };
 
     const playSlot = async (currentInteraction, isEdit = false) => {
@@ -155,12 +156,8 @@ module.exports = {
       const embed = new EmbedBuilder()
         .setTitle('🎰 Veyronix Casino Slot')
         .setColor('#F39C12')
-        .setDescription(`
-${generateGrid('spin', 'spin', 'spin')}
-
-*🎰 Çarklar son sürat dönüyor...*
-        `)
-        .setFooter({ text: `Bahis: ${bet} Puan | Bakiye: ${mockBalance}` });
+        .setDescription(`\n${generateGrid('spin', 'spin', 'spin')}\n\n*🎰 Reels are starting to spin...*`)
+        .setFooter({ text: `Bet: ${bet} Points | Balance: ${mockBalance}` });
 
       let responseMsg;
       if (isEdit) {
@@ -173,26 +170,23 @@ ${generateGrid('spin', 'spin', 'spin')}
       const s2 = getRandomSymbol();
       const s3 = getRandomSymbol();
 
-      // Kare 1
-      await delay(800);
-      embed.setDescription(`
-${generateGrid(s1, 'spin', 'spin')}
-
-*🎰 1. çark kilitlendi...*
-      `);
+      // Animasyon Kare 1 (Hepsi Dönüyor - Göz yanılması için)
+      await delay(600);
+      embed.setDescription(`\n${generateGrid('spin', 'spin', 'spin')}\n\n*🎰 Reels are spinning fast...*`);
       await currentInteraction.editReply({ embeds: [embed] });
 
-      // Kare 2
-      await delay(800);
-      embed.setDescription(`
-${generateGrid(s1, s2, 'spin')}
-
-*🎰 2. çark kilitlendi...*
-      `);
+      // Kare 2 (1. Çark Durdu)
+      await delay(700);
+      embed.setDescription(`\n${generateGrid(s1, 'spin', 'spin')}\n\n*🎰 Reel 1 locked...*`);
       await currentInteraction.editReply({ embeds: [embed] });
 
-      // Kare 3 (Sonuç)
-      await delay(1000);
+      // Kare 3 (2. Çark Durdu)
+      await delay(700);
+      embed.setDescription(`\n${generateGrid(s1, s2, 'spin')}\n\n*🎰 Waiting for the final reel...*`);
+      await currentInteraction.editReply({ embeds: [embed] });
+
+      // Kare 4 (Sonuç)
+      await delay(900);
       const result = calculatePayout(s1, s2, s3, bet);
       mockBalance = mockBalance - bet + result.won;
 
@@ -202,23 +196,28 @@ ${generateGrid(s1, s2, s3)}
 
 ${result.message}
 
-💵 **Kazanılan:** \`${result.won} Puan\`
-💳 **Yeni Bakiye:** \`${mockBalance} Puan\`
-${result.freeSpins > 0 ? `🎁 **Kazandığınız Free Spin:** \`${result.freeSpins}\`` : ''}
+💵 **Won:** \`${result.won} Points\`
+💳 **New Balance:** \`${mockBalance} Points\`
+${result.freeSpins > 0 ? `🎁 **Free Spins Won:** \`${result.freeSpins}\`` : ''}
         `);
 
       // Discord Butonları
       const row = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
           .setCustomId('respin')
-          .setLabel('Tekrar Çevir')
+          .setLabel('Respin')
           .setStyle(ButtonStyle.Primary)
           .setEmoji('🔄'),
         new ButtonBuilder()
           .setCustomId('double_down')
-          .setLabel('2x Bahis')
+          .setLabel('2x Bet')
           .setStyle(ButtonStyle.Success)
-          .setEmoji('🚀')
+          .setEmoji('🚀'),
+        new ButtonBuilder()
+          .setCustomId('payouts')
+          .setLabel('Payouts')
+          .setStyle(ButtonStyle.Secondary)
+          .setEmoji('📜')
       );
 
       const finalMsg = await currentInteraction.editReply({ embeds: [embed], components: [row] });
@@ -231,7 +230,22 @@ ${result.freeSpins > 0 ? `🎁 **Kazandığınız Free Spin:** \`${result.freeSp
 
       collector.on('collect', async i => {
         if (i.user.id !== interaction.user.id) {
-          return i.reply({ content: 'Bu butonu sadece komutu başlatan kullanabilir.', ephemeral: true });
+          return i.reply({ content: 'Only the command initiator can use this button.', ephemeral: true });
+        }
+
+        if (i.customId === 'payouts') {
+          const payoutEmbed = new EmbedBuilder()
+            .setTitle('📜 Slot Payouts')
+            .setColor('#3498DB')
+            .setDescription(
+              SYMBOLS.map(s => {
+                let desc = `**3x** = x${s.multiplier}`;
+                if (s.type === 'WILD') desc = '**WILD** (Substitutes any, 3x = x15)';
+                if (s.type === 'SCATTER') desc = '**SCATTER** (2x = 3 Free Spins, 3x = 10 Free Spins)';
+                return `${s.emoji} : ${desc}`;
+              }).join('\\n\\n')
+            );
+          return i.reply({ embeds: [payoutEmbed], ephemeral: true });
         }
 
         if (i.customId === 'double_down') {
@@ -239,7 +253,7 @@ ${result.freeSpins > 0 ? `🎁 **Kazandığınız Free Spin:** \`${result.freeSp
         }
 
         if (mockBalance < bet) {
-          return i.reply({ content: 'Yetersiz bakiye! Bahis sıfırlandı.', ephemeral: true });
+          return i.reply({ content: 'Insufficient balance! Bet reset.', ephemeral: true });
         }
 
         collector.stop();
