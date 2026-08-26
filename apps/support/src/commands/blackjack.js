@@ -19,7 +19,7 @@ let appEmojisFetched = false;
 
 // Discord Emojilerini isimlerinden (Örn: 10_of_clover) dinamik olarak bulur
 const getCardString = (client, card, hidden = false) => {
-  if (hidden) return '🂠 `?`'; // Ters dönmüş kart
+  if (hidden) return '🂠'; // Ters dönmüş kart (H1 formatında daha büyük ve şık durması için düz unicode)
   
   const suitMap = {
     '♠️': 'spades',
@@ -42,9 +42,8 @@ const getCardString = (client, card, hidden = false) => {
     return customEmoji.toString();
   }
   
-  // Bulunamazsa fallback ve HATA AYIKLAMA (DEBUG) bilgisi
-  let appSize = (client.application && client.application.emojis) ? client.application.emojis.cache.size : 0;
-  return `\`${card.rank}\` ${card.suit} (Ad: ${emojiName}, Yüklü: ${appSize})`;
+  // Bulunamazsa fallback (eski stil)
+  return `\`${card.rank}\` ${card.suit}`;
 };
 
 // Deste oluştur ve karıştır
@@ -100,12 +99,15 @@ const buildEmbed = (client, playerHand, dealerHand, bet, status, hideDealer = tr
   if (status === 'LOSE' || status === 'BUST') color = '#E74C3C';
   if (status === 'TIE') color = '#F1C40F';
 
+  // Kartları çok daha büyük (Jumbo) göstermek için Discord Markdown H1 (#) kullanıyoruz
   const embed = new EmbedBuilder()
     .setTitle('🃏 Veyronix Casino | Blackjack')
     .setColor(color)
-    .addFields(
-      { name: `🧑 Player Hand (Value: ${playerValue})`, value: playerString, inline: false },
-      { name: `🕴️ Dealer Hand (Value: ${hideDealer ? '?' : dealerValue})`, value: dealerString, inline: false }
+    .setDescription(
+      `🕴️ **Dealer Hand** (Value: ${hideDealer ? '?' : dealerValue})\n` +
+      `# ${dealerString}\n\n` +
+      `🧑 **Player Hand** (Value: ${playerValue})\n` +
+      `# ${playerString}`
     )
     .setFooter({ text: `Bet: ${bet} Points | Balance: ${mockBalance} Points` });
 
@@ -186,7 +188,7 @@ module.exports = {
         if (status === 'BLACKJACK') resultMsg = `🎉 **BLACKJACK!** You won \`${bet * 1.5}\` Points!`;
         if (status === 'LOSE') resultMsg = `💀 **Dealer has Blackjack.** You lost \`${bet}\` Points.`;
         if (status === 'TIE') resultMsg = `🤝 **Push!** Bet refunded.`;
-        embed.setDescription(resultMsg);
+        embed.setDescription(embed.data.description + `\n\n> ${resultMsg}`);
       }
 
       const messagePayload = { 
@@ -254,7 +256,7 @@ module.exports = {
             status = 'BUST';
             mockBalance -= bet;
             embed = buildEmbed(currentInteraction.client, playerHand, dealerHand, bet, status, false);
-            embed.setDescription(`💥 **BUST!** You went over 21. Lost \`${bet}\` Points.`);
+            embed.setDescription(embed.data.description + `\n\n> 💥 **BUST!** You went over 21. Lost \`${bet}\` Points.`);
             collector.stop('ended');
             return i.editReply({ embeds: [embed], components: [getGameOverRow()] });
           } else if (val === 21) {
@@ -274,7 +276,7 @@ module.exports = {
             status = 'BUST';
             mockBalance -= bet;
             embed = buildEmbed(currentInteraction.client, playerHand, dealerHand, bet, status, false);
-            embed.setDescription(`💥 **BUST!** You went over 21. Lost \`${bet}\` Points.`);
+            embed.setDescription(embed.data.description + `\n\n> 💥 **BUST!** You went over 21. Lost \`${bet}\` Points.`);
             collector.stop('ended');
             return i.editReply({ embeds: [embed], components: [getGameOverRow()] });
           }
@@ -310,7 +312,7 @@ module.exports = {
           }
 
           embed = buildEmbed(currentInteraction.client, playerHand, dealerHand, bet, status, false);
-          embed.setDescription(resultMsg);
+          embed.setDescription(embed.data.description + `\n\n> ${resultMsg}`);
           collector.stop('ended');
           return i.editReply({ embeds: [embed], components: [getGameOverRow()] });
         }
@@ -318,7 +320,7 @@ module.exports = {
 
       collector.on('end', (collected, reason) => {
         if (reason !== 'restarting' && reason !== 'ended') {
-          embed.setDescription('⏳ **Game expired.**');
+          embed.setDescription(embed.data.description + '\n\n⏳ **Game expired.**');
           targetMessage.edit({ embeds: [embed], components: [] }).catch(() => {});
         }
       });
