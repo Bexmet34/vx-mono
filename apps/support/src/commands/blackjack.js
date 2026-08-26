@@ -19,8 +19,6 @@ let appEmojisFetched = false;
 
 // Discord Emojilerini isimlerinden (Örn: 10_of_clover) dinamik olarak bulur
 const getCardString = (client, card, hidden = false) => {
-  if (hidden) return '🂠'; // Ters dönmüş kart (H1 formatında daha büyük ve şık durması için düz unicode)
-  
   const suitMap = {
     '♠️': 'spades',
     '♥️': 'hearts',
@@ -28,7 +26,7 @@ const getCardString = (client, card, hidden = false) => {
     '♣️': 'clover'
   };
   
-  const emojiName = `${card.rank}_of_${suitMap[card.suit]}`.toLowerCase();
+  const emojiName = hidden ? 'card_back' : `${card.rank}_of_${suitMap[card.suit]}`.toLowerCase();
   
   let customEmoji = null;
   
@@ -47,6 +45,7 @@ const getCardString = (client, card, hidden = false) => {
   }
   
   // Bulunamazsa fallback (eski stil)
+  if (hidden) return '🂠';
   return `\`${card.rank}\` ${card.suit}`;
 };
 
