@@ -141,7 +141,11 @@ module.exports = {
     const playBlackjack = async (currentInteraction, bet, isEdit = false) => {
       if (bet > mockBalance) {
         const msg = { content: '❌ Insufficient balance! Your bet was reset or you cannot afford this.', ephemeral: true };
-        return isEdit ? currentInteraction.reply(msg) : currentInteraction.reply(msg);
+        if (isEdit) {
+          return currentInteraction.followUp(msg);
+        } else {
+          return currentInteraction.reply(msg);
+        }
       }
 
       let deck = createDeck();
@@ -198,7 +202,7 @@ module.exports = {
 
       let response;
       if (isEdit) {
-        await currentInteraction.update(messagePayload);
+        await currentInteraction.editReply(messagePayload);
         response = currentInteraction;
       } else {
         messagePayload.withResponse = true;
@@ -232,16 +236,19 @@ module.exports = {
         }
 
         if (i.customId === 'play_again') {
+          await i.deferUpdate();
           collector.stop('restarting');
           return playBlackjack(i, bet, true);
         }
 
         if (i.customId === 'bet_plus') {
+          await i.deferUpdate();
           collector.stop('restarting');
           return playBlackjack(i, bet + 10, true);
         }
 
         if (i.customId === 'bet_minus') {
+          await i.deferUpdate();
           collector.stop('restarting');
           return playBlackjack(i, Math.max(10, bet - 10), true);
         }
