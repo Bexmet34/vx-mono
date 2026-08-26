@@ -145,8 +145,9 @@ module.exports = {
       const col2 = getCol(c2);
       const col3 = getCol(c3);
 
-      // \u3000 is an ideographic full-width space. It exactly matches the width of the ▶ emoji.
-      const pad = '\u3000 ';
+      // \u200B (Zero-width space) prevents Discord from stripping the leading space.
+      // \u3000 (Ideographic space) is exactly one emoji wide.
+      const pad = '\u200B\u3000 ';
       return `${pad}${col1[0]} ┊ ${col2[0]} ┊ ${col3[0]}
 ▶ **${col1[1]} ┊ ${col2[1]} ┊ ${col3[1]}** ◀
 ${pad}${col1[2]} ┊ ${col2[2]} ┊ ${col3[2]}`;
