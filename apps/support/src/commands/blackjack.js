@@ -14,6 +14,9 @@ let mockBalance = 500;
 const SUITS = ['♠️', '♥️', '♦️', '♣️'];
 const RANKS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
 
+// Application emoji'lerin çekilip çekilmediğini takip eden bayrak
+let appEmojisFetched = false;
+
 // Discord Emojilerini isimlerinden (Örn: 10_of_clover) dinamik olarak bulur
 const getCardString = (client, card, hidden = false) => {
   if (hidden) return '🂠 `?`'; // Ters dönmüş kart
@@ -120,6 +123,16 @@ module.exports = {
     ),
 
   async execute(interaction) {
+    // Developer Portal'a yüklenen (Application) Emojileri ilk kullanımda önbelleğe çek (Sadece 1 kere çalışır)
+    if (!appEmojisFetched && interaction.client.application) {
+      try {
+        await interaction.client.application.emojis.fetch();
+        appEmojisFetched = true;
+      } catch (error) {
+        console.error("Application emojileri çekilirken hata oluştu:", error);
+      }
+    }
+
     let initialBet = interaction.options.getInteger('bet');
 
     const playBlackjack = async (currentInteraction, bet, isEdit = false) => {
