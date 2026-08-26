@@ -93,8 +93,8 @@ const buildEmbed = (client, playerHand, dealerHand, bet, status, hideDealer = tr
     .setTitle('🃏 Veyronix Casino | Blackjack')
     .setColor(color)
     .addFields(
-      { name: `🧑 Player Hand (Value: ${playerValue})`, value: playerString, inline: true },
-      { name: `🕴️ Dealer Hand (Value: ${hideDealer ? '?' : dealerValue})`, value: dealerString, inline: true }
+      { name: `🧑 Player Hand (Value: ${playerValue})`, value: playerString },
+      { name: `🕴️ Dealer Hand (Value: ${hideDealer ? '?' : dealerValue})`, value: dealerString }
     )
     .setFooter({ text: `Bet: ${bet} Points | Balance: ${mockBalance} Points` });
 
