@@ -25,8 +25,15 @@ const getCardString = (client, card, hidden = false) => {
     '♣️': 'clover'
   };
   
-  const emojiName = `${card.rank}_of_${suitMap[card.suit]}`;
-  const customEmoji = client.emojis.cache.find(e => e.name === emojiName);
+  const emojiName = `${card.rank}_of_${suitMap[card.suit]}`.toLowerCase();
+  
+  // Önce sunucu emojilerinde (Guild Emojis) ara (Küçük-büyük harf duyarsız)
+  let customEmoji = client.emojis.cache.find(e => e.name.toLowerCase() === emojiName);
+  
+  // Eğer sunucuda yoksa, botun kendi paneline (Application Emojis) yüklenmiş olabilir
+  if (!customEmoji && client.application && client.application.emojis) {
+    customEmoji = client.application.emojis.cache.find(e => e.name.toLowerCase() === emojiName);
+  }
   
   if (customEmoji) {
     return customEmoji.toString();
