@@ -14,10 +14,25 @@ let mockBalance = 500;
 const SUITS = ['♠️', '♥️', '♦️', '♣️'];
 const RANKS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
 
-// İleride özel emojiler eklediğinizde bu fonksiyonu güncelleyebilirsiniz.
-// Örn: if(card.rank === '10' && card.suit === '♦️') return '<:10D:1234567890>';
-const getCardString = (card, hidden = false) => {
+// Discord Emojilerini isimlerinden (Örn: 10_of_clover) dinamik olarak bulur
+const getCardString = (client, card, hidden = false) => {
   if (hidden) return '🂠 `?`'; // Ters dönmüş kart
+  
+  const suitMap = {
+    '♠️': 'spades',
+    '♥️': 'hearts',
+    '♦️': 'diamonds',
+    '♣️': 'clover'
+  };
+  
+  const emojiName = `${card.rank}_of_${suitMap[card.suit]}`;
+  const customEmoji = client.emojis.cache.find(e => e.name === emojiName);
+  
+  if (customEmoji) {
+    return customEmoji.toString();
+  }
+  
+  // Bulunamazsa fallback (eski stil)
   return `\`${card.rank}\` ${card.suit}`;
 };
 
@@ -60,14 +75,14 @@ const calculateHand = (hand) => {
 };
 
 // Embed oluşturucu
-const buildEmbed = (playerHand, dealerHand, bet, status, hideDealer = true) => {
+const buildEmbed = (client, playerHand, dealerHand, bet, status, hideDealer = true) => {
   const playerValue = calculateHand(playerHand);
   const dealerValue = calculateHand(hideDealer ? [dealerHand[0]] : dealerHand);
   
-  let playerString = playerHand.map(c => getCardString(c)).join('  ');
+  let playerString = playerHand.map(c => getCardString(client, c)).join(' ');
   let dealerString = hideDealer 
-    ? `${getCardString(dealerHand[0])}  ${getCardString(null, true)}` 
-    : dealerHand.map(c => getCardString(c)).join('  ');
+    ? `${getCardString(client, dealerHand[0])} ${getCardString(client, null, true)}` 
+    : dealerHand.map(c => getCardString(client, c)).join(' ');
 
   let color = '#3498DB'; // Devam ediyor
   if (status === 'WIN' || status === 'BLACKJACK') color = '#2ECC71';
@@ -98,164 +113,196 @@ module.exports = {
     ),
 
   async execute(interaction) {
-    let bet = interaction.options.getInteger('bet');
+    let initialBet = interaction.options.getInteger('bet');
 
-    if (bet > mockBalance) {
-      return interaction.reply({ content: '❌ Insufficient balance!', ephemeral: true });
-    }
+    const playBlackjack = async (currentInteraction, bet, isEdit = false) => {
+      if (bet > mockBalance) {
+        const msg = { content: '❌ Insufficient balance! Your bet was reset or you cannot afford this.', ephemeral: true };
+        return isEdit ? currentInteraction.reply(msg) : currentInteraction.reply(msg);
+      }
 
-    let deck = createDeck();
-    let playerHand = [deck.pop(), deck.pop()];
-    let dealerHand = [deck.pop(), deck.pop()];
-    let status = 'PLAYING';
-    
-    // Anında Blackjack kontrolü
-    let pValue = calculateHand(playerHand);
-    let dValue = calculateHand(dealerHand);
-    
-    if (pValue === 21 && dValue === 21) {
-      status = 'TIE';
-    } else if (pValue === 21) {
-      status = 'BLACKJACK';
-      mockBalance += bet * 1.5; // Blackjack ödülü 1.5x
-    } else if (dValue === 21) {
-      status = 'LOSE';
-      mockBalance -= bet;
-    }
+      let deck = createDeck();
+      let playerHand = [deck.pop(), deck.pop()];
+      let dealerHand = [deck.pop(), deck.pop()];
+      let status = 'PLAYING';
+      
+      // Anında Blackjack kontrolü
+      let pValue = calculateHand(playerHand);
+      let dValue = calculateHand(dealerHand);
+      
+      if (pValue === 21 && dValue === 21) {
+        status = 'TIE';
+      } else if (pValue === 21) {
+        status = 'BLACKJACK';
+        mockBalance += bet * 1.5;
+      } else if (dValue === 21) {
+        status = 'LOSE';
+        mockBalance -= bet;
+      }
 
-    const getRow = (disabled = false) => {
-      return new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-          .setCustomId('hit')
-          .setLabel('Hit')
-          .setStyle(ButtonStyle.Success)
-          .setEmoji('➕')
-          .setDisabled(disabled),
-        new ButtonBuilder()
-          .setCustomId('stand')
-          .setLabel('Stand')
-          .setStyle(ButtonStyle.Danger)
-          .setEmoji('🛑')
-          .setDisabled(disabled),
-        new ButtonBuilder()
-          .setCustomId('double')
-          .setLabel('Double Down')
-          .setStyle(ButtonStyle.Primary)
-          .setEmoji('💸')
-          .setDisabled(disabled || playerHand.length > 2 || mockBalance < bet * 2) // Sadece ilk turda ve para yeterliyse
-      );
+      const getPlayingRow = (disabled = false) => {
+        return new ActionRowBuilder().addComponents(
+          new ButtonBuilder().setCustomId('hit').setLabel('Hit').setStyle(ButtonStyle.Success).setEmoji('➕').setDisabled(disabled),
+          new ButtonBuilder().setCustomId('stand').setLabel('Stand').setStyle(ButtonStyle.Danger).setEmoji('🛑').setDisabled(disabled),
+          new ButtonBuilder().setCustomId('double').setLabel('Double Down').setStyle(ButtonStyle.Primary).setEmoji('💸').setDisabled(disabled || playerHand.length > 2 || mockBalance < bet * 2),
+          new ButtonBuilder().setCustomId('rules').setLabel('Rules').setStyle(ButtonStyle.Secondary).setEmoji('📜')
+        );
+      };
+
+      const getGameOverRow = () => {
+        return new ActionRowBuilder().addComponents(
+          new ButtonBuilder().setCustomId('play_again').setLabel('Play Again').setStyle(ButtonStyle.Primary).setEmoji('🔄'),
+          new ButtonBuilder().setCustomId('bet_plus').setLabel('+10 Bet').setStyle(ButtonStyle.Success).setEmoji('📈'),
+          new ButtonBuilder().setCustomId('bet_minus').setLabel('-10 Bet').setStyle(ButtonStyle.Danger).setEmoji('📉').setDisabled(bet <= 10),
+          new ButtonBuilder().setCustomId('rules').setLabel('Rules').setStyle(ButtonStyle.Secondary).setEmoji('📜')
+        );
+      };
+
+      let embed = buildEmbed(currentInteraction.client, playerHand, dealerHand, bet, status, status === 'PLAYING');
+      
+      if (status !== 'PLAYING') {
+        let resultMsg = '';
+        if (status === 'BLACKJACK') resultMsg = `🎉 **BLACKJACK!** You won \`${bet * 1.5}\` Points!`;
+        if (status === 'LOSE') resultMsg = `💀 **Dealer has Blackjack.** You lost \`${bet}\` Points.`;
+        if (status === 'TIE') resultMsg = `🤝 **Push!** Bet refunded.`;
+        embed.setDescription(resultMsg);
+      }
+
+      const messagePayload = { 
+        embeds: [embed], 
+        components: [status === 'PLAYING' ? getPlayingRow() : getGameOverRow()] 
+      };
+
+      let response;
+      if (isEdit) {
+        await currentInteraction.update(messagePayload);
+        response = currentInteraction;
+      } else {
+        messagePayload.withResponse = true;
+        response = await currentInteraction.reply(messagePayload);
+      }
+
+      const targetMessage = isEdit ? currentInteraction.message : response.resource.message;
+      
+      const collector = targetMessage.createMessageComponentCollector({ 
+        componentType: ComponentType.Button, 
+        time: 120000 
+      });
+
+      collector.on('collect', async i => {
+        if (i.user.id !== interaction.user.id) {
+          return i.reply({ content: 'Only the command initiator can use these buttons.', ephemeral: true });
+        }
+
+        if (i.customId === 'rules') {
+          const rulesEmbed = new EmbedBuilder()
+            .setTitle('📜 Blackjack Rules')
+            .setColor('#3498DB')
+            .addFields(
+              { name: '🎯 Objective', value: 'Beat the dealer by getting a hand value as close to 21 as possible without going over.' },
+              { name: '🃏 Card Values', value: '• **2-10**: Face value\n• **J, Q, K**: 10 points\n• **Ace**: 1 or 11 points (whichever is better)' },
+              { name: '🕹️ Actions', value: '• **Hit**: Take another card.\n• **Stand**: End your turn.\n• **Double Down**: Double your bet, take exactly ONE more card, and stand.' },
+              { name: '🕴️ Dealer Rules', value: 'The dealer must hit until their cards total 17 or higher.' },
+              { name: '💰 Payouts', value: '• **Win**: 1x your bet\n• **Blackjack**: 1.5x your bet\n• **Tie (Push)**: Bet refunded' }
+            );
+          return i.reply({ embeds: [rulesEmbed], ephemeral: true });
+        }
+
+        if (i.customId === 'play_again') {
+          collector.stop('restarting');
+          return playBlackjack(i, bet, true);
+        }
+
+        if (i.customId === 'bet_plus') {
+          collector.stop('restarting');
+          return playBlackjack(i, bet + 10, true);
+        }
+
+        if (i.customId === 'bet_minus') {
+          collector.stop('restarting');
+          return playBlackjack(i, Math.max(10, bet - 10), true);
+        }
+
+        await i.deferUpdate();
+
+        if (i.customId === 'hit') {
+          playerHand.push(deck.pop());
+          let val = calculateHand(playerHand);
+          
+          if (val > 21) {
+            status = 'BUST';
+            mockBalance -= bet;
+            embed = buildEmbed(currentInteraction.client, playerHand, dealerHand, bet, status, false);
+            embed.setDescription(`💥 **BUST!** You went over 21. Lost \`${bet}\` Points.`);
+            collector.stop('ended');
+            return i.editReply({ embeds: [embed], components: [getGameOverRow()] });
+          } else if (val === 21) {
+            i.customId = 'stand'; // Auto stand on 21
+          } else {
+            embed = buildEmbed(currentInteraction.client, playerHand, dealerHand, bet, status, true);
+            return i.editReply({ embeds: [embed], components: [getPlayingRow()] });
+          }
+        }
+
+        if (i.customId === 'double') {
+          bet *= 2;
+          playerHand.push(deck.pop());
+          let val = calculateHand(playerHand);
+          
+          if (val > 21) {
+            status = 'BUST';
+            mockBalance -= bet;
+            embed = buildEmbed(currentInteraction.client, playerHand, dealerHand, bet, status, false);
+            embed.setDescription(`💥 **BUST!** You went over 21. Lost \`${bet}\` Points.`);
+            collector.stop('ended');
+            return i.editReply({ embeds: [embed], components: [getGameOverRow()] });
+          }
+          i.customId = 'stand';
+        }
+
+        if (i.customId === 'stand') {
+          let dVal = calculateHand(dealerHand);
+          
+          while (dVal < 17) {
+            dealerHand.push(deck.pop());
+            dVal = calculateHand(dealerHand);
+          }
+
+          let pVal = calculateHand(playerHand);
+          let resultMsg = '';
+
+          if (dVal > 21) {
+            status = 'WIN';
+            mockBalance += bet;
+            resultMsg = `🎉 **Dealer Busts!** You won \`${bet}\` Points!`;
+          } else if (dVal > pVal) {
+            status = 'LOSE';
+            mockBalance -= bet;
+            resultMsg = `💀 **Dealer Wins.** You lost \`${bet}\` Points.`;
+          } else if (pVal > dVal) {
+            status = 'WIN';
+            mockBalance += bet;
+            resultMsg = `🎉 **You Win!** You won \`${bet}\` Points!`;
+          } else {
+            status = 'TIE';
+            resultMsg = `🤝 **Push!** Bet refunded.`;
+          }
+
+          embed = buildEmbed(currentInteraction.client, playerHand, dealerHand, bet, status, false);
+          embed.setDescription(resultMsg);
+          collector.stop('ended');
+          return i.editReply({ embeds: [embed], components: [getGameOverRow()] });
+        }
+      });
+
+      collector.on('end', (collected, reason) => {
+        if (reason !== 'restarting' && reason !== 'ended') {
+          embed.setDescription('⏳ **Game expired.**');
+          targetMessage.edit({ embeds: [embed], components: [] }).catch(() => {});
+        }
+      });
     };
 
-    let embed = buildEmbed(playerHand, dealerHand, bet, status, status === 'PLAYING');
-    
-    // Oyun bittiyse sonuca göre mesaj ekle
-    if (status !== 'PLAYING') {
-      let resultMsg = '';
-      if (status === 'BLACKJACK') resultMsg = `🎉 **BLACKJACK!** You won \`${bet * 1.5}\` Points!`;
-      if (status === 'LOSE') resultMsg = `💀 **Dealer has Blackjack.** You lost \`${bet}\` Points.`;
-      if (status === 'TIE') resultMsg = `🤝 **Push!** Bet refunded.`;
-      
-      embed.setDescription(resultMsg);
-      return interaction.reply({ embeds: [embed], components: [] });
-    }
-
-    const response = await interaction.reply({ 
-      embeds: [embed], 
-      components: [getRow()], 
-      withResponse: true 
-    });
-
-    const collector = response.resource.message.createMessageComponentCollector({ 
-      componentType: ComponentType.Button, 
-      time: 60000 
-    });
-
-    collector.on('collect', async i => {
-      if (i.user.id !== interaction.user.id) {
-        return i.reply({ content: 'Only the command initiator can play.', ephemeral: true });
-      }
-
-      await i.deferUpdate();
-
-      if (i.customId === 'hit') {
-        playerHand.push(deck.pop());
-        let val = calculateHand(playerHand);
-        
-        if (val > 21) {
-          status = 'BUST';
-          mockBalance -= bet;
-          embed = buildEmbed(playerHand, dealerHand, bet, status, false);
-          embed.setDescription(`💥 **BUST!** You went over 21. Lost \`${bet}\` Points.`);
-          collector.stop();
-          return i.editReply({ embeds: [embed], components: [getRow(true)] });
-        } else if (val === 21) {
-          // Otomatik Stand
-          i.customId = 'stand';
-        } else {
-          embed = buildEmbed(playerHand, dealerHand, bet, status, true);
-          return i.editReply({ embeds: [embed], components: [getRow()] });
-        }
-      }
-
-      if (i.customId === 'double') {
-        bet *= 2;
-        playerHand.push(deck.pop());
-        let val = calculateHand(playerHand);
-        
-        if (val > 21) {
-          status = 'BUST';
-          mockBalance -= bet;
-          embed = buildEmbed(playerHand, dealerHand, bet, status, false);
-          embed.setDescription(`💥 **BUST!** You went over 21. Lost \`${bet}\` Points.`);
-          collector.stop();
-          return i.editReply({ embeds: [embed], components: [getRow(true)] });
-        }
-        // Double yapınca otomatik stand olur, o yüzden koda devam et
-        i.customId = 'stand';
-      }
-
-      if (i.customId === 'stand') {
-        let dVal = calculateHand(dealerHand);
-        
-        // Kurpiyer kuralı: 17'den küçükse kart çeker
-        while (dVal < 17) {
-          dealerHand.push(deck.pop());
-          dVal = calculateHand(dealerHand);
-        }
-
-        let pVal = calculateHand(playerHand);
-        let resultMsg = '';
-
-        if (dVal > 21) {
-          status = 'WIN';
-          mockBalance += bet;
-          resultMsg = `🎉 **Dealer Busts!** You won \`${bet}\` Points!`;
-        } else if (dVal > pVal) {
-          status = 'LOSE';
-          mockBalance -= bet;
-          resultMsg = `💀 **Dealer Wins.** You lost \`${bet}\` Points.`;
-        } else if (pVal > dVal) {
-          status = 'WIN';
-          mockBalance += bet;
-          resultMsg = `🎉 **You Win!** You won \`${bet}\` Points!`;
-        } else {
-          status = 'TIE';
-          resultMsg = `🤝 **Push!** Bet refunded.`;
-        }
-
-        embed = buildEmbed(playerHand, dealerHand, bet, status, false);
-        embed.setDescription(resultMsg);
-        collector.stop();
-        return i.editReply({ embeds: [embed], components: [getRow(true)] });
-      }
-    });
-
-    collector.on('end', collected => {
-      if (status === 'PLAYING') {
-        // Zaman aşımı
-        embed.setDescription('⏳ **Game expired.** Bet refunded.');
-        interaction.editReply({ embeds: [embed], components: [getRow(true)] }).catch(() => {});
-      }
-    });
+    await playBlackjack(interaction, initialBet, false);
   },
 };
