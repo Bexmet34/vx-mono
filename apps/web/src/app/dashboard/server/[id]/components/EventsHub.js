@@ -33,6 +33,8 @@ function RandomDropTab({ lang, guildId, discordChannels }) {
   const [loading, setLoading]   = useState(true);
   const [saving, setSaving]     = useState(false);
 
+  const [savedSuccess, setSavedSuccess] = useState(false);
+
   const fetchSettings = useCallback(async () => {
     try {
       setLoading(true);
@@ -59,7 +61,8 @@ function RandomDropTab({ lang, guildId, discordChannels }) {
         body: JSON.stringify(settings),
       });
       if (res.ok) {
-        // Saved successfully
+        setSavedSuccess(true);
+        setTimeout(() => setSavedSuccess(false), 2500);
       }
     } catch (e) {
       console.error("Error saving drop settings:", e);
@@ -85,6 +88,7 @@ function RandomDropTab({ lang, guildId, discordChannels }) {
         settings={settings}
         setSettings={setSettings}
         saving={saving}
+        savedSuccess={savedSuccess}
         saveSettings={handleSave}
         discordChannels={discordChannels}
         guildId={guildId}

@@ -11,7 +11,7 @@ import DropLeaderboard from "./DropLeaderboard";
  *   hourly_chance  — Her saat başı % ihtimalle
  *   percent_based  — Her mesajda % şansla
  */
-export default function DropTab({ lang, t, settings, setSettings, saving, saveSettings, discordChannels, guildId }) {
+export default function DropTab({ lang, t, settings, setSettings, saving, savedSuccess, saveSettings, discordChannels, guildId }) {
   const isEn = lang === "en";
   const textChannels = (discordChannels || []).filter(c => c.type === 0);
 
@@ -498,10 +498,19 @@ export default function DropTab({ lang, t, settings, setSettings, saving, saveSe
           <button
             onClick={saveSettings}
             disabled={saving}
-            className="w-full bg-gradient-to-r from-primary-container via-yellow-400 to-amber-500 hover:brightness-110 text-on-primary font-bold py-3.5 px-6 rounded-2xl transition-all shadow-xl hover:shadow-[0_0_25px_rgba(255,215,0,0.35)] flex items-center justify-center gap-2 text-sm disabled:opacity-50 active:scale-[0.99]"
+            className={`w-full font-extrabold py-3.5 px-6 rounded-2xl transition-all shadow-xl flex items-center justify-center gap-2 text-sm disabled:opacity-50 active:scale-[0.99] ${
+              savedSuccess 
+                ? "bg-emerald-400 text-emerald-950 shadow-[0_0_25px_rgba(52,211,153,0.4)] font-black" 
+                : "bg-gradient-to-r from-primary-container via-yellow-400 to-amber-500 hover:brightness-110 text-black shadow-[0_0_25px_rgba(255,215,0,0.25)]"
+            }`}
           >
             {saving ? (
               <RefreshCw className="w-5 h-5 animate-spin" />
+            ) : savedSuccess ? (
+              <>
+                <CheckCircle2 className="w-5 h-5 text-emerald-950" />
+                <span>{isEn ? "Drop Settings Saved Successfully!" : "Drop Ayarları Başarıyla Kaydedildi!"}</span>
+              </>
             ) : (
               <>
                 <Save className="w-5 h-5" />
