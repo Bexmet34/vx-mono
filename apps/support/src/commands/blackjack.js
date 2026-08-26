@@ -30,12 +30,16 @@ const getCardString = (client, card, hidden = false) => {
   
   const emojiName = `${card.rank}_of_${suitMap[card.suit]}`.toLowerCase();
   
-  // Önce sunucu emojilerinde (Guild Emojis) ara (Küçük-büyük harf duyarsız)
-  let customEmoji = client.emojis.cache.find(e => e.name.toLowerCase() === emojiName);
+  let customEmoji = null;
   
-  // Eğer sunucuda yoksa, botun kendi paneline (Application Emojis) yüklenmiş olabilir
-  if (!customEmoji && client.application && client.application.emojis) {
+  // 1. ÖNCELİK: Application Emojis (Developer Portal'a yüklenenler) - İzin gerektirmez, her yerde çalışır!
+  if (client.application && client.application.emojis) {
     customEmoji = client.application.emojis.cache.find(e => e.name.toLowerCase() === emojiName);
+  }
+  
+  // 2. ÖNCELİK: Eğer portalde yoksa Sunucu (Guild) Emojilerine bak
+  if (!customEmoji) {
+    customEmoji = client.emojis.cache.find(e => e.name.toLowerCase() === emojiName);
   }
   
   if (customEmoji) {
