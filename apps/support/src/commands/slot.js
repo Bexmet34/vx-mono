@@ -132,19 +132,41 @@ module.exports = {
       return interaction.reply({ content: 'Geçersiz bahis miktarı!', ephemeral: true });
     }
 
+    const generateGrid = (c1, c2, c3) => {
+      const getCol = (val) => {
+        if (val === 'spin') {
+          return [getRandomSymbol().emoji, getRandomSymbol().emoji, getRandomSymbol().emoji];
+        } else {
+          return [getRandomSymbol().emoji, val.emoji, getRandomSymbol().emoji];
+        }
+      };
+
+      const col1 = getCol(c1);
+      const col2 = getCol(c2);
+      const col3 = getCol(c3);
+
+      return `> ⬛ ${col1[0]} ┊ ${col2[0]} ┊ ${col3[0]} ⬛
+> 🏆 **${col1[1]} ┊ ${col2[1]} ┊ ${col3[1]}** 🏆 ◀
+> ⬛ ${col1[2]} ┊ ${col2[2]} ┊ ${col3[2]} ⬛`;
+    };
+
     const playSlot = async (currentInteraction, isEdit = false) => {
       // Slot Dönüş Animasyonu Embed
       const embed = new EmbedBuilder()
         .setTitle('🎰 Veyronix Casino Slot')
         .setColor('#F39C12')
-        .setDescription('**[ 🔄 | 🔄 | 🔄 ]**\n\n*Çarklar dönüyor...*')
+        .setDescription(`
+${generateGrid('spin', 'spin', 'spin')}
+
+*🎰 Çarklar son sürat dönüyor...*
+        `)
         .setFooter({ text: `Bahis: ${bet} Puan | Bakiye: ${mockBalance}` });
 
       let responseMsg;
       if (isEdit) {
         responseMsg = await currentInteraction.update({ embeds: [embed], components: [] });
       } else {
-        responseMsg = await currentInteraction.reply({ embeds: [embed], fetchReply: true });
+        responseMsg = await currentInteraction.reply({ embeds: [embed], withResponse: true });
       }
 
       const s1 = getRandomSymbol();
@@ -153,12 +175,20 @@ module.exports = {
 
       // Kare 1
       await delay(800);
-      embed.setDescription(`**[ ${s1.emoji} | 🔄 | 🔄 ]**\n\n*Çarklar dönüyor...*`);
+      embed.setDescription(`
+${generateGrid(s1, 'spin', 'spin')}
+
+*🎰 1. çark kilitlendi...*
+      `);
       await currentInteraction.editReply({ embeds: [embed] });
 
       // Kare 2
       await delay(800);
-      embed.setDescription(`**[ ${s1.emoji} | ${s2.emoji} | 🔄 ]**\n\n*Çarklar dönüyor...*`);
+      embed.setDescription(`
+${generateGrid(s1, s2, 'spin')}
+
+*🎰 2. çark kilitlendi...*
+      `);
       await currentInteraction.editReply({ embeds: [embed] });
 
       // Kare 3 (Sonuç)
@@ -168,7 +198,7 @@ module.exports = {
 
       embed.setColor(result.color)
         .setDescription(`
-**[ ${s1.emoji} | ${s2.emoji} | ${s3.emoji} ]**
+${generateGrid(s1, s2, s3)}
 
 ${result.message}
 
