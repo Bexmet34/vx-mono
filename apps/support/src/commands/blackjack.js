@@ -201,12 +201,17 @@ module.exports = {
       };
 
       let response;
-      if (isEdit) {
-        await currentInteraction.editReply(messagePayload);
-        response = currentInteraction;
-      } else {
-        messagePayload.withResponse = true;
-        response = await currentInteraction.reply(messagePayload);
+      try {
+        if (isEdit) {
+          await currentInteraction.editReply(messagePayload);
+          response = currentInteraction;
+        } else {
+          messagePayload.withResponse = true;
+          response = await currentInteraction.reply(messagePayload);
+        }
+      } catch (err) {
+        console.error("Reply/Edit Error:", err);
+        return; // Hata durumunda devam etme
       }
 
       const targetMessage = isEdit ? currentInteraction.message : response.resource.message;
@@ -236,24 +241,43 @@ module.exports = {
         }
 
         if (i.customId === 'play_again') {
-          await i.deferUpdate();
-          collector.stop('restarting');
-          return playBlackjack(i, bet, true);
+          try {
+            await i.deferUpdate();
+            collector.stop('restarting');
+            return await playBlackjack(i, bet, true);
+          } catch (e) {
+            console.error("Play Again Error:", e);
+            return i.followUp({ content: `Hata oluştu: ${e.message}`, ephemeral: true }).catch(()=>{});
+          }
         }
 
         if (i.customId === 'bet_plus') {
-          await i.deferUpdate();
-          collector.stop('restarting');
-          return playBlackjack(i, bet + 10, true);
+          try {
+            await i.deferUpdate();
+            collector.stop('restarting');
+            return await playBlackjack(i, bet + 10, true);
+          } catch (e) {
+            console.error("Bet Plus Error:", e);
+            return i.followUp({ content: `Hata oluştu: ${e.message}`, ephemeral: true }).catch(()=>{});
+          }
         }
 
         if (i.customId === 'bet_minus') {
-          await i.deferUpdate();
-          collector.stop('restarting');
-          return playBlackjack(i, Math.max(10, bet - 10), true);
+          try {
+            await i.deferUpdate();
+            collector.stop('restarting');
+            return await playBlackjack(i, Math.max(10, bet - 10), true);
+          } catch (e) {
+            console.error("Bet Minus Error:", e);
+            return i.followUp({ content: `Hata oluştu: ${e.message}`, ephemeral: true }).catch(()=>{});
+          }
         }
 
-        await i.deferUpdate();
+        try {
+          await i.deferUpdate();
+        } catch (e) {
+          console.error("Defer Update Error:", e);
+        }
 
         if (i.customId === 'hit') {
           playerHand.push(deck.pop());
