@@ -7,6 +7,7 @@ import SystemStatusWidget from "@/components/SystemStatusWidget";
 import ScrollToTop from "@/components/ScrollToTop";
 import MobileAppDock from "@/components/MobileAppDock";
 import CookieConsent from "@/components/CookieConsent";
+import { AuroraBackground } from "@/components/ui/aurora-background";
 
 export default function LayoutWrapper({ children }) {
   const pathname = usePathname();
@@ -15,27 +16,31 @@ export default function LayoutWrapper({ children }) {
 
   if (isDashboard || isAdmin) {
     return (
-      <div className="min-h-screen bg-background flex flex-col overflow-hidden">
-        <Navbar />
-        <div className="flex-1 pt-14 h-screen overflow-hidden">
-          {children}
+      <AuroraBackground>
+        <div className="flex flex-col w-full h-full overflow-hidden">
+          <Navbar />
+          <div className="flex-1 pt-14 h-screen overflow-hidden">
+            {children}
+          </div>
+          <CookieConsent />
         </div>
-        <CookieConsent />
-      </div>
+      </AuroraBackground>
     );
   }
 
   return (
-    <div className="flex flex-col min-h-screen pb-16 md:pb-0">
-      <Navbar />
-      <div className="flex-1 pt-14 md:pt-16">
-        {children}
+    <AuroraBackground>
+      <div className="flex flex-col w-full h-full pb-16 md:pb-0">
+        <Navbar />
+        <div className="flex-1 pt-14 md:pt-16">
+          {children}
+        </div>
+        <Footer />
+        <SystemStatusWidget />
+        <ScrollToTop />
+        <MobileAppDock />
+        <CookieConsent />
       </div>
-      <Footer />
-      <SystemStatusWidget />
-      <ScrollToTop />
-      <MobileAppDock />
-      <CookieConsent />
-    </div>
+    </AuroraBackground>
   );
 }

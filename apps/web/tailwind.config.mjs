@@ -61,6 +61,19 @@ export default {
         "on-error": "#450A0A",
         "on-error-container": "#FEE2E2",
       },
+      animation: {
+        aurora: "aurora 60s linear infinite",
+      },
+      keyframes: {
+        aurora: {
+          from: {
+            backgroundPosition: "50% 50%, 50% 50%",
+          },
+          to: {
+            backgroundPosition: "350% 50%, 350% 50%",
+          },
+        },
+      },
       borderRadius: {
         "DEFAULT": "8px",
         "sm": "6px",
