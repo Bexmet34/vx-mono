@@ -1,106 +1,61 @@
 # Veyronix Veritabanı Şeması (Supabase)
 
-Bu dosya, projenin veritabanı yapısını ve tabloların kullanım amaçlarını içerir.
+Bu dosya, projenin veritabanı yapısını ve aktif olarak kullanılan 30 tablonun kullanım amaçlarını içerir.
 
 ## Aktif Tablolar
 
-### 1. `subscriptions`
-Sunucuların abonelik durumlarını ve kullanım sürelerini takip eder.
-- `guild_id` (text): Sunucunun Discord ID'si.
-- `guild_name` (text): Sunucu adı.
-- `owner_id` (text): Sunucu sahibinin ID'si.
-- `expires_at` (timestamp): Aboneliğin veya deneme sürümünün bitiş tarihi.
-- `is_active` (boolean): Abonelik aktif mi?
-- `is_unlimited` (boolean): Sınırsız paket mi?
-- `trial_used` (boolean): 3 günlük deneme kullanıldı mı?
-- `one_day_notified` (boolean): 1 gün kala bildirimi gönderildi mi?
+### 1. Sistem ve Kullanıcı Yönetimi
+- **`users`**: Kullanıcı bazlı verileri (Discord ID) ve global premium durumlarını saklar.
+- **`system_settings`**: Sistem genelindeki ayarları (key/value formatında) tutar.
+- **`bot_analytics`**: Botun genel kullanım verilerini ve istatistiklerini (event bazlı) kaydeder.
+- **`user_templates`**: Kullanıcıların oluşturduğu parti/ekip şablonlarını saklar.
+- **`user_votes`**: Top.gg vb. platformlardan bota oy veren kullanıcıların kayıtlarını tutar.
 
-### 2. `guild_settings`
-Her sunucuya özel yapılandırmaları saklar.
-- `guild_id` (text): Sunucunun Discord ID'si.
-- `owner_id` (text): Sunucu sahibinin ID'si.
-- `language` (text): Botun sunucudaki dili (tr/en).
-- `embed_thumbnail_url` (text): Discord mesajlarındaki logo/resim linki.
-- `whitelist` (jsonb): Aynı anda birden fazla parti kurabilen rol/kullanıcı ID listesi.
-- `party_templates` (jsonb): Sunucuya özel kaydedilmiş parti şablonları.
-- `auto_role_sync` (boolean): Kayıtlı üyelerin rollerini otomatik eşitleme ayarı.
-- `system_mode` (text): Sunucudaki content sistemi (`command` veya `fixed_channel`).
-- `fixed_message_channel_id` (text): Sabit mesajın atıldığı metin kanalı ID'si.
-- `target_category_id` (text): Sabit kanaldan açılan içeriklerin düşeceği kategori ID'si.
-- `channel_name_format` (text): Oluşturulacak yeni kanalların isim formatı (`name_title` vb.).
-- `fixed_message_content` (text): Sabit mesajın açıklaması.
-- `fixed_message_id` (text): Gönderilen sabit mesajın Discord Message ID'si.
+### 2. Abonelik ve Ödemeler
+- **`subscriptions`**: Sunucuların abonelik durumlarını (başlangıç, bitiş, aktiflik) takip eder.
+- **`pricing_plans`**: Satışta olan premium paketlerin özelliklerini ve fiyatlarını tutar.
+- **`bank_accounts`**: Manuel havale/EFT ödemeleri için gösterilecek banka hesabı (IBAN) bilgilerini tutar.
+- **`crypto_payments`**: Kripto para ile yapılan ödeme işlemlerinin kayıtlarını (sipariş ID, durum) saklar.
+- **`auto_premium_rules`**: Otomatik premium verilecek sunuculara veya üyelere dair kuralları tanımlar.
 
-### 3. `support_rewards`
-Destek sunucusuna katılan kullanıcılara verilen tek seferlik ödülleri takip eder.
-- `user_id` (text): Ödülü alan kullanıcının ID'si.
-- `guild_id` (text): Ödülün tanımlandığı sunucu ID'si.
-- `awarded_at` (timestamp): Ödülün verildiği tarih.
+### 3. Sunucu (Guild) ve Moderasyon
+- **`guild_settings`**: Her sunucuya özel yapılandırmaları (dil, yetkili roller, hoş geldin mesajları vb.) saklar.
+- **`cached_guild_members`**: Sunucu üyelerinin önbelleğe alınmış listesini tutarak hızlı erişim sağlar.
+- **`custom_role_menus`**: Sunuculardaki özel rol seçim menülerinin (Reaction/Button Role) ayarlarını saklar.
+- **`temp_roles`**: Belirli bir süre sonra süresi dolacak olan geçici rollerin kayıtlarını tutar.
+- **`tickets`**: Sunucularda açılan destek taleplerinin (ticket) ve log/transcript verilerinin kaydını tutar.
 
-### 4. `message_queue`
-Botun kullanıcılara göndereceği bildirimlerin kuyruğudur. `broadcastService.js` tarafından işlenir.
-- `message_content` (text): Gönderilecek mesaj metni veya JSON embed yapısı.
-- `status` (text): Mesajın durumu (`pending`, `processing`, `completed`, `failed`).
-- `error_message` (text): Eğer gönderim başarısız olursa hata detayı.
-- `subscription_id` (uuid): İlgili abonelik kaydına referans.
+### 4. Kampanya ve Promosyonlar
+- **`campaigns`**: Genel indirim ve promosyon kampanyalarının bilgilerini tutar.
+- **`campaign_logs`**: Kampanyalar hakkında kullanıcılara gönderilen logları ve durumları saklar.
+- **`promo_usages`**: Kullanıcıların hangi promosyon/kampanya kodlarını kullandığını takip eder.
 
-### 5. `notification_templates`
-Botun gönderdiği sistem mesajlarının (hoş geldin, süre bitimi vb.) şablonlarını saklar.
-- `id` (text): Şablon kodu (`welcome_trial`, `sub_expired`, `sub_extended`).
-- `title_tr / title_en` (text): Mesaj başlıkları.
-- `content_tr / content_en` (text): Mesaj içerikleri (Placeholder destekli).
-- `is_embed` (boolean): Embed mi yoksa düz metin mi?
-- `color` (text): Embed renk kodu.
+### 5. Bildirim ve İletişim
+- **`message_queue`**: Botun kullanıcılara veya kanallara göndereceği bildirimlerin kuyruğudur.
+- **`notification_templates`**: Sistem mesajlarının (hoş geldin, süre bitimi vb.) çoklu dil destekli şablonlarını tutar.
+- **`scheduled_messages`**: Belirli zamanlarda otomatik olarak gönderilecek zamanlanmış mesajları saklar.
 
-### 6. `users`
-Kullanıcı bazlı verileri ve global premium durumlarını saklar.
-- `discord_id` (text): Kullanıcının global Discord ID'si.
-- `premium_until` (timestamp): Kullanıcı bazlı premium bitiş tarihi.
-- `is_unlimited` (boolean): Kullanıcının sınırsız erişimi var mı?
+### 6. Oyun İçi Entegrasyon (Albion Online vb.)
+- **`albion_guild_members`**: Albion Online entegrasyonu ile sunucudaki oyuncu eşleşmelerini tutar.
+- **`application_answers`**: Başvuru sistemi (guild/oyun alımları vb.) üzerinden gelen yanıtları kaydeder.
 
-### 7. `scheduled_messages`
-Botun tüm sunuculara otomatik olarak göndereceği zamanlanmış (tek seferlik veya günlük) mesajları saklar. Admin panelinden yönetilir.
-- `id` (uuid): Benzersiz ID.
-- `message_content` (text): Mesajın içeriği.
-- `ping_everyone` (boolean): `@everyone` atılıp atılmayacağı.
-- `buttons` (jsonb): Buton verileri `[{ label: 'x', url: 'y' }]`.
-- `schedule_type` (text): `once` (tek seferlik) veya `recurring` (tekrarlı/her gün).
-- `send_time` (text): Gönderim saati (örn: `14:30`) veya tarihi (`2026-05-30 14:30`).
-- `is_active` (boolean): Görevin aktifliği.
-- `last_sent_at` (timestamp): Son gönderilme tarihi (günlük tekrarlarda kontrol için).
-- `created_at` (timestamp): Oluşturulma tarihi.
+### 7. Çekiliş (Giveaway) Sistemi
+- **`giveaways`**: Sunucularda başlatılan çekilişlerin genel ayarlarını (ödül, süre, bitiş tarihi) saklar.
+- **`giveaway_participants`**: Çekilişe katılan kullanıcıların kayıtlarını tutar.
+- **`giveaway_history`**: Sona eren çekilişlerin geçmişini ve kazananlarını kaydeder.
 
-### 8. `global_roles`
-Botun sunuculara kuracağı varsayılan global rollerin tanımlarını saklar (PvP, Gatherer vb.).
-- `id` (uuid): Benzersiz ID.
-- `role_key` (varchar): Kod içi benzersiz erişim anahtarı.
-- `role_name` (varchar): Sunucuda ve arayüzde gösterilecek İngilizce rol adı.
-- `category` (varchar): Rolün kategorisi (combat, economy, gathering, crafting).
-- `color` (varchar): Rolün rengi (HEX).
-- `icon_emoji` (text): Menüde gösterilecek opsiyonel emoji.
+### 8. Drop Sistemi (Puan/Ödül Düşürme)
+- **`drop_settings`**: Kanallarda rastgele belirecek olan ödüllerin/puanların kurallarını tutar.
+- **`drop_logs`**: Beliren dropların ne zaman kime düştüğü bilgisini kaydeder.
+- **`drop_points`**: Kullanıcıların kazandığı toplam drop puanlarını saklar.
 
-### 9. `guild_roles`
-Botun belirli bir sunucuda oluşturduğu rolleri, Discord üzerindeki gerçek Rol ID'leri ile eşleştirir.
-- `guild_id` (text): Sunucunun Discord ID'si.
-- `role_key` (varchar): İlgili `global_roles` anahtarı.
-- `discord_role_id` (text): Sunucuda açılan rolün Discord ID'si.
-
-### 10. `guild_role_menus`
-Sunucunun rol seçim menüsü ayarlarını ve gönderilen mesaj bilgilerini tutar.
-- `guild_id` (text): Sunucunun Discord ID'si.
-- `channel_id` (text): Mesajın gönderileceği veya gönderildiği kanal.
-- `message_id` (text): Gönderilen Embed mesajının ID'si.
-- `active_roles` (jsonb): Menüde gösterilecek rollerin dizisi.
-- `category_limits` (jsonb): Kategorilere göre maksimum seçim limitleri (örn: `{"combat": 2}`).
-- `header_image_url` (text): Mesajın üstünde gösterilecek resim.
-- `is_installed` (boolean): Roller sunucuda oluşturuldu mu?
-- `trigger_roles_setup` (boolean): Botun rolleri kurması için tetikleyici.
-- `trigger_roles_menu_send` (boolean): Botun menüyü kanala atması için tetikleyici.
+### 9. Web ve İçerik
+- **`blog_posts`**: Web sitesindeki blog yazılarının (title, content, slug, views) verilerini tutar.
 
 ---
 
-## Silinen / Arşivlenen Tablolar (Notlar)
-- `changelogs`: Statik koda (`apps/web/src/app/changelog/page.js`) taşındığı için silindi.
+## Silinen / Arşivlenen Tablolar (Geçmiş)
+- `changelogs`: Statik koda (`apps/web/src/app/changelog/page.js`) taşındığı için hem koddan hem DB'den silindi.
+- `user_guild_access`: Dashboard yetki kontrolleri session üzerinden yapıldığı için gereksiz olduğu tespit edilip DB'den DROP edildi.
 - `guild_blacklist`: Aktif kullanımda olmadığı için silindi.
-- `user_guild_access`: Dashboard yetki kontrolleri artık direkt session üzerinden yapıldığı için silindi.
-- `pending_links`: Eski hesap bağlama sistemi parçası, şu an kullanılmıyor.
+- `support_rewards`, `global_roles`, `guild_roles`: Eski planlamalarda kalan ve uygulanmamış çürük tablolar.

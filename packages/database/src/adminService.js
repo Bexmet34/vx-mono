@@ -233,29 +233,6 @@ async function getCryptoPaymentByOrderId(orderId) {
     return data;
 }
 
-async function getChangelogs() {
-    const supabase = getClient();
-    const { data, error } = await supabase
-        .from("changelogs")
-        .select("*")
-        .order("created_at", { ascending: false });
-    if (error) throw error;
-    return data || [];
-}
-
-async function createChangelog(payload) {
-    const supabase = getClient();
-    const { error } = await supabase
-        .from("changelogs")
-        .insert([payload]);
-    if (error) throw error;
-}
-
-async function deleteChangelog(id) {
-    const supabase = getClient();
-    const { error } = await supabase.from("changelogs").delete().eq("id", id);
-    if (error) throw error;
-}
 
 module.exports = {
     getAllUsers,
@@ -282,9 +259,6 @@ module.exports = {
     getCryptoPaymentById,
     updateCryptoPayment,
     updateCryptoPaymentByOrderId,
-    getCryptoPaymentByOrderId,
-    getChangelogs,
-    createChangelog,
-    deleteChangelog
+    getCryptoPaymentByOrderId
 };
 
