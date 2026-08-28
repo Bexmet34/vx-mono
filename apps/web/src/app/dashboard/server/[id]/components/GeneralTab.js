@@ -210,22 +210,56 @@ export default function GeneralTab({
                 <InfoTooltip text={lang === 'tr' ? 'Bu rollere sahip kişiler, parti sahibi olmasalar bile açık partileri kapatabilir.' : 'Users with these roles can close active parties even if they are not the owner.'} />
               </label>
               <select
-                multiple
-                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md min-h-[80px] custom-scrollbar"
-                value={(() => {
-                  try {
-                    return typeof settings.content_close_roles === 'string' ? JSON.parse(settings.content_close_roles) : (settings.content_close_roles || []);
-                  } catch(e) { return []; }
-                })()}
+                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+                value=""
                 onChange={(e) => {
-                  const values = Array.from(e.target.selectedOptions, option => option.value);
-                  setSettings({ ...settings, content_close_roles: JSON.stringify(values) });
+                  const val = e.target.value;
+                  if (!val) return;
+                  let currentRoles = [];
+                  try {
+                    currentRoles = typeof settings.content_close_roles === 'string' ? JSON.parse(settings.content_close_roles) : (settings.content_close_roles || []);
+                  } catch(err) {}
+                  if (!currentRoles.includes(val)) {
+                    setSettings({ ...settings, content_close_roles: JSON.stringify([...currentRoles, val]) });
+                  }
                 }}
               >
+                <option value="" disabled>{lang === 'tr' ? 'Rol Seçin...' : 'Select Role...'}</option>
                 {(discordRoles || []).map(r => (
                   <option key={r.id} value={r.id}>@{r.name}</option>
                 ))}
               </select>
+              
+              {(() => {
+                let currentRoles = [];
+                try {
+                  currentRoles = typeof settings.content_close_roles === 'string' ? JSON.parse(settings.content_close_roles) : (settings.content_close_roles || []);
+                } catch(err) {}
+                if (currentRoles.length === 0) return null;
+                
+                return (
+                  <div className="flex flex-wrap gap-2 mt-3 animate-fade-in">
+                    {currentRoles.map(roleId => {
+                      const role = (discordRoles || []).find(r => r.id === roleId);
+                      return (
+                        <div key={roleId} className="flex items-center gap-1.5 bg-primary-container text-on-primary-container border border-primary/20 px-2.5 py-1 rounded-sm text-[11px] font-label-bold">
+                          <span>@{role ? role.name : roleId}</span>
+                          <button 
+                            type="button"
+                            onClick={() => {
+                              const newRoles = currentRoles.filter(id => id !== roleId);
+                              setSettings({ ...settings, content_close_roles: JSON.stringify(newRoles) });
+                            }}
+                            className="text-on-primary-container/70 hover:text-error transition-colors ml-1"
+                          >
+                            <i className="fa-solid fa-xmark"></i>
+                          </button>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )
+              })()}
             </div>
 
             <div className="md:col-span-2">
