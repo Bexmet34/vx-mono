@@ -205,61 +205,70 @@ export default function GeneralTab({
             </div>
 
             <div>
-              <label className="flex items-center text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
-                {lang === 'tr' ? 'Kapatma Yetkisi Olan Roller' : 'Content Close Roles'}
-                <InfoTooltip text={lang === 'tr' ? 'Bu rollere sahip kişiler, parti sahibi olmasalar bile açık partileri kapatabilir.' : 'Users with these roles can close active parties even if they are not the owner.'} />
-              </label>
-              <select
-                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
-                value=""
-                onChange={(e) => {
-                  const val = e.target.value;
-                  if (!val) return;
+              <div className="flex items-center justify-between mb-2">
+                <label className="flex items-center text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest">
+                  {lang === 'tr' ? 'Kapatma Yetkisi Olan Roller' : 'Content Close Roles'}
+                  <InfoTooltip text={lang === 'tr' ? 'Bu rollere sahip kişiler, parti sahibi olmasalar bile açık partileri kapatabilir.' : 'Users with these roles can close active parties even if they are not the owner.'} />
+                </label>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {(() => {
                   let currentRoles = [];
                   try {
-                    currentRoles = typeof settings.content_close_roles === 'string' ? JSON.parse(settings.content_close_roles) : (settings.content_close_roles || []);
+                    currentRoles = typeof settings.content_close_roles === 'string' 
+                      ? JSON.parse(settings.content_close_roles) 
+                      : (settings.content_close_roles || []);
                   } catch(err) {}
-                  if (!currentRoles.includes(val)) {
-                    setSettings({ ...settings, content_close_roles: JSON.stringify([...currentRoles, val]) });
-                  }
-                }}
-              >
-                <option value="" disabled>{lang === 'tr' ? 'Rol Seçin...' : 'Select Role...'}</option>
-                {(discordRoles || []).map(r => (
-                  <option key={r.id} value={r.id}>@{r.name}</option>
-                ))}
-              </select>
-              
-              {(() => {
-                let currentRoles = [];
-                try {
-                  currentRoles = typeof settings.content_close_roles === 'string' ? JSON.parse(settings.content_close_roles) : (settings.content_close_roles || []);
-                } catch(err) {}
-                if (currentRoles.length === 0) return null;
-                
-                return (
-                  <div className="flex flex-wrap gap-2 mt-3 animate-fade-in">
-                    {currentRoles.map(roleId => {
-                      const role = (discordRoles || []).find(r => r.id === roleId);
-                      return (
-                        <div key={roleId} className="flex items-center gap-1.5 bg-primary-container text-on-primary-container border border-primary/20 px-2.5 py-1 rounded-sm text-[11px] font-label-bold">
-                          <span>@{role ? role.name : roleId}</span>
+                  
+                  const selectsToRender = [...currentRoles, ""];
+                  if (selectsToRender.length > 5) selectsToRender.length = 5;
+                  
+                  return selectsToRender.map((roleId, index) => (
+                    <div key={index} className="relative mb-2">
+                      <label className="flex items-center justify-between text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+                        <span>{lang === 'tr' ? `Yetkili Rol ${index + 1}` : `Authorized Role ${index + 1}`}</span>
+                        {index < currentRoles.length && (
                           <button 
                             type="button"
                             onClick={() => {
-                              const newRoles = currentRoles.filter(id => id !== roleId);
+                              const newRoles = [...currentRoles];
+                              newRoles.splice(index, 1);
                               setSettings({ ...settings, content_close_roles: JSON.stringify(newRoles) });
                             }}
-                            className="text-on-primary-container/70 hover:text-error transition-colors ml-1"
+                            className="text-[10px] text-error hover:text-error/80 transition-colors font-label-bold uppercase"
                           >
-                            <i className="fa-solid fa-xmark"></i>
+                            {lang === 'tr' ? 'Kaldır' : 'Remove'}
                           </button>
-                        </div>
-                      )
-                    })}
-                  </div>
-                )
-              })()}
+                        )}
+                      </label>
+                      <select
+                        className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+                        value={roleId}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          const newRoles = [...currentRoles];
+                          if (index === currentRoles.length) {
+                             if (val && !newRoles.includes(val)) newRoles.push(val);
+                          } else {
+                             if (!val) {
+                               newRoles.splice(index, 1);
+                             } else {
+                               newRoles[index] = val;
+                             }
+                          }
+                          setSettings({ ...settings, content_close_roles: JSON.stringify(newRoles) });
+                        }}
+                      >
+                        <option value="">{lang === 'tr' ? 'Rol Seçin...' : 'Select Role...'}</option>
+                        {(discordRoles || []).map(r => (
+                          <option key={r.id} value={r.id}>@{r.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                  ));
+                })()}
+              </div>
             </div>
 
             <div className="md:col-span-2">
