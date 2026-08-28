@@ -235,7 +235,7 @@ function startCronService(client) {
                     const autoDeleteHours = guildConfig?.auto_delete_party_hours || 0;
                     
                     if (autoDeleteHours > 0) {
-                        const partyTime = new Date(party.created_at);
+                        const partyTime = new Date(party.created_at + 'Z');
                         const hoursPassed = (now - partyTime) / (1000 * 60 * 60);
 
                         if (hoursPassed >= autoDeleteHours) {

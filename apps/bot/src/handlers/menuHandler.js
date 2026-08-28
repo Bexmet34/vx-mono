@@ -20,14 +20,31 @@ async function handleManageMenu(interaction) {
     const guildConfig = await getGuildConfig(interaction.guildId);
     const lang = guildConfig?.language || 'tr';
 
-    if (interaction.user.id !== ownerId) {
+    const value = interaction.values[0];
+    let canManage = interaction.user.id === ownerId;
+
+    if (!canManage && value === 'close_party' && guildConfig?.content_close_roles) {
+        try {
+            const closeRoles = typeof guildConfig.content_close_roles === 'string' 
+                ? JSON.parse(guildConfig.content_close_roles) 
+                : guildConfig.content_close_roles;
+            
+            if (Array.isArray(closeRoles) && interaction.member?.roles?.cache) {
+                if (closeRoles.some(rId => interaction.member.roles.cache.has(rId))) {
+                    canManage = true;
+                }
+            }
+        } catch (e) {
+            console.error('[MenuHandler] Error checking content_close_roles:', e);
+        }
+    }
+
+    if (!canManage) {
         return await interaction.reply({
             content: `⛔ **${t('common.only_leader_can_manage', lang)}**`,
             flags: [MessageFlags.Ephemeral]
         });
     }
-
-    const value = interaction.values[0];
 
     if (value === 'close_party') {
         await handleCloseOption(interaction, ownerId, lang);

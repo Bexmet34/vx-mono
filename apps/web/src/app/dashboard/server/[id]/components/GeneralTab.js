@@ -11,7 +11,7 @@ export default function GeneralTab({
   searchGuilds, searchingGuild, 
   guildSearchResults, setGuildSearchResults, 
   guildDetail, setGuildDetail,
-  isOwner, discordMembers, guildId, subscription, showToast, discordChannels
+  isOwner, discordMembers, guildId, subscription, showToast, discordChannels, discordRoles
 }) {
   const { lang } = useLanguage();
 
@@ -201,6 +201,30 @@ export default function GeneralTab({
                 <option value="title_only">{lang === 'tr' ? 'Sadece Başlık (Örn: zvz)' : 'Title Only (e.g. zvz)'}</option>
                 <option value="title_name">{lang === 'tr' ? 'Başlık - İsim (Örn: zvz-ali)' : 'Title - Name (e.g. zvz-ali)'}</option>
                 <option value="type_title">{lang === 'tr' ? 'Kategori/Tür - Başlık (Örn: zvz-avalonda-zvz)' : 'Type - Title (e.g. zvz-avalonda-zvz)'}</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="flex items-center text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+                {lang === 'tr' ? 'Kapatma Yetkisi Olan Roller' : 'Content Close Roles'}
+                <InfoTooltip text={lang === 'tr' ? 'Bu rollere sahip kişiler, parti sahibi olmasalar bile açık partileri kapatabilir.' : 'Users with these roles can close active parties even if they are not the owner.'} />
+              </label>
+              <select
+                multiple
+                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md min-h-[80px] custom-scrollbar"
+                value={(() => {
+                  try {
+                    return typeof settings.content_close_roles === 'string' ? JSON.parse(settings.content_close_roles) : (settings.content_close_roles || []);
+                  } catch(e) { return []; }
+                })()}
+                onChange={(e) => {
+                  const values = Array.from(e.target.selectedOptions, option => option.value);
+                  setSettings({ ...settings, content_close_roles: JSON.stringify(values) });
+                }}
+              >
+                {(discordRoles || []).map(r => (
+                  <option key={r.id} value={r.id}>@{r.name}</option>
+                ))}
               </select>
             </div>
 

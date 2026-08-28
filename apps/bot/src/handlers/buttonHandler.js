@@ -34,7 +34,25 @@ async function handlePartyButtons(interaction) {
     if (customId.startsWith('close_party_')) {
         const ownerId = customId.split('_')[2];
 
-        if (interaction.user.id !== ownerId) {
+        let canClose = interaction.user.id === ownerId;
+
+        if (!canClose && guildConfig?.content_close_roles) {
+            try {
+                const closeRoles = typeof guildConfig.content_close_roles === 'string' 
+                    ? JSON.parse(guildConfig.content_close_roles) 
+                    : guildConfig.content_close_roles;
+                
+                if (Array.isArray(closeRoles) && interaction.member?.roles?.cache) {
+                    if (closeRoles.some(rId => interaction.member.roles.cache.has(rId))) {
+                        canClose = true;
+                    }
+                }
+            } catch (e) {
+                console.error('[ButtonHandler] Error checking content_close_roles:', e);
+            }
+        }
+
+        if (!canClose) {
             return await interaction.reply({
                 content: `⛔ **${t('common.only_leader_can_close', lang)}**`,
                 flags: [MessageFlags.Ephemeral]
