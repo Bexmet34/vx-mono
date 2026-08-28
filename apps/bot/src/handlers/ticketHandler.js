@@ -10,7 +10,7 @@ async function handleTicketInteraction(interaction) {
     const lang = guildConfig?.language || 'tr';
     
     if (!guildConfig || !guildConfig.ticket_system_enabled) {
-        return interaction.reply({ content: t('ticket.not_enabled', lang), flags: [MessageFlags.Ephemeral] });
+        return await interaction.reply({ content: t('ticket.not_enabled', lang), flags: [MessageFlags.Ephemeral] });
     }
 
     if (customId === 'ticket_open') {
@@ -153,7 +153,7 @@ async function handleTicketInteraction(interaction) {
     } else if (customId === 'ticket_close') {
         const ticketRow = await db.get('SELECT * FROM tickets WHERE channel_id = ?', [interaction.channelId]);
         if (!ticketRow) {
-            return interaction.reply({ content: t('ticket.not_found', lang), flags: [MessageFlags.Ephemeral] });
+            return await interaction.reply({ content: t('ticket.not_found', lang), flags: [MessageFlags.Ephemeral] });
         }
 
         // Check if user is staff or owner
@@ -168,9 +168,9 @@ async function handleTicketInteraction(interaction) {
                     ? `🔒 ${staffMentions} **Ticket sahibi bu ticketin kapatılmasını talep ediyor.**`
                     : `🔒 ${staffMentions} **The ticket owner has requested to close this ticket.**`;
                 
-                return interaction.reply({ content: requestMessage });
+                return await interaction.reply({ content: requestMessage });
             }
-            return interaction.reply({ content: t('ticket.staff_only', lang), flags: [MessageFlags.Ephemeral] });
+            return await interaction.reply({ content: t('ticket.staff_only', lang), flags: [MessageFlags.Ephemeral] });
         }
 
         await interaction.reply({ content: t('ticket.closing', lang) });

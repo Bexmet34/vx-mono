@@ -12,8 +12,8 @@ const {
 const { getGuildConfig } = require('../services/guildConfig');
 const { activeTempChannels } = require('../services/tempVoiceService');
 
-function sendOwnerError(interaction, lang) {
-    return interaction.reply({
+async function sendOwnerError(interaction, lang) {
+    return await interaction.reply({
         content: lang === 'tr' 
             ? '❌ Bu işlem için kanalın sahibi olmalısınız.' 
             : '❌ You must be the channel owner for this action.',

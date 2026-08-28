@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/sharding.js",
     "dev": "node --watch src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint ."
   },
   "keywords": [
     "discord",
@@ -31,5 +32,10 @@
     "express": "^5.2.1",
     "node-cron": "^4.2.1",
     "topgg-autoposter": "^2.0.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "eslint": "^9",
+    "globals": "^17.11.0"
   }
 }

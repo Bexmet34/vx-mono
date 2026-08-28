@@ -1007,7 +1007,7 @@ async function handleDropManualCommand(interaction) {
  */
 async function handleSetupAutoPremiumCommand(interaction) {
     if (interaction.user.id !== config.OWNER_ID) {
-        return interaction.reply({ content: '❌ Bu komutu sadece bot yetkilisi kullanabilir.', flags: [MessageFlags.Ephemeral] });
+        return await interaction.reply({ content: '❌ Bu komutu sadece bot yetkilisi kullanabilir.', flags: [MessageFlags.Ephemeral] });
     }
 
     const embed = new EmbedBuilder()
@@ -1037,7 +1037,7 @@ async function handleRegCloseCommand(interaction) {
     // Kullanıcının yetkisi var mı kontrol et
     const hasPermission = interaction.member.roles.cache.some(role => staffRoles.includes(role.id)) || interaction.member.permissions.has(PermissionFlagsBits.Administrator);
     if (!hasPermission) {
-        return interaction.reply({
+        return await interaction.reply({
             content: lang === 'tr' ? '❌ Bu komutu sadece Kayıt Sorumluları kullanabilir.' : '❌ Only Registration Staff can use this command.',
             flags: [MessageFlags.Ephemeral]
         });
@@ -1045,7 +1045,7 @@ async function handleRegCloseCommand(interaction) {
 
     const targetUser = interaction.options.getUser('kullanici');
     if (!targetUser) {
-        return interaction.reply({ content: '❌ Kullanıcı bulunamadı.', flags: [MessageFlags.Ephemeral] });
+        return await interaction.reply({ content: '❌ Kullanıcı bulunamadı.', flags: [MessageFlags.Ephemeral] });
     }
 
     const appSvc = require('../services/applicationService');
@@ -1062,7 +1062,7 @@ async function handleRegCloseCommand(interaction) {
     // RAM'den oturumu temizle
     appSvc.clearSession(targetUser.id, interaction.guildId);
 
-    return interaction.reply({
+    return await interaction.reply({
         content: `✅ <@${targetUser.id}> adlı kullanıcının takılı kalan kayıt oturumu başarıyla sonlandırıldı. Artık yeniden kayıt başlatabilir.`,
         flags: [MessageFlags.Ephemeral]
     });

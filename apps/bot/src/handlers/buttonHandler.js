@@ -601,7 +601,7 @@ async function handleRegisterButtons(interaction) {
                 ? '❌ **Registration cancelled.** You must accept the guild rules to register.'
                 : '❌ **Kayıt işlemi iptal edildi.** Guild kurallarını kabul etmeden kayıt olamazsınız.',
             embeds: [], components: []
-        }).catch(() => interaction.reply({ content: isEng ? '❌ Registration cancelled.' : '❌ Kayıt iptal edildi.', flags: [MessageFlags.Ephemeral] }));
+        }).catch(async () => await interaction.reply({ content: isEng ? '❌ Registration cancelled.' : '❌ Kayıt iptal edildi.', flags: [MessageFlags.Ephemeral] }));
     }
 
     const guildCfg = await getGuildConfig(interaction.guildId);
@@ -803,7 +803,7 @@ async function handleRegisterButtons(interaction) {
 
         // Fetch the ticket's embed to get details
         const embed = message.embeds[0];
-        if (!embed) return interaction.reply({ content: `❌ **${t('common.error', lang)}**`, flags: [MessageFlags.Ephemeral] });
+        if (!embed) return await interaction.reply({ content: `❌ **${t('common.error', lang)}**`, flags: [MessageFlags.Ephemeral] });
 
         let realName = '';
         let ign = '';
