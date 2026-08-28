@@ -9,53 +9,57 @@ export default {
   theme: {
     extend: {
       colors: {
-        "tertiary-fixed-dim": "#c8c6c7",
-        "on-error-container": "#ffdad6",
-        "surface-container-lowest": "#040e1f",
-        "primary-fixed": "#ffe16d",
-        "surface-tint": "#e9c400",
-        "error-container": "#93000a",
-        "on-secondary-fixed-variant": "#653e00",
-        "secondary-fixed-dim": "#ffb95f",
-        "on-tertiary-fixed": "#1c1b1c",
-        "surface-variant": "#2a3548",
-        "inverse-primary": "#705d00",
-        "secondary": "#ffb95f",
-        "background": "#081425",
-        "outline-variant": "#4d4732",
-        "outline": "#999077",
-        "on-surface-variant": "#d0c6ab",
-        "on-primary-fixed": "#221b00",
-        "error": "#ffb4ab",
-        "tertiary": "#f9f5f6",
-        "surface-dim": "#081425",
-        "primary-fixed-dim": "#e9c400",
-        "surface": "#081425",
-        "secondary-container": "#ee9800",
-        "surface-container-high": "#1f2a3c",
-        "surface-container": "#152031",
-        "on-error": "#690005",
-        "on-surface": "#d8e3fb",
-        "on-primary-fixed-variant": "#544600",
-        "on-primary": "#3a3000",
-        "on-secondary-fixed": "#2a1700",
-        "secondary-fixed": "#ffddb8",
-        "on-tertiary-container": "#605e60",
-        "on-tertiary": "#313031",
-        "on-tertiary-fixed-variant": "#474647",
-        "on-primary-container": "#705e00",
-        "primary": "#fff6df",
-        "on-background": "#d8e3fb",
-        "inverse-on-surface": "#263143",
-        "on-secondary": "#472a00",
-        "on-secondary-container": "#5b3800",
-        "inverse-surface": "#d8e3fb",
-        "surface-bright": "#2f3a4c",
-        "tertiary-container": "#dcd9da",
-        "tertiary-fixed": "#e5e2e3",
-        "primary-container": "#ffd700",
-        "surface-container-highest": "#2a3548",
-        "surface-container-low": "#111c2d"
+        // Zemin ve Yüzey Katmanları (Derin Lacivert/Obsidyen)
+        background: "#080C14",
+        surface: "#0D131F",
+        "surface-container-lowest": "#05080E",
+        "surface-container-low": "#0F1726",
+        "surface-container": "#141E30",
+        "surface-container-high": "#1B273E",
+        "surface-container-highest": "#23324F",
+        "surface-variant": "#1A2333",
+
+        // Ana Vurgu (Canlı Altın / Amber)
+        primary: "#FBBF24",
+        "primary-container": "#D97706",
+        "primary-fixed": "#FEF3C7",
+        "primary-fixed-dim": "#FDE68A",
+        "on-primary": "#1E1300",
+        "on-primary-container": "#FFFBEB",
+        "inverse-primary": "#B45309",
+
+        // İkincil Vurgu (Elektrik Mavisi / Cyan)
+        secondary: "#38BDF8",
+        "secondary-container": "#0284C7",
+        "secondary-fixed": "#E0F2FE",
+        "secondary-fixed-dim": "#BAE6FD",
+        "on-secondary": "#042F2E",
+        "on-secondary-container": "#F0F9FF",
+
+        // Üçüncül / Nötr Destek (Ametist Moru / Yumuşak Vurgu)
+        tertiary: "#A78BFA",
+        "tertiary-container": "#6D28D9",
+        "tertiary-fixed": "#EDE9FE",
+        "tertiary-fixed-dim": "#DDD6FE",
+        "on-tertiary": "#1E1035",
+        "on-tertiary-container": "#F5F3FF",
+
+        // Tipografi ve Metin Renkleri
+        "on-background": "#F1F5F9",
+        "on-surface": "#E2E8F0",
+        "on-surface-variant": "#94A3B8",
+        "inverse-surface": "#F8FAFC",
+        "inverse-on-surface": "#0F172A",
+
+        // Kenarlıklar ve Ayrıcılar (Borders)
+        outline: "#334155",
+        "outline-variant": "rgba(255, 255, 255, 0.08)",
+
+        // Durum Renkleri (Hata / Başarı)
+        error: "#F87171",
+        "error-container": "#991B1B",
+        "on-error": "#450A0A",
+        "on-error-container": "#FEE2E2",
       },
       borderRadius: {
         "DEFAULT": "8px",
@@ -75,6 +79,7 @@ export default {
         "gutter": "24px"
       },
       fontFamily: {
+        "sora": ["var(--font-sora)", "sans-serif"],
         "body-lg": ["var(--font-sora)", "sans-serif"],
         "headline-lg": ["var(--font-sora)", "sans-serif"],
         "body-md": ["var(--font-sora)", "sans-serif"],
@@ -82,8 +87,7 @@ export default {
         "label-bold": ["var(--font-sora)", "sans-serif"],
         "headline-md": ["var(--font-sora)", "sans-serif"],
         "label-sm": ["var(--font-sora)", "sans-serif"],
-        "headline-lg-mobile": ["var(--font-sora)", "sans-serif"],
-        "sora": ["var(--font-sora)", "sans-serif"]
+        "headline-lg-mobile": ["var(--font-sora)", "sans-serif"]
       },
       fontSize: {
         "body-lg": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
