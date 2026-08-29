@@ -19,7 +19,7 @@ const ENCHANT_COLORS = {
 };
 
 /**
- * Renders the Albion Online Killboard image (v3.1 Enhanced)
+ * Renders the Albion Online Killboard image (Preview Style Matched)
  * @param {Object} event The kill event object from Albion API
  * @returns {Promise<Buffer>} The generated PNG image buffer
  */
@@ -30,60 +30,47 @@ async function generateKillboardImage(event) {
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext('2d');
 
-  // 1. Arka Plan
-  ctx.fillStyle = '#08080c';
+  // 1. Arka Plan (HTML ile Birebir Gelişmiş Radial Gradient)
+  const bgGrad = ctx.createRadialGradient(width / 2, height / 2, 100, width / 2, height / 2, 800);
+  bgGrad.addColorStop(0, '#252530');
+  bgGrad.addColorStop(1, '#0d0d11');
+  ctx.fillStyle = bgGrad;
   ctx.fillRect(0, 0, width, height);
 
-  // Sol Glow (Katil - Yeşil)
-  const leftGlow = ctx.createRadialGradient(250, 350, 20, 250, 350, 550);
-  leftGlow.addColorStop(0, 'rgba(16, 185, 129, 0.12)');
-  leftGlow.addColorStop(1, 'transparent');
-  ctx.fillStyle = leftGlow;
-  ctx.fillRect(0, 0, width, height);
-
-  // Sağ Glow (Kurban - Kırmızı)
-  const rightGlow = ctx.createRadialGradient(950, 350, 20, 950, 350, 550);
-  rightGlow.addColorStop(0, 'rgba(239, 68, 68, 0.12)');
-  rightGlow.addColorStop(1, 'transparent');
-  ctx.fillStyle = rightGlow;
-  ctx.fillRect(0, 0, width, height);
-
-  // Dış Çerçeve
-  ctx.strokeStyle = '#1e1e24';
+  // Dış Çerçeve (Altın / Metalik Çift Çerçeve)
+  ctx.strokeStyle = '#3d3d4d';
   ctx.lineWidth = 6;
+  ctx.strokeRect(3, 3, width - 6, height - 6);
+
+  ctx.strokeStyle = '#c5a059';
+  ctx.lineWidth = 1;
   ctx.strokeRect(10, 10, width - 20, height - 20);
 
-  // Yardımcı Kart Çizim Fonksiyonu
-  function drawCard(x, y, w, h, bg, border, radius = 12) {
+  // Yardımcı Fonksiyon: Yuvarlak Köşeli Dikdörtgen
+  function roundRect(x, y, w, h, radius, fillStyle, strokeStyle, lineWidth = 2) {
     ctx.beginPath();
     ctx.roundRect(x, y, w, h, radius);
-    if (bg) {
-      ctx.fillStyle = bg;
+    if (fillStyle) {
+      ctx.fillStyle = fillStyle;
       ctx.fill();
     }
-    if (border) {
-      ctx.strokeStyle = border;
-      ctx.lineWidth = 2;
+    if (strokeStyle) {
+      ctx.strokeStyle = strokeStyle;
+      ctx.lineWidth = lineWidth;
       ctx.stroke();
     }
   }
 
-  // 2. Oyuncu Panelleri Ölçüleri
-  const panelW = 470;
-  const panelH = 760;
-  const panelY = 35;
+  const iconSize = 130;
+  const spacing = 20;
+  const startY = 190;
 
-  drawCard(40, panelY, panelW, panelH, 'rgba(15, 20, 25, 0.85)', '#1e293b');
-  drawCard(width - 40 - panelW, panelY, panelW, panelH, 'rgba(25, 15, 20, 0.85)', '#3b0764');
-
-  const iconSize = 115;
-  const spacing = 16;
-
-  // İkon / Slot Çizim Fonksiyonu
+  // İkon / Slot Çizim Fonksiyonu (HTML Stili + Node.js Görsel Yakalama)
   const drawSlot = async (item, x, y, customSize = iconSize) => {
-    const qualityColor = item && item.Quality ? (QUALITY_COLORS[item.Quality] || '#3f3f46') : '#27272a';
-    
-    drawCard(x, y, customSize, customSize, '#0c0c0e', qualityColor, 8);
+    const qualityColor = item && item.Quality ? (QUALITY_COLORS[item.Quality] || '#2a2a36') : '#2a2a36';
+
+    // Arka plan kutusu
+    roundRect(x, y, customSize, customSize, 12, '#181820', qualityColor, 2);
 
     if (!item) return;
 
@@ -94,17 +81,16 @@ async function generateKillboardImage(event) {
 
     const quality = item.Quality > 1 ? `?quality=${item.Quality}` : '';
     const imgUrl = `https://render.albiononline.com/v1/item/${baseType}.png${quality}`;
-    
+
     try {
       const img = await loadImage(imgUrl);
       if (img) {
-        // Görselin kutu dışına taşmasını önleyen maskeleme (clip)
         ctx.save();
         ctx.beginPath();
-        ctx.roundRect(x, y, customSize, customSize, 8);
+        ctx.roundRect(x, y, customSize, customSize, 12);
         ctx.clip();
 
-        // Kenarlardaki şeffaf boşlukları ortadan kaldıran zoom (%18 offset)
+        // Görseli slot içine sığdırma (%18 zoom offset)
         const zoomOffset = customSize * 0.18;
         ctx.drawImage(
           img,
@@ -139,144 +125,123 @@ async function generateKillboardImage(event) {
       ctx.stroke();
     }
 
-    // Adet Rozeti (Count)
+    // Miktar Rozeti (HTML Tasarımı)
     if (item.Count > 1) {
-      const badgeW = customSize > 100 ? 38 : 32;
-      const badgeH = customSize > 100 ? 20 : 18;
-      
-      drawCard(x + customSize - badgeW - 2, y + customSize - badgeH - 2, badgeW, badgeH, 'rgba(0,0,0,0.85)', '#52525b', 4);
-      ctx.fillStyle = '#f4f4f5';
-      ctx.font = `bold ${customSize > 100 ? '12px' : '10px'} sans-serif`;
+      const isLarge = customSize > 100;
+      const badgeW = isLarge ? 40 : 32;
+      const badgeH = isLarge ? 24 : 18;
+      const badgeX = x + customSize - badgeW - 5;
+      const badgeY = y + customSize - badgeH - 5;
+
+      roundRect(badgeX, badgeY, badgeW, badgeH, 6, 'rgba(0, 0, 0, 0.75)');
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = `bold ${isLarge ? '16px' : '12px'} sans-serif`;
       ctx.textAlign = 'center';
-      ctx.fillText(item.Count.toString(), x + customSize - (badgeW / 2) - 2, y + customSize - (badgeH / 2) + 3);
+      ctx.fillText(item.Count.toString(), badgeX + badgeW / 2, badgeY + badgeH / 2 + (isLarge ? 5 : 4));
     }
   };
 
-  // Oyuncu Detayları Çizimi
-  const drawPlayerDetails = async (player, isKiller, panelX) => {
+  // Oyuncu Paneli Çizim Fonksiyonu (HTML Tasarımı)
+  const drawPlayerDetails = async (player, isKiller, xOffset) => {
     if (!player) return;
-    const centerX = panelX + (panelW / 2);
 
-    // Rol Rozeti
-    const badgeText = isKiller ? 'VICTOR' : 'DEFEATED';
-    const badgeBg = isKiller ? '#064e3b' : '#7f1d1d';
-    const badgeColor = isKiller ? '#34d399' : '#f87171';
-    
-    ctx.font = 'bold 13px sans-serif';
-    const bWidth = ctx.measureText(badgeText).width + 24;
-    drawCard(centerX - (bWidth / 2), panelY + 18, bWidth, 24, badgeBg, isKiller ? '#059669' : '#dc2626', 6);
-    ctx.fillStyle = badgeColor;
+    // İsim ve Lonca
+    ctx.fillStyle = isKiller ? '#4ade80' : '#f87171';
+    ctx.font = '900 38px sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText(badgeText, centerX, panelY + 34);
-
-    // İsim & Lonca
-    ctx.fillStyle = '#f8fafc';
-    ctx.font = 'bold 28px sans-serif';
-    ctx.fillText(player.Name || 'Unknown', centerX, panelY + 80);
+    ctx.fillText(player.Name || 'Unknown', xOffset, 85);
 
     ctx.fillStyle = '#94a3b8';
-    ctx.font = '16px sans-serif';
-    ctx.fillText(player.GuildName ? `< ${player.GuildName} >` : 'Loncasız', centerX, panelY + 106);
+    ctx.font = '500 22px sans-serif';
+    ctx.fillText(player.GuildName ? `[${player.GuildName}]` : 'Loncasız', xOffset, 120);
 
-    // IP Bilgisi
-    ctx.fillStyle = '#f59e0b';
+    // IP Rozeti (Pill Tasarımı)
+    const ipText = `IP ${Math.round(player.AverageItemPower || 0)}`;
     ctx.font = 'bold 20px sans-serif';
-    ctx.fillText(`${Math.round(player.AverageItemPower || 0)} IP`, centerX, panelY + 135);
+    const ipWidth = ctx.measureText(ipText).width + 30;
+    roundRect(xOffset - ipWidth / 2, 137, ipWidth, 32, 16, '#1e1e26', '#3f3f50');
 
-    // Ekipman Tablosu (Grid)
-    const gridStartY = panelY + 160;
-    const gridStartX = centerX - (iconSize / 2);
+    ctx.fillStyle = '#facc15';
+    ctx.fillText(ipText, xOffset, 160);
+
+    // Grid İkon Konumları
+    const centerX = xOffset - (iconSize / 2);
     const eq = player.Equipment || {};
 
     // Satır 1: Çanta, Miğfer, Pelerin
-    await drawSlot(eq.Bag, gridStartX - iconSize - spacing, gridStartY);
-    await drawSlot(eq.Head, gridStartX, gridStartY);
-    await drawSlot(eq.Cape, gridStartX + iconSize + spacing, gridStartY);
+    await drawSlot(eq.Bag, centerX - iconSize - spacing, startY);
+    await drawSlot(eq.Head, centerX, startY);
+    await drawSlot(eq.Cape, centerX + iconSize + spacing, startY);
 
     // Satır 2: Ana Silah, Zırh, İkinci El
-    await drawSlot(eq.MainHand, gridStartX - iconSize - spacing, gridStartY + iconSize + spacing);
-    await drawSlot(eq.Armor, gridStartX, gridStartY + iconSize + spacing);
-    await drawSlot(eq.OffHand, gridStartX + iconSize + spacing, gridStartY + iconSize + spacing);
+    await drawSlot(eq.MainHand, centerX - iconSize - spacing, startY + iconSize + spacing);
+    await drawSlot(eq.Armor, centerX, startY + iconSize + spacing);
+    await drawSlot(eq.OffHand, centerX + iconSize + spacing, startY + iconSize + spacing);
 
     // Satır 3: İksir, Ayakkabı, Yemek
-    await drawSlot(eq.Potion, gridStartX - iconSize - spacing, gridStartY + (iconSize + spacing) * 2);
-    await drawSlot(eq.Shoes, gridStartX, gridStartY + (iconSize + spacing) * 2);
-    await drawSlot(eq.Food, gridStartX + iconSize + spacing, gridStartY + (iconSize + spacing) * 2);
+    await drawSlot(eq.Potion, centerX - iconSize - spacing, startY + (iconSize + spacing) * 2);
+    await drawSlot(eq.Shoes, centerX, startY + (iconSize + spacing) * 2);
+    await drawSlot(eq.Food, centerX + iconSize + spacing, startY + (iconSize + spacing) * 2);
 
     // Satır 4: Binek
-    await drawSlot(eq.Mount, gridStartX, gridStartY + (iconSize + spacing) * 3);
+    await drawSlot(eq.Mount, centerX, startY + (iconSize + spacing) * 3);
   };
 
-  // Katil & Kurban Panelleri
-  await drawPlayerDetails(event.Killer, true, 40);
-  await drawPlayerDetails(event.Victim, false, width - 40 - panelW);
+  // 2. Katil ve Kurban Panelleri
+  await drawPlayerDetails(event.Killer, true, width / 4);
+  await drawPlayerDetails(event.Victim, false, (width / 4) * 3);
 
-  // 3. Orta Alan (VS & Fame)
-  const centerCenterX = width / 2;
+  // 3. Orta Alan (VS & Maç Detayları)
+  const centerX = width / 2;
+  const centerY = 450;
 
-  // VS Rozeti
-  ctx.beginPath();
-  ctx.arc(centerCenterX, panelY + 180, 42, 0, Math.PI * 2);
-  ctx.fillStyle = '#111827';
-  ctx.fill();
-  ctx.strokeStyle = '#b45309';
-  ctx.lineWidth = 3;
-  ctx.stroke();
-
-  ctx.fillStyle = '#f59e0b';
-  ctx.font = '900 32px sans-serif';
+  // VS Metni
+  ctx.fillStyle = '#ef4444';
+  ctx.font = '900 64px sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillText('VS', centerCenterX, panelY + 191);
+  ctx.fillText('VS', centerX, centerY - 40);
 
-  // Fame Rozeti
+  // Fame Kartı
   const fame = event.TotalVictimKillFame || event.KillFame || 0;
   const fameStr = fame >= 1000000 ? (fame / 1000000).toFixed(2) + 'M' : (fame >= 1000 ? (fame / 1000).toFixed(1) + 'k' : fame.toString());
-  
-  drawCard(centerCenterX - 85, panelY + 280, 170, 70, '#1c1917', '#d97706', 10);
-  ctx.fillStyle = '#a8a29e';
-  ctx.font = '11px sans-serif';
-  ctx.fillText('KILL FAME', centerCenterX, panelY + 300);
-  ctx.fillStyle = '#fbbf24';
-  ctx.font = 'bold 24px sans-serif';
-  ctx.fillText(`+${fameStr}`, centerCenterX, panelY + 332);
+
+  roundRect(centerX - 110, centerY + 10, 220, 45, 8, '#261a0c', '#c5a059');
+  ctx.fillStyle = '#f59e0b';
+  ctx.font = 'bold 22px sans-serif';
+  ctx.fillText(`+${fameStr} Fame`, centerX, centerY + 40);
 
   // Parti Boyutu & Tarih Bilgisi
   ctx.fillStyle = '#64748b';
-  ctx.font = '14px sans-serif';
-  ctx.fillText(`Party: ${event.Participants ? event.Participants.length : 1} Players`, centerCenterX, panelY + 385);
+  ctx.font = '18px sans-serif';
+  ctx.fillText(`Party Size: ${event.Participants ? event.Participants.length : 1}`, centerX, centerY + 90);
 
   const dateObj = event.TimeStamp ? new Date(event.TimeStamp) : new Date();
-  const dateStr = dateObj.toISOString().split('T')[0];
-  ctx.fillText(dateStr, centerCenterX, panelY + 410);
+  const dateStr = dateObj.toISOString().split('T')[0] + ' UTC';
+  ctx.fillText(dateStr, centerX, centerY + 115);
 
-  // 4. Alt Alan (Kurban Envanteri / Loot Grid - Ortalı)
-  const invContainerX = 40;
-  const invContainerW = width - 80;
-  const invY = height - 210;
-  
-  drawCard(invContainerX, invY, invContainerW, 160, 'rgba(10, 10, 14, 0.95)', '#27273a', 12);
-
-  ctx.fillStyle = '#e2e8f0';
-  ctx.font = 'bold 15px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText("VICTIM'S LOOT & INVENTORY", centerCenterX, invY + 28);
-
+  // 4. Alt Alan (Kurban Envanteri / Loot Grid)
   if (event.Victim && event.Victim.Inventory) {
     const rawInventory = Array.isArray(event.Victim.Inventory) ? event.Victim.Inventory : [];
     const inventory = rawInventory.filter(i => i !== null);
 
     if (inventory.length > 0) {
-      const invItems = inventory.slice(0, 10);
-      const invIconSize = 88;
+      const invY = height - 140;
+      const invIconSize = 75;
       const invSpacing = 12;
 
+      ctx.fillStyle = '#64748b';
+      ctx.font = 'bold 18px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText("LOOT / INVENTORY", centerX, invY - 20);
+
+      const invItems = inventory.slice(0, 10);
       const totalGridWidth = (invItems.length * invIconSize) + ((invItems.length - 1) * invSpacing);
-      let currentX = centerCenterX - (totalGridWidth / 2);
-      const itemY = invY + 45;
+      let startInvX = (width - totalGridWidth) / 2;
 
       for (const item of invItems) {
-        await drawSlot(item, currentX, itemY, invIconSize);
-        currentX += invIconSize + invSpacing;
+        await drawSlot(item, startInvX, invY, invIconSize);
+        startInvX += invIconSize + invSpacing;
       }
     }
   }
