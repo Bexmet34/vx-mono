@@ -22,14 +22,23 @@ async function getSubscription(guildId, guildName, ownerId) {
 
         // 2. If exists, update guild_name/owner_id if outdated and return
         if (data) {
-            // If guild_name is a placeholder or outdated, update it silently
-            const isPlaceholder = !data.guild_name || data.guild_name.startsWith('Sunucu (') || data.guild_name === 'Unknown';
-            if (isPlaceholder && guildName && guildName !== 'Unknown') {
+            const needsUpdate = (guildName && guildName !== 'Unknown' && data.guild_name !== guildName) ||
+                                (ownerId && ownerId !== 'Unknown' && data.owner_id !== ownerId);
+            if (needsUpdate) {
                 await supabase
                     .from('subscriptions')
-                    .update({ guild_name: guildName, owner_id: ownerId || data.owner_id, updated_at: new Date().toISOString() })
+                    .update({ 
+                        guild_name: guildName || data.guild_name, 
+                        owner_id: ownerId || data.owner_id, 
+                        updated_at: new Date().toISOString() 
+                    })
                     .eq('guild_id', guildId);
-                return { ...data, guild_name: guildName, created: false };
+                return { 
+                    ...data, 
+                    guild_name: guildName || data.guild_name, 
+                    owner_id: ownerId || data.owner_id, 
+                    created: false 
+                };
             }
             return { ...data, created: false };
         }
