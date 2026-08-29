@@ -439,9 +439,29 @@ export default function AdminServersTab({
                       <td className="px-6 py-4">
                         {u.mutual_guilds && u.mutual_guilds.length > 0 ? (
                           <div className="flex flex-wrap gap-1">
-                            {(Array.isArray(u.mutual_guilds) ? u.mutual_guilds : []).slice(0, 3).map((guild, idx) => (
-                              <span key={idx} className="bg-[#2b2d31] text-[#b5bac1] px-2 py-1 rounded-md text-[10px]">{guild}</span>
-                            ))}
+                            {(Array.isArray(u.mutual_guilds) ? u.mutual_guilds : []).slice(0, 3).map((guild, idx) => {
+                              const guildName = typeof guild === 'object' && guild !== null ? (guild.name || guild.id || 'Sunucu') : String(guild);
+                              const guildInvite = typeof guild === 'object' && guild !== null ? (guild.invite || (guild.id ? `https://discord.com/channels/${guild.id}` : null)) : null;
+                              if (guildInvite) {
+                                return (
+                                  <a
+                                    key={guild.id || idx}
+                                    href={guildInvite}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="bg-[#2b2d31] hover:bg-[#383a40] text-[#b5bac1] hover:text-white px-2 py-1 rounded-md text-[10px] transition-colors"
+                                    title={guildName}
+                                  >
+                                    {guildName}
+                                  </a>
+                                );
+                              }
+                              return (
+                                <span key={idx} className="bg-[#2b2d31] text-[#b5bac1] px-2 py-1 rounded-md text-[10px]" title={guildName}>
+                                  {guildName}
+                                </span>
+                              );
+                            })}
                             {Array.isArray(u.mutual_guilds) && u.mutual_guilds.length > 3 && (
                               <span className="bg-[#2b2d31] text-[#b5bac1] px-2 py-1 rounded-md text-[10px]">+{u.mutual_guilds.length - 3}</span>
                             )}
