@@ -213,8 +213,8 @@ async function generateKillboardImage(event) {
   roundRect(centerX - 160, infoY - 60, 320, 85, 12, '#261a0c', '#c5a059');
   
   ctx.fillStyle = '#f59e0b';
-  // Fame yazısı VS yazısı ile aynı boyut (64px) yapıldı
-  ctx.font = '900 64px sans-serif';
+  // Fame yazısı 54px'e düşürüldü
+  ctx.font = '900 54px sans-serif';
   ctx.fillText(`+${fameStr}`, centerX, infoY + 5);
 
   // Parti Boyutu & Tarih Bilgisi (Öncekinden büyük, Fame'den küçük)
