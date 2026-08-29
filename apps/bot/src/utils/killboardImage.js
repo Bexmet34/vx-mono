@@ -90,8 +90,8 @@ async function generateKillboardImage(event) {
         ctx.roundRect(x, y, customSize, customSize, 12);
         ctx.clip();
 
-        // Görseli slot içine sığdırma (%18 zoom offset)
-        const zoomOffset = customSize * 0.18;
+        // Görseli slot içine sığdırma (Taşmayı önlemek için %16 zoom offset)
+        const zoomOffset = customSize * 0.16;
         ctx.drawImage(
           img,
           x - zoomOffset,
@@ -194,31 +194,37 @@ async function generateKillboardImage(event) {
 
   // 3. Orta Alan (VS & Maç Detayları)
   const centerX = width / 2;
-  const centerY = 450;
-
-  // VS Metni
+  const vsY = 450;
+  
+  // VS Metni (Mevcut konumunda kalıyor)
   ctx.fillStyle = '#ef4444';
   ctx.font = '900 64px sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillText('VS', centerX, centerY - 40);
+  ctx.fillText('VS', centerX, vsY - 40);
+
+  // Ortadaki Alt Bilgiler (Fame, Party, Tarih) - Binek hizasına (Y: ~650) indirildi
+  const infoY = 650;
 
   // Fame Kartı
   const fame = event.TotalVictimKillFame || event.KillFame || 0;
   const fameStr = fame >= 1000000 ? (fame / 1000000).toFixed(2) + 'M' : (fame >= 1000 ? (fame / 1000).toFixed(1) + 'k' : fame.toString());
 
-  roundRect(centerX - 110, centerY + 10, 220, 45, 8, '#261a0c', '#c5a059');
+  // Fame kutusunu 64px yazıya göre büyüttük
+  roundRect(centerX - 160, infoY - 60, 320, 85, 12, '#261a0c', '#c5a059');
+  
   ctx.fillStyle = '#f59e0b';
-  ctx.font = 'bold 22px sans-serif';
-  ctx.fillText(`+${fameStr} Fame`, centerX, centerY + 40);
+  // Fame yazısı VS yazısı ile aynı boyut (64px) yapıldı
+  ctx.font = '900 64px sans-serif';
+  ctx.fillText(`+${fameStr}`, centerX, infoY + 5);
 
-  // Parti Boyutu & Tarih Bilgisi
+  // Parti Boyutu & Tarih Bilgisi (Öncekinden büyük, Fame'den küçük)
   ctx.fillStyle = '#64748b';
-  ctx.font = '18px sans-serif';
-  ctx.fillText(`Party Size: ${event.Participants ? event.Participants.length : 1}`, centerX, centerY + 90);
+  ctx.font = '500 28px sans-serif';
+  ctx.fillText(`Party Size: ${event.Participants ? event.Participants.length : 1}`, centerX, infoY + 65);
 
   const dateObj = event.TimeStamp ? new Date(event.TimeStamp) : new Date();
   const dateStr = dateObj.toISOString().split('T')[0] + ' UTC';
-  ctx.fillText(dateStr, centerX, centerY + 115);
+  ctx.fillText(dateStr, centerX, infoY + 100);
 
   // 4. Alt Alan (Kurban Envanteri / Loot Grid)
   if (event.Victim && event.Victim.Inventory) {
@@ -226,14 +232,14 @@ async function generateKillboardImage(event) {
     const inventory = rawInventory.filter(i => i !== null);
 
     if (inventory.length > 0) {
-      const invY = height - 140;
-      const invIconSize = 75;
-      const invSpacing = 12;
+      const invY = height - 160;
+      const invIconSize = 95; // Envanter kutuları büyütüldü
+      const invSpacing = 16;  // Aralarındaki boşluk artırıldı
 
       ctx.fillStyle = '#64748b';
-      ctx.font = 'bold 18px sans-serif';
+      ctx.font = 'bold 20px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText("LOOT / INVENTORY", centerX, invY - 20);
+      ctx.fillText("LOOT / INVENTORY", centerX, invY - 25);
 
       const invItems = inventory.slice(0, 10);
       const totalGridWidth = (invItems.length * invIconSize) + ((invItems.length - 1) * invSpacing);
