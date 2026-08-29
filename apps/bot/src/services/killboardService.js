@@ -89,10 +89,17 @@ async function processAlbionGuildEvents(client, trackingInfo) {
       const lastEventId = config.killboard_last_event_id ? parseInt(config.killboard_last_event_id, 10) : 0;
       let newLastEventId = lastEventId;
       let eventsSent = 0;
+      const isInitialRun = lastEventId === 0;
 
       for (const event of events) {
         // Skip if we already processed it
-        if (event.EventId <= lastEventId) continue;
+        if (!isInitialRun && event.EventId <= lastEventId) continue;
+        
+        // If it's the first run, we only want to send the very latest event to avoid spamming 50 messages
+        if (isInitialRun && eventsSent >= 1) {
+            if (event.EventId > newLastEventId) newLastEventId = event.EventId;
+            continue;
+        }
 
         // Is our guild the killer or the victim?
         const isKiller = event.Killer.GuildId === albion_guild_id;
