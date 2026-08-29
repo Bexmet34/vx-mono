@@ -12,6 +12,10 @@
   body {
     @apply bg-background text-on-background font-body-md overflow-x-hidden antialiased selection:bg-primary-container selection:text-on-primary;
     padding-top: env(safe-area-inset-top);
+    cursor: url('/cursors/default.jpg'), auto;
+  }
+  a, button, [role="button"] {
+    cursor: url('/cursors/pointer.jpg'), pointer;
   }
 }
 
