@@ -136,12 +136,14 @@ async function generateKillboardImage(event) {
   
   // Format Fame
   const formatNumber = (num) => {
+    if (num == null || isNaN(num)) return '0';
     if (num >= 1000000) return (num / 1000000).toFixed(2) + 'M';
     if (num >= 1000) return (num / 1000).toFixed(1) + 'k';
     return num.toString();
   };
   
-  ctx.fillText(`Kill Fame: ${formatNumber(event.KillFame)}`, width / 2, height / 2 + 20);
+  const fame = event.TotalVictimKillFame || event.KillFame || 0;
+  ctx.fillText(`Kill Fame: ${formatNumber(fame)}`, width / 2, height / 2 + 20);
   
   ctx.fillStyle = '#94a3b8';
   ctx.font = '20px sans-serif';

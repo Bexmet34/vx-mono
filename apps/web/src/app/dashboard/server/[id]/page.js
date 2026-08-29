@@ -285,6 +285,8 @@ export default function ServerSettings() {
             }
             return (ev && ev.registration_button_type) ? ev.registration_button_type : 'both';
           })(),
+          killboard_kill_channel_id: s?.killboard_kill_channel_id || "",
+          killboard_death_channel_id: s?.killboard_death_channel_id || "",
           tempvoice_creators: Array.isArray(s?.tempvoice_creators) ? s.tempvoice_creators : [],
         };
         setSettings(loadedSettings);
