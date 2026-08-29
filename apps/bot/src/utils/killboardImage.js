@@ -103,7 +103,7 @@ async function generateKillboardImage(event) {
         ctx.restore();
       }
     } catch (err) {
-      console.error(`Failed to load item image: ${imgUrl}`, err);
+      console.error(`[Killboard] Failed to load item image (API Error): ${item.Type || 'Unknown'}`);
     }
 
     // Trash Katmanı
