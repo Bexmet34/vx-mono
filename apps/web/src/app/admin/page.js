@@ -338,16 +338,22 @@ export default function AdminPage() {
   };
 
   const handleUserAction = async (discordId, action, value) => {
+    const isDeleteAction = action === 'delete' || action === 'revoke';
+    if (isDeleteAction) {
+      if (!confirm("Bu kullanıcının premium yetkisini tamamen kaldırmak istediğinize emin misiniz?")) return;
+    }
     setSavingId(discordId);
     try {
-      if (action === 'delete') {
-        if (!confirm("Bu kullanıcının premium yetkisini tamamen kaldırmak istediğinize emin misiniz?")) return;
+      if (isDeleteAction) {
         const res = await fetch(`/api/admin/users?id=${discordId}`, {
           method: "DELETE",
         });
         if (res.ok) {
           showToast("Kullanıcı premium yetkisi silindi!", "success");
           fetchUsers();
+        } else {
+          const errData = await res.json();
+          showToast(errData.error || "Silme işlemi başarısız.", "error");
         }
       } else {
         const res = await fetch("/api/admin/users", {
@@ -358,6 +364,9 @@ export default function AdminPage() {
         if (res.ok) {
           showToast("Kullanıcı başarıyla güncellendi!", "success");
           fetchUsers();
+        } else {
+          const errData = await res.json();
+          showToast(errData.error || "Güncelleme başarısız.", "error");
         }
       }
     } catch (err) {
