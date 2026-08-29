@@ -82,6 +82,10 @@ async function runKillboardCheck(client) {
   }
 }
 
+// Cache to prevent duplicate posts and allow processing of delayed events
+const sessionProcessedEvents = new Set();
+const sessionInitializedConfigs = new Set();
+
 /**
  * Fetch and process events for a single Albion Guild
  * @param {import('discord.js').Client} client 
@@ -130,36 +134,50 @@ async function processAlbionGuildEvents(client, trackingInfo, globalEvents = [])
     // Events are now merged. Sort by EventId ascending (oldest first) to process chronologically
     events.sort((a, b) => a.EventId - b.EventId);
 
+    // Memory cleanup: If cache grows too large, remove oldest
+    if (sessionProcessedEvents.size > 20000) {
+      const arr = Array.from(sessionProcessedEvents).slice(-10000);
+      sessionProcessedEvents.clear();
+      arr.forEach(id => sessionProcessedEvents.add(id));
+    }
+
     for (const config of discord_configs) {
       const lastEventId = config.killboard_last_event_id ? parseInt(config.killboard_last_event_id, 10) : 0;
       let newLastEventId = lastEventId;
       let eventsSent = 0;
-      const isInitialRun = lastEventId === 0;
+      const configKey = `${config.guild_id}_${albion_guild_id}`;
+      const isFirstFetch = !sessionInitializedConfigs.has(configKey);
 
       for (const event of events) {
-        // Track the highest ID seen so far
+        // Track the highest ID seen so far globally for DB
         if (event.EventId > newLastEventId) newLastEventId = event.EventId;
 
-        // Skip if we already processed it
-        if (!isInitialRun && event.EventId <= lastEventId) continue;
+        // Skip if we already processed it in this session
+        if (sessionProcessedEvents.has(`${configKey}_${event.EventId}`)) continue;
+
+        // On the very first fetch after bot starts, strictly ignore everything older than DB LastEventID
+        // We add it to cache so it doesn't get processed on the 2nd fetch either.
+        if (isFirstFetch && event.EventId <= lastEventId) {
+            sessionProcessedEvents.add(`${configKey}_${event.EventId}`);
+            continue;
+        }
         
         const isKiller = event.Killer?.GuildId === albion_guild_id;
         const isVictim = event.Victim?.GuildId === albion_guild_id;
 
-        // Skip if we are neither the killer nor victim (e.g. only assist)
+        // Skip if we are neither the killer nor victim
         if (!isKiller && !isVictim) {
-           if (event.EventId > newLastEventId) newLastEventId = event.EventId;
+           sessionProcessedEvents.add(`${configKey}_${event.EventId}`);
            continue;
         }
 
-        // If it's the first run, process only the 20 most recent valid events
-        if (isInitialRun) {
-            // Find all valid events for this guild in the fetched array
+        // If it's the very first time setting up the guild (lastEventId === 0),
+        // we only process the last 20 events to avoid spamming 50 events instantly.
+        if (lastEventId === 0 && isFirstFetch) {
             const validEvents = events.filter(e => e.Killer?.GuildId === albion_guild_id || e.Victim?.GuildId === albion_guild_id);
-            // Check if current event is among the last 20 of the valid events
             const isOneOfLastTwenty = validEvents.indexOf(event) >= validEvents.length - 20;
             if (!isOneOfLastTwenty) {
-               if (event.EventId > newLastEventId) newLastEventId = event.EventId;
+               sessionProcessedEvents.add(`${configKey}_${event.EventId}`);
                continue;
             }
         }
@@ -177,15 +195,21 @@ async function processAlbionGuildEvents(client, trackingInfo, globalEvents = [])
           color = '#f87171'; // Red
           embedTitle = `💀 ${event.Victim.Name} was killed by ${event.Killer.Name}`;
         } else {
-          if (event.EventId > newLastEventId) newLastEventId = event.EventId;
+          sessionProcessedEvents.add(`${configKey}_${event.EventId}`);
           continue;
         }
 
         const discordGuild = client.guilds.cache.get(config.guild_id);
-        if (!discordGuild) continue;
+        if (!discordGuild) {
+           sessionProcessedEvents.add(`${configKey}_${event.EventId}`);
+           continue;
+        }
 
         const channel = discordGuild.channels.cache.get(targetChannelId) || await discordGuild.channels.fetch(targetChannelId).catch(() => null);
-        if (!channel) continue;
+        if (!channel) {
+           sessionProcessedEvents.add(`${configKey}_${event.EventId}`);
+           continue;
+        }
 
         // Generate the Canvas image
         const imageBuffer = await generateKillboardImage(event);
@@ -225,7 +249,7 @@ async function processAlbionGuildEvents(client, trackingInfo, globalEvents = [])
         try {
           await channel.send({ embeds: [embed], files: [attachment] });
           eventsSent++;
-          if (event.EventId > newLastEventId) newLastEventId = event.EventId;
+          sessionProcessedEvents.add(`${configKey}_${event.EventId}`);
           
           // 1.5s delay to avoid discord rate limits per channel
           await new Promise(r => setTimeout(r, 1500));
@@ -234,6 +258,8 @@ async function processAlbionGuildEvents(client, trackingInfo, globalEvents = [])
         }
       }
 
+      sessionInitializedConfigs.add(configKey);
+
       // Update last event ID if it changed
       if (newLastEventId > lastEventId) {
         console.log(`[Killboard] Guild ${config.guild_id} processing complete. New LastEventID: ${newLastEventId}. Messages sent: ${eventsSent}`);
@@ -241,8 +267,8 @@ async function processAlbionGuildEvents(client, trackingInfo, globalEvents = [])
           .from('guild_settings')
           .update({ killboard_last_event_id: newLastEventId.toString() })
           .eq('guild_id', config.guild_id);
-      } else {
-         // console.log(`[Killboard] Guild ${config.guild_id} check complete. No new events (LastID: ${lastEventId}).`);
+      } else if (eventsSent > 0) {
+        console.log(`[Killboard] Guild ${config.guild_id} processed delayed events. Messages sent: ${eventsSent}`);
       }
     }
   } catch (err) {
