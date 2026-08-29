@@ -1,5 +1,5 @@
 // Test Script for Killboard
-require('dotenv').config({ path: __dirname + '/../.env' });
+require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
 const { Client, GatewayIntentBits } = require('discord.js');
 const { runKillboardCheck } = require('./src/services/killboardService');
 
