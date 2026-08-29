@@ -394,7 +394,7 @@ select.admin-input-field {
 }
 
 select.admin-input-field option {
-  background-color: var(--admin-bg);
+  background-color: #0f172a;
   color: white;
   text-align: left;
   padding: 10px;

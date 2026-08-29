@@ -88,12 +88,45 @@ async function getParsedTemplate(templateId, placeholders = {}) {
 
 async function getAllSubscriptions() {
     const supabase = getClient();
-    const { data, error } = await supabase
+    
+    // 1. Fetch all guild_settings (this contains all servers the bot is in)
+    const { data: guilds, error: guildError } = await supabase
+        .from('guild_settings')
+        .select('*');
+        
+    if (guildError) throw guildError;
+
+    // 2. Fetch all subscriptions
+    const { data: subs, error: subError } = await supabase
         .from('subscriptions')
-        .select('*')
-        .order('created_at', { ascending: false });
-    if (error) throw error;
-    return data || [];
+        .select('*');
+        
+    if (subError) throw subError;
+
+    // 3. Map subscriptions by guild_id
+    const subMap = {};
+    for (const sub of (subs || [])) {
+        subMap[sub.guild_id] = sub;
+    }
+
+    // 4. Merge them together
+    const merged = (guilds || []).map(g => {
+        const sub = subMap[g.guild_id] || {};
+        return {
+            id: sub.id || g.id,
+            guild_id: g.guild_id,
+            owner_id: g.owner_id,
+            guild_name: sub.guild_name || 'Bilinmiyor (Görüntülenemedi)',
+            is_active: sub.is_active || false,
+            is_unlimited: sub.is_unlimited || false,
+            expires_at: sub.expires_at || null,
+            created_at: sub.created_at || g.created_at,
+            updated_at: sub.updated_at || g.updated_at
+        };
+    });
+
+    // Sort newest first
+    return merged.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 }
 
 async function getSubscriptionByGuildId(guildId) {
