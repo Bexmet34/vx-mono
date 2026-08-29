@@ -43,3 +43,9 @@ apps/bot/src/data/
 *.sqlite
 *.sqlite-wal
 *.sqlite-shm
+
+# Google Search Console Credentials
+gsc-credentials.json
+
+# Local Agent Configs
+.agents/mcp_config.json
