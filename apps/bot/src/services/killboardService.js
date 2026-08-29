@@ -39,9 +39,39 @@ async function runKillboardCheck(client) {
       albionGuildMap.get(key).discord_configs.push(config);
     }
 
+    const activeServers = [...new Set(configs.map(c => c.albion_server))];
+    const serverGlobalEvents = {};
+    const endpoints = {
+      'americas': 'https://gameinfo.albiononline.com/api/gameinfo',
+      'asia': 'https://gameinfo-sg.albiononline.com/api/gameinfo',
+      'europe': 'https://gameinfo-ams.albiononline.com/api/gameinfo',
+      'Americas': 'https://gameinfo.albiononline.com/api/gameinfo',
+      'Asia': 'https://gameinfo-sg.albiononline.com/api/gameinfo',
+      'Europe': 'https://gameinfo-ams.albiononline.com/api/gameinfo'
+    };
+
+    for (const server of activeServers) {
+      if (!server) continue;
+      const baseUrl = endpoints[server] || endpoints['Europe'];
+      serverGlobalEvents[server] = [];
+      try {
+        // Fetch up to 250 recent events globally to catch deaths (offset 0, 51, 102, 153, 204)
+        for (let offset = 0; offset <= 204; offset += 51) {
+          const res = await fetch(`${baseUrl}/events?limit=51&offset=${offset}`, { signal: AbortSignal.timeout(8000) });
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data.length) serverGlobalEvents[server].push(...data);
+          }
+        }
+      } catch (e) {
+        console.error(`[Killboard] Error fetching global events for ${server}:`, e.message);
+      }
+    }
+
     // 2. Fetch events for each unique Albion Guild
     for (const [key, trackingInfo] of albionGuildMap.entries()) {
-      await processAlbionGuildEvents(client, trackingInfo);
+      const globalEvents = serverGlobalEvents[trackingInfo.albion_server] || [];
+      await processAlbionGuildEvents(client, trackingInfo, globalEvents);
       
       // Add a small delay between Albion API requests to avoid rate limits
       await new Promise(r => setTimeout(r, 1000));
@@ -55,9 +85,9 @@ async function runKillboardCheck(client) {
 /**
  * Fetch and process events for a single Albion Guild
  * @param {import('discord.js').Client} client 
- * @param {Object} trackingInfo 
+ * @param {Array} globalEvents
  */
-async function processAlbionGuildEvents(client, trackingInfo) {
+async function processAlbionGuildEvents(client, trackingInfo, globalEvents = []) {
   const { albion_guild_id, albion_server, discord_configs } = trackingInfo;
   
   const endpoints = {
@@ -79,11 +109,26 @@ async function processAlbionGuildEvents(client, trackingInfo) {
       return;
     }
     
-    const events = await res.json();
-    if (!events || events.length === 0) return;
+    let events = await res.json();
+    if (!events) events = [];
 
-    // Events come from newest to oldest. We want to process oldest first to maintain chronological order.
-    events.reverse();
+    // Filter globalEvents for deaths where this guild is the victim
+    const guildDeaths = globalEvents.filter(e => e.Victim?.GuildId === albion_guild_id);
+
+    // Merge them and remove duplicates by EventId
+    const eventMap = new Map();
+    for (const e of events) {
+      eventMap.set(e.EventId, e);
+    }
+    for (const e of guildDeaths) {
+      eventMap.set(e.EventId, e);
+    }
+
+    events = Array.from(eventMap.values());
+    if (events.length === 0) return;
+
+    // Events are now merged. Sort by EventId ascending (oldest first) to process chronologically
+    events.sort((a, b) => a.EventId - b.EventId);
 
     for (const config of discord_configs) {
       const lastEventId = config.killboard_last_event_id ? parseInt(config.killboard_last_event_id, 10) : 0;
@@ -107,13 +152,13 @@ async function processAlbionGuildEvents(client, trackingInfo) {
            continue;
         }
 
-        // If it's the first run, process only the 3 most recent valid events
+        // If it's the first run, process only the 20 most recent valid events
         if (isInitialRun) {
             // Find all valid events for this guild in the fetched array
             const validEvents = events.filter(e => e.Killer?.GuildId === albion_guild_id || e.Victim?.GuildId === albion_guild_id);
-            // Check if current event is among the last 3 of the valid events
-            const isOneOfLastThree = validEvents.indexOf(event) >= validEvents.length - 3;
-            if (!isOneOfLastThree) {
+            // Check if current event is among the last 20 of the valid events
+            const isOneOfLastTwenty = validEvents.indexOf(event) >= validEvents.length - 20;
+            if (!isOneOfLastTwenty) {
                if (event.EventId > newLastEventId) newLastEventId = event.EventId;
                continue;
             }

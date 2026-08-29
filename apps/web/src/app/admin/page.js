@@ -773,6 +773,10 @@ export default function AdminPage() {
               <AdminBlogAutomationTab showToast={showToast} />
             )}
 
+            {activeTab === "announcements" && (
+              <AdminAnnouncementsTab />
+            )}
+
             {activeTab === "servers" && <AdminServersTab servers={servers} loading={loading} setLoading={setLoading} fetchServers={fetchServers} showToast={showToast} users={users} fetchUsers={fetchUsers} savingId={savingId} handleServerAction={handleServerAction} handleUserAction={handleUserAction} setShowRulesModal={setShowRulesModal} setShowUserModal={setShowUserModal} userSearchTerm={userSearchTerm} setUserSearchTerm={setUserSearchTerm} />}
         {/* PLANS TAB */}
             {activeTab === "plans" && (
@@ -2267,10 +2271,6 @@ export default function AdminPage() {
             </form>
           </div>
         </div>
-      )}
-
-      {activeTab === "announcements" && (
-        <AdminAnnouncementsTab />
       )}
 
       </div>
