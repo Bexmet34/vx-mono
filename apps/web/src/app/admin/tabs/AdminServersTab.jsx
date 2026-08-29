@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Search, Server, Clock, Settings, Plus, RefreshCw, MoreVertical, Edit3, Trash2, Infinity, Power, Gamepad2, Loader2, Calendar } from "lucide-react";
 
 export default function AdminServersTab({ 
@@ -19,23 +19,12 @@ export default function AdminServersTab({
   userSearchTerm,
   setUserSearchTerm
 }) {
-  const [isMounted, setIsMounted] = useState(false);
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
   const [serverSubTab, setServerSubTab] = useState("guilds");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [dayAmounts, setDayAmounts] = useState({});
-
-  const handleDayChange = (id, val) => {
-    setDayAmounts(prev => ({ ...prev, [id]: val }));
-  };
-  const getDayAmount = (id) => dayAmounts[id] !== undefined ? dayAmounts[id] : 30;
 
   const filteredServers = (servers || []).filter(s => {
-    if (searchTerm && !s.guild_name?.toLowerCase().includes(searchTerm.toLowerCase()) && !s.guild_id?.includes(searchTerm) && !s.owner_id?.includes(searchTerm)) return false;
+    if (searchTerm && !s.guild_name.toLowerCase().includes(searchTerm.toLowerCase()) && !s.guild_id.includes(searchTerm) && !s.owner_id.includes(searchTerm)) return false;
     const isExpired = !s.is_unlimited && new Date(s.expires_at) < new Date();
     if (statusFilter === 'premium' && (!s.is_active || s.is_unlimited || isExpired)) return false;
     if (statusFilter === 'unlimited' && !s.is_unlimited) return false;
@@ -44,26 +33,7 @@ export default function AdminServersTab({
     return true;
   });
 
-  const filteredUsers = (Array.isArray(users) ? users : []).filter(u => !userSearchTerm || (u.discord_id && u.discord_id.includes(userSearchTerm)));
-
-  const [isSyncingGuilds, setIsSyncingGuilds] = useState(false);
-
-  const handleSyncGuildNames = async () => {
-    setIsSyncingGuilds(true);
-    try {
-      const res = await fetch('/api/admin/sync-guilds');
-      const data = await res.json();
-      if (data.success) {
-        showToast(`İsimler güncellendi! ${data.fixed || 0} sunucu ismi Discord'dan senkronize edildi.`, "success");
-        if (typeof fetchServers === "function") fetchServers();
-      } else {
-        showToast(data.error || "Senkronizasyon hatası.", "error");
-      }
-    } catch (e) {
-      showToast("Bağlantı hatası.", "error");
-    }
-    setIsSyncingGuilds(false);
-  };
+  const filteredUsers = (users || []).filter(u => !userSearchTerm || (u.discord_id && u.discord_id.includes(userSearchTerm)));
 
   const handleScanAutoPremium = async () => {
     setLoading(true);
@@ -146,15 +116,6 @@ export default function AdminServersTab({
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            
-            <button 
-              onClick={handleSyncGuildNames}
-              disabled={isSyncingGuilds}
-              className="shrink-0 flex items-center justify-center gap-2 bg-[#2b2d31] hover:bg-[#383a40] text-white px-4 h-[44px] rounded-xl text-sm font-medium transition-colors border border-[#1e1f22] disabled:opacity-50"
-              title="Discord API üzerinden sunucu isimlerini senkronize eder"
-            >
-              <RefreshCw size={16} className={isSyncingGuilds ? "animate-spin" : ""} /> İsimleri Senkronize Et
-            </button>
           </div>
 
           {/* Filters */}
@@ -179,9 +140,9 @@ export default function AdminServersTab({
           </div>
 
           {/* Data Display - Responsive Cards for Mobile, Table for Desktop */}
-          <div className="hidden lg:block bg-[#1e1f22] border border-[#2b2d31] rounded-xl overflow-x-auto custom-scrollbar">
+          <div className="hidden lg:block bg-[#1e1f22] border border-[#2b2d31] rounded-xl overflow-hidden">
             <table className="w-full text-left text-sm">
-              <thead className="bg-[#2b2d31]/50 text-[#949ba4] font-semibold text-xs uppercase tracking-wider whitespace-nowrap">
+              <thead className="bg-[#2b2d31]/50 text-[#949ba4] font-semibold text-xs uppercase tracking-wider">
                 <tr>
                   <th className="px-6 py-4">Sunucu Bilgisi</th>
                   <th className="px-6 py-4">Sahip ID</th>
@@ -190,7 +151,7 @@ export default function AdminServersTab({
                   <th className="px-6 py-4 text-right">İşlemler</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#2b2d31] whitespace-nowrap">
+              <tbody className="divide-y divide-[#2b2d31]">
                 {filteredServers.map(s => {
                   const isExpired = !s.is_unlimited && new Date(s.expires_at) < new Date();
                   const isPassive = !s.is_active;
@@ -199,10 +160,10 @@ export default function AdminServersTab({
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#fca311]/20 to-[#fca311]/5 border border-[#fca311]/20 flex items-center justify-center font-bold text-[#fca311]">
-                            {(s.guild_name || "?").charAt(0).toUpperCase() || 'V'}
+                            {s.guild_name?.charAt(0).toUpperCase() || 'V'}
                           </div>
                           <div>
-                            <div className="font-bold text-white">{s.guild_name || `Sunucu (${s.guild_id})`}</div>
+                            <div className="font-bold text-white">{s.guild_name}</div>
                             <div className="text-xs text-[#949ba4] font-mono">{s.guild_id}</div>
                           </div>
                         </div>
@@ -237,32 +198,21 @@ export default function AdminServersTab({
                         </div>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <div className="flex justify-end gap-2 items-center">
-                           <div className="flex items-center bg-[#1e1f22] rounded-lg px-2 py-1.5 border border-[#2b2d31]">
-                             <input 
-                               type="number" 
-                               className="w-10 bg-transparent text-white text-xs text-center focus:outline-none hide-arrows" 
-                               value={getDayAmount(s.guild_id)}
-                               onChange={(e) => handleDayChange(s.guild_id, parseInt(e.target.value) || 0)}
-                               min="1"
-                             />
-                             <span className="text-[10px] text-[#949ba4] ml-1 font-bold">GÜN</span>
-                           </div>
-                           
+                        <div className="flex justify-end gap-2">
                            <button 
                              className="p-2 bg-[#2ecc71]/10 hover:bg-[#2ecc71]/20 text-[#2ecc71] rounded-lg transition-colors border border-transparent hover:border-[#2ecc71]/30 disabled:opacity-50"
-                             title={`+${getDayAmount(s.guild_id)} Gün Ekle`} 
+                             title="+30 Gün Ekle" 
                              disabled={savingId === s.guild_id}
-                             onClick={() => handleServerAction(s.guild_id, 'add_days', getDayAmount(s.guild_id))}
+                             onClick={() => handleServerAction(s.guild_id, 'add_days', 30)}
                            >
                              {savingId === s.guild_id ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
                            </button>
                            
                            <button 
                              className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors border border-transparent hover:border-red-500/30 disabled:opacity-50"
-                             title={`-${getDayAmount(s.guild_id)} Gün Çıkar`} 
+                             title="-30 Gün Çıkar" 
                              disabled={savingId === s.guild_id}
-                             onClick={() => handleServerAction(s.guild_id, 'remove_days', getDayAmount(s.guild_id))}
+                             onClick={() => handleServerAction(s.guild_id, 'remove_days', 30)}
                            >
                              {savingId === s.guild_id ? <Loader2 size={16} className="animate-spin" /> : <Clock size={16} />}
                            </button>
@@ -318,10 +268,10 @@ export default function AdminServersTab({
                   <div className="flex items-start justify-between gap-3 pl-2">
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#fca311]/20 to-[#fca311]/5 border border-[#fca311]/20 flex items-center justify-center font-bold text-[#fca311] text-lg shrink-0">
-                        {(s.guild_name || "?").charAt(0).toUpperCase() || 'V'}
+                        {s.guild_name?.charAt(0).toUpperCase() || 'V'}
                       </div>
                       <div className="flex flex-col overflow-hidden">
-                        <h3 className="font-bold text-white text-base truncate pr-2">{s.guild_name || `Sunucu (${s.guild_id})`}</h3>
+                        <h3 className="font-bold text-white text-base truncate pr-2">{s.guild_name}</h3>
                         <div className="text-xs text-[#949ba4] font-mono mt-0.5 truncate">{s.guild_id}</div>
                       </div>
                     </div>
@@ -362,21 +312,11 @@ export default function AdminServersTab({
                   </div>
                   
                   {/* Actions mobile */}
-                  <div className="flex justify-end items-center gap-2 pt-2 border-t border-[#2b2d31]/50 mt-1 flex-wrap">
-                     <div className="flex items-center bg-[#2b2d31]/50 rounded-lg px-2 py-1 border border-[#2b2d31] mr-auto">
-                       <input 
-                         type="number" 
-                         className="w-10 bg-transparent text-white text-xs text-center focus:outline-none hide-arrows" 
-                         value={getDayAmount(s.guild_id)}
-                         onChange={(e) => handleDayChange(s.guild_id, parseInt(e.target.value) || 0)}
-                         min="1"
-                       />
-                       <span className="text-[10px] text-[#949ba4] ml-1 font-bold">GÜN</span>
-                     </div>
-                     <button className="p-2 bg-[#2ecc71]/10 text-[#2ecc71] rounded-lg disabled:opacity-50" disabled={savingId === s.guild_id} onClick={() => handleServerAction(s.guild_id, 'add_days', getDayAmount(s.guild_id))}>
+                  <div className="flex justify-end gap-2 pt-2 border-t border-[#2b2d31]/50 mt-1">
+                     <button className="p-2 bg-[#2ecc71]/10 text-[#2ecc71] rounded-lg disabled:opacity-50" disabled={savingId === s.guild_id} onClick={() => handleServerAction(s.guild_id, 'add_days', 30)}>
                        {savingId === s.guild_id ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
                      </button>
-                     <button className="p-2 bg-red-500/10 text-red-400 rounded-lg disabled:opacity-50" disabled={savingId === s.guild_id} onClick={() => handleServerAction(s.guild_id, 'remove_days', getDayAmount(s.guild_id))}>
+                     <button className="p-2 bg-red-500/10 text-red-400 rounded-lg disabled:opacity-50" disabled={savingId === s.guild_id} onClick={() => handleServerAction(s.guild_id, 'remove_days', 30)}>
                        {savingId === s.guild_id ? <Loader2 size={16} className="animate-spin" /> : <Clock size={16} />}
                      </button>
                      <button className={`p-2 rounded-lg disabled:opacity-50 ${s.unlimited_party ? 'bg-[#fca311]/20 text-[#fca311]' : 'bg-[#2b2d31] text-[#949ba4]'}`} disabled={savingId === s.guild_id} onClick={() => handleServerAction(s.guild_id, 'toggle_unlimited_party', !s.unlimited_party)}>
@@ -434,9 +374,9 @@ export default function AdminServersTab({
             </div>
           </div>
 
-          <div className="hidden lg:block bg-[#1e1f22] border border-[#2b2d31] rounded-xl overflow-x-auto custom-scrollbar">
+          <div className="hidden lg:block bg-[#1e1f22] border border-[#2b2d31] rounded-xl overflow-hidden">
             <table className="w-full text-left text-sm">
-              <thead className="bg-[#2b2d31]/50 text-[#949ba4] font-semibold text-xs uppercase tracking-wider whitespace-nowrap">
+              <thead className="bg-[#2b2d31]/50 text-[#949ba4] font-semibold text-xs uppercase tracking-wider">
                 <tr>
                   <th className="px-6 py-4">Discord Kullanıcı Bilgisi</th>
                   <th className="px-6 py-4">Durum</th>
@@ -445,7 +385,7 @@ export default function AdminServersTab({
                   <th className="px-6 py-4 text-right">İşlemler</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#2b2d31] whitespace-nowrap">
+              <tbody className="divide-y divide-[#2b2d31]">
                 {filteredUsers.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="px-6 py-12 text-center text-[#949ba4]">Bireysel premium kullanan üye bulunamadı.</td>
@@ -499,10 +439,10 @@ export default function AdminServersTab({
                       <td className="px-6 py-4">
                         {u.mutual_guilds && u.mutual_guilds.length > 0 ? (
                           <div className="flex flex-wrap gap-1">
-                            {(Array.isArray(u.mutual_guilds) ? u.mutual_guilds : []).slice(0, 3).map((guild, idx) => (
+                            {u.mutual_guilds.slice(0, 3).map((guild, idx) => (
                               <span key={idx} className="bg-[#2b2d31] text-[#b5bac1] px-2 py-1 rounded-md text-[10px]">{guild}</span>
                             ))}
-                            {Array.isArray(u.mutual_guilds) && u.mutual_guilds.length > 3 && (
+                            {u.mutual_guilds.length > 3 && (
                               <span className="bg-[#2b2d31] text-[#b5bac1] px-2 py-1 rounded-md text-[10px]">+{u.mutual_guilds.length - 3}</span>
                             )}
                           </div>
@@ -511,32 +451,22 @@ export default function AdminServersTab({
                         )}
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <div className="flex justify-end gap-2 items-center">
+                        <div className="flex justify-end gap-2">
                            {!u.is_auto_premium && (
                              <>
-                               <div className="flex items-center bg-[#1e1f22] rounded-lg px-2 py-1.5 border border-[#2b2d31]">
-                                 <input 
-                                   type="number" 
-                                   className="w-10 bg-transparent text-white text-xs text-center focus:outline-none hide-arrows" 
-                                   value={getDayAmount(u.discord_id)}
-                                   onChange={(e) => handleDayChange(u.discord_id, parseInt(e.target.value) || 0)}
-                                   min="1"
-                                 />
-                                 <span className="text-[10px] text-[#949ba4] ml-1 font-bold">GÜN</span>
-                               </div>
                                <button 
                                  className="p-2 bg-[#2ecc71]/10 hover:bg-[#2ecc71]/20 text-[#2ecc71] rounded-lg transition-colors border border-transparent hover:border-[#2ecc71]/30 disabled:opacity-50"
-                                 title={`+${getDayAmount(u.discord_id)} Gün Ekle`} 
+                                 title="+30 Gün Ekle" 
                                  disabled={savingId === u.discord_id}
-                                 onClick={() => handleUserAction(u.discord_id, 'add_days', getDayAmount(u.discord_id))}
+                                 onClick={() => handleUserAction(u.discord_id, 'add_days', 30)}
                                >
                                  {savingId === u.discord_id ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
                                </button>
                                <button 
                                  className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors border border-transparent hover:border-red-500/30 disabled:opacity-50"
-                                 title={`-${getDayAmount(u.discord_id)} Gün Çıkar`} 
+                                 title="-30 Gün Çıkar" 
                                  disabled={savingId === u.discord_id}
-                                 onClick={() => handleUserAction(u.discord_id, 'remove_days', getDayAmount(u.discord_id))}
+                                 onClick={() => handleUserAction(u.discord_id, 'remove_days', 30)}
                                >
                                  {savingId === u.discord_id ? <Loader2 size={16} className="animate-spin" /> : <Clock size={16} />}
                                </button>
@@ -607,23 +537,13 @@ export default function AdminServersTab({
                      </div>
                    </div>
                    
-                   <div className="flex justify-end items-center gap-2 pt-2 border-t border-[#2b2d31]/50 mt-1 flex-wrap">
+                   <div className="flex justify-end gap-2 pt-2 border-t border-[#2b2d31]/50 mt-1">
                      {!u.is_auto_premium && (
                        <>
-                         <div className="flex items-center bg-[#2b2d31]/50 rounded-lg px-2 py-1 border border-[#2b2d31] mr-auto">
-                           <input 
-                             type="number" 
-                             className="w-10 bg-transparent text-white text-xs text-center focus:outline-none hide-arrows" 
-                             value={getDayAmount(u.discord_id)}
-                             onChange={(e) => handleDayChange(u.discord_id, parseInt(e.target.value) || 0)}
-                             min="1"
-                           />
-                           <span className="text-[10px] text-[#949ba4] ml-1 font-bold">GÜN</span>
-                         </div>
-                         <button className="p-2 bg-[#2ecc71]/10 text-[#2ecc71] rounded-lg disabled:opacity-50" disabled={savingId === u.discord_id} onClick={() => handleUserAction(u.discord_id, 'add_days', getDayAmount(u.discord_id))}>
+                         <button className="p-2 bg-[#2ecc71]/10 text-[#2ecc71] rounded-lg disabled:opacity-50" disabled={savingId === u.discord_id} onClick={() => handleUserAction(u.discord_id, 'add_days', 30)}>
                            {savingId === u.discord_id ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
                          </button>
-                         <button className="p-2 bg-red-500/10 text-red-400 rounded-lg disabled:opacity-50" disabled={savingId === u.discord_id} onClick={() => handleUserAction(u.discord_id, 'remove_days', getDayAmount(u.discord_id))}>
+                         <button className="p-2 bg-red-500/10 text-red-400 rounded-lg disabled:opacity-50" disabled={savingId === u.discord_id} onClick={() => handleUserAction(u.discord_id, 'remove_days', 30)}>
                            {savingId === u.discord_id ? <Loader2 size={16} className="animate-spin" /> : <Clock size={16} />}
                          </button>
                          <button className={`p-2 rounded-lg disabled:opacity-50 ${u.is_unlimited ? 'bg-[#5865F2]/20 text-[#5865F2]' : 'bg-[#2b2d31] text-[#949ba4]'}`} disabled={savingId === u.discord_id} onClick={() => handleUserAction(u.discord_id, 'toggle_unlimited', !u.is_unlimited)}>
