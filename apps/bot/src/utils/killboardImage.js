@@ -53,9 +53,9 @@ async function generateKillboardImage(event) {
     ctx.font = 'bold 28px sans-serif';
     ctx.fillText(`IP: ${Math.round(player.AverageItemPower)}`, xOffset, 155);
 
-    // Equipment Icons
-    const iconSize = 128;
-    const spacing = 16;
+    // Equipment Icons & Spacing
+    const iconSize = 108;
+    const spacing = 14;
     const startY = 180;
     
     const drawItem = async (item, x, y) => {
@@ -89,35 +89,32 @@ async function generateKillboardImage(event) {
       }
     };
 
-    // Standard layout for equipment
-    // [Head]
-    // [MainHand] [Armor] [OffHand]
-    // [Shoes]
-    // [Bag] [Cape] [Mount]
-    // [Potion] [Food]
+    // Official Albion Online Equipment Slot Layout (4 Rows):
+    // Row 1: [Bag] [Head] [Cape]
+    // Row 2: [MainHand] [Armor] [OffHand]
+    // Row 3: [Potion] [Shoes] [Food]
+    // Row 4: [Mount] (Center)
     
     const centerX = xOffset - (iconSize / 2);
-    const equipment = player.Equipment;
+    const equipment = player.Equipment || {};
     
-    // Head
+    // Row 1: Bag (Left), Head (Center), Cape (Right)
+    await drawItem(equipment.Bag, centerX - iconSize - spacing, startY);
     await drawItem(equipment.Head, centerX, startY);
+    await drawItem(equipment.Cape, centerX + iconSize + spacing, startY);
     
-    // Row 2: MainHand, Armor, OffHand
+    // Row 2: MainHand (Left), Armor (Center), OffHand (Right)
     await drawItem(equipment.MainHand, centerX - iconSize - spacing, startY + iconSize + spacing);
     await drawItem(equipment.Armor, centerX, startY + iconSize + spacing);
     await drawItem(equipment.OffHand, centerX + iconSize + spacing, startY + iconSize + spacing);
     
-    // Row 3: Shoes
+    // Row 3: Potion (Left), Shoes (Center), Food (Right)
+    await drawItem(equipment.Potion, centerX - iconSize - spacing, startY + (iconSize + spacing) * 2);
     await drawItem(equipment.Shoes, centerX, startY + (iconSize + spacing) * 2);
+    await drawItem(equipment.Food, centerX + iconSize + spacing, startY + (iconSize + spacing) * 2);
 
-    // Row 4: Cape, Bag, Mount
-    await drawItem(equipment.Cape, centerX - iconSize - spacing, startY + (iconSize + spacing) * 3);
-    await drawItem(equipment.Bag, centerX, startY + (iconSize + spacing) * 3);
-    await drawItem(equipment.Mount, centerX + iconSize + spacing, startY + (iconSize + spacing) * 3);
-
-    // Row 5: Potion, Food
-    await drawItem(equipment.Potion, centerX - (iconSize/2) - spacing/2, startY + (iconSize + spacing) * 4);
-    await drawItem(equipment.Food, centerX + (iconSize/2) + spacing/2, startY + (iconSize + spacing) * 4);
+    // Row 4: Mount (Center)
+    await drawItem(equipment.Mount, centerX, startY + (iconSize + spacing) * 3);
   };
 
   // Draw Killer (Left)
