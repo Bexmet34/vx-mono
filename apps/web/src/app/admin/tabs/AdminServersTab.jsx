@@ -202,7 +202,7 @@ export default function AdminServersTab({
                             {(s.guild_name || "?").charAt(0).toUpperCase() || 'V'}
                           </div>
                           <div>
-                            <div className="font-bold text-white">{s.guild_name?.startsWith("Sunucu (") ? "Ayrılan Sunucu" : (s.guild_name || "Bilinmiyor")}</div>
+                            <div className="font-bold text-white">{s.guild_name || `Sunucu (${s.guild_id})`}</div>
                             <div className="text-xs text-[#949ba4] font-mono">{s.guild_id}</div>
                           </div>
                         </div>
@@ -321,7 +321,7 @@ export default function AdminServersTab({
                         {(s.guild_name || "?").charAt(0).toUpperCase() || 'V'}
                       </div>
                       <div className="flex flex-col overflow-hidden">
-                        <h3 className="font-bold text-white text-base truncate pr-2">{s.guild_name?.startsWith("Sunucu (") ? "Ayrılan Sunucu" : (s.guild_name || "Bilinmiyor")}</h3>
+                        <h3 className="font-bold text-white text-base truncate pr-2">{s.guild_name || `Sunucu (${s.guild_id})`}</h3>
                         <div className="text-xs text-[#949ba4] font-mono mt-0.5 truncate">{s.guild_id}</div>
                       </div>
                     </div>

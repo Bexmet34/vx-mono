@@ -133,11 +133,12 @@ client.once('clientReady', async (c) => {
 
     // Sunucuları Supabase ile senkronize et
     const { getSubscription } = require('@veyronix/database');
-    const guilds = c.guilds.cache;
-    guilds.forEach(async (guild) => {
+    c.guilds.cache.forEach(async (guild) => {
         try {
             await getSubscription(guild.id, guild.name, guild.ownerId);
-        } catch (err) { }
+        } catch (err) {
+            console.error(`[GuildSync] Error syncing guild ${guild.id}:`, err?.message);
+        }
     });
 
     // Set activity safely
