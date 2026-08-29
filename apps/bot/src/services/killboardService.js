@@ -98,16 +98,26 @@ async function processAlbionGuildEvents(client, trackingInfo) {
         // Skip if we already processed it
         if (!isInitialRun && event.EventId <= lastEventId) continue;
         
-        // If it's the first run, process only the 3 most recent events so the user can see it works
-        // without spamming them with 50 old kills.
-        if (isInitialRun) {
-            const isOneOfLastThree = events.indexOf(event) >= events.length - 3;
-            if (!isOneOfLastThree) continue;
+        const isKiller = event.Killer?.GuildId === albion_guild_id;
+        const isVictim = event.Victim?.GuildId === albion_guild_id;
+
+        // Skip if we are neither the killer nor victim (e.g. only assist)
+        if (!isKiller && !isVictim) {
+           if (event.EventId > newLastEventId) newLastEventId = event.EventId;
+           continue;
         }
 
-        // Is our guild the killer or the victim?
-        const isKiller = event.Killer.GuildId === albion_guild_id;
-        const isVictim = event.Victim.GuildId === albion_guild_id;
+        // If it's the first run, process only the 3 most recent valid events
+        if (isInitialRun) {
+            // Find all valid events for this guild in the fetched array
+            const validEvents = events.filter(e => e.Killer?.GuildId === albion_guild_id || e.Victim?.GuildId === albion_guild_id);
+            // Check if current event is among the last 3 of the valid events
+            const isOneOfLastThree = validEvents.indexOf(event) >= validEvents.length - 3;
+            if (!isOneOfLastThree) {
+               if (event.EventId > newLastEventId) newLastEventId = event.EventId;
+               continue;
+            }
+        }
 
         let targetChannelId = null;
         let color = '#000000';
@@ -122,7 +132,6 @@ async function processAlbionGuildEvents(client, trackingInfo) {
           color = '#f87171'; // Red
           embedTitle = `💀 ${event.Victim.Name} was killed by ${event.Killer.Name}`;
         } else {
-          // Both are members? Or neither (shouldn't happen on this endpoint)? Or channel not set.
           if (event.EventId > newLastEventId) newLastEventId = event.EventId;
           continue;
         }

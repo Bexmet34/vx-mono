@@ -98,70 +98,82 @@ export default function AnnouncementsCarousel({ lang = 'tr' }) {
   const styles = getTypeStyles(current.type);
 
   return (
-    <div className={`relative flex flex-col w-full sm:w-[350px] md:w-[400px] rounded-xl border ${styles.border} ${styles.bg} transition-all duration-300 z-50`}>
-      <div className="flex items-center justify-between p-2.5">
-        <div className="flex items-center gap-2.5 flex-1 min-w-0">
-          <div className={`w-8 h-8 rounded-lg ${styles.iconBg} flex items-center justify-center shrink-0`}>
-            {styles.icon}
-          </div>
-          <div className="flex flex-col flex-1 min-w-0">
-            <span className={`text-xs font-bold truncate ${styles.text}`}>
-              {title}
-            </span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-1.5 shrink-0 ml-2">
-          {announcements.length > 1 && (
-            <div className="flex items-center bg-black/20 rounded-lg p-0.5">
-              <button 
-                onClick={prevSlide}
-                className="p-1 hover:bg-white/10 rounded-md transition-colors"
-              >
-                <ChevronLeft size={14} className="text-on-surface-variant" />
-              </button>
-              <span className="text-[10px] font-bold text-on-surface-variant px-1.5">
-                {currentIndex + 1} / {announcements.length}
+    <div className="relative flex justify-end w-full sm:w-auto min-w-[280px]">
+      <div 
+        className={`flex flex-col w-full sm:w-[320px] rounded-2xl border ${styles.border} ${styles.bg} shadow-lg backdrop-blur-md transition-all duration-300 relative z-50`}
+      >
+        <div 
+          className="flex items-center justify-between p-3 cursor-pointer select-none group"
+          onClick={() => content && setExpanded(!expanded)}
+        >
+          <div className="flex items-center gap-3 flex-1 min-w-0 pl-1">
+            <div className={`w-9 h-9 rounded-xl ${styles.iconBg} flex items-center justify-center shrink-0 shadow-inner`}>
+              {styles.icon}
+            </div>
+            <div className="flex flex-col flex-1 min-w-0 justify-center">
+              <span className={`text-[13px] font-bold truncate tracking-wide ${styles.text}`}>
+                {title}
               </span>
-              <button 
-                onClick={nextSlide}
-                className="p-1 hover:bg-white/10 rounded-md transition-colors"
-              >
-                <ChevronRight size={14} className="text-on-surface-variant" />
-              </button>
             </div>
-          )}
-          
-          {content && (
-            <button 
-              onClick={() => setExpanded(!expanded)}
-              className="p-1.5 hover:bg-white/10 rounded-lg transition-colors ml-1"
-              title={lang === 'tr' ? 'Detayı Oku' : 'Read More'}
-            >
-              <motion.div animate={{ rotate: expanded ? 180 : 0 }}>
-                <ChevronDown size={16} className="text-on-surface-variant" />
-              </motion.div>
-            </button>
-          )}
-        </div>
-      </div>
+          </div>
 
-      <AnimatePresence>
-        {expanded && content && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="overflow-hidden"
-          >
-            <div className={`p-3 pt-0 text-xs text-on-surface-variant whitespace-pre-wrap`}>
-              <div className="w-full h-px bg-white/10 mb-3" />
-              {content}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          <div className="flex items-center gap-2 shrink-0 pr-1">
+            {announcements.length > 1 && (
+              <div 
+                className="flex items-center bg-black/20 rounded-lg p-0.5"
+                onClick={(e) => e.stopPropagation()} // Prevent toggling expansion when clicking arrows
+              >
+                <button 
+                  onClick={prevSlide}
+                  className="p-1 hover:bg-white/10 rounded-md transition-colors"
+                >
+                  <ChevronLeft size={14} className="text-on-surface-variant hover:text-white" />
+                </button>
+                <span className="text-[10px] font-bold text-on-surface-variant px-1.5 opacity-80">
+                  {currentIndex + 1} / {announcements.length}
+                </span>
+                <button 
+                  onClick={nextSlide}
+                  className="p-1 hover:bg-white/10 rounded-md transition-colors"
+                >
+                  <ChevronRight size={14} className="text-on-surface-variant hover:text-white" />
+                </button>
+              </div>
+            )}
+            
+            {content && (
+              <div className={`p-1.5 rounded-lg transition-colors ml-1 ${expanded ? 'bg-white/10' : 'group-hover:bg-white/5'}`}>
+                <motion.div animate={{ rotate: expanded ? 180 : 0 }} transition={{ duration: 0.3, ease: "easeInOut" }}>
+                  <ChevronDown size={16} className={styles.text} />
+                </motion.div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <AnimatePresence>
+          {expanded && content && (
+            <motion.div
+              initial={{ opacity: 0, y: -10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.95 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="absolute top-[110%] right-0 w-full sm:w-[380px] bg-[#111214]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-[100]"
+            >
+              <div className="p-4 flex flex-col gap-3">
+                <div className="flex items-center gap-2 mb-1">
+                  {styles.icon}
+                  <span className={`text-sm font-bold ${styles.text}`}>{title}</span>
+                </div>
+                <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                <div className="text-[13px] text-on-surface-variant/90 whitespace-pre-wrap leading-relaxed">
+                  {content}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }
