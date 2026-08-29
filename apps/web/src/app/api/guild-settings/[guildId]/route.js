@@ -159,7 +159,7 @@ export async function POST(req, { params }) {
           ticket_message_title: ticket_message_title || 'Destek Talebi',
           ticket_message_desc: ticket_message_desc || 'Lütfen aşağıdaki menüden bir konu seçerek destek talebinizi oluşturun.',
           ticket_options: Array.isArray(ticket_options) ? ticket_options : [{"label": "Genel Destek", "value": "genel", "description": "Genel konular hakkında destek alın", "emoji": "📩"}],
-          content_close_roles: content_close_roles || null,
+          content_close_roles: typeof content_close_roles === 'string' ? (()=>{try{return JSON.parse(content_close_roles)}catch(e){return []}})() : (content_close_roles || null),
           application_enabled: application_enabled ?? false,
           registration_rules_text: registration_rules_text || null,
           application_questions: Array.isArray(application_questions) ? application_questions : [],

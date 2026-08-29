@@ -155,6 +155,7 @@ export default function ServerSettings() {
     registration_rules_text: "",
     application_questions: [],
     tempvoice_creators: [],
+    content_close_roles: "",
   });
   
   const [guildSearchQuery, setGuildSearchQuery] = useState("");
@@ -246,6 +247,7 @@ export default function ServerSettings() {
           ticket_message_title: s?.ticket_message_title || "Destek Talebi",
           ticket_message_desc: s?.ticket_message_desc || "Lütfen aşağıdaki menüden bir konu seçerek destek talebinizi oluşturun.",
           ticket_options: Array.isArray(s?.ticket_options) ? s?.ticket_options : [{"label": "Genel Destek", "value": "genel", "description": "Genel konular hakkında destek alın", "emoji": "📩"}],
+          content_close_roles: typeof s?.content_close_roles === 'string' ? s.content_close_roles : (s?.content_close_roles ? JSON.stringify(s.content_close_roles) : ""),
           auto_delete_party_hours: (() => {
             let ev = s?.log_events;
             if (typeof ev === 'string' && ev !== '[object Object]') {
