@@ -74,13 +74,7 @@ export const metadata = {
       "max-snippet": -1,
     },
   },
-  alternates: {
-    canonical: LINKS.WEBSITE,
-    languages: {
-      "tr-TR": LINKS.WEBSITE,
-      "en-US": LINKS.WEBSITE,
-    },
-  },
+  metadataBase: new URL(LINKS.WEBSITE),
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
