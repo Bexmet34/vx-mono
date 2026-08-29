@@ -757,7 +757,7 @@ export default function ServerSettings() {
         )}
 
         {activeTab === 'killboard' && (
-          <KillBoardTab lang={lang} />
+          <KillBoardTab t={t} lang={lang} settings={settings} setSettings={setSettings} discordChannels={discordChannels} handleSave={handleSave} saving={saving} />
         )}
 
         {activeTab === 'registration' && (
