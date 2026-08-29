@@ -10,57 +10,59 @@ const path = require('path');
  * @returns {Buffer} The generated PNG image buffer
  */
 async function generateKillboardImage(event) {
-  // Dimensions for the canvas
+  // 1. Tuval (Canvas) Boyutları
   const width = 1200;
   const height = 1050;
   
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext('2d');
 
-  // Background
+  // Arka Plan Çizimi
   ctx.fillStyle = '#1e1e24';
   ctx.fillRect(0, 0, width, height);
   
-  // Background Pattern / Gradient
   const gradient = ctx.createLinearGradient(0, 0, width, height);
   gradient.addColorStop(0, '#2b2b36');
   gradient.addColorStop(1, '#15151a');
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, width, height);
 
-  // Border
+  // Çerçeve
   ctx.strokeStyle = '#3a3a48';
   ctx.lineWidth = 4;
   ctx.strokeRect(2, 2, width - 4, height - 4);
 
+  // 2. Oyuncu Ekipman & Yazı Boyutları/Konumları
+  const iconSize = 135;     // Ekipman ikonlarının boyutu (Genişlik x Yükseklik)
+  const spacing = 24;       // İkonlar arasındaki boşluk
+  
+  const nameY = 83;         // Oyuncu isminin Y konumu
+  const guildY = 116;       // Lonca adının Y konumu
+  const ipY = 157;          // IP bilgisinin Y konumu
+  const startY = 186;       // İkon tablosunun yukarıdan başlama Y konumu
+
   // Helper function to draw player info
   const drawPlayer = async (player, isKiller, xOffset) => {
     // Player Name
-    ctx.fillStyle = isKiller ? '#4ade80' : '#f87171'; // Green for killer, Red for victim
+    ctx.fillStyle = isKiller ? '#4ade80' : '#f87171';
     ctx.font = 'bold 36px sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText(player.Name, xOffset, 80);
+    ctx.fillText(player.Name, xOffset, nameY);
 
     // Guild Name
     if (player.GuildName) {
       ctx.fillStyle = '#a1a1aa';
       ctx.font = '24px sans-serif';
-      ctx.fillText(`[${player.GuildName}]`, xOffset, 115);
+      ctx.fillText(`[${player.GuildName}]`, xOffset, guildY);
     }
 
     // IP
     ctx.fillStyle = '#facc15';
     ctx.font = 'bold 28px sans-serif';
-    ctx.fillText(`IP: ${Math.round(player.AverageItemPower)}`, xOffset, 155);
+    ctx.fillText(`IP: ${Math.round(player.AverageItemPower)}`, xOffset, ipY);
 
-    // Equipment Icons & Spacing
-    const iconSize = 108;
-    const spacing = 14;
-    const startY = 180;
-    
     const drawItem = async (item, x, y) => {
       if (!item) {
-        // Draw empty slot
         ctx.fillStyle = '#272732';
         ctx.strokeStyle = '#3f3f4e';
         ctx.lineWidth = 2;
@@ -77,7 +79,6 @@ async function generateKillboardImage(event) {
         const img = await loadImage(imgUrl);
         ctx.drawImage(img, x, y, iconSize, iconSize);
         
-        // Draw count if > 1
         if (item.Count > 1) {
           ctx.fillStyle = '#ffffff';
           ctx.font = 'bold 20px sans-serif';
@@ -89,42 +90,35 @@ async function generateKillboardImage(event) {
       }
     };
 
-    // Official Albion Online Equipment Slot Layout (4 Rows):
-    // Row 1: [Bag] [Head] [Cape]
-    // Row 2: [MainHand] [Armor] [OffHand]
-    // Row 3: [Potion] [Shoes] [Food]
-    // Row 4: [Mount] (Center)
-    
     const centerX = xOffset - (iconSize / 2);
     const equipment = player.Equipment || {};
     
-    // Row 1: Bag (Left), Head (Center), Cape (Right)
+    // Row 1: Bag, Head, Cape
     await drawItem(equipment.Bag, centerX - iconSize - spacing, startY);
     await drawItem(equipment.Head, centerX, startY);
     await drawItem(equipment.Cape, centerX + iconSize + spacing, startY);
     
-    // Row 2: MainHand (Left), Armor (Center), OffHand (Right)
+    // Row 2: MainHand, Armor, OffHand
     await drawItem(equipment.MainHand, centerX - iconSize - spacing, startY + iconSize + spacing);
     await drawItem(equipment.Armor, centerX, startY + iconSize + spacing);
     await drawItem(equipment.OffHand, centerX + iconSize + spacing, startY + iconSize + spacing);
     
-    // Row 3: Potion (Left), Shoes (Center), Food (Right)
+    // Row 3: Potion, Shoes, Food
     await drawItem(equipment.Potion, centerX - iconSize - spacing, startY + (iconSize + spacing) * 2);
     await drawItem(equipment.Shoes, centerX, startY + (iconSize + spacing) * 2);
     await drawItem(equipment.Food, centerX + iconSize + spacing, startY + (iconSize + spacing) * 2);
 
-    // Row 4: Mount (Center)
+    // Row 4: Mount
     await drawItem(equipment.Mount, centerX, startY + (iconSize + spacing) * 3);
   };
 
-  // Draw Killer (Left)
+  // Draw Killer (Left) & Victim (Right)
   await drawPlayer(event.Killer, true, width / 4);
-
-  // Draw Victim (Right)
   await drawPlayer(event.Victim, false, (width / 4) * 3);
 
-  // Center Info (Adjusted for new height)
-  const centerY = (height / 2) - 40;
+  // 3. Orta Alan (VS, Fame, Party Size, Tarih) Konumu
+  const centerYOffset = 130; 
+  const centerY = (height / 2) + centerYOffset;
   
   ctx.fillStyle = '#ffffff';
   ctx.font = 'bold 56px sans-serif';
@@ -134,7 +128,6 @@ async function generateKillboardImage(event) {
   ctx.fillStyle = '#a1a1aa';
   ctx.font = '28px sans-serif';
   
-  // Format Fame
   const formatNumber = (num) => {
     if (num == null || isNaN(num)) return '0';
     if (num >= 1000000) return (num / 1000000).toFixed(2) + 'M';
@@ -149,29 +142,32 @@ async function generateKillboardImage(event) {
   ctx.font = '24px sans-serif';
   ctx.fillText(`Party Size: ${event.Participants ? event.Participants.length : 1}`, width / 2, centerY + 65);
   
-  // Date and Time
   const dateObj = new Date(event.TimeStamp);
   const dateStr = dateObj.toLocaleString('en-US', { timeZone: 'UTC' }) + ' UTC';
   ctx.fillStyle = '#64748b';
   ctx.font = '20px sans-serif';
   ctx.fillText(dateStr, width / 2, centerY + 110);
 
-  // Draw Victim Inventory
+  // 4. Kurbanın Envanter Alanı (Çanta İkonları & Başlık)
+  const invIconSize = 84;       // Çantadaki ikonların boyutu
+  const invTitleOffsetY = 193;   // Envanter başlığının görselin en altından olan mesafesi
+  const invIconsOffsetY = 158;   // Envanter ikonlarının görselin en altından olan mesafesi
+
   if (event.Victim.Inventory) {
     const inventory = event.Victim.Inventory.filter(i => i !== null);
     if (inventory.length > 0) {
       ctx.fillStyle = '#94a3b8';
       ctx.font = 'bold 24px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText("Victim's Inventory", width / 2, height - 140);
+      ctx.fillText("Victim's Inventory", width / 2, height - invTitleOffsetY);
 
-      const invIconSize = 72;
       const invSpacing = 10;
       const maxItems = 12;
       const itemsToDraw = inventory.slice(0, maxItems);
       
       const totalInvWidth = itemsToDraw.length * invIconSize + (itemsToDraw.length - 1) * invSpacing;
       let startX = (width - totalInvWidth) / 2;
+      const invY = height - invIconsOffsetY;
       
       for (const item of itemsToDraw) {
         try {
@@ -183,17 +179,17 @@ async function generateKillboardImage(event) {
           ctx.strokeStyle = '#3f3f4e';
           ctx.lineWidth = 2;
           ctx.beginPath();
-          ctx.arc(startX + invIconSize/2, height - 90 + invIconSize/2, invIconSize/2, 0, Math.PI * 2);
+          ctx.arc(startX + invIconSize/2, invY + invIconSize/2, invIconSize/2, 0, Math.PI * 2);
           ctx.fill();
           ctx.stroke();
 
-          ctx.drawImage(img, startX, height - 90, invIconSize, invIconSize);
+          ctx.drawImage(img, startX, invY, invIconSize, invIconSize);
           
           if (item.Count > 1) {
             ctx.fillStyle = '#ffffff';
             ctx.font = 'bold 14px sans-serif';
             ctx.textAlign = 'right';
-            ctx.fillText(item.Count.toString(), startX + invIconSize - 4, height - 90 + invIconSize - 4);
+            ctx.fillText(item.Count.toString(), startX + invIconSize - 4, invY + invIconSize - 4);
           }
         } catch(e) {}
         startX += invIconSize + invSpacing;
