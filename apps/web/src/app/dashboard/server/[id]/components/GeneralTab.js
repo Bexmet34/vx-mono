@@ -10,7 +10,7 @@ export default function GeneralTab({
   guildSearchQuery, setGuildSearchQuery, 
   searchGuilds, searchingGuild, 
   guildSearchResults, setGuildSearchResults, 
-  guildDetail, setGuildDetail,
+  albionGuildDetail, setAlbionGuildDetail,
   isOwner, discordMembers, guildId, subscription, showToast, discordChannels, discordRoles
 }) {
   const { lang } = useLanguage();
@@ -27,7 +27,7 @@ export default function GeneralTab({
       albion_guild_name: guild.Name,
       albion_server: guild.Server || 'Europe'
     });
-    setGuildDetail(guild);
+    setAlbionGuildDetail(guild);
     setGuildSearchResults([]);
     setGuildSearchQuery("");
   };
@@ -308,20 +308,20 @@ export default function GeneralTab({
         </h2>
         <p className="font-body-md text-on-surface-variant mb-3">Search and link your Albion Online Guild to be used globally across all features.</p>
 
-        {settings.albion_guild_id && guildDetail ? (
+        {settings.albion_guild_id && albionGuildDetail ? (
           <div className="bg-primary-container/5 border border-primary-container/50 rounded-sm p-2 mb-2 flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
              <div>
                <div className="text-[10px] font-label-bold text-primary-container uppercase tracking-widest mb-1">Active Guild</div>
                <div className="text-[10px] font-headline-lg text-on-surface">
-                 {guildDetail.AllianceTag ? `[${guildDetail.AllianceTag}] ` : ''}{guildDetail.Name}
+                 {albionGuildDetail.AllianceTag ? `[${albionGuildDetail.AllianceTag}] ` : ''}{albionGuildDetail.Name || settings.albion_guild_name}
                </div>
                <div className="text-[10px] font-body-md text-on-surface-variant mt-1">
-                 Server: <span className="text-primary-container font-semibold uppercase">{settings.albion_server || 'Europe'}</span> &bull; Leader: <span className="text-on-surface">{guildDetail.FounderName || 'Unknown'}</span> &bull; Members: <span className="text-on-surface">{guildDetail.MemberCount || 0}</span>
+                 Server: <span className="text-primary-container font-semibold uppercase">{settings.albion_server || 'Europe'}</span> &bull; Leader: <span className="text-on-surface">{albionGuildDetail.FounderName || 'Unknown'}</span> &bull; Members: <span className="text-on-surface">{albionGuildDetail.MemberCount || 0}</span>
                </div>
              </div>
              <button className="px-3 py-1 bg-error/10 text-error border border-error/50 hover:bg-error hover:text-on-error rounded-sm font-label-bold uppercase tracking-widest transition-colors" onClick={() => {
                 setSettings({ ...settings, albion_guild_id: "", albion_guild_name: "", albion_server: "Europe" });
-                setGuildDetail(null);
+                setAlbionGuildDetail(null);
              }}>
                Disconnect
              </button>

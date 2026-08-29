@@ -164,6 +164,7 @@ export default function ServerSettings() {
   const [discordChannels, setDiscordChannels] = useState([]);
 
   const [guildDetail, setGuildDetail] = useState(null);
+  const [albionGuildDetail, setAlbionGuildDetail] = useState(null);
   const [thumbError, setThumbError] = useState(null);
   const [uploadingThumb, setUploadingThumb] = useState(false);
   const [discordRoles, setDiscordRoles] = useState([]);
@@ -191,6 +192,15 @@ export default function ServerSettings() {
             id: guildId
           }));
         }
+
+        if (s?.albion_guild_id) {
+          setAlbionGuildDetail({
+            Id: s.albion_guild_id,
+            Name: s.albion_guild_name || 'Unknown Guild',
+            Server: s.albion_server || 'Europe'
+          });
+        }
+
         const loadedSettings = {
           language: s?.language || "tr",
           embed_thumbnail_url: s?.embed_thumbnail_url || "",
@@ -357,13 +367,13 @@ export default function ServerSettings() {
 
   useEffect(() => {
     if (!settings.albion_guild_id) { 
-      setTimeout(() => setGuildDetail(null), 0);
+      setTimeout(() => setAlbionGuildDetail(null), 0);
       return; 
     }
     fetch(`/api/albion/guild/${settings.albion_guild_id}?server=${settings.albion_server || 'Europe'}`)
       .then(r => r.json())
-      .then(d => { if (!d.error) setGuildDetail(d); })
-      .catch(() => setGuildDetail(null));
+      .then(d => { if (!d.error) setAlbionGuildDetail(d); })
+      .catch(err => console.error("Albion API fetch error:", err));
   }, [settings.albion_guild_id, settings.albion_server]);
 
   const handleSave = async () => {
@@ -724,7 +734,7 @@ export default function ServerSettings() {
         {activeTab === 'overview' && <OverviewTab t={t} lang={lang} subscription={subscription} setActiveTab={setActiveTab} showToast={showToast} settings={settings} />}
         
         {activeTab === 'general' && (
-          <GeneralTab t={t} settings={settings} setSettings={setSettings} discordChannels={discordChannels} discordRoles={discordRoles} handleSave={handleSave} saving={saving} guildSearchQuery={guildSearchQuery} setGuildSearchQuery={setGuildSearchQuery} searchGuilds={searchGuilds} searchingGuild={searchingGuild} guildSearchResults={guildSearchResults} setGuildSearchResults={setGuildSearchResults} guildDetail={guildDetail} setGuildDetail={setGuildDetail} isOwner={isOwner} discordMembers={discordMembers} guildId={guildId} subscription={subscription} showToast={showToast} />
+          <GeneralTab t={t} settings={settings} setSettings={setSettings} discordChannels={discordChannels} discordRoles={discordRoles} handleSave={handleSave} saving={saving} guildSearchQuery={guildSearchQuery} setGuildSearchQuery={setGuildSearchQuery} searchGuilds={searchGuilds} searchingGuild={searchingGuild} guildSearchResults={guildSearchResults} setGuildSearchResults={setGuildSearchResults} albionGuildDetail={albionGuildDetail} setAlbionGuildDetail={setAlbionGuildDetail} isOwner={isOwner} discordMembers={discordMembers} guildId={guildId} subscription={subscription} showToast={showToast} />
         )}
 
         {activeTab === 'embed' && (
