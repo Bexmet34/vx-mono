@@ -41,6 +41,25 @@ export default function AdminServersTab({
 
   const filteredUsers = (Array.isArray(users) ? users : []).filter(u => !userSearchTerm || (u.discord_id && u.discord_id.includes(userSearchTerm)));
 
+  const [isSyncingGuilds, setIsSyncingGuilds] = useState(false);
+
+  const handleSyncGuildNames = async () => {
+    setIsSyncingGuilds(true);
+    try {
+      const res = await fetch('/api/admin/sync-guilds');
+      const data = await res.json();
+      if (data.success) {
+        showToast(`İsimler güncellendi! ${data.fixed || 0} sunucu ismi Discord'dan senkronize edildi.`, "success");
+        if (typeof fetchServers === "function") fetchServers();
+      } else {
+        showToast(data.error || "Senkronizasyon hatası.", "error");
+      }
+    } catch (e) {
+      showToast("Bağlantı hatası.", "error");
+    }
+    setIsSyncingGuilds(false);
+  };
+
   const handleScanAutoPremium = async () => {
     setLoading(true);
     try {
@@ -122,6 +141,15 @@ export default function AdminServersTab({
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
+            
+            <button 
+              onClick={handleSyncGuildNames}
+              disabled={isSyncingGuilds}
+              className="shrink-0 flex items-center justify-center gap-2 bg-[#2b2d31] hover:bg-[#383a40] text-white px-4 h-[44px] rounded-xl text-sm font-medium transition-colors border border-[#1e1f22] disabled:opacity-50"
+              title="Discord API üzerinden sunucu isimlerini senkronize eder"
+            >
+              <RefreshCw size={16} className={isSyncingGuilds ? "animate-spin" : ""} /> İsimleri Senkronize Et
+            </button>
           </div>
 
           {/* Filters */}
