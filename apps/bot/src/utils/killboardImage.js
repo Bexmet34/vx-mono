@@ -12,7 +12,7 @@ const path = require('path');
 async function generateKillboardImage(event) {
   // Dimensions for the canvas
   const width = 1200;
-  const height = 850;
+  const height = 1050;
   
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext('2d');
@@ -37,26 +37,26 @@ async function generateKillboardImage(event) {
   const drawPlayer = async (player, isKiller, xOffset) => {
     // Player Name
     ctx.fillStyle = isKiller ? '#4ade80' : '#f87171'; // Green for killer, Red for victim
-    ctx.font = 'bold 32px sans-serif';
+    ctx.font = 'bold 36px sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText(player.Name, xOffset, 80);
 
     // Guild Name
     if (player.GuildName) {
       ctx.fillStyle = '#a1a1aa';
-      ctx.font = '20px sans-serif';
-      ctx.fillText(`[${player.GuildName}]`, xOffset, 110);
+      ctx.font = '24px sans-serif';
+      ctx.fillText(`[${player.GuildName}]`, xOffset, 115);
     }
 
     // IP
     ctx.fillStyle = '#facc15';
-    ctx.font = 'bold 24px sans-serif';
-    ctx.fillText(`IP: ${Math.round(player.AverageItemPower)}`, xOffset, 145);
+    ctx.font = 'bold 28px sans-serif';
+    ctx.fillText(`IP: ${Math.round(player.AverageItemPower)}`, xOffset, 155);
 
     // Equipment Icons
-    const iconSize = 96;
-    const spacing = 12;
-    const startY = 160;
+    const iconSize = 128;
+    const spacing = 16;
+    const startY = 180;
     
     const drawItem = async (item, x, y) => {
       if (!item) {
@@ -80,7 +80,7 @@ async function generateKillboardImage(event) {
         // Draw count if > 1
         if (item.Count > 1) {
           ctx.fillStyle = '#ffffff';
-          ctx.font = 'bold 16px sans-serif';
+          ctx.font = 'bold 20px sans-serif';
           ctx.textAlign = 'right';
           ctx.fillText(item.Count.toString(), x + iconSize - 5, y + iconSize - 5);
         }
@@ -126,14 +126,16 @@ async function generateKillboardImage(event) {
   // Draw Victim (Right)
   await drawPlayer(event.Victim, false, (width / 4) * 3);
 
-  // Center Info
+  // Center Info (Adjusted for new height)
+  const centerY = (height / 2) - 40;
+  
   ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 48px sans-serif';
+  ctx.font = 'bold 56px sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillText('VS', width / 2, height / 2 - 50);
+  ctx.fillText('VS', width / 2, centerY - 60);
 
   ctx.fillStyle = '#a1a1aa';
-  ctx.font = '24px sans-serif';
+  ctx.font = '28px sans-serif';
   
   // Format Fame
   const formatNumber = (num) => {
@@ -144,27 +146,27 @@ async function generateKillboardImage(event) {
   };
   
   const fame = event.TotalVictimKillFame || event.KillFame || 0;
-  ctx.fillText(`Kill Fame: ${formatNumber(fame)}`, width / 2, height / 2 + 20);
+  ctx.fillText(`Kill Fame: ${formatNumber(fame)}`, width / 2, centerY + 20);
   
   ctx.fillStyle = '#94a3b8';
-  ctx.font = '20px sans-serif';
-  ctx.fillText(`Party Size: ${event.Participants ? event.Participants.length : 1}`, width / 2, height / 2 + 60);
+  ctx.font = '24px sans-serif';
+  ctx.fillText(`Party Size: ${event.Participants ? event.Participants.length : 1}`, width / 2, centerY + 65);
   
   // Date and Time
   const dateObj = new Date(event.TimeStamp);
   const dateStr = dateObj.toLocaleString('en-US', { timeZone: 'UTC' }) + ' UTC';
   ctx.fillStyle = '#64748b';
-  ctx.font = '18px sans-serif';
-  ctx.fillText(dateStr, width / 2, height / 2 + 100);
+  ctx.font = '20px sans-serif';
+  ctx.fillText(dateStr, width / 2, centerY + 110);
 
   // Draw Victim Inventory
   if (event.Victim.Inventory) {
     const inventory = event.Victim.Inventory.filter(i => i !== null);
     if (inventory.length > 0) {
       ctx.fillStyle = '#94a3b8';
-      ctx.font = 'bold 20px sans-serif';
+      ctx.font = 'bold 24px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText("Victim's Inventory", width / 2, height - 120);
+      ctx.fillText("Victim's Inventory", width / 2, height - 140);
 
       const invIconSize = 72;
       const invSpacing = 10;

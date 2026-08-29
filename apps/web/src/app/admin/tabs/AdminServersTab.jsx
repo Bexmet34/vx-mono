@@ -39,7 +39,7 @@ export default function AdminServersTab({
     return true;
   });
 
-  const filteredUsers = (users || []).filter(u => !userSearchTerm || (u.discord_id && u.discord_id.includes(userSearchTerm)));
+  const filteredUsers = (Array.isArray(users) ? users : []).filter(u => !userSearchTerm || (u.discord_id && u.discord_id.includes(userSearchTerm)));
 
   const handleScanAutoPremium = async () => {
     setLoading(true);
@@ -466,10 +466,10 @@ export default function AdminServersTab({
                       <td className="px-6 py-4">
                         {u.mutual_guilds && u.mutual_guilds.length > 0 ? (
                           <div className="flex flex-wrap gap-1">
-                            {u.mutual_guilds.slice(0, 3).map((guild, idx) => (
+                            {(Array.isArray(u.mutual_guilds) ? u.mutual_guilds : []).slice(0, 3).map((guild, idx) => (
                               <span key={idx} className="bg-[#2b2d31] text-[#b5bac1] px-2 py-1 rounded-md text-[10px]">{guild}</span>
                             ))}
-                            {u.mutual_guilds.length > 3 && (
+                            {Array.isArray(u.mutual_guilds) && u.mutual_guilds.length > 3 && (
                               <span className="bg-[#2b2d31] text-[#b5bac1] px-2 py-1 rounded-md text-[10px]">+{u.mutual_guilds.length - 3}</span>
                             )}
                           </div>
