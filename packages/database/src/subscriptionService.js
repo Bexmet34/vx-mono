@@ -20,8 +20,20 @@ async function getSubscription(guildId, guildName, ownerId) {
              return null;
         }
 
-        // 2. If exists, return it with created: false
-        if (data) return { ...data, created: false };
+        // 2. If exists, update guild_name/owner_id if outdated and return
+        if (data) {
+            // If guild_name is a placeholder or outdated, update it silently
+            const isPlaceholder = !data.guild_name || data.guild_name.startsWith('Sunucu (') || data.guild_name === 'Unknown';
+            if (isPlaceholder && guildName && guildName !== 'Unknown') {
+                await supabase
+                    .from('subscriptions')
+                    .update({ guild_name: guildName, owner_id: ownerId || data.owner_id, updated_at: new Date().toISOString() })
+                    .eq('guild_id', guildId);
+                return { ...data, guild_name: guildName, created: false };
+            }
+            return { ...data, created: false };
+        }
+
 
         // 3. If not exists, create 3-day trial
         const expiresAt = new Date();

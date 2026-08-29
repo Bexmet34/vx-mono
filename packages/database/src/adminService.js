@@ -2,12 +2,22 @@ const { getClient } = require('./client');
 
 async function getAllUsers() {
     const supabase = getClient();
-    const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .order('discord_id', { ascending: true });
-    if (error) throw error;
-    return data || [];
+    const PAGE_SIZE = 1000;
+    let allData = [];
+    let from = 0;
+    while (true) {
+        const { data, error } = await supabase
+            .from('users')
+            .select('*')
+            .order('discord_id', { ascending: true })
+            .range(from, from + PAGE_SIZE - 1);
+        if (error) throw error;
+        if (!data || data.length === 0) break;
+        allData = allData.concat(data);
+        if (data.length < PAGE_SIZE) break;
+        from += PAGE_SIZE;
+    }
+    return allData;
 }
 
 async function getUserProfile(discordId) {
@@ -86,50 +96,79 @@ async function getParsedTemplate(templateId, placeholders = {}) {
     return { title, content, color: template.color, is_embed: template.is_embed };
 }
 
+async function fetchAllRows(supabase, table) {
+    const PAGE_SIZE = 1000;
+    let allData = [];
+    let from = 0;
+    
+    while (true) {
+        const { data, error } = await supabase
+            .from(table)
+            .select('*')
+            .range(from, from + PAGE_SIZE - 1);
+        
+        if (error) throw error;
+        if (!data || data.length === 0) break;
+        
+        allData = allData.concat(data);
+        if (data.length < PAGE_SIZE) break; // last page
+        from += PAGE_SIZE;
+    }
+    
+    return allData;
+}
+
 async function getAllSubscriptions() {
     const supabase = getClient();
     
-    // 1. Fetch all guild_settings (this contains all servers the bot is in)
-    const { data: guilds, error: guildError } = await supabase
-        .from('guild_settings')
-        .select('*');
-        
-    if (guildError) throw guildError;
+    // subscriptions is the source of truth (has guild_name, is_active etc.)
+    const subs = await fetchAllRows(supabase, 'subscriptions');
 
-    // 2. Fetch all subscriptions
-    const { data: subs, error: subError } = await supabase
-        .from('subscriptions')
-        .select('*');
-        
-    if (subError) throw subError;
+    // guild_settings has no guild_name column; only use it to find servers
+    // that have settings but no subscription yet (freemium)
+    const guilds = await fetchAllRows(supabase, 'guild_settings');
 
-    // 3. Map subscriptions by guild_id
+    // Map existing subscriptions by guild_id
     const subMap = {};
-    for (const sub of (subs || [])) {
+    for (const sub of subs) {
         subMap[sub.guild_id] = sub;
     }
 
-    // 4. Merge them together
-    const merged = (guilds || []).map(g => {
-        const sub = subMap[g.guild_id] || {};
-        // Use guild_name from subscriptions first, then guild_settings, then fallback
-        const guildName = sub.guild_name || g.guild_name || null;
-        return {
-            id: sub.id || g.id,
-            guild_id: g.guild_id,
-            owner_id: sub.owner_id || g.owner_id,
-            guild_name: guildName,
-            is_active: sub.is_active || false,
-            is_unlimited: sub.is_unlimited || false,
-            unlimited_party: sub.unlimited_party || false,
-            expires_at: sub.expires_at || null,
-            created_at: sub.created_at || g.created_at,
-            updated_at: sub.updated_at || g.updated_at
-        };
-    });
+    // Start with all subscriptions (these have guild_name)
+    const result = subs.map(sub => ({
+        id: sub.id,
+        guild_id: sub.guild_id,
+        owner_id: sub.owner_id,
+        guild_name: sub.guild_name,
+        is_active: sub.is_active || false,
+        is_unlimited: sub.is_unlimited || false,
+        unlimited_party: sub.unlimited_party || false,
+        expires_at: sub.expires_at || null,
+        created_at: sub.created_at,
+        updated_at: sub.updated_at
+    }));
+
+    // Add guild_settings entries that don't exist in subscriptions yet
+    // These are servers that joined but never got a subscription record
+    for (const g of guilds) {
+        if (!subMap[g.guild_id]) {
+            result.push({
+                id: g.id,
+                guild_id: g.guild_id,
+                owner_id: g.owner_id,
+                guild_name: null, // no guild_name in guild_settings table
+                is_active: false,
+                is_unlimited: false,
+                unlimited_party: false,
+                expires_at: null,
+                created_at: g.created_at,
+                updated_at: g.updated_at
+            });
+        }
+    }
 
     // Sort newest first
-    return merged.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    return result.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 }
 
 async function getSubscriptionByGuildId(guildId) {
