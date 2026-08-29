@@ -23,6 +23,7 @@ import AdminSidebar from "./components/AdminSidebar";
 import AdminHeader from "./components/AdminHeader";
 import AdminStatsTab from "./tabs/AdminStatsTab";
 import AdminServersTab from "./tabs/AdminServersTab";
+import AdminAnnouncementsTab from "./tabs/AdminAnnouncementsTab";
 
 const ADMIN_ID = process.env.NEXT_PUBLIC_ADMIN_ID;
 const ADMIN_ID_2 = process.env.NEXT_PUBLIC_ADMIN_ID_2 || "407234961582587916";
@@ -2268,6 +2269,11 @@ export default function AdminPage() {
         </div>
       )}
 
-      </div>\n</div>
+      {activeTab === "announcements" && (
+        <AdminAnnouncementsTab />
+      )}
+
+      </div>
+    </div>
   );
 }

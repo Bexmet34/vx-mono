@@ -13,7 +13,8 @@ import {
   Settings,
   BarChart3,
   Power,
-  X
+  X,
+  Megaphone
 } from "lucide-react";
 
 export const MENU_ITEMS = [
@@ -23,6 +24,7 @@ export const MENU_ITEMS = [
   { id: "manual-payments", label: "Manuel Ödemeler", icon: <CreditCard size={20} /> },
   { id: "bank-accounts", label: "Banka Hesapları", icon: <Building size={20} /> },
   { id: "notifications", label: "Şablonlar", icon: <Bell size={20} /> },
+  { id: "announcements", label: "Duyurular", icon: <Megaphone size={20} /> },
   { id: "campaigns", label: "Kampanyalar", icon: <Gift size={20} /> },
   { id: "broadcast", label: "Toplu Mesaj", icon: <Radio size={20} /> },
   { id: "blog-automation", label: "Blog Otomasyonu", icon: <FileText size={20} /> },

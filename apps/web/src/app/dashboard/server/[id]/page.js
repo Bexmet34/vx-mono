@@ -20,8 +20,10 @@ import GeneralTab from "./components/GeneralTab";
 import VisualTab from "./components/VisualTab";
 import LogSettingsTab from "./components/LogSettingsTab";
 import TemplateTab from "./components/TemplateTab";
-import KillBoardTab from "./components/KillBoardTab";
 import RegistrationTab from "./components/RegistrationTab";
+import PremiumLock from './components/PremiumLock';
+import KillBoardTab from './components/KillBoardTab';
+import AnnouncementsCarousel from '@/components/AnnouncementsCarousel';
 import RoleMenuTab from "./components/RoleMenuTab";
 import TicketTab from "./components/TicketTab";
 import TicketHistoryTab from "./components/TicketHistoryTab";
@@ -651,12 +653,12 @@ export default function ServerSettings() {
           </div>
         </div>
       </nav>
-
+      
       {/* Main Content Area - Full width on Mobile, padded on Desktop */}
       <div className="flex-1 ml-0 md:ml-60 w-full h-[calc(100vh-56px)] overflow-y-auto custom-scrollbar p-3 sm:p-4 md:p-6 pb-28 md:pb-24">
         <main className="w-full max-w-[1200px] mx-auto flex flex-col">
-        <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3 pb-3 md:mb-4 md:pb-4 border-b border-outline-variant/30">
-          <div className="flex items-center gap-3 text-left w-full sm:w-auto">
+        <header className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4 mb-3 pb-3 md:mb-4 md:pb-4 border-b border-outline-variant/30">
+          <div className="flex items-center gap-3 text-left w-full xl:w-auto">
             {/* Mobile Back Button */}
             <Link
               href="/dashboard"
@@ -703,6 +705,9 @@ export default function ServerSettings() {
                  )}
               </div>
             </div>
+          </div>
+          <div className="flex-1 w-full xl:w-auto xl:max-w-md flex justify-end">
+            <AnnouncementsCarousel lang={lang} />
           </div>
         </header>
 
