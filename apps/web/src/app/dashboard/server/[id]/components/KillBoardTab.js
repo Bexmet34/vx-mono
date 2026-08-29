@@ -94,20 +94,6 @@ export default function KillboardTab({ t, settings, setSettings, discordChannels
 
       </div>
 
-      <div className="flex justify-end pt-4 border-t border-outline-variant">
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="px-6 py-2 bg-primary-container text-on-primary-container rounded-sm font-label-bold uppercase tracking-widest hover:brightness-110 transition-all disabled:opacity-50 flex items-center gap-2"
-        >
-          {saving ? (
-            <div className="w-4 h-4 border-2 border-on-primary-container border-t-transparent rounded-full animate-spin" />
-          ) : (
-            <Save size={18} />
-          )}
-          {lang === 'tr' ? 'Değişiklikleri Kaydet' : 'Save Changes'}
-        </button>
-      </div>
     </div>
   );
 }
