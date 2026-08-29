@@ -65,7 +65,7 @@ export async function POST(req, { params }) {
     const { 
       language, embed_thumbnail_url, party_templates,
       log_system_enabled, log_channel_id, log_events, log_exempts,
-      albion_guild_id, albion_guild_name, albion_server, killboard_channel_id, killboard_time,
+      albion_guild_id, albion_guild_name, albion_server,
       registration_enabled, registration_channel_id, registration_staff_role_ids,
       registration_category_id, registration_welcome_message, registration_given_role_id,
       registration_given_role_id_2, registration_given_role_id_3,
@@ -124,8 +124,6 @@ export async function POST(req, { params }) {
           albion_guild_id: albion_guild_id || null,
           albion_guild_name: albion_guild_name || null,
           albion_server: albion_server || 'Europe',
-          killboard_channel_id: killboard_channel_id || null,
-          killboard_time: killboard_time || '06:00',
           registration_enabled: registration_enabled ?? false,
           registration_channel_id: registration_channel_id || null,
           registration_staff_role_ids: registration_staff_role_ids || null,

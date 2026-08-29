@@ -123,8 +123,6 @@ export default function ServerSettings() {
     albion_guild_id: "",
     albion_guild_name: "",
     albion_server: "Europe",
-    killboard_channel_id: "",
-    killboard_time: "06:00",
     registration_enabled: false,
     registration_channel_id: "",
     registration_staff_role_ids: "",
