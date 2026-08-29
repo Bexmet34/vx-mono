@@ -98,9 +98,12 @@ async function processAlbionGuildEvents(client, trackingInfo) {
         // Skip if we already processed it
         if (!isInitialRun && event.EventId <= lastEventId) continue;
         
-        // If it's the first run, we DO NOT send anything. We just initialize the pointer to the newest event.
-        // This prevents sending old kills/deaths when the bot starts.
-        if (isInitialRun) continue;
+        // If it's the first run, process only the 3 most recent events so the user can see it works
+        // without spamming them with 50 old kills.
+        if (isInitialRun) {
+            const isOneOfLastThree = events.indexOf(event) >= events.length - 3;
+            if (!isOneOfLastThree) continue;
+        }
 
         // Is our guild the killer or the victim?
         const isKiller = event.Killer.GuildId === albion_guild_id;
@@ -177,17 +180,19 @@ async function processAlbionGuildEvents(client, trackingInfo) {
         }
       }
 
-      // Update the last event ID in DB if it changed
+      // Update last event ID if it changed
       if (newLastEventId > lastEventId) {
+        console.log(`[Killboard] Guild ${config.guild_id} processing complete. New LastEventID: ${newLastEventId}. Messages sent: ${eventsSent}`);
         await supabase
           .from('guild_settings')
           .update({ killboard_last_event_id: newLastEventId.toString() })
           .eq('guild_id', config.guild_id);
+      } else {
+         // console.log(`[Killboard] Guild ${config.guild_id} check complete. No new events (LastID: ${lastEventId}).`);
       }
     }
-
   } catch (err) {
-    console.error(`[Killboard] Error processing Albion Guild ${albion_guild_id}:`, err);
+    console.error(`[Killboard] Error processing Albion Guild ${trackingInfo.albion_guild_id}:`, err);
   }
 }
 

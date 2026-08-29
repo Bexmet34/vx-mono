@@ -21,8 +21,6 @@ import VisualTab from "./components/VisualTab";
 import LogSettingsTab from "./components/LogSettingsTab";
 import TemplateTab from "./components/TemplateTab";
 import RegistrationTab from "./components/RegistrationTab";
-import PremiumLock from './components/PremiumLock';
-import KillBoardTab from './components/KillBoardTab';
 import AnnouncementsCarousel from '@/components/AnnouncementsCarousel';
 import RoleMenuTab from "./components/RoleMenuTab";
 import TicketTab from "./components/TicketTab";
