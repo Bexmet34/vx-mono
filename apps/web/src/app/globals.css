@@ -7,7 +7,7 @@
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
     scroll-behavior: smooth;
-    scroll-padding-top: 120px;
+    scroll-padding-top: 90px;
   }
   body {
     @apply bg-background text-on-background font-body-md overflow-x-hidden antialiased selection:bg-primary-container selection:text-on-primary;
