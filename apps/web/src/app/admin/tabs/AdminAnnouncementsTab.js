@@ -119,7 +119,8 @@ export default function AdminAnnouncementsTab() {
         </div>
         <button
           onClick={() => openModal()}
-          className="admin-btn"
+          className="admin-btn-primary"
+          style={{padding: '0.8rem 1.5rem', borderRadius: '12px'}}
         >
           <Plus size={14} /> Yeni Duyuru
         </button>
@@ -130,62 +131,82 @@ export default function AdminAnnouncementsTab() {
           <Loader2 className="spin" size={40} color="var(--admin-accent)" />
         </div>
       ) : (
-        <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem'}}>
-          {announcements.map((a) => (
-            <div key={a.id} style={{
-              background: 'var(--admin-card)', 
-              borderRadius: '16px', 
-              border: `1px solid var(--admin-border)`, 
-              overflow: 'hidden',
-              display: 'flex',
-              flexDirection: 'column',
-              opacity: a.is_active ? 1 : 0.6,
-              transition: 'transform 0.3s ease',
-            }}>
-              <div style={{ padding: '1.2rem', borderBottom: '1px solid var(--admin-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.2)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: '700', color: 'var(--admin-text)' }}>
-                  {getTypeIcon(a.type)}
-                  {a.title_tr}
-                </div>
-                <div style={{display: 'flex', gap: '0.5rem'}}>
-                   <button onClick={() => openModal(a)} className="admin-action-btn">
-                     <Edit3 size={14} />
-                   </button>
-                   <button onClick={() => handleDelete(a.id)} className="admin-action-btn danger">
-                     <Trash2 size={14} />
-                   </button>
-                </div>
-              </div>
-              <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <p style={{ fontSize: '0.85rem', color: 'var(--admin-text-muted)', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                  {a.content_tr || 'İçerik yok.'}
-                </p>
-                <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem', color: 'var(--admin-text-muted)', paddingTop: '1rem' }}>
-                  <span>{new Date(a.created_at).toLocaleString('tr-TR')}</span>
-                  {a.is_active ? <span className="admin-badge badge-active" style={{padding: '0.2rem 0.6rem'}}>Aktif</span> : <span className="admin-badge badge-passive" style={{padding: '0.2rem 0.6rem'}}>Pasif</span>}
-                </div>
-              </div>
-            </div>
-          ))}
-          {announcements.length === 0 && (
-             <div style={{gridColumn: '1 / -1', textAlign: 'center', padding: '4rem', color: 'var(--admin-text-muted)', background: 'var(--admin-card)', borderRadius: '16px', border: '1px solid var(--admin-border)'}}>
-               Henüz duyuru eklenmemiş.
-             </div>
-          )}
+        <div className="admin-card">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>BAŞLIK (TR / EN)</th>
+                <th>TİP</th>
+                <th>TARİH</th>
+                <th>DURUM</th>
+                <th style={{textAlign: "right"}}>İŞLEMLER</th>
+              </tr>
+            </thead>
+            <tbody>
+              {announcements.length === 0 ? (
+                <tr>
+                  <td colSpan={5} style={{textAlign: 'center', padding: '4rem', opacity: 0.5}}>
+                    Henüz duyuru eklenmemiş.
+                  </td>
+                </tr>
+              ) : (
+                announcements.map((a) => (
+                  <tr key={a.id} style={{ opacity: a.is_active ? 1 : 0.6 }}>
+                    <td data-label="BAŞLIK">
+                      <div style={{fontWeight: '700', color: 'var(--admin-text)', marginBottom: '0.2rem'}}>
+                        {a.title_tr}
+                      </div>
+                      <div style={{fontSize: '0.8rem', color: 'var(--admin-text-muted)'}}>
+                        {a.title_en}
+                      </div>
+                    </td>
+                    <td data-label="TİP">
+                      <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', fontWeight: '500'}}>
+                        {getTypeIcon(a.type)}
+                        <span style={{textTransform: 'capitalize'}}>{a.type}</span>
+                      </div>
+                    </td>
+                    <td data-label="TARİH">
+                      <div style={{fontSize: '0.9rem', color: 'var(--admin-text-muted)'}}>
+                        {new Date(a.created_at).toLocaleDateString('tr-TR')}
+                      </div>
+                    </td>
+                    <td data-label="DURUM">
+                      {a.is_active ? (
+                        <span className="admin-badge badge-active">Aktif</span>
+                      ) : (
+                        <span className="admin-badge badge-passive">Pasif</span>
+                      )}
+                    </td>
+                    <td data-label="İŞLEMLER">
+                      <div style={{display: 'flex', gap: '0.5rem', justifyContent: 'flex-end'}}>
+                        <button className="admin-action-btn" onClick={() => openModal(a)}>
+                          <Edit3 size={14} />
+                        </button>
+                        <button className="admin-action-btn danger" onClick={() => handleDelete(a.id)}>
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       )}
 
       {showModal && (
         <div className="admin-modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="admin-modal animate-slide-up" style={{maxWidth: '800px'}} onClick={e => e.stopPropagation()}>
-            <div className="admin-modal-header border-b border-[var(--admin-border)] mb-2 pb-4">
+          <div className="admin-modal animate-slide-up" style={{maxWidth: '800px', maxHeight: '90vh', display: 'flex', flexDirection: 'column'}} onClick={e => e.stopPropagation()}>
+            <div className="admin-modal-header border-b border-[var(--admin-border)] mb-2 pb-4" style={{flexShrink: 0}}>
               <h3 className="admin-modal-title">{editingId ? 'Duyuru Düzenle' : 'Yeni Duyuru Ekle'}</h3>
               <button className="admin-modal-close" onClick={() => setShowModal(false)}>
                 <X size={14} />
               </button>
             </div>
             
-            <div className="admin-modal-body space-y-4" style={{maxHeight: '70vh', overflowY: 'auto'}}>
+            <div className="admin-modal-body space-y-4" style={{overflowY: 'auto', flex: 1, paddingRight: '0.5rem', marginBottom: '1rem'}}>
               <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem'}}>
                 <div>
                   <label className="admin-input-label">TR Başlık</label>
@@ -260,7 +281,7 @@ export default function AdminAnnouncementsTab() {
               </div>
             </div>
 
-            <div className="admin-modal-footer mt-3 pt-4 border-t border-[var(--admin-border)]">
+            <div className="admin-modal-footer mt-3 pt-4 border-t border-[var(--admin-border)]" style={{flexShrink: 0}}>
               <button type="button" className="admin-btn-secondary" onClick={() => setShowModal(false)}>İptal</button>
               <button 
                 type="button"

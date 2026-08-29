@@ -97,6 +97,7 @@ async function generateKillboardImage(event) {
     // [Potion] [Food]
     
     const centerX = xOffset - (iconSize / 2);
+    const equipment = player.Equipment;
     
     // Head
     await drawItem(equipment.Head, centerX, startY);
