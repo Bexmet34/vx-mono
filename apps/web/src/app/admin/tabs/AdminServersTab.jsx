@@ -24,7 +24,7 @@ export default function AdminServersTab({
   const [statusFilter, setStatusFilter] = useState("all");
 
   const filteredServers = (servers || []).filter(s => {
-    if (searchTerm && !s.guild_name.toLowerCase().includes(searchTerm.toLowerCase()) && !s.guild_id.includes(searchTerm) && !s.owner_id.includes(searchTerm)) return false;
+    if (searchTerm && !s.guild_name?.toLowerCase().includes(searchTerm.toLowerCase()) && !s.guild_id.includes(searchTerm) && !s.owner_id.includes(searchTerm)) return false;
     const isExpired = !s.is_unlimited && new Date(s.expires_at) < new Date();
     if (statusFilter === 'premium' && (!s.is_active || s.is_unlimited || isExpired)) return false;
     if (statusFilter === 'unlimited' && !s.is_unlimited) return false;
@@ -33,7 +33,7 @@ export default function AdminServersTab({
     return true;
   });
 
-  const filteredUsers = (users || []).filter(u => !userSearchTerm || (u.discord_id && u.discord_id.includes(userSearchTerm)));
+  const filteredUsers = (Array.isArray(users) ? users : []).filter(u => !userSearchTerm || (u.discord_id && u.discord_id.includes(userSearchTerm)));
 
   const handleScanAutoPremium = async () => {
     setLoading(true);
@@ -439,10 +439,10 @@ export default function AdminServersTab({
                       <td className="px-6 py-4">
                         {u.mutual_guilds && u.mutual_guilds.length > 0 ? (
                           <div className="flex flex-wrap gap-1">
-                            {u.mutual_guilds.slice(0, 3).map((guild, idx) => (
+                            {(Array.isArray(u.mutual_guilds) ? u.mutual_guilds : []).slice(0, 3).map((guild, idx) => (
                               <span key={idx} className="bg-[#2b2d31] text-[#b5bac1] px-2 py-1 rounded-md text-[10px]">{guild}</span>
                             ))}
-                            {u.mutual_guilds.length > 3 && (
+                            {Array.isArray(u.mutual_guilds) && u.mutual_guilds.length > 3 && (
                               <span className="bg-[#2b2d31] text-[#b5bac1] px-2 py-1 rounded-md text-[10px]">+{u.mutual_guilds.length - 3}</span>
                             )}
                           </div>
