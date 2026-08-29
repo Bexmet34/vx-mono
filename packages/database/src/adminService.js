@@ -112,13 +112,16 @@ async function getAllSubscriptions() {
     // 4. Merge them together
     const merged = (guilds || []).map(g => {
         const sub = subMap[g.guild_id] || {};
+        // Use guild_name from subscriptions first, then guild_settings, then fallback
+        const guildName = sub.guild_name || g.guild_name || null;
         return {
             id: sub.id || g.id,
             guild_id: g.guild_id,
-            owner_id: g.owner_id,
-            guild_name: sub.guild_name || 'Bilinmiyor (Görüntülenemedi)',
+            owner_id: sub.owner_id || g.owner_id,
+            guild_name: guildName,
             is_active: sub.is_active || false,
             is_unlimited: sub.is_unlimited || false,
+            unlimited_party: sub.unlimited_party || false,
             expires_at: sub.expires_at || null,
             created_at: sub.created_at || g.created_at,
             updated_at: sub.updated_at || g.updated_at

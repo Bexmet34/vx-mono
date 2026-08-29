@@ -30,7 +30,7 @@ export default function AdminServersTab({
   const getDayAmount = (id) => dayAmounts[id] !== undefined ? dayAmounts[id] : 30;
 
   const filteredServers = (servers || []).filter(s => {
-    if (searchTerm && !s.guild_name.toLowerCase().includes(searchTerm.toLowerCase()) && !s.guild_id.includes(searchTerm) && !s.owner_id.includes(searchTerm)) return false;
+    if (searchTerm && !s.guild_name?.toLowerCase().includes(searchTerm.toLowerCase()) && !s.guild_id?.includes(searchTerm) && !s.owner_id?.includes(searchTerm)) return false;
     const isExpired = !s.is_unlimited && new Date(s.expires_at) < new Date();
     if (statusFilter === 'premium' && (!s.is_active || s.is_unlimited || isExpired)) return false;
     if (statusFilter === 'unlimited' && !s.is_unlimited) return false;
@@ -166,10 +166,10 @@ export default function AdminServersTab({
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#fca311]/20 to-[#fca311]/5 border border-[#fca311]/20 flex items-center justify-center font-bold text-[#fca311]">
-                            {s.guild_name?.charAt(0).toUpperCase() || 'V'}
+                            {(s.guild_name || "?").charAt(0).toUpperCase() || 'V'}
                           </div>
                           <div>
-                            <div className="font-bold text-white">{s.guild_name}</div>
+                            <div className="font-bold text-white">{s.guild_name || "Bilinmiyor"}</div>
                             <div className="text-xs text-[#949ba4] font-mono">{s.guild_id}</div>
                           </div>
                         </div>
@@ -285,10 +285,10 @@ export default function AdminServersTab({
                   <div className="flex items-start justify-between gap-3 pl-2">
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#fca311]/20 to-[#fca311]/5 border border-[#fca311]/20 flex items-center justify-center font-bold text-[#fca311] text-lg shrink-0">
-                        {s.guild_name?.charAt(0).toUpperCase() || 'V'}
+                        {(s.guild_name || "?").charAt(0).toUpperCase() || 'V'}
                       </div>
                       <div className="flex flex-col overflow-hidden">
-                        <h3 className="font-bold text-white text-base truncate pr-2">{s.guild_name}</h3>
+                        <h3 className="font-bold text-white text-base truncate pr-2">{s.guild_name || "Bilinmiyor"}</h3>
                         <div className="text-xs text-[#949ba4] font-mono mt-0.5 truncate">{s.guild_id}</div>
                       </div>
                     </div>
