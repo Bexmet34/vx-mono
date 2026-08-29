@@ -27,7 +27,7 @@ import TicketTab from "./components/TicketTab";
 import TicketHistoryTab from "./components/TicketHistoryTab";
 import EventsHub from "./components/EventsHub";
 import TempVoiceTab from "./components/TempVoiceTab";
-import KillboardTab from "./components/KillboardTab";
+import KillboardTab from "./components/KillBoardTab";
 
 function PremiumLock({ lang, t }) {
   return (
