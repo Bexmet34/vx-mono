@@ -1,6 +1,6 @@
 const { EmbedBuilder, AttachmentBuilder } = require('discord.js');
 const { createDropLog, updateDropMessageId } = require('@veyronix/database');
-const { createCanvas } = require('canvas');
+const { createCanvas } = require('@napi-rs/canvas');
 
 /**
  * dropEngine.js — Drop v2: 8 Haneli Kod Sistemi
