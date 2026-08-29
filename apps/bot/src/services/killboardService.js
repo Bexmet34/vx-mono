@@ -172,10 +172,10 @@ async function processAlbionGuildEvents(client, trackingInfo, globalEvents = [])
         }
 
         // If it's the very first time setting up the guild (lastEventId === 0),
-        // we only process the last 20 events to avoid spamming 50 events instantly.
+        // we only process the last 1 event to avoid spamming 50 events instantly.
         if (lastEventId === 0 && isFirstFetch) {
             const validEvents = events.filter(e => e.Killer?.GuildId === albion_guild_id || e.Victim?.GuildId === albion_guild_id);
-            const isOneOfLastTwenty = validEvents.indexOf(event) >= validEvents.length - 20;
+            const isOneOfLastTwenty = validEvents.indexOf(event) >= validEvents.length - 1;
             if (!isOneOfLastTwenty) {
                sessionProcessedEvents.add(`${configKey}_${event.EventId}`);
                continue;
