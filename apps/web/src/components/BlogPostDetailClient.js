@@ -9,6 +9,13 @@ import AdSenseUnit from "@/components/AdSenseUnit";
 import { LINKS } from '@veyronix/config';
 import { useLanguage } from '@/context/LanguageContext';
 
+const extractText = (node) => {
+  if (!node) return '';
+  if (node.type === 'text') return node.value;
+  if (node.children) return node.children.map(extractText).join('');
+  return '';
+};
+
 export default function BlogPostDetailClient({ post, relatedPosts = [] }) {
   const [copied, setCopied] = useState(false);
   const { lang } = useLanguage();
@@ -135,7 +142,26 @@ export default function BlogPostDetailClient({ post, relatedPosts = [] }) {
         
         {/* Main Markdown Content */}
         <article className="lg:col-span-8 markdown-content">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+          <ReactMarkdown 
+            remarkPlugins={[remarkGfm]}
+            components={{
+              h2: ({node, ...props}) => {
+                const text = extractText(node);
+                const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
+                return <h2 id={id} {...props} />;
+              },
+              h3: ({node, ...props}) => {
+                const text = extractText(node);
+                const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
+                return <h3 id={id} {...props} />;
+              },
+              h4: ({node, ...props}) => {
+                const text = extractText(node);
+                const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
+                return <h4 id={id} {...props} />;
+              }
+            }}
+          >
             {post.content}
           </ReactMarkdown>
 
@@ -178,7 +204,7 @@ export default function BlogPostDetailClient({ post, relatedPosts = [] }) {
                 <BookOpen size={14} />
                 <span>{isTr ? 'İçindekiler' : 'Table of Contents'}</span>
               </div>
-              <nav className="flex flex-col gap-2 text-xs">
+              <nav className="flex flex-col gap-2 text-xs max-h-[65vh] overflow-y-auto pr-2 custom-scrollbar">
                 {headings.map((h, i) => (
                   <a
                     key={i}
@@ -250,6 +276,21 @@ export default function BlogPostDetailClient({ post, relatedPosts = [] }) {
         .markdown-content pre code { background: none; padding: 0; border: none; color: #e2e8f0; }
         .markdown-content img { max-width: 100%; border-radius: 14px; margin: 1.5rem 0; border: 1px solid rgba(255,255,255,0.1); }
         .markdown-content hr { border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 2rem 0; }
+        
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.02);
+          border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(255, 255, 255, 0.2);
+        }
       `}} />
 
     </main>
