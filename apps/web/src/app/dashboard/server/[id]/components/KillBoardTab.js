@@ -1,157 +1,21 @@
 "use client";
 
-import { Search, Loader2, Sword, Send, Eye, ShieldAlert } from "lucide-react";
-import InfoTooltip from "@/components/InfoTooltip";
-import Image from "next/image";
+import { Construction } from "lucide-react";
 
-export default function KillBoardTab({ 
-  t, 
-  lang, 
-  settings, 
-  setSettings, 
-  discordChannels, 
-  killboardPreview, 
-  loadingPreview, 
-  handlePreviewKillBoard, 
-  handleTriggerKillBoard, 
-  triggeringKillBoard,
-  setActiveTab
-}) {
-
-
-
+export default function KillBoardTab({ lang }) {
   return (
-    <div className="grid grid-cols-1 gap-2 animate-slide-up">
-      {/* Search & Select Guild - Moved to General */}
-      {!settings.albion_guild_id && (
-        <div className="glass-panel p-2 relative overflow-visible border border-error/50 bg-error/5 flex flex-col md:flex-row justify-between items-center gap-2">
-          <div>
-            <h2 className="font-headline-lg text-[10px] text-error mb-2 flex items-center gap-2 uppercase tracking-tight"><ShieldAlert /> {lang === 'en' ? 'Action Required' : 'İşlem Gerekiyor'}</h2>
-            <p className="font-body-md text-error/80">{lang === 'en' ? 'Please select an Albion Guild in the General settings before using the KillBoard.' : 'KillBoard kullanmadan önce lütfen Genel ayarlardan bir Albion Loncası seçin.'}</p>
-          </div>
-          <button onClick={() => setActiveTab('general')} className="px-3 py-1.5 bg-error hover:bg-error/80 text-white border border-error rounded-sm font-label-bold uppercase tracking-widest transition-colors whitespace-nowrap">
-            {lang === 'en' ? 'Go to General Settings' : 'Genel Ayarlara Git'}
-          </button>
-        </div>
-      )}
-
-      {/* KillBoard Settings & Triggers */}
-      <div className={`glass-panel p-3 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-all ${!settings.albion_guild_id ? 'opacity-40 pointer-events-none' : ''}`}>
-        <h2 className="font-headline-lg text-[10px] text-on-surface mb-2 flex items-center gap-2 uppercase tracking-tight"><Send className="text-primary-container" /> Discord Integration</h2>
-        <p className="font-body-md text-on-surface-variant mb-3">Where and when should the KillBoard report be posted?</p>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
-          <div>
-            <label className="flex items-center text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
-              Target Channel
-              <InfoTooltip text={lang === 'en' ? 'The Discord channel where the daily killboard report will be sent.' : 'Günlük killboard raporunun atılacağı Discord kanalı.'} />
-            </label>
-            <select 
-              className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md" 
-              value={settings.killboard_channel_id || ""}
-              onChange={(e) => setSettings({ ...settings, killboard_channel_id: e.target.value })}
-            >
-              <option value="">-- Select a Channel --</option>
-              {discordChannels.filter(c => c.type === 0).map(c => (
-                <option key={c.id} value={c.id}>#{c.name}</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="flex items-center text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
-              Daily Post Time (UTC)
-              <InfoTooltip text={lang === 'en' ? 'The time (in UTC) when the daily report will be generated and sent automatically.' : 'Günlük raporun otomatik olarak oluşturulup gönderileceği saat (UTC saat diliminde).'} />
-            </label>
-            <input 
-              type="time" 
-              className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md" 
-              value={settings.killboard_time || "06:00"}
-              onChange={(e) => setSettings({ ...settings, killboard_time: e.target.value })}
-            />
-          </div>
-        </div>
-
-        <div className="flex flex-col sm:flex-row gap-2">
-           <button className="flex-1 px-3 py-1.5 bg-surface-container border border-outline-variant text-on-surface hover:text-primary-container hover:border-primary-container rounded-sm font-label-bold uppercase tracking-widest transition-colors flex items-center justify-center gap-2 disabled:opacity-50" onClick={handlePreviewKillBoard} disabled={!settings.albion_guild_id || loadingPreview || triggeringKillBoard}>
-              {loadingPreview ? <Loader2 size={14} className="animate-spin"/> : <Eye size={14}/>} 
-              Preview Data
-           </button>
-           <button className="flex-1 px-3 py-1.5 bg-primary-container text-on-primary font-label-bold uppercase tracking-widest tactical-glow rounded-sm transition-all hover:brightness-110 flex items-center justify-center gap-2 disabled:opacity-50" onClick={handleTriggerKillBoard} disabled={!settings.albion_guild_id || !settings.killboard_channel_id || triggeringKillBoard || loadingPreview}>
-              {triggeringKillBoard ? <Loader2 size={14} className="animate-spin"/> : <ShieldAlert size={14}/>} 
-              Trigger Now
-           </button>
-        </div>
+    <div className="flex flex-col items-center justify-center p-12 text-center animate-slide-up bg-surface-container-low rounded-xl border border-outline-variant/30">
+      <div className="w-16 h-16 bg-primary-container/20 rounded-full flex items-center justify-center mb-4">
+        <Construction size={32} className="text-primary-container" />
       </div>
-
-      {/* Preview Section */}
-      {killboardPreview && (
-        <div className="glass-panel p-3 relative overflow-visible border border-primary-container/30 animate-slide-up">
-          <h2 className="font-headline-lg text-[10px] text-on-surface mb-3 uppercase tracking-tight">Daily Summary Preview</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-2">
-             <div className="bg-surface-container-lowest border border-outline-variant rounded-sm p-2 text-center">
-               <div className="text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">Total Kills</div>
-               <div className="text-4xl font-headline-xl text-success">{killboardPreview.totalKills || 0}</div>
-             </div>
-             <div className="bg-surface-container-lowest border border-outline-variant rounded-sm p-2 text-center">
-               <div className="text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">Total Deaths</div>
-               <div className="text-4xl font-headline-xl text-error">{killboardPreview.totalDeaths || 0}</div>
-             </div>
-             <div className="bg-surface-container-lowest border border-outline-variant rounded-sm p-2 text-center">
-               <div className="text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">Kill Fame</div>
-               <div className="text-4xl font-headline-xl text-primary-container">{(killboardPreview.totalKillFame || 0).toLocaleString()}</div>
-             </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">
-            <div className="bg-surface-container-lowest border border-outline-variant rounded-sm p-2">
-              <h3 className="font-headline-md text-[10px] text-on-surface mb-2 pb-2 border-b border-outline-variant/50 uppercase tracking-tight">⚔️ Top Killers</h3>
-              {killboardPreview.topKillers && killboardPreview.topKillers.length > 0 ? (
-                killboardPreview.topKillers.map((k, i) => (
-                  <div key={k.name} className="flex justify-between items-center mb-2 font-body-md">
-                    <span className="text-on-surface-variant">
-                      {['🥇', '🥈', '🥉'][i] || '🏅'} <a href={`https://albiononline.com/en/killboard/player/${k.id}`} target="_blank" rel="noopener noreferrer" className="text-on-surface-variant hover:text-primary-container transition-colors ml-1">{k.name}</a>
-                    </span>
-                    <span className="font-label-bold text-success text-[10px]">{k.kills} Kills</span>
-                  </div>
-                ))
-              ) : (
-                <div className="text-[10px] font-body-md text-on-surface-variant">No kills recorded.</div>
-              )}
-            </div>
-
-            <div className="bg-surface-container-lowest border border-outline-variant rounded-sm p-2">
-              <h3 className="font-headline-md text-[10px] text-on-surface mb-2 pb-2 border-b border-outline-variant/50 uppercase tracking-tight">💀 Top Deaths</h3>
-              {killboardPreview.topDeaths && killboardPreview.topDeaths.length > 0 ? (
-                killboardPreview.topDeaths.map((d, i) => (
-                  <div key={d.name} className="flex justify-between items-center mb-2 font-body-md">
-                    <span className="text-on-surface-variant">
-                      {['🥇', '🥈', '🥉'][i] || '🏅'} <a href={`https://albiononline.com/en/killboard/player/${d.id}`} target="_blank" rel="noopener noreferrer" className="text-on-surface-variant hover:text-error transition-colors ml-1">{d.name}</a>
-                    </span>
-                    <span className="font-label-bold text-error text-[10px]">{d.deaths} Deaths</span>
-                  </div>
-                ))
-              ) : (
-                <div className="text-[10px] font-body-md text-on-surface-variant">No deaths recorded.</div>
-              )}
-            </div>
-          </div>
-
-          {killboardPreview.topFameKill && (
-            <div className="bg-primary-container/5 border border-primary-container/30 rounded-sm p-2 mb-3">
-              <h3 className="font-headline-md text-[10px] text-primary-container mb-2 uppercase tracking-tight">💰 Most Valuable Kill</h3>
-              <div className="font-body-md text-on-surface text-[10px]">
-                <span className="font-label-bold text-success">{killboardPreview.topFameKill.killer}</span> killed <span className="font-label-bold text-error">{killboardPreview.topFameKill.victim}</span>
-              </div>
-              <div className="font-headline-md text-primary-container mt-2">
-                +{(killboardPreview.topFameKill.fame || 0).toLocaleString()} Fame
-              </div>
-            </div>
-          )}
-          
-          <p className="text-[10px] font-body-md text-on-surface-variant">Note: This preview mirrors the actual Discord post data.</p>
-        </div>
-      )}
+      <h2 className="text-2xl font-headline-xl text-on-surface mb-2 font-bold tracking-tight">
+        {lang === 'en' ? 'Under Construction' : 'Yapım Aşamasında'}
+      </h2>
+      <p className="text-on-surface-variant font-body-md max-w-md mx-auto">
+        {lang === 'en' 
+          ? 'We are developing a brand new KillBoard system. This feature will be available soon!' 
+          : 'Yepyeni bir KillBoard sistemi geliştiriyoruz. Bu özellik çok yakında burada aktif olacak!'}
+      </p>
     </div>
   );
 }

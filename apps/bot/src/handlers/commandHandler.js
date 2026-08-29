@@ -511,44 +511,6 @@ async function handleSetupGuildCommand(interaction) {
 /**
  * Handles /setup-killboard command
  */
-async function handleSetupKillBoardCommand(interaction) {
-    const guildConfig = await getGuildConfig(interaction.guildId);
-    const lang = guildConfig?.language || 'tr';
-
-    // Check Subscription
-    const isPremium = await isSubscriptionActive(interaction.guildId, interaction.guild.name, interaction.guild.ownerId);
-    if (!isPremium) {
-        return await safeReply(interaction, {
-            content: lang === 'tr'
-                ? `❌ **Bu özellik Veyronix Premium gerektirir!**\n\nGünlük otomatik KillBoard özet raporlarını aktifleştirmek için web panelimiz üzerinden sunucunuzu premium pakete yükseltin.`
-                : `❌ **This feature requires Veyronix Premium!**\n\nTo activate daily automatic KillBoard summary reports, upgrade your server to premium via our web panel.`,
-            flags: [MessageFlags.Ephemeral]
-        });
-    }
-
-    const channel = interaction.options.getChannel('kanal');
-    const time = interaction.options.getString('saat') || '06:00'; // Default 06:00 UTC
-
-    const success = await updateGuildConfig(interaction.guildId, {
-        killboard_channel_id: channel.id,
-        killboard_time: time
-    });
-
-    if (success) {
-        return await safeReply(interaction, {
-            content: lang === 'tr'
-                ? `✅ **KillBoard ayarlandı!**\nKanal: <#${channel.id}>\nSaat: **${time} UTC**`
-                : `✅ **KillBoard configured!**\nChannel: <#${channel.id}>\nTime: **${time} UTC**`,
-            flags: [MessageFlags.Ephemeral]
-        });
-    } else {
-        return await safeReply(interaction, {
-            content: `❌ **${t('common.error', lang)}**`,
-            flags: [MessageFlags.Ephemeral]
-        });
-    }
-}
-
 /**
  * Handles /setup-registration command
  */
@@ -879,7 +841,6 @@ module.exports = {
 
     handleSetupObjectiveSystemCommand,
     handleSetupGuildCommand,
-    handleSetupKillBoardCommand,
     handleSetupRegistrationCommand,
     handleForceRegistrationCommand,
     handleFixRegistrationCommand,

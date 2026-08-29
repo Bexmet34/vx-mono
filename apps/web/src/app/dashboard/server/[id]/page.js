@@ -163,9 +163,7 @@ export default function ServerSettings() {
   const [guildSearchResults, setGuildSearchResults] = useState([]);
   const [searchingGuild, setSearchingGuild] = useState(false);
   const [discordChannels, setDiscordChannels] = useState([]);
-  const [triggeringKillBoard, setTriggeringKillBoard] = useState(false);
-  const [killboardPreview, setKillboardPreview] = useState(null);
-  const [loadingPreview, setLoadingPreview] = useState(false);
+
   const [guildDetail, setGuildDetail] = useState(null);
   const [thumbError, setThumbError] = useState(null);
   const [uploadingThumb, setUploadingThumb] = useState(false);
@@ -214,8 +212,6 @@ export default function ServerSettings() {
           albion_guild_id: s?.albion_guild_id || "",
           albion_guild_name: s?.albion_guild_name || "",
           albion_server: s?.albion_server || "Europe",
-          killboard_channel_id: s?.killboard_channel_id || "",
-          killboard_time: s?.killboard_time || "06:00",
           registration_enabled: s?.registration_enabled || false,
           registration_channel_id: s?.registration_channel_id || "",
           registration_staff_role_ids: s?.registration_staff_role_ids || "",
@@ -429,67 +425,6 @@ export default function ServerSettings() {
     }
   };
 
-  const handleTriggerKillBoard = async () => {
-    if (!settings.albion_guild_id || !settings.killboard_channel_id) {
-      showToast(lang === "en" ? "Please set guild and channel first!" : "Önce lonca ve kanalı ayarlayın!", "error");
-      return;
-    }
-
-    setTriggeringKillBoard(true);
-    try {
-      const res = await fetch(`/api/killboard/trigger/${guildId}`, { method: "POST" });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Trigger failed");
-      }
-      
-      showToast(lang === "en" ? "Triggering KillBoard... Please wait." : "KillBoard tetikleniyor... Lütfen bekleyin.", "success");
-
-      let isDone = false;
-      let attempts = 0;
-      while (!isDone && attempts < 35) { // max ~70s wait
-        await new Promise(r => setTimeout(r, 2000));
-        const checkRes = await fetch(`/api/guild-settings/${guildId}`);
-        if (checkRes.ok) {
-           const checkData = await checkRes.json();
-           if (checkData.settings && checkData.settings.trigger_killboard === false) {
-              isDone = true;
-           }
-        }
-        attempts++;
-      }
-      
-      if (isDone) {
-        showToast(lang === "en" ? "KillBoard posted successfully!" : "KillBoard başarıyla kanala gönderildi!", "success");
-      } else {
-        showToast(lang === "en" ? "Taking too long. Process continues in background." : "İşlem uzun sürdü, arka planda devam ediyor.", "warning");
-      }
-
-    } catch (err) {
-      showToast(err.message, "error");
-    } finally {
-      setTriggeringKillBoard(false);
-    }
-  };
-
-  const handlePreviewKillBoard = async () => {
-    if (!settings.albion_guild_id) {
-      showToast("Önce bir lonca seçin!", "error");
-      return;
-    }
-    setLoadingPreview(true);
-    setKillboardPreview(null);
-    try {
-      const res = await fetch(`/api/killboard/preview/${settings.albion_guild_id}?server=${settings.albion_server || 'Europe'}`);
-      const data = await res.json();
-      if (res.ok) setKillboardPreview(data);
-      else throw new Error(data.error || "Veri çekilemedi");
-    } catch (err) {
-      showToast(err.message, "error");
-    } finally {
-      setLoadingPreview(false);
-    }
-  };
 
   const checkImage = (url) => {
     const img = new Image();
@@ -809,7 +744,7 @@ export default function ServerSettings() {
         )}
 
         {activeTab === 'killboard' && (
-          <KillBoardTab t={t} lang={lang} settings={settings} setSettings={setSettings} discordChannels={discordChannels} isPremium={isPremium} handleSave={handleSave} saving={saving} guildId={guildId} handleTriggerKillBoard={handleTriggerKillBoard} triggeringKillBoard={triggeringKillBoard} handlePreviewKillBoard={handlePreviewKillBoard} loadingPreview={loadingPreview} killboardPreview={killboardPreview} />
+          <KillBoardTab lang={lang} />
         )}
 
         {activeTab === 'registration' && (

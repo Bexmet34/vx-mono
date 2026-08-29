@@ -89,19 +89,7 @@ const commands = [
                 .setAutocomplete(true))
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
-    new SlashCommandBuilder()
-        .setName('setup-killboard')
-        .setDescription('Günlük KillBoard özetinin atılacağı kanalı ve saati ayarlar.')
-        .addChannelOption(option => 
-            option.setName('kanal')
-                .setDescription('KillBoard özetinin atılacağı kanal')
-                .setRequired(true))
-        .addStringOption(option => 
-            option.setName('saat')
-                .setDescription('Bildirim saati (UTC olarak, Örn: 06:00, 23:00)')
-                .setRequired(false))
-        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
-    
+
     new SlashCommandBuilder()
         .setName('setup-registration')
         .setDescription('Kayıt sistemini bu kanalda başlatır | Starts the registration system in this channel.')

@@ -8,7 +8,7 @@ const { getSupportServerLink } = require('./utils/settingsUtils');
 const fs = require('fs');
 const path = require('path');
 const { registerCommands } = require('./services/commandRegistration');
-const { handleHelpCommand, handleVoteCommand, handleClosePartyCommand, handleSettingsCommand, handleServersCommand, handleSubscriptionCommand, handleSubscriptionSelect, handleSubscriptionModal, handleSetupObjectiveSystemCommand, handleSetupGuildCommand, handleSetupKillBoardCommand, handleMyPointsCommand, handleDropLeaderboardCommand } = require('./handlers/commandHandler');
+const { handleHelpCommand, handleVoteCommand, handleClosePartyCommand, handleSettingsCommand, handleServersCommand, handleSubscriptionCommand, handleSubscriptionSelect, handleSubscriptionModal, handleSetupObjectiveSystemCommand, handleSetupGuildCommand, handleMyPointsCommand, handleDropLeaderboardCommand } = require('./handlers/commandHandler');
 
 const { handleCreatePartyCommand, handleTempCommand, handleTempAutocomplete, handleMyTempsCommand } = require('./handlers/partikurHandler');
 
@@ -102,7 +102,6 @@ client.once('clientReady', async (c) => {
     const { initDbListeners } = require('./services/dbListenerService');
     const { startBroadcastWorker } = require('./services/broadcastService');
     const { initObjectiveService } = require('./services/objectiveService');
-    const { initKillBoardService } = require('./services/killboardService');
     const { startScheduledMessageService } = require('./services/scheduledMessageService');
     const { initTempRoleService } = require('./services/tempRoleService');
 
@@ -114,7 +113,6 @@ client.once('clientReady', async (c) => {
         initDbListeners(client);
         startBroadcastWorker(client);
         initObjectiveService(client);
-        initKillBoardService(client);
         startScheduledMessageService(client);
         initTempRoleService(client);
         console.log('[PrimaryShard] Background services initialized.');
@@ -253,8 +251,7 @@ client.on('interactionCreate', async interaction => {
                 await handleSetupObjectiveSystemCommand(interaction);
             } else if (interaction.commandName === 'setup-guild') {
                 await handleSetupGuildCommand(interaction);
-            } else if (interaction.commandName === 'setup-killboard') {
-                await handleSetupKillBoardCommand(interaction);
+
             } else if (interaction.commandName === 'setup-registration') {
                 const { handleSetupRegistrationCommand } = require('./handlers/commandHandler');
                 await handleSetupRegistrationCommand(interaction);
