@@ -260,6 +260,14 @@ function startCronService(client) {
             console.error('[CronService] Auto Party Cleanup Error:', e.message);
         }
     });
+
+    // --- Killboard Check (Every 2 minutes) ---
+    cron.schedule('*/2 * * * *', async () => {
+        const { runKillboardCheck } = require('./killboardService');
+        await runKillboardCheck(client).catch(err => {
+            console.error('[CronService] Killboard Check Error:', err);
+        });
+    });
 }
 
 /**

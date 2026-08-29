@@ -27,6 +27,7 @@ import TicketTab from "./components/TicketTab";
 import TicketHistoryTab from "./components/TicketHistoryTab";
 import EventsHub from "./components/EventsHub";
 import TempVoiceTab from "./components/TempVoiceTab";
+import KillboardTab from "./components/KillboardTab";
 
 function PremiumLock({ lang, t }) {
   return (
@@ -156,6 +157,8 @@ export default function ServerSettings() {
     application_questions: [],
     tempvoice_creators: [],
     content_close_roles: "",
+    killboard_kill_channel_id: "",
+    killboard_death_channel_id: "",
   });
   
   const [guildSearchQuery, setGuildSearchQuery] = useState("");
@@ -525,7 +528,7 @@ export default function ServerSettings() {
       category: lang === 'tr' ? 'ALBION & SES' : 'ALBION & VOICE',
       items: [
         { id: 'tempvoice', label: 'VoiceForge', icon: Headphones, isBeta: true },
-        { id: 'killboard', label: lang === 'tr' ? 'KillBoard' : 'KillBoard', icon: Crosshair },
+        { id: 'killboard', label: 'Killboard', icon: Skull, isBeta: false },
         { id: 'templates', label: lang === 'tr' ? 'Parti Şablonları' : 'Party Templates', icon: Copy },
         { id: 'events', label: lang === 'tr' ? 'Etkinlikler' : 'Events', icon: Sparkles },
       ]

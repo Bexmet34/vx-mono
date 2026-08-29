@@ -25,7 +25,7 @@
     "@veyronix/config": "workspace:*",
     "@veyronix/database": "workspace:*",
     "better-sqlite3": "^12.9.0",
-    "canvas": "^3.2.3",
+    "@napi-rs/canvas": "^0.1.53",
     "cors": "^2.8.6",
     "discord.js": "^14.16.3",
     "dotenv": "^17.2.3",

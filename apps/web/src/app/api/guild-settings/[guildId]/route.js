@@ -83,7 +83,7 @@ export async function POST(req, { params }) {
       ticket_options, auto_delete_party_hours, content_close_roles,
       application_enabled, registration_rules_text, application_questions,
       registration_button_type, registration_rules_text_en,
-      tempvoice_creators
+      tempvoice_creators, killboard_kill_channel_id, killboard_death_channel_id
     } = body;
 
     let mergedTempVoiceCreators = [];
@@ -164,6 +164,8 @@ export async function POST(req, { params }) {
           registration_rules_text: registration_rules_text || null,
           application_questions: Array.isArray(application_questions) ? application_questions : [],
           tempvoice_creators: mergedTempVoiceCreators,
+          killboard_kill_channel_id: killboard_kill_channel_id || null,
+          killboard_death_channel_id: killboard_death_channel_id || null,
           ...(needsTempVoiceSetup ? { trigger_tempvoice_setup: true } : {})
         },
         { onConflict: 'guild_id' }
