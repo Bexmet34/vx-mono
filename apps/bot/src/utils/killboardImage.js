@@ -202,8 +202,8 @@ async function generateKillboardImage(event) {
   ctx.textAlign = 'center';
   ctx.fillText('VS', centerX, vsY - 40);
 
-  // Ortadaki Alt Bilgiler (Fame, Party, Tarih) - Binek hizasına (Y: ~650) indirildi
-  const infoY = 650;
+  // Ortadaki Alt Bilgiler (Fame, Party, Tarih) - Bot ve yemek hizasının altına indirildi
+  const infoY = 700;
 
   // Fame Kartı
   const fame = event.TotalVictimKillFame || event.KillFame || 0;
@@ -213,8 +213,8 @@ async function generateKillboardImage(event) {
   roundRect(centerX - 160, infoY - 60, 320, 85, 12, '#261a0c', '#c5a059');
   
   ctx.fillStyle = '#f59e0b';
-  // Fame yazısı 54px'e düşürüldü
-  ctx.font = '900 54px sans-serif';
+  // Fame yazısı 48px'e düşürüldü
+  ctx.font = '900 48px sans-serif';
   ctx.fillText(`+${fameStr}`, centerX, infoY + 5);
 
   // Parti Boyutu & Tarih Bilgisi (Öncekinden büyük, Fame'den küçük)
