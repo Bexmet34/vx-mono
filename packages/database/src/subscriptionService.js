@@ -48,6 +48,10 @@ async function getSubscription(guildId, guildName, ownerId) {
         const expiresAt = new Date();
         expiresAt.setDate(expiresAt.getDate() + 3);
 
+        if (ownerId && ownerId !== 'Unknown') {
+            await supabase.from('users').upsert([{ id: ownerId }], { onConflict: 'id' });
+        }
+
         const { data: newData, error: insertError } = await supabase
             .from('subscriptions')
             .insert([
