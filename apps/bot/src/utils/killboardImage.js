@@ -12,7 +12,7 @@ const path = require('path');
 async function generateKillboardImage(event) {
   // Dimensions for the canvas
   const width = 1200;
-  const height = 600;
+  const height = 850;
   
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext('2d');
@@ -54,9 +54,9 @@ async function generateKillboardImage(event) {
     ctx.fillText(`IP: ${Math.round(player.AverageItemPower)}`, xOffset, 145);
 
     // Equipment Icons
-    const equipment = player.Equipment;
-    const iconSize = 80;
-    const spacing = 10;
+    const iconSize = 96;
+    const spacing = 12;
+    const startY = 160;
     
     const drawItem = async (item, x, y) => {
       if (!item) {
@@ -99,24 +99,24 @@ async function generateKillboardImage(event) {
     const centerX = xOffset - (iconSize / 2);
     
     // Head
-    await drawItem(equipment.Head, centerX, 180);
+    await drawItem(equipment.Head, centerX, startY);
     
     // Row 2: MainHand, Armor, OffHand
-    await drawItem(equipment.MainHand, centerX - iconSize - spacing, 180 + iconSize + spacing);
-    await drawItem(equipment.Armor, centerX, 180 + iconSize + spacing);
-    await drawItem(equipment.OffHand, centerX + iconSize + spacing, 180 + iconSize + spacing);
+    await drawItem(equipment.MainHand, centerX - iconSize - spacing, startY + iconSize + spacing);
+    await drawItem(equipment.Armor, centerX, startY + iconSize + spacing);
+    await drawItem(equipment.OffHand, centerX + iconSize + spacing, startY + iconSize + spacing);
     
     // Row 3: Shoes
-    await drawItem(equipment.Shoes, centerX, 180 + (iconSize + spacing) * 2);
+    await drawItem(equipment.Shoes, centerX, startY + (iconSize + spacing) * 2);
 
     // Row 4: Cape, Bag, Mount
-    await drawItem(equipment.Cape, centerX - iconSize - spacing, 180 + (iconSize + spacing) * 3);
-    await drawItem(equipment.Bag, centerX, 180 + (iconSize + spacing) * 3);
-    await drawItem(equipment.Mount, centerX + iconSize + spacing, 180 + (iconSize + spacing) * 3);
+    await drawItem(equipment.Cape, centerX - iconSize - spacing, startY + (iconSize + spacing) * 3);
+    await drawItem(equipment.Bag, centerX, startY + (iconSize + spacing) * 3);
+    await drawItem(equipment.Mount, centerX + iconSize + spacing, startY + (iconSize + spacing) * 3);
 
     // Row 5: Potion, Food
-    await drawItem(equipment.Potion, centerX - (iconSize/2) - spacing/2, 180 + (iconSize + spacing) * 4);
-    await drawItem(equipment.Food, centerX + (iconSize/2) + spacing/2, 180 + (iconSize + spacing) * 4);
+    await drawItem(equipment.Potion, centerX - (iconSize/2) - spacing/2, startY + (iconSize + spacing) * 4);
+    await drawItem(equipment.Food, centerX + (iconSize/2) + spacing/2, startY + (iconSize + spacing) * 4);
   };
 
   // Draw Killer (Left)
@@ -154,7 +154,52 @@ async function generateKillboardImage(event) {
   const dateStr = dateObj.toLocaleString('en-US', { timeZone: 'UTC' }) + ' UTC';
   ctx.fillStyle = '#64748b';
   ctx.font = '18px sans-serif';
-  ctx.fillText(dateStr, width / 2, height - 30);
+  ctx.fillText(dateStr, width / 2, height / 2 + 100);
+
+  // Draw Victim Inventory
+  if (event.Victim.Inventory) {
+    const inventory = event.Victim.Inventory.filter(i => i !== null);
+    if (inventory.length > 0) {
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = 'bold 20px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText("Victim's Inventory", width / 2, height - 120);
+
+      const invIconSize = 72;
+      const invSpacing = 10;
+      const maxItems = 12;
+      const itemsToDraw = inventory.slice(0, maxItems);
+      
+      const totalInvWidth = itemsToDraw.length * invIconSize + (itemsToDraw.length - 1) * invSpacing;
+      let startX = (width - totalInvWidth) / 2;
+      
+      for (const item of itemsToDraw) {
+        try {
+          const quality = item.Quality > 1 ? `?quality=${item.Quality}` : '';
+          const imgUrl = `https://render.albiononline.com/v1/item/${item.Type}.png${quality}`;
+          const img = await loadImage(imgUrl);
+          
+          ctx.fillStyle = '#272732';
+          ctx.strokeStyle = '#3f3f4e';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(startX + invIconSize/2, height - 90 + invIconSize/2, invIconSize/2, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.drawImage(img, startX, height - 90, invIconSize, invIconSize);
+          
+          if (item.Count > 1) {
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 14px sans-serif';
+            ctx.textAlign = 'right';
+            ctx.fillText(item.Count.toString(), startX + invIconSize - 4, height - 90 + invIconSize - 4);
+          }
+        } catch(e) {}
+        startX += invIconSize + invSpacing;
+      }
+    }
+  }
 
   return canvas.toBuffer('image/png');
 }

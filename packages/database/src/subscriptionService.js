@@ -42,7 +42,9 @@ async function getSubscription(guildId, guildName, ownerId) {
             .single();
 
         if (insertError) {
-            console.error('[SubscriptionService] Trial Create Error:', insertError.message);
+            if (insertError.code !== '23503') {
+                console.error('[SubscriptionService] Trial Create Error:', insertError.message);
+            }
             return null;
         }
 

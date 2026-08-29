@@ -92,14 +92,15 @@ async function processAlbionGuildEvents(client, trackingInfo) {
       const isInitialRun = lastEventId === 0;
 
       for (const event of events) {
+        // Track the highest ID seen so far
+        if (event.EventId > newLastEventId) newLastEventId = event.EventId;
+
         // Skip if we already processed it
         if (!isInitialRun && event.EventId <= lastEventId) continue;
         
-        // If it's the first run, we only want to send the very latest event to avoid spamming 50 messages
-        if (isInitialRun && eventsSent >= 1) {
-            if (event.EventId > newLastEventId) newLastEventId = event.EventId;
-            continue;
-        }
+        // If it's the first run, we DO NOT send anything. We just initialize the pointer to the newest event.
+        // This prevents sending old kills/deaths when the bot starts.
+        if (isInitialRun) continue;
 
         // Is our guild the killer or the victim?
         const isKiller = event.Killer.GuildId === albion_guild_id;
@@ -145,15 +146,23 @@ async function processAlbionGuildEvents(client, trackingInfo) {
           }
         }
 
+        const fameNum = event.TotalVictimKillFame || event.KillFame || 0;
         const embed = new EmbedBuilder()
+          .setAuthor({ name: 'Albion Online PvP Event' })
           .setTitle(embedTitle)
           .setColor(color)
+          .setDescription(
+            `**Katil:** [${event.Killer.GuildName || 'Yok'}] ${event.Killer.Name} \`(IP: ${Math.round(event.Killer.AverageItemPower)})\`\n` +
+            `**Kurban:** [${event.Victim.GuildName || 'Yok'}] ${event.Victim.Name} \`(IP: ${Math.round(event.Victim.AverageItemPower)})\`\n\n` +
+            `🎯 **Fame:** ${fameNum.toLocaleString()} | 👥 **Katılımcı:** ${event.Participants ? event.Participants.length : 1}`
+          )
           .setImage('attachment://killboard.png')
           .setURL(`https://albiononline.com/en/killboard/kill/${event.EventId}`)
-          .setTimestamp(new Date(event.TimeStamp));
+          .setTimestamp(new Date(event.TimeStamp))
+          .setFooter({ text: 'Veyronix Albion System' });
 
         if (assistText) {
-          embed.addFields({ name: 'Assists', value: assistText, inline: false });
+          embed.addFields({ name: '🤝 Asistler', value: assistText, inline: false });
         }
 
         try {
