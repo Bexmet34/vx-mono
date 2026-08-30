@@ -25,7 +25,7 @@ export default function AdminServersTab({
   const [statusFilter, setStatusFilter] = useState("all");
 
   const filteredServers = (servers || []).filter(s => {
-    if (searchTerm && !s.guild_name?.toLowerCase().includes(searchTerm.toLowerCase()) && !s.guild_id.includes(searchTerm) && !s.owner_id.includes(searchTerm)) return false;
+    if (searchTerm && !s.guild_name?.toLowerCase().includes(searchTerm.toLowerCase()) && !s.guild_id.includes(searchTerm) && !(s.owner_id && s.owner_id.includes(searchTerm))) return false;
     const isExpired = !s.is_unlimited && new Date(s.expires_at) < new Date();
     if (statusFilter === 'premium' && (!s.is_active || s.is_unlimited || isExpired)) return false;
     if (statusFilter === 'unlimited' && !s.is_unlimited) return false;
@@ -43,9 +43,27 @@ export default function AdminServersTab({
       const data = await res.json();
       if (data.success) {
         showToast(`Tarama tamamlandı! ${data.revokedCount || 0} kişinin otomatik premiumu iptal edildi.`, "success");
-        fetchUsers();
+        fetchUsers(true);
       } else {
         showToast("Tarama sırasında bir hata oluştu.", "error");
+      }
+    } catch (e) {
+      showToast("Bağlantı hatası.", "error");
+    }
+    setLoading(false);
+  };
+
+  const handleCleanServers = async () => {
+    if (!confirm("Botun bulunmadığı tüm sunucular veritabanından kalıcı olarak silinecektir. Onaylıyor musunuz?")) return;
+    setLoading(true);
+    try {
+      const res = await fetch('/api/admin/clean-servers', { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        showToast(`Temizlik tamamlandı! ${data.deletedCount || 0} adet çöp sunucu veritabanından silindi.`, "success");
+        fetchServers(true);
+      } else {
+        showToast(data.error || "Temizlik sırasında bir hata oluştu.", "error");
       }
     } catch (e) {
       showToast("Bağlantı hatası.", "error");
@@ -117,6 +135,14 @@ export default function AdminServersTab({
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
+            <button 
+              onClick={handleCleanServers}
+              disabled={loading}
+              className="w-full sm:w-auto px-4 py-2.5 bg-red-500/10 hover:bg-red-500/20 text-red-500 font-semibold rounded-xl border border-red-500/30 transition-colors flex items-center justify-center gap-2 h-[44px]"
+            >
+              {loading ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
+              <span>Çöp Sunucuları Temizle</span>
+            </button>
           </div>
 
           {/* Filters */}

@@ -120,13 +120,17 @@ export async function PATCH(req) {
       let fetchedOwner = null;
       let fetchedName = "Bilinmeyen Sunucu";
       try {
-          const guildRes = await fetch(`https://discord.com/api/v10/guilds/${guildId}`, {
-              headers: { 'Authorization': `Bot ${process.env.DISCORD_BOT_TOKEN}` }
-          });
-          if (guildRes.ok) {
-              const gData = await guildRes.json();
-              fetchedOwner = gData.owner_id;
-              fetchedName = gData.name;
+          const botApiUrl = process.env.BOT_API_URL || "http://localhost:3005";
+          const botRes = await fetch(`${botApiUrl}/api/bot-guilds`);
+          if (botRes.ok) {
+              const bData = await botRes.json();
+              if (bData.success && bData.guilds) {
+                  const targetGuild = bData.guilds.find(g => g.id === guildId);
+                  if (targetGuild) {
+                      fetchedOwner = targetGuild.owner_id;
+                      fetchedName = targetGuild.name;
+                  }
+              }
           }
       } catch (e) {
           console.error("Guild fetch error fallback:", e);
