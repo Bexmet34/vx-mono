@@ -111,24 +111,24 @@ export default function AdminPage() {
 
   const isAdmin = session?.user?.id === ADMIN_ID || session?.user?.id === ADMIN_ID_2;
 
-  const fetchTemplates = useCallback(async () => {
-    setLoading(true);
+  const fetchTemplates = useCallback(async (silent = false) => {
+    if (!silent) setLoading(true);
     try {
       const res = await fetch("/api/admin/notifications");
       const data = await res.json();
       if (res.ok) setTemplates(data);
     } catch (err) { console.error(err); }
-    finally { setLoading(false); }
+    finally { if (!silent) setLoading(false); }
   }, []);
 
-  const fetchServers = useCallback(async () => {
-    setLoading(true);
+  const fetchServers = useCallback(async (silent = false) => {
+    if (!silent) setLoading(true);
     try {
       const res = await fetch("/api/admin/servers");
       const data = await res.json();
       if (res.ok) setServers(data);
     } catch (err) { console.error(err); }
-    finally { setLoading(false); }
+    finally { if (!silent) setLoading(false); }
   }, []);
 
   const fetchCampaigns = useCallback(async () => {
@@ -201,14 +201,14 @@ export default function AdminPage() {
     finally { setLoading(false); }
   }, []);
 
-  const fetchUsers = useCallback(async () => {
-    setLoading(true);
+  const fetchUsers = useCallback(async (silent = false) => {
+    if (!silent) setLoading(true);
     try {
       const res = await fetch("/api/admin/users");
       const data = await res.json();
       if (res.ok) setUsers(data);
     } catch (err) { console.error(err); }
-    finally { setLoading(false); }
+    finally { if (!silent) setLoading(false); }
   }, []);
 
   const fetchRules = useCallback(async () => {
@@ -350,7 +350,7 @@ export default function AdminPage() {
         });
         if (res.ok) {
           showToast("Kullanıcı premium yetkisi silindi!", "success");
-          fetchUsers();
+          fetchUsers(true);
         } else {
           const errData = await res.json();
           showToast(errData.error || "Silme işlemi başarısız.", "error");
@@ -363,7 +363,7 @@ export default function AdminPage() {
         });
         if (res.ok) {
           showToast("Kullanıcı başarıyla güncellendi!", "success");
-          fetchUsers();
+          fetchUsers(true);
         } else {
           const errData = await res.json();
           showToast(errData.error || "Güncelleme başarısız.", "error");
@@ -551,10 +551,32 @@ export default function AdminPage() {
         if (result.updatedData) {
           setServers(prev => prev.map(s => s.guild_id === guildId ? { ...s, ...result.updatedData } : s));
         } else {
-          fetchServers(); // Fallback if data not returned
+          fetchServers(true); // Fallback if data not returned (silent fetch)
         }
         
         setShowDayModal(null);
+      }
+    } catch (err) {
+      showToast(err.message, "error");
+    } finally {
+      setSavingId(null);
+    }
+  };
+
+  const handleDeleteServer = async (guildId) => {
+    if (!confirm("Bu sunucunun tüm abonelik ve yetki kayıtlarını silmek istediğinize emin misiniz? (Freemium olarak görünecektir)")) return;
+    
+    setSavingId(guildId);
+    try {
+      const res = await fetch(`/api/admin/servers?id=${guildId}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        showToast("Sunucu kaydı başarıyla silindi!", "success");
+        fetchServers(true);
+      } else {
+        const err = await res.json();
+        showToast(err.error || "Silinirken hata oluştu.", "error");
       }
     } catch (err) {
       showToast(err.message, "error");
@@ -786,7 +808,7 @@ export default function AdminPage() {
               <AdminAnnouncementsTab />
             )}
 
-            {activeTab === "servers" && <AdminServersTab servers={servers} loading={loading} setLoading={setLoading} fetchServers={fetchServers} showToast={showToast} users={users} fetchUsers={fetchUsers} savingId={savingId} handleServerAction={handleServerAction} handleUserAction={handleUserAction} setShowRulesModal={setShowRulesModal} setShowUserModal={setShowUserModal} userSearchTerm={userSearchTerm} setUserSearchTerm={setUserSearchTerm} />}
+            {activeTab === "servers" && <AdminServersTab servers={servers} loading={loading} setLoading={setLoading} fetchServers={fetchServers} showToast={showToast} users={users} fetchUsers={fetchUsers} savingId={savingId} handleServerAction={handleServerAction} handleDeleteServer={handleDeleteServer} handleUserAction={handleUserAction} setShowRulesModal={setShowRulesModal} setShowUserModal={setShowUserModal} userSearchTerm={userSearchTerm} setUserSearchTerm={setUserSearchTerm} />}
         {/* PLANS TAB */}
             {activeTab === "plans" && (
               <div className="animate-slide-up">

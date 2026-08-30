@@ -13,6 +13,7 @@ export default function AdminServersTab({
   fetchUsers,
   savingId,
   handleServerAction,
+  handleDeleteServer,
   handleUserAction,
   setShowRulesModal,
   setShowUserModal,
@@ -159,9 +160,13 @@ export default function AdminServersTab({
                     <tr key={s.id} className={`hover:bg-[#2b2d31]/30 transition-colors ${isPassive ? 'opacity-50' : ''}`}>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#fca311]/20 to-[#fca311]/5 border border-[#fca311]/20 flex items-center justify-center font-bold text-[#fca311]">
-                            {s.guild_name?.charAt(0).toUpperCase() || 'V'}
-                          </div>
+                          {s.guild_icon ? (
+                            <img src={`https://cdn.discordapp.com/icons/${s.guild_id}/${s.guild_icon}.${s.guild_icon.startsWith('a_') ? 'gif' : 'png'}?size=64`} alt="icon" className="w-10 h-10 rounded-xl border border-[#fca311]/20 object-cover" />
+                          ) : (
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#fca311]/20 to-[#fca311]/5 border border-[#fca311]/20 flex items-center justify-center font-bold text-[#fca311]">
+                              {s.guild_name?.charAt(0).toUpperCase() || 'V'}
+                            </div>
+                          )}
                           <div>
                             <div className="font-bold text-white">{s.guild_name}</div>
                             <div className="text-xs text-[#949ba4] font-mono">{s.guild_id}</div>
@@ -201,18 +206,24 @@ export default function AdminServersTab({
                         <div className="flex justify-end gap-2">
                            <button 
                              className="p-2 bg-[#2ecc71]/10 hover:bg-[#2ecc71]/20 text-[#2ecc71] rounded-lg transition-colors border border-transparent hover:border-[#2ecc71]/30 disabled:opacity-50"
-                             title="+30 Gün Ekle" 
+                             title="Özel Gün Ekle" 
                              disabled={savingId === s.guild_id}
-                             onClick={() => handleServerAction(s.guild_id, 'add_days', 30)}
+                             onClick={() => {
+                               const days = window.prompt("Eklenecek gün sayısını girin:", "30");
+                               if (days && !isNaN(days) && parseInt(days) > 0) handleServerAction(s.guild_id, 'add_days', parseInt(days));
+                             }}
                            >
                              {savingId === s.guild_id ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
                            </button>
                            
                            <button 
                              className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors border border-transparent hover:border-red-500/30 disabled:opacity-50"
-                             title="-30 Gün Çıkar" 
+                             title="Özel Gün Çıkar" 
                              disabled={savingId === s.guild_id}
-                             onClick={() => handleServerAction(s.guild_id, 'remove_days', 30)}
+                             onClick={() => {
+                               const days = window.prompt("Çıkarılacak gün sayısını girin:", "30");
+                               if (days && !isNaN(days) && parseInt(days) > 0) handleServerAction(s.guild_id, 'remove_days', parseInt(days));
+                             }}
                            >
                              {savingId === s.guild_id ? <Loader2 size={16} className="animate-spin" /> : <Clock size={16} />}
                            </button>
@@ -243,6 +254,15 @@ export default function AdminServersTab({
                              onClick={() => handleServerAction(s.guild_id, 'toggle_active', !s.is_active)}
                            >
                              {savingId === s.guild_id ? <Loader2 size={16} className="animate-spin" /> : <Power size={16} />}
+                           </button>
+                           
+                           <button 
+                             className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg transition-colors border border-transparent hover:border-red-500/30 disabled:opacity-50"
+                             title="Sunucu Kaydını Sil (Freemium'a Düşür)" 
+                             disabled={savingId === s.guild_id}
+                             onClick={() => handleDeleteServer && handleDeleteServer(s.guild_id)}
+                           >
+                             {savingId === s.guild_id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
                            </button>
                         </div>
                       </td>
@@ -313,10 +333,16 @@ export default function AdminServersTab({
                   
                   {/* Actions mobile */}
                   <div className="flex justify-end gap-2 pt-2 border-t border-[#2b2d31]/50 mt-1">
-                     <button className="p-2 bg-[#2ecc71]/10 text-[#2ecc71] rounded-lg disabled:opacity-50" disabled={savingId === s.guild_id} onClick={() => handleServerAction(s.guild_id, 'add_days', 30)}>
+                     <button className="p-2 bg-[#2ecc71]/10 text-[#2ecc71] rounded-lg disabled:opacity-50" disabled={savingId === s.guild_id} onClick={() => {
+                         const days = window.prompt("Eklenecek gün sayısını girin:", "30");
+                         if (days && !isNaN(days) && parseInt(days) > 0) handleServerAction(s.guild_id, 'add_days', parseInt(days));
+                     }}>
                        {savingId === s.guild_id ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
                      </button>
-                     <button className="p-2 bg-red-500/10 text-red-400 rounded-lg disabled:opacity-50" disabled={savingId === s.guild_id} onClick={() => handleServerAction(s.guild_id, 'remove_days', 30)}>
+                     <button className="p-2 bg-red-500/10 text-red-400 rounded-lg disabled:opacity-50" disabled={savingId === s.guild_id} onClick={() => {
+                         const days = window.prompt("Çıkarılacak gün sayısını girin:", "30");
+                         if (days && !isNaN(days) && parseInt(days) > 0) handleServerAction(s.guild_id, 'remove_days', parseInt(days));
+                     }}>
                        {savingId === s.guild_id ? <Loader2 size={16} className="animate-spin" /> : <Clock size={16} />}
                      </button>
                      <button className={`p-2 rounded-lg disabled:opacity-50 ${s.unlimited_party ? 'bg-[#fca311]/20 text-[#fca311]' : 'bg-[#2b2d31] text-[#949ba4]'}`} disabled={savingId === s.guild_id} onClick={() => handleServerAction(s.guild_id, 'toggle_unlimited_party', !s.unlimited_party)}>
@@ -327,6 +353,9 @@ export default function AdminServersTab({
                      </button>
                      <button className={`p-2 rounded-lg disabled:opacity-50 ${!s.is_active ? 'bg-red-500/20 text-red-400' : 'bg-[#2b2d31] text-[#949ba4]'}`} disabled={s.is_unlimited || savingId === s.guild_id} onClick={() => handleServerAction(s.guild_id, 'toggle_active', !s.is_active)}>
                        {savingId === s.guild_id ? <Loader2 size={16} className="animate-spin" /> : <Power size={16} />}
+                     </button>
+                     <button className="p-2 bg-red-500/10 text-red-500 rounded-lg disabled:opacity-50" disabled={savingId === s.guild_id} onClick={() => handleDeleteServer && handleDeleteServer(s.guild_id)}>
+                       {savingId === s.guild_id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
                      </button>
                   </div>
                 </div>

@@ -14,7 +14,7 @@ function startApiServer(manager, port = process.env.BOT_API_PORT || 3005) {
     app.get('/api/bot-guilds', async (req, res) => {
         try {
             const results = await manager.broadcastEval(client => {
-                return client.guilds.cache.map(g => ({ id: g.id, name: g.name }));
+                return client.guilds.cache.map(g => ({ id: g.id, name: g.name, icon: g.icon, owner_id: g.ownerId }));
             });
             const guilds = results.flat();
             return res.json({ success: true, guilds });

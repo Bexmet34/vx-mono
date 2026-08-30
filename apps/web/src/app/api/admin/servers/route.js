@@ -27,11 +27,35 @@ export async function GET() {
         if (botData?.success && Array.isArray(botData.guilds)) {
           const guildMap = {};
           for (const g of botData.guilds) {
-            guildMap[g.id] = g.name;
+            guildMap[g.id] = g;
           }
+          
+          const dbGuildIds = new Set(data.map(d => d.guild_id));
+
+          // Enhance existing subscriptions
           for (const d of data) {
-            if (!d.guild_name && guildMap[d.guild_id]) {
-              d.guild_name = guildMap[d.guild_id];
+            if (guildMap[d.guild_id]) {
+              d.guild_name = d.guild_name || guildMap[d.guild_id].name;
+              d.guild_icon = guildMap[d.guild_id].icon;
+            }
+          }
+
+          // Add bot guilds that are NOT in the database yet (freemium/unconfigured)
+          for (const g of botData.guilds) {
+            if (!dbGuildIds.has(g.id)) {
+              data.push({
+                id: g.id, 
+                guild_id: g.id,
+                owner_id: null,
+                guild_name: g.name,
+                guild_icon: g.icon,
+                is_active: false,
+                is_unlimited: false,
+                unlimited_party: false,
+                expires_at: null,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+              });
             }
           }
         }
@@ -45,6 +69,36 @@ export async function GET() {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
   return NextResponse.json(data);
+}
+
+}
+
+export async function DELETE(req) {
+  const session = await getServerSession(authOptions);
+  const isAdmin = session?.user?.id === ADMIN_ID || session?.user?.id === "407234961582587916";
+  if (!isAdmin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  try {
+    const { searchParams } = new URL(req.url);
+    const guildId = searchParams.get('id');
+    if (!guildId) return NextResponse.json({ error: "Missing ID" }, { status: 400 });
+
+    const supabase = require('@veyronix/database').getClient();
+
+    // Sadece subscription kaydını silelim (ayarlar durabilir veya onları da silebiliriz, plan dahilinde tüm premium siliyoruz)
+    const { error: subError } = await supabase
+        .from('subscriptions')
+        .delete()
+        .eq('guild_id', guildId);
+        
+    if (subError) throw subError;
+
+    // Ayrıca freemium için settings tablosundan da silebiliriz, ancak guild_settings sunucu ayarlarıdır. Şimdilik sadece subsriptions siliyoruz.
+    
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
 }
 
 export async function PATCH(req) {
