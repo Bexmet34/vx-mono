@@ -26,7 +26,8 @@ export default function AdminServersTab({
 
   const filteredServers = (servers || []).filter(s => {
     if (searchTerm && !s.guild_name?.toLowerCase().includes(searchTerm.toLowerCase()) && !s.guild_id.includes(searchTerm) && !(s.owner_id && s.owner_id.includes(searchTerm))) return false;
-    const isExpired = !s.is_unlimited && new Date(s.expires_at) < new Date();
+    const isFarFuture = s.expires_at && new Date(s.expires_at).getFullYear() > new Date().getFullYear() + 2;
+    const isExpired = !s.is_unlimited && (!s.expires_at || new Date(s.expires_at) <= new Date() || s.trial_used === true || isFarFuture);
     if (statusFilter === 'premium' && (!s.is_active || s.is_unlimited || isExpired)) return false;
     if (statusFilter === 'unlimited' && !s.is_unlimited) return false;
     if (statusFilter === 'passive' && s.is_active) return false;
@@ -180,7 +181,9 @@ export default function AdminServersTab({
               </thead>
               <tbody className="divide-y divide-[#2b2d31]">
                 {filteredServers.map(s => {
-                  const isExpired = !s.is_unlimited && new Date(s.expires_at) < new Date();
+                  const isFarFuture = s.expires_at && new Date(s.expires_at).getFullYear() > new Date().getFullYear() + 2;
+                  const isExpired = !s.is_unlimited && (!s.expires_at || new Date(s.expires_at) <= new Date() || s.trial_used === true || isFarFuture);
+                  const remainingDays = s.expires_at ? Math.max(0, Math.ceil((new Date(s.expires_at) - new Date()) / (1000 * 60 * 60 * 24))) : 0;
                   const isPassive = !s.is_active;
                   return (
                     <tr key={s.id} className={`hover:bg-[#2b2d31]/30 transition-colors ${isPassive ? 'opacity-50' : ''}`}>
@@ -220,7 +223,7 @@ export default function AdminServersTab({
                             <>
                               <span className="bg-[#5865F2]/10 text-[#5865F2] px-2 py-1 rounded-md text-xs font-bold border border-[#5865F2]/20">Premium</span>
                               <span className="text-[10px] text-[#949ba4] flex items-center gap-1 font-semibold">
-                                <Clock size={10} /> {Math.ceil((new Date(s.expires_at) - new Date()) / (1000 * 60 * 60 * 24))} Gün Kaldı
+                                <Clock size={10} /> {remainingDays} Gün Kaldı
                               </span>
                             </>
                           ) : (
@@ -301,7 +304,9 @@ export default function AdminServersTab({
           {/* Mobile Cards (Visible only on lg <) */}
           <div className="lg:hidden flex flex-col gap-4">
             {filteredServers.map(s => {
-              const isExpired = !s.is_unlimited && new Date(s.expires_at) < new Date();
+              const isFarFuture = s.expires_at && new Date(s.expires_at).getFullYear() > new Date().getFullYear() + 2;
+              const isExpired = !s.is_unlimited && (!s.expires_at || new Date(s.expires_at) <= new Date() || s.trial_used === true || isFarFuture);
+              const remainingDays = s.expires_at ? Math.max(0, Math.ceil((new Date(s.expires_at) - new Date()) / (1000 * 60 * 60 * 24))) : 0;
               const isPassive = !s.is_active;
               return (
                 <div key={s.id} className={`bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 flex flex-col gap-4 relative overflow-hidden ${isPassive ? 'opacity-60' : ''}`}>
@@ -346,7 +351,7 @@ export default function AdminServersTab({
                           <>
                             <span className="bg-[#5865F2]/10 text-[#5865F2] px-2 py-0.5 rounded text-xs font-bold">Premium</span>
                             <span className="text-[10px] text-[#949ba4] flex items-center gap-1 font-semibold">
-                              <Clock size={10} /> {Math.ceil((new Date(s.expires_at) - new Date()) / (1000 * 60 * 60 * 24))} Gün Kaldı
+                              <Clock size={10} /> {remainingDays} Gün Kaldı
                             </span>
                           </>
                         ) : (

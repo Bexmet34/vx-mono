@@ -182,13 +182,14 @@ export async function PATCH(req) {
       const farFuture = new Date();
       farFuture.setFullYear(farFuture.getFullYear() + 100);
       updateData.expires_at = farFuture.toISOString();
+      templateId = 'sub_unlimited';
     } else {
       updateData.is_unlimited = false;
-      if (!currentSub.expires_at) {
-        updateData.expires_at = new Date().toISOString();
-      }
+      // Sınırsız premium kapatıldığında 100 yıllık gün kalmaması için süreyi bugüne çekiyoruz
+      updateData.expires_at = new Date().toISOString();
+      updateData.trial_used = true;
+      templateId = 'sub_suspended';
     }
-    templateId = isUnlimited ? 'sub_unlimited' : 'sub_extended';
   } else if (action === 'toggle_unlimited_party') {
     updateData.unlimited_party = !!value;
     if (!currentSub.expires_at) {

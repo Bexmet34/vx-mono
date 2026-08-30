@@ -145,20 +145,33 @@ async function addSubscriptionDays(guildId, days) {
  * Sets unlimited subscription
  */
 async function setUnlimitedSubscription(guildId, value = true) {
-    const farFuture = new Date();
-    farFuture.setFullYear(farFuture.getFullYear() + 100);
+    if (value) {
+        const farFuture = new Date();
+        farFuture.setFullYear(farFuture.getFullYear() + 100);
 
-    const { error } = await supabase
-        .from('subscriptions')
-        .update({ 
-            is_unlimited: value, 
-            is_active: true,
-            trial_used: false,
-            expires_at: farFuture.toISOString(),
-            updated_at: new Date().toISOString() 
-        })
-        .eq('guild_id', guildId);
-    return !error;
+        const { error } = await supabase
+            .from('subscriptions')
+            .update({ 
+                is_unlimited: true, 
+                is_active: true,
+                trial_used: false,
+                expires_at: farFuture.toISOString(),
+                updated_at: new Date().toISOString() 
+            })
+            .eq('guild_id', guildId);
+        return !error;
+    } else {
+        const { error } = await supabase
+            .from('subscriptions')
+            .update({ 
+                is_unlimited: false, 
+                trial_used: true,
+                expires_at: new Date().toISOString(),
+                updated_at: new Date().toISOString() 
+            })
+            .eq('guild_id', guildId);
+        return !error;
+    }
 }
 
 /**
