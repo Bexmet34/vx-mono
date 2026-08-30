@@ -11,6 +11,49 @@ function startApiServer(manager, port = process.env.BOT_API_PORT || 3005) {
     app.use(cors());
     app.use(express.json());
 
+    app.get('/api/bot-guilds', async (req, res) => {
+        try {
+            const results = await manager.broadcastEval(client => {
+                return client.guilds.cache.map(g => ({ id: g.id, name: g.name }));
+            });
+            const guilds = results.flat();
+            return res.json({ success: true, guilds });
+        } catch (error) {
+            console.error('API /bot-guilds Error:', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+    });
+
+    app.get('/api/user/:userId', async (req, res) => {
+        try {
+            // Pick the first shard to fetch the user
+            const results = await manager.broadcastEval(async (client, context) => {
+                try {
+                    const u = await client.users.fetch(context.userId);
+                    if (u) {
+                        return {
+                            id: u.id,
+                            username: u.username,
+                            global_name: u.globalName || u.username,
+                            avatar: u.avatar
+                        };
+                    }
+                } catch(e) { return null; }
+                return null;
+            }, { context: { userId: req.params.userId } });
+
+            const user = results.find(r => r !== null);
+            if (user) {
+                return res.json({ success: true, user });
+            } else {
+                return res.status(404).json({ error: 'Not found' });
+            }
+        } catch (error) {
+            console.error('API /user Error:', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+    });
+
     app.get('/api/mutual-guilds/:userId', async (req, res) => {
         const userId = req.params.userId;
         if (!userId) return res.status(400).json({ error: 'Missing userId' });

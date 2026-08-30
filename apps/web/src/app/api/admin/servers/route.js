@@ -20,15 +20,15 @@ export async function GET() {
     
     // Enrich with actual guild names for freemium servers
     try {
-      const token = process.env.DISCORD_TOKEN || process.env.DISCORD_BOT_TOKEN;
-      if (token) {
-        const res = await fetch('https://discord.com/api/v10/users/@me/guilds', {
-          headers: { 'Authorization': `Bot ${token}` }
-        });
-        if (res.ok) {
-          const guilds = await res.json();
+      const botApiUrl = process.env.BOT_API_URL || 'http://localhost:3005';
+      const res = await fetch(`${botApiUrl}/api/bot-guilds`, {
+        next: { revalidate: 300 }
+      });
+      if (res.ok) {
+        const botData = await res.json();
+        if (botData?.success && Array.isArray(botData.guilds)) {
           const guildMap = {};
-          for (const g of guilds) {
+          for (const g of botData.guilds) {
             guildMap[g.id] = g.name;
           }
           for (const d of data) {

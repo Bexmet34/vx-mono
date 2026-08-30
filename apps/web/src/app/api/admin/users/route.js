@@ -36,19 +36,28 @@ export async function GET() {
   const results = await Promise.allSettled((data || []).map(async (u) => {
     let discordProfile = { username: `Kullanıcı (${u.discord_id})`, avatar_url: null };
     try {
-      const data = await getDiscordUser(u.discord_id);
-      let avatarUrl = null;
-      if (data.avatar) {
-        const isGif = data.avatar.startsWith('a_');
-        avatarUrl = `https://cdn.discordapp.com/avatars/${u.discord_id}/${data.avatar}.${isGif ? 'gif' : 'png'}`;
+      const botApiUrl = process.env.BOT_API_URL || 'http://localhost:3005';
+      const userRes = await fetch(`${botApiUrl}/api/user/${u.discord_id}`);
+      if (userRes.ok) {
+        const userData = await userRes.json();
+        if (userData?.success && userData.user) {
+          const data = userData.user;
+          let avatarUrl = null;
+          if (data.avatar) {
+            const isGif = data.avatar.startsWith('a_');
+            avatarUrl = `https://cdn.discordapp.com/avatars/${u.discord_id}/${data.avatar}.${isGif ? 'gif' : 'png'}`;
+          } else {
+            const defaultIdx = Number((BigInt(u.discord_id) >> 22n) % 6n);
+            avatarUrl = `https://cdn.discordapp.com/embed/avatars/${defaultIdx}.png`;
+          }
+          discordProfile = {
+            username: data.global_name || data.username || `Kullanıcı (${u.discord_id})`,
+            avatar_url: avatarUrl
+          };
+        }
       } else {
-        const defaultIdx = Number((BigInt(u.discord_id) >> 22n) % 6n);
-        avatarUrl = `https://cdn.discordapp.com/embed/avatars/${defaultIdx}.png`;
+         console.error(`[AdminAPI] User fetch from bot api failed for ${u.discord_id}:`, await userRes.text());
       }
-      discordProfile = {
-        username: data.global_name || data.username || `Kullanıcı (${u.discord_id})`,
-        avatar_url: avatarUrl
-      };
     } catch (e) {
       console.error(`[AdminAPI] Failed to get discord user ${u.discord_id}:`, e.message);
     }
