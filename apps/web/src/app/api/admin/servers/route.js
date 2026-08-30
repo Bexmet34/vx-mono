@@ -119,6 +119,19 @@ export async function PATCH(req) {
       // It's a freemium server without a subscription record yet. We will upsert it.
       let fetchedOwner = null;
       let fetchedName = "Bilinmeyen Sunucu";
+      
+      // Database fallback (most reliable for owner_id)
+      try {
+          const supabase = require('@veyronix/database').getClient();
+          const { data: gsData } = await supabase.from('guild_settings').select('owner_id').eq('guild_id', guildId).single();
+          if (gsData && gsData.owner_id) {
+              fetchedOwner = gsData.owner_id;
+          }
+      } catch (e) {
+          console.error("Guild settings fallback error:", e);
+      }
+
+      // Bot API fetch (for name and as secondary fallback)
       try {
           const botApiUrl = process.env.BOT_API_URL || "http://localhost:3005";
           const botRes = await fetch(`${botApiUrl}/api/bot-guilds`);
@@ -127,7 +140,7 @@ export async function PATCH(req) {
               if (bData.success && bData.guilds) {
                   const targetGuild = bData.guilds.find(g => g.id === guildId);
                   if (targetGuild) {
-                      fetchedOwner = targetGuild.owner_id;
+                      if (!fetchedOwner) fetchedOwner = targetGuild.owner_id;
                       fetchedName = targetGuild.name;
                   }
               }
