@@ -83,14 +83,29 @@ export default function GeneralTab({
     }
   };
 
-  const filteredMembers = adminSearch.length > 1
-    ? discordMembers.filter(m => (
+  const filteredMembers = useMemo(() => {
+    if (adminSearch.length < 2) return [];
+    
+    const searchLower = adminSearch.toLowerCase();
+    let results = discordMembers.filter(m => (
         !authorizedUsers.includes(m.id) &&
-        (m.username?.toLowerCase()?.includes(adminSearch.toLowerCase()) || 
-         m.global_name?.toLowerCase()?.includes(adminSearch.toLowerCase()) ||
+        (m.username?.toLowerCase()?.includes(searchLower) || 
+         m.global_name?.toLowerCase()?.includes(searchLower) ||
          m.id?.includes(adminSearch))
-      )).slice(0, 10)
-    : [];
+      )).slice(0, 10);
+
+    // Exact ID fallback for large guilds where member is not in the first 1000
+    if (/^\d{17,20}$/.test(adminSearch) && !authorizedUsers.includes(adminSearch)) {
+        if (!results.find(m => m.id === adminSearch)) {
+            results.push({
+                id: adminSearch,
+                username: "ID ile Eklendi",
+                global_name: `Discord ID: ${adminSearch}`
+            });
+        }
+    }
+    return results;
+  }, [adminSearch, discordMembers, authorizedUsers]);
 
   return (
     <div className="grid grid-cols-1 gap-2 animate-slide-up pb-10">
