@@ -19,15 +19,32 @@ export async function GET(req) {
        return NextResponse.json({ error: "Supabase credentials missing" }, { status: 500 });
     }
 
-    // Fetch subscriptions where owner_id = Discord ID OR authorized_users contains Discord ID
+    // 1. Fetch bot guilds to get real names, icons and owner_ids
+    let botGuildMap = {};
+    try {
+      const botApiUrl = process.env.BOT_API_URL || 'http://localhost:3005';
+      const botRes = await fetch(`${botApiUrl}/api/bot-guilds`);
+      if (botRes.ok) {
+        const botData = await botRes.json();
+        if (botData?.success && Array.isArray(botData.guilds)) {
+          for (const g of botData.guilds) {
+            botGuildMap[g.id] = g;
+          }
+        }
+      }
+    } catch (e) {
+      console.error("[DashboardAPI] Error fetching bot guilds:", e.message);
+    }
+
+    // 2. Fetch subscriptions where owner_id = Discord ID OR authorized_users contains Discord ID
     const { data: subs, error: subError } = await supabase
       .from('subscriptions')
-      .select('id, guild_id, guild_name, expires_at, is_unlimited, is_active, trial_used, authorized_users')
+      .select('id, guild_id, guild_name, expires_at, is_unlimited, is_active, trial_used, authorized_users, unlimited_party')
       .or(`owner_id.eq.${discordId},authorized_users.cs.{${discordId}}`);
 
     if (subError) throw subError;
 
-    // Fetch guild_settings where owner_id = Discord ID
+    // 3. Fetch guild_settings where owner_id = Discord ID
     const { data: settings, error: setError } = await supabase
       .from('guild_settings')
       .select('id, guild_id')
@@ -36,30 +53,67 @@ export async function GET(req) {
     if (setError) throw setError;
 
     const subMap = {};
+    const resultList = [];
+
+    // Add existing subscriptions and enrich names/icons
     for (const sub of (subs || [])) {
       subMap[sub.guild_id] = sub;
+      const bg = botGuildMap[sub.guild_id];
+      const realName = bg?.name || (sub.guild_name && sub.guild_name !== 'Yükleniyor...' && sub.guild_name !== 'Unknown' ? sub.guild_name : `Sunucu (${sub.guild_id})`);
+      
+      resultList.push({
+        ...sub,
+        guild_name: realName,
+        guild_icon: bg?.icon || null
+      });
     }
 
-    const combinedGuilds = [...(subs || [])];
-
-    // Add settings that aren't in subscriptions (freemium)
+    // Add guild_settings that aren't in subscriptions (freemium)
     for (const setting of (settings || [])) {
       if (!subMap[setting.guild_id]) {
-        combinedGuilds.push({
+        const bg = botGuildMap[setting.guild_id];
+        const realName = bg?.name || `Sunucu (${setting.guild_id})`;
+        const freemiumItem = {
           id: setting.id,
           guild_id: setting.guild_id,
-          guild_name: "Yükleniyor...", // The frontend maps real names
-          expires_at: null,
+          guild_name: realName,
+          guild_icon: bg?.icon || null,
+          expires_at: new Date().toISOString(),
           is_unlimited: false,
-          is_active: false,
-          trial_used: false,
+          is_active: true,
+          trial_used: true,
+          unlimited_party: false,
           authorized_users: []
-        });
+        };
+        subMap[setting.guild_id] = freemiumItem;
+        resultList.push(freemiumItem);
       }
     }
 
-    return NextResponse.json(combinedGuilds);
+    // Add bot guilds owned by this user that don't have DB rows yet
+    for (const guildId of Object.keys(botGuildMap)) {
+      const bg = botGuildMap[guildId];
+      if (bg && bg.owner_id === discordId && !subMap[guildId]) {
+        const freemiumItem = {
+          id: bg.id,
+          guild_id: bg.id,
+          guild_name: bg.name || `Sunucu (${bg.id})`,
+          guild_icon: bg.icon || null,
+          expires_at: new Date().toISOString(),
+          is_unlimited: false,
+          is_active: true,
+          trial_used: true,
+          unlimited_party: false,
+          authorized_users: []
+        };
+        subMap[guildId] = freemiumItem;
+        resultList.push(freemiumItem);
+      }
+    }
+
+    return NextResponse.json(resultList);
   } catch (error) {
+    console.error("[DashboardAPI] Error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

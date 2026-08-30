@@ -102,9 +102,9 @@ export async function PATCH(req) {
 
         if (subscription) {
           const now = new Date();
-          let currentExpiry = new Date(subscription.expires_at);
+          let currentExpiry = subscription.expires_at ? new Date(subscription.expires_at) : now;
 
-          if (currentExpiry < now) {
+          if (isNaN(currentExpiry.getTime()) || currentExpiry < now) {
             currentExpiry = now;
           }
 
@@ -113,7 +113,10 @@ export async function PATCH(req) {
           await updateSubscription(subscription.guild_id, { 
               expires_at: currentExpiry.toISOString(),
               is_active: true,
-              is_unlimited: subscription.is_unlimited || false
+              is_unlimited: subscription.is_unlimited || false,
+              trial_used: false,
+              owner_id: subscription.owner_id || payment.user_id || null,
+              updated_at: new Date().toISOString()
             });
 
           console.log(`[Admin Manual Payment] Order ${payment.order_id} approved. Guild ${payment.guild_id} extended by ${payment.duration_days} days.`);
@@ -125,9 +128,11 @@ export async function PATCH(req) {
           await createSubscription({
               guild_id: payment.guild_id,
               guild_name: payment.guild_name || 'Bilinmeyen Sunucu',
+              owner_id: payment.user_id || null,
               expires_at: now.toISOString(),
               is_active: true,
-              is_unlimited: false
+              is_unlimited: false,
+              trial_used: false
             });
           
           console.log(`[Admin Manual Payment] Order ${payment.order_id} approved. Guild ${payment.guild_id} NEW subscription created for ${payment.duration_days} days.`);

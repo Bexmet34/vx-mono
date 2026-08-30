@@ -194,13 +194,22 @@ async function updateSubscription(guildId, updateData) {
 
 async function upsertSubscription(updateData) {
     const supabase = getClient();
+    const safeData = {
+        ...updateData,
+        expires_at: updateData.expires_at || new Date().toISOString(),
+        updated_at: new Date().toISOString()
+    };
     const { data, error } = await supabase
         .from('subscriptions')
-        .upsert(updateData, { onConflict: 'guild_id' })
+        .upsert(safeData, { onConflict: 'guild_id' })
         .select()
         .single();
     if (error) throw error;
     return data;
+}
+
+async function createSubscription(data) {
+    return upsertSubscription(data);
 }
 
 async function getAutoPremiumRules() {
@@ -333,6 +342,7 @@ module.exports = {
     getSubscriptionByGuildId,
     updateSubscription,
     upsertSubscription,
+    createSubscription,
     getAutoPremiumRules,
     getAutoPremiumRulesOnlyGuilds,
     upsertCachedGuildMembers,

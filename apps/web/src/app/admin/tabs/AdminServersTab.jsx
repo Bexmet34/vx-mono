@@ -255,40 +255,39 @@ export default function AdminServersTab({
                            </button>
 
                            <button 
-                             className={`p-2 rounded-lg transition-colors border border-transparent disabled:opacity-50 ${s.unlimited_party ? 'bg-[#fca311]/20 text-[#fca311] border-[#fca311]/30' : 'bg-[#2b2d31] hover:bg-[#383a40] text-[#949ba4] hover:text-white'}`}
-                             title={s.unlimited_party ? 'Sınırsız Party Aç: AÇIK — Kapat' : 'Sınırsız Party Aç: KAPALI — Aç'}
-                             disabled={savingId === s.guild_id}
-                             onClick={() => handleServerAction(s.guild_id, 'toggle_unlimited_party', !s.unlimited_party)}
-                           >
-                             {savingId === s.guild_id ? <Loader2 size={16} className="animate-spin" /> : <Gamepad2 size={16} />}
-                           </button>
-                           
-                           <button 
-                             className={`p-2 rounded-lg transition-colors border border-transparent disabled:opacity-50 ${s.is_unlimited ? 'bg-[#5865F2]/20 text-[#5865F2] border-[#5865F2]/30' : 'bg-[#2b2d31] hover:bg-[#383a40] text-[#949ba4] hover:text-white'}`}
-                             title={!s.is_active ? "Önce aktif etmelisiniz" : "Sınırsız Yap"} 
-                             disabled={!s.is_active || savingId === s.guild_id}
-                             style={{ opacity: !s.is_active ? 0.3 : 1, cursor: !s.is_active ? 'not-allowed' : 'pointer' }}
-                             onClick={() => handleServerAction(s.guild_id, 'toggle_unlimited', !s.is_unlimited)}
-                           >
-                             {savingId === s.guild_id ? <Loader2 size={16} className="animate-spin" /> : <Infinity size={16} />}
-                           </button>
-                           
-                           <button 
-                             className={`p-2 rounded-lg transition-colors border border-transparent disabled:opacity-50 ${!s.is_active ? 'bg-red-500/20 text-red-400 border-red-500/30' : 'bg-[#2b2d31] hover:bg-[#383a40] text-[#949ba4] hover:text-white'}`}
-                             title={s.is_unlimited ? "Süresiz sunucu devre dışı bırakılamaz" : (s.is_active ? "Devre Dışı Bırak" : "Etkinleştir")} 
-                             disabled={s.is_unlimited || savingId === s.guild_id}
-                             onClick={() => handleServerAction(s.guild_id, 'toggle_active', !s.is_active)}
-                           >
-                             {savingId === s.guild_id ? <Loader2 size={16} className="animate-spin" /> : <Power size={16} />}
-                           </button>
-                           
-                           <button 
-                             className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg transition-colors border border-transparent hover:border-red-500/30 disabled:opacity-50"
-                             title="Sunucu Kaydını Sil (Freemium'a Düşür)" 
-                             disabled={savingId === s.guild_id}
-                             onClick={() => handleDeleteServer && handleDeleteServer(s.guild_id)}
-                           >
-                             {savingId === s.guild_id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
+                              className={`p-2 rounded-lg transition-colors border border-transparent disabled:opacity-50 ${s.unlimited_party ? 'bg-[#fca311]/20 text-[#fca311] border-[#fca311]/30 font-bold' : 'bg-[#2b2d31] hover:bg-[#383a40] text-[#949ba4] hover:text-white'}`}
+                              title={s.unlimited_party ? 'Sınırsız Party Aç: AÇIK — Kapat' : 'Sınırsız Party Aç: KAPALI — Aç'}
+                              disabled={savingId === s.guild_id}
+                              onClick={() => handleServerAction(s.guild_id, 'toggle_unlimited_party', !s.unlimited_party)}
+                            >
+                              {savingId === s.guild_id ? <Loader2 size={16} className="animate-spin" /> : <Gamepad2 size={16} />}
+                            </button>
+                            
+                            <button 
+                              className={`p-2 rounded-lg transition-colors border border-transparent disabled:opacity-50 ${s.is_unlimited ? 'bg-gradient-to-r from-[#FF3366]/20 to-[#FF9900]/20 text-[#FF3366] border-[#FF3366]/30 font-bold shadow-sm' : 'bg-[#2b2d31] hover:bg-[#383a40] text-[#949ba4] hover:text-white'}`}
+                              title={s.is_unlimited ? "Sınırsız Premium: AÇIK — Kapat" : "Sınırsız Premium Yap"} 
+                              disabled={savingId === s.guild_id}
+                              onClick={() => handleServerAction(s.guild_id, 'toggle_unlimited', !s.is_unlimited)}
+                            >
+                              {savingId === s.guild_id ? <Loader2 size={16} className="animate-spin" /> : <Infinity size={16} />}
+                            </button>
+                            
+                            <button 
+                              className={`p-2 rounded-lg transition-colors border border-transparent disabled:opacity-50 ${!s.is_active ? 'bg-red-500/20 text-red-400 border-red-500/30' : 'bg-[#2b2d31] hover:bg-[#383a40] text-[#949ba4] hover:text-white'}`}
+                              title={s.is_active ? "Sunucuyu Devre Dışı Bırak" : "Sunucuyu Etkinleştir"} 
+                              disabled={savingId === s.guild_id}
+                              onClick={() => handleServerAction(s.guild_id, 'toggle_active', !s.is_active)}
+                            >
+                              {savingId === s.guild_id ? <Loader2 size={16} className="animate-spin" /> : <Power size={16} />}
+                            </button>
+                            
+                            <button 
+                              className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg transition-colors border border-transparent hover:border-red-500/30 disabled:opacity-50"
+                              title="Sunucu Kaydını Sil (Freemium'a Düşür)" 
+                              disabled={savingId === s.guild_id}
+                              onClick={() => handleDeleteServer && handleDeleteServer(s.guild_id)}
+                            >
+                              {savingId === s.guild_id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
                            </button>
                         </div>
                       </td>
@@ -371,13 +370,13 @@ export default function AdminServersTab({
                      }}>
                        {savingId === s.guild_id ? <Loader2 size={16} className="animate-spin" /> : <Clock size={16} />}
                      </button>
-                     <button className={`p-2 rounded-lg disabled:opacity-50 ${s.unlimited_party ? 'bg-[#fca311]/20 text-[#fca311]' : 'bg-[#2b2d31] text-[#949ba4]'}`} disabled={savingId === s.guild_id} onClick={() => handleServerAction(s.guild_id, 'toggle_unlimited_party', !s.unlimited_party)}>
+                     <button className={`p-2 rounded-lg disabled:opacity-50 ${s.unlimited_party ? 'bg-[#fca311]/20 text-[#fca311] border border-[#fca311]/30 font-bold' : 'bg-[#2b2d31] text-[#949ba4]'}`} title={s.unlimited_party ? 'Sınırsız Party: AÇIK' : 'Sınırsız Party: KAPALI'} disabled={savingId === s.guild_id} onClick={() => handleServerAction(s.guild_id, 'toggle_unlimited_party', !s.unlimited_party)}>
                        {savingId === s.guild_id ? <Loader2 size={16} className="animate-spin" /> : <Gamepad2 size={16} />}
                      </button>
-                     <button className={`p-2 rounded-lg disabled:opacity-50 ${s.is_unlimited ? 'bg-[#5865F2]/20 text-[#5865F2]' : 'bg-[#2b2d31] text-[#949ba4]'}`} disabled={!s.is_active || savingId === s.guild_id} onClick={() => handleServerAction(s.guild_id, 'toggle_unlimited', !s.is_unlimited)}>
+                     <button className={`p-2 rounded-lg disabled:opacity-50 ${s.is_unlimited ? 'bg-gradient-to-r from-[#FF3366]/20 to-[#FF9900]/20 text-[#FF3366] border border-[#FF3366]/30 font-bold' : 'bg-[#2b2d31] text-[#949ba4]'}`} title={s.is_unlimited ? 'Sınırsız: AÇIK' : 'Sınırsız: KAPALI'} disabled={savingId === s.guild_id} onClick={() => handleServerAction(s.guild_id, 'toggle_unlimited', !s.is_unlimited)}>
                        {savingId === s.guild_id ? <Loader2 size={16} className="animate-spin" /> : <Infinity size={16} />}
                      </button>
-                     <button className={`p-2 rounded-lg disabled:opacity-50 ${!s.is_active ? 'bg-red-500/20 text-red-400' : 'bg-[#2b2d31] text-[#949ba4]'}`} disabled={s.is_unlimited || savingId === s.guild_id} onClick={() => handleServerAction(s.guild_id, 'toggle_active', !s.is_active)}>
+                     <button className={`p-2 rounded-lg disabled:opacity-50 ${!s.is_active ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-[#2b2d31] text-[#949ba4]'}`} title={s.is_active ? 'Devre Dışı Bırak' : 'Etkinleştir'} disabled={savingId === s.guild_id} onClick={() => handleServerAction(s.guild_id, 'toggle_active', !s.is_active)}>
                        {savingId === s.guild_id ? <Loader2 size={16} className="animate-spin" /> : <Power size={16} />}
                      </button>
                      <button className="p-2 bg-red-500/10 text-red-500 rounded-lg disabled:opacity-50" disabled={savingId === s.guild_id} onClick={() => handleDeleteServer && handleDeleteServer(s.guild_id)}>

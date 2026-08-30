@@ -36,6 +36,8 @@ async function handlePartiModal(interaction) {
         const isDeveloper = config.WHITELIST_USERS?.includes(userId);
 
         // 0. Subscription & Vote Check
+        const sub = await getSubscription(interaction.guildId, interaction.guild?.name, interaction.guild?.ownerId);
+        const isUnlimitedParty = sub?.unlimited_party === true || sub?.is_unlimited === true;
         const userPremium = await isUserPremium(userId);
         const serverPremium = await isSubscriptionActive(interaction.guildId);
         const needsVote = !(isDeveloper || userPremium || serverPremium);
@@ -72,7 +74,7 @@ async function handlePartiModal(interaction) {
 
         const partyCount = getActivePartyCount(userId);
         let limit = 1;
-        if (isOwner || isDeveloper || userPremium) limit = 999;
+        if (isOwner || isDeveloper || userPremium || isUnlimitedParty || serverPremium) limit = 999;
 
         if (partyCount >= limit) {
             let errorMsg = `❌ **${t('party.already_active', lang)}**\n\n${t('party.limit_desc_normal', lang)}`;

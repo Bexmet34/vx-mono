@@ -547,14 +547,17 @@ export default function AdminPage() {
         const result = await res.json();
         showToast("İşlem başarıyla gerçekleşti!", "success");
         
-        // Update local state instead of full re-fetch
+        // Update local state or silent fetch
         if (result.updatedData) {
           setServers(prev => prev.map(s => s.guild_id === guildId ? { ...s, ...result.updatedData } : s));
         } else {
-          fetchServers(true); // Fallback if data not returned (silent fetch)
+          fetchServers(true);
         }
         
         setShowDayModal(null);
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        showToast(errData.error || "İşlem sırasında bir hata oluştu.", "error");
       }
     } catch (err) {
       showToast(err.message, "error");

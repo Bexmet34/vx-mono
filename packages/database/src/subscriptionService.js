@@ -94,14 +94,14 @@ async function isSubscriptionActive(guildId, guildName, ownerId) {
     const sub = await getSubscription(guildId, guildName, ownerId);
     
     if (!sub) return false;
+    if (sub.is_active === false) return false;
+    if (sub.is_unlimited === true) return true;
 
-    // Must be explicitly premium (unlimited OR paid — not trial)
-    const isPaid = sub.is_unlimited || (sub.trial_used === false);
-    if (!isPaid) return false; // trial_used=true means it's just a trial → not premium
+    // Must be explicitly premium (trial_used=false AND not expired)
+    const isPaid = sub.trial_used === false;
+    if (!isPaid) return false;
 
-    if (!sub.is_active) return false;
-    if (sub.is_unlimited) return true;
-
+    if (!sub.expires_at) return false;
     const expiresAt = new Date(sub.expires_at);
     const now = new Date();
 
@@ -145,11 +145,16 @@ async function addSubscriptionDays(guildId, days) {
  * Sets unlimited subscription
  */
 async function setUnlimitedSubscription(guildId, value = true) {
+    const farFuture = new Date();
+    farFuture.setFullYear(farFuture.getFullYear() + 100);
+
     const { error } = await supabase
         .from('subscriptions')
         .update({ 
             is_unlimited: value, 
             is_active: true,
+            trial_used: false,
+            expires_at: farFuture.toISOString(),
             updated_at: new Date().toISOString() 
         })
         .eq('guild_id', guildId);
