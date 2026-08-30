@@ -24,6 +24,7 @@ import AdminHeader from "./components/AdminHeader";
 import AdminStatsTab from "./tabs/AdminStatsTab";
 import AdminServersTab from "./tabs/AdminServersTab";
 import AdminAnnouncementsTab from "./tabs/AdminAnnouncementsTab";
+import AdminAutoPremiumTab from "./tabs/AdminAutoPremiumTab";
 
 const ADMIN_ID = process.env.NEXT_PUBLIC_ADMIN_ID;
 const ADMIN_ID_2 = process.env.NEXT_PUBLIC_ADMIN_ID_2 || "407234961582587916";
@@ -811,7 +812,30 @@ export default function AdminPage() {
               <AdminAnnouncementsTab />
             )}
 
-            {activeTab === "servers" && <AdminServersTab servers={servers} loading={loading} setLoading={setLoading} fetchServers={fetchServers} showToast={showToast} users={users} fetchUsers={fetchUsers} savingId={savingId} handleServerAction={handleServerAction} handleDeleteServer={handleDeleteServer} handleUserAction={handleUserAction} setShowRulesModal={setShowRulesModal} setShowUserModal={setShowUserModal} userSearchTerm={userSearchTerm} setUserSearchTerm={setUserSearchTerm} />}
+            {activeTab === "servers" && (
+              <AdminServersTab 
+                servers={servers} 
+                loading={loading} 
+                setLoading={setLoading} 
+                fetchServers={fetchServers} 
+                showToast={showToast} 
+                users={users} 
+                fetchUsers={fetchUsers} 
+                savingId={savingId} 
+                handleServerAction={handleServerAction} 
+                handleDeleteServer={handleDeleteServer} 
+                handleUserAction={handleUserAction} 
+                setShowRulesModal={setShowRulesModal} 
+                setShowUserModal={setShowUserModal} 
+                userSearchTerm={userSearchTerm} 
+                setUserSearchTerm={setUserSearchTerm} 
+                onNavigateTab={setActiveTab}
+              />
+            )}
+
+            {activeTab === "auto-premium" && (
+              <AdminAutoPremiumTab showToast={showToast} />
+            )}
         {/* PLANS TAB */}
             {activeTab === "plans" && (
               <div className="animate-slide-up">
@@ -2001,248 +2025,7 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* Bireysel Premium Modal */}
-      {showRulesModal && (
-        <div className="admin-modal-overlay" onClick={() => setShowRulesModal(false)}>
-          <div className="admin-modal animate-slide-up" onClick={e => e.stopPropagation()} style={{ maxWidth: '800px', width: '90%' }}>
-            <div className="admin-modal-header border-b border-[var(--admin-border)] mb-2 pb-4">
-              <h3 className="admin-modal-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Settings size={18} /> Otomatik Premium Kuralları
-              </h3>
-              <button className="admin-modal-close" onClick={() => setShowRulesModal(false)}><X size={14} /></button>
-            </div>
-            
-            <div className="admin-modal-body space-y-6" style={{ maxHeight: '70vh', overflowY: 'auto', paddingRight: '0.5rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h4 style={{ fontSize: '0.95rem', fontWeight: '600', color: 'var(--admin-text)' }}>Mevcut Kurallar</h4>
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  <button 
-                    className="btn-secondary" 
-                    style={{ padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
-                    onClick={handleSyncGuilds}
-                    disabled={isSyncingGuilds}
-                  >
-                    {isSyncingGuilds ? <Loader2 size={14} className="spin" /> : <RefreshCw size={14} />} Üyeleri Senkronize Et
-                  </button>
-                  <button 
-                    className="btn-primary" 
-                    style={{ padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.85rem' }}
-                    onClick={() => {
-                      setEditingRuleId(null);
-                      setNewRule({ id: "", rule_name: "", albion_guilds: "", discord_servers: "", premium_type: "limited", days_to_give: 30 });
-                    }}
-                  >
-                    <Plus size={14} /> Yeni Kural Ekle
-                  </button>
-                </div>
-              </div>
 
-              {autoPremiumRules.length === 0 ? (
-                <div style={{ padding: '2rem', textAlign: 'center', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', color: 'var(--admin-text-muted)' }}>
-                  Henüz kural eklenmemiş.
-                </div>
-              ) : (
-                <div className="table-responsive">
-                  <table className="admin-table">
-                    <thead>
-                      <tr>
-                        <th>KURAL ADI</th>
-                        <th>LONCALAR</th>
-                        <th>SUNUCULAR</th>
-                        <th>TİP / SÜRE</th>
-                        <th style={{ textAlign: 'right' }}>İŞLEMLER</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {autoPremiumRules.map(r => (
-                        <tr key={r.id}>
-                          <td>{r.rule_name}</td>
-                          <td>
-                            <div style={{ display: 'flex', gap: '0.2rem', flexWrap: 'wrap' }}>
-                              {(r.albion_guilds || []).map((g, i) => (
-                                <span key={i} className="admin-badge" style={{background: 'rgba(255,255,255,0.05)', color: 'var(--admin-text-muted)'}}>{g}</span>
-                              ))}
-                            </div>
-                          </td>
-                          <td>
-                            <div style={{ display: 'flex', gap: '0.2rem', flexWrap: 'wrap' }}>
-                              {(r.discord_servers || []).map((s, i) => (
-                                <span key={i} className="admin-badge" style={{background: 'rgba(88,101,242,0.1)', color: '#5865F2'}}>{s}</span>
-                              ))}
-                            </div>
-                          </td>
-                          <td>
-                            {r.premium_type === 'unlimited' ? (
-                               <span className="admin-badge badge-unlimited">Sınırsız</span>
-                            ) : (
-                               <span className="admin-badge badge-active">{r.days_to_give} Gün</span>
-                            )}
-                          </td>
-                          <td style={{ textAlign: 'right', display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
-                            <button 
-                              className="admin-action-btn"
-                              title="Düzenle"
-                              onClick={() => {
-                                setEditingRuleId(r.id);
-                                setNewRule({ 
-                                  id: r.id, 
-                                  rule_name: r.rule_name, 
-                                  albion_guilds: (r.albion_guilds || []).join(", "), 
-                                  discord_servers: (r.discord_servers || []).join(", "), 
-                                  premium_type: r.premium_type, 
-                                  days_to_give: r.days_to_give 
-                                });
-                              }}
-                            >
-                              <Edit3 size={14} />
-                            </button>
-                            <button className="admin-action-btn danger" title="Sil" onClick={() => handleDeleteRule(r.id)}>
-                              <Trash2 size={14} />
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-
-              <div style={{ height: '1px', background: 'var(--admin-border)', margin: '1.5rem 0' }}></div>
-
-              <h4 style={{ fontSize: '0.95rem', fontWeight: '600', color: 'var(--admin-text)', marginBottom: '1rem' }}>
-                {editingRuleId ? 'Kuralı Düzenle' : 'Yeni Kural Ekle'}
-              </h4>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="admin-input-label">Kural Adı</label>
-                  <input 
-                    type="text" 
-                    className="admin-input-field"
-                    value={newRule.rule_name}
-                    onChange={e => setNewRule({...newRule, rule_name: e.target.value})}
-                    placeholder="Örn: Alpha Loncası Premiumu"
-                  />
-                </div>
-
-                <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--admin-border)' }}>
-                  <label className="admin-input-label">Albion Loncası Ara ve Ekle</label>
-                  <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                    <select 
-                      className="admin-input-field"
-                      style={{ width: '120px' }}
-                      value={guildSearchServer}
-                      onChange={e => setGuildSearchServer(e.target.value)}
-                    >
-                      <option value="all">Tümü (Yavaş)</option>
-                      <option value="americas">Americas</option>
-                      <option value="asia">Asia</option>
-                      <option value="europe">Europe</option>
-                    </select>
-                    <input 
-                      type="text" 
-                      className="admin-input-field"
-                      value={guildSearchQuery}
-                      onChange={e => setGuildSearchQuery(e.target.value)}
-                      placeholder="Lonca adını yazın..."
-                      onKeyDown={e => e.key === 'Enter' && handleSearchGuild()}
-                    />
-                    <button 
-                      className="btn-secondary" 
-                      style={{ padding: '0 1rem', borderRadius: '8px', minWidth: '100px' }}
-                      onClick={handleSearchGuild}
-                      disabled={isSearchingGuild}
-                      type="button"
-                    >
-                      {isSearchingGuild ? <Loader2 size={16} className="spin" /> : <Search size={16} />}
-                    </button>
-                  </div>
-                  
-                  {guildSearchResults.length > 0 && (
-                    <div style={{ background: 'rgba(0,0,0,0.5)', borderRadius: '8px', border: '1px solid var(--admin-border)', maxHeight: '150px', overflowY: 'auto', marginBottom: '1rem' }}>
-                      {guildSearchResults.map(g => (
-                        <div 
-                          key={g.Id} 
-                          style={{ padding: '0.5rem 1rem', cursor: 'pointer', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-                          onClick={() => handleAddGuild(g.Name)}
-                          className="admin-tr-hover"
-                        >
-                          <span style={{ fontWeight: '500' }}>{g.Name}</span>
-                          <Plus size={14} style={{ opacity: 0.5 }} />
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  <label className="admin-input-label" style={{ marginTop: '1rem' }}>Zorunlu Albion Loncaları (Seçilenler)</label>
-                  <input 
-                    type="text" 
-                    className="admin-input-field"
-                    value={newRule.albion_guilds}
-                    onChange={e => setNewRule({...newRule, albion_guilds: e.target.value})}
-                    placeholder="Örn: Lonca1, Lonca2, Lonca3"
-                  />
-                  <div style={{ fontSize: '0.75rem', color: 'var(--admin-text-muted)', marginTop: '0.4rem' }}>
-                    Kullanıcı bu loncalardan <strong>EN AZ BİRİNDE</strong> olmalıdır. Manuel olarak da virgülle ekleyebilirsiniz.
-                  </div>
-                </div>
-
-                <div>
-                  <label className="admin-input-label">Zorunlu Discord Sunucuları ID (Virgülle Ayırın)</label>
-                  <input 
-                    type="text" 
-                    className="admin-input-field font-mono"
-                    value={newRule.discord_servers}
-                    onChange={e => setNewRule({...newRule, discord_servers: e.target.value})}
-                    placeholder="Örn: 123456789, 987654321"
-                  />
-                  <div style={{ fontSize: '0.75rem', color: 'var(--admin-text-muted)', marginTop: '0.4rem' }}>
-                    Kullanıcı bu sunucuların <strong>HEPSİNDE</strong> bulunmalıdır. ID'leri kopyalayıp virgülle yapıştırın.
-                  </div>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                  <div>
-                    <label className="admin-input-label">Premium Tipi</label>
-                    <select 
-                      className="admin-input-field"
-                      value={newRule.premium_type}
-                      onChange={e => setNewRule({...newRule, premium_type: e.target.value})}
-                    >
-                      <option value="limited">Süreli (Günlük)</option>
-                      <option value="unlimited">Sınırsız (Ömür Boyu)</option>
-                    </select>
-                  </div>
-                  
-                  {newRule.premium_type === 'limited' && (
-                    <div>
-                      <label className="admin-input-label">Süre (Gün)</label>
-                      <input 
-                        type="number" 
-                        className="admin-input-field"
-                        value={newRule.days_to_give}
-                        onChange={e => setNewRule({...newRule, days_to_give: parseInt(e.target.value) || 0})}
-                        min="1"
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-            
-            <div className="admin-modal-footer">
-              <button className="btn-secondary" onClick={() => setShowRulesModal(false)}>İptal</button>
-              <button 
-                className="btn-primary" 
-                onClick={handleSaveRule}
-                disabled={!newRule.rule_name}
-              >
-                {editingRuleId ? 'Güncelle' : 'Kaydet'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {showUserModal && (
         <div className="admin-modal-overlay" onClick={() => setShowUserModal(false)}>

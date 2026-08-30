@@ -14,12 +14,14 @@ import {
   BarChart3,
   Power,
   X,
-  Megaphone
+  Megaphone,
+  Sparkles
 } from "lucide-react";
 
 export const MENU_ITEMS = [
   { id: "stats", label: "İstatistikler", icon: <BarChart3 size={20} /> },
   { id: "servers", label: "Lisans Yönetimi", icon: <Server size={20} /> },
+  { id: "auto-premium", label: "Otomatik Premium", icon: <Sparkles size={20} /> },
   { id: "plans", label: "Paketler (Plans)", icon: <FileText size={20} /> },
   { id: "manual-payments", label: "Manuel Ödemeler", icon: <CreditCard size={20} /> },
   { id: "bank-accounts", label: "Banka Hesapları", icon: <Building size={20} /> },

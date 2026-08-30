@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Search, Server, Clock, Settings, Plus, RefreshCw, MoreVertical, Edit3, Trash2, Infinity, Power, Gamepad2, Loader2, Calendar } from "lucide-react";
+import { Search, Server, Clock, Settings, Plus, RefreshCw, MoreVertical, Edit3, Trash2, Infinity, Power, Gamepad2, Loader2, Calendar, Sparkles } from "lucide-react";
 
 export default function AdminServersTab({ 
   servers, 
@@ -18,7 +18,8 @@ export default function AdminServersTab({
   setShowRulesModal,
   setShowUserModal,
   userSearchTerm,
-  setUserSearchTerm
+  setUserSearchTerm,
+  onNavigateTab
 }) {
   const [serverSubTab, setServerSubTab] = useState("guilds");
   const [searchTerm, setSearchTerm] = useState("");
@@ -413,16 +414,10 @@ export default function AdminServersTab({
             
             <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0 custom-scrollbar">
               <button 
-                onClick={handleScanAutoPremium}
-                className="shrink-0 flex items-center justify-center gap-2 bg-[#2b2d31] hover:bg-[#383a40] text-white px-4 h-[44px] rounded-xl text-sm font-medium transition-colors border border-[#1e1f22]"
+                onClick={() => onNavigateTab ? onNavigateTab("auto-premium") : (setShowRulesModal && setShowRulesModal(true))}
+                className="shrink-0 flex items-center justify-center gap-2 bg-[#5865F2]/15 hover:bg-[#5865F2]/25 text-[#5865F2] hover:text-white px-4 h-[44px] rounded-xl text-sm font-semibold transition-all border border-[#5865F2]/30 shadow-sm"
               >
-                <RefreshCw size={16} /> Otomatik Tara
-              </button>
-              <button 
-                onClick={() => setShowRulesModal(true)}
-                className="shrink-0 flex items-center justify-center gap-2 bg-[#2b2d31] hover:bg-[#383a40] text-white px-4 h-[44px] rounded-xl text-sm font-medium transition-colors border border-[#1e1f22]"
-              >
-                <Settings size={16} /> Kurallar
+                <Sparkles size={16} /> Otomatik Kurallar
               </button>
               <button 
                 onClick={() => setShowUserModal(true)}
