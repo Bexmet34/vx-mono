@@ -17,6 +17,31 @@ export async function GET() {
   let data;
   try {
     data = await getAllSubscriptions();
+    
+    // Enrich with actual guild names for freemium servers
+    try {
+      const token = process.env.DISCORD_TOKEN || process.env.DISCORD_BOT_TOKEN;
+      if (token) {
+        const res = await fetch('https://discord.com/api/v10/users/@me/guilds', {
+          headers: { 'Authorization': `Bot ${token}` }
+        });
+        if (res.ok) {
+          const guilds = await res.json();
+          const guildMap = {};
+          for (const g of guilds) {
+            guildMap[g.id] = g.name;
+          }
+          for (const d of data) {
+            if (!d.guild_name && guildMap[d.guild_id]) {
+              d.guild_name = guildMap[d.guild_id];
+            }
+          }
+        }
+      }
+    } catch (enrichError) {
+      console.error("[AdminAPI] Error enriching guild names:", enrichError);
+    }
+    
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

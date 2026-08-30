@@ -1,9 +1,10 @@
 export async function checkDiscordPresence(discordId, serverIds) {
     if (!serverIds || serverIds.length === 0) return false;
+    const token = process.env.DISCORD_TOKEN || process.env.DISCORD_BOT_TOKEN;
     for (const guildId of serverIds) {
         try {
             const res = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${discordId}`, {
-                headers: { 'Authorization': `Bot ${process.env.DISCORD_BOT_TOKEN}` }
+                headers: { 'Authorization': `Bot ${token}` }
             });
             if (!res.ok) return false; // Eğer herhangi bir sunucuda yoksa false döner (VE mantığı)
         } catch (e) {
@@ -15,16 +16,18 @@ export async function checkDiscordPresence(discordId, serverIds) {
 }
 
 export async function getDiscordUser(discordId) {
+    const token = process.env.DISCORD_TOKEN || process.env.DISCORD_BOT_TOKEN;
     const res = await fetch(`https://discord.com/api/v10/users/${discordId}`, {
-        headers: { 'Authorization': `Bot ${process.env.DISCORD_BOT_TOKEN}` }
+        headers: { 'Authorization': `Bot ${token}` }
     });
     if (!res.ok) throw new Error(`Discord user API error: ${res.status}`);
     return await res.json();
 }
 
 export async function getGuildMember(guildId, discordId) {
+    const token = process.env.DISCORD_TOKEN || process.env.DISCORD_BOT_TOKEN;
     const res = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${discordId}`, {
-        headers: { 'Authorization': `Bot ${process.env.DISCORD_BOT_TOKEN}` }
+        headers: { 'Authorization': `Bot ${token}` }
     });
     if (!res.ok) throw new Error(`Discord member API error: ${res.status}`);
     return await res.json();

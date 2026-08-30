@@ -49,13 +49,15 @@ export async function GET() {
         username: data.global_name || data.username || `Kullanıcı (${u.discord_id})`,
         avatar_url: avatarUrl
       };
-    } catch (e) {}
+    } catch (e) {
+      console.error(`[AdminAPI] Failed to get discord user ${u.discord_id}:`, e.message);
+    }
     
     let mutualGuilds = [];
     try {
       const botApiUrl = process.env.BOT_API_URL || 'http://localhost:3005';
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 600);
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
       const botRes = await fetch(`${botApiUrl}/api/mutual-guilds/${u.discord_id}`, {
         signal: controller.signal,
         next: { revalidate: 300 }
