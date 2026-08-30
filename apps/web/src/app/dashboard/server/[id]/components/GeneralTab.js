@@ -83,10 +83,14 @@ export default function GeneralTab({
     }
   };
 
-  const filteredMembers = (discordMembers || []).filter(m => 
-    !authorizedUsers.includes(m.id) && 
-    (m.username?.toLowerCase().includes(adminSearch.toLowerCase()) || m.global_name?.toLowerCase().includes(adminSearch.toLowerCase()))
-  ).slice(0, 5);
+  const filteredMembers = adminSearch.length > 1
+    ? discordMembers.filter(m => (
+        !authorizedUsers.includes(m.id) &&
+        (m.username?.toLowerCase()?.includes(adminSearch.toLowerCase()) || 
+         m.global_name?.toLowerCase()?.includes(adminSearch.toLowerCase()) ||
+         m.id?.includes(adminSearch))
+      )).slice(0, 10)
+    : [];
 
   return (
     <div className="grid grid-cols-1 gap-2 animate-slide-up pb-10">

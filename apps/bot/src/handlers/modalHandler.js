@@ -16,7 +16,7 @@ const appSvc = require('../services/applicationService');
 const { buildRolesFields, addFooterFields, createObjectiveEmbed, createPlayerCardEmbed } = require('../builders/embedBuilder');
 const { createObjectiveButtons } = require('../builders/componentBuilder');
 const { parseTimeToMs, getNow } = require('../utils/timeUtils');
-const { getSubscription, isUserPremium } = require('@veyronix/database');
+const { getSubscription, isUserPremium, isSubscriptionActive } = require('@veyronix/database');
 const { addUserTemplate, updateUserTemplate, getUserTemplates } = require('@veyronix/database');
 
 const activeRegistrations = new Set();
@@ -37,7 +37,8 @@ async function handlePartiModal(interaction) {
 
         // 0. Subscription & Vote Check
         const userPremium = await isUserPremium(userId);
-        const needsVote = !(isDeveloper || userPremium);
+        const serverPremium = await isSubscriptionActive(interaction.guildId);
+        const needsVote = !(isDeveloper || userPremium || serverPremium);
 
         await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
 
@@ -187,7 +188,8 @@ async function handleSaveTempModal(interaction) {
 
         const isDeveloper = config.WHITELIST_USERS?.includes(userId);
         const userPremium = await isUserPremium(userId);
-        const limit = (isDeveloper || userPremium) ? 999 : 5;
+        const serverPremium = await isSubscriptionActive(interaction.guildId);
+        const limit = (isDeveloper || userPremium || serverPremium) ? 999 : 5;
 
         const currentTemplates = await getUserTemplates(userId);
         if (currentTemplates.length >= limit) {

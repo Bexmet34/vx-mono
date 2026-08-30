@@ -212,9 +212,10 @@ async function handleTempCommand(interaction) {
     await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
     // 0. Subscription & Vote Check
     const userPremium = await isUserPremium(userId);
+    const serverPremium = await isSubscriptionActive(interaction.guildId);
 
-    // Everyone must vote, EXCEPT developers or global premium users.
-    const needsVote = !(isDeveloper || userPremium);
+    // Everyone must vote, EXCEPT developers, global premium users, or if the server has premium.
+    const needsVote = !(isDeveloper || userPremium || serverPremium);
 
     if (needsVote) {
         let hasVoted = false;

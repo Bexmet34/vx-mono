@@ -288,12 +288,27 @@ async function performServerCleanup(client, source = 'Sistem') {
 
         const deletedServers = [];
 
-        // 2. Check each server
+        // Fetch all guilds across all shards if sharding is enabled
+        let allGuildIds = new Set();
+        if (client.shard) {
+            const results = await client.shard.broadcastEval(c => c.guilds.cache.map(g => g.id));
+            allGuildIds = new Set(results.flat());
+        } else {
+            allGuildIds = new Set(client.guilds.cache.map(g => g.id));
+        }
+
+        // 2. Check each server in subscriptions
         for (const sub of subs) {
-            if (!client.guilds.cache.has(sub.guild_id)) {
-                // Bot is not in this server, delete it
+            if (!allGuildIds.has(sub.guild_id)) {
+                // Bot is not in this server, delete from subscriptions
                 const { error: delError } = await supabase
                     .from('subscriptions')
+                    .delete()
+                    .eq('guild_id', sub.guild_id);
+
+                // Delete from guild_settings so it doesn't show in admin panel
+                await supabase
+                    .from('guild_settings')
                     .delete()
                     .eq('guild_id', sub.guild_id);
 
@@ -303,7 +318,17 @@ async function performServerCleanup(client, source = 'Sistem') {
             }
         }
 
-        // 3. Notify Owner
+        // 3. Check guild_settings for freemium servers that kicked the bot
+        const { data: settingsData } = await supabase.from('guild_settings').select('guild_id');
+        if (settingsData) {
+            for (const setting of settingsData) {
+                if (!allGuildIds.has(setting.guild_id)) {
+                    await supabase.from('guild_settings').delete().eq('guild_id', setting.guild_id);
+                }
+            }
+        }
+
+        // 4. Notify Owner
         if (deletedServers.length > 0) {
             try {
                 const owner = await client.users.fetch(BOT_OWNER_ID);

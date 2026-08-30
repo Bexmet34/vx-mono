@@ -52,9 +52,16 @@ function startBroadcastWorker(client) {
             }
 
             // 2. Başka bir bot/worker aynı mesajı almasın diye durumu 'processing' yap
-            await supabase.from('message_queue')
+            const { data: updatedMsg, error: updateError } = await supabase.from('message_queue')
                 .update({ status: 'processing', updated_at: new Date().toISOString() })
-                .eq('id', msg.id);
+                .eq('id', msg.id)
+                .eq('status', 'pending')
+                .select();
+
+            // Eğer başka bir shard bu mesajı bizden önce aldıysa (update edemediysek) iptal et
+            if (updateError || !updatedMsg || updatedMsg.length === 0) {
+                return;
+            }
 
             try {
                 // 3. Dinamik içerik değişimi: {sunucu} -> sunucu_adi
@@ -140,8 +147,14 @@ function startBroadcastWorker(client) {
                 return;
             }
 
-            // Update to processing
-            await supabase.from('campaign_logs').update({ status: 'sent', sent_at: new Date().toISOString() }).eq('id', log.id);
+            // Update to processing with race condition check
+            const { data: updatedLog, error: updateError } = await supabase.from('campaign_logs')
+                .update({ status: 'sent', sent_at: new Date().toISOString() })
+                .eq('id', log.id)
+                .eq('status', 'pending')
+                .select();
+
+            if (updateError || !updatedLog || updatedLog.length === 0) return;
 
             const lang = sub.language || 'tr';
             const title = lang === 'tr' ? campaign.title_tr : campaign.title_en;
