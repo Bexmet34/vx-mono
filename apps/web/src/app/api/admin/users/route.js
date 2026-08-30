@@ -218,15 +218,15 @@ export async function PATCH(req) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
 
-    let userProfile;
+    let userProfile = null;
     try {
       userProfile = await getUserProfile(discord_id);
     } catch (fetchError) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      console.error(`[AdminAPI] Fetch Error: ${fetchError?.message}`);
     }
 
     if (!userProfile) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      userProfile = { discord_id: discord_id, premium_until: null, is_unlimited: false };
     }
 
     let updateData = {};
@@ -272,7 +272,8 @@ export async function PATCH(req) {
     }
 
     try {
-      await updateUser(discord_id, updateData);
+      updateData.discord_id = discord_id;
+      await upsertUser(updateData);
     } catch (updateError) {
       throw updateError;
     }

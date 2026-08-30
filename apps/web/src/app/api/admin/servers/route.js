@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { getAllSubscriptions, getSubscriptionByGuildId, updateSubscription, queueMessage, getParsedTemplate } from '@veyronix/database';
+import { getAllSubscriptions, getSubscriptionByGuildId, updateSubscription, upsertSubscription, queueMessage, getParsedTemplate } from '@veyronix/database';
 
 export const dynamic = "force-dynamic";
 
@@ -33,15 +33,15 @@ export async function PATCH(req) {
   console.log(`[AdminAPI] Action: ${action}, Guild: ${guildId}, Value: ${value}`);
 
   // 1. Fetch current sub
-  let currentSub;
+  let currentSub = null;
   try {
     currentSub = await getSubscriptionByGuildId(guildId);
   } catch (fetchError) {
     console.error(`[AdminAPI] Fetch Error: ${fetchError?.message}`);
-    return NextResponse.json({ error: "Server not found" }, { status: 404 });
   }
   if (!currentSub) {
-    return NextResponse.json({ error: "Server not found" }, { status: 404 });
+      // It's a freemium server without a subscription record yet. We will upsert it.
+      currentSub = { guild_name: "Bilinmeyen Sunucu" };
   }
 
   let updateData = { updated_at: new Date().toISOString() };
@@ -122,7 +122,8 @@ export async function PATCH(req) {
 
   // 2. Update Subscription
   try {
-    await updateSubscription(guildId, updateData);
+    const upsertData = { guild_id: guildId, ...updateData };
+    await upsertSubscription(upsertData);
   } catch (updateError) {
     console.error(`[AdminAPI] Update Error: ${updateError.message}`);
     return NextResponse.json({ error: updateError.message }, { status: 500 });
