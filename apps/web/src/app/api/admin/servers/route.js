@@ -21,9 +21,7 @@ export async function GET() {
     // Enrich with actual guild names for freemium servers
     try {
       const botApiUrl = process.env.BOT_API_URL || 'http://localhost:3005';
-      const res = await fetch(`${botApiUrl}/api/bot-guilds`, {
-        next: { revalidate: 300 }
-      });
+      const res = await fetch(`${botApiUrl}/api/bot-guilds`);
       if (res.ok) {
         const botData = await res.json();
         if (botData?.success && Array.isArray(botData.guilds)) {
@@ -43,6 +41,7 @@ export async function GET() {
     }
     
   } catch (error) {
+    console.error("[AdminAPI] Fatal Error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
   return NextResponse.json(data);

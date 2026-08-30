@@ -68,8 +68,7 @@ export async function GET() {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000);
       const botRes = await fetch(`${botApiUrl}/api/mutual-guilds/${u.discord_id}`, {
-        signal: controller.signal,
-        next: { revalidate: 300 }
+        signal: controller.signal
       });
       clearTimeout(timeoutId);
       if (botRes.ok) {
