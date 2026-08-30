@@ -119,7 +119,21 @@ export async function PATCH(req) {
   }
   if (!currentSub) {
       // It's a freemium server without a subscription record yet. We will upsert it.
-      currentSub = { guild_name: "Bilinmeyen Sunucu" };
+      let fetchedOwner = null;
+      let fetchedName = "Bilinmeyen Sunucu";
+      try {
+          const guildRes = await fetch(`https://discord.com/api/v10/guilds/${guildId}`, {
+              headers: { 'Authorization': `Bot ${process.env.DISCORD_BOT_TOKEN}` }
+          });
+          if (guildRes.ok) {
+              const gData = await guildRes.json();
+              fetchedOwner = gData.owner_id;
+              fetchedName = gData.name;
+          }
+      } catch (e) {
+          console.error("Guild fetch error fallback:", e);
+      }
+      currentSub = { guild_name: fetchedName, owner_id: fetchedOwner };
   }
 
   let updateData = { updated_at: new Date().toISOString() };
@@ -201,6 +215,15 @@ export async function PATCH(req) {
   // 2. Update Subscription
   try {
     const upsertData = { guild_id: guildId, ...updateData };
+    
+    // If it's a completely new sub being created now, we must ensure required fields are there
+    if (currentSub.owner_id && !upsertData.owner_id) {
+        upsertData.owner_id = currentSub.owner_id;
+    }
+    if (currentSub.guild_name && !upsertData.guild_name) {
+        upsertData.guild_name = currentSub.guild_name;
+    }
+
     await upsertSubscription(upsertData);
   } catch (updateError) {
     console.error(`[AdminAPI] Update Error: ${updateError.message}`);
