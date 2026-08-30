@@ -71,8 +71,6 @@ export async function GET() {
   return NextResponse.json(data);
 }
 
-}
-
 export async function DELETE(req) {
   const session = await getServerSession(authOptions);
   const isAdmin = session?.user?.id === ADMIN_ID || session?.user?.id === "407234961582587916";
