@@ -24,6 +24,64 @@ function startApiServer(manager, port = process.env.BOT_API_PORT || 3005) {
         }
     });
 
+    app.get('/api/guild-data/:guildId', async (req, res) => {
+        const { guildId } = req.params;
+        if (!guildId) return res.status(400).json({ error: 'Missing guildId' });
+
+        try {
+            const results = await manager.broadcastEval(async (client, context) => {
+                const guild = client.guilds.cache.get(context.guildId);
+                if (!guild) return null;
+
+                const channels = guild.channels.cache.map(c => ({
+                    id: c.id,
+                    name: c.name,
+                    type: c.type,
+                    position: c.position,
+                    parentId: c.parentId
+                }));
+
+                const roles = guild.roles.cache
+                    .filter(r => r.name !== '@everyone')
+                    .map(r => ({
+                        id: r.id,
+                        name: r.name,
+                        color: r.color,
+                        position: r.position
+                    }))
+                    .sort((a, b) => b.position - a.position);
+
+                const members = guild.members.cache.map(m => ({
+                    id: m.user.id,
+                    username: m.user.username,
+                    global_name: m.user.globalName || m.user.username,
+                    avatar: m.user.avatar,
+                    bot: m.user.bot || false
+                }));
+
+                return {
+                    id: guild.id,
+                    name: guild.name,
+                    icon: guild.iconURL({ format: 'png', size: 256 }),
+                    owner_id: guild.ownerId,
+                    approximate_member_count: guild.memberCount,
+                    channels,
+                    roles,
+                    members
+                };
+            }, { context: { guildId } });
+
+            const guildData = results.find(r => r !== null);
+            if (guildData) {
+                return res.json({ success: true, ...guildData });
+            }
+            return res.status(404).json({ error: 'Guild not found on any bot shard' });
+        } catch (error) {
+            console.error('[API] /guild-data Error:', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+    });
+
     app.get('/api/user/:userId', async (req, res) => {
         try {
             // Pick the first shard to fetch the user
