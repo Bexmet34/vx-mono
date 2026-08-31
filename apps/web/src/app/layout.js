@@ -89,8 +89,8 @@ export const metadata = {
     title: "Veyronix",
   },
   openGraph: {
-    title: "Veyronix – Discord Kayıt, Geçici Ses Kanalı & Albion Online Botu",
-    description: "Discord sunucunuzu tek bir güçlü botla yönetin: Geçici ses kanalları (VoiceForge), butonlu kayıt & otomatik rol sistemi, ZvZ parti kurucu, Killboard takibi ve web paneli!",
+    title: "Veyronix – Discord Automation, VoiceForge & Community Platform",
+    description: "Empower your Discord server with all-in-one automation: 15-button temporary voice channels (VoiceForge), modal registration & auto-roles, Albion Online ZvZ party finder, live Killboard & web dashboard!",
     url: LINKS.WEBSITE,
     siteName: "Veyronix",
     images: [
@@ -98,17 +98,17 @@ export const metadata = {
         url: LINKS.OG_IMAGE_URL,
         width: 1200,
         height: 630,
-        alt: "Veyronix - Discord Kayıt, Geçici Ses Kanalı ve Albion Online Botu",
+        alt: "Veyronix - Discord Automation & Community Management Platform",
       },
     ],
-    locale: "tr_TR",
-    alternateLocale: ["en_US"],
+    locale: "en_US",
+    alternateLocale: ["tr_TR"],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Veyronix – Discord Kayıt, Geçici Ses Kanalı & Albion Online Botu",
-    description: "Discord sunucunuzu tek bir güçlü botla yönetin: Geçici ses kanalları, butonlu kayıt & otomatik rol sistemi, ZvZ parti kurucu, canlı Killboard ve web paneli!",
+    title: "Veyronix – Discord Automation, VoiceForge & Community Platform",
+    description: "Empower your Discord server with all-in-one automation: 15-button temporary voice channels (VoiceForge), modal registration & auto-roles, ZvZ party finder, live Killboard & web dashboard!",
     images: [LINKS.OG_IMAGE_URL],
   },
   other: {
