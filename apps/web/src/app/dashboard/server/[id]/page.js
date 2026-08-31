@@ -382,43 +382,58 @@ export default function ServerSettings() {
   }, [settings.albion_guild_id, settings.albion_server]);
 
   const handleSave = async () => {
-    // Template validation
-    if (settings.party_templates && settings.party_templates.length > 0) {
-      for (const tpl of settings.party_templates) {
-        if (!tpl.name || !tpl.name.trim()) {
-          showToast(lang === "en" ? "Template name cannot be empty!" : "Şablon adı boş bırakılamaz!", "error");
-          return;
+    // Template validation (only block if user is actively on templates tab)
+    if (activeTab === 'templates') {
+      if (settings.party_templates && settings.party_templates.length > 0) {
+        for (const tpl of settings.party_templates) {
+          if (!tpl.name || !tpl.name.trim()) {
+            showToast(lang === "en" ? "Template name cannot be empty!" : "Şablon adı boş bırakılamaz!", "error");
+            return;
+          }
+          const reqCount = (tpl.required_roles || []).filter(r => r && r.trim()).length;
+          const optCount = (tpl.optional_roles || []).filter(r => r && r.trim()).length;
+          if (reqCount + optCount === 0) {
+            showToast(
+              lang === "en" 
+                ? `Template "${tpl.name}" must have at least one role!` 
+                : `"${tpl.name}" şablonunda en az bir rol bulunmalıdır!`, 
+              "error"
+            );
+            return;
+          }
         }
-        const reqCount = (tpl.required_roles || []).filter(r => r && r.trim()).length;
-        const optCount = (tpl.optional_roles || []).filter(r => r && r.trim()).length;
-        if (reqCount + optCount === 0) {
-          showToast(
-            lang === "en" 
-              ? `Template "${tpl.name}" must have at least one role!` 
-              : `"${tpl.name}" şablonunda en az bir rol bulunmalıdır!`, 
-            "error"
-          );
-          return;
-        }
+      }
+
+      if (!isPremium && settings.party_templates && settings.party_templates.length > 5) {
+        showToast(
+          lang === "en"
+            ? "Freemium servers are limited to 5 templates. Please delete extra templates before saving."
+            : "Freemium sunucular en fazla 5 şablon kaydedebilir. Lütfen fazla şablonları silin.",
+          "error"
+        );
+        return;
       }
     }
 
-    if (!isPremium && settings.party_templates && settings.party_templates.length > 5) {
-      showToast(
-        lang === "en"
-          ? "Freemium servers are limited to 5 templates. Please delete extra templates before saving."
-          : "Freemium sunucular en fazla 5 şablon kaydedebilir. Lütfen fazla şablonları silin.",
-        "error"
-      );
-      return;
-    }
+    // Sanitize party_templates: exclude incomplete/empty templates so they don't break save
+    const sanitizedTemplates = (settings.party_templates || []).filter(tpl => {
+      const hasName = tpl.name && tpl.name.trim();
+      const reqCount = (tpl.required_roles || []).filter(r => r && r.trim()).length;
+      const optCount = (tpl.optional_roles || []).filter(r => r && r.trim()).length;
+      return hasName && (reqCount + optCount > 0);
+    });
+
+    const settingsToSave = {
+      ...settings,
+      party_templates: sanitizedTemplates
+    };
 
     setSaving(true);
     try {
       const res = await fetch(`/api/guild-settings/${guildId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(settings),
+        body: JSON.stringify(settingsToSave),
       });
       
       const dropRes = await fetch(`/api/drop-settings/${guildId}`, {
@@ -428,7 +443,8 @@ export default function ServerSettings() {
       });
 
       if (res.ok && dropRes.ok) {
-        setInitialSettings(settings);
+        setSettings(settingsToSave);
+        setInitialSettings(settingsToSave);
         setInitialDropSettings(dropSettings);
         showToast(lang === "en" ? "Settings saved!" : "Ayarlar kaydedildi!", "success");
       }
