@@ -98,52 +98,29 @@ else
   log_ok "Bağımlılıklar güncel (Hızlı geçildi)"
 fi
 
-# 3. WEB DERLEME
+# 3. KESİNTİSİZ WEB DERLEME (ZERO-DOWNTIME BUILD)
 log_step "3/6" "Web sitesi durumu kontrol ediliyor..."
 if [ "$WEB_CHANGED" = true ]; then
-  log_info "Bakım modu yayına alınıyor (3 Çarklı Animasyon)..."
-  pm2 stop vxweb >/dev/null 2>&1 || true
-  pkill -9 -f "scripts/maintenance-server.js" >/dev/null 2>&1 || true
-  pkill -9 -f "maintenance-server" >/dev/null 2>&1 || true
-  fuser -k 3000/tcp >/dev/null 2>&1 || true
-  sleep 1
-
-  node "$PROJECT_DIR/scripts/maintenance-server.js" 3000 >/dev/null 2>&1 &
-  MAINT_PID=$!
-  sleep 1
-  log_ok "Bakım sayfası devrede (Port 3000)"
-
-  log_info "Web sitesi sıfırdan derleniyor (Next.js)..."
-  rm -rf apps/web/.next
+  log_info "Web sitesi arka planda kesintisiz derleniyor (Mevcut site yayında kalmaya devam eder)..."
   BUILD_START=$SECONDS
   
   if (cd apps/web && pnpm run build); then
     BUILD_DUR=$((SECONDS - BUILD_START))
-    log_ok "Web derlemesi tamamlandı (${BUILD_DUR}s)"
+    log_ok "Web derlemesi başarıyla tamamlandı (${BUILD_DUR}s)"
   else
-    log_err "Derleme hatası oluştu!"
-    kill -9 $MAINT_PID 2>/dev/null || true
-    pkill -9 -f "maintenance-server" 2>/dev/null || true
-    fuser -k 3000/tcp 2>/dev/null || true
+    log_err "Derleme hatası oluştu! Mevcut çalışan site bozulmadan yayında bırakıldı."
     exit 1
   fi
-
-  log_info "Bakım modu kapatılıyor..."
-  kill -9 $MAINT_PID 2>/dev/null || true
-  pkill -9 -f "scripts/maintenance-server.js" >/dev/null 2>&1 || true
-  pkill -9 -f "maintenance-server" >/dev/null 2>&1 || true
-  fuser -k 3000/tcp >/dev/null 2>&1 || true
-  sleep 1
 else
   log_skip "Web sitesinde değişiklik yok (Derleme adımı atlandı)"
 fi
 
-# 4. PM2 SERVİS RESTARTLARI
+# 4. PM2 SERVİS RESTARTLARI (HIZLI GEÇİŞ)
 log_step "4/6" "PM2 servisleri güncelleniyor..."
 
 if [ "$WEB_CHANGED" = true ]; then
   pm2 restart vxweb >/dev/null 2>&1 || pm2 start ecosystem.config.js --only vxweb >/dev/null 2>&1
-  log_ok "Web Sitesi (vxweb) yeniden başlatıldı"
+  log_ok "Web Sitesi (vxweb) yeni sürüme geçirildi (Kesintisiz anlık geçiş)"
 else
   log_skip "Web Sitesi (vxweb) — Değişiklik yok"
 fi
@@ -165,9 +142,7 @@ fi
 # 5. SİSTEM & RAM TEMİZLİĞİ
 log_step "5/6" "Sistem temizliği ve RAM optimizasyonu yapılıyor..."
 if [ "$SKIP_CLEAN" = false ]; then
-  command -v apt-get >/dev/null 2>&1 && { apt-get autoremove -y >/dev/null 2>&1 || true; apt-get clean >/dev/null 2>&1 || true; }
   command -v journalctl >/dev/null 2>&1 && { journalctl --vacuum-time=3d >/dev/null 2>&1 || true; }
-  rm -rf /tmp/* /var/tmp/* 2>/dev/null || true
   rm -f "$PROJECT_DIR"/*.log "$PROJECT_DIR"/*.txt 2>/dev/null || true
   pm2 flush >/dev/null 2>&1 || true
   pnpm store prune >/dev/null 2>&1 || true
@@ -186,7 +161,7 @@ log_ok "up kısayolu hazır"
 
 # BİTİŞ TABLOSU
 echo -e "\n${BOLD}${CYAN}==============================================================================${RESET}"
-echo -e "${BOLD}${GREEN} ✔ GÜNCELLEME BAŞARIYLA TAMAMLANDI!${RESET}"
+echo -e "${BOLD}${GREEN} ✔ GÜNCELLEME BAŞARIYLA TAMAMLANDI! (SIFIR KESİNTİ)${RESET}"
 echo -e "${BOLD}${CYAN}==============================================================================${RESET}\n"
 
 pm2 status
