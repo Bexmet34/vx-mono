@@ -88,6 +88,26 @@ export async function checkDashboardAccess(guildId, userId) {
       console.error('[authUtils] Bot API fetch error:', botErr.message);
     }
 
+    // 3.5 Direct Discord API Fallback
+    const token = process.env.DISCORD_BOT_TOKEN || process.env.DISCORD_TOKEN;
+    if (!isBotGuildOwner && token) {
+      try {
+        const discordGuildRes = await fetch(`https://discord.com/api/v10/guilds/${guildId}`, {
+          headers: { 'Authorization': `Bot ${token}` },
+          cache: 'no-store'
+        });
+        if (discordGuildRes.ok) {
+          const dGuild = await discordGuildRes.json();
+          botGuildName = dGuild.name || botGuildName;
+          if (dGuild.owner_id === userId) {
+            isBotGuildOwner = true;
+          }
+        }
+      } catch (dErr) {
+        console.error('[authUtils] Discord Direct Guild check error:', dErr.message);
+      }
+    }
+
     // 4. Auto-heal: If user is verified owner or Super Admin, create default freemium subscription
     if (isGuildSettingsOwner || isBotGuildOwner || isSuperAdmin) {
       const autoSub = {

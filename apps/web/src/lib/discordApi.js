@@ -1,6 +1,10 @@
+function getBotToken() {
+    return process.env.DISCORD_BOT_TOKEN || process.env.DISCORD_TOKEN;
+}
+
 export async function checkDiscordPresence(discordId, serverIds) {
     if (!serverIds || serverIds.length === 0) return false;
-    const token = process.env.DISCORD_TOKEN || process.env.DISCORD_BOT_TOKEN;
+    const token = getBotToken();
     for (const guildId of serverIds) {
         try {
             const res = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${discordId}`, {
@@ -16,7 +20,7 @@ export async function checkDiscordPresence(discordId, serverIds) {
 }
 
 export async function getDiscordUser(discordId) {
-    const token = process.env.DISCORD_TOKEN || process.env.DISCORD_BOT_TOKEN;
+    const token = getBotToken();
     const res = await fetch(`https://discord.com/api/v10/users/${discordId}`, {
         headers: { 'Authorization': `Bot ${token}` }
     });
@@ -25,7 +29,7 @@ export async function getDiscordUser(discordId) {
 }
 
 export async function getGuildMember(guildId, discordId) {
-    const token = process.env.DISCORD_TOKEN || process.env.DISCORD_BOT_TOKEN;
+    const token = getBotToken();
     const res = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${discordId}`, {
         headers: { 'Authorization': `Bot ${token}` }
     });
@@ -34,30 +38,34 @@ export async function getGuildMember(guildId, discordId) {
 }
 
 export async function getGuildRoles(guildId) {
+    const token = getBotToken();
     const res = await fetch(`https://discord.com/api/v10/guilds/${guildId}/roles`, {
-        headers: { 'Authorization': `Bot ${process.env.DISCORD_BOT_TOKEN}` }
+        headers: { 'Authorization': `Bot ${token}` }
     });
     if (!res.ok) throw new Error(`Discord roles API error: ${res.status}`);
     return await res.json();
 }
 
 export async function getGuildMembers(guildId, limit = 1000) {
+    const token = getBotToken();
     const res = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members?limit=${limit}`, {
-        headers: { 'Authorization': `Bot ${process.env.DISCORD_BOT_TOKEN}` }
+        headers: { 'Authorization': `Bot ${token}` }
     });
     if (!res.ok) throw new Error(`Discord members list API error: ${res.status}`);
     return await res.json();
 }
 
 export async function getGuildChannels(guildId) {
+    const token = getBotToken();
     const res = await fetch(`https://discord.com/api/v10/guilds/${guildId}/channels`, {
-        headers: { 'Authorization': `Bot ${process.env.DISCORD_BOT_TOKEN}` }
+        headers: { 'Authorization': `Bot ${token}` }
     });
     if (!res.ok) throw new Error(`Discord channels API error: ${res.status}`);
     return await res.json();
 }
 
 export async function sendChannelMessage(channelId, messagePayload, files = []) {
+    const token = getBotToken();
     if (files && files.length > 0) {
         const formData = new FormData();
         formData.append('payload_json', JSON.stringify(messagePayload));
@@ -69,7 +77,7 @@ export async function sendChannelMessage(channelId, messagePayload, files = []) 
         const res = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bot ${process.env.DISCORD_BOT_TOKEN}`
+                'Authorization': `Bot ${token}`
             },
             body: formData
         });
@@ -83,7 +91,7 @@ export async function sendChannelMessage(channelId, messagePayload, files = []) 
     const res = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
         method: 'POST',
         headers: {
-            'Authorization': `Bot ${process.env.DISCORD_BOT_TOKEN}`,
+            'Authorization': `Bot ${token}`,
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(messagePayload)
@@ -96,10 +104,11 @@ export async function sendChannelMessage(channelId, messagePayload, files = []) 
 }
 
 export async function deleteChannelMessage(channelId, messageId) {
+    const token = getBotToken();
     const res = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages/${messageId}`, {
         method: 'DELETE',
         headers: {
-            'Authorization': `Bot ${process.env.DISCORD_BOT_TOKEN}`
+            'Authorization': `Bot ${token}`
         }
     });
     if (!res.ok && res.status !== 404) throw new Error(`Discord delete message API error: ${res.status}`);
@@ -107,10 +116,11 @@ export async function deleteChannelMessage(channelId, messageId) {
 }
 
 export async function createDMChannel(userId) {
+    const token = getBotToken();
     const res = await fetch(`https://discord.com/api/v10/users/@me/channels`, {
         method: 'POST',
         headers: {
-            'Authorization': `Bot ${process.env.DISCORD_BOT_TOKEN}`,
+            'Authorization': `Bot ${token}`,
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({ recipient_id: userId })
@@ -125,15 +135,16 @@ export async function sendSupportMessage(messagePayload) {
 
 export async function getApplicationEmojis() {
     try {
+        const token = getBotToken();
         const appRes = await fetch(`https://discord.com/api/v10/oauth2/applications/@me`, {
-            headers: { 'Authorization': `Bot ${process.env.DISCORD_BOT_TOKEN}` }
+            headers: { 'Authorization': `Bot ${token}` }
         });
         if (!appRes.ok) return {};
         const appData = await appRes.json();
         const appId = appData.id;
 
         const emojisRes = await fetch(`https://discord.com/api/v10/applications/${appId}/emojis`, {
-            headers: { 'Authorization': `Bot ${process.env.DISCORD_BOT_TOKEN}` }
+            headers: { 'Authorization': `Bot ${token}` }
         });
         if (!emojisRes.ok) return {};
         const emojisData = await emojisRes.json();

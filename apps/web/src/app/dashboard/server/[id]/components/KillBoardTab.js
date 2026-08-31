@@ -56,7 +56,7 @@ export default function KillboardTab({ t, settings, setSettings, discordChannels
               onChange={(e) => setSettings({ ...settings, killboard_kill_channel_id: e.target.value })}
             >
               <option value="">{lang === 'tr' ? 'Kanal Seçin...' : 'Select Channel...'}</option>
-              {(discordChannels || []).filter(c => c.type === 0 || c.type === 5).map(c => (
+              {(discordChannels || []).filter(c => Number(c.type) === 0 || Number(c.type) === 5).map(c => (
                 <option key={c.id} value={c.id}>#{c.name}</option>
               ))}
             </select>
@@ -74,7 +74,7 @@ export default function KillboardTab({ t, settings, setSettings, discordChannels
               onChange={(e) => setSettings({ ...settings, killboard_death_channel_id: e.target.value })}
             >
               <option value="">{lang === 'tr' ? 'Kanal Seçin...' : 'Select Channel...'}</option>
-              {(discordChannels || []).filter(c => c.type === 0 || c.type === 5).map(c => (
+              {(discordChannels || []).filter(c => Number(c.type) === 0 || Number(c.type) === 5).map(c => (
                 <option key={c.id} value={c.id}>#{c.name}</option>
               ))}
             </select>

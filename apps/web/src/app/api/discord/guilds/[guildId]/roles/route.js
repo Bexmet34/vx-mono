@@ -15,15 +15,16 @@ export async function GET(req, { params }) {
     
     const { hasAccess } = await checkDashboardAccess(guildId, session.user.id);
     if (!hasAccess) {
+      console.warn(`[API] Forbidden access to guild ${guildId} for user ${session.user.id}`);
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     console.log(`[API] Fetching Discord data for Guild: ${guildId}`);
 
-    const token = process.env.DISCORD_BOT_TOKEN;
+    const token = process.env.DISCORD_BOT_TOKEN || process.env.DISCORD_TOKEN;
     
     if (!token) {
-      console.error("[API] DISCORD_BOT_TOKEN is missing");
+      console.error("[API] DISCORD_BOT_TOKEN / DISCORD_TOKEN is missing");
       return NextResponse.json({ error: "DISCORD_BOT_TOKEN is missing" }, { status: 500 });
     }
 
@@ -32,7 +33,7 @@ export async function GET(req, { params }) {
     try {
       const guildRes = await fetch(`https://discord.com/api/v10/guilds/${guildId}?with_counts=true`, {
         headers: { 'Authorization': `Bot ${token}` },
-        next: { revalidate: 0 }
+        cache: 'no-store'
       });
       if (guildRes.ok) {
         const gData = await guildRes.json();
@@ -42,36 +43,40 @@ export async function GET(req, { params }) {
           icon: gData.icon ? `https://cdn.discordapp.com/icons/${gData.id}/${gData.icon}.${gData.icon.startsWith('a_') ? 'gif' : 'png'}?size=256` : null,
           approximate_member_count: gData.approximate_member_count || null
         };
+      } else {
+        console.warn(`[API] Discord Guild Info returned status ${guildRes.status}`);
       }
     } catch (e) {
       console.error("[API] Guild Detail Fetch Exception:", e);
     }
 
     // 1. Fetch Roles
-    let roles = [];
+    let formattedRoles = [];
     try {
-      roles = await getGuildRoles(guildId);
+      const roles = await getGuildRoles(guildId);
+      if (Array.isArray(roles)) {
+        formattedRoles = roles
+          .filter(r => r.name !== '@everyone') 
+          .sort((a, b) => b.position - a.position);
+      }
     } catch (error) {
       console.error(`[API] Discord Roles Error: ${error.message}`);
-      return NextResponse.json({ error: "Failed to fetch roles from Discord" }, { status: 500 });
     }
-    const formattedRoles = roles
-      .filter(r => r.name !== '@everyone') 
-      .sort((a, b) => b.position - a.position);
 
     // 2. Fetch Members (Guild Specific)
     let formattedMembers = [];
     try {
       const membersData = await getGuildMembers(guildId, 1000);
-      
-      console.log(`[API] Fetched ${membersData.length} members for Guild: ${guildId}`);
-      formattedMembers = membersData.map(m => ({
-        id: m.user.id,
-        username: m.user.username,
-        global_name: m.user.global_name,
-        avatar: m.user.avatar,
-        bot: m.user.bot || false
-      }));
+      if (Array.isArray(membersData)) {
+        console.log(`[API] Fetched ${membersData.length} members for Guild: ${guildId}`);
+        formattedMembers = membersData.map(m => ({
+          id: m.user.id,
+          username: m.user.username,
+          global_name: m.user.global_name,
+          avatar: m.user.avatar,
+          bot: m.user.bot || false
+        }));
+      }
     } catch (e) {
       console.error("[API] Member Fetch Exception:", e);
     }
@@ -80,11 +85,14 @@ export async function GET(req, { params }) {
     let formattedChannels = [];
     try {
       const channelsData = await getGuildChannels(guildId);
-      formattedChannels = channelsData.map(c => ({
-        id: c.id,
-        name: c.name,
-        type: c.type
-      }));
+      if (Array.isArray(channelsData)) {
+        formattedChannels = channelsData.map(c => ({
+          id: c.id,
+          name: c.name,
+          type: Number(c.type)
+        }));
+        console.log(`[API] Fetched ${formattedChannels.length} channels for Guild: ${guildId}`);
+      }
     } catch (e) {
       console.error("[API] Channel Fetch Exception:", e);
     }
@@ -97,6 +105,7 @@ export async function GET(req, { params }) {
       channels: formattedChannels
     });
   } catch (err) {
+    console.error("[API] GET /roles Error:", err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
