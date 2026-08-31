@@ -17,7 +17,7 @@ export async function POST(req, context) {
         const params = await Promise.resolve(context?.params || {});
         const guildId = params?.guildId;
         if (!guildId) {
-            return NextResponse.json({ error: "Guild ID is required." }, { status: 400 });
+            return NextResponse.json({ error: "Sunucu ID gereklidir." }, { status: 400 });
         }
 
         const { hasAccess } = await checkDashboardAccess(guildId, session.user.id);
@@ -57,14 +57,14 @@ export async function POST(req, context) {
 
         const botToken = process.env.DISCORD_BOT_TOKEN || process.env.DISCORD_TOKEN;
         if (!botToken) {
-            return NextResponse.json({ error: "Bot token tanımlı değil (DISCORD_BOT_TOKEN)." }, { status: 500 });
+            return NextResponse.json({ error: "Web sunucusunda bot token (DISCORD_BOT_TOKEN) tanımlı değil." }, { status: 400 });
         }
 
         const payload = {
             embeds: [
                 {
-                    title: ticket_message_title || defaultTitle,
-                    description: ticket_message_desc || defaultDesc,
+                    title: (ticket_message_title && ticket_message_title.trim()) ? ticket_message_title : defaultTitle,
+                    description: (ticket_message_desc && ticket_message_desc.trim()) ? ticket_message_desc : defaultDesc,
                     color: 5793266, // Blurple
                     footer: { text: "Veyronix Ticket System" }
                 }
@@ -111,25 +111,27 @@ export async function POST(req, context) {
             console.error("Discord API Error during ticket deploy:", apiError.message);
             const msg = apiError.message || "";
             let friendlyError = lang === 'en'
-                ? "Failed to send message to Discord. Please check bot channel permissions (View Channel, Send Messages, Embed Links)."
-                : "Discord'a mesaj gönderilemedi. Botun kanalı görme (View Channel) ve mesaj gönderme (Send Messages / Embed Links) yetkilerini kontrol edin.";
+                ? `Failed to send to Discord: ${msg}`
+                : `Discord'a gönderilemedi: ${msg}`;
             
-            if (msg.includes("403") || msg.includes("50001") || msg.includes("50013")) {
+            if (msg.includes("403") || msg.includes("50001") || msg.includes("50013") || msg.includes("Missing Permissions") || msg.includes("Missing Access")) {
                 friendlyError = lang === 'en'
-                    ? "Missing permissions: Bot cannot send messages/embeds in this channel."
-                    : "İzin yetersiz: Botun bu kanalda mesaj veya embed gönderme yetkisi yok (403 Missing Permissions).";
-            } else if (msg.includes("404") || msg.includes("10003")) {
+                    ? "Missing permissions: Bot cannot send messages/embeds in this channel (Check Discord bot permissions: View Channel, Send Messages, Embed Links)."
+                    : "İzin yetersiz: Botun bu kanalda mesaj veya embed gönderme yetkisi yok (403 Missing Permissions). Lütfen Discord'da botun kanal izinlerini (Kanalı Görüntüle, Mesaj Gönder, Bağlantı Yerleştir) açın.";
+            } else if (msg.includes("404") || msg.includes("10003") || msg.includes("Unknown Channel")) {
                 friendlyError = lang === 'en'
-                    ? "Selected channel was not found on Discord."
-                    : "Seçilen kanal Discord sunucusunda bulunamadı (404 Unknown Channel).";
+                    ? "Selected channel was not found on Discord (Unknown Channel)."
+                    : "Seçilen kanal Discord sunucusunda bulunamadı (404 Bilinmeyen Kanal). Lütfen kanalı tekrar seçin.";
+            } else if (msg.includes("401") || msg.includes("Unauthorized")) {
+                friendlyError = "Bot token yetkisiz (401 Unauthorized). Lütfen DISCORD_BOT_TOKEN ayarını kontrol edin.";
             }
 
-            return NextResponse.json({ error: friendlyError, details: msg }, { status: 500 });
+            return NextResponse.json({ error: friendlyError, details: msg }, { status: 400 });
         }
 
         return NextResponse.json({ success: true });
     } catch (err) {
         console.error("Ticket Deploy Error:", err);
-        return NextResponse.json({ error: err.message }, { status: 500 });
+        return NextResponse.json({ error: err.message || "Beklenmeyen bir hata oluştu." }, { status: 400 });
     }
 }
