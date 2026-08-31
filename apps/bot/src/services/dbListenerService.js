@@ -187,6 +187,60 @@ async function checkFastUpdates(client) {
                     .eq('guild_id', config.guild_id);
             }
         }
+
+        // --- Check Ticket Deploy Triggers (Fast Path) ---
+        const { data: ticketConfigs, error: ticketError } = await supabase
+            .from('guild_settings')
+            .select('*')
+            .eq('trigger_ticket_deploy', true);
+
+        if (!ticketError && ticketConfigs && ticketConfigs.length > 0) {
+            const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require('discord.js');
+            for (const config of ticketConfigs) {
+                try {
+                    const guild = client.guilds.cache.get(config.guild_id) || await client.guilds.fetch(config.guild_id).catch(() => null);
+                    if (!guild || !config.ticket_channel_id) {
+                        await supabase.from('guild_settings').update({ trigger_ticket_deploy: false }).eq('guild_id', config.guild_id);
+                        continue;
+                    }
+
+                    const channel = guild.channels.cache.get(config.ticket_channel_id) || await guild.channels.fetch(config.ticket_channel_id).catch(() => null);
+                    if (!channel) {
+                        console.error(`[TicketDeploy] Channel ${config.ticket_channel_id} not found in guild ${guild.id}`);
+                        await supabase.from('guild_settings').update({ trigger_ticket_deploy: false }).eq('guild_id', config.guild_id);
+                        continue;
+                    }
+
+                    const lang = config.language || 'tr';
+                    const defaultTitle = lang === 'en' ? "Support Ticket" : "Destek Talebi";
+                    const defaultDesc = lang === 'en' 
+                        ? "Please click the button below to create a support ticket." 
+                        : "Lütfen aşağıdaki butona tıklayarak destek talebinizi oluşturun.";
+                    const buttonLabel = lang === 'en' ? "Open Support Ticket" : "Destek Talebi Aç";
+
+                    const embed = new EmbedBuilder()
+                        .setTitle((config.ticket_message_title && config.ticket_message_title.trim()) ? config.ticket_message_title : defaultTitle)
+                        .setDescription((config.ticket_message_desc && config.ticket_message_desc.trim()) ? config.ticket_message_desc : defaultDesc)
+                        .setColor(5793266)
+                        .setFooter({ text: "Veyronix Ticket System" });
+
+                    const row = new ActionRowBuilder().addComponents(
+                        new ButtonBuilder()
+                            .setCustomId("ticket_open")
+                            .setLabel(buttonLabel)
+                            .setStyle(ButtonStyle.Primary)
+                            .setEmoji("🎫")
+                    );
+
+                    await channel.send({ embeds: [embed], components: [row] });
+                    console.log(`[TicketDeploy] Successfully deployed ticket panel to channel ${channel.id} for guild ${guild.id}`);
+                } catch (deployErr) {
+                    console.error(`[TicketDeploy] Failed to deploy ticket panel for guild ${config.guild_id}:`, deployErr.message);
+                } finally {
+                    await supabase.from('guild_settings').update({ trigger_ticket_deploy: false }).eq('guild_id', config.guild_id);
+                }
+            }
+        }
     } catch (err) {
         console.error('[DbListenerService] Fast Polling Error:', err.message);
     }

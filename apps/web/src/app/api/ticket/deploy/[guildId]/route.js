@@ -55,11 +55,6 @@ export async function POST(req, context) {
             : "Lütfen aşağıdaki butona tıklayarak destek talebinizi oluşturun.";
         const buttonLabel = lang === 'en' ? "Open Support Ticket" : "Destek Talebi Aç";
 
-        const botToken = process.env.DISCORD_BOT_TOKEN || process.env.DISCORD_TOKEN;
-        if (!botToken) {
-            return NextResponse.json({ error: "Web sunucusunda bot token (DISCORD_BOT_TOKEN) tanımlı değil." }, { status: 400 });
-        }
-
         const payload = {
             embeds: [
                 {
@@ -85,13 +80,14 @@ export async function POST(req, context) {
             ]
         };
 
-        // Sync ticket settings to DB so interaction works immediately
+        // 1. Sync ticket settings to DB and trigger bot deploy
         try {
             await supabase
                 .from('guild_settings')
                 .update({
                     ticket_system_enabled: true,
                     ticket_channel_id: ticket_channel_id,
+                    trigger_ticket_deploy: true,
                     ...(ticket_category_id ? { ticket_category_id } : {}),
                     ...(ticket_staff_roles !== undefined ? { ticket_staff_roles } : {}),
                     ...(ticket_message_title !== undefined ? { ticket_message_title } : {}),
@@ -105,31 +101,41 @@ export async function POST(req, context) {
             console.error("Guild settings update on deploy warning:", dbErr);
         }
 
+        // 2. Try direct Discord API send
         try {
             await sendChannelMessage(ticket_channel_id, payload);
+            // If direct send succeeded, turn off the bot trigger
+            await supabase.from('guild_settings').update({ trigger_ticket_deploy: false }).eq('guild_id', guildId);
+            return NextResponse.json({ success: true });
         } catch (apiError) {
-            console.error("Discord API Error during ticket deploy:", apiError.message);
+            console.warn("Direct Discord API send failed, bot fallback trigger active:", apiError.message);
             const msg = apiError.message || "";
+            
+            // If it's a token / unauthorized error on web server, the bot will handle it via trigger_ticket_deploy
+            if (msg.includes("401") || msg.includes("Unauthorized") || msg.includes("tanımlı değil") || msg.includes("not configured")) {
+                return NextResponse.json({ 
+                    success: true, 
+                    message: lang === 'en' ? 'Ticket panel is being deployed by the bot.' : 'Panel bot tarafından kanala iletiliyor.' 
+                });
+            }
+
+            // If it's missing permissions or channel not found, return actionable warning
             let friendlyError = lang === 'en'
                 ? `Failed to send to Discord: ${msg}`
                 : `Discord'a gönderilemedi: ${msg}`;
             
             if (msg.includes("403") || msg.includes("50001") || msg.includes("50013") || msg.includes("Missing Permissions") || msg.includes("Missing Access")) {
                 friendlyError = lang === 'en'
-                    ? "Missing permissions: Bot cannot send messages/embeds in this channel (Check Discord bot permissions: View Channel, Send Messages, Embed Links)."
+                    ? "Missing permissions: Bot cannot send messages/embeds in this channel. Please grant 'View Channel', 'Send Messages', and 'Embed Links' permissions to the bot."
                     : "İzin yetersiz: Botun bu kanalda mesaj veya embed gönderme yetkisi yok (403 Missing Permissions). Lütfen Discord'da botun kanal izinlerini (Kanalı Görüntüle, Mesaj Gönder, Bağlantı Yerleştir) açın.";
             } else if (msg.includes("404") || msg.includes("10003") || msg.includes("Unknown Channel")) {
                 friendlyError = lang === 'en'
-                    ? "Selected channel was not found on Discord (Unknown Channel)."
-                    : "Seçilen kanal Discord sunucusunda bulunamadı (404 Bilinmeyen Kanal). Lütfen kanalı tekrar seçin.";
-            } else if (msg.includes("401") || msg.includes("Unauthorized")) {
-                friendlyError = "Bot token yetkisiz (401 Unauthorized). Lütfen DISCORD_BOT_TOKEN ayarını kontrol edin.";
+                    ? "Selected channel was not found on Discord."
+                    : "Seçilen kanal Discord sunucusunda bulunamadı (404 Bilinmeyen Kanal). Lütfen geçerli bir metin kanalı seçin.";
             }
 
             return NextResponse.json({ error: friendlyError, details: msg }, { status: 400 });
         }
-
-        return NextResponse.json({ success: true });
     } catch (err) {
         console.error("Ticket Deploy Error:", err);
         return NextResponse.json({ error: err.message || "Beklenmeyen bir hata oluştu." }, { status: 400 });

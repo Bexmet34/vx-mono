@@ -1,5 +1,10 @@
 function getBotToken() {
-    return process.env.DISCORD_BOT_TOKEN || process.env.DISCORD_TOKEN;
+    let token = process.env.DISCORD_BOT_TOKEN || process.env.DISCORD_TOKEN || process.env.TOKEN || process.env.BOT_TOKEN || '';
+    token = token.trim();
+    if (token.startsWith('"') && token.endsWith('"')) token = token.slice(1, -1).trim();
+    if (token.startsWith("'") && token.endsWith("'")) token = token.slice(1, -1).trim();
+    if (token.startsWith('Bot ')) token = token.substring(4).trim();
+    return token;
 }
 
 export async function checkDiscordPresence(discordId, serverIds) {
