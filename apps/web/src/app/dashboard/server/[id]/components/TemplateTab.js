@@ -1,6 +1,6 @@
 "use client";
 
-import { Copy, Plus, Trash2, GripVertical, PlusCircle } from "lucide-react";
+import { Copy, Plus, Trash2, GripVertical, PlusCircle, Crown, Lock, ShieldCheck, CheckCircle2, Sparkles, Layers } from "lucide-react";
 import InfoTooltip from "@/components/InfoTooltip";
 import { useState, useEffect } from "react";
 import { 
@@ -13,14 +13,20 @@ import {
 } from "@/data/albionItems";
 
 export default function TemplateTab({ t, lang, settings, setSettings, selectedTemplateId, setSelectedTemplateId, isPremium, showToast }) {
-  const selectedTemplate = settings.party_templates?.find(tpl => tpl.id === selectedTemplateId) || null;
+  const templates = settings.party_templates || [];
+  const selectedIndex = templates.findIndex(tpl => tpl.id === selectedTemplateId);
+  const selectedTemplate = selectedIndex !== -1 ? templates[selectedIndex] : null;
+  const isSelectedActive = isPremium || selectedIndex < 5;
+
+  const totalCount = templates.length;
+  const activeCount = isPremium ? totalCount : Math.min(totalCount, 5);
+  const passiveCount = isPremium ? 0 : Math.max(0, totalCount - 5);
 
   const [blocks, setBlocks] = useState([]);
   const [dragInfo, setDragInfo] = useState(null);
   const [dragOverIndex, setDragOverIndex] = useState(null);
 
   // Yalnızca şablon DEĞİŞTİĞİNDE blokları parse et.
-  // selectedTemplate'i dependency olarak verirsek her harfte useEffect tetiklenir ve focus kaybolur.
   useEffect(() => {
     const template = settings.party_templates?.find(tpl => tpl.id === selectedTemplateId) || null;
     if (template) {
@@ -99,18 +105,18 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
   };
 
   const handleCreateTemplate = () => {
-    if (!isPremium && (settings.party_templates || []).length >= 5) {
+    const newTemplate = { id: `tpl_${Date.now()}`, name: `New Template ${templates.length + 1}`, required_roles: [], optional_roles: [] };
+    setSettings(prev => ({ ...prev, party_templates: [...(prev.party_templates || []), newTemplate] }));
+    setSelectedTemplateId(newTemplate.id);
+    
+    if (!isPremium && templates.length >= 5) {
       showToast(
         lang === 'tr' 
-          ? "Freemium sunucular en fazla 5 şablon oluşturabilir! Fazlası için lütfen Premium pakete geçin." 
-          : "Freemium servers can create a maximum of 5 templates! Upgrade to Premium for unlimited templates.", 
-        "error"
+          ? "Yeni şablon eklendi! (Freemium planda ilk 5 şablon Discord'da aktiftir, 6 ve üstü şablonlar Premium ile aktifleşir)" 
+          : "New template added! (On Freemium, the first 5 templates are active on Discord. 6th+ templates will activate with Premium)", 
+        "info"
       );
-      return;
     }
-    const newTemplate = { id: `tpl_${Date.now()}`, name: "New Template", required_roles: [], optional_roles: [] };
-    setSettings({ ...settings, party_templates: [...(settings.party_templates || []), newTemplate] });
-    setSelectedTemplateId(newTemplate.id);
   };
 
   const handleUpdateTemplate = (updates) => {
@@ -130,7 +136,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
   };
 
   return (
-    <div className="flex flex-col gap-2 animate-slide-up">
+    <div className="flex flex-col gap-3 animate-slide-up">
       {/* Datalists for Autocomplete */}
       <datalist id="weapons-list">{albionWeapons.map(w => <option key={w} value={w} />)}</datalist>
       <datalist id="heads-list">{albionHeads.map(w => <option key={w} value={w} />)}</datalist>
@@ -139,18 +145,84 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
       <datalist id="potions-list">{albionPotions.map(w => <option key={w} value={w} />)}</datalist>
       <datalist id="foods-list">{albionFoods.map(w => <option key={w} value={w} />)}</datalist>
 
+      {/* Quota & Status Banner */}
+      {isPremium ? (
+        <div className="bg-primary-container/10 border border-primary-container/30 rounded-md p-3 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary-container/20 rounded-sm text-primary-container shrink-0">
+              <Crown size={20} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-headline-sm text-xs font-bold text-on-surface uppercase tracking-wide">
+                  {lang === 'tr' ? '👑 Sınırsız Şablon (Premium Aktif)' : '👑 Unlimited Templates (Premium Active)'}
+                </span>
+                <span className="text-[10px] bg-primary-container text-on-primary font-bold px-2 py-0.5 rounded-full">
+                  {totalCount} {lang === 'tr' ? 'Şablon' : 'Templates'}
+                </span>
+              </div>
+              <p className="text-xs text-on-surface-variant mt-0.5">
+                {lang === 'tr'
+                  ? 'Sunucunuzda Premium aktif olduğu için tüm şablonlarınız Discord üzerinde (/temp) sınırsız ve kesintisiz kullanılabilir.'
+                  : 'All your templates are active and usable on Discord (/temp) with your Server Premium subscription.'}
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-surface-container-high/70 border border-outline-variant/60 rounded-md p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="flex items-start gap-3">
+            <div className="p-2 bg-surface-container rounded-sm border border-outline-variant/40 shrink-0 text-primary-container">
+              <Layers size={18} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-headline-sm text-xs font-bold text-on-surface uppercase tracking-wide">
+                  {lang === 'tr' ? 'Şablon Kullanım Durumu' : 'Template Usage Status'}
+                </span>
+                <span className="text-[10px] bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                  {lang === 'tr' ? `Discord Aktif: ${Math.min(totalCount, 5)} / 5` : `Active on Discord: ${Math.min(totalCount, 5)} / 5`}
+                </span>
+                {passiveCount > 0 && (
+                  <span className="text-[10px] bg-amber-500/15 text-amber-300 border border-amber-500/30 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <Lock size={10} />
+                    {lang === 'tr' ? `Discord Pasif: ${passiveCount}` : `Inactive on Discord: ${passiveCount}`}
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-on-surface-variant mt-1 leading-relaxed">
+                {lang === 'tr'
+                  ? `Freemium planda ilk 5 şablon Discord'da (/temp) aktiftir.${passiveCount > 0 ? ` 6. ve sonraki ${passiveCount} adet şablon Discord'da pasiftir ancak web panelinden düzenleyebilir veya Premium alarak hepsini Discord'da açabilirsiniz.` : ' İstediğiniz kadar şablon ekleyebilir ve Premium ile hepsini Discord\'da kullanabilirsiniz.'}`
+                  : `On Freemium plan, the first 5 templates are active on Discord (/temp).${passiveCount > 0 ? ` The 6th+ templates (${passiveCount}) are inactive on Discord but can still be edited here.` : ' You can add more templates and unlock them all on Discord with Premium.'}`}
+              </p>
+            </div>
+          </div>
+          <a
+            href="https://veyronix.com.tr"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-primary-container/20 border border-primary-container/40 hover:bg-primary-container hover:text-on-primary text-primary-container rounded-sm text-[10px] font-label-bold uppercase tracking-widest transition-all"
+          >
+            <Crown size={12} />
+            {lang === 'tr' ? 'Tümünü Aç (Premium)' : 'Unlock All (Premium)'}
+          </a>
+        </div>
+      )}
+
+      {/* Templates List Panel */}
       <div className="glass-panel relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors flex flex-col">
         <div className="p-2 border-b border-outline-variant/50 flex justify-between items-center bg-surface-container-highest/30">
           <h2 className="font-headline-md text-[10px] text-on-surface flex items-center gap-2 uppercase tracking-tight m-0">
-            <Copy className="text-primary-container" /> {lang === 'en' ? 'Templates' : 'Şablonlar'}
+            <Copy className="text-primary-container" size={16} /> {lang === 'en' ? 'Templates' : 'Şablonlar'}
             <InfoTooltip text={lang === 'en' ? 'Create reusable party setups. Use the /temp command in Discord to quickly start a party using these templates.' : 'Tekrar kullanılabilir parti ayarları oluşturun. Discord\'da /temp komutunu kullanarak bu şablonlarla saniyeler içinde parti kurabilirsiniz.'} />
           </h2>
           <button 
-            className={`p-2 bg-surface-container border border-outline-variant rounded-sm transition-colors text-on-surface-variant ${(!isPremium && (settings.party_templates || []).length >= 5) ? 'opacity-50 cursor-not-allowed' : 'hover:border-primary-container hover:text-primary-container'}`} 
+            className="flex items-center gap-1.5 px-2.5 py-1.5 bg-primary-container text-on-primary rounded-sm font-label-bold text-[10px] uppercase tracking-wider hover:brightness-110 active:scale-95 transition-all shadow-sm"
             onClick={handleCreateTemplate}
-            title={!isPremium && (settings.party_templates || []).length >= 5 ? (lang === 'tr' ? 'Yeni şablonlar eklemek için Premium pakete geçin.' : 'Upgrade to Premium to add more templates.') : ''}
           >
              <Plus size={14} />
+             <span>{lang === 'tr' ? 'Şablon Ekle' : 'Add Template'}</span>
           </button>
         </div>
         
@@ -159,23 +231,69 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
             <div className="p-3 text-center text-on-surface-variant font-body-md">{lang === 'en' ? 'No templates yet.' : 'Henüz şablon yok.'}</div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 p-2">
-              {settings.party_templates.map(tpl => (
-                <div 
-                  key={tpl.id} 
-                  className={`flex justify-between items-center p-2 border rounded-sm cursor-pointer transition-colors group ${selectedTemplateId === tpl.id ? 'bg-primary-container/10 border-primary-container' : 'border-outline-variant/30 hover:bg-white/5 hover:border-outline-variant'}`}
-                  onClick={() => setSelectedTemplateId(tpl.id)}
-                >
-                  <div className={`font-label-bold ${selectedTemplateId === tpl.id ? 'text-primary-container' : 'text-on-surface'}`}>{tpl.name}</div>
-                  <button className="p-1.5 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-sm transition-colors opacity-0 group-hover:opacity-100" onClick={(e) => { e.stopPropagation(); handleDeleteTemplate(tpl.id); }}>
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-              ))}
+              {settings.party_templates.map((tpl, index) => {
+                const isItemActive = isPremium || index < 5;
+                const roleCount = ((tpl.required_roles || []).length + (tpl.optional_roles || []).length);
+
+                return (
+                  <div 
+                    key={tpl.id} 
+                    className={`flex justify-between items-center p-2.5 border rounded-sm cursor-pointer transition-all group relative ${
+                      selectedTemplateId === tpl.id 
+                        ? 'bg-primary-container/15 border-primary-container shadow-[0_0_12px_rgba(255,215,0,0.15)]' 
+                        : isItemActive
+                          ? 'border-outline-variant/40 bg-surface-container-high/40 hover:bg-surface-container-high hover:border-outline-variant'
+                          : 'border-dashed border-amber-500/30 bg-amber-500/5 opacity-70 hover:opacity-100 hover:border-amber-500/60'
+                    }`}
+                    onClick={() => setSelectedTemplateId(tpl.id)}
+                  >
+                    <div className="flex-1 min-w-0 pr-2">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-xs ${
+                          isItemActive 
+                            ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' 
+                            : 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
+                        }`}>
+                          #{index + 1}
+                        </span>
+                        <div className={`font-label-bold text-xs truncate ${selectedTemplateId === tpl.id ? 'text-primary-container' : 'text-on-surface'}`}>
+                          {tpl.name || (lang === 'tr' ? 'İsimsiz Şablon' : 'Untitled')}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 text-[10px] text-on-surface-variant">
+                        <span>{roleCount} {lang === 'tr' ? 'rol' : 'roles'}</span>
+                        <span>•</span>
+                        {isItemActive ? (
+                          <span className="text-emerald-400 font-semibold flex items-center gap-1">
+                            <span className="w-1 h-1 rounded-full bg-emerald-400"></span>
+                            {lang === 'tr' ? 'Discord Aktif' : 'Discord Active'}
+                          </span>
+                        ) : (
+                          <span className="text-amber-300/90 font-semibold flex items-center gap-1">
+                            <Lock size={10} />
+                            {lang === 'tr' ? 'Discord Pasif' : 'Discord Inactive'}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <button 
+                      className="p-1.5 text-on-surface-variant/70 hover:text-error hover:bg-error/10 rounded-sm transition-colors opacity-0 group-hover:opacity-100 shrink-0" 
+                      onClick={(e) => { e.stopPropagation(); handleDeleteTemplate(tpl.id); }}
+                      title={lang === 'tr' ? 'Şablonu Sil' : 'Delete Template'}
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
       </div>
 
+      {/* Template Editor Panel */}
       <div className="glass-panel p-3 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
         {!selectedTemplate ? (
           <div className="h-full min-h-[400px] flex items-center justify-center text-on-surface-variant font-body-md bg-surface-container-lowest/50 border border-dashed border-outline-variant/50 rounded-sm">
@@ -183,7 +301,42 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
           </div>
         ) : (
           <div className="animate-slide-up">
-            <h3 className="font-headline-lg text-[10px] text-on-surface mb-2 pb-4 border-b border-outline-variant/50 uppercase tracking-tight">{lang === 'en' ? 'Edit Template' : 'Şablonu Düzenle'}</h3>
+            <div className="flex items-center justify-between border-b border-outline-variant/50 pb-3 mb-3">
+              <div className="flex items-center gap-2">
+                <h3 className="font-headline-lg text-xs text-on-surface uppercase tracking-tight font-bold m-0">
+                  {lang === 'en' ? 'Edit Template' : 'Şablonu Düzenle'}
+                </h3>
+                <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-xs ${
+                  isSelectedActive 
+                    ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' 
+                    : 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
+                }`}>
+                  #{selectedIndex + 1} {isSelectedActive ? (lang === 'tr' ? 'Aktif' : 'Active') : (lang === 'tr' ? 'Discord Pasif' : 'Discord Inactive')}
+                </span>
+              </div>
+              <button 
+                onClick={() => handleDeleteTemplate(selectedTemplate.id)}
+                className="flex items-center gap-1 px-2 py-1 text-error hover:bg-error/10 border border-error/20 rounded-sm text-[10px] font-label-bold transition-colors"
+              >
+                <Trash2 size={12} />
+                <span>{lang === 'tr' ? 'Şablonu Sil' : 'Delete'}</span>
+              </button>
+            </div>
+
+            {/* Passive Notice in Editor */}
+            {!isSelectedActive && (
+              <div className="bg-amber-500/10 border border-amber-500/30 p-2.5 rounded-md flex items-start gap-2.5 mb-3 text-xs text-amber-200">
+                <Lock className="text-amber-400 shrink-0 mt-0.5" size={16} />
+                <div>
+                  <span className="font-semibold">{lang === 'tr' ? `Bu Şablon (#${selectedIndex + 1}) Freemium Limiti Nedeniyle Discord'da Pasiftir` : `This Template (#${selectedIndex + 1}) is Inactive on Discord`}</span>
+                  <p className="text-on-surface-variant text-[11px] mt-0.5 leading-relaxed">
+                    {lang === 'tr'
+                      ? 'Freemium sunucularda yalnızca ilk 5 şablon Discord /temp komutunda çalışır. Bu şablonu buradan dilediğiniz gibi düzenleyebilir, üstteki şablonlardan birini silerek bu şablonu ilk 5 içine alabilir veya Sunucu Premium alarak tüm şablonları aktif edebilirsiniz.'
+                      : 'On Freemium servers, only the first 5 templates work in Discord /temp. You can edit this template here, delete an earlier template to move this into the top 5, or upgrade to Server Premium.'}
+                  </p>
+                </div>
+              </div>
+            )}
             
             <div className="mb-3">
               <label className="flex items-center text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">

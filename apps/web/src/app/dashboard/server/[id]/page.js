@@ -403,16 +403,6 @@ export default function ServerSettings() {
           }
         }
       }
-
-      if (!isPremium && settings.party_templates && settings.party_templates.length > 5) {
-        showToast(
-          lang === "en"
-            ? "Freemium servers are limited to 5 templates. Please delete extra templates before saving."
-            : "Freemium sunucular en fazla 5 şablon kaydedebilir. Lütfen fazla şablonları silin.",
-          "error"
-        );
-        return;
-      }
     }
 
     // Sanitize party_templates: exclude incomplete/empty templates so they don't break save

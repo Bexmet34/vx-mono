@@ -177,6 +177,12 @@ async function handleTempAutocomplete(interaction) {
 
     if (!Array.isArray(serverTemplates)) serverTemplates = [];
 
+    // Freemium restriction: Only first 5 server templates are active on Discord if server is not Premium
+    const serverPremium = await isSubscriptionActive(interaction.guildId);
+    if (!serverPremium && serverTemplates.length > 5) {
+        serverTemplates = serverTemplates.slice(0, 5);
+    }
+
     const choices = [];
 
     userTemplates.forEach(t => {
@@ -306,7 +312,10 @@ function getTemplateByIndex(templatesStr, indexStr) {
         
         const { getUserTemplates } = require('@veyronix/database');
         const userTemplates = await getUserTemplates(userId) || [];
-        const guildTemplates = guildConfig?.party_templates || [];
+        let guildTemplates = guildConfig?.party_templates || [];
+        if (!serverPremium && guildTemplates.length > 5) {
+            guildTemplates = guildTemplates.slice(0, 5);
+        }
 
         if (userTemplates.length === 0 && guildTemplates.length === 0) {
             return await interaction.editReply({
@@ -379,6 +388,13 @@ function getTemplateByIndex(templatesStr, indexStr) {
         }
     } else if (templateValue.startsWith('guild:')) {
         const indexStr = templateValue.split(':')[1];
+        const idx = parseInt(indexStr, 10);
+        if (!serverPremium && idx >= 5) {
+            const lockedMsg = lang === 'tr'
+                ? '🔒 Bu şablon sunucunuz Freemium modunda olduğu için kilitlidir. İlk 5 şablon aktiftir. Tüm şablonları Discord üzerinde kullanabilmek için Sunucu Premium paketine geçebilirsiniz.'
+                : '🔒 This template is locked because your server is on Freemium. The first 5 templates are active. Upgrade to Server Premium to unlock all templates on Discord.';
+            return await interaction.editReply({ content: lockedMsg });
+        }
         template = getTemplateByIndex(guildConfig?.party_templates, indexStr);
     } else {
         template = getTemplateByIndex(guildConfig?.party_templates, templateValue);
