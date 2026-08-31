@@ -1,0 +1,159 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <!-- Background Gradient -->
+    <radialGradient id="bgGlow" cx="50%" cy="45%" r="70%">
+      <stop offset="0%" stop-color="#131b31"/>
+      <stop offset="45%" stop-color="#0b0f19"/>
+      <stop offset="100%" stop-color="#05070d"/>
+    </radialGradient>
+
+    <!-- Ambient Center Glow behind Logo -->
+    <radialGradient id="centerOrb" cx="50%" cy="40%" r="45%">
+      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.28"/>
+      <stop offset="50%" stop-color="#f59e0b" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- 3D V Logo Gradients -->
+    <linearGradient id="gradBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f2fe"/>
+      <stop offset="100%" stop-color="#4facfe"/>
+    </linearGradient>
+    <linearGradient id="gradPurple" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c471ed"/>
+      <stop offset="100%" stop-color="#f64f59"/>
+    </linearGradient>
+    <linearGradient id="gradOrange" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f83600"/>
+      <stop offset="100%" stop-color="#f9d423"/>
+    </linearGradient>
+
+    <linearGradient id="gradBlueDark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0062a3"/>
+      <stop offset="100%" stop-color="#1b5a8f"/>
+    </linearGradient>
+    <linearGradient id="gradPurpleDark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7a2a9e"/>
+      <stop offset="100%" stop-color="#911d25"/>
+    </linearGradient>
+    <linearGradient id="gradOrangeDark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ab1d00"/>
+      <stop offset="100%" stop-color="#c29d00"/>
+    </linearGradient>
+
+    <linearGradient id="gradBlueLight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#89f7fe"/>
+      <stop offset="100%" stop-color="#8ed2ff"/>
+    </linearGradient>
+    <linearGradient id="gradPurpleLight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e2aefc"/>
+      <stop offset="100%" stop-color="#ff949b"/>
+    </linearGradient>
+    <linearGradient id="gradOrangeLight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff7f54"/>
+      <stop offset="100%" stop-color="#ffe670"/>
+    </linearGradient>
+
+    <linearGradient id="titleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="35%" stop-color="#ffd54f"/>
+      <stop offset="100%" stop-color="#ff9800"/>
+    </linearGradient>
+
+    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.4"/>
+      <stop offset="50%" stop-color="#f59e0b" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#10b981" stop-opacity="0.3"/>
+    </linearGradient>
+
+    <filter id="shadow3D" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="18" stdDeviation="20" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="1200" height="630" fill="url(#bgGlow)"/>
+
+  <!-- Tech Grid Background lines -->
+  <g opacity="0.08" stroke="#ffffff" stroke-width="1">
+    <line x1="0" y1="105" x2="1200" y2="105"/>
+    <line x1="0" y1="210" x2="1200" y2="210"/>
+    <line x1="0" y1="315" x2="1200" y2="315"/>
+    <line x1="0" y1="420" x2="1200" y2="420"/>
+    <line x1="0" y1="525" x2="1200" y2="525"/>
+    <line x1="200" y1="0" x2="200" y2="630"/>
+    <line x1="400" y1="0" x2="400" y2="630"/>
+    <line x1="600" y1="0" x2="600" y2="630"/>
+    <line x1="800" y1="0" x2="800" y2="630"/>
+    <line x1="1000" y1="0" x2="1000" y2="630"/>
+  </g>
+
+  <!-- Ambient Glow Behind Elements -->
+  <circle cx="600" cy="240" r="320" fill="url(#centerOrb)"/>
+
+  <!-- Card Border Accent -->
+  <rect x="24" y="24" width="1152" height="582" rx="28" fill="none" stroke="url(#borderGrad)" stroke-width="1.5"/>
+
+  <!-- 3D V Logo Group (Centered at top: scale and translate) -->
+  <g transform="translate(480, 70) scale(0.75)" filter="url(#shadow3D)">
+    <g>
+      <polygon points="210,340 230,320 170,220 150,240" fill="url(#gradBlueDark)"/>
+      <polygon points="100,240 150,240 170,220 120,220" fill="url(#gradBlueLight)"/>
+      <polygon points="100,240 150,240 210,340 160,340" fill="url(#gradBlue)"/>
+      <polyline points="160,340 100,240 150,240" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.6"/>
+    </g>
+
+    <g>
+      <polygon points="280,360 300,340 230,160 210,180" fill="url(#gradPurpleDark)"/>
+      <polygon points="160,180 210,180 230,160 180,160" fill="url(#gradPurpleLight)"/>
+      <polygon points="160,180 210,180 280,360 230,360" fill="url(#gradPurple)"/>
+      <polyline points="230,360 160,180 210,180" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.6"/>
+    </g>
+
+    <g>
+      <polygon points="280,360 300,340 420,100 400,120" fill="url(#gradOrangeDark)"/>
+      <polygon points="350,120 400,120 420,100 370,100" fill="url(#gradOrangeLight)"/>
+      <polygon points="230,360 280,360 400,120 350,120" fill="url(#gradOrange)"/>
+      <polyline points="230,360 350,120 400,120" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.6"/>
+    </g>
+  </g>
+
+  <!-- Typography: Veyronix Title -->
+  <text x="600" y="390" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="52" font-weight="900" letter-spacing="-1" fill="url(#titleGrad)">
+    Veyronix
+  </text>
+
+  <!-- Tagline / Subtitle -->
+  <text x="600" y="435" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="21" font-weight="600" fill="#94a3b8" letter-spacing="0.5">
+    Discord Otomasyon &amp; Topluluk Yönetim Sistemi
+  </text>
+
+  <!-- Feature Pills / Badges -->
+  <g transform="translate(600, 500)">
+    <!-- Pill 1: Temp Voice -->
+    <g transform="translate(-370, 0)">
+      <rect x="0" y="0" width="165" height="38" rx="19" fill="#1e293b" fill-opacity="0.8" stroke="#6366f1" stroke-width="1.2"/>
+      <text x="82.5" y="24" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="700" fill="#a5b4fc">🎙️ Geçici Ses</text>
+    </g>
+    <!-- Pill 2: Registration -->
+    <g transform="translate(-185, 0)">
+      <rect x="0" y="0" width="170" height="38" rx="19" fill="#1e293b" fill-opacity="0.8" stroke="#10b981" stroke-width="1.2"/>
+      <text x="85" y="24" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="700" fill="#6ee7b7">📝 Butonlu Kayıt</text>
+    </g>
+    <!-- Pill 3: Party Finder -->
+    <g transform="translate(5, 0)">
+      <rect x="0" y="0" width="175" height="38" rx="19" fill="#1e293b" fill-opacity="0.8" stroke="#38bdf8" stroke-width="1.2"/>
+      <text x="87.5" y="24" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="700" fill="#7dd3fc">⚔️ ZvZ Parti Kurucu</text>
+    </g>
+    <!-- Pill 4: Killboard -->
+    <g transform="translate(195, 0)">
+      <rect x="0" y="0" width="170" height="38" rx="19" fill="#1e293b" fill-opacity="0.8" stroke="#f59e0b" stroke-width="1.2"/>
+      <text x="85" y="24" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="700" fill="#fcd34d">📊 Canlı Killboard</text>
+    </g>
+  </g>
+
+  <!-- Bottom Website URL -->
+  <text x="600" y="572" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="14" font-weight="700" fill="#64748b" letter-spacing="1.5">
+    VEYRONIX.COM.TR
+  </text>
+</svg>
