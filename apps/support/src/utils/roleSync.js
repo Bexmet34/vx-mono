@@ -125,20 +125,30 @@ async function syncMemberRoles(member, supabase, cachedRoles = null) {
     targetRoles.add(roles.verifiedUser.id);
   }
 
-  // B. GM Roles
+  // B. GM Roles (Fully independent: A user can hold BOTH Premium GM and Partnered GM if they have both)
   if (roles.premiumGm) candidateRoles.add(roles.premiumGm.id);
   if (roles.partneredGm) candidateRoles.add(roles.partneredGm.id);
   if (roles.partnerAccess) candidateRoles.add(roles.partnerAccess.id);
 
-  if (activeSubs.length > 0 || isRulePartnerGM) {
-    if (hasPaidServerPayment && !isRulePartnerGM) {
-      // Parasıyla Sunucu Premium alan GM
-      if (roles.premiumGm) targetRoles.add(roles.premiumGm.id);
-    } else {
-      // Kurallı / Sponsorluk / Partnerlik ile Premium alan GM
-      if (roles.partneredGm) targetRoles.add(roles.partneredGm.id);
-      if (roles.partnerAccess) targetRoles.add(roles.partnerAccess.id);
-    }
+  // 1. Paid Server GM Check (Active paid subscription - timed or unlimited)
+  const ownsPaidActiveServer = (ownedSubs || []).some(s => {
+    const isActive = s.is_active && !s.trial_used && (s.is_unlimited || (s.expires_at && new Date(s.expires_at) > now));
+    const isPaid = paidPayments.some(p => p.plan_type === 'server' || !p.plan_type) || s.trial_used === false;
+    return isActive && isPaid;
+  });
+
+  if (ownsPaidActiveServer) {
+    if (roles.premiumGm) targetRoles.add(roles.premiumGm.id);
+  }
+
+  // 2. Partnered Server GM Check (Server listed in auto_premium_rules or partner sponsorship)
+  if (isRulePartnerGM) {
+    if (roles.partneredGm) targetRoles.add(roles.partneredGm.id);
+    if (roles.partnerAccess) targetRoles.add(roles.partnerAccess.id);
+  } else if (activeSubs.length > 0 && !hasPaidServerPayment) {
+    // Sponsored/free active server
+    if (roles.partneredGm) targetRoles.add(roles.partneredGm.id);
+    if (roles.partnerAccess) targetRoles.add(roles.partnerAccess.id);
   }
 
   // C. Individual Supporter (Bireysel Premium / Oylama Muafiyeti)
@@ -315,14 +325,15 @@ async function syncAllGuildMembers(guild, supabase) {
       targetRoles.add(roles.verifiedUser.id);
     }
 
-    // B. GM Roles
+    // B. GM Roles (Fully independent: A user can hold BOTH Premium GM and Partnered GM if they have both)
     if (roles.premiumGm) candidateRoles.add(roles.premiumGm.id);
     if (roles.partneredGm) candidateRoles.add(roles.partneredGm.id);
     if (roles.partnerAccess) candidateRoles.add(roles.partnerAccess.id);
 
     if (paidGmUserIds.has(member.id)) {
       if (roles.premiumGm) targetRoles.add(roles.premiumGm.id);
-    } else if (partnerGmUserIds.has(member.id)) {
+    }
+    if (partnerGmUserIds.has(member.id)) {
       if (roles.partneredGm) targetRoles.add(roles.partneredGm.id);
       if (roles.partnerAccess) targetRoles.add(roles.partnerAccess.id);
     }
