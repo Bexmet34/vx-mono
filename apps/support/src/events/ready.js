@@ -1,12 +1,13 @@
 const { Events, ActivityType } = require('discord.js');
 const { resolveSupportRoles, syncAllGuildMembers } = require('../utils/roleSync');
+const { updateStatChannels } = require('../utils/statsChannels');
 
 module.exports = {
   name: Events.ClientReady,
   once: true,
   async execute(client) {
     console.log(`Ready! Logged in as ${client.user.tag}`);
-    client.user.setActivity('Veyronix Support & Roles', { type: ActivityType.Watching });
+    client.user.setActivity('Veyronix Support & Stats', { type: ActivityType.Watching });
     
     // Command Registration
     const targetGuildId = process.env.GUILD_ID;
@@ -22,7 +23,25 @@ module.exports = {
       .then(() => console.log(`[SupportBot] Successfully registered ${commandData.length} guild commands in ${guild.name}.`))
       .catch(err => console.error('[SupportBot] Command registration error:', err));
 
-    // 1. Initial Role Sync on Startup
+    // 1. Initial Live Stat Channels Setup & Update
+    try {
+      console.log(`[SupportBot] Initializing Live Stat Channels for ${guild.name}...`);
+      await updateStatChannels(guild, client.supabase);
+    } catch (e) {
+      console.error('[SupportBot] Initial stat channels setup error:', e);
+    }
+
+    // 2. Scheduled Live Stat Channels Update (Every 10 minutes - Discord safe rate limit)
+    const STAT_INTERVAL = 10 * 60 * 1000;
+    setInterval(async () => {
+      try {
+        await updateStatChannels(guild, client.supabase);
+      } catch (err) {
+        console.error('[SupportBot] Stat channels update error:', err);
+      }
+    }, STAT_INTERVAL);
+
+    // 3. Initial Role Sync on Startup
     try {
       await resolveSupportRoles(guild);
       console.log(`[SupportBot] Triggering initial role synchronization for ${guild.name}...`);
@@ -31,7 +50,7 @@ module.exports = {
       console.error('[SupportBot] Initial role sync error:', e);
     }
 
-    // 2. Scheduled Periodic Role Sync (Every 2 Hours to prevent any rate-limit or CPU stress)
+    // 4. Scheduled Periodic Role Sync (Every 2 Hours to prevent any rate-limit or CPU stress)
     const SYNC_INTERVAL = 2 * 60 * 60 * 1000;
     setInterval(async () => {
       try {
