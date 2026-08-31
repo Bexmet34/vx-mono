@@ -80,7 +80,7 @@ export async function POST(req, { params }) {
       channel_name_format, fixed_message_content,
       ticket_system_enabled, ticket_category_id, ticket_channel_id,
       ticket_staff_roles, ticket_message_title, ticket_message_desc,
-      ticket_options, auto_delete_party_hours, content_close_roles,
+      ticket_options, ticket_limit, ticket_name_format, auto_delete_party_hours, content_close_roles,
       application_enabled, registration_rules_text, application_questions,
       registration_button_type, registration_rules_text_en,
       tempvoice_creators, killboard_kill_channel_id, killboard_death_channel_id
@@ -159,6 +159,8 @@ export async function POST(req, { params }) {
           ticket_message_title: ticket_message_title || 'Destek Talebi',
           ticket_message_desc: ticket_message_desc || 'Lütfen aşağıdaki menüden bir konu seçerek destek talebinizi oluşturun.',
           ticket_options: Array.isArray(ticket_options) ? ticket_options : [{"label": "Genel Destek", "value": "genel", "description": "Genel konular hakkında destek alın", "emoji": "📩"}],
+          ticket_limit: ticket_limit !== undefined ? (parseInt(ticket_limit, 10) || 1) : 1,
+          ticket_name_format: ticket_name_format || 'topic-username',
           content_close_roles: typeof content_close_roles === 'string' ? (()=>{try{return JSON.parse(content_close_roles)}catch(e){return []}})() : (content_close_roles || null),
           application_enabled: application_enabled ?? false,
           registration_rules_text: registration_rules_text || null,

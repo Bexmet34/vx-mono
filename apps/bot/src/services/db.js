@@ -188,6 +188,8 @@ function initDb() {
             safeAlter("ALTER TABLE guild_configs ADD COLUMN ticket_channel_id TEXT");
             safeAlter("ALTER TABLE guild_configs ADD COLUMN ticket_staff_roles TEXT");
             safeAlter("ALTER TABLE guild_configs ADD COLUMN ticket_options TEXT");
+            safeAlter("ALTER TABLE guild_configs ADD COLUMN ticket_limit INTEGER DEFAULT 1");
+            safeAlter("ALTER TABLE guild_configs ADD COLUMN ticket_name_format TEXT DEFAULT 'topic-username'");
 
 
             // Set default settings if not exists

@@ -60,16 +60,18 @@ async function handleTicketInteraction(interaction) {
         // Acknowledge the select menu interaction immediately to prevent timeout
         await interaction.update({ content: t('ticket.creating_channel', lang), components: [] });
 
-        // Check for existing open ticket by this user in this guild
-        const existingTicket = await db.get(
+        // Check for existing open tickets by this user against user ticket limit
+        const maxLimit = Math.max(1, parseInt(guildConfig.ticket_limit, 10) || 1);
+        const openTickets = await db.all(
             'SELECT channel_id FROM tickets WHERE guild_id = ? AND owner_id = ? AND status = ?',
             [interaction.guildId, interaction.user.id, 'open']
         );
-        if (existingTicket) {
+        if (openTickets && openTickets.length >= maxLimit) {
+            const ticketLinks = openTickets.map(t => `<#${t.channel_id}>`).join(', ');
             return interaction.editReply({
                 content: lang === 'tr'
-                    ? `❌ Zaten açık bir destek talebiniz var: <#${existingTicket.channel_id}>`
-                    : `❌ You already have an open ticket: <#${existingTicket.channel_id}>`,
+                    ? `❌ Maksimum açık destek talebi limitine ulaştınız (Limit: ${maxLimit}). Lütfen önce mevcut talebinizi kapatın: ${ticketLinks}`
+                    : `❌ You have reached the maximum open ticket limit (${maxLimit}). Please close your existing ticket(s) first: ${ticketLinks}`,
                 components: []
             });
         }
@@ -78,7 +80,36 @@ async function handleTicketInteraction(interaction) {
         const rawName = (interaction.member?.nickname || interaction.member?.displayName || interaction.user.username).replace(/[çğıöşüÇĞİÖŞÜ]/g, m => trMap[m]);
         const safeName = rawName.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '').toLowerCase() || 'user';
         const safeTopic = topicValue.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '').toLowerCase() || 'ticket';
-        const channelName = `${safeTopic}-${safeName}`;
+
+        // Fetch ticket sequence count for formatted ticket ID
+        const countRow = await db.get('SELECT COUNT(*) as total FROM tickets WHERE guild_id = ?', [interaction.guildId]);
+        const ticketIdNum = (countRow?.total || 0) + 1;
+        const ticketIdFormatted = String(ticketIdNum).padStart(4, '0');
+
+        const nameFormat = (guildConfig.ticket_name_format || 'topic-username').trim();
+        let channelName = '';
+        if (nameFormat === 'topic-username') {
+            channelName = `${safeTopic}-${safeName}`;
+        } else if (nameFormat === 'ticket-username') {
+            channelName = `ticket-${safeName}`;
+        } else if (nameFormat === 'ticket-id') {
+            channelName = `ticket-${ticketIdFormatted}`;
+        } else if (nameFormat === 'topic-id') {
+            channelName = `${safeTopic}-${ticketIdFormatted}`;
+        } else {
+            channelName = nameFormat
+                .replace(/\{username\}/gi, safeName)
+                .replace(/\{topic\}/gi, safeTopic)
+                .replace(/\{ticket_id\}/gi, ticketIdFormatted)
+                .replace(/\{id\}/gi, ticketIdFormatted)
+                .replace(/[çğıöşüÇĞİÖŞÜ]/g, m => trMap[m])
+                .replace(/\s+/g, '-')
+                .replace(/[^a-zA-Z0-9-]/g, '')
+                .toLowerCase();
+        }
+        if (!channelName || channelName === '-') {
+            channelName = `ticket-${safeName}`;
+        }
 
         const staffRoles = (guildConfig.ticket_staff_roles || "").split(',').map(r => r.trim()).filter(Boolean);
 

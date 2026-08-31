@@ -152,6 +152,8 @@ export default function ServerSettings() {
     ticket_message_title: "Destek Talebi",
     ticket_message_desc: "Lütfen aşağıdaki menüden bir konu seçerek destek talebinizi oluşturun.",
     ticket_options: [{"label": "Genel Destek", "value": "genel", "description": "Genel konular hakkında destek alın", "emoji": "📩"}],
+    ticket_limit: 1,
+    ticket_name_format: "topic-username",
     application_enabled: false,
     registration_rules_text: "",
     application_questions: [],
@@ -260,6 +262,8 @@ export default function ServerSettings() {
           ticket_message_title: s?.ticket_message_title || "Destek Talebi",
           ticket_message_desc: s?.ticket_message_desc || "Lütfen aşağıdaki menüden bir konu seçerek destek talebinizi oluşturun.",
           ticket_options: Array.isArray(s?.ticket_options) ? s?.ticket_options : [{"label": "Genel Destek", "value": "genel", "description": "Genel konular hakkında destek alın", "emoji": "📩"}],
+          ticket_limit: s?.ticket_limit ?? 1,
+          ticket_name_format: s?.ticket_name_format || "topic-username",
           content_close_roles: typeof s?.content_close_roles === 'string' ? s.content_close_roles : (s?.content_close_roles ? JSON.stringify(s.content_close_roles) : ""),
           auto_delete_party_hours: (() => {
             let ev = s?.log_events;
@@ -764,7 +768,7 @@ export default function ServerSettings() {
         )}
 
         {activeTab === 'templates' && (
-          <TemplateTab t={t} lang={lang} settings={settings} setSettings={setSettings} selectedTemplateId={selectedTemplateId} setSelectedTemplateId={setSelectedTemplateId} discordRoles={discordRoles} isPremium={isPremium} handleSave={handleSave} saving={saving} />
+          <TemplateTab t={t} lang={lang} settings={settings} setSettings={setSettings} selectedTemplateId={selectedTemplateId} setSelectedTemplateId={setSelectedTemplateId} discordRoles={discordRoles} isPremium={isPremium} handleSave={handleSave} saving={saving} showToast={showToast} />
         )}
 
         {activeTab === 'killboard' && (
@@ -776,15 +780,15 @@ export default function ServerSettings() {
         )}
 
         {activeTab === 'rolemenu' && (
-          <RoleMenuTab t={t} lang={lang} discordRoles={discordRoles} discordChannels={discordChannels} guildId={guildId} isPremium={isPremium} />
+          <RoleMenuTab t={t} lang={lang} discordRoles={discordRoles} discordChannels={discordChannels} guildId={guildId} isPremium={isPremium} showToast={showToast} />
         )}
 
         {activeTab === 'ticket' && (
-          <TicketTab t={t} lang={lang} settings={settings} setSettings={setSettings} discordChannels={discordChannels} discordRoles={discordRoles} handleSave={handleSave} saving={saving} isPremium={isPremium} guildId={guildId} />
+          <TicketTab t={t} lang={lang} settings={settings} setSettings={setSettings} discordChannels={discordChannels} discordRoles={discordRoles} handleSave={handleSave} saving={saving} isPremium={isPremium} guildId={guildId} showToast={showToast} />
         )}
 
         {activeTab === 'ticket_history' && (
-          <TicketHistoryTab t={t} lang={lang} guildId={guildId} isPremium={isPremium} />
+          <TicketHistoryTab t={t} lang={lang} guildId={guildId} isPremium={isPremium} showToast={showToast} />
         )}
 
         {activeTab === 'events' && (

@@ -7,25 +7,37 @@ import { sendChannelMessage } from '@/lib/discordApi';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(req, { params }) {
+export async function POST(req, context) {
     try {
         const session = await getServerSession(authOptions);
         if (!session?.user?.id) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const { guildId } = await params;
-        const { hasAccess } = await checkDashboardAccess(guildId, session.user.id);
+        const params = await Promise.resolve(context?.params || {});
+        const guildId = params?.guildId;
+        if (!guildId) {
+            return NextResponse.json({ error: "Guild ID is required." }, { status: 400 });
+        }
 
+        const { hasAccess } = await checkDashboardAccess(guildId, session.user.id);
         if (!hasAccess) {
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
 
-        const body = await req.json();
-        const { ticket_channel_id, ticket_message_title, ticket_message_desc } = body;
+        const body = await req.json().catch(() => ({}));
+        const ticket_channel_id = body.ticket_channel_id || body.settings?.ticket_channel_id;
+        const ticket_message_title = body.ticket_message_title || body.settings?.ticket_message_title;
+        const ticket_message_desc = body.ticket_message_desc || body.settings?.ticket_message_desc;
+        const ticket_category_id = body.ticket_category_id || body.settings?.ticket_category_id;
+        const ticket_staff_roles = body.ticket_staff_roles || body.settings?.ticket_staff_roles;
+        const ticket_options = body.ticket_options || body.settings?.ticket_options;
+
+        const ticket_limit = body.ticket_limit || body.settings?.ticket_limit;
+        const ticket_name_format = body.ticket_name_format || body.settings?.ticket_name_format;
 
         if (!ticket_channel_id) {
-            return NextResponse.json({ error: "Kanal ayarlanmamış." }, { status: 400 });
+            return NextResponse.json({ error: "Lütfen önce bir panel kanalı seçin." }, { status: 400 });
         }
 
         // Fetch guild language setting
@@ -33,7 +45,7 @@ export async function POST(req, { params }) {
             .from('guild_settings')
             .select('language')
             .eq('guild_id', guildId)
-            .single();
+            .maybeSingle();
 
         const lang = guildSettings?.language || 'tr';
 
@@ -43,7 +55,10 @@ export async function POST(req, { params }) {
             : "Lütfen aşağıdaki butona tıklayarak destek talebinizi oluşturun.";
         const buttonLabel = lang === 'en' ? "Open Support Ticket" : "Destek Talebi Aç";
 
-        const botToken = process.env.DISCORD_BOT_TOKEN;
+        const botToken = process.env.DISCORD_BOT_TOKEN || process.env.DISCORD_TOKEN;
+        if (!botToken) {
+            return NextResponse.json({ error: "Bot token tanımlı değil (DISCORD_BOT_TOKEN)." }, { status: 500 });
+        }
 
         const payload = {
             embeds: [
@@ -70,11 +85,46 @@ export async function POST(req, { params }) {
             ]
         };
 
+        // Sync ticket settings to DB so interaction works immediately
+        try {
+            await supabase
+                .from('guild_settings')
+                .update({
+                    ticket_system_enabled: true,
+                    ticket_channel_id: ticket_channel_id,
+                    ...(ticket_category_id ? { ticket_category_id } : {}),
+                    ...(ticket_staff_roles !== undefined ? { ticket_staff_roles } : {}),
+                    ...(ticket_message_title !== undefined ? { ticket_message_title } : {}),
+                    ...(ticket_message_desc !== undefined ? { ticket_message_desc } : {}),
+                    ...(ticket_options !== undefined ? { ticket_options } : {}),
+                    ...(ticket_limit !== undefined ? { ticket_limit: parseInt(ticket_limit, 10) || 1 } : {}),
+                    ...(ticket_name_format !== undefined ? { ticket_name_format } : {})
+                })
+                .eq('guild_id', guildId);
+        } catch (dbErr) {
+            console.error("Guild settings update on deploy warning:", dbErr);
+        }
+
         try {
             await sendChannelMessage(ticket_channel_id, payload);
         } catch (apiError) {
-            console.error("Discord API Error:", apiError.message);
-            return NextResponse.json({ error: "Discord'a gönderilemedi. Kanal izinlerini veya ID'sini kontrol edin." }, { status: 500 });
+            console.error("Discord API Error during ticket deploy:", apiError.message);
+            const msg = apiError.message || "";
+            let friendlyError = lang === 'en'
+                ? "Failed to send message to Discord. Please check bot channel permissions (View Channel, Send Messages, Embed Links)."
+                : "Discord'a mesaj gönderilemedi. Botun kanalı görme (View Channel) ve mesaj gönderme (Send Messages / Embed Links) yetkilerini kontrol edin.";
+            
+            if (msg.includes("403") || msg.includes("50001") || msg.includes("50013")) {
+                friendlyError = lang === 'en'
+                    ? "Missing permissions: Bot cannot send messages/embeds in this channel."
+                    : "İzin yetersiz: Botun bu kanalda mesaj veya embed gönderme yetkisi yok (403 Missing Permissions).";
+            } else if (msg.includes("404") || msg.includes("10003")) {
+                friendlyError = lang === 'en'
+                    ? "Selected channel was not found on Discord."
+                    : "Seçilen kanal Discord sunucusunda bulunamadı (404 Unknown Channel).";
+            }
+
+            return NextResponse.json({ error: friendlyError, details: msg }, { status: 500 });
         }
 
         return NextResponse.json({ success: true });

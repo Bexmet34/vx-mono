@@ -11,6 +11,14 @@ export default function TicketHistoryTab({ t, lang, guildId, showToast, isPremiu
   const [searchTerm, setSearchTerm] = useState("");
   const [timeFilter, setTimeFilter] = useState("all");
 
+  const notify = (msg, type = 'info') => {
+    if (typeof showToast === 'function') {
+      showToast(msg, type);
+    } else {
+      alert(msg);
+    }
+  };
+
   const fetchHistory = async () => {
     setLoading(true);
     try {
@@ -19,10 +27,10 @@ export default function TicketHistoryTab({ t, lang, guildId, showToast, isPremiu
       if (res.ok) {
         setTickets(data.tickets || []);
       } else {
-        showToast(data.error || 'Geçmiş alınamadı', 'error');
+        notify(data.error || 'Geçmiş alınamadı', 'error');
       }
     } catch (err) {
-      showToast(err.message, 'error');
+      notify(err.message, 'error');
     } finally {
       setLoading(false);
     }
@@ -38,14 +46,14 @@ export default function TicketHistoryTab({ t, lang, guildId, showToast, isPremiu
     try {
       const res = await fetch(`/api/ticket/history/${guildId}?id=${id}`, { method: 'DELETE' });
       if (res.ok) {
-        showToast(lang === 'tr' ? 'Kayıt silindi.' : 'Record deleted.', 'success');
+        notify(lang === 'tr' ? 'Kayıt silindi.' : 'Record deleted.', 'success');
         setTickets(tickets.filter(t => t.id !== id));
       } else {
         const data = await res.json();
-        showToast(data.error || 'Silinemedi', 'error');
+        notify(data.error || 'Silinemedi', 'error');
       }
     } catch (err) {
-      showToast(err.message, 'error');
+      notify(err.message, 'error');
     } finally {
       setDeleting(false);
     }

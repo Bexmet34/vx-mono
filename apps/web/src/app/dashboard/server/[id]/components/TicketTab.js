@@ -1,4 +1,4 @@
-import { Save, Info, Hash, Shield, Search, X as XIcon, Users, Plus, Trash2, Send } from "lucide-react";
+import { Save, Info, Hash, Shield, Search, X as XIcon, Users, Plus, Trash2, Send, Sliders } from "lucide-react";
 import InfoTooltip from "@/components/InfoTooltip";
 import { useState, useRef, useEffect } from "react";
 import TicketHistoryTab from "./TicketHistoryTab";
@@ -64,9 +64,17 @@ export default function TicketTab({ t, lang, settings, setSettings, discordChann
     setSettings({ ...settings, ticket_options: currentOptions });
   };
 
+  const notify = (msg, type = 'info') => {
+    if (typeof showToast === 'function') {
+      showToast(msg, type);
+    } else {
+      alert(msg);
+    }
+  };
+
   const handleDeploy = async () => {
     if (!settings.ticket_channel_id || !settings.ticket_category_id) {
-        showToast(lang === 'tr' ? 'Lütfen önce kanal ve kategori ayarlarını yapıp kaydedin.' : 'Please set and save channel/category first.', 'error');
+        notify(lang === 'tr' ? 'Lütfen önce kanal ve kategori ayarlarını yapıp kaydedin.' : 'Please set and save channel/category first.', 'error');
         return;
     }
     setDeploying(true);
@@ -78,12 +86,12 @@ export default function TicketTab({ t, lang, settings, setSettings, discordChann
         });
         const data = await res.json();
         if (res.ok) {
-            showToast(lang === 'tr' ? 'Panel başarıyla gönderildi!' : 'Panel deployed successfully!', 'success');
+            notify(lang === 'tr' ? 'Panel başarıyla gönderildi!' : 'Panel deployed successfully!', 'success');
         } else {
-            showToast(data.error || 'Deploy failed', 'error');
+            notify(data.error || (lang === 'tr' ? 'Panel gönderilemedi' : 'Deploy failed'), 'error');
         }
     } catch (err) {
-        showToast(err.message, 'error');
+        notify(err.message, 'error');
     } finally {
         setDeploying(false);
     }
@@ -223,6 +231,76 @@ export default function TicketTab({ t, lang, settings, setSettings, discordChann
                 </div>
               )}
             </div>
+        </div>
+
+        <div className="bg-surface-variant p-2 rounded-md border border-white/5 shadow-sm relative group">
+          <div className="absolute -inset-0.5 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+          <h3 className="font-headline-md text-xs font-bold text-on-surface mb-3 uppercase tracking-wider flex items-center gap-2">
+            <Sliders className="text-primary-container" size={16}/> 
+            {lang === 'tr' ? 'Ticket Kuralları & Formatı' : 'Ticket Rules & Format'}
+          </h3>
+
+          <div className="space-y-4">
+            {/* Ticket Limiti */}
+            <div>
+              <label className="flex items-center gap-2 font-label-bold text-on-surface mb-2 uppercase tracking-wider text-xs">
+                {lang === 'tr' ? 'Kullanıcı Ticket Limiti' : 'User Ticket Limit'}
+                <InfoTooltip text={lang === 'tr' ? 'Bir kullanıcının aynı anda açabileceği maksimum açık ticket sayısı (Varsayılan: 1).' : 'Maximum number of open tickets a single user can have at the same time (Default: 1).'} />
+              </label>
+              <input
+                type="number"
+                min="1"
+                max="10"
+                value={settings?.ticket_limit ?? 1}
+                onChange={(e) => {
+                  const val = parseInt(e.target.value, 10);
+                  setSettings({ ...settings, ticket_limit: isNaN(val) ? 1 : Math.max(1, Math.min(10, val)) });
+                }}
+                className="w-full bg-surface text-on-surface p-3 rounded-sm outline-none border border-white/10 focus:border-primary/50 transition-colors text-xs font-mono"
+                placeholder="1"
+              />
+              <p className="text-[10px] text-on-surface-variant mt-1">
+                {lang === 'tr' ? 'Spam önlemek için önerilen: 1 veya 2 adet' : 'Recommended for spam prevention: 1 or 2 tickets'}
+              </p>
+            </div>
+
+            {/* Ticket Kanal Adı Formatı */}
+            <div>
+              <label className="flex items-center gap-2 font-label-bold text-on-surface mb-2 uppercase tracking-wider text-xs">
+                {lang === 'tr' ? 'Ticket Kanal Adı Formatı' : 'Ticket Channel Name Format'}
+                <InfoTooltip text={lang === 'tr' ? 'Destek talebi açıldığında oluşturulan Discord kanalının isimlendirme formatı.' : 'Naming format of the Discord channel created for new tickets.'} />
+              </label>
+              <select
+                className="w-full bg-surface text-on-surface p-3 rounded-sm outline-none border border-white/10 focus:border-primary/50 transition-colors appearance-none text-xs"
+                value={settings?.ticket_name_format || "topic-username"}
+                onChange={(e) => setSettings({ ...settings, ticket_name_format: e.target.value })}
+              >
+                <option value="topic-username">
+                  {lang === 'tr' ? 'konu-kullanıcıadı (Örn: genel-hakki)' : '{topic}-{username} (e.g. general-john)'}
+                </option>
+                <option value="ticket-username">
+                  {lang === 'tr' ? 'ticket-kullanıcıadı (Örn: ticket-hakki)' : 'ticket-{username} (e.g. ticket-john)'}
+                </option>
+                <option value="ticket-id">
+                  {lang === 'tr' ? 'ticket-numara (Örn: ticket-0001)' : 'ticket-{ticket_id} (e.g. ticket-0001)'}
+                </option>
+                <option value="topic-id">
+                  {lang === 'tr' ? 'konu-numara (Örn: genel-0001)' : '{topic}-{ticket_id} (e.g. general-0001)'}
+                </option>
+              </select>
+
+              {/* Önizleme Kutusu */}
+              <div className="mt-2 flex items-center justify-between text-[10px] text-on-surface-variant bg-surface/60 px-2.5 py-1.5 rounded border border-white/5 font-mono">
+                <span className="text-on-surface-variant/80">{lang === 'tr' ? 'Önizleme:' : 'Preview:'}</span>
+                <span className="text-primary-container font-semibold">
+                  # {settings?.ticket_name_format === 'ticket-username' ? 'ticket-hakki' :
+                     settings?.ticket_name_format === 'ticket-id' ? 'ticket-0001' :
+                     settings?.ticket_name_format === 'topic-id' ? (lang === 'tr' ? 'genel-0001' : 'general-0001') :
+                     (lang === 'tr' ? 'genel-hakki' : 'general-john')}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 

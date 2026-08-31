@@ -104,13 +104,21 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
     handleUpdateBlocks(blocks.filter(b => b.id !== id));
   };
 
+  const notify = (msg, type = 'info') => {
+    if (typeof showToast === 'function') {
+      showToast(msg, type);
+    } else {
+      alert(msg);
+    }
+  };
+
   const handleCreateTemplate = () => {
     const newTemplate = { id: `tpl_${Date.now()}`, name: `New Template ${templates.length + 1}`, required_roles: [], optional_roles: [] };
     setSettings(prev => ({ ...prev, party_templates: [...(prev.party_templates || []), newTemplate] }));
     setSelectedTemplateId(newTemplate.id);
     
     if (!isPremium && templates.length >= 5) {
-      showToast(
+      notify(
         lang === 'tr' 
           ? "Yeni şablon eklendi! (Freemium planda ilk 5 şablon Discord'da aktiftir, 6 ve üstü şablonlar Premium ile aktifleşir)" 
           : "New template added! (On Freemium, the first 5 templates are active on Discord. 6th+ templates will activate with Premium)", 

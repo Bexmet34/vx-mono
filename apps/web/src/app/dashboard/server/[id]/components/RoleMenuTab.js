@@ -14,6 +14,14 @@ export default function RoleMenuTab({ t, lang, guildId, discordChannels, discord
   const [deletingId, setDeletingId] = useState(null);
   const [triggeringId, setTriggeringId] = useState(null);
 
+  const notify = (msg, type = 'info') => {
+    if (typeof showToast === 'function') {
+      showToast(msg, type);
+    } else {
+      alert(msg);
+    }
+  };
+
   useEffect(() => {
     fetchConfigs();
   }, [guildId]);
@@ -26,11 +34,11 @@ export default function RoleMenuTab({ t, lang, guildId, discordChannels, discord
       if (res.ok) {
         setConfigs(data.configs || []);
       } else {
-        showToast(data.error || "Failed to fetch configs", "error");
+        notify(data.error || "Failed to fetch configs", "error");
       }
     } catch (err) {
       console.error(err);
-      showToast(err.message, "error");
+      notify(err.message, "error");
     } finally {
       setLoading(false);
     }
@@ -73,13 +81,13 @@ export default function RoleMenuTab({ t, lang, guildId, discordChannels, discord
         body: JSON.stringify({ id }),
       });
       if (res.ok) {
-        showToast(lang === "en" ? "Menu deleted!" : "Menü silindi!", "success");
+        notify(lang === "en" ? "Menu deleted!" : "Menü silindi!", "success");
         await fetchConfigs();
       } else {
         throw new Error("Delete failed");
       }
     } catch (err) {
-      showToast(err.message, "error");
+      notify(err.message, "error");
     } finally {
       setDeletingId(null);
     }
@@ -87,11 +95,11 @@ export default function RoleMenuTab({ t, lang, guildId, discordChannels, discord
 
   const saveCurrentConfig = async () => {
     if (!currentConfig.channel_id) {
-      showToast(lang === 'en' ? 'Please select a channel.' : 'Lütfen bir kanal seçin.', 'error');
+      notify(lang === 'en' ? 'Please select a channel.' : 'Lütfen bir kanal seçin.', 'error');
       return;
     }
     if (currentConfig.menus.length === 0) {
-      showToast(lang === 'en' ? 'Add at least one menu.' : 'En az bir menü ekleyin.', 'error');
+      notify(lang === 'en' ? 'Add at least one menu.' : 'En az bir menü ekleyin.', 'error');
       return;
     }
 
@@ -103,14 +111,14 @@ export default function RoleMenuTab({ t, lang, guildId, discordChannels, discord
         body: JSON.stringify(currentConfig),
       });
       if (res.ok) {
-        showToast(lang === "en" ? "Menu saved!" : "Menü kaydedildi!", "success");
+        notify(lang === "en" ? "Menu saved!" : "Menü kaydedildi!", "success");
         setViewState("list");
         await fetchConfigs();
       } else {
         throw new Error("Save failed");
       }
     } catch (err) {
-      showToast(err.message, "error");
+      notify(err.message, "error");
     } finally {
       setSaving(false);
     }
@@ -125,13 +133,13 @@ export default function RoleMenuTab({ t, lang, guildId, discordChannels, discord
         body: JSON.stringify({ action: "send_menu", id }),
       });
       if (res.ok) {
-        showToast(lang === "en" ? "Menu send command issued to the bot." : "Menü gönderme komutu bota iletildi.", "success");
+        notify(lang === "en" ? "Menu send command issued to the bot." : "Menü gönderme komutu bota iletildi.", "success");
       } else {
         const data = await res.json();
         throw new Error(data.error || "Failed to send");
       }
     } catch (err) {
-      showToast(err.message, "error");
+      notify(err.message, "error");
     } finally {
       setTriggeringId(null);
     }
@@ -140,7 +148,7 @@ export default function RoleMenuTab({ t, lang, guildId, discordChannels, discord
   // Menu Builders
   const addMenu = () => {
     if (currentConfig.menus.length >= 5) {
-      showToast(lang === 'en' ? 'Discord limit: Max 5 menus per message.' : 'Discord sınırı: Bir mesajda en fazla 5 menü olabilir.', 'warning');
+      notify(lang === 'en' ? 'Discord limit: Max 5 menus per message.' : 'Discord sınırı: Bir mesajda en fazla 5 menü olabilir.', 'warning');
       return;
     }
     setCurrentConfig(prev => ({
@@ -174,7 +182,7 @@ export default function RoleMenuTab({ t, lang, guildId, discordChannels, discord
 
   const addOption = (menuIndex) => {
     if (currentConfig.menus[menuIndex].options.length >= 25) {
-      showToast(lang === 'en' ? 'Discord limit: Max 25 options per menu.' : 'Discord sınırı: Bir menüde en fazla 25 seçenek olabilir.', 'warning');
+      notify(lang === 'en' ? 'Discord limit: Max 25 options per menu.' : 'Discord sınırı: Bir menüde en fazla 25 seçenek olabilir.', 'warning');
       return;
     }
     setCurrentConfig(prev => {
