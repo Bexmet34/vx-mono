@@ -74,6 +74,14 @@ export const metadata = {
     },
   },
   metadataBase: new URL(LINKS.WEBSITE),
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/icon.png", sizes: "512x512", type: "image/png" }
+    ],
+    shortcut: "/icon.svg",
+    apple: "/icon.png",
+  },
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,

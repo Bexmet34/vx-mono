@@ -12,7 +12,7 @@ const LINKS = {
   SUPPORT_SERVER: "https://veyronix.com.tr/support",
 
   // Static Assets (Logos, Banners)
-  LOGO_URL: "https://veyronix.com.tr/icon.svg",
+  LOGO_URL: "https://veyronix.com.tr/icon.png",
   OG_IMAGE_URL: "https://veyronix.com.tr/og-image.png",
   OG_BANNER_URL: "https://veyronix.com.tr/og-banner.png",
 

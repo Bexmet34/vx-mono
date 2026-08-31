@@ -12,7 +12,7 @@ Hostinger Email MCP sunucusu (`email_call_api_write`) kullanılarak `POST /api/v
   <tr>
     <td valign="middle" style="width: 56px; padding-right: 16px;">
       <a href="https://veyronix.com.tr" target="_blank" style="text-decoration: none; display: block;">
-        <img src="https://veyronix.com.tr/icon.svg" alt="Veyronix" width="48" height="48" style="display: block; border-radius: 10px; border: 0;" />
+        <img src="https://veyronix.com.tr/icon.png" alt="Veyronix" width="48" height="48" style="display: block; border-radius: 10px; border: 0;" />
       </a>
     </td>
     <td valign="top" style="border-left: 2px solid #6366f1; padding-left: 16px;">

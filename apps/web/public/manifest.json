@@ -1,7 +1,7 @@
 {
-  "name": "Veyronix - Albion Online Discord Bot",
+  "name": "Veyronix – Discord & Topluluk Yönetim Botu",
   "short_name": "Veyronix",
-  "description": "#1 Albion Online Discord Botu | Otomatik Killboard & Parti Kurucu",
+  "description": "Discord Kayıt, Geçici Ses Kanalı ve Topluluk Otomasyon Sistemi",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0B0F19",
@@ -9,9 +9,15 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/icon.jpg",
-      "sizes": "1024x1024",
-      "type": "image/jpeg",
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ]
