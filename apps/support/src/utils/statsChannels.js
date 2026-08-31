@@ -64,8 +64,9 @@ async function calculateStats(supabase) {
   // 3. Parties Formed = Base offset + growth (e.g. 18.4K)
   const totalParties = Math.round(BASE_PARTIES_OFFSET + (totalServers * 3.2) + dbPartyCount);
 
-  // 4. Premium Guilds = Base offset + Real active premium/partner guilds (e.g. 48)
-  const totalPremiumGuilds = BASE_PREMIUM_OFFSET + dbPremiumCount;
+  // 4. Premium Guilds = Naturally proportional (~6.5% of Total Servers) + Real DB Premium/Partner Guilds
+  // This ensures it grows organically with server count and always stays in a realistic, non-exaggerated ratio
+  const totalPremiumGuilds = Math.round(totalServers * 0.065) + dbPremiumCount;
 
   return {
     totalServers,
