@@ -31,10 +31,11 @@ module.exports = {
       console.error('[SupportBot] Initial stat channels setup error:', e);
     }
 
-    // 2. Scheduled Live Stat Channels Update (Every 10 minutes - Discord safe rate limit)
-    const STAT_INTERVAL = 10 * 60 * 1000;
+    // 2. Scheduled Live Stat Channels Update (Every 2 Hours)
+    const STAT_INTERVAL = 2 * 60 * 60 * 1000;
     setInterval(async () => {
       try {
+        console.log('[SupportBot] Running scheduled 2-hour stat channels update sweep...');
         await updateStatChannels(guild, client.supabase);
       } catch (err) {
         console.error('[SupportBot] Stat channels update error:', err);
