@@ -1,5 +1,5 @@
 import React from 'react';
-import { Skull, Crosshair, AlertTriangle, Info, Save } from 'lucide-react';
+import { Skull, Crosshair, AlertTriangle, Info, Save, ShieldCheck } from 'lucide-react';
 import InfoTooltip from "@/components/InfoTooltip";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -91,7 +91,7 @@ export default function KillboardTab({ t, settings, setSettings, discordChannels
         </div>
 
         <div className="bg-primary-container/10 border border-primary-container/20 p-3 rounded-md flex gap-3 items-start mt-4">
-          <Info className="text-primary-container mt-0.5" size={18} />
+          <Info className="text-primary-container mt-0.5 shrink-0" size={18} />
           <div>
             <p className="text-on-surface font-body-md text-sm">
               {lang === 'tr' 
@@ -99,6 +99,42 @@ export default function KillboardTab({ t, settings, setSettings, discordChannels
                 : 'Tip: If you want to send Kill and Death notifications to the same channel, you can select the same channel for both options.'}
             </p>
           </div>
+        </div>
+
+        {/* Permission Requirement Box */}
+        <div className="bg-surface-container-high/80 border border-outline-variant/60 rounded-md p-3.5 space-y-2 mt-3">
+          <div className="flex items-center gap-2 text-on-surface font-headline-sm text-xs font-semibold">
+            <ShieldCheck size={16} className="text-primary-container" />
+            <span>{lang === 'tr' ? 'Gerekli Bot İzinleri' : 'Required Bot Permissions'}</span>
+          </div>
+          <p className="text-on-surface-variant text-xs font-body-md leading-relaxed">
+            {lang === 'tr'
+              ? 'Botun seçtiğiniz kanallara Killboard bildirimlerini ve görsel kartları sorunsuz gönderebilmesi için Discord\'da ilgili kanallarda (veya bot rolünde) şu izinlerin açık olması gerekir:'
+              : 'For the bot to post Killboard notifications and visual cards to your selected channels, make sure the following permissions are granted to the bot in those channels (or on its role):'}
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 pt-1">
+            <div className="flex items-center gap-2 bg-surface-container px-2.5 py-1.5 rounded-sm border border-outline-variant/40 text-xs text-on-surface">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              <span>{lang === 'tr' ? 'Kanalları Görüntüle' : 'View Channel'}</span>
+            </div>
+            <div className="flex items-center gap-2 bg-surface-container px-2.5 py-1.5 rounded-sm border border-outline-variant/40 text-xs text-on-surface">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              <span>{lang === 'tr' ? 'Mesaj Gönder' : 'Send Messages'}</span>
+            </div>
+            <div className="flex items-center gap-2 bg-surface-container px-2.5 py-1.5 rounded-sm border border-outline-variant/40 text-xs text-on-surface">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              <span>{lang === 'tr' ? 'Bağlantı Yerleştir' : 'Embed Links'}</span>
+            </div>
+            <div className="flex items-center gap-2 bg-surface-container px-2.5 py-1.5 rounded-sm border border-outline-variant/40 text-xs text-on-surface">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              <span>{lang === 'tr' ? 'Dosya Ekle (Görseller İçin)' : 'Attach Files (For Images)'}</span>
+            </div>
+          </div>
+          <p className="text-[11px] text-on-surface-variant/70 italic pt-0.5">
+            {lang === 'tr'
+              ? '💡 İpucu: Bota sunucuda "Yönetici" (Administrator) yetkisi verilmesi tüm bu izinleri otomatik olarak sağlar.'
+              : '💡 Tip: Granting "Administrator" permission to the bot role automatically covers all required permissions.'}
+          </p>
         </div>
 
       </div>
