@@ -31,11 +31,11 @@ module.exports = {
       console.error('[SupportBot] Initial role sync error:', e);
     }
 
-    // 2. Scheduled Periodic Role Sync (Every 15 minutes)
-    const SYNC_INTERVAL = 15 * 60 * 1000;
+    // 2. Scheduled Periodic Role Sync (Every 2 Hours to prevent any rate-limit or CPU stress)
+    const SYNC_INTERVAL = 2 * 60 * 60 * 1000;
     setInterval(async () => {
       try {
-        console.log('[SupportBot] Running scheduled 15-minute role sync sweep...');
+        console.log('[SupportBot] Running scheduled 2-hour role sync sweep...');
         await syncAllGuildMembers(guild, client.supabase);
       } catch (err) {
         console.error('[SupportBot] Scheduled role sync sweep error:', err);
