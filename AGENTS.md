@@ -1,9 +1,18 @@
-# Veyronix Hostinger E-Posta Gönderim Kuralları
+# Veyronix Hostinger E-Posta & MCP Gönderim Kuralları
 
-Hostinger Email MCP sunucusu (`email_call_api_write`) kullanılarak `POST /api/v1/mailboxes/{mailboxResourceId}/send` endpoint'i üzerinden her e-posta gönderildiğinde:
+## Mailbox & API Bilgileri
+- **Resmi E-Posta Adresi:** `info@veyronix.com.tr`
+- **Mailbox Resource ID:** `AC30b8d8ceec68a6689b8b6a0ece64`
+- **Order Resource ID:** `OR1a85b557ef0111b81fbb336143c1`
+- **API Base URL:** `https://api.mail.hostinger.com`
+- **Gönderim Endpoint:** `POST /api/v1/mailboxes/AC30b8d8ceec68a6689b8b6a0ece64/send`
+- **Klasörler:** `INBOX` (Gelen), `INBOX.Sent` (Gönderilen), `INBOX.Drafts` (Taslak), `INBOX.Junk` (Spam), `INBOX.Trash` (Çöp)
+
+Hostinger Email MCP sunucusu (`email_call_api_write` / `email_call_api_read`) kullanılarak e-posta gönderildiğinde:
 
 1. **HTML Gövdesi (`html`):** Mesaj metninin sonuna mutlaka aşağıdaki Veyronix resmi HTML imzasını ekleyin.
 2. **Düz Metin Gövdesi (`text`):** Mesaj metninin sonuna mutlaka aşağıdaki düz metin imzasını ekleyin.
+3. **Gönderici (`from`):** Her zaman `{ "name": "Veyronix", "address": "info@veyronix.com.tr" }` olarak tanımlanmalıdır.
 
 ### Resmi HTML İmza Şablonu
 
