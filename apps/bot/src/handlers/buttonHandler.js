@@ -358,6 +358,7 @@ async function handlePartyButtons(interaction) {
             }
             
             const voiceLink = invite.url;
+            const voiceName = member.voice.channel.name;
             
             const release = await acquireLock(message.id);
             try {
@@ -370,7 +371,7 @@ async function handlePartyButtons(interaction) {
                 const { finalizeRoleUpdate } = require('./menuHandler');
                 const data = parseEmbedData(freshMessage.embeds[0], lang);
                 
-                const { newEmbed, newComponents } = await finalizeRoleUpdate(freshMessage, data.rolesWithMembers, data.multiRoleWaitlist || [], data, lang, guildName, { voiceLink });
+                const { newEmbed, newComponents } = await finalizeRoleUpdate(freshMessage, data.rolesWithMembers, data.multiRoleWaitlist || [], data, lang, guildName, { voiceLink, voiceName });
                 
                 await freshMessage.edit({ embeds: [newEmbed], components: newComponents }).catch(() => {});
             } finally {

@@ -40,10 +40,17 @@ function parseEmbedData(embed, lang) {
     }
 
     let voiceLink = null;
+    let voiceName = null;
     const voiceLine = infoField.split('\n').find(l => l.includes('🔊'));
     if (voiceLine) {
-        const match = voiceLine.match(/\((https:\/\/discord\.gg\/[a-zA-Z0-9_-]+)\)/);
-        if (match) voiceLink = match[1];
+        const match = voiceLine.match(/\[(.*?)\]\((https:\/\/discord\.gg\/[a-zA-Z0-9_-]+)\)/);
+        if (match) {
+            const linkText = match[1];
+            voiceLink = match[2];
+            if (linkText.includes(' - ')) {
+                voiceName = linkText.split(' - ').slice(1).join(' - ');
+            }
+        }
     }
 
     let rolesWithMembers = [];
@@ -140,6 +147,7 @@ function parseEmbedData(embed, lang) {
         partyTime: '',
         description,
         voiceLink,
+        voiceName,
         rolesWithMembers,
         multiRoleWaitlist
     };
@@ -203,7 +211,7 @@ function createEmbed(title, details, content, roles, isClosed = false, guild = n
 /**
  * Creates a custom party embed for the Partikur system
  */
-function createPartikurEmbed(header, rolesList, description = '', content = '', currentCount = 0, guild = null, lang = 'tr', ownerId = null, thumbnailUrl = null, voiceLink = null) {
+function createPartikurEmbed(header, rolesList, description = '', content = '', currentCount = 0, guild = null, lang = 'tr', ownerId = null, thumbnailUrl = null, voiceLink = null, voiceName = null) {
     let sanitizedHeader = header ? cleanTitle(header) : '';
     
     // Explicitly check for generic titles
@@ -239,7 +247,9 @@ function createPartikurEmbed(header, rolesList, description = '', content = '', 
     }
 
     if (voiceLink) {
-        topInfoValue += `\n🔊 **[${lang === 'tr' ? 'Ses Kanalına Katıl' : 'Join Voice Channel'}](${voiceLink})**`;
+        const linkLabel = lang === 'tr' ? 'Ses Kanalına Katıl' : 'Join Voice Channel';
+        const displayLabel = voiceName ? `${linkLabel} - ${voiceName}` : linkLabel;
+        topInfoValue += `\n🔊 **[${displayLabel}](${voiceLink})**`;
     }
 
     embed.addFields({

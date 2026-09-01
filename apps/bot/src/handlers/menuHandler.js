@@ -354,6 +354,7 @@ async function finalizeRoleUpdate(message, rolesWithMembers, multiRoleWaitlist, 
     const description = overrides.description !== undefined ? overrides.description : data.description;
     const ownerId = overrides.ownerId || data.ownerId;
     const voiceLink = overrides.voiceLink !== undefined ? overrides.voiceLink : data.voiceLink;
+    const voiceName = overrides.voiceName !== undefined ? overrides.voiceName : data.voiceName;
 
     const { createPartikurEmbed, buildRolesFields, buildWaitlistField, addFooterFields } = require('../builders/embedBuilder');
     const { createCustomPartyComponents } = require('../builders/componentBuilder');
@@ -361,7 +362,7 @@ async function finalizeRoleUpdate(message, rolesWithMembers, multiRoleWaitlist, 
 
     const guildConfig = await getGuildConfig(message.guildId);
 
-    const newEmbed = createPartikurEmbed(title, rolesWithMembers.map(r => r.role), description, '', filledCount, message.guild, lang, ownerId, guildConfig?.embed_thumbnail_url, voiceLink);
+    const newEmbed = createPartikurEmbed(title, rolesWithMembers.map(r => r.role), description, '', filledCount, message.guild, lang, ownerId, guildConfig?.embed_thumbnail_url, voiceLink, voiceName);
     newEmbed.addFields(...buildRolesFields(rolesWithMembers, lang, message.guild));
     
     const waitlistField = buildWaitlistField(multiRoleWaitlist, rolesWithMembers, lang);
