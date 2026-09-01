@@ -4,6 +4,18 @@ const { generateKillboardImage } = require('../utils/killboardImage');
 const { getGuildConfig } = require('./guildConfig');
 const { t } = require('./i18n');
 
+const ALBION_ENDPOINTS = {
+  'americas': 'https://gameinfo.albiononline.com/api/gameinfo',
+  'asia': 'https://gameinfo-sgp.albiononline.com/api/gameinfo',
+  'europe': 'https://gameinfo-ams.albiononline.com/api/gameinfo'
+};
+
+function getAlbionBaseUrl(server) {
+  if (!server) return ALBION_ENDPOINTS['europe'];
+  const key = server.toString().trim().toLowerCase();
+  return ALBION_ENDPOINTS[key] || ALBION_ENDPOINTS['europe'];
+}
+
 /**
  * Run the killboard check for all configured guilds
  * @param {import('discord.js').Client} client 
@@ -28,36 +40,28 @@ async function runKillboardCheck(client) {
     // to avoid rate limits if multiple discord servers track the same Albion guild.
     const albionGuildMap = new Map();
     for (const config of configs) {
-      const key = `${config.albion_server}_${config.albion_guild_id}`;
+      const serverKey = (config.albion_server || 'Europe').toString().trim().toLowerCase();
+      const key = `${serverKey}_${config.albion_guild_id}`;
       if (!albionGuildMap.has(key)) {
         albionGuildMap.set(key, {
           albion_guild_id: config.albion_guild_id,
-          albion_server: config.albion_server,
+          albion_server: serverKey,
           discord_configs: []
         });
       }
       albionGuildMap.get(key).discord_configs.push(config);
     }
 
-    const activeServers = [...new Set(configs.map(c => c.albion_server))];
+    const activeServers = [...new Set(configs.map(c => (c.albion_server || 'Europe').toString().trim().toLowerCase()))];
     const serverGlobalEvents = {};
-    const endpoints = {
-      'americas': 'https://gameinfo.albiononline.com/api/gameinfo',
-      'asia': 'https://gameinfo-sgp.albiononline.com/api/gameinfo',
-      'europe': 'https://gameinfo-ams.albiononline.com/api/gameinfo',
-      'Americas': 'https://gameinfo.albiononline.com/api/gameinfo',
-      'Asia': 'https://gameinfo-sgp.albiononline.com/api/gameinfo',
-      'Europe': 'https://gameinfo-ams.albiononline.com/api/gameinfo'
-    };
 
     for (const server of activeServers) {
-      if (!server) continue;
-      const baseUrl = endpoints[server] || endpoints['Europe'];
+      const baseUrl = getAlbionBaseUrl(server);
       serverGlobalEvents[server] = [];
       try {
-        // Fetch up to 250 recent events globally to catch deaths (offset 0, 51, 102, 153, 204)
-        for (let offset = 0; offset <= 204; offset += 51) {
-          const res = await fetch(`${baseUrl}/events?limit=51&offset=${offset}`, { signal: AbortSignal.timeout(8000) });
+        // Fetch up to 102 recent events globally to catch deaths (offset 0, 51)
+        for (let offset = 0; offset <= 51; offset += 51) {
+          const res = await fetch(`${baseUrl}/events?limit=51&offset=${offset}`, { signal: AbortSignal.timeout(6000) });
           if (res.ok) {
             const data = await res.json();
             if (data && data.length) serverGlobalEvents[server].push(...data);
@@ -74,7 +78,7 @@ async function runKillboardCheck(client) {
       await processAlbionGuildEvents(client, trackingInfo, globalEvents);
       
       // Add a small delay between Albion API requests to avoid rate limits
-      await new Promise(r => setTimeout(r, 1000));
+      await new Promise(r => setTimeout(r, 800));
     }
 
   } catch (err) {
@@ -93,18 +97,7 @@ const sessionInitializedConfigs = new Set();
  */
 async function processAlbionGuildEvents(client, trackingInfo, globalEvents = []) {
   const { albion_guild_id, albion_server, discord_configs } = trackingInfo;
-  
-  const endpoints = {
-    'americas': 'https://gameinfo.albiononline.com/api/gameinfo',
-    'asia': 'https://gameinfo-sgp.albiononline.com/api/gameinfo',
-    'europe': 'https://gameinfo-ams.albiononline.com/api/gameinfo',
-    // Fallback if older data
-    'Americas': 'https://gameinfo.albiononline.com/api/gameinfo',
-    'Asia': 'https://gameinfo-sgp.albiononline.com/api/gameinfo',
-    'Europe': 'https://gameinfo-ams.albiononline.com/api/gameinfo'
-  };
-
-  const baseUrl = endpoints[albion_server] || endpoints['Europe'];
+  const baseUrl = getAlbionBaseUrl(albion_server);
   
   try {
     const res = await fetch(`${baseUrl}/events?guildId=${albion_guild_id}&limit=50`, { signal: AbortSignal.timeout(10000) });
