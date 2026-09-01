@@ -21,7 +21,8 @@ export async function GET() {
       method: "GET",
       headers: {
         "Authorization": `Bearer ${patToken}`,
-        "Accept": "application/json"
+        "Accept": "application/json",
+        "User-Agent": "VeyronixPlatform/1.0"
       }
     });
 
