@@ -43,10 +43,10 @@ async function runKillboardCheck(client) {
     const serverGlobalEvents = {};
     const endpoints = {
       'americas': 'https://gameinfo.albiononline.com/api/gameinfo',
-      'asia': 'https://gameinfo-sg.albiononline.com/api/gameinfo',
+      'asia': 'https://gameinfo-sgp.albiononline.com/api/gameinfo',
       'europe': 'https://gameinfo-ams.albiononline.com/api/gameinfo',
       'Americas': 'https://gameinfo.albiononline.com/api/gameinfo',
-      'Asia': 'https://gameinfo-sg.albiononline.com/api/gameinfo',
+      'Asia': 'https://gameinfo-sgp.albiononline.com/api/gameinfo',
       'Europe': 'https://gameinfo-ams.albiononline.com/api/gameinfo'
     };
 
@@ -96,11 +96,11 @@ async function processAlbionGuildEvents(client, trackingInfo, globalEvents = [])
   
   const endpoints = {
     'americas': 'https://gameinfo.albiononline.com/api/gameinfo',
-    'asia': 'https://gameinfo-sg.albiononline.com/api/gameinfo',
+    'asia': 'https://gameinfo-sgp.albiononline.com/api/gameinfo',
     'europe': 'https://gameinfo-ams.albiononline.com/api/gameinfo',
     // Fallback if older data
     'Americas': 'https://gameinfo.albiononline.com/api/gameinfo',
-    'Asia': 'https://gameinfo-sg.albiononline.com/api/gameinfo',
+    'Asia': 'https://gameinfo-sgp.albiononline.com/api/gameinfo',
     'Europe': 'https://gameinfo-ams.albiononline.com/api/gameinfo'
   };
 
