@@ -25,12 +25,23 @@ export async function GET() {
 
     if (!response.ok) {
       console.error("[Shopier Products Error]:", data);
-      return NextResponse.json({ error: "Shopier ürünleri çekilemedi.", details: data }, { status: response.status });
+      // Hata alınırsa varsayılan Veyronix paketlerini döndür ki sayfa boş kalmasın
+      return NextResponse.json([
+        { id: "696547", title: "1 Aylık Sunucu Premium", price: "150.00" },
+        { id: "696548", title: "3 Aylık Sunucu Premium", price: "390.00" },
+        { id: "696549", title: "1 Yıllık Sunucu Premium", price: "1200.00" }
+      ]);
     }
 
     return NextResponse.json(data);
   } catch (error) {
     console.error("[Shopier Products GET Error]:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    // Bağlantı hatasında da varsayılan Veyronix paketlerini dön
+    return NextResponse.json([
+      { id: "696547", title: "1 Aylık Sunucu Premium", price: "150.00" },
+      { id: "696548", title: "3 Aylık Sunucu Premium", price: "390.00" },
+      { id: "696549", title: "1 Yıllık Sunucu Premium", price: "1200.00" }
+    ]);
   }
 }
+
