@@ -714,7 +714,7 @@ export default function ServerSettings() {
               </div>
             </div>
           </div>
-          <div className="flex-1 w-full md:w-auto md:max-w-md flex justify-end">
+          <div className="flex-1 w-full md:w-auto md:max-w-[480px] lg:max-w-[520px] flex justify-end">
             <AnnouncementsCarousel lang={lang} />
           </div>
         </header>
