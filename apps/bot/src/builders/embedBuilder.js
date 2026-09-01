@@ -39,6 +39,13 @@ function parseEmbedData(embed, lang) {
         }
     }
 
+    let voiceLink = null;
+    const voiceLine = infoField.split('\n').find(l => l.includes('🔊'));
+    if (voiceLine) {
+        const match = voiceLine.match(/\((https:\/\/discord\.gg\/[a-zA-Z0-9_-]+)\)/);
+        if (match) voiceLink = match[1];
+    }
+
     let rolesWithMembers = [];
     
     for (const field of rollerFields) {
@@ -132,6 +139,7 @@ function parseEmbedData(embed, lang) {
         content: '',
         partyTime: '',
         description,
+        voiceLink,
         rolesWithMembers,
         multiRoleWaitlist
     };
@@ -195,7 +203,7 @@ function createEmbed(title, details, content, roles, isClosed = false, guild = n
 /**
  * Creates a custom party embed for the Partikur system
  */
-function createPartikurEmbed(header, rolesList, description = '', content = '', currentCount = 0, guild = null, lang = 'tr', ownerId = null, thumbnailUrl = null) {
+function createPartikurEmbed(header, rolesList, description = '', content = '', currentCount = 0, guild = null, lang = 'tr', ownerId = null, thumbnailUrl = null, voiceLink = null) {
     let sanitizedHeader = header ? cleanTitle(header) : '';
     
     // Explicitly check for generic titles
@@ -228,6 +236,10 @@ function createPartikurEmbed(header, rolesList, description = '', content = '', 
     
     if (description && description.trim() !== '') {
         topInfoValue += `\n📝 **${t('party.party_description', lang)}:** ${description.trim()}`;
+    }
+
+    if (voiceLink) {
+        topInfoValue += `\n🔊 **[${lang === 'tr' ? 'Ses Kanalına Katıl' : 'Join Voice Channel'}](${voiceLink})**`;
     }
 
     embed.addFields({

@@ -99,6 +99,15 @@ function createSelectMenuPartyComponents(rolesList, ownerId, lang, rolesWithMemb
             .setStyle(ButtonStyle.Secondary)
     ));
 
+    // --- Row 3: Voice Channel Link Button ---
+    rows.push(new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId(`link_vc_${ownerId}`)
+            .setLabel(lang === 'tr' ? 'Ses Kanalını Bağla' : 'Link Voice Channel')
+            .setEmoji('🔊')
+            .setStyle(ButtonStyle.Success)
+    ));
+
     return rows;
 }
 
@@ -162,6 +171,17 @@ function createButtonPartyComponents(rolesList, ownerId, lang, guildOrClient = n
 
     // Management Menu (last row)
     rows.push(new ActionRowBuilder().addComponents(createManageMenu(ownerId, lang)));
+
+    // Voice Channel Link Button (add if we have space, we should since max is 5, role buttons take max 3, leave+manage is 1 or 2)
+    if (rows.length < MAX_TOTAL_ROWS) {
+        rows.push(new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setCustomId(`link_vc_${ownerId}`)
+                .setLabel(lang === 'tr' ? 'Ses Kanalını Bağla' : 'Link Voice Channel')
+                .setEmoji('🔊')
+                .setStyle(ButtonStyle.Success)
+        ));
+    }
 
     // Safety check
     if (rows.length > 5) {

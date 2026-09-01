@@ -325,6 +325,68 @@ async function handlePartyButtons(interaction) {
         return; // Interaction zaten cevaplandı, settings bloklarına düşmesin
     }
 
+    if (customId.startsWith('link_vc_')) {
+        const ownerId = customId.split('_')[2];
+        if (interaction.user.id !== ownerId) {
+            return await interaction.reply({
+                content: `⛔ **${t('common.only_leader_can_manage', lang)}**`,
+                flags: [MessageFlags.Ephemeral]
+            });
+        }
+        
+        const member = interaction.member;
+        if (!member.voice || !member.voice.channel) {
+            return await interaction.reply({
+                content: lang === 'tr' ? '❌ Lütfen önce bir ses kanalına katılın.' : '❌ Please join a voice channel first.',
+                flags: [MessageFlags.Ephemeral]
+            });
+        }
+        
+        await interaction.deferUpdate().catch(() => {});
+        
+        try {
+            const invite = await member.voice.channel.createInvite({ maxAge: 0, maxUses: 0 }).catch(e => {
+                console.error('Invite creation error:', e);
+                return null;
+            });
+            
+            if (!invite) {
+                return await interaction.followUp({
+                    content: lang === 'tr' ? '❌ Ses kanalı linki oluşturulamadı. Botun kanalda "Davet Oluştur" yetkisi olduğundan emin olun.' : '❌ Failed to create voice invite. Ensure bot has "Create Invite" permissions.',
+                    flags: [MessageFlags.Ephemeral]
+                });
+            }
+            
+            const voiceLink = invite.url;
+            
+            const release = await acquireLock(message.id);
+            try {
+                const channel = interaction.channel || await interaction.client.channels.fetch(interaction.channelId);
+                const freshMessage = await channel.messages.fetch(message.id);
+                if (!freshMessage || !freshMessage.embeds[0]) {
+                    release();
+                    return;
+                }
+                const { finalizeRoleUpdate } = require('./menuHandler');
+                const data = parseEmbedData(freshMessage.embeds[0], lang);
+                
+                const { newEmbed, newComponents } = await finalizeRoleUpdate(freshMessage, data.rolesWithMembers, data.multiRoleWaitlist || [], data, lang, guildName, { voiceLink });
+                
+                await freshMessage.edit({ embeds: [newEmbed], components: newComponents }).catch(() => {});
+            } finally {
+                release();
+            }
+        } catch (error) {
+            console.error('Error handling link_vc:', error);
+            if (interaction.deferred || interaction.replied) {
+                await interaction.followUp({ content: '❌ Bir hata oluştu.', flags: [MessageFlags.Ephemeral] }).catch(() => {});
+            } else {
+                await interaction.reply({ content: '❌ Bir hata oluştu.', flags: [MessageFlags.Ephemeral] }).catch(() => {});
+            }
+        }
+        return;
+    }
+
     // --- SETTINGS BUTTON HANDLERS ---
 
     if (customId === 'swap_roles_btn') {
