@@ -92,7 +92,7 @@ export default function Navbar({ isStatic = false }) {
 
   return (
     <>
-      <nav className={`${isStatic ? 'absolute' : 'fixed'} top-0 w-full z-40 bg-surface/85 backdrop-blur-xl border-b border-on-surface/10 shadow-[0_4px_25px_rgba(0,0,0,0.4)] transition-all`}>
+      <nav className={`${isStatic ? 'absolute' : 'fixed'} top-0 w-full z-[100] bg-surface/85 backdrop-blur-xl border-b border-on-surface/10 shadow-[0_4px_25px_rgba(0,0,0,0.4)] transition-all`}>
         <div className="flex justify-between items-center px-3 md:px-margin-desktop py-2 max-w-container-max mx-auto">
           <div className="flex items-center gap-1">
             <Link href="/" className="flex items-center gap-2.5 font-headline-md text-headline-md font-bold tracking-tighter text-primary-container group">
@@ -113,7 +113,7 @@ export default function Navbar({ isStatic = false }) {
                   {lang === 'tr' ? 'Keşfet' : 'Explore'}
                   <ChevronDown size={14} className="text-on-surface-variant group-hover:text-primary-container transition-transform group-hover:rotate-180" />
                 </div>
-                <div className="absolute top-[100%] left-0 mt-2 w-52 bg-[#081425]/95 backdrop-blur-2xl border border-outline-variant/50 p-2 shadow-[0_15px_40px_rgba(0,0,0,0.8),0_0_20px_rgba(255,215,0,0.1)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 rounded-xl">
+                <div className="absolute top-[100%] left-0 mt-2 w-52 bg-[#081425]/95 backdrop-blur-2xl border border-outline-variant/50 p-2 shadow-[0_15px_40px_rgba(0,0,0,0.8),0_0_20px_rgba(255,215,0,0.1)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 rounded-xl z-[110]">
                   <div className="flex flex-col gap-1">
                     <div className="px-3 py-1 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest">
                       {lang === 'tr' ? 'Öne Çıkan Sistemler' : 'Core Systems'}
@@ -257,7 +257,7 @@ export default function Navbar({ isStatic = false }) {
                     </button>
 
                     {isProfileOpen && (
-                        <div className="absolute top-full right-0 mt-2 w-56 md:w-64 bg-surface-container border border-outline-variant/50 p-2 z-50 shadow-[0_10px_40px_rgba(0,0,0,0.8)] animate-in fade-in slide-in-from-top-2 rounded-2xl">
+                        <div className="absolute top-full right-0 mt-2 w-56 md:w-64 bg-surface-container border border-outline-variant/50 p-2 z-[110] shadow-[0_10px_40px_rgba(0,0,0,0.8)] animate-in fade-in slide-in-from-top-2 rounded-2xl">
                           <div className="flex flex-col gap-1">
                             <div className="px-2 py-1 md:hidden border-b border-outline-variant/30 mb-1">
                               <div className="text-xs font-bold text-on-surface truncate">{session.user?.name}</div>
