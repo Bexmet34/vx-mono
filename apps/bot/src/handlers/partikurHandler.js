@@ -87,74 +87,49 @@ async function checkWeeklyVote(userId) {
  * Handles /createparty command
  */
 async function handleCreatePartyCommand(interaction) {
-    const userId = interaction.user.id;
-    const [guildConfig, userPremium, serverPremium, sub] = await Promise.all([
-        getGuildConfig(interaction.guildId).catch(() => null),
-        isUserPremium(userId).catch(() => false),
-        isSubscriptionActive(interaction.guildId).catch(() => false),
-        getSubscription(interaction.guildId, interaction.guild?.name, interaction.guild?.ownerId).catch(() => null)
-    ]);
-
-    const lang = guildConfig?.language || 'tr';
-    const isOwner = userId === interaction.guild?.ownerId;
-    const isDeveloper = config.WHITELIST_USERS?.includes(userId);
-    const isUnlimitedParty = sub?.unlimited_party === true || sub?.is_unlimited === true;
-
-    // Vote check is moved to Modal Submit (modalHandler) to prevent Discord 3-second timeout!
-
-    const partyCount = getActivePartyCount(userId);
-    let limit = 1;
-    if (isOwner || isDeveloper || userPremium || isUnlimitedParty || serverPremium) limit = 999;
-
-    if (partyCount >= limit) {
-        let errorMsg = `❌ **${t('party.already_active', lang)}**\n\n${t('party.limit_desc_normal', lang)}`;
-
-        return await interaction.reply({
-            content: errorMsg,
-            flags: [MessageFlags.Ephemeral]
-        });
-    }
-
-    const modal = new ModalBuilder()
-        .setCustomId(`parti_modal:genel`)
-        .setTitle(t('party.create_party_title', lang));
-
-    const headerInput = new TextInputBuilder()
-        .setCustomId('party_header')
-        .setLabel(t('party.party_header_label', lang))
-        .setPlaceholder(t('party.party_header_placeholder', lang))
-        .setStyle(TextInputStyle.Short)
-        .setMinLength(2)
-        .setMaxLength(100)
-        .setRequired(true);
-
-    const rolesInput = new TextInputBuilder()
-        .setCustomId('party_roles')
-        .setLabel(t('party.party_roles_label', lang))
-        .setPlaceholder(t('party.party_roles_placeholder', lang))
-        .setStyle(TextInputStyle.Paragraph)
-        .setMinLength(2)
-        .setMaxLength(4000)
-        .setRequired(true);
-
-    const descriptionInput = new TextInputBuilder()
-        .setCustomId('party_description')
-        .setLabel(t('party.party_desc_label', lang))
-        .setPlaceholder(t('party.party_desc_placeholder', lang))
-        .setStyle(TextInputStyle.Paragraph)
-        .setMaxLength(1000)
-        .setRequired(false);
-
-    modal.addComponents(
-        new ActionRowBuilder().addComponents(headerInput),
-        new ActionRowBuilder().addComponents(descriptionInput),
-        new ActionRowBuilder().addComponents(rolesInput)
-    );
-
     try {
+        const guildConfig = await getGuildConfig(interaction.guildId).catch(() => null);
+        const lang = guildConfig?.language || 'tr';
+
+        const modal = new ModalBuilder()
+            .setCustomId(`parti_modal:genel`)
+            .setTitle(t('party.create_party_title', lang));
+
+        const headerInput = new TextInputBuilder()
+            .setCustomId('party_header')
+            .setLabel(t('party.party_header_label', lang))
+            .setPlaceholder(t('party.party_header_placeholder', lang))
+            .setStyle(TextInputStyle.Short)
+            .setMinLength(2)
+            .setMaxLength(100)
+            .setRequired(true);
+
+        const rolesInput = new TextInputBuilder()
+            .setCustomId('party_roles')
+            .setLabel(t('party.party_roles_label', lang))
+            .setPlaceholder(t('party.party_roles_placeholder', lang))
+            .setStyle(TextInputStyle.Paragraph)
+            .setMinLength(2)
+            .setMaxLength(4000)
+            .setRequired(true);
+
+        const descriptionInput = new TextInputBuilder()
+            .setCustomId('party_description')
+            .setLabel(t('party.party_desc_label', lang))
+            .setPlaceholder(t('party.party_desc_placeholder', lang))
+            .setStyle(TextInputStyle.Paragraph)
+            .setMaxLength(1000)
+            .setRequired(false);
+
+        modal.addComponents(
+            new ActionRowBuilder().addComponents(headerInput),
+            new ActionRowBuilder().addComponents(descriptionInput),
+            new ActionRowBuilder().addComponents(rolesInput)
+        );
+
         await interaction.showModal(modal);
     } catch (err) {
-        console.error(`[PartikurHandler] Failed to show modal (Interaction expired): ${err.message}`);
+        console.error(`[PartikurHandler] Failed to show modal: ${err.message}`);
     }
 }
 
