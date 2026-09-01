@@ -6,14 +6,9 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const patToken = process.env.SHOPIER_PAT_TOKEN;
     if (!patToken) {
-      return NextResponse.json({ error: "SHOPIER_PAT_TOKEN bulunamadı." }, { status: 500 });
+      return NextResponse.json({ error: "SHOPIER_PAT_TOKEN ortam değişkeni tanımlı değil." }, { status: 500 });
     }
 
     // Shopier v1 API ile Mağazadaki Ürünleri Çek
