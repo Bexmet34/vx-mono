@@ -61,7 +61,7 @@ async function generateKillboardImage(event) {
     }
   }
 
-  const iconSize = 140;
+  const iconSize = 135;
   const spacing = 16;
   const startY = 190;
 
