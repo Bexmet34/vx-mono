@@ -58,8 +58,8 @@ export async function GET() {
         const data = await res.json();
         return NextResponse.json(Array.isArray(data) ? data : FALLBACK_PRODUCTS);
       }
-      // PAT ile de 403 gelirse statik ürünleri shopUrl ile döndür
-      return NextResponse.json(FALLBACK_PRODUCTS.map(p => ({ ...p, url: shopUrl })));
+      // PAT ile de 403 gelirse statik ürünleri URL'leriyle döndür
+      return NextResponse.json(FALLBACK_PRODUCTS);
     }
 
     // 3. Her şey başarısız → statik fallback
