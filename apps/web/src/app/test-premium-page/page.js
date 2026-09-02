@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useSession, signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { 
-  CreditCard, X, Loader2, CheckCircle, Server, ShieldCheck, ShoppingBag
+  CreditCard, X, Loader2, CheckCircle, Server, ShieldCheck, ShoppingBag, ExternalLink
 } from "lucide-react";
 
 export default function TestPremiumPage() {
@@ -27,10 +27,9 @@ export default function TestPremiumPage() {
   const [checkoutError, setCheckoutError] = useState("");
   const [isLoadingServers, setIsLoadingServers] = useState(false);
 
-  // iFrame Modal State
-  const [showFrameModal, setShowFrameModal] = useState(false);
-  const [paymentUrl, setPaymentUrl] = useState("");
-  const [iframeError, setIframeError] = useState(false);
+  // Ödeme Popup State
+  const [paymentPending, setPaymentPending] = useState(false);
+  const [paymentDone, setPaymentDone] = useState(false);
 
   const paymentStatus = searchParams.get('payment');
 
@@ -101,10 +100,25 @@ export default function TestPremiumPage() {
       const data = await res.json();
 
       if (res.ok && data.payment_url) {
-        setPaymentUrl(data.payment_url);
-        setIframeError(false);
         setShowCheckout(false);
-        setShowFrameModal(true);
+        setPaymentDone(false);
+        setPaymentPending(true);
+
+        // Shopier ödeme sayfasını popup'ta aç
+        const popup = window.open(
+          data.payment_url,
+          'shopier-odeme',
+          'width=820,height=720,left=200,top=100,resizable=yes,scrollbars=yes'
+        );
+
+        // Popup kapandığında kontrol et
+        const timer = setInterval(() => {
+          if (!popup || popup.closed) {
+            clearInterval(timer);
+            setPaymentPending(false);
+            setPaymentDone(true);
+          }
+        }, 1000);
       } else {
         setCheckoutError(data.error || "Shopier ödeme oturumu açılamadı.");
       }
@@ -124,10 +138,10 @@ export default function TestPremiumPage() {
           <ShieldCheck className="text-emerald-400 shrink-0" size={24} />
           <div>
             <h4 className="font-bold text-sm text-emerald-200 uppercase tracking-wide">Shopier Mağaza Ürünleri Canlı Entegrasyonu</h4>
-            <p className="text-xs text-emerald-300/80">PAT tokenınız ile doğrudan Shopier mağazanızdaki gerçek ürünler listeleniyor.</p>
+            <p className="text-xs text-emerald-300/80">Shopier mağazanızdaki gerçek ürünler listeleniyor.</p>
           </div>
         </div>
-        <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-mono text-xs font-bold shrink-0">CANLI SHOPIER PAT</span>
+        <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-mono text-xs font-bold shrink-0">CANLI</span>
       </div>
 
       {paymentStatus === 'success' && (
@@ -142,7 +156,7 @@ export default function TestPremiumPage() {
       <section className="text-center">
         <h1 className="text-3xl sm:text-4xl font-extrabold text-on-surface mb-3">Shopier Mağaza Ürünleriniz</h1>
         <p className="text-xs sm:text-sm text-on-surface-variant mb-8 max-w-lg mx-auto">
-          Shopier mağazanızda bulunan ürünler aşağıda çekilmiştir. Seçtiğiniz ürün sitemizden **hiç ayrılmadan** ödeme modalında açılacaktır.
+          Shopier mağazanızda bulunan ürünler aşağıda listelenmiştir. Ödeme popup penceresinde güvenle tamamlanır.
         </p>
 
         {/* Shopier Real Products List */}
@@ -171,17 +185,37 @@ export default function TestPremiumPage() {
                 <div key={product.id || idx} className="p-5 rounded-2xl border border-outline-variant/30 bg-surface-container-low/80 flex flex-col justify-between">
                   <div>
                     <h4 className="font-bold text-base text-on-surface uppercase mb-1">{product.title || product.name || "Shopier Ürünü"}</h4>
+                    {product.duration_days && (
+                      <p className="text-xs text-on-surface-variant mb-2">
+                        {product.duration_days >= 365 
+                          ? `${Math.round(product.duration_days / 365)} Yıl Süre` 
+                          : `${Math.round(product.duration_days / 30)} Ay Süre`}
+                      </p>
+                    )}
                     <div className="text-2xl font-extrabold text-primary-container mb-3">
                       {product.price} TL
                     </div>
                   </div>
-                  <button 
-                    onClick={() => handleBuyClick(product)}
-                    className="w-full py-2.5 bg-primary-container text-on-primary font-bold text-xs uppercase rounded-xl flex items-center justify-center gap-2 hover:brightness-110 active:scale-95 transition-all mt-4"
-                  >
-                    <CreditCard size={16} />
-                    <span>Siteden Ayrılmadan Öde</span>
-                  </button>
+                  <div className="flex flex-col gap-2 mt-4">
+                    <button 
+                      onClick={() => handleBuyClick(product)}
+                      className="w-full py-2.5 bg-primary-container text-on-primary font-bold text-xs uppercase rounded-xl flex items-center justify-center gap-2 hover:brightness-110 active:scale-95 transition-all"
+                    >
+                      <CreditCard size={16} />
+                      <span>Satın Al</span>
+                    </button>
+                    {product.url && (
+                      <a
+                        href={product.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full py-2 text-center text-xs text-on-surface-variant hover:text-primary-container flex items-center justify-center gap-1 transition-colors"
+                      >
+                        <ExternalLink size={12} />
+                        Shopier'de Görüntüle
+                      </a>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -200,7 +234,7 @@ export default function TestPremiumPage() {
             </button>
 
             <h3 className="text-lg font-bold text-on-surface uppercase mb-1">{selectedProduct.title || selectedProduct.name}</h3>
-            <p className="text-xs text-on-surface-variant mb-4">Shopier güvenli kart ödemesi başlatılacak.</p>
+            <p className="text-xs text-on-surface-variant mb-4">Shopier güvenli kart ödemesi popup pencerede açılacak.</p>
 
             {checkoutError && <div className="p-3 mb-3 bg-error/10 border border-error/40 text-error text-xs rounded-xl">{checkoutError}</div>}
 
@@ -210,6 +244,12 @@ export default function TestPremiumPage() {
               <div className="space-y-2 max-h-36 overflow-y-auto bg-[#060913] p-2 rounded-xl border border-outline-variant/30">
                 {status !== "authenticated" ? (
                   <button onClick={() => signIn("discord")} className="w-full py-2 bg-[#5865F2] text-white text-xs font-bold rounded-xl">Discord ile Giriş Yap</button>
+                ) : isLoadingServers ? (
+                  <div className="flex items-center justify-center py-3 gap-2 text-on-surface-variant text-xs">
+                    <Loader2 className="animate-spin" size={14} /> Sunucular yükleniyor...
+                  </div>
+                ) : userServers.length === 0 ? (
+                  <p className="text-xs text-on-surface-variant text-center py-2">Yönetici olduğunuz sunucu bulunamadı.</p>
                 ) : userServers.map(s => (
                   <label key={s.guild_id} className={`flex items-center justify-between p-2 rounded-lg border cursor-pointer ${selectedServer === s.guild_id ? 'border-primary-container bg-primary-container/10' : 'border-outline-variant/30'}`}>
                     <span className="text-xs font-bold text-on-surface">{s.guild_name}</span>
@@ -230,65 +270,33 @@ export default function TestPremiumPage() {
               disabled={isProcessing || !selectedServer}
               className="w-full py-3 bg-primary-container text-on-primary font-bold text-xs uppercase rounded-xl flex items-center justify-center gap-2 hover:brightness-110 active:scale-95 disabled:opacity-40"
             >
-              {isProcessing ? <Loader2 className="animate-spin" size={16} /> : <><CreditCard size={16} /> <span>SİTEDEN AYRILMADAN ÖDEMEYİ BAŞLAT</span></>}
+              {isProcessing ? <Loader2 className="animate-spin" size={16} /> : <><CreditCard size={16} /> <span>SHOPIER İLE ÖDE</span></>}
             </button>
           </div>
         </div>
       )}
 
-      {/* SHOPIER IFRAME MODAL */}
-      {showFrameModal && paymentUrl && (
-        <div className="fixed inset-0 z-[150] flex items-center justify-center p-2 sm:p-4">
-          <div className="fixed inset-0 bg-black/90 backdrop-blur-md" onClick={() => setShowFrameModal(false)}></div>
-
-          <div className="relative z-10 w-full max-w-xl bg-[#080C18] border border-primary-container/40 rounded-3xl overflow-hidden shadow-2xl flex flex-col h-[85vh]">
-            <div className="p-4 bg-surface-container-high border-b border-outline-variant/30 flex items-center justify-between shrink-0">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="text-primary-container" size={20} />
-                <span className="font-bold text-xs text-on-surface uppercase tracking-wider">Shopier 256-bit SSL Güvenli Kart Ödemesi</span>
-              </div>
-              <button onClick={() => setShowFrameModal(false)} className="p-1.5 rounded-lg bg-surface-container-highest text-on-surface-variant hover:text-error">
-                <X size={18} />
-              </button>
-            </div>
-
-            {/* Shopier iFrame */}
-            <div className="flex-grow w-full h-full relative bg-white">
-              {iframeError ? (
-                <div className="flex flex-col items-center justify-center h-full gap-4 bg-[#080C18] p-8">
-                  <ShieldCheck className="text-yellow-400" size={40} />
-                  <p className="text-sm text-on-surface-variant text-center">
-                    Ödeme sayfası bu pencerede açılamıyor.<br/>Güvenli ödeme için yeni sekmede açın.
-                  </p>
-                  <a
-                    href={paymentUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-6 py-3 bg-primary-container text-on-primary font-bold text-xs uppercase rounded-xl flex items-center gap-2 hover:brightness-110"
-                  >
-                    <CreditCard size={16} />
-                    Shopier Ödeme Sayfasını Aç
-                  </a>
-                </div>
-              ) : (
-                <iframe 
-                  src={paymentUrl}
-                  className="w-full h-full border-0"
-                  title="Shopier Ödeme Formu"
-                  onError={() => setIframeError(true)}
-                  onLoad={(e) => {
-                    try {
-                      // iFrame yüklendi ama 404 sayfası mı kontrol et
-                      const doc = e.target.contentDocument;
-                      if (doc && doc.title && (doc.title.includes('404') || doc.title.includes('not found'))) {
-                        setIframeError(true);
-                      }
-                    } catch (err) { /* cross-origin - normal */ }
-                  }}
-                />
-              )}
-            </div>
+      {/* Ödeme Popup Durum Banner */}
+      {paymentPending && (
+        <div className="fixed bottom-6 right-6 z-[200] bg-[#080C18] border border-primary-container/40 rounded-2xl p-4 shadow-2xl flex items-center gap-3 max-w-xs">
+          <Loader2 className="animate-spin text-primary-container shrink-0" size={20} />
+          <div>
+            <p className="text-xs font-bold text-on-surface">Shopier Ödeme Sayfası Açık</p>
+            <p className="text-xs text-on-surface-variant">Ödemeyi tamamlayın, pencereyi kapatmayın.</p>
           </div>
+        </div>
+      )}
+
+      {paymentDone && (
+        <div className="fixed bottom-6 right-6 z-[200] bg-emerald-500/10 border border-emerald-500/40 rounded-2xl p-4 shadow-2xl flex items-center gap-3 max-w-xs">
+          <CheckCircle className="text-emerald-400 shrink-0" size={20} />
+          <div>
+            <p className="text-xs font-bold text-emerald-200">Ödeme tamamlandı mı?</p>
+            <p className="text-xs text-emerald-300/80">Premium paketiniz kısa sürede aktif olacak.</p>
+          </div>
+          <button onClick={() => setPaymentDone(false)} className="ml-auto text-on-surface-variant hover:text-error">
+            <X size={16} />
+          </button>
         </div>
       )}
 
