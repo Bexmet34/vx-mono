@@ -16,6 +16,16 @@ function getAlbionBaseUrl(server) {
   return ALBION_ENDPOINTS[key] || ALBION_ENDPOINTS['europe'];
 }
 
+function getAppEmoji(client, names, fallback = '') {
+  if (client?.application?.emojis?.cache) {
+    for (const name of names) {
+      const found = client.application.emojis.cache.find(e => e.name.toLowerCase() === name.toLowerCase());
+      if (found) return found.toString();
+    }
+  }
+  return fallback;
+}
+
 /**
  * Run the killboard check for all configured guilds
  * @param {import('discord.js').Client} client 
@@ -220,14 +230,17 @@ async function processAlbionGuildEvents(client, trackingInfo, globalEvents = [])
           }
         }
 
+        const killerEmoji = getAppEmoji(client, ['killbotknife'], '⚔️');
+        const victimEmoji = getAppEmoji(client, ['kilbotdeath', 'killbotdeath'], '💀');
+
         const fameNum = event.TotalVictimKillFame || event.KillFame || 0;
         const embed = new EmbedBuilder()
           .setAuthor({ name: 'Albion Online PvP Event' })
           .setTitle(embedTitle)
           .setColor(color)
           .setDescription(
-            `**Katil:** [${event.Killer.GuildName || 'Yok'}] ${event.Killer.Name} \`(IP: ${Math.round(event.Killer.AverageItemPower)})\`\n` +
-            `**Kurban:** [${event.Victim.GuildName || 'Yok'}] ${event.Victim.Name} \`(IP: ${Math.round(event.Victim.AverageItemPower)})\`\n\n` +
+            `${killerEmoji} [${event.Killer.GuildName || 'Yok'}] ${event.Killer.Name} \`(IP: ${Math.round(event.Killer.AverageItemPower)})\`\n` +
+            `${victimEmoji} [${event.Victim.GuildName || 'Yok'}] ${event.Victim.Name} \`(IP: ${Math.round(event.Victim.AverageItemPower)})\`\n\n` +
             `🎯 **Fame:** ${fameNum.toLocaleString()} | 👥 **Katılımcı:** ${event.Participants ? event.Participants.length : 1}`
           )
           .setImage('attachment://killboard.png')
