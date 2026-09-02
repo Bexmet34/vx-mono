@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useSession, signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { 
-  CreditCard, X, Loader2, CheckCircle, Server, ShieldCheck, ShoppingBag, ExternalLink
+  CreditCard, X, Loader2, CheckCircle, Server, ShieldCheck, Zap, ChevronDown, ChevronUp, Sparkles, Heart
 } from "lucide-react";
 
 export default function TestPremiumPage() {
@@ -26,6 +26,9 @@ export default function TestPremiumPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
   const [isLoadingServers, setIsLoadingServers] = useState(false);
+
+  // Accordion State
+  const [openAccordion, setOpenAccordion] = useState('server');
 
   // Ödeme Popup State
   const [paymentPending, setPaymentPending] = useState(false);
@@ -129,6 +132,11 @@ export default function TestPremiumPage() {
     }
   };
 
+  const toggleAccordion = (name) => {
+    setOpenAccordion(openAccordion === name ? null : name);
+  };
+
+
   return (
     <main className="min-h-screen pt-24 pb-32 px-4 max-w-4xl mx-auto w-full">
       
@@ -153,73 +161,109 @@ export default function TestPremiumPage() {
       )}
 
       {/* Main Section */}
-      <section className="text-center">
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-on-surface mb-3">Shopier Mağaza Ürünleriniz</h1>
-        <p className="text-xs sm:text-sm text-on-surface-variant mb-8 max-w-lg mx-auto">
-          Shopier mağazanızda bulunan ürünler aşağıda listelenmiştir. Ödeme popup penceresinde güvenle tamamlanır.
+      <section className="relative text-center flex flex-col items-center w-full overflow-hidden">
+        {/* Ambient Glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm sm:max-w-md h-[250px] bg-primary-container/10 blur-[90px] pointer-events-none rounded-full"></div>
+        
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary-container/10 border border-primary-container/30 text-primary-container font-label-bold text-xs uppercase tracking-widest mb-3 shadow-[0_0_15px_rgba(255,215,0,0.15)] relative z-10">
+          <Sparkles size={14} />
+          <span>Veyronix Premium (Shopier)</span>
+        </div>
+
+        <h1 className="font-headline-xl text-3xl sm:text-4xl md:text-5xl text-on-surface mb-3 font-bold tracking-tight relative z-10">
+          Sunucunuza Güç Katın
+        </h1>
+        
+        <p className="font-body-md text-xs sm:text-sm text-on-surface-variant max-w-xl mx-auto mb-8 relative z-10 leading-relaxed font-light">
+          Shopier altyapısı ile saniyeler içinde premium özelliklerin kilidini açın.
         </p>
 
-        {/* Shopier Real Products List */}
-        <div className="rounded-2xl border border-primary-container/40 bg-surface-container-high/90 p-5 text-left mb-6">
-          <h3 className="font-bold text-base text-on-surface mb-4 flex items-center gap-2">
-            <ShoppingBag className="text-primary-container" size={20} />
-            <span>Shopier Mağaza Ürünleriniz</span>
-          </h3>
-
-          {loadingProducts ? (
-            <div className="flex items-center justify-center py-8 text-primary-container gap-2">
-              <Loader2 className="animate-spin" size={24} />
-              <span>Shopier mağazanızdaki ürünler çekiliyor...</span>
-            </div>
-          ) : productError ? (
-            <div className="p-4 bg-error/10 border border-error/30 text-error text-xs rounded-xl text-center">
-              {productError}
-            </div>
-          ) : shopierProducts.length === 0 ? (
-            <div className="p-4 bg-surface/40 border border-dashed border-outline-variant/40 text-on-surface-variant text-xs rounded-xl text-center">
-              Shopier mağazanızda henüz kayıtlı ürün bulunamadı.
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {shopierProducts.map((product, idx) => (
-                <div key={product.id || idx} className="p-5 rounded-2xl border border-outline-variant/30 bg-surface-container-low/80 flex flex-col justify-between">
-                  <div>
-                    <h4 className="font-bold text-base text-on-surface uppercase mb-1">{product.title || product.name || "Shopier Ürünü"}</h4>
-                    {product.duration_days && (
-                      <p className="text-xs text-on-surface-variant mb-2">
-                        {product.duration_days >= 365 
-                          ? `${Math.round(product.duration_days / 365)} Yıl Süre` 
-                          : `${Math.round(product.duration_days / 30)} Ay Süre`}
-                      </p>
-                    )}
-                    <div className="text-2xl font-extrabold text-primary-container mb-3">
-                      {product.price} TL
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-2 mt-4">
-                    <button 
-                      onClick={() => handleBuyClick(product)}
-                      className="w-full py-2.5 bg-primary-container text-on-primary font-bold text-xs uppercase rounded-xl flex items-center justify-center gap-2 hover:brightness-110 active:scale-95 transition-all"
-                    >
-                      <CreditCard size={16} />
-                      <span>Satın Al</span>
-                    </button>
-                    {product.url && (
-                      <a
-                        href={product.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full py-2 text-center text-xs text-on-surface-variant hover:text-primary-container flex items-center justify-center gap-1 transition-colors"
-                      >
-                        <ExternalLink size={12} />
-                        Shopier'de Görüntüle
-                      </a>
-                    )}
-                  </div>
+        <div className="w-full space-y-4 relative z-10 text-left">
+          {/* Accordion 1: Sunucu Paketleri */}
+          <div className={`rounded-2xl border transition-all duration-300 overflow-hidden ${openAccordion === 'server' ? 'border-primary-container/50 shadow-[0_0_25px_rgba(255,215,0,0.15)] bg-surface-container-high/90' : 'border-outline-variant/30 bg-surface-container-low/70 hover:border-outline-variant/60 hover:bg-surface-container-high/60'}`}>
+            <button 
+              className="w-full p-4 flex items-center justify-between focus:outline-none group touch-manipulation"
+              onClick={() => toggleAccordion('server')}
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary-container/15 border border-primary-container/40 flex items-center justify-center text-primary-container shrink-0 transition-transform group-hover:scale-105 shadow-[0_0_15px_rgba(255,215,0,0.15)]">
+                  <Server size={18} />
                 </div>
-              ))}
+                <div className="text-left">
+                  <h3 className="font-headline-md text-sm sm:text-base text-on-surface font-bold">Sunucu Paketleri</h3>
+                  <p className="text-xs text-on-surface-variant mt-0.5 font-light">Sunucunuzdaki tüm kullanıcılar için premium özellikler</p>
+                </div>
+              </div>
+              {openAccordion === 'server' ? <ChevronUp className="text-primary-container shrink-0" size={20} /> : <ChevronDown className="text-on-surface-variant shrink-0" size={20} />}
+            </button>
+            
+            <div className={`px-4 transition-all duration-300 ease-in-out ${openAccordion === 'server' ? 'max-h-[2500px] pb-6 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
+              <div className="pt-4 border-t border-outline-variant/30">
+                {loadingProducts ? (
+                  <div className="w-full flex flex-col items-center justify-center py-8 text-primary-container gap-2">
+                    <Loader2 className="animate-spin" size={32} />
+                    <span className="font-label-bold text-xs uppercase tracking-widest">Shopier Ürünleri Yükleniyor...</span>
+                  </div>
+                ) : productError ? (
+                  <div className="w-full text-center py-6 text-error text-xs border border-dashed border-error/40 rounded-xl bg-error/10">
+                    {productError}
+                  </div>
+                ) : shopierProducts.length === 0 ? (
+                  <div className="w-full text-center py-6 text-on-surface-variant text-xs border border-dashed border-outline-variant/40 rounded-xl bg-surface/30">
+                    Şu anda aktif Shopier paketi bulunmamaktadır.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+                    {shopierProducts.map((product) => {
+                      const features = product.features_tr || [];
+                      const isFeatured = product.is_featured;
+                      
+                      return (
+                        <div key={product.id} className={`w-full flex flex-col p-5 rounded-2xl relative overflow-hidden border ${isFeatured ? 'border-primary-container/60 shadow-[0_0_30px_rgba(255,215,0,0.12)] bg-gradient-to-b from-primary-container/10 to-surface-container-high/90' : 'border-outline-variant/30 bg-surface-container-low/80'} transition-all hover:border-primary-container/40`}>
+                          {isFeatured && (
+                            <div className="absolute top-0 right-0 bg-primary-container text-on-primary font-label-bold text-[9px] uppercase tracking-widest px-3 py-1 rounded-bl-xl font-black shadow-sm">
+                              POPÜLER
+                            </div>
+                          )}
+                          
+                          <h3 className="font-headline-md text-base text-on-surface mb-1 font-bold uppercase tracking-tight">{product.name_tr || product.title}</h3>
+                          
+                          <div className="font-headline-xl text-2xl text-primary-container mb-4 flex items-baseline gap-1.5 font-extrabold">
+                            {product.price} <span className="font-label-bold text-xs text-on-surface-variant font-medium">TL</span>
+                          </div>
+                          
+                          <ul className="flex-grow space-y-2.5 mb-5">
+                            {features.map((feat, idx) => (
+                              <li key={idx} className="flex items-start gap-2.5 text-xs text-on-surface-variant leading-relaxed">
+                                <CheckCircle size={14} className="text-primary-container shrink-0 mt-0.5" />
+                                <span>{feat}</span>
+                              </li>
+                            ))}
+                            {/* Eğer özellik yoksa Shopier'dan gelen gün süresini yaz */}
+                            {features.length === 0 && product.duration_days && (
+                               <li className="flex items-start gap-2.5 text-xs text-on-surface-variant leading-relaxed">
+                                 <CheckCircle size={14} className="text-primary-container shrink-0 mt-0.5" />
+                                 <span>{product.duration_days >= 365 ? '1 Yıl Geçerli' : `${Math.round(product.duration_days / 30)} Ay Geçerli`}</span>
+                               </li>
+                            )}
+                          </ul>
+                          
+                          <button 
+                            className={`w-full py-2.5 rounded-xl font-label-bold text-xs uppercase tracking-wider transition-all active:scale-95 touch-manipulation font-bold flex items-center justify-center gap-2 ${isFeatured ? 'bg-primary-container text-on-primary tactical-glow hover:brightness-110' : 'bg-surface-container-highest border border-outline-variant text-on-surface hover:border-primary-container hover:text-primary-container'}`}
+                            onClick={() => handleBuyClick(product)}
+                          >
+                            <CreditCard size={14} className="fill-current" />
+                            SHOPIER İLE SATIN AL
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </div>
-          )}
+          </div>
+          
         </div>
       </section>
 

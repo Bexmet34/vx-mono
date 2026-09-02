@@ -4,8 +4,34 @@ import { getShopierAccessToken } from '@/lib/shopierOAuth';
 export const dynamic = 'force-dynamic';
 
 const FALLBACK_PRODUCTS = [
-  { id: "45902957", title: "3 Months Access",  price: "390.00",  duration_days: 90,  url: "https://www.shopier.com/veyronixbot/45902957" },
-  { id: "45902970", title: "1 Year Access",    price: "1200.00", duration_days: 365, url: "https://www.shopier.com/veyronixbot/45902970" },
+  { 
+    id: "45902957", 
+    title: "3 Months Access",  
+    price: "390.00",  
+    duration_days: 90,  
+    url: "https://www.shopier.com/veyronixbot/45902957",
+    plan_type: "server",
+    is_featured: false,
+    name_tr: "3 Aylık Premium",
+    name_en: "3 Months Premium",
+    amount: "390",
+    features_tr: ["Sunucu bazlı tüm Veyronix özellikleri", "Gelişmiş bilet (ticket) sistemi", "Gelişmiş bot koruması", "Özel kayıt sistemi", "90 Gün kesintisiz erişim"],
+    features_en: ["All server-based Veyronix features", "Advanced ticket system", "Advanced bot protection", "Custom register system", "90 Days uninterrupted access"]
+  },
+  { 
+    id: "45902970", 
+    title: "1 Year Access",    
+    price: "1200.00", 
+    duration_days: 365, 
+    url: "https://www.shopier.com/veyronixbot/45902970",
+    plan_type: "server",
+    is_featured: true,
+    name_tr: "1 Yıllık Premium",
+    name_en: "1 Year Premium",
+    amount: "1200",
+    features_tr: ["Sunucu bazlı tüm Veyronix özellikleri", "Gelişmiş bilet (ticket) sistemi", "Gelişmiş bot koruması", "Özel kayıt sistemi", "365 Gün kesintisiz erişim", "Öncelikli destek"],
+    features_en: ["All server-based Veyronix features", "Advanced ticket system", "Advanced bot protection", "Custom register system", "365 Days uninterrupted access", "Priority support"]
+  },
 ];
 
 async function fetchWithToken(token) {
