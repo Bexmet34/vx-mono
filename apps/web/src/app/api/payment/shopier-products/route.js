@@ -3,9 +3,8 @@ import { NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 
 const FALLBACK_PRODUCTS = [
-  { id: "veyronix-monthly",   title: "1 Aylık Sunucu Premium",   price: "150.00", duration_days: 30,  url: "https://www.shopier.com/veyronixbot" },
-  { id: "veyronix-quarterly", title: "3 Aylık Sunucu Premium",   price: "390.00", duration_days: 90,  url: "https://www.shopier.com/veyronixbot" },
-  { id: "veyronix-yearly",    title: "1 Yıllık Sunucu Premium",  price: "1200.00", duration_days: 365, url: "https://www.shopier.com/veyronixbot" },
+  { id: "45902957", title: "3 Months Access",  price: "390.00",  duration_days: 90,  url: "https://www.shopier.com/veyronixbot/45902957" },
+  { id: "45902970", title: "1 Year Access",    price: "1200.00", duration_days: 365, url: "https://www.shopier.com/veyronixbot/45902970" },
 ];
 
 export async function GET() {
