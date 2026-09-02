@@ -235,22 +235,11 @@ export default function PremiumPage() {
               : 'We have temporarily put our Premium system under maintenance to provide you with a much better, dynamic, and secure infrastructure. Please check back later!'}
           </p>
 
-                {/* Trust Badges */}
-                <div className="pt-2 flex justify-center items-center gap-4 text-on-surface-variant/60 text-[10px] flex-wrap">
-                  <div className="flex items-center gap-1.5">
-                    <Lock size={12} />
-                    <span>256-Bit SSL Şifreleme</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Zap size={12} />
-                    <span>Anında Otomatik Tanımlama</span>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+          <a href="/" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary-container text-on-primary font-label-bold text-xs uppercase tracking-wider transition-all hover:brightness-110 active:scale-95 shadow-[0_0_20px_rgba(255,215,0,0.2)]">
+            {lang === 'tr' ? 'Ana Sayfaya Dön' : 'Return Home'}
+          </a>
         </div>
-      )}
+      </main>
     </>
   );
 }
