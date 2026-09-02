@@ -61,8 +61,8 @@ async function generateKillboardImage(event) {
     }
   }
 
-  const iconSize = 130;
-  const spacing = 20;
+  const iconSize = 110;
+  const spacing = 16;
   const startY = 190;
 
   // İkon / Slot Çizim Fonksiyonu (HTML Stili + Node.js Görsel Yakalama)
@@ -90,8 +90,8 @@ async function generateKillboardImage(event) {
         ctx.roundRect(x, y, customSize, customSize, 12);
         ctx.clip();
 
-        // Görseli slot içine sığdırma (Taşmayı önlemek için %16 zoom offset)
-        const zoomOffset = customSize * 0.16;
+        // Görseli slot içine sığdırma (Dengeli ve şık %12 zoom offset)
+        const zoomOffset = customSize * 0.12;
         ctx.drawImage(
           img,
           x - zoomOffset,
@@ -233,8 +233,8 @@ async function generateKillboardImage(event) {
 
     if (inventory.length > 0) {
       const invY = height - 160;
-      const invIconSize = 95; // Envanter kutuları büyütüldü
-      const invSpacing = 16;  // Aralarındaki boşluk artırıldı
+      const invIconSize = 85; // Envanter kutuları daha dengeli
+      const invSpacing = 14;  // Boşluk ayarlandı
 
       ctx.fillStyle = '#64748b';
       ctx.font = 'bold 20px sans-serif';
