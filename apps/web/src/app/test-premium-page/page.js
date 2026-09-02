@@ -13,8 +13,8 @@ export default function TestPremiumPage() {
   const { data: session, status } = useSession();
   const searchParams = useSearchParams();
 
-  // Shopier'deki Mağaza Ürünleri
-  const [shopierProducts, setShopierProducts] = useState([]);
+  // Veritabanındaki Planlar
+  const [dbPlans, setDbPlans] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [productError, setProductError] = useState("");
 
@@ -37,26 +37,29 @@ export default function TestPremiumPage() {
   const paymentStatus = searchParams.get('payment');
 
   useEffect(() => {
-    // Shopier Mağazasındaki Gerçek Ürünleri API ile Çek
-    fetch('/api/payment/shopier-products')
+    // Veritabanındaki (Admin Panelinden Eklenen) Gerçek Planları Çek
+    fetch('/api/plans')
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
-          setShopierProducts(data);
+          setDbPlans(data);
         } else if (data.data && Array.isArray(data.data)) {
-          setShopierProducts(data.data);
+          setDbPlans(data.data);
         } else {
-          setShopierProducts([]);
-          setProductError(data.error || "Mağazada ürün bulunamadı.");
+          setDbPlans([]);
+          setProductError(data.error || "Paket bulunamadı.");
         }
         setLoadingProducts(false);
       })
       .catch(err => {
         console.error(err);
-        setProductError("Shopier ürünleri yüklenirken hata oluştu.");
+        setProductError("Paketler yüklenirken hata oluştu.");
         setLoadingProducts(false);
       });
   }, []);
+
+  const serverPlans = dbPlans.filter(p => !p.plan_type || p.plan_type === 'server');
+  const userPlans = dbPlans.filter(p => p.plan_type === 'user');
 
   const handleBuyClick = (product) => {
     setSelectedProduct(product);
@@ -79,23 +82,46 @@ export default function TestPremiumPage() {
   };
 
   const handleShopierPay = async () => {
-    if (!selectedServer) {
+    if (!selectedServer && selectedProduct.plan_type !== 'user') {
       return setCheckoutError("Lütfen bir sunucu seçin.");
     }
     setCheckoutError("");
     setIsProcessing(true);
 
     try {
+      // Eğer veritabanındaki pakette shopier_url varsa Shopier Popup tetikle
+      if (selectedProduct.shopier_url) {
+        setShowCheckout(false);
+        setPaymentDone(false);
+        setPaymentPending(true);
+
+        const popup = window.open(
+          selectedProduct.shopier_url,
+          'shopier-odeme',
+          'width=820,height=720,left=200,top=100,resizable=yes,scrollbars=yes'
+        );
+
+        const timer = setInterval(() => {
+          if (!popup || popup.closed) {
+            clearInterval(timer);
+            setPaymentPending(false);
+            setPaymentDone(true);
+          }
+        }, 1000);
+        return;
+      }
+
+      // Shopier URL yoksa (Eski Crypto Sistemi veya Alternatif Ödeme)
       const res = await fetch("/api/payment/shopier-create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           guildId: selectedServer,
           guildName: userServers.find(s => s.guild_id === selectedServer)?.guild_name || null,
-          productId: selectedProduct.id || selectedProduct.productId,
-          productName: selectedProduct.title || selectedProduct.name,
-          productPrice: selectedProduct.price,
-          productUrl: selectedProduct.url || null,
+          productId: selectedProduct.id,
+          productName: selectedProduct.name_tr || selectedProduct.name_en || selectedProduct.id,
+          productPrice: selectedProduct.amount,
+          productUrl: selectedProduct.shopier_url || null,
           durationDays: selectedProduct.duration_days || 30
         })
       });
@@ -107,14 +133,12 @@ export default function TestPremiumPage() {
         setPaymentDone(false);
         setPaymentPending(true);
 
-        // Shopier ödeme sayfasını popup'ta aç
         const popup = window.open(
           data.payment_url,
           'shopier-odeme',
           'width=820,height=720,left=200,top=100,resizable=yes,scrollbars=yes'
         );
 
-        // Popup kapandığında kontrol et
         const timer = setInterval(() => {
           if (!popup || popup.closed) {
             clearInterval(timer);
@@ -123,7 +147,7 @@ export default function TestPremiumPage() {
           }
         }, 1000);
       } else {
-        setCheckoutError(data.error || "Shopier ödeme oturumu açılamadı.");
+        setCheckoutError(data.error || "Ödeme oturumu açılamadı. Bu paket için Shopier linki eklenmemiş olabilir.");
       }
     } catch (err) {
       setCheckoutError("Bağlantı hatası oluştu.");
@@ -208,13 +232,13 @@ export default function TestPremiumPage() {
                   <div className="w-full text-center py-6 text-error text-xs border border-dashed border-error/40 rounded-xl bg-error/10">
                     {productError}
                   </div>
-                ) : shopierProducts.length === 0 ? (
+                ) : serverPlans.length === 0 ? (
                   <div className="w-full text-center py-6 text-on-surface-variant text-xs border border-dashed border-outline-variant/40 rounded-xl bg-surface/30">
-                    Şu anda aktif Shopier paketi bulunmamaktadır.
+                    Şu anda aktif Sunucu paketi bulunmamaktadır.
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
-                    {shopierProducts.map((product) => {
+                    {serverPlans.map((product) => {
                       const features = product.features_tr || [];
                       const isFeatured = product.is_featured;
                       
@@ -226,10 +250,10 @@ export default function TestPremiumPage() {
                             </div>
                           )}
                           
-                          <h3 className="font-headline-md text-base text-on-surface mb-1 font-bold uppercase tracking-tight">{product.name_tr || product.title}</h3>
+                          <h3 className="font-headline-md text-base text-on-surface mb-1 font-bold uppercase tracking-tight">{product.name_tr || product.name_en || product.id}</h3>
                           
                           <div className="font-headline-xl text-2xl text-primary-container mb-4 flex items-baseline gap-1.5 font-extrabold">
-                            {product.price} <span className="font-label-bold text-xs text-on-surface-variant font-medium">TL</span>
+                            {product.amount} <span className="font-label-bold text-xs text-on-surface-variant font-medium">TL</span>
                           </div>
                           
                           <ul className="flex-grow space-y-2.5 mb-5">
@@ -253,7 +277,92 @@ export default function TestPremiumPage() {
                             onClick={() => handleBuyClick(product)}
                           >
                             <CreditCard size={14} className="fill-current" />
-                            SHOPIER İLE SATIN AL
+                            {product.shopier_url ? 'SHOPIER İLE SATIN AL' : 'SATIN AL'}
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Accordion 2: Bireysel Paketler */}
+          <div className={`rounded-2xl border transition-all duration-300 overflow-hidden ${openAccordion === 'user' ? 'border-primary-container/50 shadow-[0_0_25px_rgba(255,215,0,0.15)] bg-surface-container-high/90' : 'border-outline-variant/30 bg-surface-container-low/70 hover:border-outline-variant/60 hover:bg-surface-container-high/60'}`}>
+            <button 
+              className="w-full p-4 flex items-center justify-between focus:outline-none group touch-manipulation"
+              onClick={() => toggleAccordion('user')}
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary-container/15 border border-primary-container/40 flex items-center justify-center text-primary-container shrink-0 transition-transform group-hover:scale-105 shadow-[0_0_15px_rgba(255,215,0,0.15)]">
+                  <Heart size={18} />
+                </div>
+                <div className="text-left">
+                  <h3 className="font-headline-md text-sm sm:text-base text-on-surface font-bold">Bireysel Paketler</h3>
+                  <p className="text-xs text-on-surface-variant mt-0.5 font-light">Kendi hesabınıza özel premium ayrıcalıklar</p>
+                </div>
+              </div>
+              {openAccordion === 'user' ? <ChevronUp className="text-primary-container shrink-0" size={20} /> : <ChevronDown className="text-on-surface-variant shrink-0" size={20} />}
+            </button>
+            
+            <div className={`px-4 transition-all duration-300 ease-in-out ${openAccordion === 'user' ? 'max-h-[2500px] pb-6 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
+              <div className="pt-4 border-t border-outline-variant/30">
+                {loadingProducts ? (
+                  <div className="w-full flex flex-col items-center justify-center py-8 text-primary-container gap-2">
+                    <Loader2 className="animate-spin" size={32} />
+                    <span className="font-label-bold text-xs uppercase tracking-widest">Yükleniyor...</span>
+                  </div>
+                ) : productError ? (
+                  <div className="w-full text-center py-6 text-error text-xs border border-dashed border-error/40 rounded-xl bg-error/10">
+                    {productError}
+                  </div>
+                ) : userPlans.length === 0 ? (
+                  <div className="w-full text-center py-6 text-on-surface-variant text-xs border border-dashed border-outline-variant/40 rounded-xl bg-surface/30">
+                    Şu anda aktif Bireysel paket bulunmamaktadır.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+                    {userPlans.map((product) => {
+                      const features = product.features_tr || [];
+                      const isFeatured = product.is_featured;
+                      
+                      return (
+                        <div key={product.id} className={`w-full flex flex-col p-5 rounded-2xl relative overflow-hidden border ${isFeatured ? 'border-primary-container/60 shadow-[0_0_30px_rgba(255,215,0,0.12)] bg-gradient-to-b from-primary-container/10 to-surface-container-high/90' : 'border-outline-variant/30 bg-surface-container-low/80'} transition-all hover:border-primary-container/40`}>
+                          {isFeatured && (
+                            <div className="absolute top-0 right-0 bg-primary-container text-on-primary font-label-bold text-[9px] uppercase tracking-widest px-3 py-1 rounded-bl-xl font-black shadow-sm">
+                              POPÜLER
+                            </div>
+                          )}
+                          
+                          <h3 className="font-headline-md text-base text-on-surface mb-1 font-bold uppercase tracking-tight">{product.name_tr || product.name_en || product.id}</h3>
+                          
+                          <div className="font-headline-xl text-2xl text-primary-container mb-4 flex items-baseline gap-1.5 font-extrabold">
+                            {product.amount} <span className="font-label-bold text-xs text-on-surface-variant font-medium">TL</span>
+                          </div>
+                          
+                          <ul className="flex-grow space-y-2.5 mb-5">
+                            {features.map((feat, idx) => (
+                              <li key={idx} className="flex items-start gap-2.5 text-xs text-on-surface-variant leading-relaxed">
+                                <CheckCircle size={14} className="text-primary-container shrink-0 mt-0.5" />
+                                <span>{feat}</span>
+                              </li>
+                            ))}
+                            {/* Eğer özellik yoksa Shopier'dan gelen gün süresini yaz */}
+                            {features.length === 0 && product.duration_days && (
+                               <li className="flex items-start gap-2.5 text-xs text-on-surface-variant leading-relaxed">
+                                 <CheckCircle size={14} className="text-primary-container shrink-0 mt-0.5" />
+                                 <span>{product.duration_days >= 365 ? '1 Yıl Geçerli' : `${Math.round(product.duration_days / 30)} Ay Geçerli`}</span>
+                               </li>
+                            )}
+                          </ul>
+                          
+                          <button 
+                            className={`w-full py-2.5 rounded-xl font-label-bold text-xs uppercase tracking-wider transition-all active:scale-95 touch-manipulation font-bold flex items-center justify-center gap-2 ${isFeatured ? 'bg-primary-container text-on-primary tactical-glow hover:brightness-110' : 'bg-surface-container-highest border border-outline-variant text-on-surface hover:border-primary-container hover:text-primary-container'}`}
+                            onClick={() => handleBuyClick(product)}
+                          >
+                            <CreditCard size={14} className="fill-current" />
+                            {product.shopier_url ? 'SHOPIER İLE SATIN AL' : 'SATIN AL'}
                           </button>
                         </div>
                       );
@@ -277,44 +386,46 @@ export default function TestPremiumPage() {
               <X size={18} />
             </button>
 
-            <h3 className="text-lg font-bold text-on-surface uppercase mb-1">{selectedProduct.title || selectedProduct.name}</h3>
-            <p className="text-xs text-on-surface-variant mb-4">Shopier güvenli kart ödemesi popup pencerede açılacak.</p>
+            <h3 className="text-lg font-bold text-on-surface uppercase mb-1">{selectedProduct.name_tr || selectedProduct.name_en || selectedProduct.id}</h3>
+            <p className="text-xs text-on-surface-variant mb-4">{selectedProduct.shopier_url ? 'Shopier güvenli kart ödemesi popup pencerede açılacak.' : 'Ödeme işlemi devam ediyor...'}</p>
 
             {checkoutError && <div className="p-3 mb-3 bg-error/10 border border-error/40 text-error text-xs rounded-xl">{checkoutError}</div>}
 
-            {/* Server Selection */}
-            <div className="mb-4">
-              <label className="text-xs font-bold text-primary-container uppercase block mb-2">Hedef Sunucu</label>
-              <div className="space-y-2 max-h-36 overflow-y-auto bg-[#060913] p-2 rounded-xl border border-outline-variant/30">
-                {status !== "authenticated" ? (
-                  <button onClick={() => signIn("discord")} className="w-full py-2 bg-[#5865F2] text-white text-xs font-bold rounded-xl">Discord ile Giriş Yap</button>
-                ) : isLoadingServers ? (
-                  <div className="flex items-center justify-center py-3 gap-2 text-on-surface-variant text-xs">
-                    <Loader2 className="animate-spin" size={14} /> Sunucular yükleniyor...
-                  </div>
-                ) : userServers.length === 0 ? (
-                  <p className="text-xs text-on-surface-variant text-center py-2">Yönetici olduğunuz sunucu bulunamadı.</p>
-                ) : userServers.map(s => (
-                  <label key={s.guild_id} className={`flex items-center justify-between p-2 rounded-lg border cursor-pointer ${selectedServer === s.guild_id ? 'border-primary-container bg-primary-container/10' : 'border-outline-variant/30'}`}>
-                    <span className="text-xs font-bold text-on-surface">{s.guild_name}</span>
-                    <input type="radio" name="server" checked={selectedServer === s.guild_id} onChange={() => setSelectedServer(s.guild_id)} />
-                  </label>
-                ))}
+            {/* Server Selection (Only for Server Plans) */}
+            {selectedProduct.plan_type !== 'user' && (
+              <div className="mb-4">
+                <label className="text-xs font-bold text-primary-container uppercase block mb-2">Hedef Sunucu</label>
+                <div className="space-y-2 max-h-36 overflow-y-auto bg-[#060913] p-2 rounded-xl border border-outline-variant/30">
+                  {status !== "authenticated" ? (
+                    <button onClick={() => signIn("discord")} className="w-full py-2 bg-[#5865F2] text-white text-xs font-bold rounded-xl">Discord ile Giriş Yap</button>
+                  ) : isLoadingServers ? (
+                    <div className="flex items-center justify-center py-3 gap-2 text-on-surface-variant text-xs">
+                      <Loader2 className="animate-spin" size={14} /> Sunucular yükleniyor...
+                    </div>
+                  ) : userServers.length === 0 ? (
+                    <p className="text-xs text-on-surface-variant text-center py-2">Yönetici olduğunuz sunucu bulunamadı.</p>
+                  ) : userServers.map(s => (
+                    <label key={s.guild_id} className={`flex items-center justify-between p-2 rounded-lg border cursor-pointer ${selectedServer === s.guild_id ? 'border-primary-container bg-primary-container/10' : 'border-outline-variant/30'}`}>
+                      <span className="text-xs font-bold text-on-surface">{s.guild_name}</span>
+                      <input type="radio" name="server" checked={selectedServer === s.guild_id} onChange={() => setSelectedServer(s.guild_id)} />
+                    </label>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Price Box */}
             <div className="bg-surface-container-high p-3 rounded-xl border border-outline-variant/30 flex justify-between items-center mb-4">
               <span className="text-xs font-bold text-on-surface">Tutar</span>
-              <span className="text-lg font-bold text-primary-container">{selectedProduct.price} TL</span>
+              <span className="text-lg font-bold text-primary-container">{selectedProduct.amount} TL</span>
             </div>
 
             <button 
               onClick={handleShopierPay}
-              disabled={isProcessing || !selectedServer}
+              disabled={isProcessing || (!selectedServer && selectedProduct.plan_type !== 'user')}
               className="w-full py-3 bg-primary-container text-on-primary font-bold text-xs uppercase rounded-xl flex items-center justify-center gap-2 hover:brightness-110 active:scale-95 disabled:opacity-40"
             >
-              {isProcessing ? <Loader2 className="animate-spin" size={16} /> : <><CreditCard size={16} /> <span>SHOPIER İLE ÖDE</span></>}
+              {isProcessing ? <Loader2 className="animate-spin" size={16} /> : <><CreditCard size={16} /> <span>{selectedProduct.shopier_url ? 'SHOPIER İLE ÖDE' : 'ÖDE'}</span></>}
             </button>
           </div>
         </div>

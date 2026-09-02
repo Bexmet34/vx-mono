@@ -101,7 +101,7 @@ export default function AdminPage() {
   const [showPlanModal, setShowPlanModal] = useState(false);
   const [editingPlanId, setEditingPlanId] = useState(null);
   const [newPlan, setNewPlan] = useState({
-    id: "", name_tr: "", name_en: "", amount: "", duration_days: 30, is_active: true, is_featured: false, sort_order: 0, features_tr: [], features_en: []
+    id: "", name_tr: "", name_en: "", amount: "", duration_days: 30, is_active: true, is_featured: false, sort_order: 0, features_tr: [], features_en: [], plan_type: "server", shopier_url: ""
   });
 
   // Settings States
@@ -848,7 +848,7 @@ export default function AdminPage() {
                        </div>
                        <button className="btn-primary" onClick={() => {
                          setEditingPlanId(null);
-                         setNewPlan({id: "", name_tr: "", name_en: "", amount: "", duration_days: 30, is_active: true, is_featured: false, sort_order: 0, features_tr: [], features_en: []});
+                         setNewPlan({id: "", name_tr: "", name_en: "", amount: "", duration_days: 30, is_active: true, is_featured: false, sort_order: 0, features_tr: [], features_en: [], plan_type: "server", shopier_url: ""});
                          setShowPlanModal(true);
                        }} style={{padding: '0.8rem 1.5rem', borderRadius: '12px'}}>
                           <Plus size={14} /> Yeni Paket Ekle
@@ -860,6 +860,7 @@ export default function AdminPage() {
                         <thead>
                           <tr>
                             <th>PAKET ADI / ID</th>
+                            <th>KATEGORİ</th>
                             <th>FİYAT</th>
                             <th>SÜRE</th>
                             <th>DURUM</th>
@@ -877,6 +878,12 @@ export default function AdminPage() {
                                   {p.is_featured && <span className="admin-badge badge-unlimited" style={{fontSize: '0.65rem', padding: '0.1rem 0.4rem'}}>Öne Çıkan</span>}
                                 </div>
                                 <code style={{fontSize: '0.8rem', color: 'var(--admin-text-muted)'}}>{p.id}</code>
+                                {p.shopier_url && <div style={{fontSize: '0.7rem', color: '#6366f1', marginTop: '0.2rem', display: 'flex', alignItems: 'center', gap: '0.3rem'}}><CreditCard size={10} /> Shopier Entegre</div>}
+                              </td>
+                              <td data-label="KATEGORİ">
+                                <span className={`admin-badge ${p.plan_type === 'user' ? 'badge-active' : 'badge-unlimited'}`}>
+                                  {p.plan_type === 'user' ? 'Bireysel' : 'Sunucu'}
+                                </span>
                               </td>
                               <td data-label="FİYAT">
                                 <div style={{fontWeight: '600', color: 'var(--admin-accent)'}}>{p.amount} {p.currency}</div>
@@ -924,18 +931,32 @@ export default function AdminPage() {
                     </div>
 
                     <div className="admin-card" style={{padding: '2.5rem'}}>
-                      <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1.5rem', marginBottom: '2rem'}}>
+                      <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem'}}>
                          <div>
                             <label className="admin-label">Paket ID (Örn: 1_month)</label>
                             <input className="admin-input-field" value={newPlan.id} disabled={!!editingPlanId} onChange={e => setNewPlan({...newPlan, id: e.target.value})} />
                          </div>
                          <div>
-                            <label className="admin-label">Fiyat (USDT)</label>
-                            <input className="admin-input-field" type="number" step="0.01" value={newPlan.amount} onChange={e => setNewPlan({...newPlan, amount: e.target.value})} />
+                            <label className="admin-label">Kategori</label>
+                            <select className="admin-input-field" value={newPlan.plan_type || 'server'} onChange={e => setNewPlan({...newPlan, plan_type: e.target.value})}>
+                              <option value="server">Sunucu Bazlı (Server)</option>
+                              <option value="user">Bireysel (User)</option>
+                            </select>
                          </div>
                          <div>
                             <label className="admin-label">Süre (Gün)</label>
                             <input className="admin-input-field" type="number" value={newPlan.duration_days} onChange={e => setNewPlan({...newPlan, duration_days: parseInt(e.target.value)})} />
+                         </div>
+                      </div>
+
+                      <div style={{display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1.5rem', marginBottom: '2rem'}}>
+                         <div>
+                            <label className="admin-label">Fiyat (TL/USDT)</label>
+                            <input className="admin-input-field" type="number" step="0.01" value={newPlan.amount} onChange={e => setNewPlan({...newPlan, amount: e.target.value})} />
+                         </div>
+                         <div>
+                            <label className="admin-label">Shopier URL (İsteğe bağlı, girilirse otomatik Shopier açılır)</label>
+                            <input className="admin-input-field" value={newPlan.shopier_url || ''} placeholder="https://www.shopier.com/veyronixbot/12345" onChange={e => setNewPlan({...newPlan, shopier_url: e.target.value})} />
                          </div>
                       </div>
 
