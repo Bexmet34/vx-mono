@@ -108,46 +108,8 @@ export default function TestPremiumPage() {
             setPaymentDone(true);
           }
         }, 1000);
-        return;
-      }
-
-      // Shopier URL yoksa (Eski Crypto Sistemi veya Alternatif Ödeme)
-      const res = await fetch("/api/payment/shopier-create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          guildId: selectedServer,
-          guildName: userServers.find(s => s.guild_id === selectedServer)?.guild_name || null,
-          productId: selectedProduct.id,
-          productName: selectedProduct.name_tr || selectedProduct.name_en || selectedProduct.id,
-          productPrice: selectedProduct.amount,
-          productUrl: selectedProduct.shopier_url || null,
-          durationDays: selectedProduct.duration_days || 30
-        })
-      });
-
-      const data = await res.json();
-
-      if (res.ok && data.payment_url) {
-        setShowCheckout(false);
-        setPaymentDone(false);
-        setPaymentPending(true);
-
-        const popup = window.open(
-          data.payment_url,
-          'shopier-odeme',
-          'width=820,height=720,left=200,top=100,resizable=yes,scrollbars=yes'
-        );
-
-        const timer = setInterval(() => {
-          if (!popup || popup.closed) {
-            clearInterval(timer);
-            setPaymentPending(false);
-            setPaymentDone(true);
-          }
-        }, 1000);
       } else {
-        setCheckoutError(data.error || "Ödeme oturumu açılamadı. Bu paket için Shopier linki eklenmemiş olabilir.");
+        setCheckoutError("Bu paket için Shopier ödeme bağlantısı bulunamadı. Lütfen yönetici ile iletişime geçin.");
       }
     } catch (err) {
       setCheckoutError("Bağlantı hatası oluştu.");
@@ -387,7 +349,7 @@ export default function TestPremiumPage() {
             </button>
 
             <h3 className="text-lg font-bold text-on-surface uppercase mb-1">{selectedProduct.name_tr || selectedProduct.name_en || selectedProduct.id}</h3>
-            <p className="text-xs text-on-surface-variant mb-4">{selectedProduct.shopier_url ? 'Shopier güvenli kart ödemesi popup pencerede açılacak.' : 'Ödeme işlemi devam ediyor...'}</p>
+            <p className="text-xs text-on-surface-variant mb-4">{selectedProduct.shopier_url ? 'Shopier güvenli kart ödemesi popup pencerede açılacak.' : 'Ödeme bağlantısı bulunamadı.'}</p>
 
             {checkoutError && <div className="p-3 mb-3 bg-error/10 border border-error/40 text-error text-xs rounded-xl">{checkoutError}</div>}
 
