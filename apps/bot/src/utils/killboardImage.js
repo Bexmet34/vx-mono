@@ -61,7 +61,7 @@ async function generateKillboardImage(event) {
     }
   }
 
-  const iconSize = 110;
+  const iconSize = 140;
   const spacing = 16;
   const startY = 190;
 
@@ -90,8 +90,8 @@ async function generateKillboardImage(event) {
         ctx.roundRect(x, y, customSize, customSize, 12);
         ctx.clip();
 
-        // Görseli slot içine sığdırma (Dengeli ve şık %12 zoom offset)
-        const zoomOffset = customSize * 0.12;
+        // Görseli slot içine sığdırma (%10 zoom offset)
+        const zoomOffset = customSize * 0.10;
         ctx.drawImage(
           img,
           x - zoomOffset,
