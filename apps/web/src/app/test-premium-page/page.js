@@ -30,6 +30,7 @@ export default function TestPremiumPage() {
   // iFrame Modal State
   const [showFrameModal, setShowFrameModal] = useState(false);
   const [paymentUrl, setPaymentUrl] = useState("");
+  const [iframeError, setIframeError] = useState(false);
 
   const paymentStatus = searchParams.get('payment');
 
@@ -101,6 +102,7 @@ export default function TestPremiumPage() {
 
       if (res.ok && data.payment_url) {
         setPaymentUrl(data.payment_url);
+        setIframeError(false);
         setShowCheckout(false);
         setShowFrameModal(true);
       } else {
@@ -252,11 +254,39 @@ export default function TestPremiumPage() {
 
             {/* Shopier iFrame */}
             <div className="flex-grow w-full h-full relative bg-white">
-              <iframe 
-                src={paymentUrl}
-                className="w-full h-full border-0"
-                title="Shopier Ödeme Formu"
-              ></iframe>
+              {iframeError ? (
+                <div className="flex flex-col items-center justify-center h-full gap-4 bg-[#080C18] p-8">
+                  <ShieldCheck className="text-yellow-400" size={40} />
+                  <p className="text-sm text-on-surface-variant text-center">
+                    Ödeme sayfası bu pencerede açılamıyor.<br/>Güvenli ödeme için yeni sekmede açın.
+                  </p>
+                  <a
+                    href={paymentUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-6 py-3 bg-primary-container text-on-primary font-bold text-xs uppercase rounded-xl flex items-center gap-2 hover:brightness-110"
+                  >
+                    <CreditCard size={16} />
+                    Shopier Ödeme Sayfasını Aç
+                  </a>
+                </div>
+              ) : (
+                <iframe 
+                  src={paymentUrl}
+                  className="w-full h-full border-0"
+                  title="Shopier Ödeme Formu"
+                  onError={() => setIframeError(true)}
+                  onLoad={(e) => {
+                    try {
+                      // iFrame yüklendi ama 404 sayfası mı kontrol et
+                      const doc = e.target.contentDocument;
+                      if (doc && doc.title && (doc.title.includes('404') || doc.title.includes('not found'))) {
+                        setIframeError(true);
+                      }
+                    } catch (err) { /* cross-origin - normal */ }
+                  }}
+                />
+              )}
             </div>
           </div>
         </div>
