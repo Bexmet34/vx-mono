@@ -88,9 +88,12 @@ export default function TestPremiumPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           guildId: selectedServer,
+          guildName: userServers.find(s => s.guild_id === selectedServer)?.guild_name || null,
           productId: selectedProduct.id || selectedProduct.productId,
           productName: selectedProduct.title || selectedProduct.name,
-          productPrice: selectedProduct.price
+          productPrice: selectedProduct.price,
+          productUrl: selectedProduct.url || null,
+          durationDays: selectedProduct.duration_days || 30
         })
       });
 
