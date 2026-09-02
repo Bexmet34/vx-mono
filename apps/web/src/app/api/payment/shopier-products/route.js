@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getShopierAccessToken } from '@/lib/shopierOAuth';
 
 export const dynamic = 'force-dynamic';
 
@@ -7,69 +8,65 @@ const FALLBACK_PRODUCTS = [
   { id: "45902970", title: "1 Year Access",    price: "1200.00", duration_days: 365, url: "https://www.shopier.com/veyronixbot/45902970" },
 ];
 
+async function fetchWithToken(token) {
+  const headers = {
+    "Authorization": `Bearer ${token}`,
+    "Accept": "application/json",
+    "User-Agent": "VeyronixPlatform/1.0"
+  };
+
+  // Mağaza URL'sini al
+  let shopUrl = "https://www.shopier.com/veyronixbot";
+  try {
+    const shopRes = await fetch("https://api.shopier.com/v1/shop/settings", { headers });
+    if (shopRes.ok) {
+      const d = await shopRes.json();
+      if (d.url) shopUrl = d.url;
+    }
+  } catch (e) {}
+
+  // Ürünleri çek
+  const res = await fetch("https://api.shopier.com/v1/products", { headers });
+  return { res, shopUrl, headers };
+}
+
 export async function GET() {
   try {
+    // 1. Önce OAuth App Token ile dene (yeni uygulama kimlik bilgileri)
+    const clientId = process.env.SHOPIER_CLIENT_ID;
+    if (clientId) {
+      try {
+        const oauthToken = await getShopierAccessToken();
+        const { res, shopUrl } = await fetchWithToken(oauthToken);
+
+        if (res.ok) {
+          const data = await res.json();
+          console.log('[Shopier] OAuth token ile ürünler başarıyla çekildi!');
+          return NextResponse.json(Array.isArray(data) ? data : FALLBACK_PRODUCTS);
+        }
+        console.warn('[Shopier] OAuth token ile /v1/products:', res.status);
+      } catch (oauthErr) {
+        console.warn('[Shopier] OAuth token alınamadı:', oauthErr.message);
+      }
+    }
+
+    // 2. PAT token ile dene (fallback)
     const patToken = process.env.SHOPIER_PAT_TOKEN;
-    if (!patToken) {
-      return NextResponse.json(FALLBACK_PRODUCTS);
-    }
-
-    const headers = {
-      "Authorization": `Bearer ${patToken}`,
-      "Accept": "application/json",
-      "User-Agent": "VeyronixPlatform/1.0"
-    };
-
-    // Önce mağaza ayarlarından shop URL'sini al (bu endpoint çalışıyor ✅)
-    let shopUrl = "https://www.shopier.com/veyronixbot";
-    try {
-      const shopRes = await fetch("https://api.shopier.com/v1/shop/settings", { headers });
-      if (shopRes.ok) {
-        const shopData = await shopRes.json();
-        if (shopData.url) shopUrl = shopData.url;
+    if (patToken) {
+      const { res, shopUrl } = await fetchWithToken(patToken);
+      if (res.ok) {
+        const data = await res.json();
+        return NextResponse.json(Array.isArray(data) ? data : FALLBACK_PRODUCTS);
       }
-    } catch (e) {}
-
-    // /v1/products endpoint'ini dene (403 dönebilir - Shopier kısıtlı)
-    const response = await fetch("https://api.shopier.com/v1/products", { headers });
-
-    if (response.ok) {
-      const data = await response.json();
-      // Gerçek ürünleri döndür
-      return NextResponse.json(Array.isArray(data) ? data : FALLBACK_PRODUCTS);
+      // PAT ile de 403 gelirse statik ürünleri shopUrl ile döndür
+      return NextResponse.json(FALLBACK_PRODUCTS.map(p => ({ ...p, url: shopUrl })));
     }
 
-    // /v1/products 403 dönerse geçmiş siparişlerden ürün bilgisi çekmeyi dene
-    const ordersRes = await fetch("https://api.shopier.com/v1/orders?limit=10", { headers });
-    if (ordersRes.ok) {
-      const ordersData = await ordersRes.json();
-      // Siparişlerden benzersiz ürünleri çıkar
-      if (Array.isArray(ordersData) && ordersData.length > 0) {
-        const seenIds = new Set();
-        const products = [];
-        for (const order of ordersData) {
-          if (order.product && !seenIds.has(order.product.id)) {
-            seenIds.add(order.product.id);
-            products.push({
-              id: String(order.product.id),
-              title: order.product.title || order.product.name,
-              price: String(order.product.price || order.totalPrice || "0.00"),
-              url: order.product.url || shopUrl,
-              duration_days: 30
-            });
-          }
-        }
-        if (products.length > 0) {
-          return NextResponse.json(products);
-        }
-      }
-    }
-
-    // Hiçbiri çalışmazsa varsayılan paketleri döndür (mağaza URL'siyle)
-    return NextResponse.json(FALLBACK_PRODUCTS.map(p => ({ ...p, url: shopUrl })));
+    // 3. Her şey başarısız → statik fallback
+    return NextResponse.json(FALLBACK_PRODUCTS);
 
   } catch (error) {
-    console.error("[Shopier Products GET Error]:", error);
+    console.error('[Shopier Products GET Error]:', error);
     return NextResponse.json(FALLBACK_PRODUCTS);
   }
 }

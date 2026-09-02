@@ -2,30 +2,53 @@ import { LINKS } from '@veyronix/config';
 import { NextResponse } from 'next/server';
 import { getCryptoPaymentByOrderId, updateCryptoPaymentByOrderId, getUserProfile, upsertUser, getSubscriptionByGuildId, updateSubscription, createSubscription } from "@veyronix/database";
 import { sendSupportMessage } from '@/lib/discordApi';
+import { verifyShopierWebhookToken } from '@/lib/shopierOAuth';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(req) {
   try {
-    const formData = await req.formData();
-    
-    // Shopier OSB Bilgileri
-    const osbUser = formData.get('username') || formData.get('osb_user');
-    const osbPass = formData.get('password') || formData.get('osb_pass');
-    const status = formData.get('status') || formData.get('payment_status');
-    const order_id = formData.get('platform_order_id') || formData.get('custom_order_id');
-    const amount = formData.get('total_order_value') || formData.get('price');
+    // App Webhook token kontrolü (X-Shopier-Signature header'ı)
+    const webhookSignature = req.headers.get('x-shopier-signature') ||
+                             req.headers.get('x-webhook-token') ||
+                             req.headers.get('authorization')?.replace('Bearer ', '');
 
-    // OSB Kimlik Doğrulaması (Shopier Paneli Tarafından Gönderilen)
-    const VALID_OSB_USER = "3bee3d95dfbc9b0afc27b6c01bf44e35";
-    const VALID_OSB_PASS = "340bfa456ab52ab2efb5130926143255";
+    const isAppWebhook = webhookSignature && verifyShopierWebhookToken(webhookSignature);
 
-    if (osbUser && osbPass && (osbUser !== VALID_OSB_USER || osbPass !== VALID_OSB_PASS)) {
-      console.error("[Shopier OSB Callback] Geçersiz OSB kullanıcı bilgileri!");
-      return new Response("OK", { status: 200 }); // Shopier her zaman 200 OK bekler
+    // JSON body mu yoksa form-data mı? (App webhook JSON, OSB form-data gönderir)
+    const contentType = req.headers.get('content-type') || '';
+    let bodyData = {};
+    let isJson = false;
+
+    if (contentType.includes('application/json')) {
+      bodyData = await req.json();
+      isJson = true;
+    } else {
+      const formData = await req.formData();
+      for (const [k, v] of formData.entries()) bodyData[k] = v;
     }
 
-    console.log("[Shopier OSB Callback Tetiklendi]:", { order_id, status, amount });
+    // OSB Kimlik Doğrulaması (eski sistem - form-data)
+    if (!isAppWebhook && !isJson) {
+      const osbUser = bodyData['username'] || bodyData['osb_user'];
+      const osbPass = bodyData['password'] || bodyData['osb_pass'];
+      const VALID_OSB_USER = "3bee3d95dfbc9b0afc27b6c01bf44e35";
+      const VALID_OSB_PASS = "340bfa456ab52ab2efb5130926143255";
+
+      if (osbUser && osbPass && (osbUser !== VALID_OSB_USER || osbPass !== VALID_OSB_PASS)) {
+        console.error("[Shopier Callback] Geçersiz OSB kimlik bilgileri!");
+        return new Response("OK", { status: 200 });
+      }
+    }
+
+    const status   = bodyData['status'] || bodyData['payment_status'] || bodyData['event'];
+    const order_id = bodyData['platform_order_id'] || bodyData['custom_order_id'] ||
+                     bodyData['id'] || bodyData['orderId'];
+    const amount   = bodyData['total_order_value'] || bodyData['price'] ||
+                     bodyData['totalPrice'] || bodyData['amount'];
+
+    console.log(`[Shopier Callback] ${isAppWebhook ? 'App Webhook' : 'OSB'} tetiklendi:`, { order_id, status, amount });
+
 
     // Shopier OSB Bildirimi Başarılıysa
     if (status === 'success' || status === '1' || status === 1 || !status) {
