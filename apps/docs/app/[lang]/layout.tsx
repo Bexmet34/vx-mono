@@ -24,10 +24,7 @@ export default function Layout({
   return (
     <html lang={params.lang} className={inter.className} suppressHydrationWarning>
       <body className="flex flex-col min-h-screen">
-        <I18nProvider locale={params.lang} translations={{
-          tr: { name: 'Türkçe' },
-          en: { name: 'English' },
-        }[params.lang]}>
+        <I18nProvider locale={params.lang}>
           <RootProvider>{children}</RootProvider>
         </I18nProvider>
       </body>
