@@ -43,8 +43,31 @@ export default function AboutPage() {
           </p>
           <p>
             {isEn
+              ? "Founded in 2024, Veyronix was born out of a real gaming problem: managing large MMO parties, Discord roles, and guild events manually was chaotic, time-consuming, and prone to errors. We set out to build the fastest, most reliable, and beautifully designed Discord automation ecosystem specifically tailored for Albion Online guilds and competitive gaming communities."
+              : "2024 yılında kurulan Veyronix, bizzat oyuncuların yaşadığı büyük bir soruna çözüm üretmek amacıyla doğdu: Geniş çaplı MMO loncalarında parti kurma, ZvZ kompozisyonlarını yönetme, rol dağıtma ve Killboard takibini manuel yapmak hem yorucu hem de karmaşıktı. Veyronix, Albion Online loncaları ve oyun toplulukları için dünyanın en hızlı, en güvenilir ve en gelişmiş Discord otomasyon platformunu inşa etme vizyonuyla yola çıktı."}
+          </p>
+          <p>
+            {isEn
               ? "Today, Veyronix powers hundreds of active Discord servers, handling thousands of automated party setups, real-time killboard tracking, and guild registrations daily with a 99.9% uptime track record."
               : "Bugün Veyronix, yüzlerce aktif Discord sunucusunda on binlerce oyuncunun parti organizasyonunu, canlı killboard bildirimlerini ve otomatik kayıt sistemlerini %99.9 kesintisiz çalışma oranıyla yönetmektedir."}
+          </p>
+        </section>
+
+        {/* SEO Text / Discord Community Management */}
+        <section className="space-y-4 pt-4 border-t border-white/10">
+          <h2 className="text-xl font-bold text-white flex items-center gap-2">
+            <Users className="text-primary" size={22} />
+            {isEn ? "Advanced Discord Community Management" : "Gelişmiş Discord Topluluk Yönetimi"}
+          </h2>
+          <p>
+            {isEn
+              ? "Managing a gaming community requires more than just creating text channels. Moderation, automated role assignments based on in-game API data, and engaging your members with temporary voice channels are essential to building a thriving community. Veyronix provides guild leaders with a complete suite of tools to automate these processes. Our state-of-the-art Web Dashboard allows you to control everything from welcome messages to automated drop events without writing a single line of code."
+              : "Bir oyun topluluğunu yönetmek, sadece metin kanalları açmaktan çok daha fazlasını gerektirir. Oyun içi API verilerine dayalı otomatik rol atamaları, dinamik geçici ses kanalları (VoiceForge) ve üyelerin etkileşimini artıran puan/drop sistemleri, canlı bir topluluk inşa etmenin temelidir. Veyronix, lonca liderlerine bu süreçleri tamamen otomatikleştirebilecekleri kapsamlı bir araç seti sunar. Gelişmiş Web Paneli sayesinde, karşılama mesajlarından otomatik çekilişlere kadar her şeyi tek bir satır kod yazmadan yönetebilirsiniz."}
+          </p>
+          <p>
+            {isEn
+              ? "For competitive Albion Online guilds, data is everything. Our Killboard and ZvZ party tracking systems bring crucial player statistics directly to your Discord server, enabling shotcallers and officers to make data-driven decisions."
+              : "Özellikle rekabetçi Albion Online loncaları için veri her şeydir. Killboard analizlerimiz ve ZvZ (Zerg vs Zerg) parti takip sistemimiz, oyuncuların PvP ve PvE istatistiklerini doğrudan Discord sunucunuza taşıyarak liderlerin ve yöneticilerin veriye dayalı kararlar almasını sağlar."}
           </p>
         </section>
 

@@ -3,7 +3,7 @@ export default function robots() {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/admin/', '/api/', '/dashboard/'],
+      disallow: ['/admin/', '/api/', '/dashboard/', '/player/', '/guild/', '/killboard/', '/vote/', '/premium/'],
     },
     sitemap: 'https://veyronix.com.tr/sitemap.xml',
   }

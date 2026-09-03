@@ -146,6 +146,12 @@ export default function Footer() {
                   <span>{lang === 'tr' ? 'Hakkımızda' : 'About Us'}</span>
                 </Link>
               </li>
+              <li>
+                <Link href="/iletisim" className="inline-flex items-center gap-1.5 text-xs text-on-surface-variant hover:text-primary-container transition-colors font-medium">
+                  <MessageCircle size={13} className="text-primary-container" />
+                  <span>{lang === 'tr' ? 'İletişim' : 'Contact'}</span>
+                </Link>
+              </li>
               <li className="inline-flex items-center gap-1.5 text-xs text-on-surface-variant">
                 <Phone size={13} className="text-emerald-400" />
                 <span>0551 078 82 61</span>
