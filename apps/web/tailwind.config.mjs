@@ -1,14 +1,10 @@
-import { createPreset } from 'fumadocs-ui/tailwind-plugin';
-
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: "class",
-  presets: [createPreset()],
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-    "./node_modules/fumadocs-ui/dist/**/*.js",
   ],
   theme: {
     extend: {

@@ -1,13 +1,9 @@
 {
   "compilerOptions": {
-    "module": "esnext",
-    "jsx": "preserve",
-    "moduleResolution": "bundler",
     "paths": {
       "@/*": ["./src/*"],
       "@veyronix/config": ["../../packages/config/src/index.js"],
-      "@veyronix/database": ["../../packages/database/src/index.js"],
-      "@/.source": ["./.source"]
+      "@veyronix/database": ["../../packages/database/src/index.js"]
     }
   }
 }
