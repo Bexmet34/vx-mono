@@ -76,6 +76,12 @@ export default async function sitemap() {
       priority: 0.80,
     },
     {
+      url: `${LINKS.WEBSITE}/iletisim`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.80,
+    },
+    {
       url: `${LINKS.WEBSITE}/privacy`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
@@ -110,24 +116,6 @@ export default async function sitemap() {
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.50,
-    },
-    {
-      url: LINKS.PAGE_PREMIUM,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.90,
-    },
-    {
-      url: LINKS.PAGE_KILLBOARD,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.85,
-    },
-    {
-      url: LINKS.PAGE_VOTE,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.70,
     },
     {
       url: LINKS.PAGE_CHANGELOG,
