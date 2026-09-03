@@ -1,0 +1,76 @@
+---
+title: VoiceForge (Dynamic Voice)
+description: A dynamic voice infrastructure allowing your members to create and manage their own voice channels in seconds.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+# VoiceForge System
+
+VoiceForge is a **dynamic temporary voice channel engine** that completely eliminates the traditional, unused, and cluttered voice channel list in your Discord server.
+
+When your members connect to voice, an isolated channel is instantly created exclusively for them. Once the last person leaves the room, the channel is automatically destroyed by the system.
+
+<Callout type="info">
+  **Performance & Optimization:** Thanks to Veyronix's isolated infrastructure, the VoiceForge system can create and delete hundreds of channels in seconds without hitting Discord API rate limits.
+</Callout>
+
+## How Does It Work?
+
+The underlying logic of VoiceForge is built entirely around smoothing out the user experience.
+
+<Steps>
+<Step>
+### Entering the Room
+A member enters a designated "Create Room" (or similarly named) Hub channel on your server.
+</Step>
+
+<Step>
+### Automatic Channel Creation
+Veyronix instantly detects the member, opens a brand-new custom voice channel, and pulls the member into that channel in a fraction of a second.
+</Step>
+
+<Step>
+### Room Management (Panel)
+The member who created the room (Room Owner) manages all channel features independently using the interactive **Room Control Panel** in the text channel.
+</Step>
+
+<Step>
+### Auto-Destruct
+As soon as the last person leaves the room, the channel is instantly deleted by the system, leaving no clutter on the server.
+</Step>
+</Steps>
+
+## Room Control Panel Capabilities
+
+The true power of VoiceForge comes from the freedom it offers your members. Using the custom button interface, users can perform the following actions in seconds:
+
+<Tabs items={['Access Control', 'Channel Customization', 'User Management']}>
+  <Tab value="Access Control">
+    - **Lock / Unlock Channel:** Instantly prevents strangers from joining the room with a single click.
+    - **Hide / Show Channel:** Hides the room from everyone except those already inside or explicitly invited. Perfect for private meetings.
+  </Tab>
+  <Tab value="Channel Customization">
+    - **Change Name:** Instantly updates the name of the channel (within server rules).
+    - **Set Capacity:** Adjusts the maximum number of people allowed in the room (e.g., a 5-player squad room).
+  </Tab>
+  <Tab value="User Management">
+    - **Kick / Ban User:** Kicks an unwanted person from the room and bans them from re-entering.
+    - **Transfer Ownership:** Transfers room ownership to another friend inside before leaving.
+  </Tab>
+</Tabs>
+
+## Quick Setup
+
+You can activate the VoiceForge system on your server using the Veyronix Web Dashboard.
+
+1. **Log in** to the Veyronix Dashboard and select your server.
+2. Click on the **Temporary Voice (VoiceForge)** tab from the left menu.
+3. Enable the system, choose the **Category** where channels will be created, and select the **Text Channel** where the control panel will be sent.
+4. (Optional) Customize the channel naming format (e.g., `🔊 {user}'s Room`).
+
+<Callout type="warn">
+  For the system to work smoothly, ensure the bot's role (`Veyronix`) has the **Manage Channels** permission in the category selected for VoiceForge.
+</Callout>
