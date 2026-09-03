@@ -240,10 +240,11 @@ export default async function RootLayout({ children }) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFaq) }}
         />
         {/* Google AdSense Script */}
-        <script
+        <Script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1315540294941790"
           crossOrigin="anonymous"
+          strategy="afterInteractive"
         />
       </head>
       <body>
