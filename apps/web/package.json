@@ -12,11 +12,15 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.103.0",
     "@swc/helpers": "^0.5.15",
+    "@types/mdx": "^2.0.14",
     "@veyronix/config": "workspace:*",
     "@veyronix/database": "workspace:*",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "framer-motion": "^13.1.1",
+    "fumadocs-core": "^16.15.5",
+    "fumadocs-mdx": "^15.4.0",
+    "fumadocs-ui": "^16.15.5",
     "gray-matter": "^4.0.3",
     "lucide-react": "^1.8.0",
     "next": "16.2.3",
@@ -27,7 +31,8 @@
     "react-markdown": "^10.1.0",
     "recharts": "^3.9.2",
     "remark-gfm": "^4.0.1",
-    "tailwind-merge": "^3.6.0"
+    "tailwind-merge": "^3.6.0",
+    "zod": "^4.5.4"
   },
   "devDependencies": {
     "autoprefixer": "^10.5.0",
