@@ -1,25 +1,53 @@
 ---
 title: Veyronix'e Hoş Geldiniz
-description: Veyronix Discord Topluluk ve Otomasyon Botu resmi dokümantasyonu.
+description: Veyronix Discord Topluluk ve Otomasyon Platformu resmi dokümantasyonu.
 ---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
 
 # Veyronix Nedir?
 
-Veyronix, Discord sunucunuzu profesyonel bir şekilde yönetmenizi sağlayan gelişmiş bir otomasyon ve topluluk sistemidir.
+Veyronix, basit bir Discord botu olmanın çok ötesinde, sunucunuzun büyümesini, yönetilmesini ve güvenliğini sağlayan **kurumsal seviyede bir topluluk yönetim ve otomasyon platformudur.**
 
-Öne çıkan özelliklerimiz:
-- **VoiceForge:** Gelişmiş geçici ses kanalı sistemi.
-- **Kayıt Sistemi:** Butonlu, loglu ve otomatik isimlendirme destekli üye kayıt altyapısı.
-- **Albion Online:** Dünyanın en iyi Albion Online ZvZ, Killboard ve istatistik entegrasyonu.
-- **Topluluk:** Ticket, Çekiliş ve Drop (Puan/Ekonomi) sistemleriyle etkileşimi artırın.
+Gelişmiş monorepo mimarisi ve yüksek yüklere dayanıklı izole (sharded) mikroservis altyapısıyla çalışır. Bu sayede sunucunuzdaki anlık binlerce etkileşim, sıfır gecikme ve maksimum performansla işlenir.
 
-## Kurulum ve Başlangıç
+<Callout type="info">
+  **Mimari Bilgisi:** Veyronix sistemi; çekirdek bot operasyonları (Partikür), destek ve biletleme (VX Destek) ve modern web paneli (VX Web) olmak üzere birbirleriyle entegre ancak izole çalışan çoklu sistemlerden oluşur.
+</Callout>
 
-Veyronix'i sunucunuza eklemek ve kullanmaya başlamak çok kolaydır.
+## Öne Çıkan Modüllerimiz
 
-1. [Web Panelimize](https://veyronix.com.tr) gidin.
-2. Discord ile giriş yapın.
-3. Sunucunuzu seçip botu davet edin.
-4. Karşınıza çıkan **Setup (Kurulum)** sihirbazını takip edin.
+Platformumuz, birbirine tam entegre çalışan dört ana ekosistem sunar:
 
-Daha detaylı ayarlar için sol taraftaki menüden ilgili özelliğin dokümanına gidebilirsiniz.
+- **VoiceForge (Dinamik Ses Sistemi):** Geleneksel kanal kirliliğini bitiren, üyelerinizin anında özel odalar oluşturup panel üzerinden yönetebildiği pürüzsüz ses kanalı altyapısı.
+- **Kayıt ve Güvenlik Altyapısı:** Butonlu, loglu, oto-isimlendirme destekli ve çok aşamalı güvenlik bariyerlerine sahip üye kayıt sistemi.
+- **Albion Online ZvZ Motoru:** Dünyanın en gelişmiş Albion Online entegrasyonu. Lonca (Guild) senkronizasyonu, otomatik Killboard takibi ve ZvZ istatistiklerinin doğrudan Discord üzerinden analizi.
+- **Topluluk ve Etkileşim:** Modern bilet (ticket) sistemi, şeffaf çekilişler ve drop (puan/ekonomi) mekanikleriyle sunucu içi etkileşimi maksimize eden araçlar.
+
+## Hızlı Kurulum
+
+Veyronix ekosistemini sunucunuza entegre etmek saniyeler sürer. Özel web panelimiz üzerinden her şeyi görsel olarak yapılandırabilirsiniz.
+
+<Steps>
+<Step>
+### Web Panelimize Giriş Yapın
+[veyronix.com.tr](https://veyronix.com.tr) adresine gidin ve Discord hesabınızla güvenli bir şekilde giriş yapın.
+</Step>
+
+<Step>
+### Sunucunuzu Seçin
+Yönetici yetkisine sahip olduğunuz sunucuyu seçin ve "Veyronix'i Ekle" butonuna tıklayarak yetkilendirmeyi onaylayın.
+</Step>
+
+<Step>
+### Kurulum Sihirbazını Tamamlayın
+Karşınıza çıkacak **Kurulum Sihirbazı (Setup)** üzerinden temel rolleri ve log kanallarını saniyeler içinde ayarlayın.
+</Step>
+</Steps>
+
+<Callout type="warn">
+  Kurulum sonrasında botun **"Yönetici"** rolünün, sunucu ayarlarında işlem yapacağı rollerin (örn: Kayıtsız rolü, Üye rolü) üzerinde olduğundan emin olun.
+</Callout>
+
+Detaylı modül yapılandırmaları için sol taraftaki menüyü kullanarak ilgili dokümantasyona geçiş yapabilirsiniz.
