@@ -27,6 +27,16 @@ module.exports = {
       env: {
         NODE_ENV: 'production'
       }
+    },
+    {
+      name: 'vxdocs',
+      script: 'pnpm',
+      args: 'start -p 3001',
+      cwd: './apps/docs',
+      watch: false,
+      env: {
+        NODE_ENV: 'production'
+      }
     }
   ]
 };

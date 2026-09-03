@@ -70,14 +70,16 @@ fi
 
 # Değişiklik tespiti
 WEB_CHANGED=false
+DOCS_CHANGED=false
 BOT_CHANGED=false
 SUPPORT_CHANGED=false
 
 if [ "$FORCE_BUILD" = true ] || [ "$BEFORE_HASH" = "NONE" ] || [ "$BEFORE_HASH" = "$AFTER_HASH" ]; then
-  [ "$FORCE_BUILD" = true ] && { WEB_CHANGED=true; BOT_CHANGED=true; SUPPORT_CHANGED=true; }
+  [ "$FORCE_BUILD" = true ] && { WEB_CHANGED=true; DOCS_CHANGED=true; BOT_CHANGED=true; SUPPORT_CHANGED=true; }
 else
   CHANGED_FILES=$(git diff --name-only "$BEFORE_HASH" "$AFTER_HASH" 2>/dev/null || echo "")
   echo "$CHANGED_FILES" | grep -qE "^(apps/web/|packages/|pnpm-lock.yaml)" && WEB_CHANGED=true
+  echo "$CHANGED_FILES" | grep -qE "^(apps/docs/|packages/|pnpm-lock.yaml)" && DOCS_CHANGED=true
   echo "$CHANGED_FILES" | grep -qE "^(apps/bot/|packages/|pnpm-lock.yaml)" && BOT_CHANGED=true
   echo "$CHANGED_FILES" | grep -qE "^(apps/support/|packages/|pnpm-lock.yaml)" && SUPPORT_CHANGED=true
 fi
@@ -115,6 +117,20 @@ else
   log_skip "Web sitesinde değişiklik yok (Derleme adımı atlandı)"
 fi
 
+if [ "$DOCS_CHANGED" = true ]; then
+  log_info "Dokümantasyon (Docs) arka planda derleniyor..."
+  BUILD_START=$SECONDS
+  if (cd apps/docs && pnpm run build); then
+    BUILD_DUR=$((SECONDS - BUILD_START))
+    log_ok "Dokümantasyon başarıyla derlendi (${BUILD_DUR}s)"
+  else
+    log_err "Dokümantasyon derleme hatası oluştu!"
+    exit 1
+  fi
+else
+  log_skip "Dokümantasyon (Docs) sitesinde değişiklik yok (Derleme adımı atlandı)"
+fi
+
 # 4. PM2 SERVİS RESTARTLARI (HIZLI GEÇİŞ)
 log_step "4/6" "PM2 servisleri güncelleniyor..."
 
@@ -123,6 +139,13 @@ if [ "$WEB_CHANGED" = true ]; then
   log_ok "Web Sitesi (vxweb) yeni sürüme geçirildi (Kesintisiz anlık geçiş)"
 else
   log_skip "Web Sitesi (vxweb) — Değişiklik yok"
+fi
+
+if [ "$DOCS_CHANGED" = true ]; then
+  pm2 restart vxdocs >/dev/null 2>&1 || pm2 start ecosystem.config.js --only vxdocs >/dev/null 2>&1
+  log_ok "Dokümantasyon (vxdocs) yeni sürüme geçirildi"
+else
+  log_skip "Dokümantasyon (vxdocs) — Değişiklik yok"
 fi
 
 if [ "$BOT_CHANGED" = true ]; then
