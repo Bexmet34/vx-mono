@@ -1,5 +1,4 @@
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
-import { i18n } from '@/lib/i18n';
 
 /**
  * Shared layout configurations
@@ -9,7 +8,7 @@ import { i18n } from '@/lib/i18n';
  * Docs Layout: app/docs/layout.tsx
  */
 export const baseOptions: BaseLayoutProps = {
-  i18n,
+  i18n: true,
   nav: {
     title: 'Veyronix Docs',
     url: '/docs',
