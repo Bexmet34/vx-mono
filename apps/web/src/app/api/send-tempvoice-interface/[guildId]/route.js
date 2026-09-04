@@ -114,6 +114,6 @@ export async function POST(req, context) {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error sending VoiceForge interface:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
   }
 }
