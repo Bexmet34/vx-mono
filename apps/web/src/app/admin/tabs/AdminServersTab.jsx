@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Search, Server, Clock, Settings, Plus, RefreshCw, MoreVertical, Edit3, Trash2, Infinity, Power, Gamepad2, Loader2, Calendar, Sparkles } from "lucide-react";
+import { Search, Server, Clock, Settings, Plus, RefreshCw, MoreVertical, Edit3, Trash2, Infinity, Power, Gamepad2, Loader2, Calendar, Sparkles, ExternalLink } from "lucide-react";
 
 export default function AdminServersTab({ 
   servers, 
@@ -66,6 +66,23 @@ export default function AdminServersTab({
         fetchServers(true);
       } else {
         showToast(data.error || "Temizlik sırasında bir hata oluştu.", "error");
+      }
+    } catch (e) {
+      showToast("Bağlantı hatası.", "error");
+    }
+    setLoading(false);
+  };
+
+  const handleGenerateInvite = async (guildId) => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/admin/generate-invite/${guildId}`, { method: 'POST' });
+      const data = await res.json();
+      if (data.success && data.url) {
+        window.open(data.url, '_blank');
+        showToast("Davet linki oluşturuldu ve yeni sekmede açıldı.", "success");
+      } else {
+        showToast(data.error || "Davet oluşturulamadı (Botun yetkisi olmayabilir).", "error");
       }
     } catch (e) {
       showToast("Bağlantı hatası.", "error");
@@ -286,6 +303,15 @@ export default function AdminServersTab({
                             </button>
                             
                             <button 
+                              className="p-2 bg-[#5865F2]/10 hover:bg-[#5865F2]/20 text-[#5865F2] rounded-lg transition-colors border border-transparent hover:border-[#5865F2]/30 disabled:opacity-50"
+                              title="Sunucuya Katıl / Davet Linki Üret" 
+                              disabled={savingId === s.guild_id || loading}
+                              onClick={() => handleGenerateInvite(s.guild_id)}
+                            >
+                              <ExternalLink size={16} />
+                            </button>
+
+                            <button 
                               className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg transition-colors border border-transparent hover:border-red-500/30 disabled:opacity-50"
                               title="Sunucu Kaydını Sil (Freemium'a Düşür)" 
                               disabled={savingId === s.guild_id}
@@ -384,6 +410,9 @@ export default function AdminServersTab({
                      </button>
                      <button className={`p-2 rounded-lg disabled:opacity-50 ${!s.is_active ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-[#2b2d31] text-[#949ba4]'}`} title={s.is_active ? 'Devre Dışı Bırak' : 'Etkinleştir'} disabled={savingId === s.guild_id} onClick={() => handleServerAction(s.guild_id, 'toggle_active', !s.is_active)}>
                        {savingId === s.guild_id ? <Loader2 size={16} className="animate-spin" /> : <Power size={16} />}
+                     </button>
+                     <button className="p-2 bg-[#5865F2]/10 text-[#5865F2] rounded-lg disabled:opacity-50" title="Sunucuya Katıl" disabled={savingId === s.guild_id || loading} onClick={() => handleGenerateInvite(s.guild_id)}>
+                       <ExternalLink size={16} />
                      </button>
                      <button className="p-2 bg-red-500/10 text-red-500 rounded-lg disabled:opacity-50" disabled={savingId === s.guild_id} onClick={() => handleDeleteServer && handleDeleteServer(s.guild_id)}>
                        {savingId === s.guild_id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
