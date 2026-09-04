@@ -39,10 +39,12 @@ export async function POST(req, context) {
     }
 
     // 0. Fetch dynamic Application Emojis from Discord Developer Portal
+    console.log('[VoiceForge] Step 0: Fetching application emojis...');
     const emojiMap = await getApplicationEmojis();
-    console.log(`[VoiceForge] Loaded ${Object.keys(emojiMap).length} custom application emojis from Discord`);
+    console.log(`[VoiceForge] Step 0 OK: Loaded ${Object.keys(emojiMap).length} custom application emojis from Discord`);
 
     // 1. Generate the sleek canvas image for embed
+    console.log('[VoiceForge] Step 1: Generating interface image...');
     let files = [];
     let imageAttachmentUrl = null;
     try {
@@ -54,12 +56,16 @@ export async function POST(req, context) {
           contentType: 'image/png'
         });
         imageAttachmentUrl = 'attachment://interface.png';
+        console.log('[VoiceForge] Step 1 OK: Interface image generated successfully');
+      } else {
+        console.log('[VoiceForge] Step 1: No image buffer returned, skipping image');
       }
     } catch (imgErr) {
-      console.error('[VoiceForge] Failed to generate interface image:', imgErr);
+      console.error('[VoiceForge] Step 1 FAILED - image generation error:', imgErr?.message, imgErr?.stack);
     }
 
     // 2. Build Discord interactive ActionRows with Custom Application Emojis
+    console.log('[VoiceForge] Step 2: Building action rows...');
     const actionRows = [];
     for (let i = 0; i < buttons.length; i += 5) {
       const rowButtons = buttons.slice(i, i + 5).map(btnId => {
@@ -85,8 +91,10 @@ export async function POST(req, context) {
         actionRows.push({ type: 1, components: rowButtons });
       }
     }
+    console.log(`[VoiceForge] Step 2 OK: Built ${actionRows.length} action rows`);
 
     // 3. Assemble Discord Embed (Footer is positioned strictly below the image!)
+    console.log('[VoiceForge] Step 3: Assembling embed...');
     const embed = {
       title: embedTitle || (lang === 'tr' ? 'VoiceForge Arayüzü' : 'VoiceForge Interface'),
       description: embedDesc || '',
@@ -109,7 +117,9 @@ export async function POST(req, context) {
       components: actionRows
     };
 
+    console.log(`[VoiceForge] Step 4: Sending to Discord channel ${channelId} with ${files.length} files...`);
     await sendChannelMessage(channelId, messagePayload, files);
+    console.log('[VoiceForge] Step 4 OK: Message sent to Discord successfully!');
 
     return NextResponse.json({ success: true });
   } catch (error) {
