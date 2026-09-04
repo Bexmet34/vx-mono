@@ -5,11 +5,12 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 export const dynamic = "force-dynamic";
 const ADMIN_ID = process.env.NEXT_PUBLIC_ADMIN_ID;
 
-export async function POST(req, { params }) {
+export async function POST(req, props) {
   const session = await getServerSession(authOptions);
   const isAdmin = session?.user?.id === ADMIN_ID || session?.user?.id === "407234961582587916";
   if (!isAdmin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  const params = await props.params;
   const { guildId } = params;
   if (!guildId) return NextResponse.json({ error: "Missing guildId" }, { status: 400 });
 
