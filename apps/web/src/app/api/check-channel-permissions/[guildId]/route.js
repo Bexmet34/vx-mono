@@ -178,14 +178,46 @@ export async function GET(req, context) {
             { flag: PERM.ATTACH_FILES,  name_tr: 'Dosya Ekle',          name_en: 'Attach Files'  },
         ];
 
-        const missingPermissions = requiredPerms.filter(p => (basePermissions & p.flag) !== p.flag);
-        const allGood = missingPermissions.length === 0;
+        let missingPermissions = requiredPerms.filter(p => (basePermissions & p.flag) !== p.flag);
 
-        console.log(`[PermCheck] Guild=${guildId} Channel=${channelId} Bot=${botUserId} Effective=${basePermissions} Missing=${missingPermissions.length}`);
+        // ── Step 8: REAL API TESTING (Ultimate Source of Truth) ───────────────
+        // Even if our local math says "Yes", Discord API might say "No" due to complex 
+        // category syncing or cached state. Let's do a real test!
+        
+        // Test SEND_MESSAGES by triggering "typing" status. It doesn't send a message, 
+        // but Discord will block it with 403 if bot can't send messages in that channel.
+        let hasRealSendAccess = false;
+        try {
+            const typingRes = await fetch(`https://discord.com/api/v10/channels/${channelId}/typing`, {
+                method: 'POST',
+                headers: headers
+            });
+            if (typingRes.ok || typingRes.status === 204) {
+                hasRealSendAccess = true;
+            } else {
+                hasRealSendAccess = false;
+            }
+        } catch (e) {
+            hasRealSendAccess = false;
+        }
+
+        // If Discord actively rejects typing (Send Messages), then force it as missing!
+        if (!hasRealSendAccess) {
+            if (!missingPermissions.find(p => p.flag === PERM.SEND_MESSAGES)) {
+                missingPermissions.push(requiredPerms.find(p => p.flag === PERM.SEND_MESSAGES));
+            }
+            if (!missingPermissions.find(p => p.flag === PERM.VIEW_CHANNEL)) {
+                missingPermissions.push(requiredPerms.find(p => p.flag === PERM.VIEW_CHANNEL));
+            }
+        }
+
+        // If bot is explicitly marked as ADMIN by our algorithm but typing fails, 
+        // the local algorithm was wrong (or bot lacks basic token scopes). 
+        const allGood = missingPermissions.length === 0;
 
         return NextResponse.json({
             hasAccess: allGood,
-            isAdmin: false,
+            isAdmin: botUserId === guildOwnerId || (basePermissions & PERM.ADMINISTRATOR) === PERM.ADMINISTRATOR,
             channelName: channel.name,
             channelType: channel.type,
             missingPermissions: missingPermissions.map(p => ({ name_tr: p.name_tr, name_en: p.name_en })),
