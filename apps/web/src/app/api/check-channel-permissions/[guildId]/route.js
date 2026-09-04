@@ -12,20 +12,20 @@ function getBotToken() {
     return token;
 }
 
-// Discord Permission Flags
-const PERMISSIONS = {
-    VIEW_CHANNEL: BigInt(1 << 10),
-    SEND_MESSAGES: BigInt(1 << 11),
-    EMBED_LINKS: BigInt(1 << 14),
-    ATTACH_FILES: BigInt(1 << 15),
-    READ_MESSAGE_HISTORY: BigInt(1 << 16),
+// Discord permission bit flags (BigInt)
+const PERM = {
+    ADMINISTRATOR: 1n << 3n,
+    VIEW_CHANNEL:  1n << 10n,
+    SEND_MESSAGES: 1n << 11n,
+    EMBED_LINKS:   1n << 14n,
+    ATTACH_FILES:  1n << 15n,
 };
 
 /**
- * Checks if the bot has required permissions in a specific channel.
- * Uses Discord's /channels/:id endpoint to get channel info + overwrites,
- * and /guilds/:id/members/@me to get the bot's roles.
- * No message is sent — pure permission check only.
+ * Checks Discord bot permissions in a channel.
+ * Implements Discord's exact permission computation algorithm.
+ * Reference: https://discord.com/developers/docs/topics/permissions#permission-overwrites
+ * No messages are sent — pure permission check only.
  */
 export async function GET(req, context) {
     try {
@@ -52,82 +52,80 @@ export async function GET(req, context) {
         }
 
         const token = getBotToken();
+        const headers = { 'Authorization': `Bot ${token}` };
 
-        // 1. Fetch channel info (includes permission_overwrites)
-        const channelRes = await fetch(`https://discord.com/api/v10/channels/${channelId}`, {
-            headers: { 'Authorization': `Bot ${token}` }
-        });
+        // ── Step 1: Get bot user ID ──────────────────────────────────────────
+        const botUserRes = await fetch('https://discord.com/api/v10/users/@me', { headers });
+        if (!botUserRes.ok) {
+            console.error('[PermCheck] Bot auth failed:', await botUserRes.text());
+            return NextResponse.json({ hasAccess: false, reason: 'bot_auth_failed', channelName: null, missingPermissions: [] });
+        }
+        const botUser = await botUserRes.json();
+        const botUserId = botUser.id;
 
+        // ── Step 2: Get channel info & overwrites ────────────────────────────
+        const channelRes = await fetch(`https://discord.com/api/v10/channels/${channelId}`, { headers });
         if (!channelRes.ok) {
-            const err = await channelRes.text().catch(() => '');
-            if (channelRes.status === 404) {
-                return NextResponse.json({ hasAccess: false, reason: 'channel_not_found', channelName: null });
+            if (channelRes.status === 403) {
+                // Bot can't even see the channel
+                return NextResponse.json({
+                    hasAccess: false,
+                    channelName: null,
+                    missingPermissions: [
+                        { name_tr: 'Kanalı Görüntüle', name_en: 'View Channel' },
+                        { name_tr: 'Mesaj Gönder',     name_en: 'Send Messages'  },
+                        { name_tr: 'Bağlantı Yerleştir', name_en: 'Embed Links' },
+                        { name_tr: 'Dosya Ekle',        name_en: 'Attach Files' },
+                    ],
+                    reason: 'no_view_access',
+                });
             }
-            return NextResponse.json({ hasAccess: false, reason: 'api_error', detail: err });
+            return NextResponse.json({ hasAccess: false, reason: 'channel_fetch_failed', channelName: null, missingPermissions: [] });
         }
-
         const channel = await channelRes.json();
+        const channelOverwrites = channel.permission_overwrites || [];
 
-        // 2. Fetch bot's own guild member info (to get role IDs)
-        const botMemberRes = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/@me`, {
-            headers: { 'Authorization': `Bot ${token}` }
-        });
-
-        if (!botMemberRes.ok) {
-            // Fallback: try to get bot user id via oauth2/applications/@me
-            return NextResponse.json({ hasAccess: false, reason: 'bot_member_fetch_failed' });
+        // ── Step 3: Get bot's guild member info (role IDs) ───────────────────
+        const memberRes = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${botUserId}`, { headers });
+        if (!memberRes.ok) {
+            console.error('[PermCheck] Could not fetch bot member:', await memberRes.text());
+            return NextResponse.json({ hasAccess: false, reason: 'bot_not_in_guild', channelName: channel.name, missingPermissions: [] });
         }
+        const botMember = await memberRes.json();
+        // Include @everyone role (its ID = guildId)
+        const botRoleIds = new Set([guildId, ...(botMember.roles || [])]);
 
-        const botMember = await botMemberRes.json();
-        const botRoleIds = new Set(botMember.roles || []);
+        // ── Step 4: Fetch guild info + roles in parallel ──────────────────────
+        const [rolesRes, guildRes] = await Promise.all([
+            fetch(`https://discord.com/api/v10/guilds/${guildId}/roles`, { headers }),
+            fetch(`https://discord.com/api/v10/guilds/${guildId}`, { headers }),
+        ]);
 
-        // 3. Fetch guild info to get @everyone role id (same as guildId) and bot user id
-        const guildRes = await fetch(`https://discord.com/api/v10/guilds/${guildId}`, {
-            headers: { 'Authorization': `Bot ${token}` }
-        });
-
-        let everyoneRoleId = guildId; // @everyone role ID always equals guild ID
-        let isOwner = false;
-        
+        let guildOwnerId = null;
         if (guildRes.ok) {
-            const guild = await guildRes.json();
-            if (guild.owner_id && botMember.user?.id === guild.owner_id) {
-                isOwner = true;
-            }
+            const guildData = await guildRes.json();
+            guildOwnerId = guildData.owner_id;
         }
 
-        // 4. Calculate effective permissions using Discord's algorithm
-        // Start with @everyone base permissions (from guild roles)
-        const rolesRes = await fetch(`https://discord.com/api/v10/guilds/${guildId}/roles`, {
-            headers: { 'Authorization': `Bot ${token}` }
-        });
-
-        let basePermissions = BigInt(0);
-        let isAdmin = false;
+        // ── Step 5: Compute base permissions from guild-level roles ───────────
+        // Sum up @everyone + all of bot's role permissions
+        let basePermissions = 0n;
 
         if (rolesRes.ok) {
             const roles = await rolesRes.json();
-            
             for (const role of roles) {
-                // @everyone role
-                if (role.id === everyoneRoleId) {
-                    basePermissions |= BigInt(role.permissions);
-                }
-                // Bot's own roles
                 if (botRoleIds.has(role.id)) {
-                    basePermissions |= BigInt(role.permissions);
+                    try {
+                        basePermissions |= BigInt(role.permissions);
+                    } catch {
+                        // skip invalid permissions value
+                    }
                 }
-            }
-
-            // Check ADMINISTRATOR bit (bit 3)
-            const ADMIN_PERM = BigInt(1 << 3);
-            if ((basePermissions & ADMIN_PERM) === ADMIN_PERM || isOwner) {
-                isAdmin = true;
             }
         }
 
-        // If admin, all permissions granted
-        if (isAdmin) {
+        // Guild owner or ADMINISTRATOR → all permissions
+        if (botUserId === guildOwnerId || (basePermissions & PERM.ADMINISTRATOR) === PERM.ADMINISTRATOR) {
             return NextResponse.json({
                 hasAccess: true,
                 isAdmin: true,
@@ -137,53 +135,56 @@ export async function GET(req, context) {
             });
         }
 
-        // 5. Apply channel-level permission overwrites
-        let allow = BigInt(0);
-        let deny = BigInt(0);
+        // ── Step 6: Apply channel-level overwrites (Discord exact algorithm) ──
+        //
+        // Order (per Discord docs):
+        //   a) @everyone role overwrite
+        //   b) All role-specific overwrites (deny accumulated first, then allow)
+        //   c) Member-specific overwrite
+        //
+        const toBigInt = (v) => { try { return BigInt(v || '0'); } catch { return 0n; } };
 
-        const overwrites = channel.permission_overwrites || [];
-
-        // First apply @everyone overwrite
-        const everyoneOverwrite = overwrites.find(o => o.id === everyoneRoleId);
-        if (everyoneOverwrite) {
-            allow |= BigInt(everyoneOverwrite.allow || 0);
-            deny |= BigInt(everyoneOverwrite.deny || 0);
+        // 6a. @everyone channel overwrite
+        const everyoneOW = channelOverwrites.find(o => o.id === guildId && Number(o.type) === 0);
+        if (everyoneOW) {
+            basePermissions &= ~toBigInt(everyoneOW.deny);
+            basePermissions |=  toBigInt(everyoneOW.allow);
         }
 
-        // Then apply role overwrites for bot's roles
-        for (const overwrite of overwrites) {
-            if (overwrite.type === 0 && botRoleIds.has(overwrite.id)) {
-                allow |= BigInt(overwrite.allow || 0);
-                deny |= BigInt(overwrite.deny || 0);
+        // 6b. Role-specific overwrites (bot's roles, excluding @everyone which was above)
+        let roleAllow = 0n;
+        let roleDeny  = 0n;
+        for (const ow of channelOverwrites) {
+            if (Number(ow.type) === 0 && ow.id !== guildId && botRoleIds.has(ow.id)) {
+                roleAllow |= toBigInt(ow.allow);
+                roleDeny  |= toBigInt(ow.deny);
             }
         }
+        basePermissions &= ~roleDeny;
+        basePermissions |=  roleAllow;
 
-        // Then apply member-specific overwrite
-        const botUserId = botMember.user?.id;
-        if (botUserId) {
-            const memberOverwrite = overwrites.find(o => o.id === botUserId && o.type === 1);
-            if (memberOverwrite) {
-                allow |= BigInt(memberOverwrite.allow || 0);
-                deny |= BigInt(memberOverwrite.deny || 0);
-            }
+        // 6c. Member-specific overwrite
+        const memberOW = channelOverwrites.find(o => o.id === botUserId && Number(o.type) === 1);
+        if (memberOW) {
+            basePermissions &= ~toBigInt(memberOW.deny);
+            basePermissions |=  toBigInt(memberOW.allow);
         }
 
-        // Compute final permissions
-        let effectivePermissions = (basePermissions & ~deny) | allow;
-
-        // 6. Check required permissions
+        // ── Step 7: Check required permissions ───────────────────────────────
         const requiredPerms = [
-            { flag: PERMISSIONS.VIEW_CHANNEL, name_tr: 'Kanalı Görüntüle', name_en: 'View Channel' },
-            { flag: PERMISSIONS.SEND_MESSAGES, name_tr: 'Mesaj Gönder', name_en: 'Send Messages' },
-            { flag: PERMISSIONS.EMBED_LINKS, name_tr: 'Bağlantı Yerleştir', name_en: 'Embed Links' },
-            { flag: PERMISSIONS.ATTACH_FILES, name_tr: 'Dosya Ekle', name_en: 'Attach Files' },
+            { flag: PERM.VIEW_CHANNEL,  name_tr: 'Kanalı Görüntüle',   name_en: 'View Channel'  },
+            { flag: PERM.SEND_MESSAGES, name_tr: 'Mesaj Gönder',        name_en: 'Send Messages' },
+            { flag: PERM.EMBED_LINKS,   name_tr: 'Bağlantı Yerleştir',  name_en: 'Embed Links'   },
+            { flag: PERM.ATTACH_FILES,  name_tr: 'Dosya Ekle',          name_en: 'Attach Files'  },
         ];
 
-        const missingPermissions = requiredPerms.filter(p => (effectivePermissions & p.flag) !== p.flag);
-        const hasAllPermissions = missingPermissions.length === 0;
+        const missingPermissions = requiredPerms.filter(p => (basePermissions & p.flag) !== p.flag);
+        const allGood = missingPermissions.length === 0;
+
+        console.log(`[PermCheck] Guild=${guildId} Channel=${channelId} Bot=${botUserId} Effective=${basePermissions} Missing=${missingPermissions.length}`);
 
         return NextResponse.json({
-            hasAccess: hasAllPermissions,
+            hasAccess: allGood,
             isAdmin: false,
             channelName: channel.name,
             channelType: channel.type,
@@ -191,7 +192,7 @@ export async function GET(req, context) {
         });
 
     } catch (error) {
-        console.error('[PermCheck] Error:', error);
+        console.error('[PermCheck] Unexpected error:', error);
         return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
     }
 }
