@@ -206,33 +206,7 @@ export default function InterfaceBuilder({ lang = 'tr', discordChannels, guildId
               placeholder={lang === 'tr' ? 'Açıklama girin...' : 'Enter description...'}
             />
 
-            {/* ===== CANVAS IMAGE PREVIEW (Exact Discord generated image preview) ===== */}
-            {activeButtons.length > 0 && (
-              <div className="w-full bg-[#18191c] rounded-lg p-2 flex flex-col gap-1.5 border border-black/40 shadow-inner mt-1 select-none">
-                {Array.from({ length: Math.ceil(activeButtons.length / 5) }).map((_, rowIdx) => (
-                  <div key={rowIdx} className="grid grid-cols-5 gap-1.5">
-                    {activeButtons.slice(rowIdx * 5, (rowIdx + 1) * 5).map((btnId) => {
-                      const config = BUTTON_DATA[btnId];
-                      if (!config) return null;
-                      const label = config.label[lang] || config.label.en;
-                      return (
-                        <div
-                          key={btnId}
-                          className="h-[34px] bg-[#2b2d31] border border-white/10 rounded-[7px] flex items-center px-2 gap-1.5 shadow-sm transition-all"
-                        >
-                          <div className="shrink-0 flex items-center justify-center">
-                            {renderButtonIcon(config)}
-                          </div>
-                          <span className="text-white text-[9.5px] font-extrabold uppercase tracking-tight truncate leading-none">
-                            {label}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ))}
-              </div>
-            )}
+
 
             {/* Inline Editable Footer */}
             <input

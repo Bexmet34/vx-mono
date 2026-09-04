@@ -796,7 +796,7 @@ export default function ServerSettings() {
         )}
 
         {activeTab === 'tempvoice' && (
-          <TempVoiceTab t={t} lang={lang} settings={settings} setSettings={setSettings} setInitialSettings={setInitialSettings} discordChannels={discordChannels} discordRoles={discordRoles} isPremium={isPremium} guildId={guildId} />
+          <TempVoiceTab t={t} lang={settings.language || 'tr'} settings={settings} setSettings={setSettings} setInitialSettings={setInitialSettings} discordChannels={discordChannels} discordRoles={discordRoles} isPremium={isPremium} guildId={guildId} />
         )}
 
       </main>

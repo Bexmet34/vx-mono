@@ -42,30 +42,7 @@ export async function POST(req, context) {
     const emojiMap = await getApplicationEmojis();
     console.log(`[VoiceForge] Step 0 OK: Loaded ${Object.keys(emojiMap).length} custom application emojis from Discord`);
 
-    // 1. Generate the sleek canvas image for embed
-    console.log('[VoiceForge] Step 1: Generating interface image...');
-    let files = [];
-    let imageAttachmentUrl = null;
-    try {
-      const { generateInterfaceImage } = await import('@/lib/generateInterfaceImage');
-      const imageBuffer = await generateInterfaceImage(buttons, lang, emojiMap);
-      if (imageBuffer) {
-        files.push({
-          name: 'interface.png',
-          buffer: imageBuffer,
-          contentType: 'image/png'
-        });
-        imageAttachmentUrl = 'attachment://interface.png';
-        console.log('[VoiceForge] Step 1 OK: Interface image generated successfully');
-      } else {
-        console.log('[VoiceForge] Step 1: No image buffer returned, skipping image');
-      }
-    } catch (imgErr) {
-      console.error('[VoiceForge] Step 1 FAILED - image generation error:', imgErr?.message, imgErr?.stack);
-      // Continue without image — buttons will still be sent to Discord
-    }
-
-    // 2. Build Discord interactive ActionRows with Custom Application Emojis
+    // 2. Build Discord interactive ActionRows
     console.log('[VoiceForge] Step 2: Building action rows...');
     const actionRows = [];
     for (let i = 0; i < buttons.length; i += 5) {
@@ -105,9 +82,6 @@ export async function POST(req, context) {
       }
     };
 
-    if (imageAttachmentUrl) {
-      embed.image = { url: imageAttachmentUrl };
-    }
 
     if (embedFooter) {
       embed.footer = { text: embedFooter };
@@ -118,8 +92,8 @@ export async function POST(req, context) {
       components: actionRows
     };
 
-    console.log(`[VoiceForge] Step 4: Sending to Discord channel ${channelId} with ${files.length} files...`);
-    await sendChannelMessage(channelId, messagePayload, files);
+    console.log(`[VoiceForge] Step 4: Sending to Discord channel ${channelId}...`);
+    await sendChannelMessage(channelId, messagePayload);
     console.log('[VoiceForge] Step 4 OK: Message sent to Discord successfully!');
 
     return NextResponse.json({ success: true });
