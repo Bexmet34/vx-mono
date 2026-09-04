@@ -181,11 +181,12 @@ export async function GET(req, context) {
         let missingPermissions = requiredPerms.filter(p => (basePermissions & p.flag) !== p.flag);
 
         // ── Step 8: REAL API TESTING (Ultimate Source of Truth) ───────────────
-        // Even if our local math says "Yes", Discord API might say "No" due to complex 
-        // category syncing or cached state. Let's do a real test!
         
-        // Test SEND_MESSAGES by triggering "typing" status. It doesn't send a message, 
-        // but Discord will block it with 403 if bot can't send messages in that channel.
+        // KESİN BİLGİ 1: Step 2'de (channel fetch) 403 yemedik ve kanalı okuduk. 
+        // Bu yüzden VIEW_CHANNEL kesinlikle var! (Local hesaplama ne derse desin)
+        missingPermissions = missingPermissions.filter(p => p.flag !== PERM.VIEW_CHANNEL);
+
+        // KESİN BİLGİ 2: SEND_MESSAGES testini Typing endpoint ile yapıyoruz.
         let hasRealSendAccess = false;
         try {
             const typingRes = await fetch(`https://discord.com/api/v10/channels/${channelId}/typing`, {
@@ -194,25 +195,21 @@ export async function GET(req, context) {
             });
             if (typingRes.ok || typingRes.status === 204) {
                 hasRealSendAccess = true;
-            } else {
-                hasRealSendAccess = false;
             }
         } catch (e) {
             hasRealSendAccess = false;
         }
 
-        // If Discord actively rejects typing (Send Messages), then force it as missing!
+        // Eğer typing atamadıysak, SEND_MESSAGES kesinlikle yoktur. (Eksik listesine ekle)
         if (!hasRealSendAccess) {
             if (!missingPermissions.find(p => p.flag === PERM.SEND_MESSAGES)) {
                 missingPermissions.push(requiredPerms.find(p => p.flag === PERM.SEND_MESSAGES));
             }
-            if (!missingPermissions.find(p => p.flag === PERM.VIEW_CHANNEL)) {
-                missingPermissions.push(requiredPerms.find(p => p.flag === PERM.VIEW_CHANNEL));
-            }
+        } else {
+            // Eğer typing atabildiysek, SEND_MESSAGES kesinlikle VARDIR. (Eksik listesinden çıkar)
+            missingPermissions = missingPermissions.filter(p => p.flag !== PERM.SEND_MESSAGES);
         }
 
-        // If bot is explicitly marked as ADMIN by our algorithm but typing fails, 
-        // the local algorithm was wrong (or bot lacks basic token scopes). 
         const allGood = missingPermissions.length === 0;
 
         return NextResponse.json({
