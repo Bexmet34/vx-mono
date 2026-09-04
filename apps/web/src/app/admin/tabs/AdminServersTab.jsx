@@ -73,7 +73,9 @@ export default function AdminServersTab({
     setLoading(false);
   };
 
-  const handleGenerateInvite = async (guildId) => {
+  const handleGenerateInvite = async (guildId, guildName) => {
+    if (!confirm(`"${guildName}" sunucusuna gitmek (davet linki oluşturmak) istiyor musunuz?`)) return;
+    
     setLoading(true);
     try {
       const res = await fetch(`/api/admin/generate-invite/${guildId}`, { method: 'POST' });
@@ -206,16 +208,20 @@ export default function AdminServersTab({
                   return (
                     <tr key={s.id} className={`hover:bg-[#2b2d31]/30 transition-colors ${isPassive ? 'opacity-50' : ''}`}>
                       <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
+                        <div 
+                          className="flex items-center gap-3 cursor-pointer group"
+                          onClick={() => handleGenerateInvite(s.guild_id, s.guild_name)}
+                          title="Sunucuya gitmek için tıkla"
+                        >
                           {s.guild_icon ? (
-                            <img src={`https://cdn.discordapp.com/icons/${s.guild_id}/${s.guild_icon}.${s.guild_icon.startsWith('a_') ? 'gif' : 'png'}?size=64`} alt="icon" className="w-10 h-10 rounded-xl border border-[#fca311]/20 object-cover" />
+                            <img src={`https://cdn.discordapp.com/icons/${s.guild_id}/${s.guild_icon}.${s.guild_icon.startsWith('a_') ? 'gif' : 'png'}?size=64`} alt="icon" className="w-10 h-10 rounded-xl border border-[#fca311]/20 object-cover group-hover:opacity-80 transition-opacity" />
                           ) : (
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#fca311]/20 to-[#fca311]/5 border border-[#fca311]/20 flex items-center justify-center font-bold text-[#fca311]">
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#fca311]/20 to-[#fca311]/5 border border-[#fca311]/20 flex items-center justify-center font-bold text-[#fca311] group-hover:opacity-80 transition-opacity">
                               {s.guild_name?.charAt(0).toUpperCase() || 'V'}
                             </div>
                           )}
                           <div>
-                            <div className="font-bold text-white">{s.guild_name}</div>
+                            <div className="font-bold text-white group-hover:text-[#5865F2] transition-colors">{s.guild_name}</div>
                             <div className="text-xs text-[#949ba4] font-mono">{s.guild_id}</div>
                           </div>
                         </div>
@@ -302,14 +308,6 @@ export default function AdminServersTab({
                               {savingId === s.guild_id ? <Loader2 size={16} className="animate-spin" /> : <Power size={16} />}
                             </button>
                             
-                            <button 
-                              className="p-2 bg-[#5865F2]/10 hover:bg-[#5865F2]/20 text-[#5865F2] rounded-lg transition-colors border border-transparent hover:border-[#5865F2]/30 disabled:opacity-50"
-                              title="Sunucuya Katıl / Davet Linki Üret" 
-                              disabled={savingId === s.guild_id || loading}
-                              onClick={() => handleGenerateInvite(s.guild_id)}
-                            >
-                              <ExternalLink size={16} />
-                            </button>
 
                             <button 
                               className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg transition-colors border border-transparent hover:border-red-500/30 disabled:opacity-50"
@@ -342,13 +340,20 @@ export default function AdminServersTab({
                     !isExpired ? 'bg-[#5865F2]' : 'bg-[#ff4757]'
                   }`} />
                   
-                  <div className="flex items-start justify-between gap-3 pl-2">
+                  <div 
+                    className="flex items-start justify-between gap-3 pl-2 cursor-pointer group"
+                    onClick={() => handleGenerateInvite(s.guild_id, s.guild_name)}
+                  >
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#fca311]/20 to-[#fca311]/5 border border-[#fca311]/20 flex items-center justify-center font-bold text-[#fca311] text-lg shrink-0">
-                        {s.guild_name?.charAt(0).toUpperCase() || 'V'}
-                      </div>
+                      {s.guild_icon ? (
+                        <img src={`https://cdn.discordapp.com/icons/${s.guild_id}/${s.guild_icon}.${s.guild_icon.startsWith('a_') ? 'gif' : 'png'}?size=64`} alt="icon" className="w-12 h-12 rounded-xl border border-[#fca311]/20 object-cover shrink-0 group-hover:opacity-80 transition-opacity" />
+                      ) : (
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#fca311]/20 to-[#fca311]/5 border border-[#fca311]/20 flex items-center justify-center font-bold text-[#fca311] text-lg shrink-0 group-hover:opacity-80 transition-opacity">
+                          {s.guild_name?.charAt(0).toUpperCase() || 'V'}
+                        </div>
+                      )}
                       <div className="flex flex-col overflow-hidden">
-                        <h3 className="font-bold text-white text-base truncate pr-2">{s.guild_name}</h3>
+                        <h3 className="font-bold text-white text-base truncate pr-2 group-hover:text-[#5865F2] transition-colors">{s.guild_name}</h3>
                         <div className="text-xs text-[#949ba4] font-mono mt-0.5 truncate">{s.guild_id}</div>
                       </div>
                     </div>
@@ -411,9 +416,7 @@ export default function AdminServersTab({
                      <button className={`p-2 rounded-lg disabled:opacity-50 ${!s.is_active ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-[#2b2d31] text-[#949ba4]'}`} title={s.is_active ? 'Devre Dışı Bırak' : 'Etkinleştir'} disabled={savingId === s.guild_id} onClick={() => handleServerAction(s.guild_id, 'toggle_active', !s.is_active)}>
                        {savingId === s.guild_id ? <Loader2 size={16} className="animate-spin" /> : <Power size={16} />}
                      </button>
-                     <button className="p-2 bg-[#5865F2]/10 text-[#5865F2] rounded-lg disabled:opacity-50" title="Sunucuya Katıl" disabled={savingId === s.guild_id || loading} onClick={() => handleGenerateInvite(s.guild_id)}>
-                       <ExternalLink size={16} />
-                     </button>
+
                      <button className="p-2 bg-red-500/10 text-red-500 rounded-lg disabled:opacity-50" disabled={savingId === s.guild_id} onClick={() => handleDeleteServer && handleDeleteServer(s.guild_id)}>
                        {savingId === s.guild_id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
                      </button>
