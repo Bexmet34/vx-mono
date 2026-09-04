@@ -3,7 +3,6 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { checkDashboardAccess } from '@/utils/authUtils';
 import { sendChannelMessage, getApplicationEmojis } from "@/lib/discordApi";
-import { generateInterfaceImage } from "@/lib/generateInterfaceImage";
 import { BUTTON_DATA } from "@/lib/buttonConfigs";
 
 export async function POST(req, context) {
@@ -48,6 +47,7 @@ export async function POST(req, context) {
     let files = [];
     let imageAttachmentUrl = null;
     try {
+      const { generateInterfaceImage } = await import('@/lib/generateInterfaceImage');
       const imageBuffer = await generateInterfaceImage(buttons, lang, emojiMap);
       if (imageBuffer) {
         files.push({
@@ -62,6 +62,7 @@ export async function POST(req, context) {
       }
     } catch (imgErr) {
       console.error('[VoiceForge] Step 1 FAILED - image generation error:', imgErr?.message, imgErr?.stack);
+      // Continue without image — buttons will still be sent to Discord
     }
 
     // 2. Build Discord interactive ActionRows with Custom Application Emojis
