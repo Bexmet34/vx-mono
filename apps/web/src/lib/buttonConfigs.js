@@ -4,6 +4,7 @@ export const BUTTON_DATA = {
   name: {
     id: 'name',
     label: { tr: 'ODA İSMİ', en: 'NAME' },
+    shortLabel: { tr: 'İsim', en: 'Name' },
     emojiName: 'editt',
     fallbackEmoji: '✏️',
     color: '#ffffff',
@@ -17,6 +18,7 @@ export const BUTTON_DATA = {
   limit: {
     id: 'limit',
     label: { tr: 'ODA LİMİTİ', en: 'LIMIT' },
+    shortLabel: { tr: 'Limit', en: 'Limit' },
     emojiName: 'userss',
     fallbackEmoji: '👥',
     color: '#ffffff',
@@ -32,6 +34,7 @@ export const BUTTON_DATA = {
   privacy: {
     id: 'privacy',
     label: { tr: 'GİZLİLİK', en: 'PRIVACY' },
+    shortLabel: { tr: 'Gizlilik', en: 'Privacy' },
     emojiName: 'shieldd',
     fallbackEmoji: '🛡️',
     color: '#ffffff',
@@ -46,6 +49,7 @@ export const BUTTON_DATA = {
   waiting_room: {
     id: 'waiting_room',
     label: { tr: 'BEKLEME ODASI', en: 'WAITING ROOM' },
+    shortLabel: { tr: 'Bekleme', en: 'Waiting' },
     emojiName: 'clockk',
     fallbackEmoji: '⏳',
     color: '#facc15',
@@ -59,6 +63,7 @@ export const BUTTON_DATA = {
   chat: {
     id: 'chat',
     label: { tr: 'SOHBET', en: 'CHAT' },
+    shortLabel: { tr: 'Sohbet', en: 'Chat' },
     emojiName: 'chatt',
     fallbackEmoji: '💬',
     color: '#ffffff',
@@ -71,6 +76,7 @@ export const BUTTON_DATA = {
   trusted: {
     id: 'trusted',
     label: { tr: 'GÜVENİLİR', en: 'TRUSTED' },
+    shortLabel: { tr: 'Güvenilir', en: 'Trusted' },
     emojiName: 'userpluss',
     fallbackEmoji: '✅',
     color: '#22c55e',
@@ -86,6 +92,7 @@ export const BUTTON_DATA = {
   untrusted: {
     id: 'untrusted',
     label: { tr: 'GÜVENSİZ', en: 'UNTRUSTED' },
+    shortLabel: { tr: 'Güvensiz', en: 'Untrust' },
     emojiName: 'userminuss',
     fallbackEmoji: '❌',
     color: '#ef4444',
@@ -102,6 +109,7 @@ export const BUTTON_DATA = {
   invite: {
     id: 'invite',
     label: { tr: 'DAVET', en: 'INVITE' },
+    shortLabel: { tr: 'Davet', en: 'Invite' },
     emojiName: 'phonee',
     fallbackEmoji: '📞',
     color: '#22c55e',
@@ -115,6 +123,7 @@ export const BUTTON_DATA = {
   kick: {
     id: 'kick',
     label: { tr: 'SESTEN AT', en: 'KICK' },
+    shortLabel: { tr: 'At', en: 'Kick' },
     emojiName: 'disconnectedd',
     fallbackEmoji: '📴',
     color: '#ef4444',
@@ -128,6 +137,7 @@ export const BUTTON_DATA = {
   region: {
     id: 'region',
     label: { tr: 'BÖLGE', en: 'REGION' },
+    shortLabel: { tr: 'Bölge', en: 'Region' },
     emojiName: 'globee',
     fallbackEmoji: '🌐',
     color: '#ffffff',
@@ -142,6 +152,7 @@ export const BUTTON_DATA = {
   block: {
     id: 'block',
     label: { tr: 'ENGELLE', en: 'BLOCK' },
+    shortLabel: { tr: 'Engelle', en: 'Block' },
     emojiName: 'blockk',
     fallbackEmoji: '🚫',
     color: '#ef4444',
@@ -157,6 +168,7 @@ export const BUTTON_DATA = {
   unblock: {
     id: 'unblock',
     label: { tr: 'ENGELİ KALDIR', en: 'UNBLOCK' },
+    shortLabel: { tr: 'Aç', en: 'Unblock' },
     emojiName: 'opensolidd',
     fallbackEmoji: '🔓',
     color: '#22c55e',
@@ -172,6 +184,7 @@ export const BUTTON_DATA = {
   claim: {
     id: 'claim',
     label: { tr: 'SAHİPLEN', en: 'CLAIM' },
+    shortLabel: { tr: 'Al', en: 'Claim' },
     emojiName: 'crownn',
     fallbackEmoji: '👑',
     color: '#f59e0b',
@@ -184,6 +197,7 @@ export const BUTTON_DATA = {
   transfer: {
     id: 'transfer',
     label: { tr: 'ODAYI DEVRET', en: 'TRANSFER' },
+    shortLabel: { tr: 'Devret', en: 'Transfer' },
     emojiName: 'rightleftsolidd',
     fallbackEmoji: '🔁',
     color: '#f97316',
@@ -199,6 +213,7 @@ export const BUTTON_DATA = {
   delete: {
     id: 'delete',
     label: { tr: 'SİL', en: 'DELETE' },
+    shortLabel: { tr: 'Sil', en: 'Delete' },
     emojiName: 'deletee',
     fallbackEmoji: '🗑️',
     color: '#ef4444',
@@ -212,3 +227,4 @@ export const BUTTON_DATA = {
     )
   },
 };
+

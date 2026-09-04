@@ -76,7 +76,8 @@ export async function POST(req, context) {
           type: 2,
           style: 2, // Secondary / Gray for sleek uniform look
           custom_id: `tv_${btnId}`,
-          emoji: emojiPayload
+          emoji: emojiPayload,
+          label: config.shortLabel ? config.shortLabel[lang] : (config.label ? config.label[lang] : 'Buton')
         };
       }).filter(Boolean);
 
