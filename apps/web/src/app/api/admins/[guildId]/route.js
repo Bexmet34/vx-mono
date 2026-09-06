@@ -21,18 +21,49 @@ export async function POST(req, { params }) {
     }
 
     // Check if the requester is the OWNER of the subscription
-    const { data: sub, error: fetchError } = await supabase
+    let { data: sub, error: fetchError } = await supabase
       .from('subscriptions')
       .select('*')
       .eq('guild_id', guildId)
       .single();
 
     if (fetchError || !sub) {
-        return NextResponse.json({ error: "Subscription not found" }, { status: 404 });
-    }
+        // If not in subscriptions, check if they are owner in guild_settings (Freemium server)
+        const { data: gs, error: gsError } = await supabase
+            .from('guild_settings')
+            .select('owner_id')
+            .eq('guild_id', guildId)
+            .single();
 
-    if (sub.owner_id !== session.user.id) {
-        return NextResponse.json({ error: "Only the server owner can manage admins" }, { status: 403 });
+        if (gsError || !gs) {
+            return NextResponse.json({ error: "Sunucu veritabanında bulunamadı." }, { status: 404 });
+        }
+
+        if (gs.owner_id !== session.user.id) {
+            return NextResponse.json({ error: "Yetkili atama işlemini sadece sunucu sahibi yapabilir." }, { status: 403 });
+        }
+
+        // Create a default freemium subscription row to hold authorized_users
+        const newSub = {
+             guild_id: guildId,
+             owner_id: session.user.id,
+             guild_name: 'Sunucu',
+             is_active: true,
+             is_unlimited: false,
+             trial_used: true,
+             expires_at: new Date(Date.now() - 1000).toISOString(), // Expired
+             authorized_users: []
+        };
+        const { data: inserted, error: insertError } = await supabase.from('subscriptions').insert(newSub).select().single();
+        if (insertError) {
+             console.error("Supabase Sub Insert Error:", insertError);
+             return NextResponse.json({ error: "Sunucu abonelik kaydı oluşturulamadı." }, { status: 500 });
+        }
+        sub = inserted;
+    } else {
+        if (sub.owner_id !== session.user.id) {
+            return NextResponse.json({ error: "Yetkili atama işlemini sadece sunucu sahibi yapabilir." }, { status: 403 });
+        }
     }
 
     // Parse existing authorized_users
