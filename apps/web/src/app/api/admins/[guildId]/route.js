@@ -29,7 +29,7 @@ export async function POST(req, { params }) {
 
     if (fetchError || !sub) {
         // If not in subscriptions, check if they are owner in guild_settings (Freemium server)
-        const { data: gs, error: gsError } = await supabase
+        let { data: gs, error: gsError } = await supabase
             .from('guild_settings')
             .select('owner_id')
             .eq('guild_id', guildId)
