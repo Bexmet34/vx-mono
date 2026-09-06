@@ -3,14 +3,6 @@
 import { Copy, Plus, Trash2, GripVertical, PlusCircle, Crown, Lock, ShieldCheck, CheckCircle2, Sparkles, Layers, Minus, ClipboardPaste } from "lucide-react";
 import InfoTooltip from "@/components/InfoTooltip";
 import { useState, useEffect } from "react";
-import { 
-  albionWeapons, 
-  albionHeads, 
-  albionChests, 
-  albionShoes, 
-  albionPotions, 
-  albionFoods 
-} from "@/data/albionItems";
 import { parseTextToBlocks } from "@/utils/templateParser";
 
 export default function TemplateTab({ t, lang, settings, setSettings, selectedTemplateId, setSelectedTemplateId, isPremium, showToast }) {
@@ -19,7 +11,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
   const selectedTemplate = selectedIndex !== -1 ? templates[selectedIndex] : null;
   const isSelectedActive = isPremium || selectedIndex < 5;
 
-  const totalCount = templates.length;
+  const totalCount = settings.party_templates?.length || 0;
   const activeCount = isPremium ? totalCount : Math.min(totalCount, 5);
   const passiveCount = isPremium ? 0 : Math.max(0, totalCount - 5);
 
@@ -29,6 +21,33 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
   const [dragOverIndex, setDragOverIndex] = useState(null);
   const [showImportBox, setShowImportBox] = useState(false);
   const [importText, setImportText] = useState("");
+
+  const [albionWeapons, setAlbionWeapons] = useState([]);
+  const [albionHeads, setAlbionHeads] = useState([]);
+  const [albionChests, setAlbionChests] = useState([]);
+  const [albionShoes, setAlbionShoes] = useState([]);
+  const [albionOffhands, setAlbionOffhands] = useState([]);
+  const [albionPotions, setAlbionPotions] = useState([]);
+  const [albionFoods, setAlbionFoods] = useState([]);
+  const [albionSwaps, setAlbionSwaps] = useState([]);
+
+  useEffect(() => {
+    fetch('/api/albion-items')
+      .then(res => res.json())
+      .then(data => {
+        if (!data.error) {
+          setAlbionWeapons(data.weapons || []);
+          setAlbionHeads(data.heads || []);
+          setAlbionChests(data.chests || []);
+          setAlbionShoes(data.shoes || []);
+          setAlbionOffhands(data.offhands || []);
+          setAlbionPotions(data.potions || []);
+          setAlbionFoods(data.foods || []);
+          setAlbionSwaps(data.swaps || []);
+        }
+      })
+      .catch(err => console.error("Failed to fetch items:", err));
+  }, []);
 
   // Yalnızca şablon DEĞİŞTİĞİNDE blokları parse et.
   useEffect(() => {

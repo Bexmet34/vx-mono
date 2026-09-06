@@ -4,14 +4,6 @@ import { Copy, Plus, Trash2, GripVertical, PlusCircle, Minus, ClipboardPaste, Sp
 import InfoTooltip from "@/components/InfoTooltip";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { 
-  albionWeapons, 
-  albionHeads, 
-  albionChests, 
-  albionShoes, 
-  albionPotions, 
-  albionFoods 
-} from "@/data/albionItems";
 import { parseTextToBlocks } from "@/utils/templateParser";
 
 export default function UserTemplatesTab({ t, lang, templates, setTemplates, isPremium, showToast }) {
@@ -24,6 +16,34 @@ export default function UserTemplatesTab({ t, lang, templates, setTemplates, isP
   const [dragOverIndex, setDragOverIndex] = useState(null);
   const [showImportBox, setShowImportBox] = useState(false);
   const [importText, setImportText] = useState("");
+  
+  // Dynamic Supabase item lists
+  const [albionWeapons, setAlbionWeapons] = useState([]);
+  const [albionHeads, setAlbionHeads] = useState([]);
+  const [albionChests, setAlbionChests] = useState([]);
+  const [albionShoes, setAlbionShoes] = useState([]);
+  const [albionOffhands, setAlbionOffhands] = useState([]);
+  const [albionPotions, setAlbionPotions] = useState([]);
+  const [albionFoods, setAlbionFoods] = useState([]);
+  const [albionSwaps, setAlbionSwaps] = useState([]);
+
+  useEffect(() => {
+    fetch('/api/albion-items')
+      .then(res => res.json())
+      .then(data => {
+        if (!data.error) {
+          setAlbionWeapons(data.weapons || []);
+          setAlbionHeads(data.heads || []);
+          setAlbionChests(data.chests || []);
+          setAlbionShoes(data.shoes || []);
+          setAlbionOffhands(data.offhands || []);
+          setAlbionPotions(data.potions || []);
+          setAlbionFoods(data.foods || []);
+          setAlbionSwaps(data.swaps || []);
+        }
+      })
+      .catch(err => console.error("Failed to fetch items:", err));
+  }, []);
 
   const prevTemplateIdRef = useRef(null);
 
@@ -228,10 +248,10 @@ export default function UserTemplatesTab({ t, lang, templates, setTemplates, isP
       <datalist id="heads-list">{albionHeads.map(w => <option key={w} value={w} />)}</datalist>
       <datalist id="chests-list">{albionChests.map(w => <option key={w} value={w} />)}</datalist>
       <datalist id="shoes-list">{albionShoes.map(w => <option key={w} value={w} />)}</datalist>
-      <datalist id="offhands-list">{[]}</datalist>
+      <datalist id="offhands-list">{albionOffhands.map(w => <option key={w} value={w} />)}</datalist>
       <datalist id="potions-list">{albionPotions.map(w => <option key={w} value={w} />)}</datalist>
       <datalist id="foods-list">{albionFoods.map(w => <option key={w} value={w} />)}</datalist>
-      <datalist id="swaps-list">{[]}</datalist>
+      <datalist id="swaps-list">{albionSwaps.map(w => <option key={w} value={w} />)}</datalist>
 
       <div className="glass-panel relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors flex flex-col">
         <div className="p-3 border-b border-outline-variant/50 flex justify-between items-center bg-surface-container-highest/30">
