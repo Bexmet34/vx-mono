@@ -43,15 +43,20 @@ export default function UserTemplatesTab({ t, lang, templates, setTemplates, isP
             parsedBlocks.push({ id: `blk_${index}_${Date.now()}`, type: "header", text });
           } else if (trimmed.includes(">")) {
             const [weaponPart, gearPart] = trimmed.split(">");
+            const gears = gearPart ? gearPart.split("-").map(s => s.trim()) : [];
             const head = gears[0] || "";
             const chest = gears[1] || "";
             const shoes = gears[2] || "";
-            const potion = gears[3] || "";
-            const food = gears[4] || "";
+            const offhand = gears[3] || "";
+            const potion = gears[4] || "";
+            const food = gears[5] || "";
+            const swap = gears[6] || "";
             
             let visibleFields = 1;
-            if (food) visibleFields = 6;
-            else if (potion) visibleFields = 5;
+            if (swap) visibleFields = 8;
+            else if (food) visibleFields = 7;
+            else if (potion) visibleFields = 6;
+            else if (offhand) visibleFields = 5;
             else if (shoes) visibleFields = 4;
             else if (chest) visibleFields = 3;
             else if (head) visibleFields = 2;
@@ -64,8 +69,10 @@ export default function UserTemplatesTab({ t, lang, templates, setTemplates, isP
               head,
               chest,
               shoes,
+              offhand,
               potion,
               food,
+              swap,
               visibleFields
             });
           } else {
@@ -73,7 +80,7 @@ export default function UserTemplatesTab({ t, lang, templates, setTemplates, isP
               id: `blk_${index}_${Date.now()}`,
               type: "role",
               weapon: trimmed,
-              head: "", chest: "", shoes: "", potion: "", food: "",
+              head: "", chest: "", shoes: "", offhand: "", potion: "", food: "", swap: "",
               visibleFields: 1
             });
           }
@@ -113,7 +120,7 @@ export default function UserTemplatesTab({ t, lang, templates, setTemplates, isP
       if (b.type === "header") {
         return `#${b.text}`;
       } else {
-        const gearArr = [b.head, b.chest, b.shoes, b.potion, b.food].map(x => x || "");
+        const gearArr = [b.head, b.chest, b.shoes, b.offhand, b.potion, b.food, b.swap].map(x => x || "");
         const hasGear = gearArr.some(x => x !== "");
         if (hasGear) {
           return `${b.weapon || "Unknown"} > ${gearArr.map(g => g || " ").join(" - ")}`;
@@ -147,7 +154,7 @@ export default function UserTemplatesTab({ t, lang, templates, setTemplates, isP
   const addBlock = (type) => {
     const newBlock = type === "header" 
       ? { id: `blk_${Date.now()}_${Math.random()}`, type: "header", text: "" }
-      : { id: `blk_${Date.now()}_${Math.random()}`, type: "role", weapon: "", head: "", chest: "", shoes: "", potion: "", food: "", visibleFields: 1 };
+      : { id: `blk_${Date.now()}_${Math.random()}`, type: "role", weapon: "", head: "", chest: "", shoes: "", offhand: "", potion: "", food: "", swap: "", visibleFields: 1 };
     handleUpdateBlocks([...blocks, newBlock]);
   };
 
@@ -221,8 +228,10 @@ export default function UserTemplatesTab({ t, lang, templates, setTemplates, isP
       <datalist id="heads-list">{albionHeads.map(w => <option key={w} value={w} />)}</datalist>
       <datalist id="chests-list">{albionChests.map(w => <option key={w} value={w} />)}</datalist>
       <datalist id="shoes-list">{albionShoes.map(w => <option key={w} value={w} />)}</datalist>
+      <datalist id="offhands-list">{[]}</datalist>
       <datalist id="potions-list">{albionPotions.map(w => <option key={w} value={w} />)}</datalist>
       <datalist id="foods-list">{albionFoods.map(w => <option key={w} value={w} />)}</datalist>
+      <datalist id="swaps-list">{[]}</datalist>
 
       <div className="glass-panel relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors flex flex-col">
         <div className="p-3 border-b border-outline-variant/50 flex justify-between items-center bg-surface-container-highest/30">
@@ -507,7 +516,6 @@ export default function UserTemplatesTab({ t, lang, templates, setTemplates, isP
                                 />
                               </div>
                             )}
-
                             {(block.visibleFields || 1) >= 6 && (
                               <div className="flex-1 min-w-[100px] animate-pop-in">
                                 <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Food' : 'Yemek'}</label>
@@ -520,14 +528,38 @@ export default function UserTemplatesTab({ t, lang, templates, setTemplates, isP
                               </div>
                             )}
 
+                            {(block.visibleFields || 1) >= 7 && (
+                              <div className="flex-1 min-w-[100px] animate-pop-in">
+                                <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Offhand' : 'İkincil El'}</label>
+                                <input 
+                                  list="offhands-list"
+                                  value={block.offhand || ""}
+                                  onChange={(e) => updateBlock(block.id, { offhand: e.target.value })}
+                                  className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-[10px] text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                                />
+                              </div>
+                            )}
+
+                            {(block.visibleFields || 1) >= 8 && (
+                              <div className="flex-1 min-w-[100px] animate-pop-in">
+                                <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Swap' : 'Değişimlik'}</label>
+                                <input 
+                                  list="swaps-list"
+                                  value={block.swap || ""}
+                                  onChange={(e) => updateBlock(block.id, { swap: e.target.value })}
+                                  className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-[10px] text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                                />
+                              </div>
+                            )}
+
                             <div className="flex items-center gap-1 shrink-0 mb-1">
                               {(block.visibleFields || 1) > 1 && (
                                 <button 
                                   onClick={() => {
-                                    const fields = ['weapon', 'head', 'chest', 'shoes', 'potion', 'food'];
+                                    const fields = ['weapon', 'head', 'chest', 'shoes', 'potion', 'food', 'offhand', 'swap'];
                                     const currentCount = block.visibleFields || 1;
                                     const fieldToClear = fields[currentCount - 1];
-                                    updateBlock(block.id, { [fieldToClear]: "", visibleFields: currentCount - 1 });
+                                    updateBlock(block.id, { [fieldToClear]: "", visibleFields: Math.max(1, currentCount - 1) });
                                   }}
                                   className="p-1.5 bg-surface border border-outline-variant text-on-surface-variant hover:text-error hover:border-error/50 hover:bg-error/10 rounded-sm transition-colors shadow-sm"
                                   title={lang === 'tr' ? 'Son kutuyu kaldır' : 'Remove last field'}
@@ -535,7 +567,7 @@ export default function UserTemplatesTab({ t, lang, templates, setTemplates, isP
                                   <Minus size={14} />
                                 </button>
                               )}
-                              {(block.visibleFields || 1) < 6 && (
+                              {(block.visibleFields || 1) < 8 && (
                                 <button 
                                   onClick={() => updateBlock(block.id, { visibleFields: (block.visibleFields || 1) + 1 })}
                                   className="p-1.5 bg-primary-container/20 border border-primary-container/50 text-primary-container hover:bg-primary-container hover:text-on-primary rounded-sm transition-colors shadow-sm"
