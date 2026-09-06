@@ -36,11 +36,32 @@ export async function POST(req, { params }) {
             .single();
 
         if (gsError || !gs) {
-            return NextResponse.json({ error: "Sunucu veritabanında bulunamadı." }, { status: 404 });
-        }
-
-        if (gs.owner_id !== session.user.id) {
-            return NextResponse.json({ error: "Yetkili atama işlemini sadece sunucu sahibi yapabilir." }, { status: 403 });
+            // Sunucu veritabaninda HIC yoksa, Bot uzerinden gercekten owner mi diye dogrulayalim
+            try {
+                const botApiUrl = process.env.BOT_API_URL || 'http://localhost:3005';
+                const botRes = await fetch(`${botApiUrl}/api/bot-guilds`);
+                const botData = await botRes.json();
+                const guildFromBot = botData.guilds?.find(g => g.id === guildId);
+                
+                if (!guildFromBot || guildFromBot.owner_id !== session.user.id) {
+                    return NextResponse.json({ error: "Sadece sunucu kurucusu yetkilendirme yapabilir." }, { status: 403 });
+                }
+                
+                // Madem owner o, DB'ye guild_settings kaydini basalim
+                const newGs = { guild_id: guildId, owner_id: session.user.id, language: 'tr' };
+                const { data: insGs, error: insGsErr } = await supabase.from('guild_settings').insert(newGs).select().single();
+                if (insGsErr) {
+                    return NextResponse.json({ error: "Sunucu ayarlari olusturulamadi." }, { status: 500 });
+                }
+                gs = insGs;
+            } catch (e) {
+                console.error("Bot doğrulama hatası:", e);
+                return NextResponse.json({ error: "Sunucu doğrulamasi basarisiz oldu." }, { status: 500 });
+            }
+        } else {
+            if (gs.owner_id !== session.user.id) {
+                return NextResponse.json({ error: "Yetkili atama işlemini sadece sunucu sahibi yapabilir." }, { status: 403 });
+            }
         }
 
         // Create a default freemium subscription row to hold authorized_users
