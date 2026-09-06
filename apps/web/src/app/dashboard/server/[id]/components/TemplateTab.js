@@ -1,6 +1,6 @@
 "use client";
 
-import { Copy, Plus, Trash2, GripVertical, PlusCircle, Crown, Lock, ShieldCheck, CheckCircle2, Sparkles, Layers } from "lucide-react";
+import { Copy, Plus, Trash2, GripVertical, PlusCircle, Crown, Lock, ShieldCheck, CheckCircle2, Sparkles, Layers, Minus } from "lucide-react";
 import InfoTooltip from "@/components/InfoTooltip";
 import { useState, useEffect } from "react";
 import { 
@@ -41,22 +41,38 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
         } else if (trimmed.includes(">")) {
           const [weaponPart, gearPart] = trimmed.split(">");
           const gears = gearPart ? gearPart.split("-").map(s => s.trim()) : [];
+          const head = gears[0] || "";
+          const chest = gears[1] || "";
+          const shoes = gears[2] || "";
+          const potion = gears[3] || "";
+          const food = gears[4] || "";
+
+          let visibleFields = 1;
+          if (food) visibleFields = 6;
+          else if (potion) visibleFields = 5;
+          else if (shoes) visibleFields = 4;
+          else if (chest) visibleFields = 3;
+          else if (head) visibleFields = 2;
+          else if (gears.length > 0) visibleFields = gears.length + 1;
+
           parsedBlocks.push({
             id: `blk_${index}_${Date.now()}`,
             type: "role",
             weapon: weaponPart.trim(),
-            head: gears[0] || "",
-            chest: gears[1] || "",
-            shoes: gears[2] || "",
-            potion: gears[3] || "",
-            food: gears[4] || ""
+            head,
+            chest,
+            shoes,
+            potion,
+            food,
+            visibleFields
           });
         } else {
           parsedBlocks.push({
             id: `blk_${index}_${Date.now()}`,
             type: "role",
             weapon: trimmed,
-            head: "", chest: "", shoes: "", potion: "", food: ""
+            head: "", chest: "", shoes: "", potion: "", food: "",
+            visibleFields: 1
           });
         }
       });
@@ -92,7 +108,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
   const addBlock = (type) => {
     const newBlock = type === "header" 
       ? { id: `blk_${Date.now()}_${Math.random()}`, type: "header", text: "" }
-      : { id: `blk_${Date.now()}_${Math.random()}`, type: "role", weapon: "", head: "", chest: "", shoes: "", potion: "", food: "" };
+      : { id: `blk_${Date.now()}_${Math.random()}`, type: "role", weapon: "", head: "", chest: "", shoes: "", potion: "", food: "", visibleFields: 1 };
     handleUpdateBlocks([...blocks, newBlock]);
   };
 
@@ -477,8 +493,8 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
                             className="w-full bg-transparent border-b border-primary-container/50 focus:border-primary-container px-2 py-1 text-[10px] font-headline-md text-primary-container outline-none transition-colors"
                           />
                         ) : (
-                          <div className="grid grid-cols-2 md:grid-cols-6 gap-2">
-                            <div>
+                          <div className="flex flex-wrap items-end gap-2 relative">
+                            <div className="flex-1 min-w-[120px]">
                               <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Weapon' : 'Silah'}</label>
                               <input 
                                 list="weapons-list"
@@ -488,50 +504,91 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
                                 className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-[10px] text-on-surface focus:outline-none focus:border-primary-container transition-colors"
                               />
                             </div>
-                            <div>
-                              <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Head' : 'Başlık'}</label>
-                              <input 
-                                list="heads-list"
-                                value={block.head}
-                                onChange={(e) => updateBlock(block.id, { head: e.target.value })}
-                                className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-[10px] text-on-surface focus:outline-none focus:border-primary-container transition-colors"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Chest' : 'Zırh'}</label>
-                              <input 
-                                list="chests-list"
-                                value={block.chest}
-                                onChange={(e) => updateBlock(block.id, { chest: e.target.value })}
-                                className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-[10px] text-on-surface focus:outline-none focus:border-primary-container transition-colors"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Shoes' : 'Ayakkabı'}</label>
-                              <input 
-                                list="shoes-list"
-                                value={block.shoes}
-                                onChange={(e) => updateBlock(block.id, { shoes: e.target.value })}
-                                className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-[10px] text-on-surface focus:outline-none focus:border-primary-container transition-colors"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Potion' : 'Pot'}</label>
-                              <input 
-                                list="potions-list"
-                                value={block.potion}
-                                onChange={(e) => updateBlock(block.id, { potion: e.target.value })}
-                                className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-[10px] text-on-surface focus:outline-none focus:border-primary-container transition-colors"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Food' : 'Yemek'}</label>
-                              <input 
-                                list="foods-list"
-                                value={block.food}
-                                onChange={(e) => updateBlock(block.id, { food: e.target.value })}
-                                className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-[10px] text-on-surface focus:outline-none focus:border-primary-container transition-colors"
-                              />
+                            
+                            {(block.visibleFields || 1) >= 2 && (
+                              <div className="flex-1 min-w-[100px] animate-pop-in">
+                                <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Head' : 'Başlık'}</label>
+                                <input 
+                                  list="heads-list"
+                                  value={block.head}
+                                  onChange={(e) => updateBlock(block.id, { head: e.target.value })}
+                                  className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-[10px] text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                                />
+                              </div>
+                            )}
+
+                            {(block.visibleFields || 1) >= 3 && (
+                              <div className="flex-1 min-w-[100px] animate-pop-in">
+                                <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Chest' : 'Zırh'}</label>
+                                <input 
+                                  list="chests-list"
+                                  value={block.chest}
+                                  onChange={(e) => updateBlock(block.id, { chest: e.target.value })}
+                                  className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-[10px] text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                                />
+                              </div>
+                            )}
+
+                            {(block.visibleFields || 1) >= 4 && (
+                              <div className="flex-1 min-w-[100px] animate-pop-in">
+                                <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Shoes' : 'Ayakkabı'}</label>
+                                <input 
+                                  list="shoes-list"
+                                  value={block.shoes}
+                                  onChange={(e) => updateBlock(block.id, { shoes: e.target.value })}
+                                  className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-[10px] text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                                />
+                              </div>
+                            )}
+
+                            {(block.visibleFields || 1) >= 5 && (
+                              <div className="flex-1 min-w-[100px] animate-pop-in">
+                                <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Potion' : 'Pot'}</label>
+                                <input 
+                                  list="potions-list"
+                                  value={block.potion}
+                                  onChange={(e) => updateBlock(block.id, { potion: e.target.value })}
+                                  className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-[10px] text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                                />
+                              </div>
+                            )}
+
+                            {(block.visibleFields || 1) >= 6 && (
+                              <div className="flex-1 min-w-[100px] animate-pop-in">
+                                <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Food' : 'Yemek'}</label>
+                                <input 
+                                  list="foods-list"
+                                  value={block.food}
+                                  onChange={(e) => updateBlock(block.id, { food: e.target.value })}
+                                  className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-[10px] text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                                />
+                              </div>
+                            )}
+
+                            <div className="flex items-center gap-1 shrink-0 mb-1">
+                              {(block.visibleFields || 1) > 1 && (
+                                <button 
+                                  onClick={() => {
+                                    const fields = ['weapon', 'head', 'chest', 'shoes', 'potion', 'food'];
+                                    const currentCount = block.visibleFields || 1;
+                                    const fieldToClear = fields[currentCount - 1];
+                                    updateBlock(block.id, { [fieldToClear]: "", visibleFields: currentCount - 1 });
+                                  }}
+                                  className="p-1.5 bg-surface border border-outline-variant text-on-surface-variant hover:text-error hover:border-error/50 hover:bg-error/10 rounded-sm transition-colors shadow-sm"
+                                  title={lang === 'tr' ? 'Son kutuyu kaldır' : 'Remove last field'}
+                                >
+                                  <Minus size={14} />
+                                </button>
+                              )}
+                              {(block.visibleFields || 1) < 6 && (
+                                <button 
+                                  onClick={() => updateBlock(block.id, { visibleFields: (block.visibleFields || 1) + 1 })}
+                                  className="p-1.5 bg-primary-container/20 border border-primary-container/50 text-primary-container hover:bg-primary-container hover:text-on-primary rounded-sm transition-colors shadow-sm"
+                                  title={lang === 'tr' ? 'Yeni kutu ekle' : 'Add new field'}
+                                >
+                                  <Plus size={14} />
+                                </button>
+                              )}
                             </div>
                           </div>
                         )}
