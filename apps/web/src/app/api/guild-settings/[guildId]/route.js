@@ -106,7 +106,7 @@ export async function POST(req, { params }) {
       });
     }
 
-    const needsTempVoiceSetup = mergedTempVoiceCreators.some(c => !c.channelId);
+    const needsTempVoiceSetup = mergedTempVoiceCreators.length > 0;
 
     // Upsert: varsa güncelle, yoksa ekle
     const { data, error } = await supabase

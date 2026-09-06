@@ -83,10 +83,13 @@ export default function InterfaceBuilder({ lang = 'tr', discordChannels, guildId
     setDraggedItemIdx(null);
   };
 
+  const [sendError, setSendError] = useState('');
+
   const handleSend = async () => {
     if (!selectedChannel) return;
     setIsSending(true);
     setSendSuccess(false);
+    setSendError('');
 
     try {
       const res = await fetch(`/api/send-tempvoice-interface/${guildId}`, {
@@ -106,10 +109,16 @@ export default function InterfaceBuilder({ lang = 'tr', discordChannels, guildId
         setSendSuccess(true);
         setTimeout(() => setSendSuccess(false), 3000);
       } else {
-        console.error("Failed to send interface");
+        const data = await res.json().catch(() => ({}));
+        const errMessage = data.error || (lang === 'tr' ? "Gönderim başarısız." : "Failed to send.");
+        setSendError(errMessage);
+        setTimeout(() => setSendError(''), 5000);
+        console.error("Failed to send interface:", errMessage);
       }
     } catch (e) {
       console.error(e);
+      setSendError(e.message || "Network error");
+      setTimeout(() => setSendError(''), 5000);
     } finally {
       setIsSending(false);
     }
@@ -357,6 +366,11 @@ export default function InterfaceBuilder({ lang = 'tr', discordChannels, guildId
             )}
           </button>
         </div>
+        {sendError && (
+          <div className="text-red-500 text-xs mt-1 animate-pop-in">
+            {sendError}
+          </div>
+        )}
       </div>
     </div>
   );

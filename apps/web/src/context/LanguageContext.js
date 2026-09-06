@@ -661,7 +661,12 @@ E-Posta: info@veyronix.com.tr
 };
 
 
-const LanguageContext = createContext();
+const LanguageContext = createContext({ 
+  lang: "tr", 
+  toggleLanguage: () => {}, 
+  setLanguage: () => {}, 
+  t: tr 
+});
 
 export function LanguageProvider({ children, initialLang = "tr" }) {
   // Always start with the server-rendered language to avoid hydration mismatch.

@@ -159,7 +159,16 @@ async function checkFastUpdates(client) {
 
                 for (let i = 0; i < updatedCreators.length; i++) {
                     const creator = updatedCreators[i];
-                    if (!creator.channelId) {
+                    let needsCreation = !creator.channelId;
+                    
+                    if (creator.channelId) {
+                        const existingChannel = guild.channels.cache.get(creator.channelId) || await guild.channels.fetch(creator.channelId).catch(() => null);
+                        if (!existingChannel) {
+                            needsCreation = true;
+                        }
+                    }
+
+                    if (needsCreation) {
                         try {
                             const newChannel = await guild.channels.create({
                                 name: creator.name || '➕・Open-Audio-Channel',
@@ -181,7 +190,7 @@ async function checkFastUpdates(client) {
                 await supabase
                     .from('guild_settings')
                     .update({ 
-                        tempvoice_creators: updatedCreators,
+                        ...(creatorsUpdated ? { tempvoice_creators: updatedCreators } : {}),
                         trigger_tempvoice_setup: false
                     })
                     .eq('guild_id', config.guild_id);
