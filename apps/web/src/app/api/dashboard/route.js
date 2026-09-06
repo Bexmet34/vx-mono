@@ -90,10 +90,37 @@ export async function GET(req) {
       }
     }
 
-    // Add bot guilds owned by this user that don't have DB rows yet
+    // 3.5. Fetch user's guilds from Discord API to check permissions
+    let userDiscordGuilds = [];
+    if (session.accessToken) {
+      try {
+        const discordRes = await fetch('https://discord.com/api/v10/users/@me/guilds', {
+          headers: { 'Authorization': `Bearer ${session.accessToken}` }
+        });
+        if (discordRes.ok) {
+          userDiscordGuilds = await discordRes.json();
+        }
+      } catch (e) {
+        console.error("[DashboardAPI] Error fetching Discord guilds:", e.message);
+      }
+    }
+
+    const authorizedDiscordGuildIds = new Set();
+    for (const g of userDiscordGuilds) {
+      try {
+        const perms = BigInt(g.permissions || 0);
+        const isAdmin = (perms & (1n << 3n)) === (1n << 3n);
+        const isManageServer = (perms & (1n << 5n)) === (1n << 5n);
+        if (g.owner || isAdmin || isManageServer) {
+          authorizedDiscordGuildIds.add(g.id);
+        }
+      } catch(e) {}
+    }
+
+    // Add bot guilds owned by this user or where they have Admin/Manage Server perms
     for (const guildId of Object.keys(botGuildMap)) {
       const bg = botGuildMap[guildId];
-      if (bg && bg.owner_id === discordId && !subMap[guildId]) {
+      if (bg && (bg.owner_id === discordId || authorizedDiscordGuildIds.has(guildId)) && !subMap[guildId]) {
         const freemiumItem = {
           id: bg.id,
           guild_id: bg.id,
