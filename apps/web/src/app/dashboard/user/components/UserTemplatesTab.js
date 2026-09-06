@@ -385,7 +385,7 @@ export default function UserTemplatesTab({ t, lang, templates, setTemplates, isP
                     </button>
                     <button 
                       onClick={() => {
-                        const parsed = parseTextToBlocks(importText);
+                        const parsed = parseTextToBlocks(importText, { albionWeapons, albionHeads, albionChests, albionShoes, albionOffhands, albionPotions, albionFoods, albionSwaps });
                         if (parsed.length > 0) {
                           handleUpdateBlocks([...blocks, ...parsed]);
                           setImportText("");

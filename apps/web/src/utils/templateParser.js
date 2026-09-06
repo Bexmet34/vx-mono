@@ -1,16 +1,18 @@
-import { 
-  albionWeapons, 
-  albionHeads, 
-  albionChests, 
-  albionShoes, 
-  albionPotions, 
-  albionFoods 
-} from '@/data/albionItems';
-
 /**
  * Heuristic parser to convert unstructured LFG text into structured party blocks.
  */
-export function parseTextToBlocks(rawText) {
+export function parseTextToBlocks(rawText, lists = {}) {
+  const {
+    albionWeapons = [],
+    albionHeads = [],
+    albionChests = [],
+    albionShoes = [],
+    albionOffhands = [],
+    albionPotions = [],
+    albionFoods = [],
+    albionSwaps = []
+  } = lists;
+
   const blocks = [];
   if (!rawText || typeof rawText !== 'string') return blocks;
 
@@ -93,6 +95,8 @@ export function parseTextToBlocks(rawText) {
     const shoes = findBestMatch(gearsText, albionShoes) || findGenericMatch(gearsText, 'shoes');
     const potion = findBestMatch(gearsText, albionPotions);
     const food = findBestMatch(gearsText, albionFoods);
+    const offhand = findBestMatch(gearsText, albionOffhands);
+    const swap = findBestMatch(gearsText, albionSwaps);
     let weapon = findBestMatch(gearsText, albionWeapons) || findBestMatch(roleOrWeapon, albionWeapons);
 
     // If it's a pure header and no items found
@@ -118,8 +122,10 @@ export function parseTextToBlocks(rawText) {
     if (!weapon) weapon = 'Role';
 
     let visibleFields = 1;
-    if (food) visibleFields = 6;
-    else if (potion) visibleFields = 5;
+    if (swap) visibleFields = 8;
+    else if (offhand) visibleFields = 7;
+    else if (potion) visibleFields = 6;
+    else if (food) visibleFields = 5;
     else if (shoes) visibleFields = 4;
     else if (chest) visibleFields = 3;
     else if (head) visibleFields = 2;
@@ -131,8 +137,10 @@ export function parseTextToBlocks(rawText) {
       head,
       chest,
       shoes,
-      potion,
       food,
+      potion,
+      offhand,
+      swap,
       visibleFields
     });
   });

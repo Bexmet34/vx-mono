@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from 'database';
+import { supabase } from '@veyronix/database';
 
 export async function GET() {
   try {
