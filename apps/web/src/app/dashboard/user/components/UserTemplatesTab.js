@@ -1,6 +1,6 @@
 "use client";
 
-import { Copy, Plus, Trash2, GripVertical, PlusCircle, Minus } from "lucide-react";
+import { Copy, Plus, Trash2, GripVertical, PlusCircle, Minus, ClipboardPaste, Sparkles } from "lucide-react";
 import InfoTooltip from "@/components/InfoTooltip";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -12,6 +12,7 @@ import {
   albionPotions, 
   albionFoods 
 } from "@/data/albionItems";
+import { parseTextToBlocks } from "@/utils/templateParser";
 
 export default function UserTemplatesTab({ t, lang, templates, setTemplates, isPremium, showToast }) {
   const router = useRouter();
@@ -21,6 +22,8 @@ export default function UserTemplatesTab({ t, lang, templates, setTemplates, isP
   const [blocks, setBlocks] = useState([]);
   const [dragInfo, setDragInfo] = useState(null);
   const [dragOverIndex, setDragOverIndex] = useState(null);
+  const [showImportBox, setShowImportBox] = useState(false);
+  const [importText, setImportText] = useState("");
 
   const prevTemplateIdRef = useRef(null);
 
@@ -312,6 +315,12 @@ export default function UserTemplatesTab({ t, lang, templates, setTemplates, isP
                 </label>
                 <div className="flex gap-2">
                   <button 
+                    onClick={() => setShowImportBox(!showImportBox)}
+                    className={`flex items-center gap-1 px-3 py-1.5 border rounded-sm text-[10px] font-label-bold transition-colors ${showImportBox ? 'bg-primary-container text-on-primary border-primary-container' : 'bg-surface-container border-outline-variant text-on-surface hover:border-primary-container hover:text-primary-container'}`}
+                  >
+                    <ClipboardPaste size={14} /> {lang === 'en' ? 'Import Text' : 'Metinden Aktar'}
+                  </button>
+                  <button 
                     onClick={() => addBlock('header')}
                     className="flex items-center gap-1 px-3 py-1.5 bg-surface-container border border-outline-variant rounded-sm text-[10px] font-label-bold text-on-surface hover:border-primary-container hover:text-primary-container transition-colors"
                   >
@@ -325,6 +334,46 @@ export default function UserTemplatesTab({ t, lang, templates, setTemplates, isP
                   </button>
                 </div>
               </div>
+
+              {showImportBox && (
+                <div className="mb-3 p-3 bg-surface-container-high border border-primary-container/40 rounded-sm animate-pop-in shadow-sm">
+                  <label className="block text-[10px] uppercase text-primary-container font-label-bold mb-2">
+                    {lang === 'en' ? 'Paste Discord LFG Text Here' : 'Discord Şablonunu Buraya Yapıştırın'}
+                  </label>
+                  <textarea
+                    className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-2 text-[11px] text-on-surface focus:outline-none focus:border-primary-container transition-colors custom-scrollbar mb-2"
+                    rows={4}
+                    value={importText}
+                    onChange={(e) => setImportText(e.target.value)}
+                    placeholder={lang === 'en' ? 'e.g. TANK : Iron Root (blueflame torch...)\n@user1 - Healer\n...' : 'Örn: TANK : Iron Root (blueflame torch...)\n@isim - Şifacı\n...'}
+                  />
+                  <div className="flex justify-end gap-2">
+                    <button 
+                      onClick={() => setShowImportBox(false)}
+                      className="px-3 py-1.5 bg-surface border border-outline-variant text-on-surface-variant text-[10px] font-label-bold rounded-sm hover:text-on-surface transition-colors"
+                    >
+                      {lang === 'en' ? 'Cancel' : 'İptal'}
+                    </button>
+                    <button 
+                      onClick={() => {
+                        const parsed = parseTextToBlocks(importText);
+                        if (parsed.length > 0) {
+                          handleUpdateBlocks([...blocks, ...parsed]);
+                          setImportText("");
+                          setShowImportBox(false);
+                          showToast(lang === 'en' ? `${parsed.length} blocks imported!` : `${parsed.length} satır aktarıldı!`, 'success');
+                        } else {
+                          showToast(lang === 'en' ? 'No valid blocks found.' : 'Geçerli bir şablon bulunamadı.', 'error');
+                        }
+                      }}
+                      className="px-3 py-1.5 bg-primary-container text-on-primary text-[10px] font-label-bold rounded-sm hover:brightness-110 active:scale-95 transition-all shadow-sm flex items-center gap-1"
+                    >
+                      <Sparkles size={12} />
+                      {lang === 'en' ? 'Parse & Import' : 'Analiz Et ve Ekle'}
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <div className="flex flex-col gap-1">
                 {blocks.length === 0 ? (
