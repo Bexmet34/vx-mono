@@ -2,7 +2,7 @@ import { supabase } from '@veyronix/database';
 import { LINKS } from '@veyronix/config';
 
 // Helper to query with a timeout for fast fallback
-async function fetchWithTimeout(promise, timeoutMs = 3000) {
+async function fetchWithTimeout(promise, timeoutMs = 15000) {
   let timeoutHandle;
   const timeoutPromise = new Promise((_, reject) => {
     timeoutHandle = setTimeout(() => reject(new Error('Supabase fetch timeout')), timeoutMs);
@@ -28,7 +28,7 @@ export async function getAllBlogPosts() {
         .select('*')
         .eq('status', 'published')
         .order('published_at', { ascending: false }),
-      3000
+      15000
     );
 
     if (!error && data && data.length > 0) {
@@ -68,7 +68,7 @@ export async function getBlogPostBySlug(slug) {
         .eq('slug', slug)
         .eq('status', 'published')
         .single(),
-      2500
+      15000
     );
 
     if (!error && data) {
