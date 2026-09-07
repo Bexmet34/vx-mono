@@ -26,6 +26,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
   const [albionHeads, setAlbionHeads] = useState([]);
   const [albionChests, setAlbionChests] = useState([]);
   const [albionShoes, setAlbionShoes] = useState([]);
+  const [albionCapes, setAlbionCapes] = useState([]);
   const [albionOffhands, setAlbionOffhands] = useState([]);
   const [albionPotions, setAlbionPotions] = useState([]);
   const [albionFoods, setAlbionFoods] = useState([]);
@@ -40,6 +41,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
           setAlbionHeads(data.heads || []);
           setAlbionChests(data.chests || []);
           setAlbionShoes(data.shoes || []);
+          setAlbionCapes(data.capes || []);
           setAlbionOffhands(data.offhands || []);
           setAlbionPotions(data.potions || []);
           setAlbionFoods(data.foods || []);
@@ -71,12 +73,14 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
           const potion = gears[4] || "";
           const food = gears[5] || "";
           const swap = gears[6] || "";
+          const cape = gears[7] || "";
 
           let visibleFields = 1;
-          if (swap) visibleFields = 8;
+          if (swap) visibleFields = 9;
+          else if (offhand) visibleFields = 8;
           else if (food) visibleFields = 7;
           else if (potion) visibleFields = 6;
-          else if (offhand) visibleFields = 5;
+          else if (cape) visibleFields = 5;
           else if (shoes) visibleFields = 4;
           else if (chest) visibleFields = 3;
           else if (head) visibleFields = 2;
@@ -93,6 +97,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
             potion,
             food,
             swap,
+            cape,
             visibleFields
           });
         } else {
@@ -100,7 +105,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
             id: `blk_${index}_${Date.now()}`,
             type: "role",
             weapon: trimmed,
-            head: "", chest: "", shoes: "", offhand: "", potion: "", food: "", swap: "",
+            head: "", chest: "", shoes: "", cape: "", offhand: "", potion: "", food: "", swap: "",
             visibleFields: 1
           });
         }
@@ -117,10 +122,11 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
       if (b.type === "header") {
         return `#${b.text}`;
       } else {
-        const gearArr = [b.head, b.chest, b.shoes, b.offhand, b.potion, b.food, b.swap].map(x => x || "");
+        const gearArr = [b.head, b.chest, b.shoes, b.offhand, b.potion, b.food, b.swap, b.cape].map(x => x || "");
         const hasGear = gearArr.some(x => x !== "");
         if (hasGear) {
-          return `${b.weapon || "Unknown"} > ${gearArr.map(g => g || " ").join(" - ")}`;
+          const filledGears = gearArr.filter(g => g && g.trim() !== "");
+          return `${b.weapon || "Unknown"} > ${filledGears.join(" - ")}`;
         } else {
           return b.weapon || "Unknown";
         }
@@ -137,7 +143,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
   const addBlock = (type) => {
     const newBlock = type === "header" 
       ? { id: `blk_${Date.now()}_${Math.random()}`, type: "header", text: "" }
-      : { id: `blk_${Date.now()}_${Math.random()}`, type: "role", weapon: "", head: "", chest: "", shoes: "", offhand: "", potion: "", food: "", swap: "", visibleFields: 1 };
+      : { id: `blk_${Date.now()}_${Math.random()}`, type: "role", weapon: "", head: "", chest: "", shoes: "", cape: "", offhand: "", potion: "", food: "", swap: "", visibleFields: 1 };
     handleUpdateBlocks([...blocks, newBlock]);
   };
 
@@ -194,19 +200,20 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
       <datalist id="weapons-list">
         {albionWeapons.map(w => {
           const match = w.match(/^(.*?) \((.*?)\)$/);
-          return match ? <option key={w} value={match[1]}>{match[2]}</option> : <option key={w} value={w} />;
+          return match ? <option key={w} value={match[1]}>{match[1]} ({match[2]})</option> : <option key={w} value={w} />;
         })}
       </datalist>
       <datalist id="heads-list">{albionHeads.map(w => <option key={w} value={w} />)}</datalist>
       <datalist id="chests-list">{albionChests.map(w => <option key={w} value={w} />)}</datalist>
       <datalist id="shoes-list">{albionShoes.map(w => <option key={w} value={w} />)}</datalist>
+      <datalist id="capes-list">{albionCapes.map(w => <option key={w} value={w} />)}</datalist>
       <datalist id="offhands-list">{albionOffhands.map(w => <option key={w} value={w} />)}</datalist>
       <datalist id="potions-list">{albionPotions.map(w => <option key={w} value={w} />)}</datalist>
       <datalist id="foods-list">{albionFoods.map(w => <option key={w} value={w} />)}</datalist>
       <datalist id="swaps-list">
         {albionSwaps.map(w => {
           const match = w.match(/^(.*?) \((.*?)\)$/);
-          return match ? <option key={w} value={match[1]}>{match[2]}</option> : <option key={w} value={w} />;
+          return match ? <option key={w} value={match[1]}>{match[1]} ({match[2]})</option> : <option key={w} value={w} />;
         })}
       </datalist>
 
@@ -630,11 +637,11 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
 
                             {(block.visibleFields || 1) >= 5 && (
                               <div className="flex-1 min-w-[100px] animate-pop-in">
-                                <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Potion' : 'Pot'}</label>
+                                <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Cape' : 'Pelerin'}</label>
                                 <input 
-                                  list="potions-list"
-                                  value={block.potion}
-                                  onChange={(e) => updateBlock(block.id, { potion: e.target.value })}
+                                  list="capes-list"
+                                  value={block.cape || ""}
+                                  onChange={(e) => updateBlock(block.id, { cape: e.target.value })}
                                   className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-[10px] text-on-surface focus:outline-none focus:border-primary-container transition-colors"
                                 />
                               </div>
@@ -642,17 +649,29 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
 
                             {(block.visibleFields || 1) >= 6 && (
                               <div className="flex-1 min-w-[100px] animate-pop-in">
-                                <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Food' : 'Yemek'}</label>
+                                <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Potion' : 'Pot'}</label>
                                 <input 
-                                  list="foods-list"
-                                  value={block.food}
-                                  onChange={(e) => updateBlock(block.id, { food: e.target.value })}
+                                  list="potions-list"
+                                  value={block.potion || ""}
+                                  onChange={(e) => updateBlock(block.id, { potion: e.target.value })}
                                   className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-[10px] text-on-surface focus:outline-none focus:border-primary-container transition-colors"
                                 />
                               </div>
                             )}
 
                             {(block.visibleFields || 1) >= 7 && (
+                              <div className="flex-1 min-w-[100px] animate-pop-in">
+                                <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Food' : 'Yemek'}</label>
+                                <input 
+                                  list="foods-list"
+                                  value={block.food || ""}
+                                  onChange={(e) => updateBlock(block.id, { food: e.target.value })}
+                                  className="w-full bg-surface border border-outline-variant rounded-sm px-2 py-1.5 text-[10px] text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+                                />
+                              </div>
+                            )}
+
+                            {(block.visibleFields || 1) >= 8 && (
                               <div className="flex-1 min-w-[100px] animate-pop-in">
                                 <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Offhand' : 'İkincil El'}</label>
                                 <input 
@@ -664,7 +683,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
                               </div>
                             )}
 
-                            {(block.visibleFields || 1) >= 8 && (
+                            {(block.visibleFields || 1) >= 9 && (
                               <div className="flex-1 min-w-[100px] animate-pop-in">
                                 <label className="block text-[10px] uppercase text-on-surface-variant mb-1 ml-1">{lang === 'en' ? 'Swap' : 'Değişimlik'}</label>
                                 <input 
@@ -679,7 +698,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
                               {(block.visibleFields || 1) > 1 && (
                                 <button 
                                   onClick={() => {
-                                    const fields = ['weapon', 'head', 'chest', 'shoes', 'potion', 'food', 'offhand', 'swap'];
+                                    const fields = ['weapon', 'head', 'chest', 'shoes', 'cape', 'potion', 'food', 'offhand', 'swap'];
                                     const currentCount = block.visibleFields || 1;
                                     const fieldToClear = fields[currentCount - 1];
                                     updateBlock(block.id, { [fieldToClear]: "", visibleFields: Math.max(1, currentCount - 1) });
@@ -690,7 +709,7 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
                                   <Minus size={14} />
                                 </button>
                               )}
-                              {(block.visibleFields || 1) < 8 && (
+                              {(block.visibleFields || 1) < 9 && (
                                 <button 
                                   onClick={() => updateBlock(block.id, { visibleFields: (block.visibleFields || 1) + 1 })}
                                   className="p-1.5 bg-primary-container/20 border border-primary-container/50 text-primary-container hover:bg-primary-container hover:text-on-primary rounded-sm transition-colors shadow-sm"

@@ -19,6 +19,7 @@ export async function GET() {
       heads: [],
       chests: [],
       shoes: [],
+      capes: [],
       offhands: [],
       potions: [],
       foods: []
@@ -38,26 +39,39 @@ export async function GET() {
         }
       }
       
+      let enName = item.name_en;
+      for (const prefix of prefixesToRemove) {
+        if (enName.startsWith(prefix)) {
+          enName = enName.substring(prefix.length);
+          break;
+        }
+      }
+
       switch (item.category) {
         case 'weapon':
           const u = item.unique_name;
-          if (u.includes('HOLYSTAFF')) displayName += ' (Healer - Holy Staff)';
-          else if (u.includes('NATURESTAFF')) displayName += ' (Healer - Nature Staff)';
-          else if (u.includes('MACE')) displayName += ' (Tank - Mace)';
-          else if (u.includes('HAMMER')) displayName += ' (Tank - Hammer)';
-          else if (u.includes('AXE')) displayName += ' (Axe)';
-          else if (u.includes('SWORD')) displayName += ' (Sword)';
-          else if (u.includes('DAGGER')) displayName += ' (Dagger)';
-          else if (u.includes('SPEAR')) displayName += ' (Spear)';
-          else if (u.includes('CROSSBOW')) displayName += ' (Crossbow)';
-          else if (u.includes('BOW')) displayName += ' (Bow)';
-          else if (u.includes('FIRESTAFF')) displayName += ' (Fire Staff)';
-          else if (u.includes('FROSTSTAFF')) displayName += ' (Frost Staff)';
-          else if (u.includes('CURSESTAFF')) displayName += ' (Curse Staff)';
-          else if (u.includes('ARCANESTAFF')) displayName += ' (Support - Arcane Staff)';
-          else if (u.includes('QUARTERSTAFF')) displayName += ' (Quarterstaff)';
-          else if (u.includes('KNUCKLES')) displayName += ' (War Gloves)';
-          else if (u.includes('SHAPESHIFTER')) displayName += ' (Shapeshifter)';
+          let role = '';
+          if (u.includes('HOLYSTAFF')) role = 'Healer - Holy Staff';
+          else if (u.includes('NATURESTAFF')) role = 'Healer - Nature Staff';
+          else if (u.includes('MACE')) role = 'Tank - Mace';
+          else if (u.includes('HAMMER')) role = 'Tank - Hammer';
+          else if (u.includes('AXE')) role = 'Axe';
+          else if (u.includes('SWORD')) role = 'Sword';
+          else if (u.includes('DAGGER')) role = 'Dagger';
+          else if (u.includes('SPEAR')) role = 'Spear';
+          else if (u.includes('CROSSBOW')) role = 'Crossbow';
+          else if (u.includes('BOW')) role = 'Bow';
+          else if (u.includes('FIRESTAFF')) role = 'Fire Staff';
+          else if (u.includes('FROSTSTAFF')) role = 'Frost Staff';
+          else if (u.includes('CURSESTAFF')) role = 'Curse Staff';
+          else if (u.includes('ARCANESTAFF')) role = 'Support - Arcane Staff';
+          else if (u.includes('QUARTERSTAFF')) role = 'Quarterstaff';
+          else if (u.includes('KNUCKLES')) role = 'War Gloves';
+          else if (u.includes('SHAPESHIFTER')) role = 'Shapeshifter';
+          
+          if (role) displayName += ` (${role} | ${enName})`;
+          else displayName += ` (${enName})`;
+          
           grouped.weapons.push(displayName);
           break;
         case 'head':
@@ -68,6 +82,9 @@ export async function GET() {
           break;
         case 'shoes':
           grouped.shoes.push(displayName);
+          break;
+        case 'cape':
+          grouped.capes.push(displayName);
           break;
         case 'offhand':
           grouped.offhands.push(displayName);
