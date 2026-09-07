@@ -23,7 +23,17 @@ export default function CountersTab({ t, lang, settings, setSettings, discordCha
   const [addingCounter, setAddingCounter] = useState(false);
   const [selectedCounterType, setSelectedCounterType] = useState(COUNTER_TYPES[0].id);
 
-  const activeCounters = settings.server_counters || [];
+  let activeCounters = [];
+  try {
+    if (Array.isArray(settings.server_counters)) {
+      activeCounters = settings.server_counters;
+    } else if (typeof settings.server_counters === 'string') {
+      activeCounters = JSON.parse(settings.server_counters);
+    }
+  } catch (e) {
+    activeCounters = [];
+  }
+  if (!Array.isArray(activeCounters)) activeCounters = [];
   
   const categories = discordChannels?.filter(c => c.type === 4) || [];
 
@@ -50,10 +60,18 @@ export default function CountersTab({ t, lang, settings, setSettings, discordCha
   };
 
   const handleSetupCounters = async () => {
-    // This will save and also trigger the bot to setup the category and channels
-    setSettings({ ...settings, trigger_counters_setup: true });
+    // First save the settings via parent component
     await handleSave();
-    showToast(lang === 'tr' ? 'Kurulum talebi gönderildi, bot kanalları ayarlıyor...' : 'Setup request sent, bot is configuring channels...', 'success');
+    
+    // Then trigger the setup flag directly in Supabase
+    try {
+      const { supabase } = require('@veyronix/database');
+      await supabase.from('guild_settings').update({ trigger_counters_setup: true }).eq('guild_id', guildId);
+      showToast(lang === 'tr' ? 'Kurulum talebi gönderildi, bot kanalları ayarlıyor...' : 'Setup request sent, bot is configuring channels...', 'success');
+    } catch (err) {
+      console.error(err);
+      showToast(lang === 'tr' ? 'Bir hata oluştu!' : 'An error occurred!', 'error');
+    }
   };
 
   return (
