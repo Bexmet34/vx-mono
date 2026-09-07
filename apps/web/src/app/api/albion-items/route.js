@@ -51,49 +51,75 @@ export async function GET() {
         case 'weapon':
           const u = item.unique_name;
           let role = '';
-          if (u.includes('HOLYSTAFF')) role = 'Healer - Holy Staff';
-          else if (u.includes('NATURESTAFF')) role = 'Healer - Nature Staff';
-          else if (u.includes('MACE')) role = 'Tank - Mace';
-          else if (u.includes('HAMMER')) role = 'Tank - Hammer';
+          if (u.includes('HOLYSTAFF')) role = 'Priest';
+          else if (u.includes('NATURESTAFF')) role = 'Nature';
+          else if (u.includes('MACE')) role = 'Mace';
+          else if (u.includes('HAMMER')) role = 'Hammer';
           else if (u.includes('AXE')) role = 'Axe';
           else if (u.includes('SWORD')) role = 'Sword';
           else if (u.includes('DAGGER')) role = 'Dagger';
           else if (u.includes('SPEAR')) role = 'Spear';
           else if (u.includes('CROSSBOW')) role = 'Crossbow';
           else if (u.includes('BOW')) role = 'Bow';
-          else if (u.includes('FIRESTAFF')) role = 'Fire Staff';
-          else if (u.includes('FROSTSTAFF')) role = 'Frost Staff';
-          else if (u.includes('CURSESTAFF')) role = 'Curse Staff';
-          else if (u.includes('ARCANESTAFF')) role = 'Support - Arcane Staff';
+          else if (u.includes('FIRESTAFF')) role = 'Pyromancer';
+          else if (u.includes('FROSTSTAFF')) role = 'Frost mage';
+          else if (u.includes('CURSESTAFF')) role = 'Warlock';
+          else if (u.includes('ARCANESTAFF')) role = 'Arcanist';
           else if (u.includes('QUARTERSTAFF')) role = 'Quarterstaff';
-          else if (u.includes('KNUCKLES')) role = 'War Gloves';
-          else if (u.includes('SHAPESHIFTER')) role = 'Shapeshifter';
+          else if (u.includes('KNUCKLES')) role = 'War gloves';
+          else if (u.includes('SHAPESHIFTER')) role = 'Shapesshifter';
           
-          if (role) displayName += ` (${role} | ${enName})`;
-          else displayName += ` (${enName})`;
+          if (role) {
+            grouped.weapons.push(`${displayName} (${role})`);
+            // Avoid duplicate pushing if tr and en are identical
+            if (displayName !== enName) {
+              grouped.weapons.push(`${enName} (${role})`);
+            }
+          } else {
+            grouped.weapons.push(displayName);
+            if (displayName !== enName) grouped.weapons.push(enName);
+          }
+          break;
+        case 'offhand':
+          const offU = item.unique_name;
+          let offRole = '';
+          if (offU.includes('SHIELD') || offU.includes('TOWERSHIELD') || offU.includes('SPIKEDSHIELD')) offRole = 'Shield';
+          else if (offU.includes('TOME') || offU.includes('BOOK') || offU.includes('ORB') || offU.includes('CENSER') || offU.includes('TALISMAN') || offU.includes('DEMONSKULL')) offRole = 'Tome';
+          else if (offU.includes('TORCH') || offU.includes('HORN') || offU.includes('TOTEM') || offU.includes('LAMP') || offU.includes('JESTERCANE')) offRole = 'Torch';
           
-          grouped.weapons.push(displayName);
+          if (offRole) {
+            grouped.offhands.push(`${displayName} (${offRole})`);
+            if (displayName !== enName) {
+              grouped.offhands.push(`${enName} (${offRole})`);
+            }
+          } else {
+            grouped.offhands.push(displayName);
+            if (displayName !== enName) grouped.offhands.push(enName);
+          }
           break;
         case 'head':
           grouped.heads.push(displayName);
+          if (displayName !== enName) grouped.heads.push(enName);
           break;
         case 'chest':
           grouped.chests.push(displayName);
+          if (displayName !== enName) grouped.chests.push(enName);
           break;
         case 'shoes':
           grouped.shoes.push(displayName);
+          if (displayName !== enName) grouped.shoes.push(enName);
           break;
         case 'cape':
           grouped.capes.push(displayName);
-          break;
-        case 'offhand':
-          grouped.offhands.push(displayName);
+          if (displayName !== enName) grouped.capes.push(enName);
           break;
         case 'potion':
           grouped.potions.push(displayName);
+          if (displayName !== enName) grouped.potions.push(enName);
           break;
         case 'food':
           grouped.foods.push(displayName);
+          if (displayName !== enName) grouped.foods.push(enName);
           break;
       }
     });

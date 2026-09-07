@@ -260,7 +260,12 @@ export default function UserTemplatesTab({ t, lang, templates, setTemplates, isP
       <datalist id="chests-list">{albionChests.map(w => <option key={w} value={w} />)}</datalist>
       <datalist id="shoes-list">{albionShoes.map(w => <option key={w} value={w} />)}</datalist>
       <datalist id="capes-list">{albionCapes.map(w => <option key={w} value={w} />)}</datalist>
-      <datalist id="offhands-list">{albionOffhands.map(w => <option key={w} value={w} />)}</datalist>
+      <datalist id="offhands-list">
+        {albionOffhands.map(w => {
+          const match = w.match(/^(.*?) \((.*?)\)$/);
+          return match ? <option key={w} value={match[1]}>{match[1]} ({match[2]})</option> : <option key={w} value={w} />;
+        })}
+      </datalist>
       <datalist id="potions-list">{albionPotions.map(w => <option key={w} value={w} />)}</datalist>
       <datalist id="foods-list">{albionFoods.map(w => <option key={w} value={w} />)}</datalist>
       <datalist id="swaps-list">
