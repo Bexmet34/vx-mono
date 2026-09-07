@@ -17,6 +17,7 @@ import DropTab from "./components/DropTab";
 // Modular Components (These will be refactored to use new Bento grid classes)
 import OverviewTab from "./components/OverviewTab";
 import GeneralTab from "./components/GeneralTab";
+import ContentTab from "./components/ContentTab";
 import VisualTab from "./components/VisualTab";
 import LogSettingsTab from "./components/LogSettingsTab";
 import TemplateTab from "./components/TemplateTab";
@@ -532,6 +533,7 @@ export default function ServerSettings() {
       items: [
         { id: 'overview', label: lang === 'tr' ? 'Genel Bakış' : 'Overview', icon: Home },
         { id: 'general', label: lang === 'tr' ? 'Temel Ayarlar' : 'Settings', icon: Layout },
+        { id: 'content', label: lang === 'tr' ? 'Content Ayarları' : 'Content Settings', icon: FileText },
         { id: 'embed', label: lang === 'tr' ? 'Görsel & Marka' : 'Branding', icon: ImageIcon },
       ]
     },
@@ -753,6 +755,10 @@ export default function ServerSettings() {
         
         {activeTab === 'general' && (
           <GeneralTab t={t} settings={settings} setSettings={setSettings} discordChannels={discordChannels} discordRoles={discordRoles} handleSave={handleSave} saving={saving} guildSearchQuery={guildSearchQuery} setGuildSearchQuery={setGuildSearchQuery} searchGuilds={searchGuilds} searchingGuild={searchingGuild} guildSearchResults={guildSearchResults} setGuildSearchResults={setGuildSearchResults} albionGuildDetail={albionGuildDetail} setAlbionGuildDetail={setAlbionGuildDetail} isOwner={isOwner} discordMembers={discordMembers} guildId={guildId} subscription={subscription} showToast={showToast} />
+        )}
+
+        {activeTab === 'content' && (
+          <ContentTab settings={settings} setSettings={setSettings} guildId={guildId} showToast={showToast} discordChannels={discordChannels} discordRoles={discordRoles} />
         )}
 
         {activeTab === 'embed' && (
