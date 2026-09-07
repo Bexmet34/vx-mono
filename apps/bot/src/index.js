@@ -104,6 +104,7 @@ client.once('clientReady', async (c) => {
     const { initObjectiveService } = require('./services/objectiveService');
     const { startScheduledMessageService } = require('./services/scheduledMessageService');
     const { initTempRoleService } = require('./services/tempRoleService');
+    const { initCounterService } = require('./services/counterService');
 
     // Sadece ana (birinci) Shard üzerinde arka plan işlemlerini başlat
     const isPrimaryShard = !client.shard || client.shard.ids[0] === 0;
@@ -115,6 +116,7 @@ client.once('clientReady', async (c) => {
         initObjectiveService(client);
         startScheduledMessageService(client);
         initTempRoleService(client);
+        initCounterService(client);
         console.log('[PrimaryShard] Background services initialized.');
     }
 

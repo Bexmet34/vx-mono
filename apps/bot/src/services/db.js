@@ -191,6 +191,10 @@ function initDb() {
             safeAlter("ALTER TABLE guild_configs ADD COLUMN ticket_limit INTEGER DEFAULT 1");
             safeAlter("ALTER TABLE guild_configs ADD COLUMN ticket_name_format TEXT DEFAULT 'topic-username'");
 
+            // Server Counters
+            safeAlter("ALTER TABLE guild_configs ADD COLUMN server_counters TEXT");
+            safeAlter("ALTER TABLE guild_configs ADD COLUMN counters_category_id TEXT");
+            safeAlter("ALTER TABLE guild_configs ADD COLUMN counter_ticket_category_id TEXT");
 
             // Set default settings if not exists
             try {

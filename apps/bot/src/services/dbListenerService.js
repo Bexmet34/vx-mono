@@ -250,6 +250,25 @@ async function checkFastUpdates(client) {
                 }
             }
         }
+
+        // --- Check Counters Setup Triggers (Fast Path) ---
+        const { data: countersConfigs, error: counterError } = await supabase
+            .from('guild_settings')
+            .select('guild_id')
+            .eq('trigger_counters_setup', true);
+
+        if (!counterError && countersConfigs && countersConfigs.length > 0) {
+            const { setupCountersNow } = require('./counterService');
+            for (const config of countersConfigs) {
+                try {
+                    await setupCountersNow(client, config.guild_id);
+                } catch (err) {
+                    console.error(`[DbListener] Failed to setup counters for guild ${config.guild_id}:`, err.message);
+                } finally {
+                    await supabase.from('guild_settings').update({ trigger_counters_setup: false }).eq('guild_id', config.guild_id);
+                }
+            }
+        }
     } catch (err) {
         console.error('[DbListenerService] Fast Polling Error:', err.message);
     }

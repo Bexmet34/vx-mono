@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, useCallback, useRef } from "react";
-import { ArrowLeft, Loader2, Image as ImageIcon, Layout, Shield, X, Crop, Users, Copy, Lock, Home, Save, AlertTriangle, Swords, Crown, Gift, FileText, Crosshair, UserPlus, Sparkles, Headphones, ChevronDown, Skull } from "lucide-react";
+import { ArrowLeft, Loader2, Image as ImageIcon, Layout, Shield, X, Crop, Users, Copy, Lock, Home, Save, AlertTriangle, Swords, Crown, Gift, FileText, Crosshair, UserPlus, Sparkles, Headphones, ChevronDown, Skull, Activity } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 import { useToast, ToastContainer } from "@/components/Toast";
@@ -22,6 +22,7 @@ import VisualTab from "./components/VisualTab";
 import LogSettingsTab from "./components/LogSettingsTab";
 import TemplateTab from "./components/TemplateTab";
 import RegistrationTab from "./components/RegistrationTab";
+import CountersTab from "./components/CountersTab";
 import AnnouncementsCarousel from '@/components/AnnouncementsCarousel';
 import RoleMenuTab from "./components/RoleMenuTab";
 import TicketTab from "./components/TicketTab";
@@ -265,6 +266,9 @@ export default function ServerSettings() {
           ticket_options: Array.isArray(s?.ticket_options) ? s?.ticket_options : [{"label": "Genel Destek", "value": "genel", "description": "Genel konular hakkında destek alın", "emoji": "📩"}],
           ticket_limit: s?.ticket_limit ?? 1,
           ticket_name_format: s?.ticket_name_format || "topic-username",
+          server_counters: Array.isArray(s?.server_counters) ? s.server_counters : [],
+          counters_category_id: s?.counters_category_id || "",
+          counter_ticket_category_id: s?.counter_ticket_category_id || "",
           content_close_roles: typeof s?.content_close_roles === 'string' ? s.content_close_roles : (s?.content_close_roles ? JSON.stringify(s.content_close_roles) : ""),
           auto_delete_party_hours: (() => {
             let ev = s?.log_events;
@@ -533,6 +537,7 @@ export default function ServerSettings() {
       items: [
         { id: 'overview', label: lang === 'tr' ? 'Genel Bakış' : 'Overview', icon: Home },
         { id: 'general', label: lang === 'tr' ? 'Temel Ayarlar' : 'Settings', icon: Layout },
+        { id: 'counters', label: lang === 'tr' ? 'Sunucu Sayaçları' : 'Counters', icon: Activity },
         { id: 'content', label: lang === 'tr' ? 'Content Ayarları' : 'Content Settings', icon: FileText },
         { id: 'embed', label: lang === 'tr' ? 'Görsel & Marka' : 'Branding', icon: ImageIcon },
       ]
@@ -755,6 +760,10 @@ export default function ServerSettings() {
         
         {activeTab === 'general' && (
           <GeneralTab t={t} settings={settings} setSettings={setSettings} discordChannels={discordChannels} discordRoles={discordRoles} handleSave={handleSave} saving={saving} guildSearchQuery={guildSearchQuery} setGuildSearchQuery={setGuildSearchQuery} searchGuilds={searchGuilds} searchingGuild={searchingGuild} guildSearchResults={guildSearchResults} setGuildSearchResults={setGuildSearchResults} albionGuildDetail={albionGuildDetail} setAlbionGuildDetail={setAlbionGuildDetail} isOwner={isOwner} discordMembers={discordMembers} guildId={guildId} subscription={subscription} showToast={showToast} />
+        )}
+
+        {activeTab === 'counters' && (
+          <CountersTab t={t} lang={lang} settings={settings} setSettings={setSettings} discordChannels={discordChannels} handleSave={handleSave} saving={saving} guildId={guildId} showToast={showToast} isPremium={isPremium} />
         )}
 
         {activeTab === 'content' && (
