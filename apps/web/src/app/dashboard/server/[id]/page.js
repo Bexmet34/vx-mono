@@ -514,7 +514,7 @@ export default function ServerSettings() {
 
   if (!mounted || loading) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-background relative overflow-hidden">
+      <div className="flex h-[100dvh] w-full items-center justify-center bg-background relative overflow-hidden">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary-container/20 rounded-full blur-[100px] pointer-events-none"></div>
         <div className="flex flex-col items-center gap-6 z-10">
           <div className="relative">
@@ -567,11 +567,11 @@ export default function ServerSettings() {
   const allNavItems = navGroups.flatMap((g) => g.items);
 
   return (
-    <div className="flex bg-background relative w-full h-[calc(100vh-56px)] overflow-hidden" suppressHydrationWarning>
+    <div className="flex bg-background relative w-full h-[calc(100dvh-56px)] overflow-hidden" suppressHydrationWarning>
       <ToastContainer toasts={toasts} />
       
       {/* Desktop / Tablet Vertical Sidebar */}
-      <nav className="hidden md:flex fixed left-0 top-[56px] h-[calc(100vh-56px)] z-30 md:w-60 bg-[#081425]/95 backdrop-blur-2xl border-r border-outline-variant/30 flex-col justify-between overflow-y-auto custom-scrollbar shadow-2xl transition-all duration-300">
+      <nav className="hidden md:flex fixed left-0 top-[56px] h-[calc(100dvh-56px)] z-30 md:w-60 bg-[#081425]/95 backdrop-blur-2xl border-r border-outline-variant/30 flex-col justify-between overflow-y-auto custom-scrollbar shadow-2xl transition-all duration-300">
         <div className="flex flex-col p-3 gap-4">
           
           {/* Back Button & Server Identity */}
@@ -670,7 +670,7 @@ export default function ServerSettings() {
       </nav>
       
       {/* Main Content Area - Full width on Mobile, padded on Desktop */}
-      <div className="flex-1 ml-0 md:ml-60 w-full h-[calc(100vh-56px)] overflow-y-auto custom-scrollbar p-3 sm:p-4 md:p-6 pb-28 md:pb-24">
+      <div className="flex-1 ml-0 md:ml-60 w-full h-[calc(100dvh-56px)] overflow-y-auto custom-scrollbar p-3 sm:p-4 md:p-6 pb-28 md:pb-24">
         <main className="w-full max-w-[1200px] mx-auto flex flex-col">
         <header className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-3 pb-3 md:mb-4 md:pb-4 border-b border-outline-variant/30">
           <div className="flex items-center gap-3 text-left w-full md:w-auto">
