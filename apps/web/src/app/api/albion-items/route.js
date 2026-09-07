@@ -40,10 +40,24 @@ export async function GET() {
       
       switch (item.category) {
         case 'weapon':
-          // Healer silahlarını aramada kolay bulabilmeleri için "Healer" kelimesi ekleniyor
-          if (item.unique_name.includes('HOLYSTAFF') || item.unique_name.includes('NATURESTAFF')) {
-            displayName += ' (Healer)';
-          }
+          const u = item.unique_name;
+          if (u.includes('HOLYSTAFF')) displayName += ' (Healer - Holy Staff)';
+          else if (u.includes('NATURESTAFF')) displayName += ' (Healer - Nature Staff)';
+          else if (u.includes('MACE')) displayName += ' (Tank - Mace)';
+          else if (u.includes('HAMMER')) displayName += ' (Tank - Hammer)';
+          else if (u.includes('AXE')) displayName += ' (Axe)';
+          else if (u.includes('SWORD')) displayName += ' (Sword)';
+          else if (u.includes('DAGGER')) displayName += ' (Dagger)';
+          else if (u.includes('SPEAR')) displayName += ' (Spear)';
+          else if (u.includes('CROSSBOW')) displayName += ' (Crossbow)';
+          else if (u.includes('BOW')) displayName += ' (Bow)';
+          else if (u.includes('FIRESTAFF')) displayName += ' (Fire Staff)';
+          else if (u.includes('FROSTSTAFF')) displayName += ' (Frost Staff)';
+          else if (u.includes('CURSESTAFF')) displayName += ' (Curse Staff)';
+          else if (u.includes('ARCANESTAFF')) displayName += ' (Support - Arcane Staff)';
+          else if (u.includes('QUARTERSTAFF')) displayName += ' (Quarterstaff)';
+          else if (u.includes('KNUCKLES')) displayName += ' (War Gloves)';
+          else if (u.includes('SHAPESHIFTER')) displayName += ' (Shapeshifter)';
           grouped.weapons.push(displayName);
           break;
         case 'head':
