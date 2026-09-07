@@ -28,8 +28,17 @@ async function setupCountersNow(client, guildId) {
         const guild = client.guilds.cache.get(guildId) || await client.guilds.fetch(guildId).catch(() => null);
         if (!guild) return;
 
-        const activeCounters = Array.isArray(config.server_counters) ? config.server_counters : [];
-        if (activeCounters.length === 0) return;
+        let activeCounters = [];
+        if (Array.isArray(config.server_counters)) {
+            activeCounters = config.server_counters;
+        } else if (typeof config.server_counters === 'string') {
+            try {
+                activeCounters = JSON.parse(config.server_counters);
+            } catch (e) {
+                activeCounters = [];
+            }
+        }
+        if (!Array.isArray(activeCounters) || activeCounters.length === 0) return;
 
         let categoryId = config.counters_category_id;
         let category = null;
@@ -196,8 +205,13 @@ function initCounterService(client) {
             if (error || !configs) return;
 
             for (const config of configs) {
-                const activeCounters = Array.isArray(config.server_counters) ? config.server_counters : [];
-                if (activeCounters.length === 0) continue;
+                let activeCounters = [];
+                if (Array.isArray(config.server_counters)) {
+                    activeCounters = config.server_counters;
+                } else if (typeof config.server_counters === 'string') {
+                    try { activeCounters = JSON.parse(config.server_counters); } catch (e) { activeCounters = []; }
+                }
+                if (!Array.isArray(activeCounters) || activeCounters.length === 0) continue;
 
                 const guild = client.guilds.cache.get(config.guild_id);
                 if (!guild) continue;

@@ -417,6 +417,10 @@ export default function ServerSettings() {
   }, [settings.albion_guild_id, settings.albion_server]);
 
   const handleSave = async (extraPayload = {}) => {
+    // Prevent React SyntheticEvent from being spread as settings payload
+    const isEvent = extraPayload && (extraPayload.nativeEvent || extraPayload.target || extraPayload._reactName || extraPayload.preventDefault);
+    const validExtra = (!isEvent && typeof extraPayload === 'object') ? extraPayload : {};
+
     // Template validation (only block if user is actively on templates tab)
     if (activeTab === 'templates') {
       if (settings.party_templates && settings.party_templates.length > 0) {
@@ -450,7 +454,7 @@ export default function ServerSettings() {
 
     const settingsToSave = {
       ...settings,
-      ...extraPayload,
+      ...validExtra,
       party_templates: sanitizedTemplates
     };
 
@@ -862,7 +866,7 @@ export default function ServerSettings() {
             <button onClick={() => setSettings(initialSettings)} className="flex-1 md:flex-none px-2 md:px-2 py-1.5 md:py-1.5 bg-transparent border border-outline-variant text-on-surface-variant hover:text-on-surface hover:border-outline rounded-sm font-label-bold text-[10px] md:text-[10px] uppercase tracking-widest transition-all text-center">
               {lang === 'en' ? 'Discard' : 'İptal Et'}
             </button>
-            <button onClick={handleSave} disabled={saving} className="flex-1 md:flex-none px-2 md:px-2 py-1.5 md:py-1.5 bg-primary-container text-on-primary border border-primary-container rounded-sm font-label-bold text-[10px] md:text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 transition-all hover:brightness-110 active:scale-95 tactical-glow disabled:opacity-50 disabled:cursor-not-allowed">
+            <button onClick={() => handleSave()} disabled={saving} className="flex-1 md:flex-none px-2 md:px-2 py-1.5 md:py-1.5 bg-primary-container text-on-primary border border-primary-container rounded-sm font-label-bold text-[10px] md:text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 transition-all hover:brightness-110 active:scale-95 tactical-glow disabled:opacity-50 disabled:cursor-not-allowed">
               {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
               {lang === 'en' ? 'Save Changes' : 'Kaydet'}
             </button>
