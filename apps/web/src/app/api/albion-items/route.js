@@ -24,12 +24,26 @@ export async function GET() {
       foods: []
     };
 
+    const prefixesToRemove = [
+      "Beginner's ", "Novice's ", "Journeyman's ", "Adept's ", "Expert's ", "Master's ", "Grandmaster's ", "Elder's ",
+      "Acemi ", "Çaylak ", "Kalfa ", "Uzman ", "Usta ", "Üstat ", "Büyük Üstat ", "Yüce "
+    ];
+
     data.forEach(item => {
-      // Format the display name: e.g. "T8 Mage Cowl"
-      const displayName = `T${item.tier} ${item.name_tr}`;
+      let displayName = item.name_tr;
+      for (const prefix of prefixesToRemove) {
+        if (displayName.startsWith(prefix)) {
+          displayName = displayName.substring(prefix.length);
+          break;
+        }
+      }
       
       switch (item.category) {
         case 'weapon':
+          // Healer silahlarını aramada kolay bulabilmeleri için "Healer" kelimesi ekleniyor
+          if (item.unique_name.includes('HOLYSTAFF') || item.unique_name.includes('NATURESTAFF')) {
+            displayName += ' (Healer)';
+          }
           grouped.weapons.push(displayName);
           break;
         case 'head':
@@ -58,8 +72,8 @@ export async function GET() {
       grouped[key] = [...new Set(grouped[key])].sort();
     });
 
-    // Swaps will just use all available items from everything
-    grouped.swaps = [...grouped.weapons, ...grouped.heads, ...grouped.chests, ...grouped.shoes, ...grouped.offhands, ...grouped.potions, ...grouped.foods].sort();
+    // Swaps will just use weapons
+    grouped.swaps = [...grouped.weapons].sort();
 
     return NextResponse.json(grouped);
   } catch (err) {
