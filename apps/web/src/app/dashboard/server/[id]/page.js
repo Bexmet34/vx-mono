@@ -350,7 +350,11 @@ export default function ServerSettings() {
   }, [guildSearchQuery, settings.albion_server]);
 
   useEffect(() => {
-    setMounted(true);
+    const t = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
     if (status === "unauthenticated") router.push("/");
   }, [status, router]);
 

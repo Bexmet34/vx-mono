@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Loader2, Trash2, Eye, Calendar, User, MessageSquare, AlertTriangle, X, Hash, Search, Filter } from "lucide-react";
 
 export default function TicketHistoryTab({ t, lang, guildId, showToast, isPremium }) {
@@ -19,7 +19,7 @@ export default function TicketHistoryTab({ t, lang, guildId, showToast, isPremiu
     }
   };
 
-  const fetchHistory = async () => {
+  const fetchHistory = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch(`/api/ticket/history/${guildId}`);
@@ -34,11 +34,15 @@ export default function TicketHistoryTab({ t, lang, guildId, showToast, isPremiu
     } finally {
       setLoading(false);
     }
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [guildId]);
 
   useEffect(() => {
-    fetchHistory();
-  }, [guildId]);
+    const t = setTimeout(() => {
+      fetchHistory();
+    }, 0);
+    return () => clearTimeout(t);
+  }, [fetchHistory]);
 
   const handleDelete = async (id) => {
     if (!confirm(lang === 'tr' ? 'Bu kaydı kalıcı olarak silmek istediğinize emin misiniz?' : 'Are you sure you want to permanently delete this record?')) return;

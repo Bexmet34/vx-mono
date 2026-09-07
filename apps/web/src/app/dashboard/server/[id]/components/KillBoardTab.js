@@ -150,13 +150,16 @@ function ChannelPermCard({ guildId, channelId, channelName, label, lang }) {
 
   // Auto check when channelId changes
   useEffect(() => {
-    if (channelId) {
-      check();
-    } else {
-      setStatus(null);
-      setResult(null);
-      setShowPanel(false);
-    }
+    const t = setTimeout(() => {
+      if (channelId) {
+        check();
+      } else {
+        setStatus(null);
+        setResult(null);
+        setShowPanel(false);
+      }
+    }, 0);
+    return () => clearTimeout(t);
   }, [channelId, check]);
 
   if (!channelId) return null;

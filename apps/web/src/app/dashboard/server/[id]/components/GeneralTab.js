@@ -261,10 +261,10 @@ export default function GeneralTab({
                              <img src={`https://cdn.discordapp.com/avatars/${m.id}/${m.avatar}.png`} width="32" height="32" alt="Avatar" className="w-8 h-8 rounded-full" />
                            ) : (
                              <div className="w-8 h-8 rounded-full bg-primary-container/20 flex items-center justify-center text-primary-container">
-                               {m.username.charAt(0).toUpperCase()}
+                               {m.username?.charAt(0)?.toUpperCase() || '?'}
                              </div>
                            )}
-                           <span className="font-label-bold text-[10px]">{m.global_name || m.username}</span>
+                           <span className="font-label-bold text-[10px]">{m.global_name || m.username || 'Unknown'}</span>
                         </div>
                         <Plus size={16} className="text-success" />
                       </div>

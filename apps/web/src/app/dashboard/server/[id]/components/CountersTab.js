@@ -3,6 +3,7 @@
 import { Activity, Plus, Trash2, Save, Info, AlertTriangle, Shield, MousePointerClick, RefreshCw, Hash, BarChart3, Users, Crown, Settings, FolderTree, FileText, Headphones } from "lucide-react";
 import { useState } from "react";
 import React from 'react';
+import { supabase } from '@veyronix/database';
 
 const COUNTER_TYPES = [
   { id: 'all', labelTr: 'Toplam Üye (Botlar Dahil)', labelEn: 'All Members (incl. bots)', icon: Users, category: 'Member' },
@@ -35,42 +36,41 @@ export default function CountersTab({ t, lang, settings, setSettings, discordCha
   }
   if (!Array.isArray(activeCounters)) activeCounters = [];
   
-  const categories = discordChannels?.filter(c => c.type === 4) || [];
+  const activeCountersArr = Array.isArray(activeCounters) ? activeCounters : [];
+  const channelsArr = Array.isArray(discordChannels) ? discordChannels : [];
+  const categories = channelsArr.filter(c => c?.type === 4);
 
   const handleAddCounter = () => {
-    if (activeCounters.includes(selectedCounterType)) {
-      showToast(lang === 'tr' ? 'Bu sayaç zaten ekli!' : 'This counter is already added!', 'error');
+    if (activeCountersArr.includes(selectedCounterType)) {
+      if (showToast) showToast(lang === 'tr' ? 'Bu sayaç zaten ekli!' : 'This counter is already added!', 'error');
       return;
     }
     
     // Limit to 10 counters to avoid huge categories
-    if (activeCounters.length >= 10) {
-      showToast(lang === 'tr' ? 'En fazla 10 sayaç ekleyebilirsiniz.' : 'You can add a maximum of 10 counters.', 'error');
+    if (activeCountersArr.length >= 10) {
+      if (showToast) showToast(lang === 'tr' ? 'En fazla 10 sayaç ekleyebilirsiniz.' : 'You can add a maximum of 10 counters.', 'error');
       return;
     }
 
-    const updatedCounters = [...activeCounters, selectedCounterType];
-    setSettings({ ...settings, server_counters: updatedCounters });
+    const updatedCounters = [...activeCountersArr, selectedCounterType];
+    if (setSettings) setSettings({ ...settings, server_counters: updatedCounters });
     setAddingCounter(false);
   };
 
   const handleRemoveCounter = (counterId) => {
-    const updatedCounters = activeCounters.filter(id => id !== counterId);
-    setSettings({ ...settings, server_counters: updatedCounters });
+    const updatedCounters = activeCountersArr.filter(id => id !== counterId);
+    if (setSettings) setSettings({ ...settings, server_counters: updatedCounters });
   };
 
   const handleSetupCounters = async () => {
-    // First save the settings via parent component
-    await handleSave();
+    if (handleSave) await handleSave();
     
-    // Then trigger the setup flag directly in Supabase
     try {
-      const { supabase } = require('@veyronix/database');
       await supabase.from('guild_settings').update({ trigger_counters_setup: true }).eq('guild_id', guildId);
-      showToast(lang === 'tr' ? 'Kurulum talebi gönderildi, bot kanalları ayarlıyor...' : 'Setup request sent, bot is configuring channels...', 'success');
+      if (showToast) showToast(lang === 'tr' ? 'Kurulum talebi gönderildi, bot kanalları ayarlıyor...' : 'Setup request sent, bot is configuring channels...', 'success');
     } catch (err) {
       console.error(err);
-      showToast(lang === 'tr' ? 'Bir hata oluştu!' : 'An error occurred!', 'error');
+      if (showToast) showToast(lang === 'tr' ? 'Bir hata oluştu!' : 'An error occurred!', 'error');
     }
   };
 
@@ -92,9 +92,9 @@ export default function CountersTab({ t, lang, settings, setSettings, discordCha
         <div className="flex gap-2">
           <button
             onClick={handleSetupCounters}
-            disabled={saving || activeCounters.length === 0}
+            disabled={saving || activeCountersArr.length === 0}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${
-              saving || activeCounters.length === 0
+              saving || activeCountersArr.length === 0
                 ? "bg-surface-container-highest text-on-surface-variant opacity-50 cursor-not-allowed"
                 : "bg-primary-container text-on-primary hover:brightness-110 shadow-lg shadow-primary-container/20"
             }`}
@@ -113,7 +113,7 @@ export default function CountersTab({ t, lang, settings, setSettings, discordCha
             }`}
           >
             {saving ? <RefreshCw className="animate-spin" size={16} /> : <Save size={16} />}
-            {t("save", "Kaydet")}
+            {t ? t("save", "Kaydet") : "Kaydet"}
           </button>
         </div>
       </div>
@@ -137,14 +137,14 @@ export default function CountersTab({ t, lang, settings, setSettings, discordCha
                   {lang === 'tr' ? 'Sayaç Kategorisi' : 'Counters Category'}
                 </label>
                 <select
-                  value={settings.counters_category_id || ""}
-                  onChange={(e) => setSettings({ ...settings, counters_category_id: e.target.value })}
+                  value={settings?.counters_category_id || ""}
+                  onChange={(e) => setSettings && setSettings({ ...settings, counters_category_id: e.target.value })}
                   className="w-full bg-surface-container-high/50 border border-outline-variant/30 rounded-xl p-3 text-sm text-on-surface focus:outline-none focus:border-primary-container/50 transition-all appearance-none"
                 >
                   <option value="">{lang === 'tr' ? '-- Bot Otomatik Oluştursun --' : '-- Let Bot Auto-Create --'}</option>
                   {categories.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
+                    <option key={c.id || Math.random()} value={c.id}>
+                      {c.name || 'Unknown'}
                     </option>
                   ))}
                 </select>
@@ -159,14 +159,14 @@ export default function CountersTab({ t, lang, settings, setSettings, discordCha
                   {lang === 'tr' ? 'Hedef Bilet Kategorisi (Ticket Counters)' : 'Target Ticket Category'}
                 </label>
                 <select
-                  value={settings.counter_ticket_category_id || ""}
-                  onChange={(e) => setSettings({ ...settings, counter_ticket_category_id: e.target.value })}
+                  value={settings?.counter_ticket_category_id || ""}
+                  onChange={(e) => setSettings && setSettings({ ...settings, counter_ticket_category_id: e.target.value })}
                   className="w-full bg-surface-container-high/50 border border-outline-variant/30 rounded-xl p-3 text-sm text-on-surface focus:outline-none focus:border-emerald-500/50 transition-all appearance-none"
                 >
                   <option value="">{lang === 'tr' ? '-- Seçilmedi --' : '-- Not Selected --'}</option>
                   {categories.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
+                    <option key={c.id || Math.random()} value={c.id}>
+                      {c.name || 'Unknown'}
                     </option>
                   ))}
                 </select>
@@ -216,7 +216,7 @@ export default function CountersTab({ t, lang, settings, setSettings, discordCha
                   {lang === 'tr' ? 'Aktif Sayaçlar' : 'Active Counters'}
                 </h3>
                 <p className="bento-desc text-xs">
-                  {lang === 'tr' ? `Mevcut sayaçlar: ${activeCounters.length}/10` : `Current counters: ${activeCounters.length}/10`}
+                  {lang === 'tr' ? `Mevcut sayaçlar: ${activeCountersArr.length}/10` : `Current counters: ${activeCountersArr.length}/10`}
                 </p>
               </div>
               <button
@@ -256,13 +256,13 @@ export default function CountersTab({ t, lang, settings, setSettings, discordCha
             )}
 
             <div className="flex-1 space-y-2 overflow-y-auto custom-scrollbar max-h-[500px] pr-2">
-              {activeCounters.length === 0 ? (
+              {activeCountersArr.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-48 text-on-surface-variant/50 border-2 border-dashed border-outline-variant/20 rounded-xl">
                   <Activity size={32} className="mb-2 opacity-20" />
                   <p className="text-sm">{lang === 'tr' ? 'Henüz sayaç eklenmemiş.' : 'No counters added yet.'}</p>
                 </div>
               ) : (
-                activeCounters.map((counterId, index) => {
+                activeCountersArr.map((counterId, index) => {
                   const typeInfo = COUNTER_TYPES.find(c => c.id === counterId);
                   const displayLabel = typeInfo ? (lang === 'tr' ? typeInfo.labelTr : typeInfo.labelEn) : counterId;
                   const Icon = typeInfo?.icon || Hash;

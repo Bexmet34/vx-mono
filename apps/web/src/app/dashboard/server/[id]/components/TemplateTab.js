@@ -110,11 +110,13 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
           });
         }
       });
-      setBlocks(parsedBlocks);
+      const t = setTimeout(() => setBlocks(parsedBlocks), 0);
+      return () => clearTimeout(t);
     } else {
-      setBlocks([]);
+      const t = setTimeout(() => setBlocks([]), 0);
+      return () => clearTimeout(t);
     }
-  }, [selectedTemplateId]);
+  }, [settings?.party_templates, selectedTemplateId]);
 
   const handleUpdateBlocks = (newBlocks) => {
     setBlocks(newBlocks);
