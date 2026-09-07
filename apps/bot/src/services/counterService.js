@@ -63,7 +63,10 @@ async function setupCountersNow(client, guildId) {
         if (!Array.isArray(activeCounters) || activeCounters.length === 0) return;
 
         // Enforce premium: Non-premium servers cannot use starred (premium) counters
-        activeCounters = activeCounters.filter(type => isPremium || !PREMIUM_COUNTER_IDS.has(type));
+        activeCounters = activeCounters.filter(item => {
+            const [baseType] = item.includes(':') ? item.split(':') : [item];
+            return isPremium || !PREMIUM_COUNTER_IDS.has(baseType);
+        });
 
         let categoryId = config.counters_category_id;
         let category = null;
@@ -100,14 +103,14 @@ async function setupCountersNow(client, guildId) {
         const existingMap = new Map(existingMappings.map(m => [m.counter_type, m.channel_id]));
 
         // Check if existing channels are actually in the server
-        for (const [type, channelId] of existingMap.entries()) {
+        for (const [counterItem, channelId] of existingMap.entries()) {
             const ch = guild.channels.cache.get(channelId) || await guild.channels.fetch(channelId).catch(() => null);
             if (!ch || ch.parentId !== categoryId) {
                 if (ch && ch.parentId !== categoryId && categoryId) {
                      await ch.setParent(categoryId).catch(() => null);
                 } else {
-                     await db.run(`DELETE FROM server_counter_channels WHERE guild_id = ? AND counter_type = ?`, [guildId, type]);
-                     existingMap.delete(type);
+                     await db.run(`DELETE FROM server_counter_channels WHERE guild_id = ? AND counter_type = ?`, [guildId, counterItem]);
+                     existingMap.delete(counterItem);
                 }
             }
         }
@@ -118,9 +121,10 @@ async function setupCountersNow(client, guildId) {
         });
 
         // Create missing channels
-        for (const type of activeCounters) {
-            if (!existingMap.has(type)) {
-                const initialName = await getCounterName(guild, type, config.counter_ticket_category_id, config.counter_role_id);
+        for (const counterItem of activeCounters) {
+            if (!existingMap.has(counterItem)) {
+                const [type, roleId] = counterItem.includes(':') ? counterItem.split(':') : [counterItem, null];
+                const initialName = await getCounterName(guild, type, config.counter_ticket_category_id, roleId || config.counter_role_id);
                 
                 const channel = await guild.channels.create({
                     name: initialName,
@@ -139,17 +143,17 @@ async function setupCountersNow(client, guildId) {
                     throw err;
                 });
 
-                await db.run(`INSERT OR REPLACE INTO server_counter_channels (guild_id, counter_type, channel_id) VALUES (?, ?, ?)`, [guildId, type, channel.id]);
-                existingMap.set(type, channel.id);
+                await db.run(`INSERT OR REPLACE INTO server_counter_channels (guild_id, counter_type, channel_id) VALUES (?, ?, ?)`, [guildId, counterItem, channel.id]);
+                existingMap.set(counterItem, channel.id);
             }
         }
 
         // Delete channels for counters that were removed (or premium counters on expired guilds)
-        for (const [type, channelId] of existingMap.entries()) {
-            if (!activeCounters.includes(type)) {
+        for (const [counterItem, channelId] of existingMap.entries()) {
+            if (!activeCounters.includes(counterItem)) {
                 const ch = guild.channels.cache.get(channelId) || await guild.channels.fetch(channelId).catch(() => null);
                 if (ch) await ch.delete().catch(() => null);
-                await db.run(`DELETE FROM server_counter_channels WHERE guild_id = ? AND counter_type = ?`, [guildId, type]);
+                await db.run(`DELETE FROM server_counter_channels WHERE guild_id = ? AND counter_type = ?`, [guildId, counterItem]);
             }
         }
         
@@ -168,14 +172,15 @@ async function updateCountersForGuild(guild, activeCounters, existingMap, ticket
         });
     } catch (e) {}
 
-    for (const type of activeCounters) {
-        const channelId = existingMap.get(type);
+    for (const counterItem of activeCounters) {
+        const channelId = existingMap.get(counterItem);
         if (!channelId) continue;
         
         const ch = guild.channels.cache.get(channelId) || await guild.channels.fetch(channelId).catch(() => null);
         if (!ch) continue;
 
-        const newName = await getCounterName(guild, type, ticketCategoryId, roleId);
+        const [type, itemRoleId] = counterItem.includes(':') ? counterItem.split(':') : [counterItem, null];
+        const newName = await getCounterName(guild, type, ticketCategoryId, itemRoleId || roleId);
         if (ch.name !== newName) {
             await ch.setName(newName).catch(err => {
                 if (err.code !== 50013) {
@@ -451,7 +456,10 @@ function initCounterService(client) {
                 if (!Array.isArray(activeCounters) || activeCounters.length === 0) continue;
 
                 // Enforce premium
-                activeCounters = activeCounters.filter(type => isPremium || !PREMIUM_COUNTER_IDS.has(type));
+                activeCounters = activeCounters.filter(item => {
+                    const [baseType] = item.includes(':') ? item.split(':') : [item];
+                    return isPremium || !PREMIUM_COUNTER_IDS.has(baseType);
+                });
 
                 const guild = client.guilds.cache.get(guildId);
                 if (!guild) continue;

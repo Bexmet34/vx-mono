@@ -5,7 +5,7 @@ import {
   MousePointerClick, RefreshCw, Hash, BarChart3, Users, Crown, 
   Settings, FolderTree, FileText, Headphones, UserCheck, UserX, 
   UserMinus, Radio, Gamepad2, Sparkles, Smile, MessageSquare, 
-  Volume2, Ban, Clock, Layers, Megaphone 
+  Volume2, Ban, Clock, Layers, Megaphone, Check 
 } from "lucide-react";
 import { useState } from "react";
 import React from 'react';
@@ -13,7 +13,7 @@ import Link from 'next/link';
 
 export const COUNTER_CATEGORIES = [
   { id: 'member', nameTr: '👥 Üye Sayaçları', nameEn: '👥 Member Counters' },
-  { id: 'role', nameTr: '🛡️ Rol Sayaçları', nameEn: '🛡️ Role Counters' },
+  { id: 'role', nameTr: '🛡️ Rol Sayaçları (Özel Rol Seçilebilir)', nameEn: '🛡️ Role Counters (Role Selectable)' },
   { id: 'status', nameTr: '🟢 Durum Sayaçları (⭐ Premium)', nameEn: '🟢 Status Counters (⭐ Premium)' },
   { id: 'ticket', nameTr: '🎫 Destek Talebi Sayaçları', nameEn: '🎫 Ticket Counters' },
   { id: 'channel', nameTr: '📁 Kanal & Kategori Sayaçları', nameEn: '📁 Channel & Category Counters' },
@@ -30,11 +30,11 @@ export const COUNTER_TYPES = [
   { id: 'pending', category: 'member', labelTr: 'Bekleyen Üyeler (Onay Aşamasında)', labelEn: 'Pending Members', icon: Clock, isPremium: false },
 
   // 2. Rol Sayaçları
-  { id: 'roles', category: 'role', labelTr: 'Toplam Roller', labelEn: 'Roles in the Server', icon: Shield, isPremium: false },
-  { id: 'role', category: 'role', labelTr: 'Rollü Üyeler', labelEn: 'Members with Roles', icon: Users, isPremium: false },
-  { id: 'norole', category: 'role', labelTr: 'Rolsüz Üyeler', labelEn: 'Members Without Any Roles', icon: UserMinus, isPremium: false },
-  { id: 'onlinerole', category: 'role', labelTr: 'Aktif Rollü Üyeler', labelEn: 'Online with Roles', icon: Activity, isPremium: true },
-  { id: 'offlinerole', category: 'role', labelTr: 'Çevrimdışı Rollü Üyeler', labelEn: 'Offline with Roles', icon: UserX, isPremium: true },
+  { id: 'roles', category: 'role', labelTr: 'Toplam Rol Sayısı', labelEn: 'Total Roles Count', icon: Shield, isPremium: false, requiresRole: false },
+  { id: 'role', category: 'role', labelTr: 'Belirli Rolün Üyeleri', labelEn: 'Members with Specific Role', icon: Users, isPremium: false, requiresRole: true },
+  { id: 'norole', category: 'role', labelTr: 'Rolsüz Üyeler', labelEn: 'Members Without Any Roles', icon: UserMinus, isPremium: false, requiresRole: false },
+  { id: 'onlinerole', category: 'role', labelTr: 'Belirli Rolün Aktif Üyeleri', labelEn: 'Online with Specific Role', icon: Activity, isPremium: true, requiresRole: true },
+  { id: 'offlinerole', category: 'role', labelTr: 'Belirli Rolün Çevrimdışı Üyeleri', labelEn: 'Offline with Specific Role', icon: UserX, isPremium: true, requiresRole: true },
 
   // 3. Durum Sayaçları (Status - Hepsi Premium ⭐)
   { id: 'online', category: 'status', labelTr: 'Aktif Üyeler (Botlar Dahil)', labelEn: 'Online Members (incl. bots)', icon: Activity, isPremium: true },
@@ -76,6 +76,7 @@ export const COUNTER_TYPES = [
 export default function CountersTab({ t, lang, settings, setSettings, discordChannels, discordRoles, handleSave, saving, guildId, showToast, isPremium }) {
   const [addingCounter, setAddingCounter] = useState(false);
   const [selectedCounterType, setSelectedCounterType] = useState(COUNTER_TYPES[0].id);
+  const [selectedRoleId, setSelectedRoleId] = useState("");
   const [settingUp, setSettingUp] = useState(false);
 
   let activeCounters = [];
@@ -93,13 +94,33 @@ export default function CountersTab({ t, lang, settings, setSettings, discordCha
   const activeCountersArr = Array.isArray(activeCounters) ? activeCounters : [];
   const channelsArr = Array.isArray(discordChannels) ? discordChannels : [];
   const categories = channelsArr.filter(c => c?.type === 4);
+  const rolesArr = (Array.isArray(discordRoles) ? discordRoles : []).filter(r => r.name !== '@everyone');
 
   const maxCounters = isPremium ? 25 : 5;
   const selectedInfo = COUNTER_TYPES.find(c => c.id === selectedCounterType);
 
   const handleAddCounter = () => {
-    if (activeCountersArr.includes(selectedCounterType)) {
-      if (showToast) showToast(lang === 'tr' ? 'Bu sayaç zaten ekli!' : 'This counter is already added!', 'error');
+    const isRoleCounter = !!selectedInfo?.requiresRole;
+
+    if (isRoleCounter && !selectedRoleId) {
+      if (showToast) showToast(lang === 'tr' ? 'Lütfen sayılacak sunucu rolünü seçin!' : 'Please select a role to count!', 'error');
+      return;
+    }
+
+    const counterKey = isRoleCounter ? `${selectedCounterType}:${selectedRoleId}` : selectedCounterType;
+
+    // Check duplicate
+    if (activeCountersArr.includes(counterKey)) {
+      const rObj = rolesArr.find(r => r.id === selectedRoleId);
+      const rName = rObj ? `@${rObj.name}` : '';
+      if (showToast) {
+        showToast(
+          lang === 'tr' 
+            ? `${rName ? rName + ' rolü için ' : ''}bu sayaç zaten ekli! Aynı role sahip mükerrer sayaç eklenemez.` 
+            : `This counter is already added${rName ? ' for ' + rName : ''}! Duplicate role counters are not allowed.`, 
+          'error'
+        );
+      }
       return;
     }
     
@@ -129,22 +150,26 @@ export default function CountersTab({ t, lang, settings, setSettings, discordCha
       return;
     }
 
-    const updatedCounters = [...activeCountersArr, selectedCounterType];
+    const updatedCounters = [...activeCountersArr, counterKey];
     if (setSettings) setSettings({ ...(settings || {}), server_counters: updatedCounters });
     setAddingCounter(false);
+    setSelectedRoleId("");
+
     if (showToast) {
-      const name = selectedInfo ? (lang === 'tr' ? selectedInfo.labelTr : selectedInfo.labelEn) : selectedCounterType;
+      const rObj = rolesArr.find(r => r.id === selectedRoleId);
+      const baseName = selectedInfo ? (lang === 'tr' ? selectedInfo.labelTr : selectedInfo.labelEn) : selectedCounterType;
+      const fullName = rObj ? `${baseName} (@${rObj.name})` : baseName;
       showToast(
         lang === 'tr' 
-          ? `"${name}" eklendi! "Kurulumu Gönder" butonuna basarak Discord'a uygulayabilirsiniz.` 
-          : `"${name}" added! Click "Deploy Counters" to apply.`, 
+          ? `"${fullName}" eklendi! "Kurulumu Gönder" butonuna basarak Discord'a uygulayabilirsiniz.` 
+          : `"${fullName}" added! Click "Deploy Counters" to apply.`, 
         'success'
       );
     }
   };
 
-  const handleRemoveCounter = (counterId) => {
-    const updatedCounters = activeCountersArr.filter(id => id !== counterId);
+  const handleRemoveCounter = (counterKey) => {
+    const updatedCounters = activeCountersArr.filter(id => id !== counterKey);
     if (setSettings) setSettings({ ...(settings || {}), server_counters: updatedCounters });
   };
 
@@ -152,11 +177,16 @@ export default function CountersTab({ t, lang, settings, setSettings, discordCha
     let currentCounters = [...activeCountersArr];
 
     // If user opened addingCounter and has a counter selected, auto-add it if eligible
-    if (addingCounter && selectedCounterType && !currentCounters.includes(selectedCounterType)) {
-      if (!selectedInfo?.isPremium || isPremium) {
-        if (currentCounters.length < maxCounters) {
-          currentCounters.push(selectedCounterType);
-          if (setSettings) setSettings({ ...(settings || {}), server_counters: currentCounters });
+    if (addingCounter && selectedCounterType) {
+      const isRoleCounter = !!selectedInfo?.requiresRole;
+      const counterKey = isRoleCounter ? `${selectedCounterType}:${selectedRoleId}` : selectedCounterType;
+
+      if ((!isRoleCounter || selectedRoleId) && !currentCounters.includes(counterKey)) {
+        if (!selectedInfo?.isPremium || isPremium) {
+          if (currentCounters.length < maxCounters) {
+            currentCounters.push(counterKey);
+            if (setSettings) setSettings({ ...(settings || {}), server_counters: currentCounters });
+          }
         }
       }
       setAddingCounter(false);
@@ -284,28 +314,6 @@ export default function CountersTab({ t, lang, settings, setSettings, discordCha
                   {lang === 'tr' ? 'Bilet sayaçlarının doğru sayması için biletlerin açıldığı kategoriyi belirleyebilirsiniz.' : 'Select the category where tickets are created for precise counting.'}
                 </p>
               </div>
-
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center gap-2">
-                  <Shield size={14} className="text-violet-400" />
-                  {lang === 'tr' ? '🎯 Hedef Rol (Özel Rol Sayacı)' : '🎯 Target Role (Role Counter)'}
-                </label>
-                <select
-                  value={settings?.counter_role_id || ""}
-                  onChange={(e) => setSettings && setSettings({ ...settings, counter_role_id: e.target.value })}
-                  className="w-full bg-surface-container-high/50 border border-outline-variant/30 rounded-xl p-3 text-sm text-on-surface focus:outline-none focus:border-violet-500/50 transition-all appearance-none"
-                >
-                  <option value="">{lang === 'tr' ? '-- Seçilmedi (Herhangi Bir Rolü Olanlar) --' : '-- Not Selected (Any Role) --'}</option>
-                  {(Array.isArray(discordRoles) ? discordRoles : []).map((r) => (
-                    <option key={r.id || Math.random()} value={r.id}>
-                      @{r.name || 'Unknown Role'}
-                    </option>
-                  ))}
-                </select>
-                <p className="text-[10px] text-on-surface-variant/70">
-                  {lang === 'tr' ? 'Buradan bir rol seçerseniz, "Rollü Üyeler" (veya Aktif/Çevrimdışı Rollü) sayaçları sadece bu role sahip üyeleri sayar.' : 'If selected, role counters will count members of this specific role.'}
-                </p>
-              </div>
             </div>
           </div>
 
@@ -346,7 +354,7 @@ export default function CountersTab({ t, lang, settings, setSettings, discordCha
                </li>
                <li className="flex items-start gap-2">
                  <div className="mt-1 w-1.5 h-1.5 rounded-full bg-primary-container shrink-0" />
-                 <span>{lang === 'tr' ? 'Kanallar kilitlidir, üyeler giriş yapamaz.' : 'Channels are locked, members cannot join.'}</span>
+                 <span>{lang === 'tr' ? 'Farklı roller için birden fazla rol sayacı (örn: @VIP, @Yetkili) ekleyebilirsiniz.' : 'You can add multiple role counters for different roles (e.g. @VIP, @Admin).'}</span>
                </li>
                <li className="flex items-start gap-2">
                  <div className="mt-1 w-1.5 h-1.5 rounded-full bg-primary-container shrink-0" />
@@ -392,50 +400,96 @@ export default function CountersTab({ t, lang, settings, setSettings, discordCha
             {/* Add Counter Panel */}
             {addingCounter && (
               <div className="p-4 mb-4 rounded-xl bg-surface-container-highest/60 border border-outline-variant/40 flex flex-col gap-3 animate-slide-up shadow-lg">
-                <div className="flex flex-col sm:flex-row sm:items-end gap-3">
-                  <div className="flex-1 space-y-1.5">
-                    <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
-                      <span>{lang === 'tr' ? 'Sayaç Türü Seçin' : 'Select Counter Type'}</span>
-                      <span className="text-[10px] font-normal text-on-surface-variant/70">
-                        {lang === 'tr' ? 'Toplam 36 Farklı Sayaç' : '36 Total Counters'}
-                      </span>
-                    </label>
-                    <select
-                      value={selectedCounterType}
-                      onChange={(e) => setSelectedCounterType(e.target.value)}
-                      className="w-full bg-surface-container-high border border-outline-variant/40 rounded-xl p-3 text-sm text-on-surface focus:outline-none focus:border-primary-container/60 transition-all"
-                    >
-                      {COUNTER_CATEGORIES.map(category => {
-                        const items = COUNTER_TYPES.filter(ct => ct.category === category.id);
-                        if (items.length === 0) return null;
-                        return (
-                          <optgroup key={category.id} label={lang === 'tr' ? category.nameTr : category.nameEn}>
-                            {items.map(ct => {
-                              const isLocked = ct.isPremium && !isPremium;
-                              return (
-                                <option 
-                                  key={ct.id} 
-                                  value={ct.id}
-                                  disabled={isLocked}
-                                >
-                                  {ct.isPremium ? '⭐ ' : '• '}
-                                  {lang === 'tr' ? ct.labelTr : ct.labelEn}
-                                  {ct.isPremium ? (isLocked ? ' (⭐ Premium Gerekli)' : ' (⭐ Premium)') : ''}
-                                </option>
-                              );
-                            })}
-                          </optgroup>
-                        );
-                      })}
-                    </select>
+                <div className="flex flex-col gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
+                        <span>{lang === 'tr' ? '1. Sayaç Türü Seçin' : '1. Select Counter Type'}</span>
+                      </label>
+                      <select
+                        value={selectedCounterType}
+                        onChange={(e) => {
+                          setSelectedCounterType(e.target.value);
+                          const isRole = COUNTER_TYPES.find(c => c.id === e.target.value)?.requiresRole;
+                          if (isRole && !selectedRoleId && rolesArr.length > 0) {
+                            setSelectedRoleId(rolesArr[0].id);
+                          }
+                        }}
+                        className="w-full bg-surface-container-high border border-outline-variant/40 rounded-xl p-3 text-sm text-on-surface focus:outline-none focus:border-primary-container/60 transition-all"
+                      >
+                        {COUNTER_CATEGORIES.map(category => {
+                          const items = COUNTER_TYPES.filter(ct => ct.category === category.id);
+                          if (items.length === 0) return null;
+                          return (
+                            <optgroup key={category.id} label={lang === 'tr' ? category.nameTr : category.nameEn}>
+                              {items.map(ct => {
+                                const isLocked = ct.isPremium && !isPremium;
+                                return (
+                                  <option 
+                                    key={ct.id} 
+                                    value={ct.id}
+                                    disabled={isLocked}
+                                  >
+                                    {ct.isPremium ? '⭐ ' : '• '}
+                                    {lang === 'tr' ? ct.labelTr : ct.labelEn}
+                                    {ct.requiresRole ? ' [🎯 Rol Seçimi]' : ''}
+                                    {ct.isPremium ? (isLocked ? ' (⭐ Premium Gerekli)' : ' (⭐ Premium)') : ''}
+                                  </option>
+                                );
+                              })}
+                            </optgroup>
+                          );
+                        })}
+                      </select>
+                    </div>
+
+                    {/* Dynamic Role Selection for role-specific counters */}
+                    {selectedInfo?.requiresRole ? (
+                      <div className="space-y-1.5 animate-fade-in">
+                        <label className="text-xs font-bold text-violet-400 uppercase tracking-wider flex items-center gap-1.5">
+                          <Shield size={13} />
+                          <span>{lang === 'tr' ? '2. Sayılacak Sunucu Rolü' : '2. Role to Count'}</span>
+                        </label>
+                        <select
+                          value={selectedRoleId}
+                          onChange={(e) => setSelectedRoleId(e.target.value)}
+                          className="w-full bg-surface-container-high border border-violet-500/40 rounded-xl p-3 text-sm text-on-surface focus:outline-none focus:border-violet-400 transition-all"
+                        >
+                          <option value="">{lang === 'tr' ? '-- Bir Rol Seçin --' : '-- Select a Role --'}</option>
+                          {rolesArr.map((r) => (
+                            <option key={r.id} value={r.id}>
+                              @{r.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    ) : (
+                      <div className="flex items-center text-xs text-on-surface-variant/70 p-3 rounded-xl bg-surface-container/30 border border-outline-variant/20">
+                        {lang === 'tr' 
+                          ? 'Bu sayaç tüm sunucu genelinde otomatik olarak sayılır.' 
+                          : 'This counter is automatically calculated server-wide.'}
+                      </div>
+                    )}
                   </div>
-                  <button
-                    onClick={handleAddCounter}
-                    className="px-5 py-3 bg-primary-container text-on-primary rounded-xl font-bold text-sm shadow-md hover:brightness-110 active:scale-95 transition-all shrink-0 flex items-center justify-center gap-1.5"
-                  >
-                    <Plus size={16} />
-                    {lang === 'tr' ? 'Listeye Ekle' : 'Add to List'}
-                  </button>
+
+                  <div className="flex items-center justify-between pt-1">
+                    <div className="text-xs text-on-surface-variant/80">
+                      {selectedInfo?.requiresRole && (
+                        <span>
+                          {lang === 'tr' 
+                            ? '💡 Farklı roller için birden fazla sayaç ekleyebilirsiniz. Aynı rol mükerrer eklenemez.' 
+                            : '💡 You can add multiple counters for different roles. Duplicate roles are blocked.'}
+                        </span>
+                      )}
+                    </div>
+                    <button
+                      onClick={handleAddCounter}
+                      className="px-5 py-2.5 bg-primary-container text-on-primary rounded-xl font-bold text-sm shadow-md hover:brightness-110 active:scale-95 transition-all shrink-0 flex items-center justify-center gap-1.5"
+                    >
+                      <Plus size={16} />
+                      {lang === 'tr' ? 'Listeye Ekle' : 'Add to List'}
+                    </button>
+                  </div>
                 </div>
 
                 {/* Star warning note if selected is premium and user is not premium */}
@@ -463,15 +517,20 @@ export default function CountersTab({ t, lang, settings, setSettings, discordCha
                   </p>
                 </div>
               ) : (
-                activeCountersArr.map((counterId, index) => {
-                  const typeInfo = COUNTER_TYPES.find(c => c.id === counterId);
-                  const displayLabel = typeInfo ? (lang === 'tr' ? typeInfo.labelTr : typeInfo.labelEn) : counterId;
+                activeCountersArr.map((counterKey, index) => {
+                  const isRoleSpecific = counterKey.includes(':');
+                  const [baseId, roleId] = isRoleSpecific ? counterKey.split(':') : [counterKey, null];
+                  const typeInfo = COUNTER_TYPES.find(c => c.id === baseId);
+                  const roleObj = roleId ? rolesArr.find(r => r.id === roleId) : null;
+
+                  const baseLabel = typeInfo ? (lang === 'tr' ? typeInfo.labelTr : typeInfo.labelEn) : baseId;
+                  const displayLabel = roleObj ? `${baseLabel}: @${roleObj.name}` : (roleId ? `${baseLabel} (@${roleId})` : baseLabel);
                   const Icon = typeInfo?.icon || Hash;
                   const isPremLocked = typeInfo?.isPremium && !isPremium;
                   
                   return (
                     <div 
-                      key={`${counterId}-${index}`} 
+                      key={`${counterKey}-${index}`} 
                       className={`flex items-center justify-between p-3.5 rounded-xl border transition-all group ${
                         isPremLocked 
                           ? 'bg-red-500/5 border-red-500/20 hover:border-red-500/40' 
@@ -487,8 +546,13 @@ export default function CountersTab({ t, lang, settings, setSettings, discordCha
                           <Icon size={18} />
                         </div>
                         <div>
-                          <div className="text-sm font-bold text-on-surface flex items-center gap-2">
+                          <div className="text-sm font-bold text-on-surface flex items-center gap-2 flex-wrap">
                             <span>{displayLabel}</span>
+                            {roleObj && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-violet-500/15 text-violet-300 border border-violet-500/30">
+                                @{roleObj.name}
+                              </span>
+                            )}
                             {typeInfo?.isPremium && (
                               <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
                                 isPremium 
@@ -500,7 +564,7 @@ export default function CountersTab({ t, lang, settings, setSettings, discordCha
                             )}
                           </div>
                           <div className="text-xs text-on-surface-variant flex items-center gap-2 mt-0.5">
-                            <span className="font-mono text-[11px] opacity-70">ID: {counterId}</span>
+                            <span className="font-mono text-[11px] opacity-70">ID: {counterKey}</span>
                             {typeInfo?.category && (
                               <span className="opacity-50">• {typeInfo.category.toUpperCase()}</span>
                             )}
@@ -509,7 +573,7 @@ export default function CountersTab({ t, lang, settings, setSettings, discordCha
                       </div>
                       
                       <button
-                        onClick={() => handleRemoveCounter(counterId)}
+                        onClick={() => handleRemoveCounter(counterKey)}
                         className="p-2 rounded-lg text-error hover:bg-error/10 transition-all opacity-0 group-hover:opacity-100 cursor-pointer"
                         title={lang === 'tr' ? 'Kaldır' : 'Remove'}
                       >
