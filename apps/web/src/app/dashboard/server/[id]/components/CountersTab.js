@@ -113,7 +113,7 @@ export default function CountersTab({ t, lang, settings, setSettings, discordCha
             }`}
           >
             {saving ? <RefreshCw className="animate-spin" size={16} /> : <Save size={16} />}
-            {t ? t("save", "Kaydet") : "Kaydet"}
+            {saving ? (lang === 'tr' ? 'Kaydediliyor...' : 'Saving...') : (lang === 'tr' ? 'Kaydet' : 'Save')}
           </button>
         </div>
       </div>
