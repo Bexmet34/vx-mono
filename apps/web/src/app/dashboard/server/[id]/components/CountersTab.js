@@ -3,7 +3,6 @@
 import { Activity, Plus, Trash2, Save, Info, AlertTriangle, Shield, MousePointerClick, RefreshCw, Hash, BarChart3, Users, Crown, Settings, FolderTree, FileText, Headphones } from "lucide-react";
 import { useState } from "react";
 import React from 'react';
-import { supabase } from '@veyronix/database';
 
 const COUNTER_TYPES = [
   { id: 'all', labelTr: 'Toplam Üye (Botlar Dahil)', labelEn: 'All Members (incl. bots)', icon: Users, category: 'Member' },
@@ -23,12 +22,13 @@ const COUNTER_TYPES = [
 export default function CountersTab({ t, lang, settings, setSettings, discordChannels, handleSave, saving, guildId, showToast, isPremium }) {
   const [addingCounter, setAddingCounter] = useState(false);
   const [selectedCounterType, setSelectedCounterType] = useState(COUNTER_TYPES[0].id);
+  const [settingUp, setSettingUp] = useState(false);
 
   let activeCounters = [];
   try {
-    if (Array.isArray(settings.server_counters)) {
+    if (Array.isArray(settings?.server_counters)) {
       activeCounters = settings.server_counters;
-    } else if (typeof settings.server_counters === 'string') {
+    } else if (typeof settings?.server_counters === 'string') {
       activeCounters = JSON.parse(settings.server_counters);
     }
   } catch (e) {
@@ -53,24 +53,54 @@ export default function CountersTab({ t, lang, settings, setSettings, discordCha
     }
 
     const updatedCounters = [...activeCountersArr, selectedCounterType];
-    if (setSettings) setSettings({ ...settings, server_counters: updatedCounters });
+    if (setSettings) setSettings({ ...(settings || {}), server_counters: updatedCounters });
     setAddingCounter(false);
+    if (showToast) {
+      const typeInfo = COUNTER_TYPES.find(c => c.id === selectedCounterType);
+      const name = typeInfo ? (lang === 'tr' ? typeInfo.labelTr : typeInfo.labelEn) : selectedCounterType;
+      showToast(lang === 'tr' ? `"${name}" eklendi! "Kurulumu Gönder" ile Discord'a uygulayabilirsiniz.` : `"${name}" added! Click "Deploy Counters" to apply.`, 'success');
+    }
   };
 
   const handleRemoveCounter = (counterId) => {
     const updatedCounters = activeCountersArr.filter(id => id !== counterId);
-    if (setSettings) setSettings({ ...settings, server_counters: updatedCounters });
+    if (setSettings) setSettings({ ...(settings || {}), server_counters: updatedCounters });
   };
 
   const handleSetupCounters = async () => {
-    if (handleSave) await handleSave();
+    let currentCounters = [...activeCountersArr];
+
+    // If user opened addingCounter and has a counter selected, auto-add it
+    if (addingCounter && selectedCounterType && !currentCounters.includes(selectedCounterType)) {
+      currentCounters.push(selectedCounterType);
+      if (setSettings) setSettings({ ...(settings || {}), server_counters: currentCounters });
+      setAddingCounter(false);
+    }
+
+    if (currentCounters.length === 0) {
+      if (showToast) showToast(lang === 'tr' ? 'Lütfen önce en az bir sayaç ekleyin!' : 'Please add at least one counter first!', 'error');
+      return;
+    }
     
+    setSettingUp(true);
     try {
-      await supabase.from('guild_settings').update({ trigger_counters_setup: true }).eq('guild_id', guildId);
-      if (showToast) showToast(lang === 'tr' ? 'Kurulum talebi gönderildi, bot kanalları ayarlıyor...' : 'Setup request sent, bot is configuring channels...', 'success');
+      const ok = await handleSave({ 
+        server_counters: currentCounters,
+        trigger_counters_setup: true 
+      });
+      if (ok && showToast) {
+        showToast(
+          lang === 'tr' 
+            ? 'Kurulum talebi bot\'a iletildi! Kanallar birazdan Discord sunucunuzda oluşturulacak.' 
+            : 'Setup request sent to bot! Channels will be created on your Discord server shortly.', 
+          'success'
+        );
+      }
     } catch (err) {
       console.error(err);
-      if (showToast) showToast(lang === 'tr' ? 'Bir hata oluştu!' : 'An error occurred!', 'error');
+      if (showToast) showToast(err.message || (lang === 'tr' ? 'Bir hata oluştu!' : 'An error occurred!'), 'error');
+    } finally {
+      setSettingUp(false);
     }
   };
 
@@ -92,28 +122,17 @@ export default function CountersTab({ t, lang, settings, setSettings, discordCha
         <div className="flex gap-2">
           <button
             onClick={handleSetupCounters}
-            disabled={saving || activeCountersArr.length === 0}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${
-              saving || activeCountersArr.length === 0
+            disabled={settingUp || saving || (activeCountersArr.length === 0 && !addingCounter)}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all shadow-lg active:scale-95 ${
+              settingUp || saving || (activeCountersArr.length === 0 && !addingCounter)
                 ? "bg-surface-container-highest text-on-surface-variant opacity-50 cursor-not-allowed"
-                : "bg-primary-container text-on-primary hover:brightness-110 shadow-lg shadow-primary-container/20"
+                : "bg-primary-container text-on-primary hover:brightness-110 shadow-primary-container/20 cursor-pointer"
             }`}
           >
-            {saving ? <RefreshCw className="animate-spin" size={16} /> : <Activity size={16} />}
-            {lang === 'tr' ? 'Kanalları Kur / Güncelle' : 'Setup / Update Channels'}
-          </button>
-          
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${
-              saving
-                ? "bg-surface-container-highest text-on-surface-variant opacity-50 cursor-not-allowed"
-                : "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30"
-            }`}
-          >
-            {saving ? <RefreshCw className="animate-spin" size={16} /> : <Save size={16} />}
-            {saving ? (lang === 'tr' ? 'Kaydediliyor...' : 'Saving...') : (lang === 'tr' ? 'Kaydet' : 'Save')}
+            {settingUp ? <RefreshCw className="animate-spin" size={16} /> : <Activity size={16} />}
+            {settingUp 
+              ? (lang === 'tr' ? 'Kurulum Gönderiliyor...' : 'Deploying...') 
+              : (lang === 'tr' ? 'Kurulumu Gönder' : 'Deploy Counters')}
           </button>
         </div>
       </div>

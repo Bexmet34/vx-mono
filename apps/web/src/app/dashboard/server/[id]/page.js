@@ -71,6 +71,23 @@ export default function ServerSettings() {
   const [activeTab, setActiveTab] = useState("overview");
   const [collapsedCategories, setCollapsedCategories] = useState({});
 
+  const handleTabChange = useCallback((tabId) => {
+    setActiveTab(tabId);
+    if (typeof window !== "undefined") {
+      window.history.replaceState(null, '', `#${tabId}`);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const hash = window.location.hash.replace("#", "");
+      const validTabs = ['overview', 'general', 'counters', 'content', 'embed', 'tempvoice', 'killboard', 'templates', 'events', 'registration', 'rolemenu', 'ticket', 'ticket_history', 'log'];
+      if (hash && validTabs.includes(hash)) {
+        setActiveTab(hash);
+      }
+    }
+  }, []);
+
   const toggleCategory = (key) => {
     setCollapsedCategories((prev) => ({
       ...prev,
@@ -265,8 +282,13 @@ export default function ServerSettings() {
           ticket_message_desc: s?.ticket_message_desc || "Lütfen aşağıdaki menüden bir konu seçerek destek talebinizi oluşturun.",
           ticket_options: Array.isArray(s?.ticket_options) ? s?.ticket_options : [{"label": "Genel Destek", "value": "genel", "description": "Genel konular hakkında destek alın", "emoji": "📩"}],
           ticket_limit: s?.ticket_limit ?? 1,
-          ticket_name_format: s?.ticket_name_format || "topic-username",
-          server_counters: Array.isArray(s?.server_counters) ? s.server_counters : [],
+          server_counters: (() => {
+            let sc = s?.server_counters;
+            if (typeof sc === 'string' && sc !== '[object Object]') {
+              try { sc = JSON.parse(sc); } catch(e) { sc = []; }
+            }
+            return Array.isArray(sc) ? sc : [];
+          })(),
           counters_category_id: s?.counters_category_id || "",
           counter_ticket_category_id: s?.counter_ticket_category_id || "",
           content_close_roles: typeof s?.content_close_roles === 'string' ? s.content_close_roles : (s?.content_close_roles ? JSON.stringify(s.content_close_roles) : ""),
@@ -394,14 +416,14 @@ export default function ServerSettings() {
       .catch(err => console.error("Albion API fetch error:", err));
   }, [settings.albion_guild_id, settings.albion_server]);
 
-  const handleSave = async () => {
+  const handleSave = async (extraPayload = {}) => {
     // Template validation (only block if user is actively on templates tab)
     if (activeTab === 'templates') {
       if (settings.party_templates && settings.party_templates.length > 0) {
         for (const tpl of settings.party_templates) {
           if (!tpl.name || !tpl.name.trim()) {
             showToast(lang === "en" ? "Template name cannot be empty!" : "Şablon adı boş bırakılamaz!", "error");
-            return;
+            return false;
           }
           const reqCount = (tpl.required_roles || []).filter(r => r && r.trim()).length;
           const optCount = (tpl.optional_roles || []).filter(r => r && r.trim()).length;
@@ -412,7 +434,7 @@ export default function ServerSettings() {
                 : `"${tpl.name}" şablonunda en az bir rol bulunmalıdır!`, 
               "error"
             );
-            return;
+            return false;
           }
         }
       }
@@ -428,6 +450,7 @@ export default function ServerSettings() {
 
     const settingsToSave = {
       ...settings,
+      ...extraPayload,
       party_templates: sanitizedTemplates
     };
 
@@ -446,14 +469,20 @@ export default function ServerSettings() {
       });
 
       if (res.ok && dropRes.ok) {
-        setSettings(settingsToSave);
-        setInitialSettings(settingsToSave);
+        const { trigger_counters_setup, trigger_tempvoice_setup, ...cleanSettings } = settingsToSave;
+        setSettings(cleanSettings);
+        setInitialSettings(cleanSettings);
         setInitialDropSettings(dropSettings);
         showToast(lang === "en" ? "Settings saved!" : "Ayarlar kaydedildi!", "success");
+        return true;
       }
-      else throw new Error("Save failed");
+      else {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || "Save failed");
+      }
     } catch (err) {
       showToast(err.message, "error");
+      return false;
     } finally {
       setSaving(false);
     }
@@ -637,7 +666,7 @@ export default function ServerSettings() {
                     return (
                       <button
                         key={tab.id}
-                        onClick={() => setActiveTab(tab.id)}
+                        onClick={() => handleTabChange(tab.id)}
                         title={tab.label}
                         className={`relative flex items-center gap-2.5 px-2.5 py-2 rounded-xl transition-all duration-200 w-full text-left touch-manipulation active:scale-[0.98] ${
                           isActive
@@ -738,7 +767,7 @@ export default function ServerSettings() {
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => handleTabChange(tab.id)}
                 className={`shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all touch-manipulation active:scale-95 ${
                   isActive
                     ? 'bg-primary-container text-on-primary font-bold shadow-[0_0_15px_rgba(255,215,0,0.25)]'
