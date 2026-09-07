@@ -84,7 +84,8 @@ export async function POST(req, { params }) {
       application_enabled, registration_rules_text, application_questions,
       registration_button_type, registration_rules_text_en,
       tempvoice_creators, killboard_kill_channel_id, killboard_death_channel_id,
-      server_counters, counters_category_id, trigger_counters_setup, counter_ticket_category_id
+      server_counters, counters_category_id, trigger_counters_setup, counter_ticket_category_id,
+      counter_role_id
     } = body;
 
     let mergedTempVoiceCreators = [];
@@ -172,6 +173,7 @@ export async function POST(req, { params }) {
           server_counters: Array.isArray(server_counters) ? server_counters : [],
           counters_category_id: counters_category_id || null,
           counter_ticket_category_id: counter_ticket_category_id || null,
+          counter_role_id: counter_role_id || null,
           ...(needsTempVoiceSetup ? { trigger_tempvoice_setup: true } : {}),
           ...(trigger_counters_setup ? { trigger_counters_setup: true } : {})
         },

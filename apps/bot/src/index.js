@@ -37,6 +37,7 @@ const client = new Client({
         GatewayIntentBits.DirectMessages,
         GatewayIntentBits.GuildEmojisAndStickers,
         GatewayIntentBits.GuildMessageReactions,
+        GatewayIntentBits.GuildPresences, // Durum/aktivite sayaçları ve presenceUpdate için
         GatewayIntentBits.MessageContent, // Drop v2: Kod okumak için gerekli — Discord Developer Portal'da da açılmalı!
     ],
     partials: [Partials.Channel, Partials.Message, Partials.Reaction],

@@ -800,7 +800,7 @@ export default function ServerSettings() {
         )}
 
         {activeTab === 'counters' && (
-          <CountersTab t={t} lang={lang} settings={settings} setSettings={setSettings} discordChannels={discordChannels} handleSave={handleSave} saving={saving} guildId={guildId} showToast={showToast} isPremium={isPremium} />
+          <CountersTab t={t} lang={lang} settings={settings} setSettings={setSettings} discordChannels={discordChannels} discordRoles={discordRoles} handleSave={handleSave} saving={saving} guildId={guildId} showToast={showToast} isPremium={isPremium} />
         )}
 
         {activeTab === 'content' && (
