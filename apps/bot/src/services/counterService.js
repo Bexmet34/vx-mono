@@ -35,7 +35,7 @@ async function setupCountersNow(client, guildId) {
     try {
         const { data: config, error } = await supabase
             .from('guild_settings')
-            .select('server_counters, counters_category_id, counter_ticket_category_id, counter_role_id')
+            .select('language, server_counters, counters_category_id, counter_ticket_category_id, counter_role_id')
             .eq('guild_id', guildId)
             .single();
 
@@ -46,6 +46,9 @@ async function setupCountersNow(client, guildId) {
             console.warn(`[CounterService] Guild ${guildId} not found or inaccessible by bot.`);
             return;
         }
+
+        const lang = config.language || 'tr';
+        const isEn = lang === 'en';
 
         // Check guild premium status
         const isPremium = await isSubscriptionActive(guildId).catch(() => false);
@@ -71,14 +74,21 @@ async function setupCountersNow(client, guildId) {
         let categoryId = config.counters_category_id;
         let category = null;
 
+        const categoryTitle = isEn ? '📊 SERVER STATISTICS' : '📊 SUNUCU İSTATİSTİKLERİ';
+        const altCategoryTitle = isEn ? '📊 SUNUCU İSTATİSTİKLERİ' : '📊 SERVER STATISTICS';
+
         if (categoryId) {
             category = guild.channels.cache.get(categoryId) || await guild.channels.fetch(categoryId).catch(() => null);
+            // Rename category if it matches the other language's default title
+            if (category && category.name === altCategoryTitle) {
+                await category.setName(categoryTitle).catch(() => null);
+            }
         }
 
         if (!category) {
             try {
                 category = await guild.channels.create({
-                    name: '📊 SUNUCU İSTATİSTİKLERİ',
+                    name: categoryTitle,
                     type: ChannelType.GuildCategory,
                     permissionOverwrites: [
                         {
@@ -124,7 +134,7 @@ async function setupCountersNow(client, guildId) {
         for (const counterItem of activeCounters) {
             if (!existingMap.has(counterItem)) {
                 const [type, roleId] = counterItem.includes(':') ? counterItem.split(':') : [counterItem, null];
-                const initialName = await getCounterName(guild, type, config.counter_ticket_category_id, roleId || config.counter_role_id);
+                const initialName = await getCounterName(guild, type, config.counter_ticket_category_id, roleId || config.counter_role_id, lang);
                 
                 const channel = await guild.channels.create({
                     name: initialName,
@@ -158,14 +168,14 @@ async function setupCountersNow(client, guildId) {
         }
         
         // Final update for existing channels
-        await updateCountersForGuild(guild, activeCounters, existingMap, config.counter_ticket_category_id, config.counter_role_id);
+        await updateCountersForGuild(guild, activeCounters, existingMap, config.counter_ticket_category_id, config.counter_role_id, lang);
 
     } catch (err) {
         console.error(`[CounterService] Error in setupCountersNow for guild ${guildId}:`, err.message);
     }
 }
 
-async function updateCountersForGuild(guild, activeCounters, existingMap, ticketCategoryId, roleId) {
+async function updateCountersForGuild(guild, activeCounters, existingMap, ticketCategoryId, roleId, lang = 'tr') {
     try {
         await guild.members.fetch({ withPresences: true }).catch(async () => {
             await guild.members.fetch().catch(() => null);
@@ -180,7 +190,7 @@ async function updateCountersForGuild(guild, activeCounters, existingMap, ticket
         if (!ch) continue;
 
         const [type, itemRoleId] = counterItem.includes(':') ? counterItem.split(':') : [counterItem, null];
-        const newName = await getCounterName(guild, type, ticketCategoryId, itemRoleId || roleId);
+        const newName = await getCounterName(guild, type, ticketCategoryId, itemRoleId || roleId, lang);
         if (ch.name !== newName) {
             await ch.setName(newName).catch(err => {
                 if (err.code !== 50013) {
@@ -191,23 +201,28 @@ async function updateCountersForGuild(guild, activeCounters, existingMap, ticket
     }
 }
 
-async function getCounterName(guild, type, ticketCategoryId, roleId) {
+async function getCounterName(guild, type, ticketCategoryId, roleId, lang = 'tr') {
+    const isEn = lang === 'en';
     try {
         switch (type) {
             // Member counters
             case 'all':
-                return `👥 Toplam: ${guild.memberCount}`;
-            case 'members':
-                return `👤 Üyeler: ${guild.members.cache.filter(m => !m.user.bot).size}`;
-            case 'bots':
-                return `🤖 Botlar: ${guild.members.cache.filter(m => m.user.bot).size}`;
+                return isEn ? `👥 All Members: ${guild.memberCount}` : `👥 Toplam: ${guild.memberCount}`;
+            case 'members': {
+                const count = guild.members.cache.filter(m => !m.user.bot).size;
+                return isEn ? `👤 Members: ${count}` : `👤 Üyeler: ${count}`;
+            }
+            case 'bots': {
+                const count = guild.members.cache.filter(m => m.user.bot).size;
+                return isEn ? `🤖 Bots: ${count}` : `🤖 Botlar: ${count}`;
+            }
             case 'bans': {
                 const banCount = await guild.bans.fetch().then(b => b.size).catch(() => 0);
-                return `⛔ Yasaklılar: ${banCount}`;
+                return isEn ? `⛔ Banned: ${banCount}` : `⛔ Yasaklılar: ${banCount}`;
             }
             case 'pending': {
                 const pendingCount = guild.members.cache.filter(m => m.pending).size;
-                return `⏳ Bekleyenler: ${pendingCount}`;
+                return isEn ? `⏳ Pending: ${pendingCount}` : `⏳ Bekleyenler: ${pendingCount}`;
             }
 
             // Role counters
@@ -219,17 +234,17 @@ async function getCounterName(guild, type, ticketCategoryId, roleId) {
                     }
                 }
                 const roleCount = guild.members.cache.filter(m => !m.user.bot && m.roles.cache.filter(r => r.id !== guild.id).size > 0).size;
-                return `🏷️ Rollü Üyeler: ${roleCount}`;
+                return isEn ? `🏷️ Role Members: ${roleCount}` : `🏷️ Rollü Üyeler: ${roleCount}`;
             }
             case 'roles':
-                return `🛡️ Roller: ${guild.roles.cache.size}`;
+                return isEn ? `🛡️ Roles: ${guild.roles.cache.size}` : `🛡️ Roller: ${guild.roles.cache.size}`;
             case 'norole': {
                 const noRoleCount = guild.members.cache.filter(m => !m.user.bot && m.roles.cache.filter(r => r.id !== guild.id).size === 0).size;
-                return `⚪ Rolsüzler: ${noRoleCount}`;
+                return isEn ? `⚪ No Role: ${noRoleCount}` : `⚪ Rolsüzler: ${noRoleCount}`;
             }
             case 'onlinerole': {
                 let targetMembers = guild.members.cache.filter(m => !m.user.bot);
-                let roleName = 'Rollü';
+                let roleName = isEn ? 'Role' : 'Rollü';
                 if (roleId) {
                     const targetRole = guild.roles.cache.get(roleId) || await guild.roles.fetch(roleId).catch(() => null);
                     if (targetRole) {
@@ -243,11 +258,11 @@ async function getCounterName(guild, type, ticketCategoryId, roleId) {
                     const p = m.presence || guild.presences.cache.get(m.id);
                     return p && p.status && p.status !== 'offline';
                 }).size;
-                return `🟢 ${roleName}: ${onlineRoleCount}`;
+                return isEn ? `🟢 ${roleName} (Online): ${onlineRoleCount}` : `🟢 ${roleName}: ${onlineRoleCount}`;
             }
             case 'offlinerole': {
                 let targetMembers = guild.members.cache.filter(m => !m.user.bot);
-                let roleName = 'Rollü';
+                let roleName = isEn ? 'Role' : 'Rollü';
                 if (roleId) {
                     const targetRole = guild.roles.cache.get(roleId) || await guild.roles.fetch(roleId).catch(() => null);
                     if (targetRole) {
@@ -261,7 +276,7 @@ async function getCounterName(guild, type, ticketCategoryId, roleId) {
                     const p = m.presence || guild.presences.cache.get(m.id);
                     return !p || p.status === 'offline';
                 }).size;
-                return `⚪ ${roleName}: ${offlineRoleCount}`;
+                return isEn ? `⚪ ${roleName} (Offline): ${offlineRoleCount}` : `⚪ ${roleName}: ${offlineRoleCount}`;
             }
 
             // Status counters
@@ -271,7 +286,8 @@ async function getCounterName(guild, type, ticketCategoryId, roleId) {
                     const p = m.presence || guild.presences.cache.get(m.id);
                     return p && p.status !== 'offline';
                 }).size;
-                return `🟢 Aktif: ${Math.max(pCount, mCount)}`;
+                const count = Math.max(pCount, mCount);
+                return isEn ? `🟢 Online: ${count}` : `🟢 Aktif: ${count}`;
             }
             case 'offline': {
                 const pCount = guild.presences.cache.filter(p => p.status !== 'offline').size;
@@ -281,7 +297,7 @@ async function getCounterName(guild, type, ticketCategoryId, roleId) {
                 }).size;
                 const active = Math.max(pCount, mCount);
                 const offlineCount = Math.max(0, guild.memberCount - active);
-                return `⚪ Çevrimdışı: ${offlineCount}`;
+                return isEn ? `⚪ Offline: ${offlineCount}` : `⚪ Çevrimdışı: ${offlineCount}`;
             }
             case 'dnd': {
                 const pCount = guild.presences.cache.filter(p => p.status === 'dnd').size;
@@ -289,7 +305,8 @@ async function getCounterName(guild, type, ticketCategoryId, roleId) {
                     const p = m.presence || guild.presences.cache.get(m.id);
                     return p?.status === 'dnd';
                 }).size;
-                return `🔴 Rahatsız Etmeyin: ${Math.max(pCount, mCount)}`;
+                const count = Math.max(pCount, mCount);
+                return isEn ? `🔴 Do Not Disturb: ${count}` : `🔴 Rahatsız Etmeyin: ${count}`;
             }
             case 'idle': {
                 const pCount = guild.presences.cache.filter(p => p.status === 'idle').size;
@@ -297,7 +314,8 @@ async function getCounterName(guild, type, ticketCategoryId, roleId) {
                     const p = m.presence || guild.presences.cache.get(m.id);
                     return p?.status === 'idle';
                 }).size;
-                return `🟡 Boşta: ${Math.max(pCount, mCount)}`;
+                const count = Math.max(pCount, mCount);
+                return isEn ? `🟡 Idle: ${count}` : `🟡 Boşta: ${count}`;
             }
             case 'streaming': {
                 const pCount = guild.presences.cache.filter(p => p.activities?.some(a => a.type === 1 || a.name?.toLowerCase().includes('stream') || a.name?.toLowerCase().includes('twitch'))).size;
@@ -305,7 +323,8 @@ async function getCounterName(guild, type, ticketCategoryId, roleId) {
                     const p = m.presence || guild.presences.cache.get(m.id);
                     return p?.activities?.some(a => a.type === 1 || a.name?.toLowerCase().includes('stream') || a.name?.toLowerCase().includes('twitch'));
                 }).size;
-                return `💜 Yayında: ${Math.max(pCount, mCount)}`;
+                const count = Math.max(pCount, mCount);
+                return isEn ? `💜 Streaming: ${count}` : `💜 Yayında: ${count}`;
             }
             case 'playing': {
                 const pCount = guild.presences.cache.filter(p => p.activities?.some(a => a.type === 0)).size;
@@ -313,7 +332,8 @@ async function getCounterName(guild, type, ticketCategoryId, roleId) {
                     const p = m.presence || guild.presences.cache.get(m.id);
                     return p?.activities?.some(a => a.type === 0);
                 }).size;
-                return `🎮 Oyunda: ${Math.max(pCount, mCount)}`;
+                const count = Math.max(pCount, mCount);
+                return isEn ? `🎮 Playing: ${count}` : `🎮 Oyunda: ${count}`;
             }
             case 'onlinebot': {
                 const onlineBotCount = guild.members.cache.filter(m => {
@@ -321,7 +341,7 @@ async function getCounterName(guild, type, ticketCategoryId, roleId) {
                     const p = m.presence || guild.presences.cache.get(m.id);
                     return p && p.status !== 'offline';
                 }).size;
-                return `🤖 Aktif Botlar: ${onlineBotCount}`;
+                return isEn ? `🤖 Online Bots: ${onlineBotCount}` : `🤖 Aktif Botlar: ${onlineBotCount}`;
             }
             case 'status': {
                 const pCount = guild.presences.cache.filter(p => p.activities?.some(a => a.type === 4 || a.state)).size;
@@ -329,7 +349,8 @@ async function getCounterName(guild, type, ticketCategoryId, roleId) {
                     const p = m.presence || guild.presences.cache.get(m.id);
                     return p?.activities?.some(a => a.type === 4 || a.state);
                 }).size;
-                return `💬 Özel Durum: ${Math.max(pCount, mCount)}`;
+                const count = Math.max(pCount, mCount);
+                return isEn ? `💬 Custom Status: ${count}` : `💬 Özel Durum: ${count}`;
             }
 
             // Ticket counters
@@ -341,14 +362,14 @@ async function getCounterName(guild, type, ticketCategoryId, roleId) {
                     const row = await db.get(`SELECT COUNT(*) as count FROM tickets WHERE guild_id = ?`, [guild.id]).catch(() => null);
                     openTickets = row?.count || 0;
                 }
-                return `🎫 Açık Biletler: ${openTickets}`;
+                return isEn ? `🎫 Open Tickets: ${openTickets}` : `🎫 Açık Biletler: ${openTickets}`;
             }
             case 'ticketcreated': {
                 let createdTickets = 0;
                 const { count: sbTicketCount } = await supabase.from('tickets').select('*', { count: 'exact', head: true }).eq('guild_id', guild.id).catch(() => ({ count: 0 }));
                 const openCountRow = await db.get(`SELECT COUNT(*) as count FROM tickets WHERE guild_id = ?`, [guild.id]).catch(() => null);
                 createdTickets = (sbTicketCount || 0) + (openCountRow?.count || 0);
-                return `📋 Toplam Biletler: ${createdTickets}`;
+                return isEn ? `📋 Total Tickets: ${createdTickets}` : `📋 Toplam Biletler: ${createdTickets}`;
             }
             case 'ticketclosed': {
                 let closedTickets = 0;
@@ -359,75 +380,75 @@ async function getCounterName(guild, type, ticketCategoryId, roleId) {
                     const { count: sbClosedCount } = await supabase.from('tickets').select('*', { count: 'exact', head: true }).eq('guild_id', guild.id).eq('status', 'closed').catch(() => ({ count: 0 }));
                     closedTickets = sbClosedCount || 0;
                 }
-                return `🔒 Kapalı Biletler: ${closedTickets}`;
+                return isEn ? `🔒 Closed Tickets: ${closedTickets}` : `🔒 Kapalı Biletler: ${closedTickets}`;
             }
             case 'ticketrenamed': {
                 let renamedCount = 0;
                 if (ticketCategoryId) {
                     renamedCount = guild.channels.cache.filter(c => c.parentId === ticketCategoryId && c.type === ChannelType.GuildText && !c.name.startsWith('ticket-') && !c.name.startsWith('bilet-') && !c.name.startsWith('talep-')).size;
                 }
-                return `✏️ Adı Değişen: ${renamedCount}`;
+                return isEn ? `✏️ Renamed: ${renamedCount}` : `✏️ Adı Değişen: ${renamedCount}`;
             }
 
             // Channel & Category counters
             case 'connected': {
                 const connectedCount = guild.voiceStates.cache.filter(vs => vs.channelId).size;
-                return `🎧 Seslide: ${connectedCount}`;
+                return isEn ? `🎧 In Voice: ${connectedCount}` : `🎧 Seslide: ${connectedCount}`;
             }
             case 'channels': {
                 const totalChannels = guild.channels.cache.filter(c => c.type !== ChannelType.GuildCategory).size;
-                return `💬 Kanallar: ${totalChannels}`;
+                return isEn ? `💬 Channels: ${totalChannels}` : `💬 Kanallar: ${totalChannels}`;
             }
             case 'parent': {
                 const channelsInCategories = guild.channels.cache.filter(c => c.parentId && c.type !== ChannelType.GuildCategory).size;
-                return `📁 Alt Kanallar: ${channelsInCategories}`;
+                return isEn ? `📁 Sub Channels: ${channelsInCategories}` : `📁 Alt Kanallar: ${channelsInCategories}`;
             }
             case 'text': {
                 const textChannels = guild.channels.cache.filter(c => c.type === ChannelType.GuildText).size;
-                return `📝 Metin Kanalları: ${textChannels}`;
+                return isEn ? `📝 Text Channels: ${textChannels}` : `📝 Metin Kanalları: ${textChannels}`;
             }
             case 'voice': {
                 const voiceChannels = guild.channels.cache.filter(c => c.type === ChannelType.GuildVoice).size;
-                return `🔊 Ses Kanalları: ${voiceChannels}`;
+                return isEn ? `🔊 Voice Channels: ${voiceChannels}` : `🔊 Ses Kanalları: ${voiceChannels}`;
             }
             case 'categories': {
                 const categoriesCount = guild.channels.cache.filter(c => c.type === ChannelType.GuildCategory).size;
-                return `🗂️ Kategoriler: ${categoriesCount}`;
+                return isEn ? `🗂️ Categories: ${categoriesCount}` : `🗂️ Kategoriler: ${categoriesCount}`;
             }
             case 'announcement': {
                 const annChannels = guild.channels.cache.filter(c => c.type === ChannelType.GuildAnnouncement).size;
-                return `📢 Duyuru Kanalları: ${annChannels}`;
+                return isEn ? `📢 Announcements: ${annChannels}` : `📢 Duyuru Kanalları: ${annChannels}`;
             }
             case 'staging': {
                 const stageChannels = guild.channels.cache.filter(c => c.type === ChannelType.GuildStageVoice).size;
-                return `🎭 Sahne Kanalları: ${stageChannels}`;
+                return isEn ? `🎭 Stage Channels: ${stageChannels}` : `🎭 Sahne Kanalları: ${stageChannels}`;
             }
 
             // Boost counters
             case 'boosts':
-                return `🚀 Boost: ${guild.premiumSubscriptionCount || 0}`;
+                return isEn ? `🚀 Boosts: ${guild.premiumSubscriptionCount || 0}` : `🚀 Boost: ${guild.premiumSubscriptionCount || 0}`;
             case 'tier':
-                return `👑 Seviye: ${guild.premiumTier || 0}`;
+                return isEn ? `👑 Tier: ${guild.premiumTier || 0}` : `👑 Seviye: ${guild.premiumTier || 0}`;
 
             // Emoji & Sticker counters
             case 'emojis':
-                return `😀 Emojiler: ${guild.emojis.cache.size}`;
+                return isEn ? `😀 Emojis: ${guild.emojis.cache.size}` : `😀 Emojiler: ${guild.emojis.cache.size}`;
             case 'static': {
                 const staticEmojis = guild.emojis.cache.filter(e => !e.animated).size;
-                return `🙂 Statik Emojiler: ${staticEmojis}`;
+                return isEn ? `🙂 Static Emojis: ${staticEmojis}` : `🙂 Statik Emojiler: ${staticEmojis}`;
             }
             case 'animated': {
                 const animEmojis = guild.emojis.cache.filter(e => e.animated).size;
-                return `✨ Hareketli: ${animEmojis}`;
+                return isEn ? `✨ Animated: ${animEmojis}` : `✨ Hareketli: ${animEmojis}`;
             }
             case 'stickers':
-                return `🎨 Çıkartmalar: ${guild.stickers.cache.size}`;
+                return isEn ? `🎨 Stickers: ${guild.stickers.cache.size}` : `🎨 Çıkartmalar: ${guild.stickers.cache.size}`;
 
             default:
                 return `📊 ${type}: 0`;
         }
     } catch (e) {
-        return `📊 ${type}: Yükleniyor...`;
+        return isEn ? `📊 ${type}: Loading...` : `📊 ${type}: Yükleniyor...`;
     }
 }
 
@@ -439,12 +460,13 @@ function initCounterService(client) {
         try {
             const { data: configs, error } = await supabase
                 .from('guild_settings')
-                .select('guild_id, server_counters, counters_category_id, counter_ticket_category_id, counter_role_id');
+                .select('guild_id, language, server_counters, counters_category_id, counter_ticket_category_id, counter_role_id');
                 
             if (error || !configs) return;
 
             for (const config of configs) {
                 const guildId = config.guild_id;
+                const lang = config.language || 'tr';
                 const isPremium = await isSubscriptionActive(guildId).catch(() => false);
 
                 let activeCounters = [];
@@ -469,7 +491,7 @@ function initCounterService(client) {
 
                 const existingMap = new Map(existingMappings.map(m => [m.counter_type, m.channel_id]));
                 
-                await updateCountersForGuild(guild, activeCounters, existingMap, config.counter_ticket_category_id, config.counter_role_id);
+                await updateCountersForGuild(guild, activeCounters, existingMap, config.counter_ticket_category_id, config.counter_role_id, lang);
             }
         } catch (err) {
             console.error('[CounterService] Interval Update Error:', err.message);
