@@ -112,8 +112,10 @@ async function setupCountersNow(client, guildId) {
             }
         }
 
-        // Fetch guild members once to warm cache
-        await guild.members.fetch().catch(() => null);
+        // Fetch guild members with presences to warm cache
+        await guild.members.fetch({ withPresences: true }).catch(async () => {
+            await guild.members.fetch().catch(() => null);
+        });
 
         // Create missing channels
         for (const type of activeCounters) {
@@ -161,7 +163,9 @@ async function setupCountersNow(client, guildId) {
 
 async function updateCountersForGuild(guild, activeCounters, existingMap, ticketCategoryId, roleId) {
     try {
-        await guild.members.fetch().catch(() => null);
+        await guild.members.fetch({ withPresences: true }).catch(async () => {
+            await guild.members.fetch().catch(() => null);
+        });
     } catch (e) {}
 
     for (const type of activeCounters) {
@@ -219,60 +223,108 @@ async function getCounterName(guild, type, ticketCategoryId, roleId) {
                 return `⚪ Rolsüzler: ${noRoleCount}`;
             }
             case 'onlinerole': {
+                let targetMembers = guild.members.cache.filter(m => !m.user.bot);
+                let roleName = 'Rollü';
                 if (roleId) {
                     const targetRole = guild.roles.cache.get(roleId) || await guild.roles.fetch(roleId).catch(() => null);
                     if (targetRole) {
-                        const onlineRoleCount = targetRole.members.filter(m => !m.user.bot && m.presence && m.presence.status !== 'offline').size;
-                        return `🟢 ${targetRole.name}: ${onlineRoleCount}`;
+                        targetMembers = targetRole.members.filter(m => !m.user.bot);
+                        roleName = targetRole.name;
                     }
+                } else {
+                    targetMembers = targetMembers.filter(m => m.roles.cache.filter(r => r.id !== guild.id).size > 0);
                 }
-                const onlineRoleCount = guild.members.cache.filter(m => !m.user.bot && m.roles.cache.filter(r => r.id !== guild.id).size > 0 && m.presence && m.presence.status !== 'offline').size;
-                return `🟢 Aktif Rollü: ${onlineRoleCount}`;
+                const onlineRoleCount = targetMembers.filter(m => {
+                    const p = m.presence || guild.presences.cache.get(m.id);
+                    return p && p.status && p.status !== 'offline';
+                }).size;
+                return `🟢 ${roleName}: ${onlineRoleCount}`;
             }
             case 'offlinerole': {
+                let targetMembers = guild.members.cache.filter(m => !m.user.bot);
+                let roleName = 'Rollü';
                 if (roleId) {
                     const targetRole = guild.roles.cache.get(roleId) || await guild.roles.fetch(roleId).catch(() => null);
                     if (targetRole) {
-                        const offlineRoleCount = targetRole.members.filter(m => !m.user.bot && (!m.presence || m.presence.status === 'offline')).size;
-                        return `⚪ ${targetRole.name}: ${offlineRoleCount}`;
+                        targetMembers = targetRole.members.filter(m => !m.user.bot);
+                        roleName = targetRole.name;
                     }
+                } else {
+                    targetMembers = targetMembers.filter(m => m.roles.cache.filter(r => r.id !== guild.id).size > 0);
                 }
-                const offlineRoleCount = guild.members.cache.filter(m => !m.user.bot && m.roles.cache.filter(r => r.id !== guild.id).size > 0 && (!m.presence || m.presence.status === 'offline')).size;
-                return `⚪ Çevrimdışı Rollü: ${offlineRoleCount}`;
+                const offlineRoleCount = targetMembers.filter(m => {
+                    const p = m.presence || guild.presences.cache.get(m.id);
+                    return !p || p.status === 'offline';
+                }).size;
+                return `⚪ ${roleName}: ${offlineRoleCount}`;
             }
 
             // Status counters
             case 'online': {
-                const onlineCount = guild.members.cache.filter(m => m.presence && m.presence.status !== 'offline').size;
-                return `🟢 Aktif: ${onlineCount}`;
+                const pCount = guild.presences.cache.filter(p => p.status !== 'offline').size;
+                const mCount = guild.members.cache.filter(m => {
+                    const p = m.presence || guild.presences.cache.get(m.id);
+                    return p && p.status !== 'offline';
+                }).size;
+                return `🟢 Aktif: ${Math.max(pCount, mCount)}`;
             }
             case 'offline': {
-                const offlineCount = guild.members.cache.filter(m => !m.presence || m.presence.status === 'offline').size;
+                const pCount = guild.presences.cache.filter(p => p.status !== 'offline').size;
+                const mCount = guild.members.cache.filter(m => {
+                    const p = m.presence || guild.presences.cache.get(m.id);
+                    return p && p.status !== 'offline';
+                }).size;
+                const active = Math.max(pCount, mCount);
+                const offlineCount = Math.max(0, guild.memberCount - active);
                 return `⚪ Çevrimdışı: ${offlineCount}`;
             }
             case 'dnd': {
-                const dndCount = guild.members.cache.filter(m => m.presence?.status === 'dnd').size;
-                return `🔴 Rahatsız Etmeyin: ${dndCount}`;
+                const pCount = guild.presences.cache.filter(p => p.status === 'dnd').size;
+                const mCount = guild.members.cache.filter(m => {
+                    const p = m.presence || guild.presences.cache.get(m.id);
+                    return p?.status === 'dnd';
+                }).size;
+                return `🔴 Rahatsız Etmeyin: ${Math.max(pCount, mCount)}`;
             }
             case 'idle': {
-                const idleCount = guild.members.cache.filter(m => m.presence?.status === 'idle').size;
-                return `🟡 Boşta: ${idleCount}`;
+                const pCount = guild.presences.cache.filter(p => p.status === 'idle').size;
+                const mCount = guild.members.cache.filter(m => {
+                    const p = m.presence || guild.presences.cache.get(m.id);
+                    return p?.status === 'idle';
+                }).size;
+                return `🟡 Boşta: ${Math.max(pCount, mCount)}`;
             }
             case 'streaming': {
-                const streamCount = guild.members.cache.filter(m => m.presence?.activities?.some(a => a.type === 1 || a.name?.toLowerCase().includes('twitch') || a.name?.toLowerCase().includes('stream'))).size;
-                return `💜 Yayında: ${streamCount}`;
+                const pCount = guild.presences.cache.filter(p => p.activities?.some(a => a.type === 1 || a.name?.toLowerCase().includes('stream') || a.name?.toLowerCase().includes('twitch'))).size;
+                const mCount = guild.members.cache.filter(m => {
+                    const p = m.presence || guild.presences.cache.get(m.id);
+                    return p?.activities?.some(a => a.type === 1 || a.name?.toLowerCase().includes('stream') || a.name?.toLowerCase().includes('twitch'));
+                }).size;
+                return `💜 Yayında: ${Math.max(pCount, mCount)}`;
             }
             case 'playing': {
-                const playCount = guild.members.cache.filter(m => m.presence?.activities?.some(a => a.type === 0)).size;
-                return `🎮 Oyunda: ${playCount}`;
+                const pCount = guild.presences.cache.filter(p => p.activities?.some(a => a.type === 0)).size;
+                const mCount = guild.members.cache.filter(m => {
+                    const p = m.presence || guild.presences.cache.get(m.id);
+                    return p?.activities?.some(a => a.type === 0);
+                }).size;
+                return `🎮 Oyunda: ${Math.max(pCount, mCount)}`;
             }
             case 'onlinebot': {
-                const onlineBotCount = guild.members.cache.filter(m => m.user.bot && m.presence && m.presence.status !== 'offline').size;
+                const onlineBotCount = guild.members.cache.filter(m => {
+                    if (!m.user?.bot) return false;
+                    const p = m.presence || guild.presences.cache.get(m.id);
+                    return p && p.status !== 'offline';
+                }).size;
                 return `🤖 Aktif Botlar: ${onlineBotCount}`;
             }
             case 'status': {
-                const statusCount = guild.members.cache.filter(m => m.presence?.activities?.some(a => a.type === 4 || a.state)).size;
-                return `💬 Özel Durum: ${statusCount}`;
+                const pCount = guild.presences.cache.filter(p => p.activities?.some(a => a.type === 4 || a.state)).size;
+                const mCount = guild.members.cache.filter(m => {
+                    const p = m.presence || guild.presences.cache.get(m.id);
+                    return p?.activities?.some(a => a.type === 4 || a.state);
+                }).size;
+                return `💬 Özel Durum: ${Math.max(pCount, mCount)}`;
             }
 
             // Ticket counters
