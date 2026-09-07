@@ -191,14 +191,24 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
   return (
     <div className="flex flex-col gap-3 animate-slide-up">
       {/* Datalists for Autocomplete */}
-      <datalist id="weapons-list">{albionWeapons.map(w => <option key={w} value={w} />)}</datalist>
+      <datalist id="weapons-list">
+        {albionWeapons.map(w => {
+          const match = w.match(/^(.*?) \((.*?)\)$/);
+          return match ? <option key={w} value={match[1]}>{match[2]}</option> : <option key={w} value={w} />;
+        })}
+      </datalist>
       <datalist id="heads-list">{albionHeads.map(w => <option key={w} value={w} />)}</datalist>
       <datalist id="chests-list">{albionChests.map(w => <option key={w} value={w} />)}</datalist>
       <datalist id="shoes-list">{albionShoes.map(w => <option key={w} value={w} />)}</datalist>
       <datalist id="offhands-list">{albionOffhands.map(w => <option key={w} value={w} />)}</datalist>
       <datalist id="potions-list">{albionPotions.map(w => <option key={w} value={w} />)}</datalist>
       <datalist id="foods-list">{albionFoods.map(w => <option key={w} value={w} />)}</datalist>
-      <datalist id="swaps-list">{albionSwaps.map(w => <option key={w} value={w} />)}</datalist>
+      <datalist id="swaps-list">
+        {albionSwaps.map(w => {
+          const match = w.match(/^(.*?) \((.*?)\)$/);
+          return match ? <option key={w} value={match[1]}>{match[2]}</option> : <option key={w} value={w} />;
+        })}
+      </datalist>
 
       {/* Quota & Status Banner */}
       {isPremium ? (
