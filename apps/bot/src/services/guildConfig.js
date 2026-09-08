@@ -16,18 +16,35 @@ async function getGuildConfig(guildId) {
     }
 
     let row = null;
+    let supabaseTimedOut = false;
+
     try {
         row = await db.get('SELECT * FROM guild_configs WHERE guild_id = ?', [guildId]);
         let configResult = row || {};
-        
-        const sbSettings = await getSupabaseGuildSettings(guildId);
+
+        // Supabase ağ gecikmesi durumunda Discord'un 3 saniyelik sınırını aşmamak için
+        // 1500ms zaman aşımı koruması. Timeout olursa SQLite verisiyle devam et,
+        // AMA cache'e YAZMA — böylece Supabase toparlayınca bir sonraki istekte taze veri gelir.
+        const sbSettings = await Promise.race([
+            getSupabaseGuildSettings(guildId),
+            new Promise((_, reject) => setTimeout(() => {
+                supabaseTimedOut = true;
+                reject(new Error('Supabase timeout'));
+            }, 1500))
+        ]).catch((err) => {
+            if (supabaseTimedOut) {
+                console.warn(`[GuildConfig] Supabase timeout (>1500ms) for guild ${guildId}. Falling back to SQLite cache. Will retry on next request.`);
+            }
+            return null;
+        });
+
         if (sbSettings) {
             // Merge SB settings into local config
             configResult = { ...configResult, ...sbSettings };
             if (sbSettings.language) {
                 configResult.language = sbSettings.language;
             }
-            
+
             // Extract auto_delete_party_hours from log_events JSON if it exists
             if (sbSettings.log_events) {
                 try {
@@ -45,7 +62,12 @@ async function getGuildConfig(guildId) {
         if (finalConfig && finalConfig.language) {
             finalConfig.language = finalConfig.language.toString().toLowerCase().trim() === 'en' ? 'en' : 'tr';
         }
-        configCache.set(guildId, { data: finalConfig, timestamp: Date.now() });
+
+        // Supabase timeout olduysa cache'e yazma: bir sonraki istek tekrar Supabase'i denesin
+        if (!supabaseTimedOut) {
+            configCache.set(guildId, { data: finalConfig, timestamp: Date.now() });
+        }
+
         return finalConfig;
 
     } catch (error) {
