@@ -215,6 +215,8 @@ client.on('guildCreate', async (guild) => {
 });
 
 client.on('interactionCreate', async interaction => {
+    const ident = interaction.isCommand() ? `/${interaction.commandName}` : (interaction.customId || 'unknown');
+    console.log(`[Interaction] Received: ${ident} from ${interaction.user?.tag} (${interaction.user?.id}) in guild: ${interaction.guild?.name || 'DM'} (${interaction.guildId})`);
     try {
         if (interaction.isAutocomplete()) {
             if (interaction.commandName === 'temp') {
@@ -375,6 +377,7 @@ client.on('interactionCreate', async interaction => {
             }
         }
     } catch (error) {
+        console.error('[Interaction] TOP-LEVEL ERROR for', interaction.customId || interaction.commandName, error);
         const guildSettings = await getGuildConfig(interaction.guildId);
         const lang = guildSettings?.language || 'tr';
         await handleInteractionError(interaction, error, lang);

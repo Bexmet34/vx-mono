@@ -4,6 +4,9 @@ const { handleCreatorJoin, handleTempChannelLeave } = require('../services/tempV
 module.exports = async (client) => {
     client.on('voiceStateUpdate', async (oldState, newState) => {
         try {
+            const member = newState.member || oldState.member;
+            console.log(`[voiceStateUpdate] ${member?.user?.tag || 'User'} moved in ${newState.guild?.name || oldState.guild?.name} (old: ${oldState.channelId}, new: ${newState.channelId})`);
+
             // Check if user left a temp channel
             if (oldState.channelId && oldState.channelId !== newState.channelId) {
                 await handleTempChannelLeave(oldState);
@@ -13,10 +16,17 @@ module.exports = async (client) => {
             if (newState.channelId && oldState.channelId !== newState.channelId) {
                 // Fetch guild config to see if it's a creator channel
                 const config = await getGuildConfig(newState.guild.id);
-                if (config && Array.isArray(config.tempvoice_creators)) {
-                    const creatorConfig = config.tempvoice_creators.find(c => c.channelId === newState.channelId);
-                    if (creatorConfig) {
-                        await handleCreatorJoin(newState, creatorConfig);
+                if (config) {
+                    let creators = config.tempvoice_creators;
+                    if (typeof creators === 'string') {
+                        try { creators = JSON.parse(creators); } catch (e) { creators = []; }
+                    }
+                    if (Array.isArray(creators)) {
+                        const creatorConfig = creators.find(c => c.channelId === newState.channelId);
+                        if (creatorConfig) {
+                            console.log(`[voiceStateUpdate] Triggering handleCreatorJoin for channel ${newState.channelId}`);
+                            await handleCreatorJoin(newState, creatorConfig);
+                        }
                     }
                 }
             }

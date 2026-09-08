@@ -12,6 +12,14 @@ const {
 const { getGuildConfig } = require('../services/guildConfig');
 const { activeTempChannels } = require('../services/tempVoiceService');
 
+function getCreatorsArray(config) {
+    let creators = config?.tempvoice_creators;
+    if (typeof creators === 'string') {
+        try { creators = JSON.parse(creators); } catch (e) { creators = []; }
+    }
+    return Array.isArray(creators) ? creators : [];
+}
+
 async function sendOwnerError(interaction, lang) {
     return await interaction.reply({
         content: lang === 'tr' 
@@ -77,7 +85,7 @@ async function handleTempVoiceButtons(interaction) {
         // 2. Fetch server language & creator settings
         const config = await getGuildConfig(guildId);
         const lang = config?.language || 'tr';
-        const creators = Array.isArray(config?.tempvoice_creators) ? config.tempvoice_creators : [];
+        const creators = getCreatorsArray(config);
 
         // 3. Resolve temporary channel info
         const channelInfo = await resolveChannelInfo(interaction.guild, userVoiceChannelId, member, creators);
@@ -359,7 +367,7 @@ async function handleTempVoiceModal(interaction) {
         const member = interaction.member;
         const config = await getGuildConfig(guildId);
         const lang = config?.language || 'tr';
-        const creators = Array.isArray(config?.tempvoice_creators) ? config.tempvoice_creators : [];
+        const creators = getCreatorsArray(config);
 
         // 1. ODA İSMİ MODAL
         if (interaction.customId.startsWith('tv_modal_name:')) {
@@ -513,7 +521,7 @@ async function handleTempVoiceSelectMenu(interaction) {
         const member = interaction.member;
         const config = await getGuildConfig(guildId);
         const lang = config?.language || 'tr';
-        const creators = Array.isArray(config?.tempvoice_creators) ? config.tempvoice_creators : [];
+        const creators = getCreatorsArray(config);
 
         const [actionRaw, channelId] = interaction.customId.split(':');
         const action = actionRaw.replace('tv_select_', '');
