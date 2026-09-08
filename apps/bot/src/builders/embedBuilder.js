@@ -25,9 +25,11 @@ function parseEmbedData(embed, lang) {
         const labelIndex = descLine.indexOf(descLabel);
         if (labelIndex !== -1) {
             description = descLine.substring(labelIndex + descLabel.length).replace(/^[:\s*]+/, '').trim();
-            // Handle double labels if any
-            while (description.startsWith(descLabel)) {
-                description = description.substring(descLabel.length).replace(/^[:\s*]+/, '').trim();
+            // Handle double labels if any (guarded against empty label)
+            if (descLabel && descLabel.length > 0) {
+                while (description.startsWith(descLabel)) {
+                    description = description.substring(descLabel.length).replace(/^[:\s*]+/, '').trim();
+                }
             }
         } else {
             // Fallback: strip the emoji and "Description:" prefix if present

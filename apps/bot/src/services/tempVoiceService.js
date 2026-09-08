@@ -8,8 +8,9 @@ const activeTempChannels = new Map();
  * Converts a number to Roman numerals
  */
 function toRoman(num) {
-    if (isNaN(num)) return NaN;
-    var digits = String(+num).split(""),
+    let n = Math.floor(Number(num));
+    if (isNaN(n) || n <= 0 || !isFinite(n)) return 'I';
+    var digits = String(n).split(""),
         key = ["","C","CC","CCC","CD","D","DC","DCC","DCCC","CM",
                "","X","XX","XXX","XL","L","LX","LXX","LXXX","XC",
                "","I","II","III","IV","V","VI","VII","VIII","IX"],
@@ -25,10 +26,13 @@ function toRoman(num) {
  */
 function toAlpha(num) {
     let alpha = '';
-    while (num > 0) {
-        let mod = (num - 1) % 26;
+    let n = Math.floor(Number(num));
+    if (isNaN(n) || n <= 0 || !isFinite(n)) return 'A';
+    let safety = 0;
+    while (n > 0 && safety++ < 10) {
+        let mod = (n - 1) % 26;
         alpha = String.fromCharCode(65 + mod) + alpha;
-        num = Math.floor((num - mod) / 26);
+        n = Math.floor((n - mod) / 26);
     }
     return alpha || 'A';
 }
