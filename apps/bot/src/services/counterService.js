@@ -192,8 +192,11 @@ async function updateCountersForGuild(guild, activeCounters, existingMap, ticket
         const [type, itemRoleId] = counterItem.includes(':') ? counterItem.split(':') : [counterItem, null];
         const newName = await getCounterName(guild, type, ticketCategoryId, itemRoleId || roleId, lang);
         if (ch.name !== newName) {
-            await ch.setName(newName).catch(err => {
-                if (err.code !== 50013) {
+            await ch.setName(newName).catch(async err => {
+                if (err.code === 10003) {
+                    await db.run(`DELETE FROM server_counter_channels WHERE guild_id = ? AND channel_id = ?`, [guild.id, channelId]).catch(() => null);
+                    existingMap.delete(counterItem);
+                } else if (err.code !== 50013) {
                      console.error(`[CounterService] Rate limit or error renaming channel ${channelId}:`, err.message);
                 }
             });

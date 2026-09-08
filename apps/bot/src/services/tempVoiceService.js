@@ -116,28 +116,41 @@ async function handleCreatorJoin(newState, creatorConfig) {
 
     try {
         const template = creatorConfig.channelNameFormat || creatorConfig.channelNameTemplate || creatorConfig.channelName || creatorConfig.nameFormat || "Kanal - {NUMBER}";
+        const hasNumberToken = /{NUMBER(?:_ROMAN|_ALPHA|_EXPONENT|_DIGIT)?}/.test(template);
         let tempChannelCount = 1;
-        
-        // Find the lowest available number that produces a unique channel name
-        while (true) {
-            const proposedName = parseChannelName(template, member, tempChannelCount);
-            
-            // Check if a channel with this exact name already exists
+        let channelName = '';
+
+        // Find the lowest available number that produces a unique channel name (max 50 attempts)
+        for (let i = 1; i <= 50; i++) {
+            let proposedName = parseChannelName(template, member, i);
+            if (!hasNumberToken && i > 1) {
+                proposedName = `${proposedName} (${i})`;
+            }
+
             const nameExists = guild.channels.cache.some(ch => 
-                ch.type === ChannelType.GuildVoice && ch.name === proposedName
+                ch.type === ChannelType.GuildVoice && ch.name.toLowerCase() === proposedName.toLowerCase()
             );
-            
+
             if (!nameExists) {
+                channelName = proposedName;
+                tempChannelCount = i;
                 break;
             }
-            tempChannelCount++;
         }
 
-        const channelName = parseChannelName(template, member, tempChannelCount);
+        if (!channelName) {
+            const baseName = parseChannelName(template, member, 1);
+            const randSuffix = Math.floor(Math.random() * 900) + 100;
+            channelName = hasNumberToken ? `${baseName} - ${randSuffix}` : `${baseName} (${randSuffix})`;
+            tempChannelCount = 1;
+        }
 
         // Determine category
         let categoryId = creatorConfig.categoryId;
         if (categoryId === 'Oluşturucunun kategorisi' || !categoryId) {
+            categoryId = newState.channel ? newState.channel.parentId : null;
+        }
+        if (categoryId && !guild.channels.cache.has(categoryId)) {
             categoryId = newState.channel ? newState.channel.parentId : null;
         }
 
@@ -321,23 +334,41 @@ async function handleTempChannelLeave(oldState) {
         }
     }
 
-    if (isTempChannel && channel.members.size === 0) {
-        try {
-            activeTempChannels.delete(channelId);
-            await channel.delete('VoiceForge channel empty');
-            console.log(`[VoiceForge] Cleaned up empty channel: ${channel.name} (${channelId}) in ${guild.name}`);
-        } catch (err) {
-            console.error(`[VoiceForge] Failed to delete empty temp channel ${channelId}:`, err.message);
+    if (isTempChannel) {
+        const remainingMembers = channel.members.filter(m => m.id !== oldState.id);
+        if (remainingMembers.size === 0) {
+            try {
+                activeTempChannels.delete(channelId);
+                await channel.delete('VoiceForge channel empty');
+                console.log(`[VoiceForge] Cleaned up empty channel: ${channel.name} (${channelId}) in ${guild.name}`);
+                return;
+            } catch (err) {
+                console.error(`[VoiceForge] Failed to delete empty temp channel ${channelId}:`, err.message);
+            }
         }
+
+        // Safety delayed check in case of Discord API race conditions
+        setTimeout(async () => {
+            try {
+                const refreshed = guild.channels.cache.get(channelId);
+                if (refreshed && refreshed.members.size === 0) {
+                    activeTempChannels.delete(channelId);
+                    await refreshed.delete('VoiceForge channel empty (safety check)').catch(() => {});
+                    console.log(`[VoiceForge] Cleaned up empty channel (safety check): ${refreshed.name} (${channelId}) in ${guild.name}`);
+                }
+            } catch (e) {}
+        }, 2500);
     }
 }
 
 /**
  * Scans all guilds and cleans up any abandoned empty temporary voice channels (e.g. on bot restart)
  */
-async function cleanupEmptyTempChannels(client) {
+async function cleanupEmptyTempChannels(client, isStartup = false) {
     try {
-        console.log('[VoiceForge] Starting automatic sweep for empty temporary voice channels...');
+        if (isStartup) {
+            console.log('[VoiceForge] Starting initial sweep for empty temporary voice channels...');
+        }
         let deletedCount = 0;
         let recoveredCount = 0;
 
@@ -365,7 +396,7 @@ async function cleanupEmptyTempChannels(client) {
                     if (channel.members.size === 0) {
                         // EMPTY: Delete it!
                         activeTempChannels.delete(channel.id);
-                        await channel.delete('VoiceForge: startup sweep empty channel cleanup').catch(() => {});
+                        await channel.delete('VoiceForge: sweep empty channel cleanup').catch(() => {});
                         deletedCount++;
                     } else {
                         // ACTIVE: Register into activeTempChannels so room owner keeps full control
@@ -384,7 +415,9 @@ async function cleanupEmptyTempChannels(client) {
             }
         }
 
-        console.log(`[VoiceForge] Sweep complete! Deleted ${deletedCount} empty channels, restored ${recoveredCount} active rooms.`);
+        if (isStartup || deletedCount > 0) {
+            console.log(`[VoiceForge] Sweep complete! Deleted ${deletedCount} empty channels, restored ${recoveredCount} active rooms.`);
+        }
     } catch (err) {
         console.error('[VoiceForge] Error during temporary channel sweep:', err);
     }
