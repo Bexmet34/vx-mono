@@ -78,6 +78,25 @@ process.on('uncaughtException', error => {
     }
 });
 
+// ==========================================
+// EVENT LOOP WATCHDOG (Otomatik Kilitlenme Koruması)
+// ==========================================
+let lastWatchdogTick = Date.now();
+const WATCHDOG_INTERVAL = 1000;
+const MAX_EVENT_LOOP_LAG = 10000; // 10 saniye
+
+const watchdogTimer = setInterval(() => {
+    const now = Date.now();
+    const lag = now - lastWatchdogTick - WATCHDOG_INTERVAL;
+    if (lag > MAX_EVENT_LOOP_LAG) {
+        console.error(`[CRITICAL WATCHDOG] Event loop frozen for ${lag}ms! Restarting process via exit...`);
+        process.exit(1);
+    }
+    lastWatchdogTick = now;
+}, WATCHDOG_INTERVAL);
+
+if (watchdogTimer.unref) watchdogTimer.unref();
+
 // Bot startup function
 async function startBot() {
     try {
@@ -375,6 +394,15 @@ client.on('interactionCreate', async interaction => {
             } else {
                 await handlePartiModal(interaction);
             }
+        }
+
+        // Fail-Safe: Eğer herhangi bir etkileşim cevapsız kalmışsa Discord'un zaman aşımına uğramasını engelle
+        if (!interaction.replied && !interaction.deferred) {
+            console.warn(`[Interaction] Unacknowledged interaction detected for "${interaction.customId || interaction.commandName}". Replying with fail-safe.`);
+            await interaction.reply({
+                content: '⚠️ Bu buton veya etkileşim artık aktif değil veya süresi dolmuş.',
+                flags: [MessageFlags.Ephemeral]
+            }).catch(() => {});
         }
     } catch (error) {
         console.error('[Interaction] TOP-LEVEL ERROR for', interaction.customId || interaction.commandName, error);
