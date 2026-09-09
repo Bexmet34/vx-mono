@@ -82,7 +82,7 @@ export async function POST(req, { params }) {
       ticket_staff_roles, ticket_message_title, ticket_message_desc,
       ticket_options, ticket_limit, ticket_name_format, auto_delete_party_hours, content_close_roles,
       application_enabled, registration_rules_text, application_questions,
-      registration_button_type, registration_rules_text_en,
+      registration_button_type, registration_rules_text_en, registration_name_format,
       tempvoice_creators, killboard_kill_channel_id, killboard_death_channel_id,
       server_counters, counters_category_id, trigger_counters_setup, counter_ticket_category_id,
       counter_role_id
@@ -141,6 +141,7 @@ export async function POST(req, { params }) {
           registration_log_channel_id: registration_log_channel_id || null,
           registration_welcome_channel_id: registration_welcome_channel_id || null,
           registration_welcome_message_text: registration_welcome_message_text || null,
+          registration_name_format: registration_name_format || null,
           registration_ticket_welcome_message_tr: registration_ticket_welcome_message_tr || null,
           registration_ticket_welcome_message_en: registration_ticket_welcome_message_en || null,
           auto_role_on_join_id: auto_role_on_join_id || null,

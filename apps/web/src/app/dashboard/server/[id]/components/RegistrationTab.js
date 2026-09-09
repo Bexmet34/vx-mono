@@ -218,6 +218,24 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                 onChange={(e) => setSettings({ ...settings, auto_check_guild_tag: e.target.value.replace(/[\[\]]/g, '').toUpperCase() })}
               />
             </div>
+
+            <div className="md:col-span-2">
+              <label className="flex items-center text-[10px] font-label-bold text-on-surface-variant uppercase tracking-widest mb-2">
+                {lang === 'en' ? 'Registration Name Format' : 'Kayıt İsim Formatı'}
+                <InfoTooltip text={lang === 'en' ? 'Configure how the user\'s nickname will be set after registration.' : 'Kayıt tamamlandığında üyenin sunucu içindeki takma adının nasıl olacağını belirleyin.'} />
+              </label>
+              <input
+                type="text"
+                maxLength="32"
+                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+                placeholder={lang === 'en' ? 'e.g. [{tag}] {gamenick} - {name} {age}' : 'Örn: [{tag}] {gamenick} - {name} {age}'}
+                value={settings.registration_name_format || ""}
+                onChange={(e) => setSettings({ ...settings, registration_name_format: e.target.value })}
+              />
+              <p className="text-[10px] font-body-md text-on-surface-variant/80 mt-1">
+                {lang === 'en' ? 'Variables: {tag}, {gamenick}, {name}, {age}. Example: {tag} {gamenick} | {age}' : 'Kullanılabilecek Değişkenler: {tag}, {gamenick}, {name}, {age}. Örnek: {tag} {gamenick} | {age}'}
+              </p>
+            </div>
           </div>
 
           <div className="p-2 bg-surface-container/30 border border-outline-variant/30 text-center rounded-sm mt-3">

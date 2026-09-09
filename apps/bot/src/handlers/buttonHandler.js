@@ -954,14 +954,13 @@ async function handleRegisterButtons(interaction) {
             try {
                 const targetMember = await interaction.guild.members.fetch(targetUserId);
 
-                // Format Nickname: [TURQ] Ign - RealName Age
-                let prefix = '';
+                let rawTag = '';
                 if (roleIndex === 1 && guildConfig?.auto_check_guild_tag) {
-                    prefix = `[${guildConfig.auto_check_guild_tag.toUpperCase()}] `;
+                    rawTag = guildConfig.auto_check_guild_tag.toUpperCase();
                 } else if (guildName && guildName.length > 0) {
-                    prefix = `[${guildName.substring(0, 4).toUpperCase()}] `;
+                    rawTag = guildName.substring(0, 4).toUpperCase();
                 } else {
-                    prefix = '[NAN] ';
+                    rawTag = 'NAN';
                 }
 
                 // Fallback for IGN if not in field (old tickets)
@@ -980,11 +979,18 @@ async function handleRegisterButtons(interaction) {
                 const capIgn = capitalize(ign);
                 const capRealName = capitalize(realName);
 
-                // Protect against empty age or realName
-                const safeAge = age ? ` ${age}` : '';
-                const safeRealName = capRealName ? ` - ${capRealName}` : '';
+                // Determine the formatting template
+                const nameFormat = guildConfig?.registration_name_format || `[{tag}] {gamenick} - {name} {age}`;
                 
-                const fixedLength = prefix.length + safeRealName.length + safeAge.length;
+                // We want to calculate the length of the string without gamenick to see if we need to truncate gamenick
+                const formatWithoutIgn = nameFormat
+                    .replace(/{tag}/gi, rawTag)
+                    .replace(/{name}/gi, capRealName || '')
+                    .replace(/{age}/gi, age || '')
+                    .replace(/{gamenick}/gi, '')
+                    .replace(/\s+/g, ' ').trim();
+                
+                const fixedLength = formatWithoutIgn.length;
                 let finalIgn = capIgn;
                 
                 if (fixedLength + finalIgn.length > 32) {
@@ -1007,7 +1013,15 @@ async function handleRegisterButtons(interaction) {
                     }
                 }
                 
-                let newNickname = `${prefix}${finalIgn}${safeRealName}${safeAge}`.trim();
+                let newNickname = nameFormat
+                    .replace(/{tag}/gi, rawTag)
+                    .replace(/{gamenick}/gi, finalIgn)
+                    .replace(/{name}/gi, capRealName || '')
+                    .replace(/{age}/gi, age || '')
+                    .replace(/\s+/g, ' ')
+                    .replace(/ -\s*$/, '') // Clean trailing hyphens if name/age is empty
+                    .replace(/ - - /g, ' - ') // Clean multiple hyphens
+                    .trim();
                 
                 // Absolute fallback in case safeRealName or safeAge was impossibly long
                 if (newNickname.length > 32) {
