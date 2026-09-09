@@ -828,7 +828,7 @@ export default function ServerSettings() {
         )}
 
         {activeTab === 'registration' && (
-          <RegistrationTab t={t} lang={lang} settings={settings} setSettings={setSettings} discordChannels={discordChannels} discordRoles={discordRoles} handleSave={handleSave} saving={saving} isPremium={isPremium} guildId={guildId} />
+          <RegistrationTab t={t} lang={lang} settings={settings} setSettings={setSettings} discordChannels={discordChannels} discordRoles={discordRoles} handleSave={handleSave} saving={saving} isPremium={isPremium} guildId={guildId} registeredCount={settings.registered_count || 0} />
         )}
 
         {activeTab === 'rolemenu' && (
