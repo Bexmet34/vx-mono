@@ -58,9 +58,9 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
     else if (settings.registration_given_role_id_4) count = 4;
     else if (settings.registration_given_role_id_3) count = 3;
     else if (settings.registration_given_role_id_2) count = 2;
-    // If they aren't premium, they are limited to 1 role. Force count to 1.
-    if (!isPremium) {
-      setVisibleRoleCount(1);
+    // If they aren't premium, they are limited to 3 roles. Force count to 3 at most.
+    if (!isPremium && count > 3) {
+      setVisibleRoleCount(3);
     } else {
       setVisibleRoleCount(count);
     }
@@ -444,7 +444,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
 
                 {visibleRoleCount < 5 && (
                   <div className="col-span-1 md:col-span-2 mt-2">
-                    {isPremium ? (
+                    {isPremium || visibleRoleCount < 3 ? (
                       <button
                         onClick={() => setVisibleRoleCount(prev => prev + 1)}
                         className="w-full py-1.5 border border-dashed border-outline-variant/60 rounded-sm text-on-surface-variant hover:text-primary-container hover:border-primary-container transition-colors text-[10px] uppercase tracking-widest font-label-bold flex items-center justify-center gap-2"
@@ -455,7 +455,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                       <div className="w-full p-2 border border-dashed border-outline-variant/30 rounded-sm bg-surface-container/20 flex flex-col md:flex-row items-center justify-between gap-2">
                         <span className="text-[10px] text-on-surface-variant flex items-center gap-1.5 font-label-bold uppercase tracking-wider">
                           <Crown size={14} className="text-primary-container animate-pulse" />
-                          {lang === 'en' ? 'Multiple Roles (Up to 5) Requires Premium' : 'Çoklu Rol Ekleme (Max 5) Premium Gerektirir'}
+                          {lang === 'en' ? 'More than 3 Roles (Up to 5) Requires Premium' : '3\'ten Fazla Rol Ekleme (Max 5) Premium Gerektirir'}
                         </span>
                         <a 
                           href="https://veyronix.com.tr" 
