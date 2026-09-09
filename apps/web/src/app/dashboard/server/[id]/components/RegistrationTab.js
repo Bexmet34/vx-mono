@@ -224,16 +224,69 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                 {lang === 'en' ? 'Registration Name Format' : 'Kayıt İsim Formatı'}
                 <InfoTooltip text={lang === 'en' ? 'Configure how the user\'s nickname will be set after registration.' : 'Kayıt tamamlandığında üyenin sunucu içindeki takma adının nasıl olacağını belirleyin.'} />
               </label>
-              <input
-                type="text"
-                maxLength="32"
-                className="w-full bg-surface-container-high border border-outline-variant rounded-sm px-2 py-1 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
-                placeholder={lang === 'en' ? 'e.g. [{tag}] {gamenick} - {name} {age}' : 'Örn: [{tag}] {gamenick} - {name} {age}'}
-                value={settings.registration_name_format || ""}
-                onChange={(e) => setSettings({ ...settings, registration_name_format: e.target.value })}
-              />
-              <p className="text-[10px] font-body-md text-on-surface-variant/80 mt-1">
-                {lang === 'en' ? 'Variables: {tag}, {gamenick}, {name}, {age}. Example: {tag} {gamenick} | {age}' : 'Kullanılabilecek Değişkenler: {tag}, {gamenick}, {name}, {age}. Örnek: {tag} {gamenick} | {age}'}
+              
+              <div className="flex flex-wrap gap-2 mb-2">
+                {[
+                  { key: '{tag}', label: lang === 'en' ? 'Guild Tag' : 'Guild Tag' },
+                  { key: '{gamenick}', label: lang === 'en' ? 'Game Nick' : 'Oyun Nick' },
+                  { key: '{name}', label: lang === 'en' ? 'Real Name' : 'Gerçek İsim' },
+                  { key: '{age}', label: lang === 'en' ? 'Age' : 'Yaş' }
+                ].map(v => {
+                  const currentFormat = settings.registration_name_format || "";
+                  const isActive = currentFormat.includes(v.key);
+                  return (
+                    <button
+                      key={v.key}
+                      onClick={() => {
+                        if (isActive) {
+                          setSettings({ ...settings, registration_name_format: currentFormat.replace(v.key, '').replace(/\s+/g, ' ').trim() });
+                        } else {
+                          setSettings({ ...settings, registration_name_format: (currentFormat + (currentFormat.endsWith(' ') || currentFormat === '' ? '' : ' ') + v.key).trim() });
+                        }
+                      }}
+                      className={`px-3 py-1.5 rounded-md text-[10px] font-label-bold uppercase tracking-widest transition-all shadow-sm flex items-center gap-1 ${isActive ? 'bg-primary-container text-on-primary border border-transparent' : 'bg-surface-container border border-outline-variant text-on-surface-variant hover:bg-surface-container-high hover:border-primary-container/50'}`}
+                    >
+                      {v.label} {isActive ? '✓' : '+'}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  maxLength="32"
+                  className="flex-1 bg-surface-container-high border border-outline-variant rounded-sm px-3 py-2 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-body-md"
+                  placeholder={lang === 'en' ? 'e.g. [{tag}] {gamenick} - {name} {age}' : 'Örn: [{tag}] {gamenick} - {name} {age}'}
+                  value={settings.registration_name_format || ""}
+                  onChange={(e) => {
+                    let newVal = e.target.value;
+                    const oldVal = settings.registration_name_format || "";
+                    
+                    const tags = ['{tag}', '{gamenick}', '{name}', '{age}'];
+                    for (const tag of tags) {
+                      if (oldVal.includes(tag) && !newVal.includes(tag)) {
+                        const tagMinusLast = tag.slice(0, -1);
+                        const tagMinusFirst = tag.slice(1);
+                        if (newVal.includes(tagMinusLast)) {
+                          newVal = newVal.replace(tagMinusLast, '');
+                        } else if (newVal.includes(tagMinusFirst)) {
+                          newVal = newVal.replace(tagMinusFirst, '');
+                        } else {
+                          const regex = new RegExp(tag.replace('{', '\\{').replace('}', '\\}').split('').join('?.*'), 'i');
+                          if(newVal.length < oldVal.length && oldVal.replace(tag, '') === newVal.replace(/\{[a-z]*\}?/i, '')) {
+                             newVal = oldVal.replace(tag, '');
+                          }
+                        }
+                      }
+                    }
+                    
+                    setSettings({ ...settings, registration_name_format: newVal.replace(/\s{2,}/g, ' ') });
+                  }}
+                />
+              </div>
+              <p className="text-[10px] font-body-md text-on-surface-variant/70 mt-2">
+                {lang === 'en' ? 'Click the tags above to add/remove them. You can freely type symbols like -, |, [ ] between them.' : 'Etiket eklemek/kaldırmak için yukarıdaki butonlara tıklayın. Etiketler arasına -, |, [ ] gibi dilediğiniz sembolleri yazabilirsiniz.'}
               </p>
             </div>
           </div>
