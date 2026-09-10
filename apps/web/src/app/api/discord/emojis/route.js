@@ -10,3 +10,4 @@ export async function GET() {
     return NextResponse.json({ emojis: {} }, { status: 500 });
   }
 }
+

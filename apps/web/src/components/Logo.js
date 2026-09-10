@@ -69,3 +69,4 @@ export default function Logo({ className = "" }) {
     </svg>
   );
 }
+

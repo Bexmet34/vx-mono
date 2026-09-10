@@ -70,7 +70,7 @@ export async function checkDashboardAccess(guildId, userId) {
     let botGuildName = gsData?.albion_guild_name || 'Sunucu';
 
     try {
-      const botApiUrl = process.env.BOT_API_URL || 'http://localhost:3005';
+      const botApiUrl = process.env.BOT_API_URL || 'http://127.0.0.1:3005';
       const botRes = await fetch(`${botApiUrl}/api/bot-guilds`);
       if (botRes.ok) {
         const botData = await botRes.json();
@@ -140,3 +140,4 @@ export async function checkDashboardAccess(guildId, userId) {
     return { hasAccess: false, isOwner: false, subscription: null };
   }
 }
+

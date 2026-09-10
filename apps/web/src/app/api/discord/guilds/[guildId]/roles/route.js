@@ -28,7 +28,7 @@ export async function GET(req, { params }) {
 
     // 1. ÖNCELİKLİ KAYNAK: Yerel Bot API'sinden (Sharding/Gateway Cache) Anlık Çek
     try {
-      const botApiUrl = process.env.BOT_API_URL || 'http://localhost:3005';
+      const botApiUrl = process.env.BOT_API_URL || 'http://127.0.0.1:3005';
       const botRes = await fetch(`${botApiUrl}/api/guild-data/${guildId}`, {
         cache: 'no-store'
       });

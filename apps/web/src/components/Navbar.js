@@ -700,3 +700,4 @@ export default function Navbar({ isStatic = false }) {
     </>
   );
 }
+

@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { checkDashboardAccess } from '@/utils/authUtils';
 
-const BOT_API_URL = process.env.BOT_API_URL || 'http://localhost:3005/api';
+const BOT_API_URL = process.env.BOT_API_URL || 'http://127.0.0.1:3005/api';
 
 export async function POST(req, { params }) {
   try {

@@ -67,3 +67,4 @@ export async function POST(req) {
         return NextResponse.json({ error: 'Sunucu hatası oluştu.' }, { status: 500 });
     }
 }
+

@@ -55,3 +55,4 @@ export async function GET(req) {
     return NextResponse.json({ error: "Arama sırasında bir hata oluştu." }, { status: 500 });
   }
 }
+

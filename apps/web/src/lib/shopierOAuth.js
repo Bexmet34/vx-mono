@@ -50,3 +50,4 @@ export function verifyShopierWebhookToken(receivedToken) {
   if (!webhookToken) return false;
   return receivedToken === webhookToken;
 }
+

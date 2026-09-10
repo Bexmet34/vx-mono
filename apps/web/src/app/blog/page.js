@@ -20,3 +20,4 @@ export default async function BlogIndex() {
 
   return <BlogListClient allPosts={posts} />;
 }
+

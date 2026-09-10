@@ -21,3 +21,4 @@ export async function GET() {
   // Fallback direct Discord invite if setting not in DB
   return NextResponse.redirect('https://discord.gg/invite', { status: 307 });
 }
+

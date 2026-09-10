@@ -161,3 +161,4 @@ export default function KillMatch({ event, server }) {
     </div>
   );
 }
+

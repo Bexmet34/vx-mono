@@ -22,7 +22,7 @@ export async function GET() {
     
     // Enrich with actual guild names and owner IDs from Bot API
     try {
-      const botApiUrl = process.env.BOT_API_URL || 'http://localhost:3005';
+      const botApiUrl = process.env.BOT_API_URL || 'http://127.0.0.1:3005';
       const res = await fetch(`${botApiUrl}/api/bot-guilds`);
       if (res.ok) {
         const botData = await res.json();
@@ -143,7 +143,7 @@ export async function PATCH(req) {
 
       // Bot API fetch (for name and as secondary fallback)
       try {
-          const botApiUrl = process.env.BOT_API_URL || "http://localhost:3005";
+          const botApiUrl = process.env.BOT_API_URL || "http://127.0.0.1:3005";
           const botRes = await fetch(`${botApiUrl}/api/bot-guilds`);
           if (botRes.ok) {
               const bData = await botRes.json();
@@ -305,3 +305,4 @@ export async function PATCH(req) {
 
   return NextResponse.json({ success: true, updatedData: savedSub });
 }
+

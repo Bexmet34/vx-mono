@@ -77,7 +77,7 @@ export async function POST(req, { params }) {
 
     // Call Internal Bot API or ShardingManager to publish Discord message
     try {
-      const botApiUrl = process.env.BOT_API_URL || process.env.BOT_INTERNAL_API_URL || 'http://localhost:3005';
+      const botApiUrl = process.env.BOT_API_URL || process.env.BOT_INTERNAL_API_URL || 'http://127.0.0.1:3005';
       await fetch(`${botApiUrl}/api/giveaway/publish`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

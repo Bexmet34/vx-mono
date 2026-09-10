@@ -13,7 +13,7 @@ export async function POST(req) {
 
   try {
     // 1. Fetch all guilds from the bot API
-    const botApiUrl = process.env.BOT_API_URL || "http://localhost:3005";
+    const botApiUrl = process.env.BOT_API_URL || "http://127.0.0.1:3005";
     const botRes = await fetch(`${botApiUrl}/api/bot-guilds`);
     if (!botRes.ok) throw new Error("Bot API'ye ulaşılamadı.");
     
@@ -88,3 +88,4 @@ export async function POST(req) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
+

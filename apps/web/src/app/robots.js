@@ -8,3 +8,4 @@ export default function robots() {
     sitemap: 'https://veyronix.com.tr/sitemap.xml',
   }
 }
+

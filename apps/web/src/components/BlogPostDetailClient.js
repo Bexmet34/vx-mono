@@ -296,3 +296,4 @@ export default function BlogPostDetailClient({ post, relatedPosts = [] }) {
     </main>
   );
 }
+

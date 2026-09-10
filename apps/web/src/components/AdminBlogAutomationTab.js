@@ -929,3 +929,4 @@ Lütfen aşağıdaki JSON formatında yanıt ver:
     </div>
   );
 }
+

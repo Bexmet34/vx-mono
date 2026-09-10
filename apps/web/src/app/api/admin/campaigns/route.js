@@ -75,3 +75,4 @@ export async function PATCH(request) {
         return NextResponse.json({ message: "Sunucu hatası." }, { status: 500 });
     }
 }
+

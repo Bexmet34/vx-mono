@@ -657,3 +657,4 @@ export default function UserTemplatesTab({ t, lang, templates, setTemplates, isP
     </div>
   );
 }
+

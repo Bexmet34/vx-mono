@@ -55,3 +55,4 @@ export async function GET(request) {
     return NextResponse.json({ players: [], guilds: [], error: error.message }, { status: 500 });
   }
 }
+

@@ -26,3 +26,4 @@ export default function KillboardHubClient() {
     </div>
   );
 }
+

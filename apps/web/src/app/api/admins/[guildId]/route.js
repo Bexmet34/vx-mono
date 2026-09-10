@@ -38,7 +38,7 @@ export async function POST(req, { params }) {
         if (gsError || !gs) {
             // Sunucu veritabaninda HIC yoksa, Bot uzerinden gercekten owner mi diye dogrulayalim
             try {
-                const botApiUrl = process.env.BOT_API_URL || 'http://localhost:3005';
+                const botApiUrl = process.env.BOT_API_URL || 'http://127.0.0.1:3005';
                 const botRes = await fetch(`${botApiUrl}/api/bot-guilds`);
                 const botData = await botRes.json();
                 const guildFromBot = botData.guilds?.find(g => g.id === guildId);

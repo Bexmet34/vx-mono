@@ -711,3 +711,4 @@ export function LanguageProvider({ children, initialLang = "tr" }) {
 export function useLanguage() {
   return useContext(LanguageContext);
 }
+

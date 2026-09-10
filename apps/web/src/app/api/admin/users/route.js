@@ -36,7 +36,7 @@ export async function GET() {
   const results = await Promise.allSettled((data || []).map(async (u) => {
     let discordProfile = { username: `Kullanıcı (${u.discord_id})`, avatar_url: null };
     try {
-      const botApiUrl = process.env.BOT_API_URL || 'http://localhost:3005';
+      const botApiUrl = process.env.BOT_API_URL || 'http://127.0.0.1:3005';
       const userRes = await fetch(`${botApiUrl}/api/user/${u.discord_id}`);
       if (userRes.ok) {
         const userData = await userRes.json();
@@ -64,7 +64,7 @@ export async function GET() {
     
     let mutualGuilds = [];
     try {
-      const botApiUrl = process.env.BOT_API_URL || 'http://localhost:3005';
+      const botApiUrl = process.env.BOT_API_URL || 'http://127.0.0.1:3005';
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000);
       const botRes = await fetch(`${botApiUrl}/api/mutual-guilds/${u.discord_id}`, {
@@ -402,3 +402,4 @@ export async function DELETE(req) {
     return NextResponse.json({ error: error.message || "Internal Error" }, { status: 500 });
   }
 }
+
