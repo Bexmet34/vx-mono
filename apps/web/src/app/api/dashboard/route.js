@@ -22,7 +22,7 @@ export async function GET(req) {
     // 1. Fetch bot guilds to get real names, icons and owner_ids
     let botGuildMap = {};
     try {
-      const botApiUrl = process.env.BOT_API_URL || 'http://localhost:3005';
+      const botApiUrl = process.env.BOT_API_URL || 'http://127.0.0.1:3005';
       const botRes = await fetch(`${botApiUrl}/api/bot-guilds`);
       if (botRes.ok) {
         const botData = await botRes.json();
