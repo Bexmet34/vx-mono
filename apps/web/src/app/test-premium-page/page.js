@@ -29,6 +29,10 @@ export default function TestPremiumPage() {
 
   // Accordion State
   const [openAccordion, setOpenAccordion] = useState('server');
+  
+  // Checkout Steps
+  const [step, setStep] = useState(1);
+  const [isCopied, setIsCopied] = useState(false);
 
   // Ödeme Popup State
   const [paymentPending, setPaymentPending] = useState(false);
@@ -89,25 +93,9 @@ export default function TestPremiumPage() {
     setIsProcessing(true);
 
     try {
-      // Eğer veritabanındaki pakette shopier_url varsa Shopier Popup tetikle
+      // Eğer veritabanındaki pakette shopier_url varsa, önce uyarı modalı göster
       if (selectedProduct.shopier_url) {
-        setShowCheckout(false);
-        setPaymentDone(false);
-        setPaymentPending(true);
-
-        const popup = window.open(
-          selectedProduct.shopier_url,
-          'shopier-odeme',
-          'width=820,height=720,left=200,top=100,resizable=yes,scrollbars=yes'
-        );
-
-        const timer = setInterval(() => {
-          if (!popup || popup.closed) {
-            clearInterval(timer);
-            setPaymentPending(false);
-            setPaymentDone(true);
-          }
-        }, 1000);
+        setStep(2); // Kopya kod adımına geç
       } else {
         setCheckoutError("Bu paket için Shopier ödeme bağlantısı bulunamadı. Lütfen yönetici ile iletişime geçin.");
       }
@@ -118,10 +106,36 @@ export default function TestPremiumPage() {
     }
   };
 
+  const handleOpenShopier = () => {
+    setShowCheckout(false);
+    setPaymentDone(false);
+    setPaymentPending(true);
+
+    const popup = window.open(
+      selectedProduct.shopier_url,
+      'shopier-odeme',
+      'width=820,height=720,left=200,top=100,resizable=yes,scrollbars=yes'
+    );
+
+    const timer = setInterval(() => {
+      if (!popup || popup.closed) {
+        clearInterval(timer);
+        setPaymentPending(false);
+        setPaymentDone(true);
+      }
+    }, 1000);
+  };
+
   const toggleAccordion = (name) => {
     setOpenAccordion(openAccordion === name ? null : name);
   };
 
+  const copyToClipboard = () => {
+    const code = selectedProduct.plan_type === 'user' ? `U-${session?.user?.id}` : `S-${selectedServer}`;
+    navigator.clipboard.writeText(code);
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 2000);
+  };
 
   return (
     <main className="min-h-screen pt-24 pb-32 px-4 max-w-4xl mx-auto w-full">
@@ -341,54 +355,133 @@ export default function TestPremiumPage() {
       {/* CHECKOUT MODAL */}
       {showCheckout && selectedProduct && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
-          <div className="fixed inset-0 bg-black/80 backdrop-blur-md" onClick={() => setShowCheckout(false)}></div>
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-md" onClick={() => {
+            setShowCheckout(false);
+            setStep(1);
+          }}></div>
           
           <div className="relative z-10 w-full max-w-lg bg-[#080C18] border border-primary-container/30 rounded-3xl p-6 shadow-2xl">
-            <button className="absolute top-5 right-5 p-2 text-on-surface-variant hover:text-error" onClick={() => setShowCheckout(false)}>
+            <button className="absolute top-5 right-5 p-2 text-on-surface-variant hover:text-error" onClick={() => {
+              setShowCheckout(false);
+              setStep(1);
+            }}>
               <X size={18} />
             </button>
 
-            <h3 className="text-lg font-bold text-on-surface uppercase mb-1">{selectedProduct.name_tr || selectedProduct.name_en || selectedProduct.id}</h3>
-            <p className="text-xs text-on-surface-variant mb-4">{selectedProduct.shopier_url ? 'Shopier güvenli kart ödemesi popup pencerede açılacak.' : 'Ödeme bağlantısı bulunamadı.'}</p>
+            {step === 1 ? (
+              <>
+                <h3 className="text-lg font-bold text-on-surface uppercase mb-1">{selectedProduct.name_tr || selectedProduct.name_en || selectedProduct.id}</h3>
+                <p className="text-xs text-on-surface-variant mb-4">{selectedProduct.shopier_url ? 'Devam etmeden önce hedef sunucuyu seçin.' : 'Ödeme bağlantısı bulunamadı.'}</p>
 
-            {checkoutError && <div className="p-3 mb-3 bg-error/10 border border-error/40 text-error text-xs rounded-xl">{checkoutError}</div>}
+                {checkoutError && <div className="p-3 mb-3 bg-error/10 border border-error/40 text-error text-xs rounded-xl">{checkoutError}</div>}
 
-            {/* Server Selection (Only for Server Plans) */}
-            {selectedProduct.plan_type !== 'user' && (
-              <div className="mb-4">
-                <label className="text-xs font-bold text-primary-container uppercase block mb-2">Hedef Sunucu</label>
-                <div className="space-y-2 max-h-36 overflow-y-auto bg-[#060913] p-2 rounded-xl border border-outline-variant/30">
-                  {status !== "authenticated" ? (
-                    <button onClick={() => signIn("discord")} className="w-full py-2 bg-[#5865F2] text-white text-xs font-bold rounded-xl">Discord ile Giriş Yap</button>
-                  ) : isLoadingServers ? (
-                    <div className="flex items-center justify-center py-3 gap-2 text-on-surface-variant text-xs">
-                      <Loader2 className="animate-spin" size={14} /> Sunucular yükleniyor...
+                {/* Server Selection (Only for Server Plans) */}
+                {selectedProduct.plan_type !== 'user' && (
+                  <div className="mb-4">
+                    <label className="text-xs font-bold text-primary-container uppercase block mb-2">Hedef Sunucu</label>
+                    <div className="space-y-2 max-h-36 overflow-y-auto bg-[#060913] p-2 rounded-xl border border-outline-variant/30">
+                      {status !== "authenticated" ? (
+                        <button onClick={() => signIn("discord")} className="w-full py-2 bg-[#5865F2] text-white text-xs font-bold rounded-xl">Discord ile Giriş Yap</button>
+                      ) : isLoadingServers ? (
+                        <div className="flex items-center justify-center py-3 gap-2 text-on-surface-variant text-xs">
+                          <Loader2 className="animate-spin" size={14} /> Sunucular yükleniyor...
+                        </div>
+                      ) : userServers.length === 0 ? (
+                        <p className="text-xs text-on-surface-variant text-center py-2">Yönetici olduğunuz sunucu bulunamadı.</p>
+                      ) : userServers.map(s => (
+                        <label key={s.guild_id} className={`flex items-center justify-between p-2 rounded-lg border cursor-pointer ${selectedServer === s.guild_id ? 'border-primary-container bg-primary-container/10' : 'border-outline-variant/30'}`}>
+                          <div className="flex items-center gap-2">
+                            {s.guild_icon ? (
+                              <img src={`https://cdn.discordapp.com/icons/${s.guild_id}/${s.guild_icon}.png`} className="w-6 h-6 rounded-full" alt="" />
+                            ) : (
+                              <div className="w-6 h-6 rounded-full bg-surface-container-highest flex items-center justify-center text-[10px] font-bold">
+                                {s.guild_name?.charAt(0)}
+                              </div>
+                            )}
+                            <span className="text-xs font-bold text-on-surface">{s.guild_name}</span>
+                          </div>
+                          <input type="radio" name="server" checked={selectedServer === s.guild_id} onChange={() => setSelectedServer(s.guild_id)} />
+                        </label>
+                      ))}
                     </div>
-                  ) : userServers.length === 0 ? (
-                    <p className="text-xs text-on-surface-variant text-center py-2">Yönetici olduğunuz sunucu bulunamadı.</p>
-                  ) : userServers.map(s => (
-                    <label key={s.guild_id} className={`flex items-center justify-between p-2 rounded-lg border cursor-pointer ${selectedServer === s.guild_id ? 'border-primary-container bg-primary-container/10' : 'border-outline-variant/30'}`}>
-                      <span className="text-xs font-bold text-on-surface">{s.guild_name}</span>
-                      <input type="radio" name="server" checked={selectedServer === s.guild_id} onChange={() => setSelectedServer(s.guild_id)} />
-                    </label>
-                  ))}
+                  </div>
+                )}
+
+                {/* Price Box */}
+                <div className="bg-surface-container-high p-3 rounded-xl border border-outline-variant/30 flex justify-between items-center mb-4">
+                  <span className="text-xs font-bold text-on-surface">Tutar</span>
+                  <span className="text-lg font-bold text-primary-container">{selectedProduct.amount} TL</span>
                 </div>
-              </div>
+
+                <button 
+                  onClick={handleShopierPay}
+                  disabled={isProcessing || (!selectedServer && selectedProduct.plan_type !== 'user')}
+                  className="w-full py-3 bg-primary-container text-on-primary font-bold text-xs uppercase rounded-xl flex items-center justify-center gap-2 hover:brightness-110 active:scale-95 disabled:opacity-40"
+                >
+                  {isProcessing ? <Loader2 className="animate-spin" size={16} /> : <><CreditCard size={16} /> <span>{selectedProduct.shopier_url ? 'DEVAM ET' : 'ÖDE'}</span></>}
+                </button>
+              </>
+            ) : (
+              <>
+                <h3 className="text-lg font-bold text-primary-container uppercase mb-1 flex items-center gap-2">
+                  <Zap size={20} className="fill-current" />
+                  Son Bir Adım Kaldı!
+                </h3>
+                <p className="text-xs text-on-surface-variant mb-4 leading-relaxed">
+                  Ödemenizin hesabınıza <strong className="text-emerald-400">otomatik</strong> tanımlanması için, aşağıdaki profil kodunu kopyalayın ve Shopier ödeme ekranındaki <strong className="text-on-surface underline">"Sipariş Notu (Açıklama)"</strong> kısmına yapıştırın.
+                </p>
+
+                <div className="bg-surface-container-high border border-outline-variant/30 p-4 rounded-2xl mb-4 text-center">
+                  
+                  {/* Dynamic Avatar */}
+                  <div className="flex flex-col items-center justify-center mb-3">
+                    {selectedProduct.plan_type === 'user' ? (
+                      <>
+                        <img src={session?.user?.image || 'https://cdn.discordapp.com/embed/avatars/0.png'} className="w-12 h-12 rounded-full border-2 border-primary-container mb-2 shadow-lg" alt="User Avatar" />
+                        <span className="text-xs font-bold text-on-surface">{session?.user?.name || 'Discord Kullanıcısı'}</span>
+                      </>
+                    ) : (
+                      <>
+                        {userServers.find(s => s.guild_id === selectedServer)?.guild_icon ? (
+                          <img src={`https://cdn.discordapp.com/icons/${selectedServer}/${userServers.find(s => s.guild_id === selectedServer)?.guild_icon}.png`} className="w-12 h-12 rounded-full border-2 border-primary-container mb-2 shadow-lg" alt="Server Icon" />
+                        ) : (
+                          <div className="w-12 h-12 rounded-full bg-surface-container-highest border-2 border-primary-container flex items-center justify-center text-lg font-bold text-on-surface mb-2 shadow-lg">
+                            {userServers.find(s => s.guild_id === selectedServer)?.guild_name?.charAt(0) || 'S'}
+                          </div>
+                        )}
+                        <span className="text-xs font-bold text-on-surface">{userServers.find(s => s.guild_id === selectedServer)?.guild_name || 'Seçili Sunucu'}</span>
+                      </>
+                    )}
+                  </div>
+
+                  <p className="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold mb-2">BU KODU SİPARİŞ NOTUNA YAPIŞTIRIN</p>
+                  <div className="font-mono text-2xl font-bold text-on-surface tracking-wider bg-[#060913] py-2 px-4 rounded-xl border border-primary-container/20 inline-block mb-3">
+                    {selectedProduct.plan_type === 'user' ? `U-${session?.user?.id}` : `S-${selectedServer}`}
+                  </div>
+                  <button 
+                    onClick={copyToClipboard}
+                    className={`w-full py-2.5 rounded-xl font-bold text-xs uppercase transition-all ${isCopied ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' : 'bg-primary-container/10 text-primary-container border border-primary-container/40 hover:bg-primary-container/20'}`}
+                  >
+                    {isCopied ? 'KOD KOPYALANDI! ✓' : 'KODU KOPYALA'}
+                  </button>
+                </div>
+                
+                <p className="text-[11px] text-primary-container/90 bg-primary-container/10 p-2.5 rounded-lg border border-primary-container/30 mb-4 text-center font-bold flex items-start gap-2 text-left">
+                  <span className="text-xl">⚠️</span>
+                  <span>ÖNEMLİ: Kodu kopyalayıp Shopier'deki "Sipariş Notu" kısmına mutlaka yapıştırın. Aksi halde işleminiz otomatik onaylanmaz!</span>
+                </p>
+
+                {isCopied && (
+                  <button 
+                    onClick={handleOpenShopier}
+                    className="w-full py-3 bg-primary-container text-on-primary font-bold text-xs uppercase rounded-xl flex items-center justify-center gap-2 hover:brightness-110 active:scale-95 animate-slide-up"
+                  >
+                    <CreditCard size={16} /> <span>{lang === 'tr' ? 'ÖDEMEYE DEVAM ET' : 'CONTINUE TO PAYMENT'}</span>
+                  </button>
+                )}
+              </>
             )}
 
-            {/* Price Box */}
-            <div className="bg-surface-container-high p-3 rounded-xl border border-outline-variant/30 flex justify-between items-center mb-4">
-              <span className="text-xs font-bold text-on-surface">Tutar</span>
-              <span className="text-lg font-bold text-primary-container">{selectedProduct.amount} TL</span>
-            </div>
-
-            <button 
-              onClick={handleShopierPay}
-              disabled={isProcessing || (!selectedServer && selectedProduct.plan_type !== 'user')}
-              className="w-full py-3 bg-primary-container text-on-primary font-bold text-xs uppercase rounded-xl flex items-center justify-center gap-2 hover:brightness-110 active:scale-95 disabled:opacity-40"
-            >
-              {isProcessing ? <Loader2 className="animate-spin" size={16} /> : <><CreditCard size={16} /> <span>{selectedProduct.shopier_url ? 'SHOPIER İLE ÖDE' : 'ÖDE'}</span></>}
-            </button>
           </div>
         </div>
       )}
@@ -399,7 +492,7 @@ export default function TestPremiumPage() {
           <Loader2 className="animate-spin text-primary-container shrink-0" size={20} />
           <div>
             <p className="text-xs font-bold text-on-surface">Shopier Ödeme Sayfası Açık</p>
-            <p className="text-xs text-on-surface-variant">Ödemeyi tamamlayın, pencereyi kapatmayın.</p>
+            <p className="text-xs text-on-surface-variant">Kodu not kısmına yapıştırıp ödemeyi tamamlayın.</p>
           </div>
         </div>
       )}
@@ -408,8 +501,8 @@ export default function TestPremiumPage() {
         <div className="fixed bottom-6 right-6 z-[200] bg-emerald-500/10 border border-emerald-500/40 rounded-2xl p-4 shadow-2xl flex items-center gap-3 max-w-xs">
           <CheckCircle className="text-emerald-400 shrink-0" size={20} />
           <div>
-            <p className="text-xs font-bold text-emerald-200">Ödeme tamamlandı mı?</p>
-            <p className="text-xs text-emerald-300/80">Premium paketiniz kısa sürede aktif olacak.</p>
+            <p className="text-xs font-bold text-emerald-200">İşlem bekleniyor...</p>
+            <p className="text-xs text-emerald-300/80">Eğer kodu yapıştırdıysanız premium birazdan aktif olur.</p>
           </div>
           <button onClick={() => setPaymentDone(false)} className="ml-auto text-on-surface-variant hover:text-error">
             <X size={16} />
