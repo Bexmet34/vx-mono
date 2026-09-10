@@ -291,6 +291,8 @@ function startApiServer(manager, port = process.env.BOT_API_PORT || 3005) {
             console.error('[API] Error checking discord:', error);
             res.status(500).json({ error: error.message || 'Internal Server Error' });
         }
+    });
+
     app.post('/api/partner/publish', async (req, res) => {
         const { partnerServerId, albionGuilds, ruleName, supportChannelId = '1538575675856789544' } = req.body;
         if (!partnerServerId) return res.status(400).json({ error: 'Missing partnerServerId' });
