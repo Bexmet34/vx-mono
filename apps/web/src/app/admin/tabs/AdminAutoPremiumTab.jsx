@@ -69,7 +69,7 @@ export default function AdminAutoPremiumTab({ showToast }) {
     } finally {
       setLoading(false);
     }
-  }, [showToast]);
+  }, []); // Removed showToast to prevent infinite fetch loop
 
   useEffect(() => {
     fetchRules();
@@ -244,6 +244,8 @@ export default function AdminAutoPremiumTab({ showToast }) {
 
   // Sync Rule
   const [syncingId, setSyncingId] = useState(null);
+  const [syncCounts, setSyncCounts] = useState({}); // { [ruleId]: count }
+
   const handleSyncRule = async (id, name) => {
     setSyncingId(id);
     showToast?.(`"${name}" için üye listesi çekiliyor...`, "info");
@@ -256,6 +258,7 @@ export default function AdminAutoPremiumTab({ showToast }) {
       const data = await res.json();
       if (res.ok) {
         showToast?.(`Senkronizasyon başarılı! Toplam ${data.count} üye çekildi.`, "success");
+        setSyncCounts(prev => ({ ...prev, [id]: data.count }));
       } else {
         showToast?.(data.error || "Senkronizasyon hatası.", "error");
       }
@@ -789,6 +792,11 @@ export default function AdminAutoPremiumTab({ showToast }) {
                       <div className="flex items-center justify-between text-[11px] font-bold text-[#949ba4] uppercase tracking-wider mb-1.5">
                         <span className="flex items-center gap-1.5 text-[#fca311]">
                           <Users size={13} /> Albion Loncaları ({guildCount})
+                          {syncCounts[rule.id] !== undefined && (
+                            <span className="text-[#2ecc71] bg-[#2ecc71]/10 px-2 py-0.5 rounded-md ml-2">
+                              {syncCounts[rule.id]} üye API'den çekildi!
+                            </span>
+                          )}
                         </span>
                         <span className="text-[10px] font-normal text-[#80848e]">1 tanesi yeterli</span>
                       </div>

@@ -296,11 +296,11 @@ function startApiServer(manager, port = process.env.BOT_API_PORT || 3005) {
         if (!partnerServerId) return res.status(400).json({ error: 'Missing partnerServerId' });
 
         try {
-            const results = await manager.broadcastEval(async (client, context) => {
+            // 1. Partner sunucusundan davet linkini al (Hangi shard üzerinde ise)
+            const inviteResults = await manager.broadcastEval(async (client, context) => {
                 const partnerGuild = client.guilds.cache.get(context.partnerServerId);
                 if (!partnerGuild) return null;
 
-                let inviteUrl = null;
                 try {
                     const invites = await partnerGuild.invites.fetch().catch(() => null);
                     let invite = invites?.find(i => i.maxAge === 0 && i.maxUses === 0);
@@ -310,29 +310,36 @@ function startApiServer(manager, port = process.env.BOT_API_PORT || 3005) {
                             invite = await textChannel.createInvite({ maxAge: 0, maxUses: 0, unique: false });
                         }
                     }
-                    if (invite) inviteUrl = invite.url;
-                } catch(e) { }
-
-                const supportChannel = client.channels.cache.get(context.supportChannelId);
-                if (supportChannel && supportChannel.isTextBased()) {
-                    const { EmbedBuilder } = require('discord.js');
-                    const guildStr = Array.isArray(context.albionGuilds) ? context.albionGuilds.join(', ') : (context.albionGuilds || 'Bilinmeyen');
-                    const embed = new EmbedBuilder()
-                        .setTitle(`🤝 Yeni Partner: ${context.ruleName || 'Partner'}`)
-                        .setDescription(`**Albion Loncaları**: ${guildStr}\n\n**Davet Bağlantısı**: ${inviteUrl || 'Link oluşturulamadı (Yetki yok)'}`)
-                        .setColor('#2ecc71')
-                        .setFooter({ text: 'Veyronix Partner Sistemi' });
-                    
-                    await supportChannel.send({ embeds: [embed] }).catch(() => {});
-                    return { success: true, inviteUrl };
+                    return invite ? invite.url : null;
+                } catch(e) { 
+                    return null; 
                 }
-                return null;
-            }, { context: { partnerServerId, albionGuilds, ruleName, supportChannelId } });
+            }, { context: { partnerServerId } });
 
-            const validResult = results.find(r => r !== null);
-            if (!validResult) return res.status(404).json({ error: 'Partner guild or support channel not found on any shard.' });
+            const inviteUrl = inviteResults.find(r => r !== null) || null;
 
-            return res.json(validResult);
+            // 2. Destek sunucusuna mesajı gönder (Destek sunucusu hangi shard üzerinde ise)
+            const sendResults = await manager.broadcastEval(async (client, context) => {
+                const supportChannel = client.channels.cache.get(context.supportChannelId);
+                if (!supportChannel || !supportChannel.isTextBased()) return null;
+
+                const { EmbedBuilder } = require('discord.js');
+                const guildStr = Array.isArray(context.albionGuilds) ? context.albionGuilds.join(', ') : (context.albionGuilds || 'Bilinmeyen');
+                
+                const embed = new EmbedBuilder()
+                    .setTitle(`🤝 Yeni Partner: ${context.ruleName || 'Partner'}`)
+                    .setDescription(`**Albion Loncaları**: ${guildStr}\n\n**Davet Bağlantısı**: ${context.inviteUrl || 'Link oluşturulamadı (Bota davet yetkisi verilmemiş veya sunucuda yok)'}`)
+                    .setColor('#2ecc71')
+                    .setFooter({ text: 'Veyronix Partner Sistemi' });
+                
+                await supportChannel.send({ embeds: [embed] }).catch(() => {});
+                return true;
+            }, { context: { supportChannelId, albionGuilds, ruleName, inviteUrl } });
+
+            const isSent = sendResults.some(r => r === true);
+            if (!isSent) return res.status(404).json({ error: 'Destek kanalı bulunamadı. Lütfen kanal ID\'sini kontrol edin.' });
+
+            return res.json({ success: true, inviteUrl });
         } catch (error) {
             console.error('[API] /partner/publish Error:', error);
             return res.status(500).json({ error: 'Internal Server Error' });
