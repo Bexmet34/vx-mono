@@ -398,16 +398,18 @@ function buildAnswerModal(questions, pageIndex, channelId, lang) {
             ? `📋 Başvuru Soruları (${pageIndex + 1}/${totalPages})`
             : `📋 Application Questions (${pageIndex + 1}/${totalPages})`);
 
-    for (const q of modalQuestions) {
+    modalQuestions.forEach((q, index) => {
         const questionText = getQuestionText(q, lang);
         const label = questionText.length > 45 ? questionText.substring(0, 42) + '...' : questionText;
 
+        const safeId = q.id ? String(q.id) : `q_${pageIndex}_${index}`;
+
         const input = new TextInputBuilder()
-            .setCustomId(String(q.id))
+            .setCustomId(safeId)
             .setLabel(label)
             .setStyle(q.type === 'paragraph' ? TextInputStyle.Paragraph : TextInputStyle.Short)
             .setRequired(q.required !== false)
-            .setMaxLength(q.max_length || (q.type === 'paragraph' ? 1000 : 500));
+            .setMaxLength(Math.min(q.max_length || (q.type === 'paragraph' ? 1000 : 500), 4000));
 
         if (q.placeholder_tr || q.placeholder_en) {
             const placeholder = lang === 'en' ? (q.placeholder_en || q.placeholder_tr) : (q.placeholder_tr || q.placeholder_en);
@@ -417,7 +419,7 @@ function buildAnswerModal(questions, pageIndex, channelId, lang) {
         }
 
         modal.addComponents(new ActionRowBuilder().addComponents(input));
-    }
+    });
 
     return modal;
 }

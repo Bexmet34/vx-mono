@@ -744,7 +744,15 @@ async function handleRegisterButtons(interaction) {
             // Modal sorular için modal aç — nextStep.pageIndex kullan (URL'deki değer değil)
             const modal = appSvc.buildAnswerModal(questions, nextStep.pageIndex, channelId, lang);
             if (modal) {
-                return await interaction.showModal(modal);
+                try {
+                    return await interaction.showModal(modal);
+                } catch (err) {
+                    console.error('[ButtonHandler] Error showing modal:', err.message);
+                    return await interaction.reply({
+                        content: lang === 'tr' ? '⚠️ Modal açılamadı, lütfen kurucuya başvurun (Geçersiz soru formatı).' : '⚠️ Could not open modal, please contact the server owner.',
+                        flags: [MessageFlags.Ephemeral]
+                    });
+                }
             }
         }
 

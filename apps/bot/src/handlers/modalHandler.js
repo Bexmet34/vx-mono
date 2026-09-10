@@ -582,15 +582,15 @@ async function handleApplicationAnswerModal(interaction) {
     const { getModalQuestionsForPage } = appSvc;
     const modalQuestions = getModalQuestionsForPage(questions, pageIndex);
 
-    for (const q of modalQuestions) {
+    modalQuestions.forEach((q, index) => {
         try {
-            const qIdStr = String(q.id);
+            const qIdStr = q.id ? String(q.id) : `q_${pageIndex}_${index}`;
             const val = interaction.fields.getTextInputValue(qIdStr);
-            if (val) newAnswers[qIdStr] = val;
+            if (val) newAnswers[String(q.id || qIdStr)] = val;
         } catch (e) {
             // Alan boş bırakılmış (opsiyonel soru) veya id hatası
         }
-    }
+    });
 
     // Cevapları oturuma ekle
     const added = appSvc.addAnswers(userId, guildId, newAnswers);
