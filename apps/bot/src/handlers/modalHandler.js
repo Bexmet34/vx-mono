@@ -661,12 +661,18 @@ async function handleAutoPremiumModal(interaction) {
     for (const rule of rules) {
         let requiredGuilds = rule.albion_guilds || [];
         if (typeof requiredGuilds === 'string') {
-            try { requiredGuilds = JSON.parse(requiredGuilds); } catch(e) { requiredGuilds = requiredGuilds.split(',').map(s=>s.trim()).filter(Boolean); }
+            try { requiredGuilds = JSON.parse(requiredGuilds); } catch(e) { requiredGuilds = requiredGuilds.split(','); }
+        }
+        if (Array.isArray(requiredGuilds)) {
+            requiredGuilds = requiredGuilds.map(g => String(g).trim()).filter(Boolean);
         }
 
         let requiredServers = rule.discord_servers || [];
         if (typeof requiredServers === 'string') {
-            try { requiredServers = JSON.parse(requiredServers); } catch(e) { requiredServers = requiredServers.split(',').map(s=>s.trim()).filter(Boolean); }
+            try { requiredServers = JSON.parse(requiredServers); } catch(e) { requiredServers = requiredServers.split(','); }
+        }
+        if (Array.isArray(requiredServers)) {
+            requiredServers = requiredServers.map(s => String(s).trim()).filter(Boolean);
         }
 
         console.log(`[AutoPremium] Evaluating Rule: ${rule.rule_name}`);
@@ -682,20 +688,20 @@ async function handleAutoPremiumModal(interaction) {
             }
         }
 
-        // B) Belirtilen Discord sunucularından en az birinde bulunma şartı (OR logic)
-        let inAnyServer = requiredServers.length === 0;
+        // B) Tüm Discord sunucularında bulunma şartı (AND logic)
+        let inAllServers = true;
         for (const serverId of requiredServers) {
             try {
                 const guildObj = await interaction.client.guilds.fetch(serverId);
                 await guildObj.members.fetch(interaction.user.id);
-                inAnyServer = true;
-                break; // Bir tanesinde bulunması yeterli
             } catch (err) {
-                console.log(`[AutoPremium] -> Failed: User ${interaction.user.id} not found in Discord server ${serverId} or bot is missing access.`);
+                console.log(`[AutoPremium] -> Failed: User ${interaction.user.id} not found in Discord server ${serverId} or bot is missing access. Error: ${err.message}`);
+                inAllServers = false;
+                break;
             }
         }
 
-        if (inAnyServer) { 
+        if (inAllServers) { 
             console.log(`[AutoPremium] -> Success: Matched rule '${rule.rule_name}'`);
             matchedRule = rule; break; 
         }
@@ -721,6 +727,60 @@ async function handleAutoPremiumModal(interaction) {
     }, { onConflict: 'discord_id' });
 
     await interaction.editReply(`✅ **Başarılı!** Şartları sağladığınız için hesabınıza Premium tanımlandı.`);
+
+    // 5. Partner Davet Linkini Gönder
+    try {
+        const logChannel = await interaction.guild.channels.fetch('1538575675856789544').catch(() => null);
+        let requiredServers = matchedRule.discord_servers || [];
+        if (typeof requiredServers === 'string') {
+            try { requiredServers = JSON.parse(requiredServers); } catch(e) { requiredServers = requiredServers.split(','); }
+        }
+        if (Array.isArray(requiredServers)) {
+            requiredServers = requiredServers.map(s => String(s).trim()).filter(Boolean);
+        }
+
+        if (logChannel && requiredServers.length > 0) {
+            const partnerServerId = requiredServers[0]; // İlk sunucuyu partner sunucusu olarak kabul et
+            if (partnerServerId !== interaction.guild.id) {
+                const partnerGuild = await interaction.client.guilds.fetch(partnerServerId).catch(() => null);
+                if (partnerGuild) {
+                    let inviteUrl = null;
+                    const invites = await partnerGuild.invites.fetch().catch(() => null);
+                    let invite = invites?.find(i => i.maxAge === 0 && i.maxUses === 0);
+                    
+                    if (!invite) {
+                        const textChannel = partnerGuild.channels.cache.find(c => c.isTextBased() && c.permissionsFor(partnerGuild.members.me).has('CreateInstantInvite'));
+                        if (textChannel) {
+                            invite = await textChannel.createInvite({ maxAge: 0, maxUses: 0, unique: false });
+                        }
+                    }
+                    if (invite) inviteUrl = invite.url;
+
+                    if (inviteUrl) {
+                        const { EmbedBuilder } = require('discord.js');
+                        
+                        // Lonca adını düzgün formattan bul
+                        let matchedGuildName = "Bilinmeyen Lonca";
+                        let matchedGuildsArray = matchedRule.albion_guilds || [];
+                        if (typeof matchedGuildsArray === 'string') {
+                            try { matchedGuildsArray = JSON.parse(matchedGuildsArray); } catch(e) { matchedGuildsArray = matchedGuildsArray.split(','); }
+                        }
+                        if (Array.isArray(matchedGuildsArray) && matchedGuildsArray.length > 0) {
+                            matchedGuildName = matchedGuildsArray[0].trim();
+                        }
+
+                        const embed = new EmbedBuilder()
+                            .setTitle('🤝 Yeni Partner İşlemi!')
+                            .setDescription(`**${interaction.user}**, **${matchedGuildName}** loncası üzerinden Premium aldı!\n\nPartner sunucusuna katılın: ${inviteUrl}`)
+                            .setColor('#2ecc71');
+                        await logChannel.send({ embeds: [embed] }).catch(() => {});
+                    }
+                }
+            }
+        }
+    } catch (err) {
+        console.error('[AutoPremium] Partner invite fetch error:', err);
+    }
 }
 
 module.exports = {
