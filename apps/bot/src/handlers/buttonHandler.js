@@ -1227,7 +1227,12 @@ async function handleRegisterButtons(interaction) {
 
             } catch (err) {
                 console.error('[RegApprove Error]', err);
-                await interaction.editReply({ content: `❌ Bir hata oluştu: ${err.message}` });
+                if (err.code === 10007) {
+                    const msg = lang === 'en' ? '❌ User has left the server or could not be found.' : '❌ Kullanıcı sunucudan ayrılmış veya bulunamıyor.';
+                    await interaction.editReply({ content: msg });
+                } else {
+                    await interaction.editReply({ content: `❌ Bir hata oluştu: ${err.message}` });
+                }
             }
         }
         return;
