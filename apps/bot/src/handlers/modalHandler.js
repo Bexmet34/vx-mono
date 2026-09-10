@@ -659,8 +659,16 @@ async function handleAutoPremiumModal(interaction) {
     console.log(`[AutoPremium] Checking rules for user ${interaction.user.tag} (${interaction.user.id}), IGN: ${ign}, Found Guilds: [${allGuildsOfPlayer.join(', ')}]`);
     
     for (const rule of rules) {
-        const requiredGuilds = rule.albion_guilds || [];
-        const requiredServers = rule.discord_servers || [];
+        let requiredGuilds = rule.albion_guilds || [];
+        if (typeof requiredGuilds === 'string') {
+            try { requiredGuilds = JSON.parse(requiredGuilds); } catch(e) { requiredGuilds = requiredGuilds.split(',').map(s=>s.trim()).filter(Boolean); }
+        }
+
+        let requiredServers = rule.discord_servers || [];
+        if (typeof requiredServers === 'string') {
+            try { requiredServers = JSON.parse(requiredServers); } catch(e) { requiredServers = requiredServers.split(',').map(s=>s.trim()).filter(Boolean); }
+        }
+
         console.log(`[AutoPremium] Evaluating Rule: ${rule.rule_name}`);
 
         // A) En az 1 Lonca eşleşmesi (Büyük/Küçük harf duyarsız)
@@ -674,19 +682,20 @@ async function handleAutoPremiumModal(interaction) {
             }
         }
 
-        // B) Tüm Discord sunucularında bulunma şartı
-        let inAllServers = true;
+        // B) Belirtilen Discord sunucularından en az birinde bulunma şartı (OR logic)
+        let inAnyServer = requiredServers.length === 0;
         for (const serverId of requiredServers) {
             try {
                 const guildObj = await interaction.client.guilds.fetch(serverId);
                 await guildObj.members.fetch(interaction.user.id);
+                inAnyServer = true;
+                break; // Bir tanesinde bulunması yeterli
             } catch (err) {
-                console.log(`[AutoPremium] -> Failed: User ${interaction.user.id} not found in Discord server ${serverId}. Error: ${err.message}`);
-                inAllServers = false; break;
+                console.log(`[AutoPremium] -> Failed: User ${interaction.user.id} not found in Discord server ${serverId} or bot is missing access.`);
             }
         }
 
-        if (inAllServers) { 
+        if (inAnyServer) { 
             console.log(`[AutoPremium] -> Success: Matched rule '${rule.rule_name}'`);
             matchedRule = rule; break; 
         }
