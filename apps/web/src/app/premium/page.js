@@ -215,33 +215,34 @@ export default function PremiumPage() {
               const name = (lang === 'tr' ? product.name_tr : product.name_en) || product.id;
               
               return (
-                <div key={product.id} className={`group flex flex-col p-6 sm:p-8 rounded-[2rem] relative overflow-hidden border backdrop-blur-sm transition-all duration-500 hover:-translate-y-2 ${isFeatured ? 'border-primary-container/50 shadow-[0_15px_40px_-10px_rgba(255,215,0,0.2)] bg-gradient-to-b from-primary-container/10 to-surface-container-high/90 z-10' : 'border-outline-variant/20 bg-surface-container-low/60 hover:bg-surface-container-high/80 hover:border-primary-container/30 hover:shadow-2xl'}`}>
+                <div key={product.id} className={`group flex flex-col p-5 sm:p-6 rounded-2xl relative border backdrop-blur-md transition-all duration-300 hover:-translate-y-1.5 ${isFeatured ? 'border-primary-container/60 shadow-[0_10px_30px_-10px_rgba(255,215,0,0.25)] bg-surface-container-high/90 z-10' : 'border-outline-variant/20 bg-surface-container-low/60 hover:bg-surface-container-high/90 hover:border-primary-container/30 hover:shadow-xl'}`}>
                   {isFeatured && (
-                    <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-primary-container to-transparent opacity-80"></div>
-                  )}
-                  {isFeatured && (
-                    <div className="absolute top-6 right-6 bg-primary-container/20 text-primary-container font-label-bold text-[10px] uppercase tracking-widest px-3 py-1.5 rounded-full font-black flex items-center gap-1.5">
-                      <Sparkles size={12} className="animate-pulse" /> {lang === 'tr' ? 'POPÜLER' : 'POPULAR'}
-                    </div>
+                    <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-primary-container to-transparent opacity-100"></div>
                   )}
                   
-                  <div className="mb-6">
-                    <h3 className="font-headline-md text-xl md:text-2xl text-on-surface mb-2 font-bold uppercase tracking-tight">{name}</h3>
-                    <div className="font-headline-xl text-3xl md:text-4xl text-primary-container flex items-baseline gap-1.5 font-extrabold">
-                      {product.amount} <span className="text-base text-on-surface-variant font-medium">TL</span>
+                  <div className="mb-5 flex flex-col gap-2 items-start">
+                    {isFeatured && (
+                      <div className="bg-primary-container/20 text-primary-container font-label-bold text-[10px] uppercase tracking-widest px-2.5 py-1 rounded-full font-black flex items-center gap-1.5 self-start shadow-sm">
+                        <Sparkles size={12} className="animate-pulse" /> {lang === 'tr' ? 'POPÜLER' : 'POPULAR'}
+                      </div>
+                    )}
+                    
+                    <h3 className={`font-headline-md text-lg text-on-surface font-bold uppercase tracking-tight leading-snug ${!isFeatured ? 'mt-2' : ''}`}>{name}</h3>
+                    <div className="font-headline-xl text-3xl text-primary-container flex items-baseline gap-1.5 font-extrabold mt-1">
+                      {product.amount} <span className="text-sm text-on-surface-variant font-medium">TL</span>
                     </div>
                   </div>
                   
-                  <ul className="flex-grow space-y-4 mb-8">
+                  <ul className="flex-grow space-y-3 mb-6">
                     {features.map((feat, idx) => (
-                      <li key={idx} className="flex items-start gap-3 text-sm text-on-surface-variant leading-relaxed">
-                        <CheckCircle size={18} className="text-primary-container shrink-0 mt-0.5" />
+                      <li key={idx} className="flex items-start gap-2.5 text-[13px] text-on-surface-variant leading-relaxed">
+                        <CheckCircle size={16} className="text-primary-container shrink-0 mt-0.5 opacity-90" />
                         <span className="font-medium">{feat}</span>
                       </li>
                     ))}
                     {features.length === 0 && product.duration_days && (
-                       <li className="flex items-start gap-3 text-sm text-on-surface-variant leading-relaxed">
-                         <CheckCircle size={18} className="text-primary-container shrink-0 mt-0.5" />
+                       <li className="flex items-start gap-2.5 text-[13px] text-on-surface-variant leading-relaxed">
+                         <CheckCircle size={16} className="text-primary-container shrink-0 mt-0.5 opacity-90" />
                          <span className="font-medium">{product.duration_days >= 365 ? (lang === 'tr' ? '1 Yıl Geçerli' : 'Valid for 1 Year') : `${Math.round(product.duration_days / 30)} ${lang === 'tr' ? 'Ay Geçerli' : 'Months Valid'}`}</span>
                        </li>
                     )}
