@@ -2,7 +2,7 @@
 
 import { Copy, Plus, Trash2, GripVertical, PlusCircle, Crown, Lock, ShieldCheck, CheckCircle2, Sparkles, Layers, Minus, ClipboardPaste } from "lucide-react";
 import InfoTooltip from "@/components/InfoTooltip";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { parseTextToBlocks } from "@/utils/templateParser";
 
 export default function TemplateTab({ t, lang, settings, setSettings, selectedTemplateId, setSelectedTemplateId, isPremium, showToast }) {
@@ -32,6 +32,9 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
   const [albionFoods, setAlbionFoods] = useState([]);
   const [albionSwaps, setAlbionSwaps] = useState([]);
 
+  const prevTemplateIdRef = useRef(null);
+  const prevRolesStrRef = useRef("");
+
   useEffect(() => {
     fetch('/api/albion-items')
       .then(res => res.json())
@@ -56,6 +59,16 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
     const template = settings.party_templates?.find(tpl => tpl.id === selectedTemplateId) || null;
     if (template) {
       const allRoles = [...(template.required_roles || []), ...(template.optional_roles || [])];
+      const rolesStr = JSON.stringify(allRoles);
+
+      // Skip parsing if we are already synced with this string for this template
+      if (prevTemplateIdRef.current === selectedTemplateId && prevRolesStrRef.current === rolesStr) {
+        return;
+      }
+
+      prevTemplateIdRef.current = selectedTemplateId;
+      prevRolesStrRef.current = rolesStr;
+
       const parsedBlocks = [];
       allRoles.forEach((line, index) => {
         const trimmed = line.trim();
@@ -136,6 +149,11 @@ export default function TemplateTab({ t, lang, settings, setSettings, selectedTe
     });
     
     if (!selectedTemplateId) return;
+    
+    // Senkronizasyonu kaydet ki useEffect tekrar parse edip focus'u bozmasın
+    prevRolesStrRef.current = JSON.stringify(required_roles);
+    prevTemplateIdRef.current = selectedTemplateId;
+
     setSettings(prev => ({
       ...prev,
       party_templates: prev.party_templates.map(tpl => tpl.id === selectedTemplateId ? { ...tpl, required_roles, optional_roles: [] } : tpl)
