@@ -242,6 +242,53 @@ export default function AdminAutoPremiumTab({ showToast }) {
     }
   };
 
+  // Sync Rule
+  const [syncingId, setSyncingId] = useState(null);
+  const handleSyncRule = async (id, name) => {
+    setSyncingId(id);
+    showToast?.(`"${name}" için üye listesi çekiliyor...`, "info");
+    try {
+      const res = await fetch("/api/admin/auto-premium-rules/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showToast?.(`Senkronizasyon başarılı! Toplam ${data.count} üye çekildi.`, "success");
+      } else {
+        showToast?.(data.error || "Senkronizasyon hatası.", "error");
+      }
+    } catch (e) {
+      showToast?.("Bağlantı hatası oluştu.", "error");
+    } finally {
+      setSyncingId(null);
+    }
+  };
+
+  // Publish Rule
+  const [publishingId, setPublishingId] = useState(null);
+  const handlePublishRule = async (id, name) => {
+    setPublishingId(id);
+    try {
+      const res = await fetch("/api/admin/auto-premium-rules/publish", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showToast?.(`Partner bot kanalına başarıyla gönderildi!`, "success");
+      } else {
+        showToast?.(data.error || "Partner kanalına atılırken hata oluştu.", "error");
+      }
+    } catch (e) {
+      showToast?.("Bağlantı hatası oluştu.", "error");
+    } finally {
+      setPublishingId(null);
+    }
+  };
+
   // Filtered Rules
   const filteredRules = rules.filter(r => {
     if (!searchTerm) return true;
@@ -787,7 +834,28 @@ export default function AdminAutoPremiumTab({ showToast }) {
                   <span className="flex items-center gap-1.5 text-[#2ecc71] font-semibold">
                     <CheckCircle2 size={14} /> Otomatik Tetikleme Aktif
                   </span>
-                  <span className="font-mono text-[11px]">ID: {rule.id.slice(0, 8)}...</span>
+                  
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleSyncRule(rule.id, rule.rule_name)}
+                      disabled={syncingId === rule.id}
+                      className="flex items-center gap-1 px-2.5 py-1 bg-[#2b2d31] hover:bg-[#5865F2] text-[#949ba4] hover:text-white rounded-lg transition-colors font-semibold"
+                      title="Lonca oyuncularını API'den manuel çek"
+                    >
+                      {syncingId === rule.id ? <Loader2 size={12} className="animate-spin" /> : <RefreshCw size={12} />}
+                      Senkronize Et
+                    </button>
+                    <button
+                      onClick={() => handlePublishRule(rule.id, rule.rule_name)}
+                      disabled={publishingId === rule.id}
+                      className="flex items-center gap-1 px-2.5 py-1 bg-[#2b2d31] hover:bg-[#2ecc71] text-[#949ba4] hover:text-white rounded-lg transition-colors font-semibold"
+                      title="Partner sayfasındaki kanala davet linki gönder"
+                    >
+                      {publishingId === rule.id ? <Loader2 size={12} className="animate-spin" /> : <ExternalLink size={12} />}
+                      Partner Kanalına At
+                    </button>
+                    <span className="font-mono text-[11px] ml-2">ID: {rule.id.slice(0, 8)}...</span>
+                  </div>
                 </div>
               </div>
             );

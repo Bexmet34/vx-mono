@@ -291,6 +291,52 @@ function startApiServer(manager, port = process.env.BOT_API_PORT || 3005) {
             console.error('[API] Error checking discord:', error);
             res.status(500).json({ error: error.message || 'Internal Server Error' });
         }
+    app.post('/api/partner/publish', async (req, res) => {
+        const { partnerServerId, albionGuilds, ruleName, supportChannelId = '1538575675856789544' } = req.body;
+        if (!partnerServerId) return res.status(400).json({ error: 'Missing partnerServerId' });
+
+        try {
+            const results = await manager.broadcastEval(async (client, context) => {
+                const partnerGuild = client.guilds.cache.get(context.partnerServerId);
+                if (!partnerGuild) return null;
+
+                let inviteUrl = null;
+                try {
+                    const invites = await partnerGuild.invites.fetch().catch(() => null);
+                    let invite = invites?.find(i => i.maxAge === 0 && i.maxUses === 0);
+                    if (!invite) {
+                        const textChannel = partnerGuild.channels.cache.find(c => c.isTextBased() && c.permissionsFor(partnerGuild.members.me).has('CreateInstantInvite'));
+                        if (textChannel) {
+                            invite = await textChannel.createInvite({ maxAge: 0, maxUses: 0, unique: false });
+                        }
+                    }
+                    if (invite) inviteUrl = invite.url;
+                } catch(e) { }
+
+                const supportChannel = client.channels.cache.get(context.supportChannelId);
+                if (supportChannel && supportChannel.isTextBased()) {
+                    const { EmbedBuilder } = require('discord.js');
+                    const guildStr = Array.isArray(context.albionGuilds) ? context.albionGuilds.join(', ') : (context.albionGuilds || 'Bilinmeyen');
+                    const embed = new EmbedBuilder()
+                        .setTitle(`🤝 Yeni Partner: ${context.ruleName || 'Partner'}`)
+                        .setDescription(`**Albion Loncaları**: ${guildStr}\n\n**Davet Bağlantısı**: ${inviteUrl || 'Link oluşturulamadı (Yetki yok)'}`)
+                        .setColor('#2ecc71')
+                        .setFooter({ text: 'Veyronix Partner Sistemi' });
+                    
+                    await supportChannel.send({ embeds: [embed] }).catch(() => {});
+                    return { success: true, inviteUrl };
+                }
+                return null;
+            }, { context: { partnerServerId, albionGuilds, ruleName, supportChannelId } });
+
+            const validResult = results.find(r => r !== null);
+            if (!validResult) return res.status(404).json({ error: 'Partner guild or support channel not found on any shard.' });
+
+            return res.json(validResult);
+        } catch (error) {
+            console.error('[API] /partner/publish Error:', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
     });
 
     return app.listen(port, () => {
