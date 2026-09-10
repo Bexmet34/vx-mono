@@ -41,30 +41,27 @@ export async function POST(req) {
       });
 
       const searchResults = await Promise.all(searchPromises);
-      const validMatch = searchResults.find(r => r != null);
+      const validMatches = searchResults.filter(r => r != null);
 
-      if (validMatch) {
-        guildId = validMatch.id;
-        guildServer = validMatch.server;
-      }
+      if (validMatches.length === 0) continue;
 
-      if (!guildId) continue;
-
-      try {
-        const baseUrl = endpoints[guildServer];
-        const membersRes = await fetch(`${baseUrl}/guilds/${guildId}/members`, { signal: AbortSignal.timeout(15000) });
-        if (membersRes.ok) {
-          const membersData = await membersRes.json();
-          for (const member of membersData) {
-            membersToUpsert.push({
-              ign: member.Name,
-              guild_name: guildName, // DB requires exact name Match for rule
-              last_seen: new Date().toISOString()
-            });
+      for (const match of validMatches) {
+        try {
+          const baseUrl = endpoints[match.server];
+          const membersRes = await fetch(`${baseUrl}/guilds/${match.id}/members`, { signal: AbortSignal.timeout(15000) });
+          if (membersRes.ok) {
+            const membersData = await membersRes.json();
+            for (const member of membersData) {
+              membersToUpsert.push({
+                ign: member.Name,
+                guild_name: guildName, // DB requires exact name Match for rule
+                last_seen: new Date().toISOString()
+              });
+            }
           }
+        } catch (e) {
+          console.error(`[AdminSync] Guild fetch error for ${guildName} on ${match.server}:`, e);
         }
-      } catch (e) {
-        console.error(`[AdminSync] Guild fetch error for ${guildName}:`, e);
       }
     }
 
