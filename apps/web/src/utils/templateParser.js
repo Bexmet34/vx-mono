@@ -66,9 +66,12 @@ export function parseTextToBlocks(rawText, lists = {}) {
     const line = cleanLine(originalLine);
     if (!line) return;
 
-    // Check if it's a short header-like text
+    // Check if it's a header line based on explicit header keywords only
     const lowerLine = line.toLowerCase();
-    const isHeader = lowerLine.includes('min t8') || lowerLine.includes('ava skip') || lowerLine.includes('tracking') || (line.length > 3 && line.length < 25 && !line.includes('(') && !line.includes('>'));
+    const isHeader = lowerLine.includes('min t8') || lowerLine.includes('ava skip') || lowerLine.includes('tracking') ||
+      lowerLine.includes('zvz') || lowerLine.includes('fame farm') || lowerLine.includes('arena') ||
+      lowerLine.includes('crystal') || lowerLine.includes('hce') || lowerLine.includes('dungeon') ||
+      lowerLine.startsWith('---') || lowerLine.startsWith('===') || lowerLine.startsWith('###');
     
     // Attempt to extract role name (before a colon or parentheses)
     let roleOrWeapon = "";
