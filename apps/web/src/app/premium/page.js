@@ -248,11 +248,26 @@ export default function PremiumPage() {
                   </ul>
                   
                   <button 
-                    className={`w-full py-4 rounded-2xl font-label-bold text-sm uppercase tracking-wider transition-all duration-300 font-bold flex items-center justify-center gap-2 group-hover:scale-[1.02] active:scale-[0.98] ${isFeatured ? 'bg-primary-container text-on-primary shadow-[0_0_20px_rgba(255,215,0,0.4)] hover:shadow-[0_0_30px_rgba(255,215,0,0.6)]' : 'bg-surface-container-highest border border-outline-variant text-on-surface hover:border-primary-container/50 hover:bg-primary-container/10'}`}
-                    onClick={() => handleBuyClick(product)}
+                    className={`w-full py-4 rounded-2xl font-label-bold text-sm uppercase tracking-wider transition-all duration-300 font-bold flex items-center justify-center gap-2 group-hover:scale-[1.02] active:scale-[0.98] ${
+                      status !== "authenticated" 
+                        ? 'bg-[#5865F2] text-white hover:bg-[#4752C4] shadow-[0_0_20px_rgba(88,101,242,0.3)] hover:shadow-[0_0_30px_rgba(88,101,242,0.5)] border border-transparent'
+                        : isFeatured 
+                          ? 'bg-primary-container text-on-primary shadow-[0_0_20px_rgba(255,215,0,0.4)] hover:shadow-[0_0_30px_rgba(255,215,0,0.6)] border border-transparent' 
+                          : 'bg-surface-container-highest border border-outline-variant text-on-surface hover:border-primary-container/50 hover:bg-primary-container/10'
+                    }`}
+                    onClick={() => status !== "authenticated" ? signIn("discord") : handleBuyClick(product)}
                   >
-                    <CreditCard size={18} className={isFeatured ? '' : 'text-primary-container'} />
-                    {product.shopier_url ? (lang === 'tr' ? 'SHOPIER İLE AL' : 'BUY VIA SHOPIER') : (lang === 'tr' ? 'SATIN AL' : 'PURCHASE')}
+                    {status !== "authenticated" ? (
+                      <>
+                        <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg>
+                        {lang === 'tr' ? 'GİRİŞ YAP' : 'LOGIN'}
+                      </>
+                    ) : (
+                      <>
+                        <CreditCard size={18} className={isFeatured ? '' : 'text-primary-container'} />
+                        {product.shopier_url ? (lang === 'tr' ? 'SHOPIER İLE AL' : 'BUY VIA SHOPIER') : (lang === 'tr' ? 'SATIN AL' : 'PURCHASE')}
+                      </>
+                    )}
                   </button>
                 </div>
               );
@@ -280,48 +295,48 @@ export default function PremiumPage() {
             {step === 1 ? (
               <>
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 rounded-2xl bg-primary-container/20 flex items-center justify-center text-primary-container">
-                    {selectedProduct.plan_type === 'user' ? <Heart size={24} /> : <Server size={24} />}
+                  <div className="w-10 h-10 rounded-xl bg-primary-container/20 flex items-center justify-center text-primary-container">
+                    {selectedProduct.plan_type === 'user' ? <Heart size={20} /> : <Server size={20} />}
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-on-surface uppercase tracking-tight">{lang === 'tr' ? selectedProduct.name_tr : selectedProduct.name_en}</h3>
+                    <h3 className="text-lg font-bold text-on-surface uppercase tracking-tight">{lang === 'tr' ? selectedProduct.name_tr : selectedProduct.name_en}</h3>
                     <p className="text-sm text-primary-container font-bold">{selectedProduct.amount} TL</p>
                   </div>
                 </div>
 
-                {checkoutError && <div className="p-4 mb-4 bg-error/10 border border-error/30 text-error text-sm rounded-2xl flex items-center gap-2"><X size={16} />{checkoutError}</div>}
+                {checkoutError && <div className="p-3 mb-4 bg-error/10 border border-error/30 text-error text-xs rounded-xl flex items-center gap-2"><X size={14} />{checkoutError}</div>}
 
                 {/* Server Selection */}
                 {selectedProduct.plan_type !== 'user' && (
                   <div className="mb-6">
-                    <label className="text-xs font-bold text-on-surface-variant uppercase tracking-widest block mb-3">{lang === 'tr' ? 'Hedef Sunucuyu Seçin' : 'Select Target Server'}</label>
-                    <div className="space-y-2 max-h-48 overflow-y-auto bg-[#060913] p-2 rounded-2xl border border-outline-variant/30 custom-scrollbar">
+                    <label className="text-xs font-bold text-on-surface-variant uppercase tracking-widest block mb-2">{lang === 'tr' ? 'Hedef Sunucuyu Seçin' : 'Select Target Server'}</label>
+                    <div className="space-y-2 max-h-40 overflow-y-auto bg-surface-container-low p-1.5 rounded-xl border border-outline-variant/20 custom-scrollbar">
                       {status !== "authenticated" ? (
-                        <div className="p-4 text-center">
-                          <button onClick={() => signIn("discord")} className="w-full py-3 bg-[#5865F2] text-white text-sm font-bold rounded-xl hover:bg-[#4752C4] transition-colors">
+                        <div className="p-2 text-center">
+                          <button onClick={() => signIn("discord")} className="w-full py-2.5 bg-[#5865F2] text-white text-xs font-bold rounded-lg hover:bg-[#4752C4] transition-colors">
                             {lang === 'tr' ? 'Discord ile Giriş Yap' : 'Login with Discord'}
                           </button>
                         </div>
                       ) : isLoadingServers ? (
-                        <div className="flex items-center justify-center py-6 gap-3 text-primary-container text-sm font-medium">
-                          <Loader2 className="animate-spin" size={18} /> {lang === 'tr' ? 'Sunucular yükleniyor...' : 'Loading servers...'}
+                        <div className="flex items-center justify-center py-4 gap-2 text-primary-container text-xs font-medium">
+                          <Loader2 className="animate-spin" size={16} /> {lang === 'tr' ? 'Sunucular yükleniyor...' : 'Loading servers...'}
                         </div>
                       ) : userServers.length === 0 ? (
-                        <p className="text-sm text-on-surface-variant text-center py-6">{lang === 'tr' ? 'Yönetici olduğunuz sunucu bulunamadı.' : 'No servers found.'}</p>
+                        <p className="text-xs text-on-surface-variant text-center py-4">{lang === 'tr' ? 'Yönetici olduğunuz sunucu bulunamadı.' : 'No servers found.'}</p>
                       ) : userServers.map(s => (
-                        <label key={s.guild_id} className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-colors ${selectedServer === s.guild_id ? 'border-primary-container bg-primary-container/10 shadow-[0_0_15px_rgba(255,215,0,0.1)]' : 'border-transparent hover:bg-surface-container-highest'}`}>
+                        <label key={s.guild_id} className={`flex items-center justify-between p-2.5 rounded-lg cursor-pointer transition-all ${selectedServer === s.guild_id ? 'bg-primary-container/15 border border-primary-container/40' : 'bg-transparent border border-transparent hover:bg-surface-container-highest hover:border-outline-variant/30'}`}>
                           <div className="flex items-center gap-3">
                             {s.guild_icon ? (
-                              <img src={`https://cdn.discordapp.com/icons/${s.guild_id}/${s.guild_icon}.png`} className="w-8 h-8 rounded-full shadow-md" alt="" />
+                              <img src={`https://cdn.discordapp.com/icons/${s.guild_id}/${s.guild_icon}.png`} className="w-7 h-7 rounded-full" alt="" />
                             ) : (
-                              <div className="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant/30 flex items-center justify-center text-xs font-bold shadow-md">
+                              <div className="w-7 h-7 rounded-full bg-surface-container-high border border-outline-variant/30 flex items-center justify-center text-[10px] font-bold">
                                 {s.guild_name?.charAt(0)}
                               </div>
                             )}
-                            <span className="text-sm font-bold text-on-surface">{s.guild_name}</span>
+                            <span className="text-xs font-bold text-on-surface">{s.guild_name}</span>
                           </div>
-                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${selectedServer === s.guild_id ? 'border-primary-container' : 'border-outline-variant/50'}`}>
-                            {selectedServer === s.guild_id && <div className="w-2.5 h-2.5 rounded-full bg-primary-container"></div>}
+                          <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-colors ${selectedServer === s.guild_id ? 'border-primary-container bg-primary-container/20' : 'border-outline-variant/50'}`}>
+                            {selectedServer === s.guild_id && <div className="w-2 h-2 rounded-full bg-primary-container"></div>}
                           </div>
                         </label>
                       ))}
@@ -332,70 +347,68 @@ export default function PremiumPage() {
                 <button 
                   onClick={handleShopierPay}
                   disabled={isProcessing || (!selectedServer && selectedProduct.plan_type !== 'user')}
-                  className="w-full py-4 bg-primary-container text-on-primary font-bold text-sm uppercase tracking-wider rounded-2xl flex items-center justify-center gap-2 hover:shadow-[0_0_20px_rgba(255,215,0,0.4)] active:scale-[0.98] transition-all disabled:opacity-40 disabled:hover:shadow-none"
+                  className="w-full py-3 bg-primary-container text-on-primary font-bold text-xs uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 hover:shadow-[0_0_15px_rgba(255,215,0,0.3)] active:scale-[0.98] transition-all disabled:opacity-40 disabled:hover:shadow-none"
                 >
-                  {isProcessing ? <Loader2 className="animate-spin" size={20} /> : <><CreditCard size={20} /> <span>{lang === 'tr' ? 'DEVAM ET' : 'CONTINUE'}</span> <ArrowRight size={18} /></>}
+                  {isProcessing ? <Loader2 className="animate-spin" size={16} /> : <><CreditCard size={16} /> <span>{lang === 'tr' ? 'DEVAM ET' : 'CONTINUE'}</span> <ArrowRight size={16} /></>}
                 </button>
               </>
             ) : (
               <>
-                <div className="text-center mb-6">
-                  <div className="w-16 h-16 mx-auto bg-primary-container/20 rounded-full flex items-center justify-center mb-4 shadow-[0_0_30px_rgba(255,215,0,0.2)]">
-                    <Zap size={32} className="text-primary-container fill-current" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-on-surface tracking-tight mb-2">
+                <div className="text-center mb-5">
+                  <h3 className="text-lg font-bold text-on-surface tracking-tight mb-1">
                     {lang === 'tr' ? 'Son Bir Adım!' : 'One Last Step!'}
                   </h3>
-                  <p className="text-sm text-on-surface-variant leading-relaxed px-4">
+                  <p className="text-xs text-on-surface-variant leading-relaxed px-2">
                     {lang === 'tr' ? 'Ödemenizin otomatik tanımlanması için profil kodunuzu kopyalayın ve Shopier\'deki' : 'To activate your premium automatically, copy your profile code and paste it into the'} 
                     <strong className="text-primary-container mx-1">{lang === 'tr' ? '"Sipariş Notu (Açıklama)"' : '"Order Note"'}</strong> 
                     {lang === 'tr' ? 'kısmına yapıştırın.' : 'field on Shopier.'}
                   </p>
                 </div>
 
-                <div className="bg-[#060913] border border-outline-variant/20 p-6 rounded-[1.5rem] mb-6 text-center relative overflow-hidden">
-                  <div className="absolute top-0 inset-x-0 h-1 bg-primary-container/30"></div>
-                  
-                  {/* Dynamic Avatar */}
-                  <div className="flex flex-col items-center justify-center mb-5">
+                <div className="bg-surface-container-low border border-outline-variant/20 p-4 rounded-xl mb-4 text-center relative overflow-hidden flex flex-col items-center">
+                  {/* Dynamic Avatar - Smaller size */}
+                  <div className="flex items-center gap-3 mb-4 bg-surface-container-high px-3 py-1.5 rounded-full border border-outline-variant/30">
                     {selectedProduct.plan_type === 'user' ? (
                       <>
-                        <img src={session?.user?.image || 'https://cdn.discordapp.com/embed/avatars/0.png'} className="w-16 h-16 rounded-full border-2 border-primary-container mb-3 shadow-[0_0_15px_rgba(255,215,0,0.3)]" alt="User Avatar" />
-                        <span className="text-sm font-bold text-on-surface bg-surface-container-high px-3 py-1 rounded-lg">{session?.user?.name || 'Discord Kullanıcısı'}</span>
+                        <img src={session?.user?.image || 'https://cdn.discordapp.com/embed/avatars/0.png'} className="w-6 h-6 rounded-full" alt="User Avatar" />
+                        <span className="text-xs font-bold text-on-surface">{session?.user?.name || 'Discord Kullanıcısı'}</span>
                       </>
                     ) : (
                       <>
                         {userServers.find(s => s.guild_id === selectedServer)?.guild_icon ? (
-                          <img src={`https://cdn.discordapp.com/icons/${selectedServer}/${userServers.find(s => s.guild_id === selectedServer)?.guild_icon}.png`} className="w-16 h-16 rounded-full border-2 border-primary-container mb-3 shadow-[0_0_15px_rgba(255,215,0,0.3)]" alt="Server Icon" />
+                          <img src={`https://cdn.discordapp.com/icons/${selectedServer}/${userServers.find(s => s.guild_id === selectedServer)?.guild_icon}.png`} className="w-6 h-6 rounded-full" alt="Server Icon" />
                         ) : (
-                          <div className="w-16 h-16 rounded-full bg-surface-container-highest border-2 border-primary-container flex items-center justify-center text-2xl font-bold text-on-surface mb-3 shadow-[0_0_15px_rgba(255,215,0,0.3)]">
+                          <div className="w-6 h-6 rounded-full bg-surface-container-highest flex items-center justify-center text-xs font-bold text-on-surface">
                             {userServers.find(s => s.guild_id === selectedServer)?.guild_name?.charAt(0) || 'S'}
                           </div>
                         )}
-                        <span className="text-sm font-bold text-on-surface bg-surface-container-high px-3 py-1 rounded-lg">{userServers.find(s => s.guild_id === selectedServer)?.guild_name || 'Seçili Sunucu'}</span>
+                        <span className="text-xs font-bold text-on-surface">{userServers.find(s => s.guild_id === selectedServer)?.guild_name || 'Seçili Sunucu'}</span>
                       </>
                     )}
                   </div>
 
-                  <p className="text-[10px] text-primary-container uppercase tracking-widest font-black mb-2">{lang === 'tr' ? 'BU KODU KOPYALAYIN' : 'COPY THIS CODE'}</p>
-                  <div className="font-mono text-3xl font-black text-on-surface tracking-wider bg-surface-container-highest py-3 px-6 rounded-2xl border-2 border-primary-container/30 inline-block mb-4 shadow-inner">
-                    {selectedProduct.plan_type === 'user' ? `U-${session?.user?.id}` : `S-${selectedServer}`}
-                  </div>
+                  <p className="text-[9px] text-on-surface-variant uppercase tracking-widest font-bold mb-2">{lang === 'tr' ? 'BU KODU KOPYALAYIN' : 'COPY THIS CODE'}</p>
                   
-                  <button 
-                    onClick={copyToClipboard}
-                    className={`w-full py-4 rounded-2xl font-bold text-sm uppercase tracking-wider transition-all duration-300 shadow-lg active:scale-95 ${isCopied ? 'bg-emerald-500 text-on-primary shadow-emerald-500/40' : 'bg-primary-container text-on-primary hover:brightness-110 shadow-primary-container/30'}`}
-                  >
-                    {isCopied ? (lang === 'tr' ? 'KOD KOPYALANDI! ✓' : 'COPIED! ✓') : (lang === 'tr' ? 'KODU KOPYALA' : 'COPY CODE')}
-                  </button>
+                  {/* Compact Code Box */}
+                  <div className="w-full bg-[#060913] border border-primary-container/30 rounded-lg p-3 flex items-center justify-between gap-3 mb-2 shadow-inner">
+                    <span className="font-mono text-sm sm:text-base font-bold text-primary-container tracking-widest truncate">
+                      {selectedProduct.plan_type === 'user' ? `U-${session?.user?.id}` : `S-${selectedServer}`}
+                    </span>
+                    <button 
+                      onClick={copyToClipboard}
+                      className={`px-4 py-2 rounded-md font-bold text-[10px] uppercase transition-all whitespace-nowrap ${isCopied ? 'bg-emerald-500/20 text-emerald-400' : 'bg-primary-container text-on-primary hover:brightness-110'}`}
+                    >
+                      {isCopied ? (lang === 'tr' ? 'KOPYALANDI ✓' : 'COPIED ✓') : (lang === 'tr' ? 'KOPYALA' : 'COPY')}
+                    </button>
+                  </div>
                 </div>
                 
-                {/* Çok daha belirgin uyarı alanı */}
-                <div className="bg-error/15 border-l-4 border-error p-4 rounded-r-xl mb-6 flex items-start gap-3">
-                  <span className="text-2xl mt-0.5 animate-pulse">⚠️</span>
+                {/* Warning - More compact but distinct */}
+                <div className="bg-error/10 border border-error/30 p-3 rounded-lg mb-5 flex items-start gap-2.5">
+                  <span className="text-lg leading-none mt-0.5">⚠️</span>
                   <div>
-                    <h4 className="text-error font-bold text-sm mb-1 uppercase tracking-wider">{lang === 'tr' ? 'DİKKAT EDİN!' : 'WARNING!'}</h4>
-                    <p className="text-xs text-error/90 font-medium leading-relaxed">
+                    <h4 className="text-error font-bold text-[11px] mb-0.5 uppercase tracking-wider">{lang === 'tr' ? 'DİKKAT EDİN!' : 'WARNING!'}</h4>
+                    <p className="text-[10px] text-error/90 font-medium leading-relaxed">
                       {lang === 'tr' ? 'Kodu kopyalayıp ödeme sayfasındaki "Sipariş Notu" alanına yapıştırmazsanız, Premium özelliğiniz otomatik olarak AKTİF EDİLEMEZ!' : 'If you do not paste the code into the "Order Note" field, your premium will NOT be activated automatically!'}
                     </p>
                   </div>
@@ -404,9 +417,9 @@ export default function PremiumPage() {
                 {isCopied && (
                   <button 
                     onClick={handleOpenShopier}
-                    className="w-full py-4 bg-primary-container text-on-primary font-bold text-sm uppercase tracking-wider rounded-2xl flex items-center justify-center gap-3 hover:shadow-[0_0_25px_rgba(255,215,0,0.5)] active:scale-[0.98] transition-all animate-slide-up"
+                    className="w-full py-3 bg-primary-container text-on-primary font-bold text-xs uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 hover:shadow-[0_0_15px_rgba(255,215,0,0.3)] active:scale-[0.98] transition-all animate-slide-up"
                   >
-                    <CreditCard size={20} /> <span>{lang === 'tr' ? 'ÖDEMEYE DEVAM ET' : 'CONTINUE TO PAYMENT'}</span> <ArrowRight size={18} />
+                    <CreditCard size={16} /> <span>{lang === 'tr' ? 'ÖDEMEYE DEVAM ET' : 'CONTINUE TO PAYMENT'}</span> <ArrowRight size={16} />
                   </button>
                 )}
               </>
