@@ -325,21 +325,25 @@ export default function PremiumPage() {
                       ) : userServers.length === 0 ? (
                         <p className="text-xs text-on-surface-variant text-center py-4">{lang === 'tr' ? 'Yönetici olduğunuz sunucu bulunamadı.' : 'No servers found.'}</p>
                       ) : userServers.map(s => (
-                        <label key={s.guild_id} className={`flex items-center justify-between p-2.5 rounded-lg cursor-pointer transition-all ${selectedServer === s.guild_id ? 'bg-primary-container/15 border border-primary-container/40' : 'bg-transparent border border-transparent hover:bg-surface-container-highest hover:border-outline-variant/30'}`}>
-                          <div className="flex items-center gap-3">
+                        <div 
+                          key={s.guild_id} 
+                          onClick={() => setSelectedServer(s.guild_id)}
+                          className={`flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all ${selectedServer === s.guild_id ? 'bg-primary-container/15 border border-primary-container/40 shadow-inner' : 'bg-transparent border border-transparent hover:bg-surface-container-highest hover:border-outline-variant/30'}`}
+                        >
+                          <div className="flex items-center gap-3.5">
                             {s.guild_icon ? (
-                              <img src={`https://cdn.discordapp.com/icons/${s.guild_id}/${s.guild_icon}.png`} className="w-7 h-7 rounded-full" alt="" />
+                              <img src={`https://cdn.discordapp.com/icons/${s.guild_id}/${s.guild_icon}.png`} className="w-10 h-10 rounded-full shadow-sm" alt="" />
                             ) : (
-                              <div className="w-7 h-7 rounded-full bg-surface-container-high border border-outline-variant/30 flex items-center justify-center text-[10px] font-bold">
+                              <div className="w-10 h-10 rounded-full bg-surface-container-high border border-outline-variant/30 flex items-center justify-center text-xs font-bold shadow-sm">
                                 {s.guild_name?.charAt(0)}
                               </div>
                             )}
-                            <span className="text-xs font-bold text-on-surface">{s.guild_name}</span>
+                            <span className="text-sm font-bold text-on-surface">{s.guild_name}</span>
                           </div>
-                          <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-colors ${selectedServer === s.guild_id ? 'border-primary-container bg-primary-container/20' : 'border-outline-variant/50'}`}>
-                            {selectedServer === s.guild_id && <div className="w-2 h-2 rounded-full bg-primary-container"></div>}
+                          <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${selectedServer === s.guild_id ? 'border-primary-container bg-primary-container/20' : 'border-outline-variant/50'}`}>
+                            {selectedServer === s.guild_id && <div className="w-2.5 h-2.5 rounded-full bg-primary-container"></div>}
                           </div>
-                        </label>
+                        </div>
                       ))}
                     </div>
                   </div>
