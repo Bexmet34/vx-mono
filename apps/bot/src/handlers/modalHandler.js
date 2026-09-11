@@ -626,31 +626,50 @@ async function handleAutoPremiumModal(interaction) {
     const { data: rules } = await supabase.from('auto_premium_rules').select('*');
     if (!rules || rules.length === 0) return interaction.editReply('❌ Aktif premium kuralı yok.');
 
-    // 2. Albion Karakter Bilgisi Çek (Yerel Veritabanından)
+    // 2. Albion Karakter Bilgisi Çek (SADECE Canlı API)
     let matchingPlayers = [];
-    try {
-        const { data: cachedMember, error } = await supabase
-            .from('cached_guild_members')
-            .select('*')
-            .ilike('ign', ign)
-            .single();
+    let actualGuildName = null;
 
-        if (error && error.code !== 'PGRST116') { // PGRST116 is "Rows not found"
-            console.error('DB Error:', error);
-            return interaction.editReply('❌ Veritabanına bağlanırken bir sorun oluştu.');
+    try {
+        const { getGuildConfig } = require('../services/guildConfig');
+        const { getPlayerInfo } = require('../services/albionService');
+        
+        const guildConfig = await getGuildConfig(interaction.guildId);
+        const server = guildConfig?.albion_server || 'Europe';
+
+        let playerData = null;
+        try {
+            playerData = await getPlayerInfo(ign, server);
+        } catch (apiError) {
+            console.error('[AutoPremium] Live API fetch failed:', apiError.message);
+            // Albion API çöktüyse/yoğunsa eski veriye (fallback) GİRME, direkt işlemi durdur.
+            return interaction.editReply('❌ **Albion Online sunucuları şu an yoğun veya yanıt vermiyor.** Adil bir işlem yapabilmemiz için lonca bilginizi anlık olarak teyit etmemiz gerekiyor. Lütfen 5-10 dakika sonra tekrar deneyiniz.');
         }
 
-        if (cachedMember) {
-            // DB'de ign tekildir (UNIQUE). Tek bir kayıt döner.
-            matchingPlayers.push({ GuildName: cachedMember.guild_name });
+        // Eğer canlı veri geldiyse ve adamın bir loncası varsa
+        if (playerData && playerData.GuildName) {
+            actualGuildName = playerData.GuildName;
+            matchingPlayers.push({ GuildName: actualGuildName });
+            
+            // Canlıdan aldığımız doğru bilgiyi veritabanına da yazalım (Cache'i tazeleyelim)
+            const { supabase: dbInstance } = require('@veyronix/database');
+            await dbInstance.from('cached_guild_members').upsert({
+                ign: playerData.Name || ign,
+                guild_name: actualGuildName,
+                last_seen: new Date().toISOString()
+            }, { onConflict: 'ign' });
+            
+        } else {
+            // Karakter bulunamadı veya adamın hiçbir loncası yok
+            return interaction.editReply(`❌ **${ign}** isminde bir karakter bulunamadı veya şu an hiçbir loncada değilsiniz. Lütfen adınızı doğru yazdığınızdan ve oyunda bir loncaya katıldığınızdan emin olun.`);
         }
         
         if (matchingPlayers.length === 0) {
-            return interaction.editReply(`❌ **${ign}** isminde bir karakter hiçbir kural listesindeki loncada bulunamadı. Lütfen adınızı doğru yazdığınızdan ve loncada olduğunuza emin olun. Yeni katıldıysanız, yetkilinin listeyi senkronize etmesini bekleyin.`);
+            return interaction.editReply(`❌ **${ign}** isminde bir karakter bulunamadı veya şu an hiçbir loncada değilsiniz.`);
         }
     } catch (e) {
-        console.error('DB Catch Error:', e);
-        return interaction.editReply('❌ Beklenmedik bir veritabanı hatası oluştu.');
+        console.error('AutoPremium Catch Error:', e);
+        return interaction.editReply('❌ Beklenmedik bir hata oluştu.');
     }
 
     // 3. Şartları Kontrol Et
@@ -726,7 +745,8 @@ async function handleAutoPremiumModal(interaction) {
         is_auto_premium: true
     }, { onConflict: 'discord_id' });
 
-    await interaction.editReply(`✅ **Başarılı!** Şartları sağladığınız için hesabınıza Premium tanımlandı.`);
+    let replyMsg = `✅ **Başarılı!** Şartları sağladığınız için hesabınıza Premium tanımlandı.`;
+    await interaction.editReply(replyMsg);
 
     // 5. Partner Davet Linkini Gönder
     try {
@@ -759,15 +779,8 @@ async function handleAutoPremiumModal(interaction) {
                     if (inviteUrl) {
                         const { EmbedBuilder } = require('discord.js');
                         
-                        // Lonca adını düzgün formattan bul
-                        let matchedGuildName = "Bilinmeyen Lonca";
-                        let matchedGuildsArray = matchedRule.albion_guilds || [];
-                        if (typeof matchedGuildsArray === 'string') {
-                            try { matchedGuildsArray = JSON.parse(matchedGuildsArray); } catch(e) { matchedGuildsArray = matchedGuildsArray.split(','); }
-                        }
-                        if (Array.isArray(matchedGuildsArray) && matchedGuildsArray.length > 0) {
-                            matchedGuildName = matchedGuildsArray[0].trim();
-                        }
+                        // Lonca adını düzgün formattan bul (Gerçek loncayı yazdır, kuralın ilk elemanını değil!)
+                        let matchedGuildName = actualGuildName || "Bilinmeyen Lonca";
 
                         const embed = new EmbedBuilder()
                             .setTitle('🤝 Yeni Partner İşlemi!')
