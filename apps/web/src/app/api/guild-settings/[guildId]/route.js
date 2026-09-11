@@ -83,7 +83,7 @@ export async function POST(req, { params }) {
       ticket_options, ticket_limit, ticket_name_format, auto_delete_party_hours, content_close_roles,
       application_enabled, registration_rules_text, application_questions,
       registration_button_type, registration_rules_text_en, registration_name_format,
-      tempvoice_creators, killboard_kill_channel_id, killboard_death_channel_id,
+      tempvoice_creators, trigger_tempvoice_setup, killboard_kill_channel_id, killboard_death_channel_id,
       server_counters, counters_category_id, trigger_counters_setup, counter_ticket_category_id,
       counter_role_id
     } = body;
@@ -108,7 +108,7 @@ export async function POST(req, { params }) {
       });
     }
 
-    const needsTempVoiceSetup = mergedTempVoiceCreators.length > 0;
+    const needsTempVoiceSetup = mergedTempVoiceCreators.some(c => !c.channelId);
 
     // Upsert: varsa güncelle, yoksa ekle
     const { data, error } = await supabase
@@ -175,7 +175,7 @@ export async function POST(req, { params }) {
           counters_category_id: counters_category_id || null,
           counter_ticket_category_id: counter_ticket_category_id || null,
           counter_role_id: counter_role_id || null,
-          ...(needsTempVoiceSetup ? { trigger_tempvoice_setup: true } : {}),
+          ...((needsTempVoiceSetup || trigger_tempvoice_setup) ? { trigger_tempvoice_setup: true } : {}),
           ...(trigger_counters_setup ? { trigger_counters_setup: true } : {})
         },
         { onConflict: 'guild_id' }
