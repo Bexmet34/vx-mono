@@ -817,6 +817,8 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, setInitia
         </span>
       </div>
 
+      <VoicePermCard guildId={guildId} categoryId={null} lang={lang} setHasPermError={setHasPermError} />
+
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 h-full">
         {/* Sol Taraf: Kanal Oluşturucular */}
         <div className="flex flex-col gap-4 border-r-0 xl:border-r border-outline-variant/30 xl:pr-8">
@@ -833,7 +835,7 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, setInitia
               <button
                 onClick={handleAddCreator}
                 disabled={hasPermError}
-                className="flex items-center gap-2 px-6 py-3 bg-surface border border-outline-variant hover:border-primary-container text-on-surface hover:text-primary-container rounded-lg font-label-bold tracking-wide transition-all shadow-lg hover:shadow-primary-container/20 z-10"
+                className={`flex items-center gap-2 px-6 py-3 bg-surface border rounded-lg font-label-bold tracking-wide transition-all shadow-lg z-10 ${hasPermError ? "border-red-500/30 text-red-400/50 cursor-not-allowed bg-red-500/5" : "border-outline-variant hover:border-primary-container text-on-surface hover:text-primary-container hover:shadow-primary-container/20"}`}
               >
                 <Plus size={20} />
                 Open Audio Channel
