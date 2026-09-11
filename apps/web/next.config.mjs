@@ -9,6 +9,20 @@ const nextConfig = {
   distDir: process.env.NEXT_DIST_DIR || '.next',
   serverExternalPackages: ['discord.js'],
   outputFileTracingRoot: path.join(__dirname, '../../'),
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'cdn.discordapp.com',
+        pathname: '/icons/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'media.discordapp.net',
+      },
+    ],
+  },
 };
 
 export default nextConfig;
+
