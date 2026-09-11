@@ -15,10 +15,13 @@ function getBotToken() {
 // Discord permission bit flags (BigInt)
 const PERM = {
     ADMINISTRATOR: 1n << 3n,
+    MANAGE_CHANNELS: 1n << 4n,
     VIEW_CHANNEL:  1n << 10n,
     SEND_MESSAGES: 1n << 11n,
     EMBED_LINKS:   1n << 14n,
     ATTACH_FILES:  1n << 15n,
+    MOVE_MEMBERS:  1n << 24n,
+    MANAGE_ROLES:  1n << 28n,
 };
 
 /**
@@ -46,8 +49,10 @@ export async function GET(req, context) {
         }
 
         const { searchParams } = new URL(req.url);
-        const channelId = searchParams.get('channelId');
-        if (!channelId) {
+        const mode = searchParams.get('mode'); // 'voiceforge' vs
+        let channelId = searchParams.get('channelId');
+
+        if (!channelId && mode !== 'voiceforge') {
             return NextResponse.json({ error: 'channelId query param required' }, { status: 400 });
         }
 
@@ -64,26 +69,39 @@ export async function GET(req, context) {
         const botUserId = botUser.id;
 
         // ── Step 2: Get channel info & overwrites ────────────────────────────
-        const channelRes = await fetch(`https://discord.com/api/v10/channels/${channelId}`, { headers });
-        if (!channelRes.ok) {
-            if (channelRes.status === 403) {
-                // Bot can't even see the channel
-                return NextResponse.json({
-                    hasAccess: false,
-                    channelName: null,
-                    missingPermissions: [
-                        { name_tr: 'Kanalı Görüntüle', name_en: 'View Channel' },
-                        { name_tr: 'Mesaj Gönder',     name_en: 'Send Messages'  },
-                        { name_tr: 'Bağlantı Yerleştir', name_en: 'Embed Links' },
-                        { name_tr: 'Dosya Ekle',        name_en: 'Attach Files' },
-                    ],
-                    reason: 'no_view_access',
-                });
+        let channelName = 'Sunucu Geneli';
+        let channelType = null;
+        let channelOverwrites = [];
+
+        if (channelId) {
+            const channelRes = await fetch(`https://discord.com/api/v10/channels/${channelId}`, { headers });
+            if (!channelRes.ok) {
+                if (channelRes.status === 403) {
+                    return NextResponse.json({
+                        hasAccess: false,
+                        channelName: null,
+                        missingPermissions: mode === 'voiceforge' 
+                            ? [
+                                { name_tr: 'Kanalları Yönet', name_en: 'Manage Channels' },
+                                { name_tr: 'Rolleri Yönet', name_en: 'Manage Roles' },
+                                { name_tr: 'Üyeleri Taşı', name_en: 'Move Members' }
+                              ]
+                            : [
+                                { name_tr: 'Kanalı Görüntüle', name_en: 'View Channel' },
+                                { name_tr: 'Mesaj Gönder',     name_en: 'Send Messages'  },
+                                { name_tr: 'Bağlantı Yerleştir', name_en: 'Embed Links' },
+                                { name_tr: 'Dosya Ekle',        name_en: 'Attach Files' },
+                              ],
+                        reason: 'no_view_access',
+                    });
+                }
+                return NextResponse.json({ hasAccess: false, reason: 'channel_fetch_failed', channelName: null, missingPermissions: [] });
             }
-            return NextResponse.json({ hasAccess: false, reason: 'channel_fetch_failed', channelName: null, missingPermissions: [] });
+            const channel = await channelRes.json();
+            channelName = channel.name;
+            channelType = channel.type;
+            channelOverwrites = channel.permission_overwrites || [];
         }
-        const channel = await channelRes.json();
-        const channelOverwrites = channel.permission_overwrites || [];
 
         // ── Step 3: Get bot's guild member info (role IDs) ───────────────────
         const memberRes = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${botUserId}`, { headers });
@@ -129,8 +147,8 @@ export async function GET(req, context) {
             return NextResponse.json({
                 hasAccess: true,
                 isAdmin: true,
-                channelName: channel.name,
-                channelType: channel.type,
+                channelName: channelName,
+                channelType: channelType,
                 missingPermissions: [],
             });
         }
@@ -171,43 +189,52 @@ export async function GET(req, context) {
         }
 
         // ── Step 7: Check required permissions ───────────────────────────────
-        const requiredPerms = [
+        let requiredPerms = [
             { flag: PERM.VIEW_CHANNEL,  name_tr: 'Kanalı Görüntüle',   name_en: 'View Channel'  },
             { flag: PERM.SEND_MESSAGES, name_tr: 'Mesaj Gönder',        name_en: 'Send Messages' },
             { flag: PERM.EMBED_LINKS,   name_tr: 'Bağlantı Yerleştir',  name_en: 'Embed Links'   },
             { flag: PERM.ATTACH_FILES,  name_tr: 'Dosya Ekle',          name_en: 'Attach Files'  },
         ];
 
+        if (mode === 'voiceforge') {
+            requiredPerms = [
+                { flag: PERM.MANAGE_CHANNELS, name_tr: 'Kanalları Yönet',   name_en: 'Manage Channels' },
+                { flag: PERM.MANAGE_ROLES,    name_tr: 'Rolleri Yönet',     name_en: 'Manage Roles' },
+                { flag: PERM.MOVE_MEMBERS,    name_tr: 'Üyeleri Taşı',      name_en: 'Move Members' },
+            ];
+        }
+
         let missingPermissions = requiredPerms.filter(p => (basePermissions & p.flag) !== p.flag);
 
         // ── Step 8: REAL API TESTING (Ultimate Source of Truth) ───────────────
-        
-        // KESİN BİLGİ 1: Step 2'de (channel fetch) 403 yemedik ve kanalı okuduk. 
-        // Bu yüzden VIEW_CHANNEL kesinlikle var! (Local hesaplama ne derse desin)
-        missingPermissions = missingPermissions.filter(p => p.flag !== PERM.VIEW_CHANNEL);
+        if (mode !== 'voiceforge' && channelId) {
+            // KESİN BİLGİ 1: Step 2'de (channel fetch) 403 yemedik ve kanalı okuduk. 
+            // Bu yüzden VIEW_CHANNEL kesinlikle var! (Local hesaplama ne derse desin)
+            missingPermissions = missingPermissions.filter(p => p.flag !== PERM.VIEW_CHANNEL);
 
-        // KESİN BİLGİ 2: SEND_MESSAGES testini Typing endpoint ile yapıyoruz.
-        let hasRealSendAccess = false;
-        try {
-            const typingRes = await fetch(`https://discord.com/api/v10/channels/${channelId}/typing`, {
-                method: 'POST',
-                headers: headers
-            });
-            if (typingRes.ok || typingRes.status === 204) {
-                hasRealSendAccess = true;
+            // KESİN BİLGİ 2: SEND_MESSAGES testini Typing endpoint ile yapıyoruz.
+            let hasRealSendAccess = false;
+            try {
+                const typingRes = await fetch(`https://discord.com/api/v10/channels/${channelId}/typing`, {
+                    method: 'POST',
+                    headers: headers
+                });
+                if (typingRes.ok || typingRes.status === 204) {
+                    hasRealSendAccess = true;
+                }
+            } catch (e) {
+                hasRealSendAccess = false;
             }
-        } catch (e) {
-            hasRealSendAccess = false;
-        }
 
-        // Eğer typing atamadıysak, SEND_MESSAGES kesinlikle yoktur. (Eksik listesine ekle)
-        if (!hasRealSendAccess) {
-            if (!missingPermissions.find(p => p.flag === PERM.SEND_MESSAGES)) {
-                missingPermissions.push(requiredPerms.find(p => p.flag === PERM.SEND_MESSAGES));
+            // Eğer typing atamadıysak, SEND_MESSAGES kesinlikle yoktur. (Eksik listesine ekle)
+            if (!hasRealSendAccess) {
+                if (!missingPermissions.find(p => p.flag === PERM.SEND_MESSAGES)) {
+                    missingPermissions.push(requiredPerms.find(p => p.flag === PERM.SEND_MESSAGES));
+                }
+            } else {
+                // Eğer typing atabildiysek, SEND_MESSAGES kesinlikle VARDIR. (Eksik listesinden çıkar)
+                missingPermissions = missingPermissions.filter(p => p.flag !== PERM.SEND_MESSAGES);
             }
-        } else {
-            // Eğer typing atabildiysek, SEND_MESSAGES kesinlikle VARDIR. (Eksik listesinden çıkar)
-            missingPermissions = missingPermissions.filter(p => p.flag !== PERM.SEND_MESSAGES);
         }
 
         const allGood = missingPermissions.length === 0;
@@ -215,8 +242,8 @@ export async function GET(req, context) {
         return NextResponse.json({
             hasAccess: allGood,
             isAdmin: botUserId === guildOwnerId || (basePermissions & PERM.ADMINISTRATOR) === PERM.ADMINISTRATOR,
-            channelName: channel.name,
-            channelType: channel.type,
+            channelName: channelName,
+            channelType: channelType,
             missingPermissions: missingPermissions.map(p => ({ name_tr: p.name_tr, name_en: p.name_en })),
         });
 

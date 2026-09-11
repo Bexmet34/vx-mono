@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { Plus, Settings, Trash2, ArrowLeft, Headphones, Sliders, Shield, MoreHorizontal, HelpCircle, FileText, Crown } from "lucide-react";
+import { Plus, Settings, Trash2, ArrowLeft, Headphones, Sliders, Shield, MoreHorizontal, HelpCircle, FileText, Crown, AlertTriangle, CheckCircle2, RefreshCw, Loader2 } from "lucide-react";
+import { useCallback } from "react";
 import Logo from "@/components/Logo";
 import InterfaceBuilder from "./InterfaceBuilder";
 const CustomSelect = ({ value, options, onChange, placeholder }) => {
@@ -46,6 +47,93 @@ const CustomSelect = ({ value, options, onChange, placeholder }) => {
   );
 };
 
+
+// ─── Voice Permission Status Card ────────────────────────────────────────────
+function VoicePermCard({ guildId, categoryId, lang, setHasPermError }) {
+  const [status, setStatus] = React.useState(null); 
+  const [result, setResult] = React.useState(null);
+
+  const check = React.useCallback(async () => {
+    setStatus('loading');
+    setResult(null);
+    try {
+      const url = categoryId 
+        ? `/api/check-channel-permissions/${guildId}?mode=voiceforge&channelId=${categoryId}`
+        : `/api/check-channel-permissions/${guildId}?mode=voiceforge`;
+      const res = await fetch(url);
+      const data = await res.json();
+      setResult(data);
+      if (data.hasAccess) {
+        setStatus('ok');
+        setHasPermError?.(false);
+      } else {
+        setStatus('error');
+        setHasPermError?.(true);
+      }
+    } catch {
+      setStatus('unknown');
+      setHasPermError?.(false);
+    }
+  }, [guildId, categoryId, setHasPermError]);
+
+  React.useEffect(() => {
+    const t = setTimeout(() => { check(); }, 0);
+    return () => clearTimeout(t);
+  }, [categoryId, check]);
+
+  return (
+    <div className="mt-2 space-y-2 animate-fade-in w-full">
+      <div className={`flex items-center justify-between px-3 py-2.5 rounded-md border text-sm transition-all ${
+        status === 'ok' ? 'bg-emerald-500/10 border-emerald-500/30'
+        : status === 'error' ? 'bg-red-500/10 border-red-500/30'
+        : 'bg-surface-container border-outline-variant'
+      }`}>
+        <div className="flex items-center gap-2">
+          {status === 'loading' && <Loader2 size={15} className="animate-spin text-on-surface-variant" />}
+          {status === 'ok' && <CheckCircle2 size={15} className="text-emerald-500 shrink-0" />}
+          {status === 'error' && <AlertTriangle size={15} className="text-red-500 shrink-0" />}
+          {status === 'unknown' && <AlertTriangle size={15} className="text-yellow-500 shrink-0" />}
+
+          <span className={`text-xs font-medium ${
+            status === 'ok' ? 'text-emerald-400' :
+            status === 'error' ? 'text-red-400' :
+            status === 'loading' ? 'text-on-surface-variant' :
+            'text-yellow-400'
+          }`}>
+            {status === 'loading' && (lang === 'tr' ? 'İzinler kontrol ediliyor...' : 'Checking permissions...')}
+            {status === 'ok' && (lang === 'tr' ? `✓ Botun geçici ses kanalı kurmak için gerekli tüm izinleri var.` : `✓ Bot has all required permissions for temp voice channels.`)}
+            {status === 'error' && (lang === 'tr' ? `⚠ Botun eksik izinleri var!` : `⚠ Bot is missing permissions!`)}
+            {status === 'unknown' && (lang === 'tr' ? 'İzin durumu kontrol edilemedi' : 'Could not check permissions')}
+          </span>
+        </div>
+        <button
+          onClick={check}
+          disabled={status === 'loading'}
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-semibold transition-all border bg-surface-container-high border-outline-variant text-on-surface-variant hover:text-on-surface hover:border-primary-container disabled:opacity-50"
+        >
+          <RefreshCw size={11} className={status === 'loading' ? 'animate-spin' : ''} />
+          {lang === 'tr' ? 'Test Et' : 'Test'}
+        </button>
+      </div>
+
+      {status === 'error' && result?.missingPermissions?.length > 0 && (
+        <div className="bg-red-500/8 border border-red-500/20 rounded-md px-3 py-2 mt-2">
+          <p className="text-red-400 text-[11px] font-semibold mb-1.5">
+            {lang === 'tr' ? 'Geçici kanalın çalışması için şu izinleri botun rolüne vermelisiniz:' : 'You must grant these permissions to the bot\'s role for temp channels to work:'}
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {result.missingPermissions.map((p, i) => (
+              <span key={i} className="bg-red-500/20 border border-red-500/30 text-red-300 text-[11px] px-2 py-0.5 rounded">
+                {lang === 'tr' ? p.name_tr : p.name_en}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function TempVoiceTab({ t, lang, settings, setSettings, setInitialSettings, discordChannels, discordRoles, isPremium, guildId }) {
   const [editingCreatorId, setEditingCreatorId] = useState(null);
   const [activeSubTab, setActiveSubTab] = useState("overview");
@@ -65,6 +153,7 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, setInitia
 
   const [isCreatingCreator, setIsCreatingCreator] = useState(false);
   const [creationProgress, setCreationProgress] = useState(0);
+  const [hasPermError, setHasPermError] = useState(false);
 
   // Temporary local state for the creators if it's not yet in main settings
   const creators = settings.tempvoice_creators || [];
@@ -743,6 +832,7 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, setInitia
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary-container/5 rounded-full blur-3xl"></div>
               <button
                 onClick={handleAddCreator}
+                disabled={hasPermError}
                 className="flex items-center gap-2 px-6 py-3 bg-surface border border-outline-variant hover:border-primary-container text-on-surface hover:text-primary-container rounded-lg font-label-bold tracking-wide transition-all shadow-lg hover:shadow-primary-container/20 z-10"
               >
                 <Plus size={20} />
@@ -778,7 +868,8 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, setInitia
 
               <button
                 onClick={handleAddCreator}
-                className="flex items-center justify-center gap-2 p-3 mt-2 bg-surface border border-dashed border-outline-variant hover:border-primary-container text-on-surface-variant hover:text-primary-container rounded-xl font-label-bold tracking-wide transition-all"
+                disabled={hasPermError}
+                className={`flex items-center justify-center gap-2 p-3 mt-2 bg-surface border border-dashed rounded-xl font-label-bold tracking-wide transition-all ${hasPermError ? "border-red-500/30 text-red-400/50 cursor-not-allowed bg-red-500/5" : "border-outline-variant hover:border-primary-container text-on-surface-variant hover:text-primary-container"}`}
               >
                 <Plus size={16} /> {lang === 'tr' ? 'Yeni Oluşturucu Ekle' : 'Add New Creator'}
               </button>
