@@ -96,8 +96,8 @@ async function handlePartyButtons(interaction) {
         return;
     }
 
-    if (customId.startsWith('save_temp_init:')) {
-        const msgId = customId.split(':')[1];
+    if (customId === 'save_temp_init' || customId.startsWith('save_temp_init:')) {
+        const msgId = customId.includes(':') ? customId.split(':')[1] : interaction.message.id;
         
         const partyMessage = await interaction.channel.messages.fetch(msgId).catch(() => null);
         if (!partyMessage || !partyMessage.embeds[0]) {
@@ -532,8 +532,7 @@ async function handleOpenSettings(interaction, lang) {
     );
 
     const row2 = new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setCustomId(`settings_edit_${interaction.message.id}`).setLabel(t('manage.edit_party', lang)).setStyle(ButtonStyle.Primary).setEmoji('📝'),
-        new ButtonBuilder().setCustomId(`save_temp_init:${interaction.message.id}`).setLabel(lang === 'tr' ? '💾 Şablonu Kaydet' : '💾 Save Template').setStyle(ButtonStyle.Secondary)
+        new ButtonBuilder().setCustomId(`settings_edit_${interaction.message.id}`).setLabel(t('manage.edit_party', lang)).setStyle(ButtonStyle.Primary).setEmoji('📝')
     );
 
     const row3 = new ActionRowBuilder().addComponents(
