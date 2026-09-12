@@ -574,26 +574,38 @@ export default function ServerSettings() {
       items: [
         { id: 'overview', label: lang === 'tr' ? 'Genel Bakış' : 'Overview', icon: Home },
         { id: 'general', label: lang === 'tr' ? 'Temel Ayarlar' : 'Settings', icon: Layout },
-        { id: 'counters', label: lang === 'tr' ? 'Sunucu Sayaçları' : 'Counters', icon: Activity },
-        { id: 'content', label: lang === 'tr' ? 'Content Ayarları' : 'Content Settings', icon: FileText },
-        { id: 'embed', label: lang === 'tr' ? 'Görsel & Marka' : 'Branding', icon: ImageIcon },
       ]
     },
     {
-      id: 'albion_group',
+      id: 'content_group',
+      category: lang === 'tr' ? 'İÇERİK & KAYIT' : 'CONTENT',
+      items: [
+        { id: 'content', label: lang === 'tr' ? 'Content Ayarları' : 'Content Settings', icon: FileText },
+        { id: 'templates', label: lang === 'tr' ? 'Parti Şablonları' : 'Party Templates', icon: Copy },
+        { id: 'registration', label: lang === 'tr' ? 'Kayıt & Rol' : 'Registration', icon: UserPlus },
+      ]
+    },
+    {
+      id: 'visual_group',
+      category: lang === 'tr' ? 'GÖRSEL & ETKİNLİK' : 'VISUALS & EVENTS',
+      items: [
+        { id: 'counters', label: lang === 'tr' ? 'Sunucu Sayaçları' : 'Counters', icon: Activity },
+        { id: 'embed', label: lang === 'tr' ? 'Görsel & Marka' : 'Branding', icon: ImageIcon },
+        { id: 'events', label: lang === 'tr' ? 'Etkinlikler' : 'Events', icon: Sparkles },
+      ]
+    },
+    {
+      id: 'systems_group',
       category: lang === 'tr' ? 'ALBION & SES' : 'ALBION & VOICE',
       items: [
         { id: 'tempvoice', label: 'VoiceForge', icon: Headphones, isBeta: true },
         { id: 'killboard', label: 'Killboard', icon: Skull, isBeta: false },
-        { id: 'templates', label: lang === 'tr' ? 'Parti Şablonları' : 'Party Templates', icon: Copy },
-        { id: 'events', label: lang === 'tr' ? 'Etkinlikler' : 'Events', icon: Sparkles },
       ]
     },
     {
       id: 'community_group',
       category: lang === 'tr' ? 'TOPLULUK & GÜVENLİK' : 'COMMUNITY',
       items: [
-        { id: 'registration', label: lang === 'tr' ? 'Kayıt & Rol' : 'Registration', icon: UserPlus },
         { id: 'rolemenu', label: lang === 'tr' ? 'Rol Menüleri' : 'Role Menus', icon: Users },
         { id: 'ticket', label: lang === 'tr' ? 'Ticket & Destek' : 'Ticket System', icon: Shield },
         { id: 'log', label: lang === 'tr' ? 'Denetim Logları' : 'Audit Logs', icon: FileText },
@@ -793,7 +805,7 @@ export default function ServerSettings() {
         </div>
 
         {/* Tab Content Rendering with Bento Grids */}
-        {activeTab === 'overview' && <OverviewTab t={t} lang={lang} subscription={subscription} setActiveTab={setActiveTab} showToast={showToast} settings={settings} />}
+        {activeTab === 'overview' && <OverviewTab t={t} lang={lang} subscription={subscription} setActiveTab={setActiveTab} showToast={showToast} settings={settings} albionGuildDetail={albionGuildDetail} />}
         
         {activeTab === 'general' && (
           <GeneralTab t={t} settings={settings} setSettings={setSettings} discordChannels={discordChannels} discordRoles={discordRoles} handleSave={handleSave} saving={saving} guildSearchQuery={guildSearchQuery} setGuildSearchQuery={setGuildSearchQuery} searchGuilds={searchGuilds} searchingGuild={searchingGuild} guildSearchResults={guildSearchResults} setGuildSearchResults={setGuildSearchResults} albionGuildDetail={albionGuildDetail} setAlbionGuildDetail={setAlbionGuildDetail} isOwner={isOwner} discordMembers={discordMembers} guildId={guildId} subscription={subscription} showToast={showToast} />

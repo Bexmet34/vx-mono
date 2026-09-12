@@ -5,7 +5,7 @@ import { formatDistanceToNow, isPast } from "date-fns";
 import { tr, enUS } from "date-fns/locale";
 import { useLanguage } from "@/context/LanguageContext";
 
-export default function OverviewTab({ subscription, setActiveTab, settings }) {
+export default function OverviewTab({ subscription, setActiveTab, settings, albionGuildDetail }) {
   const { lang, t } = useLanguage();
   const locale = lang === 'tr' ? tr : enUS;
 
@@ -97,7 +97,7 @@ export default function OverviewTab({ subscription, setActiveTab, settings }) {
         <h3 className="font-headline-md text-xs text-on-surface mb-2 uppercase tracking-tight">
           {lang === 'tr' ? 'Sistem Durumu' : 'System Status'}
         </h3>
-        <ul className="space-y-3">
+        <ul className="space-y-3 h-full max-h-[350px] overflow-y-auto custom-scrollbar pr-2">
            <li className={`flex items-center justify-between p-3 border rounded-sm font-label-bold text-[10px] uppercase tracking-widest ${settings?.albion_guild_id ? 'border-success/30 bg-success/5 text-success' : 'border-outline text-on-surface-variant'}`}>
              <span className="flex items-center gap-2">{settings?.albion_guild_id ? '✓' : '✗'} {lang === 'tr' ? 'Albion Lonca Bağlantısı' : 'Albion Guild Link'}</span>
              <span>{settings?.albion_guild_id ? (lang === 'tr' ? 'Bağlı' : 'Linked') : (lang === 'tr' ? 'Kurulum Bekliyor' : 'Setup Required')}</span>
@@ -106,15 +106,77 @@ export default function OverviewTab({ subscription, setActiveTab, settings }) {
              <span className="flex items-center gap-2">{settings?.registration_enabled ? '✓' : '✗'} {lang === 'tr' ? 'Kayıt (Registration) Sistemi' : 'Registration System'}</span>
              <span>{settings?.registration_enabled ? (lang === 'tr' ? 'Aktif' : 'Active') : (lang === 'tr' ? 'Kapalı' : 'Disabled')}</span>
            </li>
+           <li className={`flex items-center justify-between p-3 border rounded-sm font-label-bold text-[10px] uppercase tracking-widest ${(settings?.tempvoice_creators && settings?.tempvoice_creators.length > 0) ? 'border-success/30 bg-success/5 text-success' : 'border-outline text-on-surface-variant'}`}>
+             <span className="flex items-center gap-2">{(settings?.tempvoice_creators && settings?.tempvoice_creators.length > 0) ? '✓' : '✗'} {lang === 'tr' ? 'Geçici Ses Kanalları' : 'Temp Voice Channels'}</span>
+             <span>{(settings?.tempvoice_creators && settings?.tempvoice_creators.length > 0) ? (lang === 'tr' ? 'Aktif' : 'Active') : (lang === 'tr' ? 'Kapalı' : 'Disabled')}</span>
+           </li>
+           <li className={`flex items-center justify-between p-3 border rounded-sm font-label-bold text-[10px] uppercase tracking-widest ${(settings?.killboard_kill_channel_id || settings?.killboard_death_channel_id) ? 'border-success/30 bg-success/5 text-success' : 'border-outline text-on-surface-variant'}`}>
+             <span className="flex items-center gap-2">{(settings?.killboard_kill_channel_id || settings?.killboard_death_channel_id) ? '✓' : '✗'} {lang === 'tr' ? 'KillBoard Raporları' : 'KillBoard Reports'}</span>
+             <span>{(settings?.killboard_kill_channel_id || settings?.killboard_death_channel_id) ? (lang === 'tr' ? 'Aktif' : 'Active') : (lang === 'tr' ? 'Kapalı' : 'Disabled')}</span>
+           </li>
+           <li className={`flex items-center justify-between p-3 border rounded-sm font-label-bold text-[10px] uppercase tracking-widest ${settings?.ticket_system_enabled ? 'border-success/30 bg-success/5 text-success' : 'border-outline text-on-surface-variant'}`}>
+             <span className="flex items-center gap-2">{settings?.ticket_system_enabled ? '✓' : '✗'} {lang === 'tr' ? 'Destek (Ticket) Sistemi' : 'Ticket System'}</span>
+             <span>{settings?.ticket_system_enabled ? (lang === 'tr' ? 'Aktif' : 'Active') : (lang === 'tr' ? 'Kapalı' : 'Disabled')}</span>
+           </li>
+           <li className={`flex items-center justify-between p-3 border rounded-sm font-label-bold text-[10px] uppercase tracking-widest ${settings?.log_system_enabled ? 'border-success/30 bg-success/5 text-success' : 'border-outline text-on-surface-variant'}`}>
+             <span className="flex items-center gap-2">{settings?.log_system_enabled ? '✓' : '✗'} {lang === 'tr' ? 'Denetim Logları' : 'Audit Logs'}</span>
+             <span>{settings?.log_system_enabled ? (lang === 'tr' ? 'Aktif' : 'Active') : (lang === 'tr' ? 'Kapalı' : 'Disabled')}</span>
+           </li>
            <li className="flex items-center justify-between p-3 border rounded-sm font-label-bold text-[10px] uppercase tracking-widest border-error/30 bg-error/5 text-error">
              <span className="flex items-center gap-2">✗ {lang === 'tr' ? 'Otomatik Ayrılık Kontrolü' : 'Guild Leave Auto-Check'}</span>
              <span>{lang === 'tr' ? 'Bakımda' : 'Maintenance'}</span>
            </li>
-           <li className={`flex items-center justify-between p-3 border rounded-sm font-label-bold text-[10px] uppercase tracking-widest ${settings?.killboard_channel_id ? 'border-success/30 bg-success/5 text-success' : 'border-outline text-on-surface-variant'}`}>
-             <span className="flex items-center gap-2">{settings?.killboard_channel_id ? '✓' : '✗'} {lang === 'tr' ? 'KillBoard Raporları' : 'KillBoard Reports'}</span>
-             <span>{settings?.killboard_channel_id ? (lang === 'tr' ? 'Aktif' : 'Active') : (lang === 'tr' ? 'Kapalı' : 'Disabled')}</span>
-           </li>
         </ul>
+      </div>
+
+      {/* Albion Guild Info Box */}
+      <div className="glass-panel p-3 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
+        <h3 className="font-headline-md text-xs text-on-surface mb-2 uppercase tracking-tight">
+          {lang === 'tr' ? 'Albion Lonca Durumu' : 'Albion Guild Status'}
+        </h3>
+        {albionGuildDetail ? (
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-12 h-12 rounded bg-surface border border-outline flex items-center justify-center shadow-lg">
+                <Users size={24} className="text-primary-container" />
+              </div>
+              <div>
+                <div className="font-headline-lg text-sm text-on-surface">
+                  {albionGuildDetail.AllianceTag ? `[${albionGuildDetail.AllianceTag}] ` : ''}{albionGuildDetail.Name}
+                </div>
+                <div className="font-label-sm text-[10px] text-on-surface-variant mt-0.5 uppercase tracking-widest">
+                  {lang === 'tr' ? 'Bağlı Lonca' : 'Linked Guild'}
+                </div>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-2 mt-2">
+              <div className="bg-surface-container p-2 rounded border border-outline-variant/30">
+                <div className="text-[9px] text-on-surface-variant uppercase tracking-widest mb-1">{lang === 'tr' ? 'Sunucu' : 'Server'}</div>
+                <div className="text-xs font-bold text-on-surface">{albionGuildDetail.Server || settings?.albion_server || 'Europe'}</div>
+              </div>
+              <div className="bg-surface-container p-2 rounded border border-outline-variant/30">
+                <div className="text-[9px] text-on-surface-variant uppercase tracking-widest mb-1">{lang === 'tr' ? 'Üye Sayısı' : 'Members'}</div>
+                <div className="text-xs font-bold text-on-surface">{albionGuildDetail.MemberCount ? albionGuildDetail.MemberCount.toLocaleString() : '?'}</div>
+              </div>
+              <div className="bg-surface-container p-2 rounded border border-outline-variant/30">
+                <div className="text-[9px] text-on-surface-variant uppercase tracking-widest mb-1">Kill Fame</div>
+                <div className="text-xs font-bold text-success">{albionGuildDetail.killFame ? albionGuildDetail.killFame.toLocaleString() : '?'}</div>
+              </div>
+              <div className="bg-surface-container p-2 rounded border border-outline-variant/30">
+                <div className="text-[9px] text-on-surface-variant uppercase tracking-widest mb-1">Death Fame</div>
+                <div className="text-xs font-bold text-error">{albionGuildDetail.DeathFame ? albionGuildDetail.DeathFame.toLocaleString() : '?'}</div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full min-h-[120px] text-center bg-surface-container/20 border border-dashed border-outline-variant rounded p-4">
+            <Users size={24} className="text-on-surface-variant/50 mb-2" />
+            <p className="text-xs text-on-surface-variant">
+              {lang === 'tr' ? 'Henüz bir Albion loncası bağlanmadı.' : 'No Albion guild linked yet.'}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
