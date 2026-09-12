@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, Infinity, Star, Crown, Users } from "lucide-react";
+import { AlertCircle, Infinity, Star, Crown, Users, Layout } from "lucide-react";
 import { formatDistanceToNow, isPast } from "date-fns";
 import { tr, enUS } from "date-fns/locale";
 import { useLanguage } from "@/context/LanguageContext";
@@ -45,7 +45,7 @@ export default function OverviewTab({ subscription, setActiveTab, settings, albi
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 animate-slide-up">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 animate-slide-up items-start">
       {/* Main Welcome Box */}
       <div className="md:col-span-2 glass-panel p-3 relative overflow-visible border border-primary-container/30 bg-primary-container/5 hover:border-primary-container transition-colors group">
         <div className="scanline"></div>
@@ -68,8 +68,10 @@ export default function OverviewTab({ subscription, setActiveTab, settings, albi
         </div>
       </div>
 
-      {/* Subscription Status Box */}
-      <div className="glass-panel p-3 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
+      {/* Left Column Stack (Subscription & System Mode) */}
+      <div className="flex flex-col gap-2">
+        {/* Subscription Status Box */}
+        <div className="glass-panel p-3 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
         <h3 className="font-headline-md text-xs text-on-surface mb-2 uppercase tracking-tight">
           {lang === 'tr' ? 'Abonelik Durumu' : 'Subscription Status'}
         </h3>
@@ -90,10 +92,32 @@ export default function OverviewTab({ subscription, setActiveTab, settings, albi
               : '💡 Upgrade to Premium to remove the vote requirement.'}
           </div>
         )}
+        </div>
+
+        {/* System Content Mode Box */}
+        <div className="glass-panel p-3 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
+          <h3 className="font-headline-md text-xs text-on-surface mb-2 uppercase tracking-tight flex items-center gap-2">
+            <Layout size={14} className="text-primary-container" />
+            {lang === 'tr' ? 'Çalışma Modu (Content)' : 'Content System Mode'}
+          </h3>
+          <div className="flex items-center gap-3">
+            <div className={`flex-1 p-2 rounded border ${settings?.system_mode === 'channel' ? 'border-primary-container/50 bg-primary-container/10 text-primary-container' : 'border-outline-variant/50 bg-surface text-on-surface-variant'} text-center transition-colors`}>
+               <div className="font-label-bold text-[10px] uppercase tracking-widest">{lang === 'tr' ? 'Kanal Bazlı' : 'Channel Based'}</div>
+            </div>
+            <div className={`flex-1 p-2 rounded border ${settings?.system_mode === 'command' ? 'border-primary-container/50 bg-primary-container/10 text-primary-container' : 'border-outline-variant/50 bg-surface text-on-surface-variant'} text-center transition-colors`}>
+               <div className="font-label-bold text-[10px] uppercase tracking-widest">{lang === 'tr' ? 'Komut Bazlı' : 'Command Based'}</div>
+            </div>
+          </div>
+          <p className="text-[9px] text-on-surface-variant mt-2 leading-relaxed opacity-80">
+            {lang === 'tr' 
+              ? 'Botun içeriği sunma yöntemi. "Kanal Bazlı" içerikler sabit kanallara düşerken, "Komut Bazlı" komutlarla çağrılır.' 
+              : 'How the bot delivers content. "Channel Based" drops content in fixed channels, "Command Based" triggers on user commands.'}
+          </p>
+        </div>
       </div>
 
       {/* Quick Stats Box */}
-      <div className="glass-panel p-3 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors">
+      <div className="glass-panel p-3 relative overflow-visible border border-outline-variant hover:border-primary-container/50 transition-colors h-full">
         <h3 className="font-headline-md text-xs text-on-surface mb-2 uppercase tracking-tight">
           {lang === 'tr' ? 'Sistem Durumu' : 'System Status'}
         </h3>
