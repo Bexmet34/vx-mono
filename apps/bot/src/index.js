@@ -296,6 +296,9 @@ client.on('interactionCreate', async interaction => {
             } else if (interaction.commandName === 'setup-autopremium') {
                 const { handleSetupAutoPremiumCommand } = require('./handlers/commandHandler');
                 await handleSetupAutoPremiumCommand(interaction);
+            } else if (interaction.commandName === 'changelog-publish') {
+                const { handleChangelogPublishCommand } = require('./handlers/changelogHandler');
+                await handleChangelogPublishCommand(interaction);
             } else if (interaction.commandName === 'reg-close') {
                 const { handleRegCloseCommand } = require('./handlers/commandHandler');
                 await handleRegCloseCommand(interaction);

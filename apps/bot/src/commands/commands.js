@@ -150,6 +150,31 @@ const commands = [
     new SlashCommandBuilder()
         .setName('drop-manual')
         .setDescription('Bot sahibi için manuel drop düşürme komutu (Owner only).'),
+
+    new SlashCommandBuilder()
+        .setName('changelog-publish')
+        .setDescription('Yeni bir güncellemeyi Supabase\'e kaydeder ve duyuru kanalına atar (Owner only).')
+        .addStringOption(option => 
+            option.setName('title')
+                .setDescription('Güncelleme başlığı')
+                .setRequired(true))
+        .addStringOption(option => 
+            option.setName('content')
+                .setDescription('Güncelleme içeriği (Markdown destekler)')
+                .setRequired(true))
+        .addStringOption(option =>
+            option.setName('version')
+                .setDescription('Versiyon (Örn: 2.1.0)')
+                .setRequired(true))
+        .addStringOption(option =>
+            option.setName('type')
+                .setDescription('Tür (feature, bugfix, improvement)')
+                .setRequired(true)
+                .addChoices(
+                    { name: 'Feature', value: 'feature' },
+                    { name: 'Bugfix', value: 'bugfix' },
+                    { name: 'Improvement', value: 'improvement' }
+                )),
 ];
 
 module.exports = commands.map(command => command.toJSON());

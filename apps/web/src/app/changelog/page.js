@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import { Calendar, ChevronDown, History } from "lucide-react";
 import ReactMarkdown from "react-markdown";
@@ -100,6 +100,30 @@ const staticLogs = [
 export default function ChangelogPage() {
   const { lang } = useLanguage();
   const [expandedIndex, setExpandedIndex] = useState(0);
+  const [dbLogs, setDbLogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/changelogs')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          const formattedDbLogs = data.map(log => ({
+            version: log.version || "Update",
+            date: new Date(log.created_at).toISOString().split('T')[0],
+            title_tr: log.title,
+            title_en: log.title,
+            content_tr: log.content,
+            content_en: log.content
+          }));
+          setDbLogs(formattedDbLogs);
+        }
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  const allLogs = [...dbLogs, ...staticLogs];
 
   return (
     <main style={{ backgroundColor: "var(--bg-color)", minHeight: "70vh", color: "white" }}>
@@ -120,7 +144,8 @@ export default function ChangelogPage() {
         </div>
 
         <div className="changelog-list">
-          {staticLogs.map((item, index) => {
+          {loading && <div style={{textAlign: "center", color: "var(--text-muted)"}}>Yükleniyor...</div>}
+          {!loading && allLogs.map((item, index) => {
             const isExpanded = expandedIndex === index;
             const content = lang === "tr" ? item.content_tr : item.content_en;
             const title = lang === "tr" ? item.title_tr : item.title_en;
