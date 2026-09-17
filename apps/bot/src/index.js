@@ -120,7 +120,6 @@ client.once('clientReady', async (c) => {
 
     const { startCronService } = require('./services/cronService');
     const { initDbListeners } = require('./services/dbListenerService');
-    const { startBroadcastWorker } = require('./services/broadcastService');
     const { initObjectiveService } = require('./services/objectiveService');
     const { startScheduledMessageService } = require('./services/scheduledMessageService');
     const { initTempRoleService } = require('./services/tempRoleService');
@@ -132,7 +131,6 @@ client.once('clientReady', async (c) => {
     if (isPrimaryShard) {
         startCronService(client);
         initDbListeners(client);
-        startBroadcastWorker(client);
         initObjectiveService(client);
         startScheduledMessageService(client);
         initTempRoleService(client);
