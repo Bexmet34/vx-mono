@@ -461,9 +461,17 @@ function initCounterService(client) {
     // 10 minutes interval
     setInterval(async () => {
         try {
+            // First check local SQLite to only query guilds that actually have active counter channels
+            const activeCounterGuilds = await db.all('SELECT DISTINCT guild_id FROM server_counter_channels');
+            if (!activeCounterGuilds || activeCounterGuilds.length === 0) return;
+
+            const activeGuildIds = activeCounterGuilds.map(r => r.guild_id).filter(id => client.guilds.cache.has(id));
+            if (activeGuildIds.length === 0) return;
+
             const { data: configs, error } = await supabase
                 .from('guild_settings')
-                .select('guild_id, language, server_counters, counters_category_id, counter_ticket_category_id, counter_role_id');
+                .select('guild_id, language, server_counters, counters_category_id, counter_ticket_category_id, counter_role_id')
+                .in('guild_id', activeGuildIds);
                 
             if (error || !configs) return;
 
