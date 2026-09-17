@@ -66,8 +66,21 @@ async function handleTicketInteraction(interaction) {
             'SELECT channel_id FROM tickets WHERE guild_id = ? AND owner_id = ? AND status = ?',
             [interaction.guildId, interaction.user.id, 'open']
         );
-        if (openTickets && openTickets.length >= maxLimit) {
-            const ticketLinks = openTickets.map(t => `<#${t.channel_id}>`).join(', ');
+
+        // Verify each ticket channel actually exists on Discord (auto-clean manual deletions)
+        const validOpenTickets = [];
+        for (const t of (openTickets || [])) {
+            const ch = interaction.guild.channels.cache.get(t.channel_id) || await interaction.guild.channels.fetch(t.channel_id).catch(() => null);
+            if (!ch) {
+                // Channel was manually deleted in Discord, clean up SQLite
+                await db.run('DELETE FROM tickets WHERE channel_id = ?', [t.channel_id]).catch(() => {});
+            } else {
+                validOpenTickets.push(t);
+            }
+        }
+
+        if (validOpenTickets.length >= maxLimit) {
+            const ticketLinks = validOpenTickets.map(t => `<#${t.channel_id}>`).join(', ');
             return interaction.editReply({
                 content: lang === 'tr'
                     ? `❌ Maksimum açık destek talebi limitine ulaştınız (Limit: ${maxLimit}). Lütfen önce mevcut talebinizi kapatın: ${ticketLinks}`
@@ -119,8 +132,26 @@ async function handleTicketInteraction(interaction) {
                 deny: [PermissionsBitField.Flags.ViewChannel],
             },
             {
+                id: interaction.client.user.id,
+                allow: [
+                    PermissionsBitField.Flags.ViewChannel,
+                    PermissionsBitField.Flags.SendMessages,
+                    PermissionsBitField.Flags.EmbedLinks,
+                    PermissionsBitField.Flags.AttachFiles,
+                    PermissionsBitField.Flags.ReadMessageHistory,
+                    PermissionsBitField.Flags.ManageChannels,
+                    PermissionsBitField.Flags.ManageMessages
+                ],
+            },
+            {
                 id: interaction.user.id,
-                allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory],
+                allow: [
+                    PermissionsBitField.Flags.ViewChannel,
+                    PermissionsBitField.Flags.SendMessages,
+                    PermissionsBitField.Flags.ReadMessageHistory,
+                    PermissionsBitField.Flags.AttachFiles,
+                    PermissionsBitField.Flags.EmbedLinks
+                ],
             }
         ];
 
