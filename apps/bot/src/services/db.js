@@ -196,6 +196,9 @@ function initDb() {
             safeAlter("ALTER TABLE guild_configs ADD COLUMN counters_category_id TEXT");
             safeAlter("ALTER TABLE guild_configs ADD COLUMN counter_ticket_category_id TEXT");
 
+            // Temporary Voice Channels (VoiceForge)
+            safeAlter("ALTER TABLE guild_configs ADD COLUMN tempvoice_creators TEXT");
+
             // Set default settings if not exists
             try {
                 db.exec(`INSERT OR IGNORE INTO system_settings (key, value) VALUES ('vote_cooldown_hours', '168')`); // 1 week default

@@ -7,9 +7,11 @@ module.exports = async (client) => {
             const member = newState.member || oldState.member;
             console.log(`[voiceStateUpdate] ${member?.user?.tag || 'User'} moved in ${newState.guild?.name || oldState.guild?.name} (old: ${oldState.channelId}, new: ${newState.channelId})`);
 
-            // Check if user left a temp channel
+            // Check if user left a temp channel (non-blocking so join is instant)
             if (oldState.channelId && oldState.channelId !== newState.channelId) {
-                await handleTempChannelLeave(oldState);
+                handleTempChannelLeave(oldState).catch(err => {
+                    console.error('[VoiceForge] Error in handleTempChannelLeave:', err);
+                });
             }
 
             // Check if user joined a new channel

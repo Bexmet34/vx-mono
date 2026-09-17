@@ -128,12 +128,27 @@ async function handleCryptoPaymentChange(client, payload) {
     }
 }
 
-// Guild Settings handler (Triggers)
 async function handleGuildSettingsChange(client, payload) {
     const config = payload.new;
     if (!config || !config.guild_id) return;
 
     try {
+        // Sync tempvoice_creators to SQLite & memory cache immediately
+        if (config.tempvoice_creators !== undefined) {
+            const db = require('./db');
+            const { configCache } = require('./guildConfig');
+            const tvJson = typeof config.tempvoice_creators === 'string' 
+                ? config.tempvoice_creators 
+                : JSON.stringify(config.tempvoice_creators);
+            db.run('UPDATE guild_configs SET tempvoice_creators = ? WHERE guild_id = ?', [tvJson, config.guild_id]).catch(() => {});
+            if (configCache && configCache.has(config.guild_id)) {
+                const cached = configCache.get(config.guild_id);
+                if (cached && cached.data) {
+                    cached.data.tempvoice_creators = config.tempvoice_creators;
+                    cached.timestamp = Date.now();
+                }
+            }
+        }
         // --- KillBoard Trigger ---
         if (config.trigger_killboard) {
             console.log(`[DbListener] Manual KillBoard trigger via realtime for guild: ${config.guild_id}`);

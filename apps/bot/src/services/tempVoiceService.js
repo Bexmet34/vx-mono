@@ -3,6 +3,10 @@ const { getGuildConfig } = require('./guildConfig');
 
 // Memory map to track active temp channels: Map<channelId, { ownerId: string, creatorId: string, count: number }>
 const activeTempChannels = new Map();
+// Set to prevent duplicate concurrent creations for the same member
+const creatingMembers = new Set();
+// Timers map to prevent premature deletion during quick reconnects: Map<channelId, Timeout>
+const pendingDeletions = new Map();
 
 /**
  * Converts a number to Roman numerals
@@ -118,6 +122,13 @@ async function handleCreatorJoin(newState, creatorConfig) {
 
     if (!member || !creatorConfig) return;
 
+    // Prevent duplicate concurrent channel creations for the same user
+    if (creatingMembers.has(member.id)) {
+        console.log(`[VoiceForge] Ignored concurrent creator join for ${member.user.tag}`);
+        return;
+    }
+    creatingMembers.add(member.id);
+
     try {
         const template = creatorConfig.channelNameFormat || creatorConfig.channelNameTemplate || creatorConfig.channelName || creatorConfig.nameFormat || "Kanal - {NUMBER}";
         const hasNumberToken = /{NUMBER(?:_ROMAN|_ALPHA|_EXPONENT|_DIGIT)?}/.test(template);
@@ -149,6 +160,9 @@ async function handleCreatorJoin(newState, creatorConfig) {
             tempChannelCount = 1;
         }
 
+        // Clamp channel name to valid Discord length (1-100 characters)
+        channelName = channelName.trim().slice(0, 100) || `${member.user.username}'s channel`;
+
         // Determine category
         let categoryId = creatorConfig.categoryId;
         if (categoryId === 'Oluşturucunun kategorisi' || !categoryId) {
@@ -158,36 +172,49 @@ async function handleCreatorJoin(newState, creatorConfig) {
             categoryId = newState.channel ? newState.channel.parentId : null;
         }
 
-        // Build base permissions
-        const permissionOverwrites = [];
+        // Determine bitrate safely within guild limits (prevent Discord 50035 error on unboosted guilds)
+        let targetBitrate = 64000;
+        if (creatorConfig.bitrate === '128kbps') targetBitrate = 128000;
+        else if (creatorConfig.bitrate === '96kbps') targetBitrate = 96000;
+        else if (creatorConfig.bitrate === '64kbps') targetBitrate = 64000;
+        const maxBitrate = guild.maximumBitrate || 96000;
+        const finalBitrate = Math.min(targetBitrate, maxBitrate);
+
+        // Inherit RTC Region from creator channel or config
+        const creatorChannel = newState.channel;
+        const rtcRegion = creatorConfig.rtcRegion || creatorChannel?.rtcRegion || null;
+
+        // User limit safely bounded
+        const userLimit = Math.max(0, Math.min(99, parseInt(creatorConfig.userLimit, 10) || 0));
+
+        // Build base permissions safely without duplicates
+        const filteredOverwrites = [];
+        const setOverwrite = (id, type, allow = [], deny = []) => {
+            const idx = filteredOverwrites.findIndex(ow => ow.id === id);
+            if (idx > -1) filteredOverwrites.splice(idx, 1);
+            filteredOverwrites.push({ id, type, allow, deny });
+        };
 
         // 1. Sync Mode (Category or Creator)
         if (creatorConfig.permissionSyncMode === 'creator' && newState.channel) {
             newState.channel.permissionOverwrites.cache.forEach(ow => {
-                permissionOverwrites.push({
-                    id: ow.id,
-                    allow: ow.allow.toArray(),
-                    deny: ow.deny.toArray(),
-                    type: ow.type
-                });
+                setOverwrite(ow.id, ow.type, ow.allow.toArray(), ow.deny.toArray());
             });
         } else if (creatorConfig.permissionSyncMode === 'category' && categoryId) {
             const category = guild.channels.cache.get(categoryId);
             if (category) {
                 category.permissionOverwrites.cache.forEach(ow => {
-                    permissionOverwrites.push({
-                        id: ow.id,
-                        allow: ow.allow.toArray(),
-                        deny: ow.deny.toArray(),
-                        type: ow.type
-                    });
+                    setOverwrite(ow.id, ow.type, ow.allow.toArray(), ow.deny.toArray());
                 });
             }
         }
 
+        // Remove any pre-existing @everyone from sync; we set it definitively below
+        const everyoneIdx = filteredOverwrites.findIndex(ow => ow.id === guild.id);
+        if (everyoneIdx > -1) filteredOverwrites.splice(everyoneIdx, 1);
+
         // 2. Privacy Mode applied to @everyone
-        const filteredOverwrites = permissionOverwrites.filter(ow => ow.id !== guild.id);
-        
+        const hasAllowedRoles = Array.isArray(creatorConfig.allowedRoles) && creatorConfig.allowedRoles.length > 0;
         const everyoneAllow = [];
         const everyoneDeny = [];
 
@@ -198,32 +225,66 @@ async function handleCreatorJoin(newState, creatorConfig) {
             everyoneDeny.push(PermissionFlagsBits.ViewChannel, PermissionFlagsBits.Connect);
         } else {
             // public
-            everyoneAllow.push(PermissionFlagsBits.ViewChannel, PermissionFlagsBits.Connect);
-        }
-
-        filteredOverwrites.push({
-            id: guild.id,
-            allow: everyoneAllow,
-            deny: everyoneDeny,
-            type: OverwriteType.Role
-        });
-
-        // 3. Allowed Roles
-        if (Array.isArray(creatorConfig.allowedRoles)) {
-            for (const roleId of creatorConfig.allowedRoles) {
-                const idx = filteredOverwrites.findIndex(ow => ow.id === roleId);
-                if (idx > -1) filteredOverwrites.splice(idx, 1);
-
-                filteredOverwrites.push({
-                    id: roleId,
-                    allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.Connect],
-                    type: OverwriteType.Role
-                });
+            if (hasAllowedRoles) {
+                // If specific roles are allowed, restrict @everyone from connecting
+                everyoneDeny.push(PermissionFlagsBits.Connect);
+                everyoneAllow.push(PermissionFlagsBits.ViewChannel);
+            } else {
+                // Completely public room: grant full voice experience
+                everyoneAllow.push(
+                    PermissionFlagsBits.ViewChannel,
+                    PermissionFlagsBits.Connect,
+                    PermissionFlagsBits.Speak,
+                    PermissionFlagsBits.Stream,
+                    PermissionFlagsBits.UseVAD
+                );
             }
         }
 
-        // 4. Owner Permissions
-        const ownerAllow = [];
+        setOverwrite(guild.id, OverwriteType.Role, everyoneAllow, everyoneDeny);
+
+        // 3. Allowed Roles
+        if (hasAllowedRoles) {
+            for (const roleId of creatorConfig.allowedRoles) {
+                setOverwrite(
+                    roleId,
+                    OverwriteType.Role,
+                    [
+                        PermissionFlagsBits.ViewChannel,
+                        PermissionFlagsBits.Connect,
+                        PermissionFlagsBits.Speak,
+                        PermissionFlagsBits.Stream,
+                        PermissionFlagsBits.UseVAD
+                    ],
+                    []
+                );
+            }
+        }
+
+        // 4. Guarantee Bot Full Permissions (always can manage/move/connect)
+        setOverwrite(
+            guild.client.user.id,
+            OverwriteType.Member,
+            [
+                PermissionFlagsBits.ViewChannel,
+                PermissionFlagsBits.Connect,
+                PermissionFlagsBits.Speak,
+                PermissionFlagsBits.ManageChannels,
+                PermissionFlagsBits.MoveMembers,
+                PermissionFlagsBits.ManageRoles
+            ],
+            []
+        );
+
+        // 5. Owner Permissions (ALWAYS include ViewChannel, Connect, Speak, Stream, UseVAD)
+        const ownerAllow = [
+            PermissionFlagsBits.ViewChannel,
+            PermissionFlagsBits.Connect,
+            PermissionFlagsBits.Speak,
+            PermissionFlagsBits.Stream,
+            PermissionFlagsBits.UseVAD
+        ];
+
         if (Array.isArray(creatorConfig.ownerPermissions)) {
             const permMap = {
                 'manage_roles': PermissionFlagsBits.ManageRoles,
@@ -241,18 +302,15 @@ async function handleCreatorJoin(newState, creatorConfig) {
             };
 
             for (const p of creatorConfig.ownerPermissions) {
-                if (permMap[p]) ownerAllow.push(permMap[p]);
+                if (permMap[p] && !ownerAllow.includes(permMap[p])) {
+                    ownerAllow.push(permMap[p]);
+                }
             }
         }
-        ownerAllow.push(PermissionFlagsBits.ViewChannel, PermissionFlagsBits.Connect);
 
-        filteredOverwrites.push({
-            id: member.id,
-            allow: ownerAllow,
-            type: OverwriteType.Member
-        });
+        setOverwrite(member.id, OverwriteType.Member, ownerAllow, []);
 
-        const creatorChannel = newState.channel;
+        const creatorChannelRef = newState.channel;
         let positionValue;
 
         if (creatorConfig.position === 'Üstte') {
@@ -260,22 +318,27 @@ async function handleCreatorJoin(newState, creatorConfig) {
         } else if (creatorConfig.position === 'Altta') {
             positionValue = 999;
         } else if (creatorConfig.position === 'Oluşturucunun hemen altında') {
-            positionValue = creatorChannel ? creatorChannel.position + 1 : 999;
+            positionValue = creatorChannelRef ? creatorChannelRef.position + 1 : 999;
         } else {
-            positionValue = creatorChannel ? creatorChannel.position + 1 : 999;
+            positionValue = creatorChannelRef ? creatorChannelRef.position + 1 : 999;
         }
 
         // Create the channel
-        const newChannel = await guild.channels.create({
+        const channelOptions = {
             name: channelName,
             type: ChannelType.GuildVoice,
             parent: categoryId || null,
             position: positionValue,
-            bitrate: creatorConfig.bitrate === '128kbps' ? 128000 : (creatorConfig.bitrate === '96kbps' ? 96000 : 64000),
-            userLimit: parseInt(creatorConfig.userLimit) || 0,
+            bitrate: finalBitrate,
+            userLimit: userLimit,
             permissionOverwrites: filteredOverwrites,
             reason: 'VoiceForge channel created'
-        });
+        };
+        if (rtcRegion) {
+            channelOptions.rtcRegion = rtcRegion;
+        }
+
+        const newChannel = await guild.channels.create(channelOptions);
 
         // Store in memory
         activeTempChannels.set(newChannel.id, {
@@ -284,25 +347,31 @@ async function handleCreatorJoin(newState, creatorConfig) {
             count: tempChannelCount
         });
 
-        // Move the user
-        await member.voice.setChannel(newChannel.id).catch(err => {
-            console.error(`[VoiceForge] Failed to move user ${member.user.tag} to ${newChannel.name}:`, err);
-            // If move fails and channel is empty, cleanup
-            setTimeout(() => {
-                if (newChannel.members.size === 0) {
-                    activeTempChannels.delete(newChannel.id);
-                    newChannel.delete().catch(() => {});
-                }
-            }, 3000);
-        });
+        // Move the user if still connected to voice
+        if (member.voice && member.voice.channelId) {
+            await member.voice.setChannel(newChannel.id).catch(err => {
+                console.error(`[VoiceForge] Failed to move user ${member.user.tag} to ${newChannel.name}:`, err.message);
+            });
+        }
+
+        // Initial safety check after 8s: if user never joined, cleanup
+        setTimeout(() => {
+            const refreshed = guild.channels.cache.get(newChannel.id);
+            if (refreshed && refreshed.members.size === 0) {
+                activeTempChannels.delete(newChannel.id);
+                refreshed.delete('VoiceForge initial empty check').catch(() => {});
+            }
+        }, 8000);
 
     } catch (err) {
         console.error(`[VoiceForge] Error creating temp channel for ${member.user.tag}:`, err);
+    } finally {
+        creatingMembers.delete(member.id);
     }
 }
 
 /**
- * Handles logic when a user leaves a voice channel (auto-cleanup empty temporary channels)
+ * Handles logic when a user leaves a voice channel (auto-cleanup empty temporary channels with grace period)
  */
 async function handleTempChannelLeave(oldState) {
     const channelId = oldState.channelId;
@@ -341,27 +410,34 @@ async function handleTempChannelLeave(oldState) {
     if (isTempChannel) {
         const remainingMembers = channel.members.filter(m => m.id !== oldState.id);
         if (remainingMembers.size === 0) {
-            try {
-                activeTempChannels.delete(channelId);
-                await channel.delete('VoiceForge channel empty');
-                console.log(`[VoiceForge] Cleaned up empty channel: ${channel.name} (${channelId}) in ${guild.name}`);
-                return;
-            } catch (err) {
-                console.error(`[VoiceForge] Failed to delete empty temp channel ${channelId}:`, err.message);
+            // Cancel any existing pending deletion timer
+            if (pendingDeletions.has(channelId)) {
+                clearTimeout(pendingDeletions.get(channelId));
+            }
+
+            // Grace period of 3.5 seconds to avoid deleting during reconnect or WebRTC route change
+            const timer = setTimeout(async () => {
+                pendingDeletions.delete(channelId);
+                try {
+                    const refreshed = guild.channels.cache.get(channelId);
+                    if (refreshed && refreshed.members.size === 0) {
+                        activeTempChannels.delete(channelId);
+                        await refreshed.delete('VoiceForge channel empty').catch(() => {});
+                        console.log(`[VoiceForge] Cleaned up empty channel: ${refreshed.name} (${channelId}) in ${guild.name}`);
+                    }
+                } catch (err) {
+                    console.error(`[VoiceForge] Failed to delete empty temp channel ${channelId}:`, err.message);
+                }
+            }, 3500);
+
+            pendingDeletions.set(channelId, timer);
+        } else {
+            // Channel still has members; cancel any pending deletion
+            if (pendingDeletions.has(channelId)) {
+                clearTimeout(pendingDeletions.get(channelId));
+                pendingDeletions.delete(channelId);
             }
         }
-
-        // Safety delayed check in case of Discord API race conditions
-        setTimeout(async () => {
-            try {
-                const refreshed = guild.channels.cache.get(channelId);
-                if (refreshed && refreshed.members.size === 0) {
-                    activeTempChannels.delete(channelId);
-                    await refreshed.delete('VoiceForge channel empty (safety check)').catch(() => {});
-                    console.log(`[VoiceForge] Cleaned up empty channel (safety check): ${refreshed.name} (${channelId}) in ${guild.name}`);
-                }
-            } catch (e) {}
-        }, 2500);
     }
 }
 
@@ -454,6 +530,9 @@ async function updateOwnerPermissions(vc, newOwnerId, creatorId, guildId) {
     }
     ownerAllowObj['ViewChannel'] = true;
     ownerAllowObj['Connect'] = true;
+    ownerAllowObj['Speak'] = true;
+    ownerAllowObj['Stream'] = true;
+    ownerAllowObj['UseVAD'] = true;
     
     await vc.permissionOverwrites.edit(newOwnerId, ownerAllowObj);
 }
