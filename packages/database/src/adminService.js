@@ -59,15 +59,6 @@ async function deleteUser(discordId) {
     if (error) throw error;
 }
 
-async function queueMessage(payload) {
-    const supabase = getClient();
-    const { error } = await supabase.from('message_queue').insert({
-        ...payload,
-        status: 'pending'
-    });
-    if (error) throw error;
-}
-
 async function getNotificationTemplate(templateId) {
     const supabase = getClient();
     const { data, error } = await supabase
@@ -244,19 +235,6 @@ async function deleteOldCachedGuildMembers(dateString) {
     if (error) throw error;
 }
 
-async function createCampaignLog(logs) {
-    const supabase = getClient();
-    const { error } = await supabase.from('campaign_logs').insert(logs);
-    if (error) throw error;
-}
-
-async function updateCampaign(id, updates) {
-    const supabase = getClient();
-    const { data, error } = await supabase.from('campaigns').update(updates).eq('id', id).select().single();
-    if (error) throw error;
-    return data;
-}
-
 async function createAutoPremiumRule(rule) {
     const supabase = getClient();
     const { data, error } = await supabase.from('auto_premium_rules').insert([rule]).select();
@@ -335,7 +313,6 @@ module.exports = {
     upsertUser,
     updateUser,
     deleteUser,
-    queueMessage,
     getNotificationTemplate,
     getParsedTemplate,
     getAllSubscriptions,
@@ -347,8 +324,6 @@ module.exports = {
     getAutoPremiumRulesOnlyGuilds,
     upsertCachedGuildMembers,
     deleteOldCachedGuildMembers,
-    createCampaignLog,
-    updateCampaign,
     createAutoPremiumRule,
     updateAutoPremiumRule,
     deleteAutoPremiumRule,

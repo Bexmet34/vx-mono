@@ -27,8 +27,6 @@ export const MENU_ITEMS = [
   // { id: "bank-accounts", label: "Banka Hesapları", icon: <Building size={20} /> },
   { id: "notifications", label: "Şablonlar", icon: <Bell size={20} /> },
   { id: "announcements", label: "Duyurular", icon: <Megaphone size={20} /> },
-  { id: "campaigns", label: "Kampanyalar", icon: <Gift size={20} /> },
-  { id: "broadcast", label: "Toplu Mesaj", icon: <Radio size={20} /> },
   { id: "blog-automation", label: "Blog Otomasyonu", icon: <FileText size={20} /> },
   { id: "settings", label: "Sistem Ayarları", icon: <Settings size={20} /> },
 ];
