@@ -103,7 +103,8 @@ async function generateKillboardImage(event) {
         ctx.restore();
       }
     } catch (err) {
-      console.error(`[Killboard] Failed to load item image (API Error): ${item.Type || 'Unknown'}`);
+      // Albion CDN'de görseli bulunmayan eşyalar (Token/Trash vb.) için fallback
+      console.warn(`[Killboard] Item image not available on CDN: ${item.Type || 'Unknown'}`);
     }
 
     // Trash Katmanı

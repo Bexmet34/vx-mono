@@ -406,7 +406,10 @@ client.on('interactionCreate', async interaction => {
             }).catch(() => {});
         }
     } catch (error) {
-        console.error('[Interaction] TOP-LEVEL ERROR for', interaction.customId || interaction.commandName, error);
+        const isIgnorable = error.code === 10062 || error.code === 40060 || error.message?.includes('Unknown interaction') || error.message?.includes('already been acknowledged');
+        if (!isIgnorable) {
+            console.error('[Interaction] TOP-LEVEL ERROR for', interaction.customId || interaction.commandName, error);
+        }
         const guildSettings = await getGuildConfig(interaction.guildId);
         const lang = guildSettings?.language || 'tr';
         await handleInteractionError(interaction, error, lang);

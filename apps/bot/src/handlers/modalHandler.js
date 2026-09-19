@@ -25,6 +25,8 @@ const config = require('../config/config');
 
 async function handlePartiModal(interaction) {
     if (interaction.customId.startsWith('parti_modal:')) {
+        await interaction.deferReply({ flags: [MessageFlags.Ephemeral] }).catch(() => {});
+
         const parts = interaction.customId.split(':');
         const type = parts[1] || 'genel';
         const guildConfig = await getGuildConfig(interaction.guildId);
@@ -41,8 +43,6 @@ async function handlePartiModal(interaction) {
         const userPremium = await isUserPremium(userId);
         const serverPremium = await isSubscriptionActive(interaction.guildId);
         const needsVote = !(isDeveloper || userPremium || serverPremium);
-
-        await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
 
         if (needsVote) {
             let hasVoted = await checkWeeklyVote(userId);
@@ -182,11 +182,11 @@ async function handlePartiModal(interaction) {
  */
 async function handleSaveTempModal(interaction) {
     if (interaction.customId.startsWith('save_temp_modal:')) {
+        await interaction.deferReply({ flags: [MessageFlags.Ephemeral] }).catch(() => {});
+
         const guildConfig = await getGuildConfig(interaction.guildId);
         const lang = guildConfig?.language || 'tr';
         const userId = interaction.user.id;
-
-        await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
 
         const isDeveloper = config.WHITELIST_USERS?.includes(userId);
         const userPremium = await isUserPremium(userId);
@@ -217,12 +217,12 @@ async function handleSaveTempModal(interaction) {
             });
         }
     } else if (interaction.customId.startsWith('edit_temp_modal:')) {
+        await interaction.deferReply({ flags: [MessageFlags.Ephemeral] }).catch(() => {});
+
         const templateId = interaction.customId.split(':')[1];
         const guildConfig = await getGuildConfig(interaction.guildId);
         const lang = guildConfig?.language || 'tr';
         const userId = interaction.user.id;
-
-        await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
 
         const templateName = interaction.fields.getTextInputValue('template_name');
         const header = interaction.fields.getTextInputValue('party_header');
