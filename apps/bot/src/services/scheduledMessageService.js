@@ -2,6 +2,45 @@ const cron = require('node-cron');
 const { supabase } = require('@veyronix/database');
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType } = require('discord.js');
 
+// Aktif zamanlanmış mesajları bellekte tutarak her dakika Supabase'e boş GET sorguları atılmasını engeller
+const activeScheduledMessagesCache = new Map();
+let isScheduledCacheInitialized = false;
+
+/**
+ * Aktif zamanlanmış mesajları Supabase'den ilk kez belleğe çeker
+ */
+async function initScheduledMessagesCache() {
+    try {
+        const { data, error } = await supabase
+            .from('scheduled_messages')
+            .select('*')
+            .eq('is_active', true);
+        
+        if (!error && data) {
+            activeScheduledMessagesCache.clear();
+            for (const m of data) {
+                activeScheduledMessagesCache.set(m.id, m);
+            }
+            isScheduledCacheInitialized = true;
+            console.log(`[ScheduledMessageService] Initialized ${data.length} active scheduled messages in memory.`);
+        }
+    } catch (err) {
+        console.error('[ScheduledMessageService] Cache init error:', err.message);
+    }
+}
+
+/**
+ * Realtime veya panelden gelen güncellemelerle önbelleği senkronize eder
+ */
+function syncScheduledMessagesCache(msg, isDeleted = false) {
+    if (!msg || !msg.id) return;
+    if (isDeleted || !msg.is_active) {
+        activeScheduledMessagesCache.delete(msg.id);
+    } else {
+        activeScheduledMessagesCache.set(msg.id, msg);
+    }
+}
+
 /**
  * Starts the scheduled message service
  * @param {import('discord.js').Client} client 
@@ -9,26 +48,24 @@ const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType } = require('d
 function startScheduledMessageService(client) {
     console.log('[ScheduledMessageService] Service started (checking every minute)...');
 
-    // Run every minute
+    // Run every minute (Aktif mesaj yoksa Supabase'e 0 istek atar)
     cron.schedule('* * * * *', async () => {
         try {
+            if (!isScheduledCacheInitialized) {
+                await initScheduledMessagesCache();
+            }
+
+            if (activeScheduledMessagesCache.size === 0) {
+                return; // Aktif mesaj yoksa Supabase'e ASLA istek atma
+            }
+
             // TR timezone date
             const now = new Date();
             const trTime = new Date(now.getTime() + (3 * 60 * 60 * 1000));
             const currentHHmm = `${String(trTime.getUTCHours()).padStart(2, '0')}:${String(trTime.getUTCMinutes()).padStart(2, '0')}`;
             const currentDateString = trTime.toISOString().split('T')[0];
 
-            const { data: messages, error } = await supabase
-                .from('scheduled_messages')
-                .select('*')
-                .eq('is_active', true);
-
-            if (error) {
-                console.error("[ScheduledMessageService] Fetch Error:", error.message);
-                return;
-            }
-
-            if (!messages || messages.length === 0) return;
+            const messages = Array.from(activeScheduledMessagesCache.values());
 
             for (const msg of messages) {
                 let shouldSend = false;
@@ -190,4 +227,8 @@ async function broadcastMessage(client, msg) {
     console.log(`[ScheduledMessageService] Broadcast finished. Success: ${successCount}, Fail: ${failCount}`);
 }
 
-module.exports = { startScheduledMessageService };
+module.exports = {
+    startScheduledMessageService,
+    initScheduledMessagesCache,
+    syncScheduledMessagesCache
+};

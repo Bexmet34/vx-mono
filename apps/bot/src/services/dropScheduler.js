@@ -42,24 +42,61 @@ function resolveTargetChannels(channelIds, mode) {
   return [picked];
 }
 
+// Aktif zamanlı drop ayarlarını bellekte tutarak her dakika Supabase'e boş GET sorguları atılmasını engeller
+const activeDropSettingsCache = new Map();
+let isDropCacheInitialized = false;
+
 /**
- * Her dakika cron tarafından çağrılır
+ * Aktif drop ayarlarını Supabase'den ilk kez belleğe çeker
  */
-async function processTimeBasedDrops(client) {
+async function initDropSettingsCache() {
   try {
-    const { data: allSettings, error } = await supabase
+    const { data, error } = await supabase
       .from('drop_settings')
       .select('*')
       .eq('is_enabled', true)
       .in('schedule_type', ['exact_minutes', 'random_interval', 'hourly_chance']);
+    
+    if (!error && data) {
+      activeDropSettingsCache.clear();
+      for (const s of data) {
+        activeDropSettingsCache.set(s.guild_id, s);
+      }
+      isDropCacheInitialized = true;
+      console.log(`[DropScheduler] Initialized ${data.length} active drop settings in memory.`);
+    }
+  } catch (err) {
+    console.error('[DropScheduler] Cache init error:', err.message);
+  }
+}
 
-    if (error) {
-      console.error('[DropScheduler] DB Error:', error);
-      return;
+/**
+ * Realtime veya panel güncellemelerinden drop önbelleğini senkronize eder
+ */
+function syncDropSettingsCache(setting, isDeleted = false) {
+  if (!setting || !setting.guild_id) return;
+  const isTimeBased = ['exact_minutes', 'random_interval', 'hourly_chance'].includes(setting.schedule_type);
+  if (isDeleted || !setting.is_enabled || !isTimeBased) {
+    activeDropSettingsCache.delete(setting.guild_id);
+  } else {
+    activeDropSettingsCache.set(setting.guild_id, setting);
+  }
+}
+
+/**
+ * Her dakika cron tarafından çağrılır (Aktif ayar yoksa Supabase'e 0 istek atar)
+ */
+async function processTimeBasedDrops(client) {
+  try {
+    if (!isDropCacheInitialized) {
+      await initDropSettingsCache();
     }
 
-    if (!allSettings || allSettings.length === 0) return;
+    if (activeDropSettingsCache.size === 0) {
+      return; // Aktif zamanlı drop yoksa Supabase'e ASLA istek atma
+    }
 
+    const allSettings = Array.from(activeDropSettingsCache.values());
     const now           = new Date();
     const currentMinute = now.getMinutes();
 
@@ -145,4 +182,6 @@ async function processTimeBasedDrops(client) {
 
 module.exports = {
   processTimeBasedDrops,
+  initDropSettingsCache,
+  syncDropSettingsCache
 };

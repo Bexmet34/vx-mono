@@ -12,16 +12,14 @@ async function getSupabaseGuildSettings(guildId) {
             .from('guild_settings')
             .select('*')
             .eq('guild_id', guildId)
-            .single();
+            .maybeSingle();
 
         if (error) {
-            if (error.code !== 'PGRST116') { // PGRST116 is not found
-                console.error(`[Supabase] Error fetching guild_settings for ${guildId}:`, error.message);
-            }
+            console.error(`[Supabase] Error fetching guild_settings for ${guildId}:`, error.message);
             return null;
         }
 
-        return data; // Returns the full row: id, guild_id, owner_id, language, embed_thumbnail_url, party_templates, etc.
+        return data; // Returns the full row or null if not found
     } catch (e) {
         console.error(`[Supabase] Exception fetching guild_settings for ${guildId}:`, e.message);
         return null;
@@ -40,7 +38,7 @@ async function updateGuildLanguage(guildId, language, ownerId = null) {
             .from('guild_settings')
             .select('id')
             .eq('guild_id', guildId)
-            .single();
+            .maybeSingle();
 
         if (existing) {
             const { error } = await supabase

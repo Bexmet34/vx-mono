@@ -41,7 +41,35 @@ async function initDbListeners(client) {
         console.error('[DbListenerService] Initial pending payments fetch error:', err.message);
     }
 
-    // 3. Setup Realtime Channel
+    // 3. Pre-load all guild_settings into memory cache (Eliminates ~34,000 queries/day)
+    try {
+        const { data: allGuildSettings, error: gsErr } = await supabase.from('guild_settings').select('*');
+        if (!gsErr && allGuildSettings) {
+            const { setCachedGuildSettings } = require('./guildConfig');
+            for (const gs of allGuildSettings) {
+                setCachedGuildSettings(gs.guild_id, gs);
+            }
+            console.log(`[DbListenerService] Pre-loaded ${allGuildSettings.length} guild settings into memory.`);
+        }
+    } catch (err) {
+        console.error('[DbListenerService] Pre-load guild settings error:', err.message);
+    }
+
+    // 4. Pre-load giveaways, drop settings and scheduled messages
+    try {
+        const { initGiveawayCache } = require('./giveawayEngine');
+        const { initDropSettingsCache } = require('./dropScheduler');
+        const { initScheduledMessagesCache } = require('./scheduledMessageService');
+        await Promise.allSettled([
+            initGiveawayCache(),
+            initDropSettingsCache(),
+            initScheduledMessagesCache()
+        ]);
+    } catch (err) {
+        console.error('[DbListenerService] Pre-load cron caches error:', err.message);
+    }
+
+    // 5. Setup Realtime Channel
     const channel = supabase.channel('public_db_changes')
         .on(
             'postgres_changes',
@@ -63,6 +91,33 @@ async function initDbListeners(client) {
             { event: '*', schema: 'public', table: 'custom_role_menus' },
             (payload) => handleRoleMenuChange(client, payload)
         )
+        .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'giveaways' },
+            (payload) => {
+                const { syncGiveawayCache } = require('./giveawayEngine');
+                const isDeleted = payload.eventType === 'DELETE';
+                syncGiveawayCache(isDeleted ? payload.old : payload.new, isDeleted);
+            }
+        )
+        .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'drop_settings' },
+            (payload) => {
+                const { syncDropSettingsCache } = require('./dropScheduler');
+                const isDeleted = payload.eventType === 'DELETE';
+                syncDropSettingsCache(isDeleted ? payload.old : payload.new, isDeleted);
+            }
+        )
+        .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'scheduled_messages' },
+            (payload) => {
+                const { syncScheduledMessagesCache } = require('./scheduledMessageService');
+                const isDeleted = payload.eventType === 'DELETE';
+                syncScheduledMessagesCache(isDeleted ? payload.old : payload.new, isDeleted);
+            }
+        )
         .subscribe((status) => {
             if (status === 'SUBSCRIBED') {
                 console.log('[DbListenerService] Realtime subscribed successfully!');
@@ -74,11 +129,16 @@ async function initDbListeners(client) {
 
 // Subscriptions handler
 async function handleSubscriptionChange(client, payload) {
-    const sub = payload.new;
-    // If it's a DELETE event, payload.new might be empty
+    const isDeleted = payload.eventType === 'DELETE';
+    const sub = isDeleted ? payload.old : payload.new;
     if (!sub || !sub.guild_id) return;
 
     const guildId = sub.guild_id;
+    try {
+        const { invalidateSubCache } = require('@veyronix/database');
+        invalidateSubCache(guildId);
+    } catch (e) {}
+
     const oldSub = lastKnownSubs.get(guildId);
 
     if (oldSub) {
@@ -129,25 +189,25 @@ async function handleCryptoPaymentChange(client, payload) {
 }
 
 async function handleGuildSettingsChange(client, payload) {
-    const config = payload.new;
+    const isDeleted = payload.eventType === 'DELETE';
+    const config = isDeleted ? payload.old : payload.new;
     if (!config || !config.guild_id) return;
 
     try {
+        const { setCachedGuildSettings, configCache } = require('./guildConfig');
+        if (isDeleted) {
+            configCache.delete(config.guild_id);
+        } else {
+            setCachedGuildSettings(config.guild_id, config);
+        }
+
         // Sync tempvoice_creators to SQLite & memory cache immediately
         if (config.tempvoice_creators !== undefined) {
             const db = require('./db');
-            const { configCache } = require('./guildConfig');
             const tvJson = typeof config.tempvoice_creators === 'string' 
                 ? config.tempvoice_creators 
                 : JSON.stringify(config.tempvoice_creators);
             db.run('UPDATE guild_configs SET tempvoice_creators = ? WHERE guild_id = ?', [tvJson, config.guild_id]).catch(() => {});
-            if (configCache && configCache.has(config.guild_id)) {
-                const cached = configCache.get(config.guild_id);
-                if (cached && cached.data) {
-                    cached.data.tempvoice_creators = config.tempvoice_creators;
-                    cached.timestamp = Date.now();
-                }
-            }
         }
         // --- KillBoard Trigger ---
         if (config.trigger_killboard) {

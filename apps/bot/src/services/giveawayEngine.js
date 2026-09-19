@@ -124,24 +124,81 @@ async function publishGiveawayMessage(client, giveaway) {
     await updateGiveawayMessageId(giveaway.id, message.id);
   }
 
+  syncGiveawayCache(giveaway);
+
   return message;
 }
 
+// Aktif çekilişleri bellekte tutarak her dakika Supabase'e boş GET sorguları atılmasını engeller
+const activeGiveawaysCache = new Map();
+let isGiveawayCacheInitialized = false;
+
 /**
- * Checks and finalizes expired giveaways (Cron task)
+ * Aktif çekilişleri Supabase'den ilk kez belleğe çeker
+ */
+async function initGiveawayCache() {
+  try {
+    const { data, error } = await supabase
+      .from('giveaways')
+      .select('*')
+      .eq('status', 'active');
+    
+    if (!error && data) {
+      activeGiveawaysCache.clear();
+      for (const g of data) {
+        activeGiveawaysCache.set(g.id, g);
+      }
+      isGiveawayCacheInitialized = true;
+      console.log(`[GiveawayEngine] Initialized ${data.length} active giveaways in memory.`);
+    }
+  } catch (err) {
+    console.error('[GiveawayEngine] Cache init error:', err.message);
+  }
+}
+
+/**
+ * Realtime veya yerel olaylardan çekiliş önbelleğini günceller
+ */
+function syncGiveawayCache(giveaway, isDeleted = false) {
+  if (!giveaway || !giveaway.id) return;
+  if (isDeleted || giveaway.status !== 'active') {
+    activeGiveawaysCache.delete(giveaway.id);
+  } else {
+    activeGiveawaysCache.set(giveaway.id, giveaway);
+  }
+}
+
+/**
+ * Checks and finalizes expired giveaways (Cron task - Zero Supabase queries if no expired)
  */
 async function checkExpiredGiveaways(client) {
   try {
-    const now = new Date().toISOString();
-    const { data: expiredGiveaways } = await supabase
-      .from('giveaways')
-      .select('*')
-      .eq('status', 'active')
-      .lte('ends_at', now);
+    if (!isGiveawayCacheInitialized) {
+      await initGiveawayCache();
+    }
 
-    if (!expiredGiveaways || expiredGiveaways.length === 0) return;
+    if (activeGiveawaysCache.size === 0) {
+      return; // Aktif çekiliş yoksa Supabase'e ASLA sorgu atma
+    }
 
-    for (const giveaway of expiredGiveaways) {
+    const now = Date.now();
+    const expiredList = [];
+
+    for (const [id, giveaway] of activeGiveawaysCache.entries()) {
+      if (giveaway.ends_at) {
+        const endsAtTime = new Date(giveaway.ends_at).getTime();
+        if (endsAtTime <= now) {
+          expiredList.push(giveaway);
+        }
+      }
+    }
+
+    if (expiredList.length === 0) {
+      return; // Henüz süresi dolan çekiliş yoksa Supabase'e ASLA sorgu atma
+    }
+
+    for (const giveaway of expiredList) {
+      activeGiveawaysCache.delete(giveaway.id);
       await finalizeGiveaway(client, giveaway);
     }
   } catch (err) {
@@ -247,5 +304,7 @@ module.exports = {
   buildGiveawayComponents,
   publishGiveawayMessage,
   checkExpiredGiveaways,
-  finalizeGiveaway
+  finalizeGiveaway,
+  initGiveawayCache,
+  syncGiveawayCache
 };

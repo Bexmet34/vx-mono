@@ -2,22 +2,36 @@ const db = require('./db');
 const { getSupabaseGuildSettings, updateGuildLanguage, updateSupabaseGuildSettings } = require('@veyronix/database');
 
 const configCache = new Map();
-const CACHE_TTL_MS = 60 * 1000; // 60 seconds TTL (reduced DB overhead)
+const CACHE_TTL_MS = 10 * 60 * 1000; // 10 dakika (Realtime ile senkronize)
+const NEGATIVE_CACHE_TTL_MS = 30 * 60 * 1000; // 30 dakika (DB'de kaydı olmayan sunucular için Supabase spamını önler)
 
 /**
- * Gets configuration for a specific guild with in-memory caching
+ * Toplu olarak Realtime veya başlangıçta ayarları önbelleğe doldurur
+ */
+function setCachedGuildSettings(guildId, settings) {
+    if (!guildId) return;
+    configCache.set(guildId, {
+        data: settings,
+        timestamp: Date.now(),
+        isNegative: !settings
+    });
+}
+
+/**
+ * Gets configuration for a specific guild with intelligent in-memory & negative caching
  */
 async function getGuildConfig(guildId) {
     if (!guildId) return null;
 
     const cached = configCache.get(guildId);
-    if (cached && (Date.now() - cached.timestamp < CACHE_TTL_MS)) {
-        return cached.data;
+    if (cached) {
+        const ttl = cached.isNegative ? NEGATIVE_CACHE_TTL_MS : CACHE_TTL_MS;
+        if (Date.now() - cached.timestamp < ttl) {
+            return cached.data;
+        }
     }
 
     let row = null;
-    let supabaseTimedOut = false;
-
     try {
         row = await db.get('SELECT * FROM guild_configs WHERE guild_id = ?', [guildId]);
         let configResult = row || {};
@@ -32,29 +46,20 @@ async function getGuildConfig(guildId) {
             }
         }
 
-        // Supabase ağ gecikmesi durumunda Discord'un 3 saniyelik sınırını aşmamak için
-        // 1500ms zaman aşımı koruması.
-        const sbSettings = await Promise.race([
-            getSupabaseGuildSettings(guildId),
-            new Promise((_, reject) => setTimeout(() => {
-                supabaseTimedOut = true;
-                reject(new Error('Supabase timeout'));
-            }, 1500))
-        ]).catch((err) => {
-            if (supabaseTimedOut) {
-                console.warn(`[GuildConfig] Supabase timeout (>1500ms) for guild ${guildId}. Falling back to SQLite cache. Will retry on next request.`);
-            }
-            return null;
-        });
+        // Supabase sorgusu (yalnızca önbellekte ve yerelde taze kayıt yoksa)
+        let sbSettings = null;
+        try {
+            sbSettings = await getSupabaseGuildSettings(guildId);
+        } catch (err) {
+            sbSettings = null;
+        }
 
         if (sbSettings) {
-            // Merge SB settings into local config
             configResult = { ...configResult, ...sbSettings };
             if (sbSettings.language) {
                 configResult.language = sbSettings.language;
             }
 
-            // Sync tempvoice_creators to SQLite cache
             if (sbSettings.tempvoice_creators !== undefined) {
                 const tvJson = typeof sbSettings.tempvoice_creators === 'string' 
                     ? sbSettings.tempvoice_creators 
@@ -62,7 +67,6 @@ async function getGuildConfig(guildId) {
                 db.run('UPDATE guild_configs SET tempvoice_creators = ? WHERE guild_id = ?', [tvJson, guildId]).catch(() => {});
             }
 
-            // Extract auto_delete_party_hours from log_events JSON if it exists
             if (sbSettings.log_events) {
                 try {
                     const ev = typeof sbSettings.log_events === 'string' ? JSON.parse(sbSettings.log_events) : sbSettings.log_events;
@@ -75,20 +79,21 @@ async function getGuildConfig(guildId) {
 
         const finalConfig = Object.keys(configResult).length > 0 ? configResult : null;
 
-        // Normalize language field to always be lowercase 'en' or 'tr'
         if (finalConfig && finalConfig.language) {
             finalConfig.language = finalConfig.language.toString().toLowerCase().trim() === 'en' ? 'en' : 'tr';
         }
 
-        // Cache result: if Supabase timed out, cache with a shorter TTL (15s) to avoid spamming Supabase on every single voice event
-        const effectiveTTL = supabaseTimedOut ? 15 * 1000 : CACHE_TTL_MS;
-        configCache.set(guildId, { data: finalConfig, timestamp: Date.now() - (CACHE_TTL_MS - effectiveTTL) });
+        // Hem bulunan sonucu hem de bulunamayan sunucuları (negatif cache) hafızada tut
+        configCache.set(guildId, { 
+            data: finalConfig, 
+            timestamp: Date.now(),
+            isNegative: !finalConfig
+        });
 
         return finalConfig;
 
     } catch (error) {
-        console.error(`[GuildConfig] CRITICAL ERROR fetching for ${guildId}:`, error);
-        // Fallback to local row even if Supabase fails
+        console.error(`[GuildConfig] Error fetching for ${guildId}:`, error);
         return row || null;
     }
 }
@@ -171,4 +176,4 @@ async function updateGuildConfig(guildId, data) {
     }
 }
 
-module.exports = { getGuildConfig, updateGuildConfig, configCache };
+module.exports = { getGuildConfig, updateGuildConfig, configCache, setCachedGuildSettings };

@@ -1,4 +1,10 @@
 const { supabase } = require('./client');
+const subCache = new Map();
+const SUB_CACHE_TTL_MS = 5 * 60 * 1000; // 5 dakika TTL
+
+function invalidateSubCache(guildId) {
+    if (guildId) subCache.delete(guildId);
+}
 
 /**
  * Gets subscription for a guild. If not exists, creates a 3-day trial.
@@ -8,14 +14,24 @@ const { supabase } = require('./client');
  */
 async function getSubscription(guildId, guildName, ownerId) {
     try {
+        if (!guildId) return null;
+
+        // Salt kontrol sorgusu ise ve önbellek tazeyse DB'ye gitme
+        const cached = subCache.get(guildId);
+        if (cached && (Date.now() - cached.timestamp < SUB_CACHE_TTL_MS)) {
+            if (!guildName || guildName === 'Unknown' || cached.data?.guild_name === guildName) {
+                return cached.data;
+            }
+        }
+
         // 1. Get from database
         const { data, error } = await supabase
             .from('subscriptions')
             .select('*')
             .eq('guild_id', guildId)
-            .single();
+            .maybeSingle();
 
-        if (error && error.code !== 'PGRST116') { // PGRST116 means no rows found
+        if (error) {
              console.error('[SubscriptionService] Fetch Error:', error.message);
              return null;
         }
@@ -33,13 +49,16 @@ async function getSubscription(guildId, guildName, ownerId) {
                         updated_at: new Date().toISOString() 
                     })
                     .eq('guild_id', guildId);
-                return { 
+                const updated = { 
                     ...data, 
                     guild_name: guildName || data.guild_name, 
                     owner_id: ownerId || data.owner_id, 
                     created: false 
                 };
+                subCache.set(guildId, { data: updated, timestamp: Date.now() });
+                return updated;
             }
+            subCache.set(guildId, { data: { ...data, created: false }, timestamp: Date.now() });
             return { ...data, created: false };
         }
 
@@ -228,12 +247,10 @@ async function isUserPremium(userId) {
             .from('users')
             .select('premium_until, is_unlimited')
             .eq('discord_id', userId)
-            .single();
+            .maybeSingle();
 
         if (error) {
-            if (error.code !== 'PGRST116') {
-                console.error('[SubscriptionService] User Fetch Error:', error.message);
-            }
+            console.error('[SubscriptionService] User Fetch Error:', error.message);
             return false;
         }
 
@@ -258,4 +275,5 @@ module.exports = {
     setUnlimitedSubscription,
     setSubscriptionActive,
     isUserPremium,
+    invalidateSubCache
 };
