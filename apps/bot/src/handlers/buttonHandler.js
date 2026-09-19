@@ -903,7 +903,7 @@ async function handleRegisterButtons(interaction) {
         embed.fields.forEach(field => {
             if (field.name.includes('Gerçek İsim') || field.name.includes('Real Name')) realName = field.value;
             if (field.name.includes('Yaş') || field.name.includes('Age')) age = field.value;
-            if (field.name.includes('Oyun İçi Nick') || field.name.includes('In-Game Nick')) ign = field.value;
+            if (field.name.includes('Oyun İçi Nick') || field.name.includes('In-Game Nick') || field.name.includes('Oyuncu Nicki') || field.name.includes('Player Nickname')) ign = field.value;
             if (field.name.includes('Albion ID')) albionId = field.value;
 
             // Extract Guild from the "Diğer" / "Others" field
@@ -1260,10 +1260,10 @@ async function openRegisterModal(interaction, lang = 'tr') {
 
     const inGameNameInput = new TextInputBuilder()
         .setCustomId('ingame_name')
-        .setLabel(isEn ? 'Albion In-Game Nickname' : 'Albion Oyun İçi Nickiniz')
+        .setLabel(isEn ? 'Player Nickname' : 'Oyuncu Nicki')
         .setStyle(TextInputStyle.Short)
         .setRequired(true)
-        .setMinLength(3)
+        .setMinLength(2)
         .setMaxLength(30);
 
     const ageInput = new TextInputBuilder()
