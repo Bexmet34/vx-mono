@@ -348,6 +348,27 @@ function startApiServer(manager, port = process.env.BOT_API_PORT || 3005) {
         }
     });
 
+    app.post('/api/cache/invalidate-guild-config', async (req, res) => {
+        const { guildId } = req.body;
+        if (!guildId) return res.status(400).json({ error: 'Missing guildId' });
+
+        try {
+            const path = require('path');
+            const configServicePath = path.join(process.cwd(), 'src/services/guildConfig');
+            await manager.broadcastEval(async (client, context) => {
+                const { configCache } = require(context.configServicePath);
+                if (configCache && configCache.has(context.guildId)) {
+                    configCache.delete(context.guildId);
+                }
+            }, { context: { guildId, configServicePath } });
+
+            return res.json({ success: true, message: `Cache invalidated for guild ${guildId}` });
+        } catch (error) {
+            console.error('[API] /api/cache/invalidate-guild-config Error:', error);
+            return res.status(500).json({ error: error.message });
+        }
+    });
+
     return app.listen(port, () => {
         console.log(`[API Server] Listening on port ${port}`);
     });

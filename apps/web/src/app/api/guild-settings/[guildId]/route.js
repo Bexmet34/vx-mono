@@ -188,6 +188,14 @@ export async function POST(req, { params }) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    // Invalidate bot memory cache immediately
+    const botApiUrl = process.env.BOT_API_URL || 'http://127.0.0.1:3005';
+    fetch(`${botApiUrl}/api/cache/invalidate-guild-config`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ guildId })
+    }).catch(() => {});
+
     return NextResponse.json({ success: true, data });
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 });

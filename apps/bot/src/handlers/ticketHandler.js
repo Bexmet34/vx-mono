@@ -6,9 +6,15 @@ const { supabase } = require('@veyronix/database');
 
 async function handleTicketInteraction(interaction) {
     const customId = interaction.customId;
-    const guildConfig = await getGuildConfig(interaction.guildId);
-    const lang = guildConfig?.language || 'tr';
+    let guildConfig = await getGuildConfig(interaction.guildId);
+    let lang = guildConfig?.language || 'tr';
     
+    // Eğer önbellekte kapalı görünüyorsa, kullanıcı paneli yeni açmış olabilir; veritabanından anında taze kontrol yap
+    if (!guildConfig || !guildConfig.ticket_system_enabled) {
+        guildConfig = await getGuildConfig(interaction.guildId, { forceRefresh: true });
+        if (guildConfig?.language) lang = guildConfig.language;
+    }
+
     if (!guildConfig || !guildConfig.ticket_system_enabled) {
         return await interaction.reply({ content: t('ticket.not_enabled', lang), flags: [MessageFlags.Ephemeral] });
     }

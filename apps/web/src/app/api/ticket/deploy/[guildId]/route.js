@@ -101,6 +101,14 @@ export async function POST(req, context) {
             console.error("Guild settings update on deploy warning:", dbErr);
         }
 
+        // Invalidate bot cache immediately
+        const botApiUrl = process.env.BOT_API_URL || 'http://127.0.0.1:3005';
+        fetch(`${botApiUrl}/api/cache/invalidate-guild-config`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ guildId })
+        }).catch(() => {});
+
         // 2. Try direct Discord API send
         try {
             await sendChannelMessage(ticket_channel_id, payload);

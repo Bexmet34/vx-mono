@@ -79,14 +79,16 @@ export default function TicketTab({ t, lang, settings, setSettings, discordChann
     }
     setDeploying(true);
     try {
+        const payload = { ...settings, ticket_system_enabled: true };
         const res = await fetch(`/api/ticket/deploy/${guildId}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(settings)
+            body: JSON.stringify(payload)
         });
         const data = await res.json();
         if (res.ok) {
-            notify(lang === 'tr' ? 'Panel başarıyla gönderildi!' : 'Panel deployed successfully!', 'success');
+            setSettings(prev => ({ ...prev, ticket_system_enabled: true }));
+            notify(lang === 'tr' ? 'Panel başarıyla gönderildi ve ticket sistemi aktif edildi!' : 'Panel deployed and ticket system enabled successfully!', 'success');
         } else {
             notify(data.error || (lang === 'tr' ? 'Panel gönderilemedi' : 'Deploy failed'), 'error');
         }

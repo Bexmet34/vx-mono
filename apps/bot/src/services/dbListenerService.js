@@ -209,6 +209,12 @@ async function handleGuildSettingsChange(client, payload) {
                 : JSON.stringify(config.tempvoice_creators);
             db.run('UPDATE guild_configs SET tempvoice_creators = ? WHERE guild_id = ?', [tvJson, config.guild_id]).catch(() => {});
         }
+
+        // Sync ticket settings to SQLite immediately
+        if (config.ticket_system_enabled !== undefined) {
+            const db = require('./db');
+            db.run('UPDATE guild_configs SET ticket_system_enabled = ? WHERE guild_id = ?', [config.ticket_system_enabled ? 1 : 0, config.guild_id]).catch(() => {});
+        }
         // --- KillBoard Trigger ---
         if (config.trigger_killboard) {
             console.log(`[DbListener] Manual KillBoard trigger via realtime for guild: ${config.guild_id}`);

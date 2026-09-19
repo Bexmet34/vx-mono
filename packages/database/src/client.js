@@ -1,5 +1,13 @@
 const { createClient } = require('@supabase/supabase-js');
 
+if (typeof globalThis.WebSocket === 'undefined') {
+  try {
+    globalThis.WebSocket = require('ws');
+  } catch (e) {
+    // ws modülü yoksa tarayıcı veya yerel ortamdaki WebSocket kullanılır
+  }
+}
+
 /**
  * Creates and returns a Supabase client.
  * Uses NEXT_PUBLIC_ variables if available (for Next.js), otherwise uses SUPABASE_ variables (for Node.js).

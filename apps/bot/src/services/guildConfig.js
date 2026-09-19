@@ -3,7 +3,7 @@ const { getSupabaseGuildSettings, updateGuildLanguage, updateSupabaseGuildSettin
 
 const configCache = new Map();
 const CACHE_TTL_MS = 10 * 60 * 1000; // 10 dakika (Realtime ile senkronize)
-const NEGATIVE_CACHE_TTL_MS = 30 * 60 * 1000; // 30 dakika (DB'de kaydı olmayan sunucular için Supabase spamını önler)
+const NEGATIVE_CACHE_TTL_MS = 60 * 1000; // 1 dakika (Yeni kurulan sunucuların gecikmesini önler)
 
 /**
  * Toplu olarak Realtime veya başlangıçta ayarları önbelleğe doldurur
@@ -19,15 +19,20 @@ function setCachedGuildSettings(guildId, settings) {
 
 /**
  * Gets configuration for a specific guild with intelligent in-memory & negative caching
+ * @param {string} guildId
+ * @param {object} options
+ * @param {boolean} [options.forceRefresh=false] - Önbelleği atlayıp veritabanından taze veri çeker
  */
-async function getGuildConfig(guildId) {
+async function getGuildConfig(guildId, options = {}) {
     if (!guildId) return null;
 
-    const cached = configCache.get(guildId);
-    if (cached) {
-        const ttl = cached.isNegative ? NEGATIVE_CACHE_TTL_MS : CACHE_TTL_MS;
-        if (Date.now() - cached.timestamp < ttl) {
-            return cached.data;
+    if (!options.forceRefresh) {
+        const cached = configCache.get(guildId);
+        if (cached) {
+            const ttl = cached.isNegative ? NEGATIVE_CACHE_TTL_MS : CACHE_TTL_MS;
+            if (Date.now() - cached.timestamp < ttl) {
+                return cached.data;
+            }
         }
     }
 
@@ -46,7 +51,7 @@ async function getGuildConfig(guildId) {
             }
         }
 
-        // Supabase sorgusu (yalnızca önbellekte ve yerelde taze kayıt yoksa)
+        // Supabase sorgusu
         let sbSettings = null;
         try {
             sbSettings = await getSupabaseGuildSettings(guildId);
@@ -67,6 +72,36 @@ async function getGuildConfig(guildId) {
                 db.run('UPDATE guild_configs SET tempvoice_creators = ? WHERE guild_id = ?', [tvJson, guildId]).catch(() => {});
             }
 
+            // Sync ticket settings to SQLite so local cache remains fully up-to-date
+            if (sbSettings.ticket_system_enabled !== undefined) {
+                const optJson = typeof sbSettings.ticket_options === 'string'
+                    ? sbSettings.ticket_options
+                    : JSON.stringify(sbSettings.ticket_options || []);
+                db.run(`
+                    INSERT INTO guild_configs (
+                        guild_id, ticket_system_enabled, ticket_category_id, ticket_channel_id,
+                        ticket_staff_roles, ticket_options, ticket_limit, ticket_name_format
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(guild_id) DO UPDATE SET
+                        ticket_system_enabled = excluded.ticket_system_enabled,
+                        ticket_category_id = excluded.ticket_category_id,
+                        ticket_channel_id = excluded.ticket_channel_id,
+                        ticket_staff_roles = excluded.ticket_staff_roles,
+                        ticket_options = excluded.ticket_options,
+                        ticket_limit = excluded.ticket_limit,
+                        ticket_name_format = excluded.ticket_name_format
+                `, [
+                    guildId,
+                    sbSettings.ticket_system_enabled ? 1 : 0,
+                    sbSettings.ticket_category_id || null,
+                    sbSettings.ticket_channel_id || null,
+                    sbSettings.ticket_staff_roles || null,
+                    optJson,
+                    sbSettings.ticket_limit !== undefined ? parseInt(sbSettings.ticket_limit, 10) || 1 : 1,
+                    sbSettings.ticket_name_format || 'topic-username'
+                ]).catch(() => {});
+            }
+
             if (sbSettings.log_events) {
                 try {
                     const ev = typeof sbSettings.log_events === 'string' ? JSON.parse(sbSettings.log_events) : sbSettings.log_events;
@@ -83,7 +118,7 @@ async function getGuildConfig(guildId) {
             finalConfig.language = finalConfig.language.toString().toLowerCase().trim() === 'en' ? 'en' : 'tr';
         }
 
-        // Hem bulunan sonucu hem de bulunamayan sunucuları (negatif cache) hafızada tut
+        // Hem bulunan sonucu hem de bulunamayan sunucuları hafızada tut
         configCache.set(guildId, { 
             data: finalConfig, 
             timestamp: Date.now(),
