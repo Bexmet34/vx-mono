@@ -159,6 +159,9 @@ export default function ServerSettings() {
     auto_role_on_join_id: "",
     registration_category_id: "",
     registration_welcome_message: "",
+    registration_name_format: "",
+    registration_ticket_welcome_message_tr: "",
+    registration_ticket_welcome_message_en: "",
     system_mode: "command",
     fixed_message_channel_id: "",
     target_category_id: "",
@@ -319,6 +322,11 @@ export default function ServerSettings() {
           killboard_kill_channel_id: s?.killboard_kill_channel_id || "",
           killboard_death_channel_id: s?.killboard_death_channel_id || "",
           tempvoice_creators: Array.isArray(s?.tempvoice_creators) ? s.tempvoice_creators : [],
+          registration_name_format: s?.registration_name_format || "",
+          registration_ticket_welcome_message_tr: s?.registration_ticket_welcome_message_tr || "",
+          registration_ticket_welcome_message_en: s?.registration_ticket_welcome_message_en || "",
+          ticket_name_format: s?.ticket_name_format || "topic-username",
+          counter_role_id: s?.counter_role_id || "",
         };
         setSettings(loadedSettings);
         setInitialSettings(loadedSettings);

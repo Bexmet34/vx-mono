@@ -215,6 +215,12 @@ async function handleGuildSettingsChange(client, payload) {
             const db = require('./db');
             db.run('UPDATE guild_configs SET ticket_system_enabled = ? WHERE guild_id = ?', [config.ticket_system_enabled ? 1 : 0, config.guild_id]).catch(() => {});
         }
+
+        // Sync registration name format to SQLite immediately
+        if (config.registration_name_format !== undefined) {
+            const db = require('./db');
+            db.run('UPDATE guild_configs SET registration_name_format = ? WHERE guild_id = ?', [config.registration_name_format, config.guild_id]).catch(() => {});
+        }
         // --- KillBoard Trigger ---
         if (config.trigger_killboard) {
             console.log(`[DbListener] Manual KillBoard trigger via realtime for guild: ${config.guild_id}`);

@@ -169,6 +169,7 @@ function initDb() {
             safeAlter("ALTER TABLE guild_configs ADD COLUMN registration_category_id TEXT");
             safeAlter("ALTER TABLE guild_configs ADD COLUMN registration_welcome_message TEXT");
             safeAlter("ALTER TABLE guild_configs ADD COLUMN registration_enabled INTEGER DEFAULT 0");
+            safeAlter("ALTER TABLE guild_configs ADD COLUMN registration_name_format TEXT DEFAULT '[{tag}] {gamenick} - {name} {age}'");
             safeAlter("ALTER TABLE guild_configs ADD COLUMN embed_thumbnail_url TEXT");
             safeAlter("ALTER TABLE user_votes ADD COLUMN expires_at INTEGER");
 

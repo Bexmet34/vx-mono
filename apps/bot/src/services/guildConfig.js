@@ -102,6 +102,10 @@ async function getGuildConfig(guildId, options = {}) {
                 ]).catch(() => {});
             }
 
+            if (sbSettings.registration_name_format !== undefined) {
+                db.run('UPDATE guild_configs SET registration_name_format = ? WHERE guild_id = ?', [sbSettings.registration_name_format, guildId]).catch(() => {});
+            }
+
             if (sbSettings.log_events) {
                 try {
                     const ev = typeof sbSettings.log_events === 'string' ? JSON.parse(sbSettings.log_events) : sbSettings.log_events;

@@ -237,6 +237,7 @@ export default function RegistrationTab({ t, lang, settings, setSettings, discor
                   return (
                     <button
                       key={v.key}
+                      type="button"
                       onClick={() => {
                         if (isActive) {
                           setSettings({ ...settings, registration_name_format: currentFormat.replace(v.key, '').replace(/\s+/g, ' ').trim() });
