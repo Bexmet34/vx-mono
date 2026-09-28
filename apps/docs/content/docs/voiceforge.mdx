@@ -7,70 +7,78 @@ import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
-# VoiceForge Sistemi
+# VoiceForge Nedir?
 
-VoiceForge, Discord sunucunuzdaki geleneksel, kullanılmayan ve görüntü kirliliği yaratan kalabalık ses kanalı listesini tamamen ortadan kaldıran **dinamik bir geçici ses kanalı motorudur.**
+VoiceForge, Discord sunucunuzdaki kalabalık ve yönetimi zor olan geleneksel ses kanalı listesini tamamen ortadan kaldıran, **kendi kendini yönetebilen dinamik bir geçici ses kanalı motorudur.**
 
-Üyeleriniz sadece sese bağlandıkları anda onlara özel izole bir kanal açılır ve odadan son kişi çıktığında bu kanal sistem tarafından otomatik olarak imha edilir.
+**Problem:** Büyük sunucularda genellikle "Oda 1", "Oda 2", "Oda 3" gibi onlarca boş kanal bulunur. Bu durum hem sunucuyu karmaşık gösterir hem de üyelerin kendilerini izole hissedebilecekleri özel bir alan yaratmalarını zorlaştırır.
+**Çözüm (VoiceForge):** Sunucunuzda sadece "Oda Oluştur" isimli tek bir kanal bırakırsınız. Üyeleriniz bu kanala tıkladığı an, sistem sadece onlara özel yeni bir ses kanalı yaratır ve üyeyi oraya taşır. Odadan herkes çıktığında ise kanal otomatik olarak silinir!
 
 <Callout type="info">
-  **Performans ve Optimizasyon:** VoiceForge sistemi, Veyronix'in izole altyapısı sayesinde Discord API limitlerine takılmadan saniyeler içinde yüzlerce kanal oluşturup silebilir.
+  **Sıfır Gecikme:** VoiceForge sistemi, Veyronix'in yüksek performanslı altyapısı sayesinde Discord limitlerine takılmadan saniyeler içinde yüzlerce kanal oluşturup silebilir. Sunucunuzda asla kalıntı kanal bırakmaz.
 </Callout>
 
 ## Nasıl Çalışır?
 
-VoiceForge'un çalışma mantığı tamamen kullanıcı deneyimini pürüzsüzleştirmek üzerine kuruludur.
+VoiceForge'un çalışma mantığı, üyeleriniz için tamamen pürüzsüz bir deneyim sunmak üzere tasarlanmıştır.
 
 <Steps>
 <Step>
-### Odaya Giriş
-Sunucunuzda belirlediğiniz "Oda Oluştur" (veya benzeri isimli) bir ana kanala (Hub) bir üye giriş yapar.
+### 1. Odaya Giriş (Tetikleyici)
+Sunucunuzda belirlediğiniz tetikleyici kanala (Örn: `➕ Oda Oluştur` ses kanalı) bir üye giriş yapar.
 </Step>
 
 <Step>
-### Otomatik Kanal Oluşturma
-Veyronix o üyeyi anında algılar, ona özel yepyeni bir ses kanalı açar ve üyeyi saniyenin onda biri sürede o kanala çeker.
+### 2. Anında Oluşturma
+Veyronix o üyeyi anında algılar, ona özel yepyeni bir ses kanalı açar ve üyeyi saniyenin onda biri sürede o yeni kanala çeker.
 </Step>
 
 <Step>
-### Oda Yönetimi (Panel)
-Odayı oluşturan üye (Oda Sahibi), metin kanalındaki etkileşimli **Oda Kontrol Paneli** sayesinde kanalının tüm özelliklerini kimseye ihtiyaç duymadan yönetir.
+### 3. Oda Yönetimi (Oda Sahibi Kontrolü)
+Odayı oluşturan üye (Oda Sahibi), metin kanalındaki etkileşimli **Oda Kontrol Paneli** mesajındaki butonları kullanarak kanalının tüm özelliklerini kimseye (sunucu yetkililerine) ihtiyaç duymadan yönetir.
 </Step>
 
 <Step>
-### Otomatik İmha
-Odada bulunan son kişi de çıktığı anda, kanal anında sistem tarafından silinir ve sunucuda kirlilik bırakmaz.
+### 4. Otomatik İmha
+Odada bulunan son kişi de çıktığı anda, kanal anında sistem tarafından silinir. Böylece sunucunuz her zaman temiz kalır.
 </Step>
 </Steps>
 
-## Oda Kontrol Paneli Yetenekleri
+---
+
+## Üyelere Sunulan Oda Kontrol Paneli Yetenekleri
 
 VoiceForge'un asıl gücü üyelerinize sunduğu özgürlükten gelir. Kullanıcılar, oluşturulan özel butonlu arayüz üzerinden aşağıdaki işlemleri saniyeler içinde gerçekleştirebilir:
 
-<Tabs items={['Erişim Kontrolü', 'Kanal Özelleştirme', 'Kullanıcı Yönetimi']}>
-  <Tab value="Erişim Kontrolü">
-    - **Kanalı Kilitle / Aç:** Yabancıların odaya girmesini tek tıkla engeller.
-    - **Kanalı Gizle / Göster:** Odayı herkesten gizler, sadece içeride olanlar ve davet edilenler görebilir. Özel (private) toplantılar için mükemmeldir.
+<Tabs items={['Erişim & Gizlilik', 'Kanal Özelleştirme', 'Kullanıcı Yönetimi']}>
+  <Tab value="Erişim & Gizlilik">
+    - **Kanalı Kilitle / Aç:** Yabancıların odaya girmesini tek tıkla engeller. Sadece izin verilenler girebilir.
+    - **Kanalı Gizle / Göster:** Odayı herkesten gizler, böylece kanal listesinde gözükmez. Özel (private) toplantılar için mükemmeldir.
   </Tab>
   <Tab value="Kanal Özelleştirme">
-    - **İsim Değiştirme:** Kanalın ismini anında güncelleyebilir (Sunucu kuralları çerçevesinde).
-    - **Kapasite Belirleme:** Odaya girebilecek maksimum kişi sayısını ayarlayabilir (Örn: 5 kişilik takım odası).
+    - **İsim Değiştirme:** Kanalın ismini anında güncelleyebilir (Sunucu kurallarınız çerçevesinde otomatik filtreleme ile desteklenir).
+    - **Kapasite Belirleme:** Odaya girebilecek maksimum kişi sayısını ayarlayabilir (Örn: 5 kişilik oyun takımı odası).
   </Tab>
   <Tab value="Kullanıcı Yönetimi">
-    - **Kullanıcı At / Engelle:** Odada istenmeyen birini dışarı atabilir ve odaya bir daha girmesini engelleyebilir.
-    - **Sahibi Değiştir:** Odadan çıkması gerektiğinde odanın sahipliğini içerideki başka bir arkadaşına devredebilir.
+    - **Kullanıcı At / Engelle:** Odada istenmeyen, rahatsızlık veren birini dışarı atabilir ve odaya bir daha girmesini engelleyebilir.
+    - **Sahibi Değiştir:** Odadan çıkması gerektiğinde odanın tüm kontrolünü (sahipliğini) içerideki başka bir arkadaşına devredebilir.
   </Tab>
 </Tabs>
 
-## Hızlı Kurulum
+---
 
-VoiceForge sistemini sunucunuzda aktif etmek için Veyronix Web Paneli'ni kullanabilirsiniz.
+## Adım Adım VoiceForge Kurulumu
 
-1. **Veyronix Panel'e** giriş yapın ve sunucunuzu seçin.
+Sistemi aktif etmek panelimiz sayesinde saniyelerinizi alır.
+
+1. **[Veyronix Panel'e](https://veyronix.com.tr)** giriş yapın ve sunucunuzu seçin.
 2. Sol menüden **Geçici Ses (VoiceForge)** sekmesine tıklayın.
-3. Sistemi aktif edip, kanalların açılacağı **Kategori'yi** ve kontrol panelinin gönderileceği **Metin Kanalını** seçin.
-4. (Opsiyonel) Kanal isimlendirme formatını kişiselleştirin (Örn: `🔊 {user} Odası`).
+3. Sistemi aktif duruma getirin.
+4. **Kategori Seçimi:** Odaların hangi kategori altında açılacağını seçin (Örn: "Özel Odalar" kategorisi).
+5. **Metin Kanalı Seçimi:** Üyelerin odalarını yönetebilecekleri butonlu "Kontrol Paneli" mesajının hangi metin kanalına gönderileceğini seçin.
+6. **Kanal İsim Formatı (Opsiyonel):** Odaların varsayılan ismini ayarlayın (Örn: `🔊 {user} Odası`).
+7. **Kaydet'e** tıklayın. Sistem, tetikleyici ses kanalını otomatik olarak kuracaktır!
 
 <Callout type="warn">
-  Sistemin sorunsuz çalışması için botun rolünün (`Veyronix`), VoiceForge için seçilen kategoride **Kanalları Yönet** yetkisine sahip olduğundan emin olun.
+  **Dikkat:** Sistemin sorunsuz çalışması için botun rolünün (`Veyronix`), VoiceForge için seçtiğiniz kategoride **Kanalları Yönet** ve **Üyeleri Taşı** yetkisine kesinlikle sahip olması gerekmektedir.
 </Callout>

@@ -1,26 +1,67 @@
 ---
-title: Web Dashboard
-description: Sunucunuzu Veyronix web arayüzünden yönetin.
+title: Web Dashboard (Yönetim Paneli)
+description: Discord sunucunuzun tüm kontrolünü karmaşık komutlar olmadan, modern web arayüzümüz üzerinden yönetin.
 ---
 
-# Web Dashboard (Yönetim Paneli)
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-Botun tüm ayarlarını Discord içindeki karmaşık ve uzun komutlarla yapmak yerine, modern ve hızlı web arayüzümüz üzerinden gerçekleştirebilirsiniz.
+# Modern Web Dashboard
 
-## Panele Giriş
+Geleneksel Discord botlarında ayar yapmak genellikle yorucudur. Hangi komutu yazacağınızı unutur, doğru kanalı veya rolü ID numaralarıyla belirtmek zorunda kalırsınız. 
 
-1. [veyronix.com.tr](https://veyronix.com.tr) adresine gidin.
-2. Sağ üst köşedeki **Giriş Yap** butonuna tıklayarak Discord hesabınızla bağlanın.
-3. Yönetici yetkisine (Administrator) sahip olduğunuz sunucular panelde otomatik olarak listelenecektir.
+**Veyronix Web Dashboard**, tüm bu zorlukları ortadan kaldırır. Botun tüm ayarlarını, modüllerini ve güvenlik altyapısını sanki bir akıllı telefon uygulaması kullanıyormuşsunuz gibi kolayca, sadece **tıklayarak ve seçerek** yönetmenizi sağlayan görsel bir kontrol merkezidir.
 
-## Ayar Modülleri
+<Callout type="info">
+  **Gerçek Zamanlı Senkronizasyon:** Panelde yaptığınız herhangi bir değişiklik, kaydet butonuna bastığınız milisaniye içerisinde Discord sunucunuzda aktif olur. Botu yeniden başlatmanıza veya beklemenize gerek yoktur.
+</Callout>
 
-Dashboard üzerinde kullanabileceğiniz ana modüller:
+---
 
-- **Genel Ayarlar:** Sunucu prefixi, dil ayarları ve yetkili rolleri.
-- **Geçici Ses (VoiceForge):** Ses kanallarının açılacağı kategori ve panel ayarları.
-- **Kayıt Sistemi:** Otomatik verilecek roller ve kayıt karşılama kanalı.
-- **Karşılama / Uğurlama:** Giren çıkan üyelere atılacak özel embed resimli veya metin mesajları.
-- **Oto Rol:** Sunucuya katılanlara koşulsuz verilecek başlangıç rolleri.
-- **Ticket Ayarları:** Destek sistemi yöneticileri ve transkript kanalları.
-- **Premium:** Eğer sunucunuz Premium özelliklere sahipse, ekstra özelliklerin aktif edildiği alan.
+## Panele Giriş ve İlk Adımlar
+
+Sistemi kullanmaya başlamak son derece güvenli ve kolaydır.
+
+<Steps>
+<Step>
+### Sisteme Bağlanın
+Tarayıcınızdan [veyronix.com.tr](https://veyronix.com.tr) adresine gidin. Sağ üst köşedeki **Giriş Yap** butonuna tıklayın.
+</Step>
+<Step>
+### Discord ile Güvenli Doğrulama
+Veyronix sizi doğrudan Discord'un resmi giriş sayfasına yönlendirir. Bot hiçbir zaman şifrenizi veya e-posta adresinizi görmez. Sadece profil bilgilerinize ve bulunduğunuz sunuculara erişim izni ister.
+</Step>
+<Step>
+### Sunucunuzu Seçin
+Giriş yaptıktan sonra açılan **Sunucularım** listesinde, yalnızca Discord üzerinde *Yönetici (Administrator)* yetkisine sahip olduğunuz sunucuları görürsünüz. Ayar yapmak istediğiniz sunucuyu seçerek yönetim paneline geçiş yapın.
+</Step>
+</Steps>
+
+---
+
+## Panel Arayüzü ve Modüller
+
+Yönetim paneline girdiğinizde, sol tarafta tüm özellikleri kategorize edilmiş bir menü halinde bulacaksınız. Kullanabileceğiniz temel modül sekmeleri şunlardır:
+
+### 1. Genel Ayarlar
+Sunucunuzun ana sinir merkezidir. 
+- **Dil Seçimi:** Botun sunucunuza vereceği yanıtların dilini (Türkçe/İngilizce) ayarlayabilirsiniz.
+- **Yetkili Rolleri:** Bot üzerinde sadece yöneticilerin değil, belirlediğiniz alt yetkililerin (Örn: Moderatör) de belirli komutları kullanabilmesini sağlayabilirsiniz.
+- **Log Kanalı:** Botun arka planda yaptığı tüm işlemlerin raporlandığı genel kanalı buradan seçersiniz.
+
+### 2. Güvenlik ve Karşılama
+- **Kayıt Sistemi:** Butonlu kayıt modülü ayarları, alınacak/verilecek roller ve isim formatları buradan yapılandırılır.
+- **Hoş Geldin & Görüşürüz Mesajları:** Sunucunuza yeni biri katıldığında veya ayrıldığında, özel tasarımlı resimler veya şık mesaj (embed) tasarımlarıyla hangi kanala bildirim gideceğini ayarlarsınız.
+- **Oto Rol:** Kayıt sistemini kullanmak istemiyorsanız, giren herkese anında ve koşulsuz verilecek başlangıç rolünü buradan atayabilirsiniz.
+
+### 3. Etkileşim ve Topluluk (Community)
+- **Geçici Ses (VoiceForge):** Dinamik oda oluşturma sisteminin kategorisini, kontrol panelinin nereye gideceğini ve oda kapasitelerini buradan belirlersiniz.
+- **Bilet (Ticket) Sistemi:** Üyelerinizin destek talebi açabilmesi için kategoriler (Örn: "Şikayet", "Ödeme Bildirimi") oluşturur ve bu taleplerin hangi yetkili rolleri tarafından görüleceğini ayarlarsınız. Ayrıca konuşma dökümleri (Transkript) buradan yönetilir.
+
+### 4. Ekstra Özellikler
+- **Veyronix Premium:** Eğer sunucunuz Premium aboneliğe sahipse, ekstra renk paletleri, özel bot isimleri veya özel bot avatarı gibi özellikleri bu alandan aktif edebilirsiniz.
+- **Albion Online ZvZ:** (Sadece ilgili sunucular için) Oyun içi istatistiklerin Discord'a aktarılması ayarları.
+
+<Callout type="warn">
+  **İpucu:** Panel üzerinden bir metin kanalı veya rol seçerken, bazen son açtığınız kanalları göremeyebilirsiniz. Bunun sebebi Discord'un önbellekleme sistemidir. Sayfayı yenileyerek veya bir süre bekleyerek yeni açtığınız kanalların panelde listelenmesini sağlayabilirsiniz.
+</Callout>

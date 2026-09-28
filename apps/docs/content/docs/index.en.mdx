@@ -1,6 +1,6 @@
 ---
 title: Welcome to Veyronix
-description: Veyronix Discord Community and Automation Platform official documentation.
+description: Official documentation for the Veyronix Discord Community and Automation Platform.
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
@@ -8,46 +8,61 @@ import { Step, Steps } from 'fumadocs-ui/components/steps';
 
 # What is Veyronix?
 
-Veyronix is far more than a simple Discord bot. It is an **enterprise-grade community management and automation platform** designed to grow, manage, and secure your server.
+Veyronix is far more than just a regular Discord bot; it is a **comprehensive community management and automation platform** designed to help you manage your server professionally.
 
-It operates on an advanced monorepo architecture with a sharded microservices infrastructure that easily handles high loads. This ensures thousands of real-time interactions are processed with zero latency and maximum performance.
+Designed to meet the needs of all Discord servers, from newly established ones to massive communities with tens of thousands of members. It provides all the tools you need to ensure your server's security, boost member engagement, and fully automate moderation processes, all through a modern **Web Dashboard**.
 
-<Callout type="info">
-  **Architecture Insights:** The Veyronix system is composed of multiple isolated yet fully integrated systems: core bot operations (Partikür), support and ticketing (VX Support), and a modern web dashboard (VX Web).
-</Callout>
+## Why Should You Use Veyronix?
 
-## Featured Modules
+Managing a community is a difficult and time-consuming process. Veyronix takes this burden off your shoulders:
+- **No More Complex Commands:** You don't need to write long and hard-to-remember commands to manage your server. You can manage everything by simply clicking through our modern and user-friendly web dashboard.
+- **Modular Architecture:** You can activate only the features you need (e.g., only the registration system or only temporary voice channels) and keep your server clean and lightweight by disabling unused modules.
+- **High Performance:** Thanks to its advanced infrastructure (Sharding & Monorepo), it smoothly processes thousands of instant interactions on your server without experiencing any latency.
 
-Our platform provides four main ecosystems working seamlessly together:
+---
 
-- **VoiceForge (Dynamic Voice System):** Eliminates traditional channel clutter by allowing members to create and manage their own private voice channels on the fly via a dedicated panel.
-- **Registration & Security:** A multi-layered registration system featuring button interfaces, detailed logging, auto-naming, and strict security barriers.
-- **Albion Online ZvZ Engine:** The world's most advanced Albion Online integration. Direct Discord integration for Guild synchronization, automated Killboard tracking, and deep ZvZ statistics analysis.
-- **Community & Engagement:** Tools that maximize server engagement, including modern ticket systems, transparent giveaways, and drop (point/economy) mechanics.
+## Our Highlighted Features
 
-## Quick Setup
+Among the hundreds of features offered by the system, the most preferred core modules are:
 
-Integrating the Veyronix ecosystem into your server takes only seconds. You can visually configure everything via our custom web dashboard.
+1. **[VoiceForge (Temporary Voice) System](/docs/voiceforge):** End the traditional channel clutter! It allows your members to create a custom voice channel the moment they join the hub and deletes the channel when they leave.
+2. **[Registration & Security Infrastructure](/docs/registration):** Admits your members to the server only through secure steps. It provides a professional welcome with button-based registration screens and automatic name formatting systems.
+3. **[Modern Web Dashboard](/docs/dashboard):** Eliminates the hassle of searching for bot commands to make settings. Everything is right at your fingertips.
+4. **[Ticket & Support System](/docs/community):** A categorized support request creation system to quickly resolve your members' issues.
+5. **[Albion Online ZvZ Engine](/docs/albion):** A guild synchronization and statistics analysis module specifically developed for Albion Online communities.
+
+---
+
+## Step-by-Step Setup Guide from Scratch
+
+Adding Veyronix to your server and configuring the initial settings only takes a few minutes. You don't need any technical knowledge.
 
 <Steps>
 <Step>
-### Login to our Web Dashboard
-Navigate to [veyronix.com.tr](https://veyronix.com.tr) and log in securely with your Discord account.
+### Log in to the Web Dashboard
+Go to [veyronix.com.tr](https://veyronix.com.tr). Click the **Login** button in the top right corner to securely log in with your Discord account. (Veyronix will never ask for your password; you are authorized directly through Discord.)
 </Step>
 
 <Step>
-### Select Your Server
-Select a server where you have Administrator permissions and click "Add Veyronix" to authorize the integration.
+### Invite the Bot to Your Server
+After logging in, you will see the servers where you have administrator privileges on the "My Servers" page. Click the **"Add Veyronix"** button under the server you want to set up and approve the necessary permissions in the Discord window.
 </Step>
 
 <Step>
 ### Complete the Setup Wizard
-Use the interactive **Setup Wizard** to configure base roles and logging channels in seconds.
+When the bot joins the server, the dashboard will direct you to a **Setup Wizard**. Through this wizard:
+- **Unregistered Member Role:** Select the role to be given to those who first join the server.
+- **Bot Command Channel:** Select the channel where bot notifications will go or where administrators will interact with the bot.
+- **Log Channel:** Select the information channel where the bot's actions (who registered, who was banned, etc.) will be logged.
 </Step>
 </Steps>
 
 <Callout type="warn">
-  After installation, ensure that the **"Veyronix"** bot role is placed higher than any roles it needs to manage (e.g., Unregistered role, Member role) in your server settings.
+  **IMPORTANT:** For the bot to perform all actions (assigning roles, creating channels, etc.), you must **move the "Veyronix" role to the top** in the "Roles" section of the server settings. The Veyronix role must always be above the roles it will interact with (e.g., "Member", "VIP").
 </Callout>
 
-For detailed module configurations, use the sidebar menu to navigate to the specific documentation pages.
+### Next Steps
+
+You have completed the basic setup! Now your bot is ready to work. You can use the menu on the left to explore the features you want to activate in detail and start configuring them via the dashboard.
+
+For example, you can immediately check out the **[VoiceForge (Temporary Voice)](/docs/voiceforge)** tab to bring order to your server.

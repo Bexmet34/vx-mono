@@ -8,46 +8,61 @@ import { Step, Steps } from 'fumadocs-ui/components/steps';
 
 # Veyronix Nedir?
 
-Veyronix, basit bir Discord botu olmanın çok ötesinde, sunucunuzun büyümesini, yönetilmesini ve güvenliğini sağlayan **kurumsal seviyede bir topluluk yönetim ve otomasyon platformudur.**
+Veyronix, sıradan bir Discord botu olmanın ötesinde, sunucunuzu profesyonelce yönetmenizi sağlayan **kapsamlı bir topluluk yönetim ve otomasyon platformudur.** 
 
-Gelişmiş monorepo mimarisi ve yüksek yüklere dayanıklı izole (sharded) mikroservis altyapısıyla çalışır. Bu sayede sunucunuzdaki anlık binlerce etkileşim, sıfır gecikme ve maksimum performansla işlenir.
+Yeni kurulan bir sunucudan tutun, on binlerce üyesi olan devasa topluluklara kadar her ölçekteki Discord sunucusunun ihtiyaçlarını karşılamak üzere tasarlanmıştır. Discord sunucunuzun güvenliğini sağlamak, üye etkileşimini artırmak ve moderasyon süreçlerini tamamen otomatize etmek için ihtiyacınız olan tüm araçları modern bir **Web Paneli** ile kullanımınıza sunar.
 
-<Callout type="info">
-  **Mimari Bilgisi:** Veyronix sistemi; çekirdek bot operasyonları (Partikür), destek ve biletleme (VX Destek) ve modern web paneli (VX Web) olmak üzere birbirleriyle entegre ancak izole çalışan çoklu sistemlerden oluşur.
-</Callout>
+## Neden Veyronix Kullanmalısınız?
 
-## Öne Çıkan Modüllerimiz
+Topluluk yönetmek zor ve zaman alıcı bir süreçtir. Veyronix bu yükü omuzlarınızdan alır:
+- **Karmaşık Komutlara Son:** Sunucunuzu yönetmek için uzun ve ezberlenmesi zor komutlar yazmanıza gerek yok. Her şeyi modern ve kullanıcı dostu web panelimiz üzerinden tıklayarak yönetebilirsiniz.
+- **Modüler Yapı:** Sadece ihtiyacınız olan özellikleri (Örn: Sadece kayıt sistemi veya sadece geçici ses kanalları) aktif edebilir, kullanmadığınız modülleri kapatarak sunucunuzu hafif ve temiz tutabilirsiniz.
+- **Yüksek Performans:** Gelişmiş altyapısı (Sharding & Monorepo) sayesinde, sunucunuzdaki binlerce anlık işlemi gecikme yaşamadan, pürüzsüz bir şekilde gerçekleştirir.
 
-Platformumuz, birbirine tam entegre çalışan dört ana ekosistem sunar:
+---
 
-- **VoiceForge (Dinamik Ses Sistemi):** Geleneksel kanal kirliliğini bitiren, üyelerinizin anında özel odalar oluşturup panel üzerinden yönetebildiği pürüzsüz ses kanalı altyapısı.
-- **Kayıt ve Güvenlik Altyapısı:** Butonlu, loglu, oto-isimlendirme destekli ve çok aşamalı güvenlik bariyerlerine sahip üye kayıt sistemi.
-- **Albion Online ZvZ Motoru:** Dünyanın en gelişmiş Albion Online entegrasyonu. Lonca (Guild) senkronizasyonu, otomatik Killboard takibi ve ZvZ istatistiklerinin doğrudan Discord üzerinden analizi.
-- **Topluluk ve Etkileşim:** Modern bilet (ticket) sistemi, şeffaf çekilişler ve drop (puan/ekonomi) mekanikleriyle sunucu içi etkileşimi maksimize eden araçlar.
+## Öne Çıkan Özelliklerimiz
 
-## Hızlı Kurulum
+Sistemin sunduğu yüzlerce özellik arasında en çok tercih edilen ana modüller şunlardır:
 
-Veyronix ekosistemini sunucunuza entegre etmek saniyeler sürer. Özel web panelimiz üzerinden her şeyi görsel olarak yapılandırabilirsiniz.
+1. **[VoiceForge (Geçici Ses) Sistemi](/docs/voiceforge):** Geleneksel kanal kirliliğine son! Üyelerinizin odaya katıldığı anda özel bir ses kanalı oluşturmasını ve çıkıldığında o kanalın silinmesini sağlar.
+2. **[Kayıt ve Güvenlik Altyapısı](/docs/registration):** Üyelerinizi sadece güvenli adımlardan geçirerek sunucuya alır. Butonlu kayıt ekranları ve otomatik isim formatlama sistemleriyle profesyonel bir karşılama sağlar.
+3. **[Modern Web Paneli](/docs/dashboard):** Ayar yapmak için bot komutu arama derdini bitirir. Her şey elinizin altındadır.
+4. **[Bilet (Ticket) ve Destek Sistemi](/docs/community):** Üyelerinizin sorunlarını hızlıca çözebilmeniz için kategorilere ayrılmış destek talebi oluşturma sistemi.
+5. **[Albion Online ZvZ Motoru](/docs/albion):** Özellikle Albion Online toplulukları için geliştirilmiş lonca eşitleme ve istatistik analiz modülü.
+
+---
+
+## Sıfırdan Adım Adım Kurulum Rehberi
+
+Veyronix’i sunucunuza eklemek ve ilk ayarlarını yapmak sadece birkaç dakikanızı alır. Teknik bilgiye ihtiyacınız yoktur.
 
 <Steps>
 <Step>
-### Web Panelimize Giriş Yapın
-[veyronix.com.tr](https://veyronix.com.tr) adresine gidin ve Discord hesabınızla güvenli bir şekilde giriş yapın.
+### Web Paneline Giriş Yapın
+[veyronix.com.tr](https://veyronix.com.tr) adresine gidin. Sağ üst köşedeki **Giriş Yap** butonuna tıklayarak Discord hesabınızla güvenli giriş gerçekleştirin. (Veyronix sizden hiçbir zaman şifrenizi istemez, direkt Discord üzerinden yetkilendirilirsiniz.)
 </Step>
 
 <Step>
-### Sunucunuzu Seçin
-Yönetici yetkisine sahip olduğunuz sunucuyu seçin ve "Veyronix'i Ekle" butonuna tıklayarak yetkilendirmeyi onaylayın.
+### Botu Sunucunuza Davet Edin
+Giriş yaptıktan sonra "Sunucularım" sayfasında yönetici yetkisine sahip olduğunuz sunucuları göreceksiniz. Kurulum yapmak istediğiniz sunucunun altındaki **"Veyronix'i Ekle"** butonuna tıklayın ve Discord pencerisinden gerekli izinleri onaylayın.
 </Step>
 
 <Step>
 ### Kurulum Sihirbazını Tamamlayın
-Karşınıza çıkacak **Kurulum Sihirbazı (Setup)** üzerinden temel rolleri ve log kanallarını saniyeler içinde ayarlayın.
+Bot sunucuya katıldığında panel sizi bir **Kurulum Sihirbazı'na** yönlendirecektir. Bu sihirbaz üzerinden:
+- **Kayıtsız Üye Rolü:** Sunucuya ilk katılanlara verilecek rolü seçin.
+- **Bot Komut Kanalı:** Bot bildirimlerinin gideceği veya yöneticilerin botla etkileşime gireceği kanalı seçin.
+- **Log Kanalı:** Botun yaptığı işlemlerin (kim kayıt oldu, kim banlandı vb.) kayıt altına alınacağı bilgi kanalını seçin.
 </Step>
 </Steps>
 
 <Callout type="warn">
-  Kurulum sonrasında botun **"Yönetici"** rolünün, sunucu ayarlarında işlem yapacağı rollerin (örn: Kayıtsız rolü, Üye rolü) üzerinde olduğundan emin olun.
+  **ÖNEMLİ:** Botun tüm işlemleri (rol verme, kanal oluşturma vs.) yapabilmesi için sunucu ayarlarındaki "Roller" kısmında **"Veyronix" rolünü en üst sıralara taşımanız** gerekmektedir. Veyronix rolü, işlem yapacağı rollerin (örneğin "Üye", "VIP") her zaman üstünde olmalıdır.
 </Callout>
 
-Detaylı modül yapılandırmaları için sol taraftaki menüyü kullanarak ilgili dokümantasyona geçiş yapabilirsiniz.
+### Sonraki Adımlar
+
+Temel kurulumu tamamladınız! Artık botunuz çalışmaya hazır. Sol taraftaki menüyü kullanarak aktif etmek istediğiniz özellikleri detaylıca inceleyebilir ve panel üzerinden yapılandırmaya başlayabilirsiniz. 
+
+Örneğin, sunucunuzu düzene sokmak için hemen **[VoiceForge (Geçici Ses)](/docs/voiceforge)** sekmesine göz atabilirsiniz.

@@ -1,25 +1,62 @@
 ---
 title: Kayıt Sistemi
-description: Sunucunuza katılan üyeleri profesyonelce karşılayın ve kaydedin.
+description: Sunucunuza katılan üyeleri profesyonelce karşılayın, güvenliği sağlayın ve isimlerini otomatik düzenleyin.
 ---
 
-# Kayıt Sistemi
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-Veyronix, klasik kayıt botlarından farklı olarak tamamen modern ve loglanabilir bir kayıt altyapısı sunar. 
+# Kayıt Sistemi Nedir?
 
-## Özellikler
+Veyronix Kayıt Sistemi, sunucunuza yeni katılan üyeleri yetkililerinizin manuel olarak kayıt etmesi derdini ortadan kaldıran veya bu süreci çok daha profesyonel bir arayüzle sunan gelişmiş bir modüldür.
 
-- **Butonlu Kayıt:** Üyeler karmaşık komutlar girmeden, sadece butonlara tıklayarak (Erkek, Kadın vb.) hızlıca kayıt olabilir.
-- **İsim Formatlama:** Kayıt olan kişinin adı, belirlediğiniz formata göre otomatik değiştirilir (Örn: `[Tag] İsim | Yaş`).
-- **Hoş Geldin ve Log Mesajları:** Yeni gelenlere özel resimli hoş geldin mesajları gönderebilir ve kayıt işlemi tamamlandığında log kanalına bildirim atabilirsiniz.
-- **Kayıtsız Rolü Otomasyonu:** Sunucuya ilk giren kişiye otomatik olarak kayıtsız rolü verilir ve kayıt tamamlanınca bu rol geri alınır.
+Klasik kayıt botlarının aksine, kullanıcıların zorlu komutlar yazmasını beklemez. Tamamen **Discord Butonları** üzerinden çalışan, loglanabilir ve isim formatlama destekli modern bir altyapı sunar.
 
-## Kayıt Kurulumu
+## Temel Özellikler
 
-Web dashboard üzerinden **Kayıt Sistemi** sekmesine gidin:
-1. Kayıtsızlara verilecek başlangıç rolünü seçin.
-2. Erkek/Kadın veya Üye gibi verilecek kayıtlı rollerini seçin.
-3. Kayıt yapacak yetkili (Kayıt Sorumlusu) rolünü belirleyin.
-4. Kayıt panelinin gönderileceği kanalı (Örn: `#kayıt-ol`) seçin ve kaydedin.
+- **Butonlu Etkileşim:** Üyeler karmaşık komutlar girmeden, doğrudan kanal içindeki şık bir mesaja yerleştirilmiş butonlara (Örn: Erkek, Kadın, Üye) tıklayarak kayıt olabilirler.
+- **Otomatik İsim Formatlama:** Kayıt olan kişinin adı, belirlediğiniz şablona göre otomatik değiştirilir (Örn: `[Tag] İsim | Yaş` veya `✨ İsim`).
+- **Görsel Hoş Geldin Mesajları:** Yeni gelen üyelere özel resimli ve tasarımlı hoş geldin mesajları gönderebilirsiniz.
+- **Kayıtsız Rolü Otomasyonu:** Sunucuya giren kişiye saniyesinde belirlediğiniz "Kayıtsız" rolü verilir. Kayıt başarıyla tamamlandığında bu rol geri alınır ve yerine kayıtlı rolleri verilir.
+- **Güvenlik Bariyeri:** Yeni açılmış veya şüpheli hesapların sunucuya doğrudan giriş yapmasını kayıt aşamasında filtreleyebilirsiniz.
 
-Ayarları kaydettiğiniz anda belirlediğiniz kanala şık bir kayıt menüsü gönderilecektir.
+---
+
+## Adım Adım Kayıt Sistemi Kurulumu
+
+Kayıt sistemini aktif etmek için herhangi bir komut kullanmanıza gerek yoktur, her şeyi **Web Panelinizden** birkaç tıklamayla halledebilirsiniz.
+
+<Steps>
+<Step>
+### Panelde Kayıt Modülüne Gidin
+[Veyronix Panel'e](https://veyronix.com.tr) giriş yaptıktan sonra sunucunuzu seçin ve sol menüden **Kayıt Sistemi** sekmesine tıklayın.
+</Step>
+
+<Step>
+### Rolleri Tanımlayın
+Sistemin kimden hangi rolü alıp, kime ne vereceğini bilmesi gerekir. Açılan ekranda şunları seçin:
+- **Kayıtsız Rolü:** (Örn: "Unregistered" veya "Kayıtsız").
+- **Kayıtlı Rolleri:** (Örn: "Üye", "Erkek", "Kadın" gibi kayıt işlemi bitince verilecek roller).
+- **Kayıt Yetkilisi:** (Eğer sistemin yetkili onaylı olmasını istiyorsanız kayıt işlemlerini yapacak rolü seçin).
+</Step>
+
+<Step>
+### İsim Formatını Belirleyin (Opsiyonel)
+Üyelerin isimlerinin belirli bir düzende olmasını istiyorsanız "İsim Formatı" kutucuğunu doldurun. 
+Kullanabileceğiniz değişkenler: `{isim}`, `{yas}`, `{tag}`.
+*Örnek:* `[VX] {isim} | {yas}` yazarsanız, sistem kullanıcının adını bu şablona göre otomatik düzenler.
+</Step>
+
+<Step>
+### Kayıt Kanalını Seçin ve Başlatın
+Kayıt butonlarının gönderileceği kanalı (Örn: `#kayıt-ol`) seçin ve **"Kaydet ve Sistemi Başlat"** butonuna tıklayın.
+</Step>
+</Steps>
+
+<Callout type="info">
+  **İşlem Tamam!** Ayarları kaydettiğiniz anda belirlediğiniz Discord kanalına çok şık bir kayıt karşılama mesajı ve altında tıklanabilir kayıt butonları gönderilecektir. Üyeleriniz artık bu butonları kullanarak kolayca kayıt olabilir.
+</Callout>
+
+## Loglama ve Takip
+
+Kayıt olan her üyenin bilgisi, kimin ne zaman kayıt olduğu, eski isminin ne olduğu ve yeni isminin ne yapıldığı gibi tüm detaylar, Kurulum Sihirbazı'nda belirlediğiniz **Log Kanalı'na** detaylı bir rapor (embed) olarak gönderilir. Böylece sunucunuzdaki tüm üye giriş akışını şeffaf bir şekilde takip edebilirsiniz.
