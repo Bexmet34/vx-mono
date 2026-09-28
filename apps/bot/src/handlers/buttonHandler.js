@@ -380,9 +380,9 @@ async function handlePartyButtons(interaction) {
         } catch (error) {
             console.error('Error handling link_vc:', error);
             if (interaction.deferred || interaction.replied) {
-                await interaction.followUp({ content: '❌ Bir hata oluştu.', flags: [MessageFlags.Ephemeral] }).catch(() => {});
+                await interaction.followUp({ content: lang === 'tr' ? '❌ Bir hata oluştu.' : '❌ An error occurred.', flags: [MessageFlags.Ephemeral] }).catch(() => {});
             } else {
-                await interaction.reply({ content: '❌ Bir hata oluştu.', flags: [MessageFlags.Ephemeral] }).catch(() => {});
+                await interaction.reply({ content: lang === 'tr' ? '❌ Bir hata oluştu.' : '❌ An error occurred.', flags: [MessageFlags.Ephemeral] }).catch(() => {});
             }
         }
         return;
@@ -1230,7 +1230,7 @@ async function handleRegisterButtons(interaction) {
                     const msg = lang === 'en' ? '❌ User has left the server or could not be found.' : '❌ Kullanıcı sunucudan ayrılmış veya bulunamıyor.';
                     await interaction.editReply({ content: msg });
                 } else {
-                    await interaction.editReply({ content: `❌ Bir hata oluştu: ${err.message}` });
+                    await interaction.editReply({ content: lang === 'tr' ? `❌ Bir hata oluştu: ${err.message}` : `❌ An error occurred: ${err.message}` });
                 }
             }
         }

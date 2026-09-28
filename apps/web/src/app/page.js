@@ -28,7 +28,10 @@ async function getPublicServers() {
     let botGuildMap = {};
     try {
       const botApiUrl = process.env.BOT_API_URL || 'http://127.0.0.1:3005';
-      const botRes = await fetch(`${botApiUrl}/api/bot-guilds`, { next: { revalidate: 300 } });
+      const botRes = await fetch(`${botApiUrl}/api/bot-guilds`, { 
+        next: { revalidate: 300 },
+        signal: AbortSignal.timeout(3000)
+      });
       if (botRes.ok) {
         const botData = await botRes.json();
         if (botData?.success && Array.isArray(botData.guilds)) {

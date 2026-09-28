@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { getAllSubscriptions, getSubscriptionByGuildId, updateSubscription, upsertSubscription, queueMessage, getParsedTemplate } from '@veyronix/database';
+import { getAllSubscriptions, getSubscriptionByGuildId, updateSubscription, upsertSubscription, getParsedTemplate } from '@veyronix/database';
 
 export const dynamic = "force-dynamic";
 
@@ -278,29 +278,6 @@ export async function PATCH(req) {
   } catch (updateError) {
     console.error(`[AdminAPI] Update Error: ${updateError.message}`);
     return NextResponse.json({ error: updateError.message }, { status: 500 });
-  }
-
-  // 3. Queue Notification
-  if (templateId && currentSub.owner_id) {
-    try {
-      const parsed = await getParsedTemplate(templateId, placeholders);
-      if (parsed) {
-        await queueMessage({
-          guild_id: guildId,
-          owner_id: currentSub.owner_id,
-          message_content: JSON.stringify({
-            embeds: [{
-              title: parsed.title,
-              description: parsed.content,
-              color: parsed.color ? parseInt(parsed.color.replace('#', ''), 16) : 0x5865f2,
-              timestamp: new Date().toISOString()
-            }]
-          })
-        });
-      }
-    } catch (queueError) {
-      console.error(`[AdminAPI] Queue Error: ${queueError.message}`);
-    }
   }
 
   return NextResponse.json({ success: true, updatedData: savedSub });

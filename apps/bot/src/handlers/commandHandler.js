@@ -335,7 +335,7 @@ async function handleSubscriptionModal(interaction) {
     const days = parseInt(daysStr);
 
     if (isNaN(days) || days <= 0) {
-        return await interaction.reply({ content: '❌ Lütfen geçerli bir sayı giriniz.', flags: [MessageFlags.Ephemeral] });
+        return await interaction.reply({ content: '❌ Lütfen geçerli bir sayı giriniz. / Please enter a valid number.', flags: [MessageFlags.Ephemeral] });
     }
 
     let success = false;
@@ -633,7 +633,7 @@ async function handleForceRegistrationCommand(interaction) {
         });
     } catch (err) {
         console.error('[CommandHandler] Error in handleForceRegistrationCommand:', err);
-        await interaction.editReply({ content: `❌ Bir hata oluştu: ${err.message}` });
+        await interaction.editReply({ content: lang === 'tr' ? `❌ Bir hata oluştu: ${err.message}` : `❌ An error occurred: ${err.message}` });
     }
 }
 
@@ -818,12 +818,12 @@ async function handleFixRegistrationCommand(interaction) {
         }
 
         await interaction.editReply({
-            content: `✅ **<@${targetMember.id}> kullanıcısının kaydı başarıyla güncellendi!**\n🎖️ **Verilen Rol:** <@&${givenRoleId}>${nickStatus}`
+            content: lang === 'tr' ? `✅ **<@${targetMember.id}> kullanıcısının kaydı başarıyla güncellendi!**\n🎖️ **Verilen Rol:** <@&${givenRoleId}>${nickStatus}` : `✅ **<@${targetMember.id}>'s registration successfully updated!**\n🎖️ **Given Role:** <@&${givenRoleId}>${nickStatus}`
         });
 
     } catch (err) {
         console.error('[CommandHandler] Error in handleFixRegistrationCommand:', err);
-        await interaction.editReply({ content: `❌ Bir hata oluştu: ${err.message}` });
+        await interaction.editReply({ content: lang === 'tr' ? `❌ Bir hata oluştu: ${err.message}` : `❌ An error occurred: ${err.message}` });
     }
 }
 
@@ -959,7 +959,7 @@ async function handleDropManualCommand(interaction) {
     if (result) {
         await interaction.editReply({ content: '✅ Drop başarıyla bu kanala düşürüldü.' });
     } else {
-        await interaction.editReply({ content: '❌ Drop düşürülürken bir hata oluştu.' });
+        await interaction.editReply({ content: lang === 'tr' ? '❌ Drop düşürülürken bir hata oluştu.' : '❌ An error occurred while dropping.' });
     }
 }
 

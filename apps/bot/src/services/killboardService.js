@@ -1,5 +1,5 @@
 const { supabase } = require('@veyronix/database');
-const { EmbedBuilder, AttachmentBuilder } = require('discord.js');
+const { EmbedBuilder, AttachmentBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { generateKillboardImage } = require('../utils/killboardImage');
 const { getGuildConfig } = require('./guildConfig');
 const { t } = require('./i18n');
@@ -253,7 +253,18 @@ async function processAlbionGuildEvents(client, trackingInfo, globalEvents = [])
         }
 
         try {
-          await channel.send({ embeds: [embed], files: [attachment] });
+          const row = new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+              .setLabel('Website')
+              .setURL('https://veyronix.com.tr')
+              .setStyle(ButtonStyle.Link),
+            new ButtonBuilder()
+              .setLabel('Destek')
+              .setURL('https://veyronix.com.tr/support')
+              .setStyle(ButtonStyle.Link)
+          );
+
+          await channel.send({ embeds: [embed], files: [attachment], components: [row] });
           eventsSent++;
           sessionProcessedEvents.add(`${configKey}_${event.EventId}`);
           

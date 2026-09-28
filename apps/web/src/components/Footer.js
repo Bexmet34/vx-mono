@@ -175,7 +175,7 @@ export default function Footer() {
             {/* SSL Logo */}
             <div className="inline-flex items-center gap-1.5 text-primary-container font-bold text-[11px] uppercase tracking-wider px-3.5 py-1 rounded-full border border-primary-container/30 bg-primary-container/10">
               <Shield size={13} />
-              <span>256-Bit SSL Güvencesiyle</span>
+              <span>{lang === 'tr' ? '256-Bit SSL Güvencesiyle' : 'Secured by 256-Bit SSL'}</span>
             </div>
 
             {/* Payment Methods */}
@@ -186,7 +186,7 @@ export default function Footer() {
             </div>
           </div>
           <p className="text-[10px] text-on-surface-variant/40 font-mono text-center">
-            &copy; {new Date().getFullYear()} Veyronix. Tüm hakları saklıdır.
+            &copy; {new Date().getFullYear()} Veyronix. {lang === 'tr' ? 'Tüm hakları saklıdır.' : 'All rights reserved.'}
           </p>
         </div>
 

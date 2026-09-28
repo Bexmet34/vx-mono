@@ -304,18 +304,18 @@ export default function TempVoiceTab({ t, lang, settings, setSettings, setInitia
   ];
 
   const ownerPermOptions = [
-    { value: "manage_roles", label: "İzinleri Yönet (Önerilmez)" },
-    { value: "manage_channels", label: "Kanalları Yönet" },
-    { value: "manage_messages", label: "Mesajları Sil" },
-    { value: "disconnect_members", label: "Üyelerin Bağlantısını Kes" },
-    { value: "create_invite", label: "Davet Oluştur" },
-    { value: "create_poll", label: "Anket Oluştur" },
-    { value: "send_voice_messages", label: "Sesli Mesaj Gönder" },
-    { value: "stream", label: "Kamera ve Ekran Paylaşma" },
-    { value: "priority_speaker", label: "Öncelikli Konuşmacı" },
-    { value: "use_voice_activity", label: "Ses Etkinliğini Kullan" },
-    { value: "set_voice_channel_status", label: "Ses Kanalının Durumunu Ayarla" },
-    { value: "use_soundboard", label: "Ses Panelini Kullan" }
+    { value: "manage_roles", label: lang === 'tr' ? "İzinleri Yönet (Önerilmez)" : "Manage Permissions (Not Recommended)" },
+    { value: "manage_channels", label: lang === 'tr' ? "Kanalları Yönet" : "Manage Channels" },
+    { value: "manage_messages", label: lang === 'tr' ? "Mesajları Sil" : "Delete Messages" },
+    { value: "disconnect_members", label: lang === 'tr' ? "Üyelerin Bağlantısını Kes" : "Disconnect Members" },
+    { value: "create_invite", label: lang === 'tr' ? "Davet Oluştur" : "Create Invite" },
+    { value: "create_poll", label: lang === 'tr' ? "Anket Oluştur" : "Create Poll" },
+    { value: "send_voice_messages", label: lang === 'tr' ? "Sesli Mesaj Gönder" : "Send Voice Messages" },
+    { value: "stream", label: lang === 'tr' ? "Kamera ve Ekran Paylaşma" : "Video & Screen Share" },
+    { value: "priority_speaker", label: lang === 'tr' ? "Öncelikli Konuşmacı" : "Priority Speaker" },
+    { value: "use_voice_activity", label: lang === 'tr' ? "Ses Etkinliğini Kullan" : "Use Voice Activity" },
+    { value: "set_voice_channel_status", label: lang === 'tr' ? "Ses Kanalının Durumunu Ayarla" : "Set Voice Channel Status" },
+    { value: "use_soundboard", label: lang === 'tr' ? "Ses Panelini Kullan" : "Use Soundboard" }
   ];
 
   const toggleOwnerPerm = (creator, val) => {

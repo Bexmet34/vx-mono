@@ -37,6 +37,15 @@ module.exports = {
       env: {
         NODE_ENV: 'production'
       }
+    },
+    {
+      name: 'vx-monitor',
+      script: 'index.js',
+      cwd: './apps/monitor',
+      watch: false,
+      env: {
+        NODE_ENV: 'production'
+      }
     }
   ]
 };

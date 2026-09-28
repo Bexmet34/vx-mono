@@ -74,7 +74,7 @@ async function checkWeeklyVote(userId) {
         }
     } catch (err) {
         if (err.message?.includes('404') || err.message?.includes('Not Found')) {
-            console.warn("[checkWeeklyVote] Top.gg 404 — (Uyarı: Bot Top.gg'de onaylıysa .env içindeki TOPGG_TOKEN'i kontrol edin)");
+            console.warn("[checkWeeklyVote] Top.gg 404 (Not Found) hatası alındı. Bu durum genellikle Top.gg API'sindeki geçici bir kesintiden kaynaklanır. Botunuz Top.gg'de onaylıysa bu uyarıyı görmezden gelebilirsiniz.");
         } else {
             console.error('[checkWeeklyVote] Top.gg API error:', err.message || err);
         }
@@ -210,7 +210,7 @@ async function handleTempCommand(interaction) {
                 console.log(`[PartikurHandler] Vote check for ${userId}: ${hasVoted}`);
             } catch (err) {
                 if (err.message?.includes('404') || err.message?.includes('Not Found')) {
-                    console.warn('[PartikurHandler] Top.gg 404 — (Uyarı: Bot Top.gg\'de onaylıysa .env içindeki TOPGG_TOKEN\'i kontrol edin)');
+                    console.warn("[PartikurHandler] Top.gg 404 (Not Found) hatası alındı. API'deki anlık bir kesintiden dolayı olabilir, botunuz onaylıysa görmezden gelebilirsiniz.");
                 } else {
                     console.error('[PartikurHandler] Top.gg API error:', err.message || err);
                 }

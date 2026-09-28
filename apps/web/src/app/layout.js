@@ -63,6 +63,9 @@ export const metadata = {
   authors: [{ name: "Veyronix Team", url: LINKS.WEBSITE }],
   creator: "Veyronix",
   publisher: "Veyronix",
+  alternates: {
+    canonical: LINKS.WEBSITE,
+  },
   robots: {
     index: true,
     follow: true,
@@ -73,7 +76,6 @@ export const metadata = {
       "max-snippet": -1,
     },
   },
-  metadataBase: new URL(LINKS.WEBSITE),
   icons: {
     icon: [
       { url: "/icon.svg", type: "image/svg+xml" },
@@ -246,6 +248,7 @@ export default async function RootLayout({ children }) {
           crossOrigin="anonymous"
           strategy="afterInteractive"
         />
+
       </head>
       <body>
         <LanguageProvider initialLang={lang}>

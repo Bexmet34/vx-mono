@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Server, Activity, X, Cpu, HardDrive, Clock } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function SystemStatusWidget() {
+  const { lang } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [stats, setStats] = useState({
     cpu: 0,
@@ -101,7 +103,7 @@ export default function SystemStatusWidget() {
   }, [isOpen, stats.cpu]);
 
   const formatUptime = (seconds) => {
-    if (!seconds) return "Hesaplanıyor...";
+    if (!seconds) return lang === 'tr' ? "Hesaplanıyor..." : "Calculating...";
     // Sistemin 1 yıla yakın (yaklaşık 356 gün) süredir açık gibi görünmesi için ekstra saniye ekliyoruz
     const offsetSeconds = 356 * 24 * 3600; 
     const totalSeconds = seconds + offsetSeconds;
@@ -109,9 +111,10 @@ export default function SystemStatusWidget() {
     const d = Math.floor(totalSeconds / (3600 * 24));
     const h = Math.floor((totalSeconds % (3600 * 24)) / 3600);
     const m = Math.floor((totalSeconds % 3600) / 60);
-    if (d > 0) return `${d} gün ${h} saat`;
-    if (h > 0) return `${h} saat ${m} dk`;
-    return `${m} dakika`;
+    
+    if (d > 0) return `${d} ${lang === 'tr' ? 'gün' : 'days'} ${h} ${lang === 'tr' ? 'saat' : 'hours'}`;
+    if (h > 0) return `${h} ${lang === 'tr' ? 'saat' : 'hours'} ${m} ${lang === 'tr' ? 'dk' : 'min'}`;
+    return `${m} ${lang === 'tr' ? 'dakika' : 'minutes'}`;
   };
 
   return (
@@ -131,7 +134,9 @@ export default function SystemStatusWidget() {
         <div className="bg-surface-container px-2 py-1 flex justify-between items-center border-b border-outline-variant">
           <div className="flex items-center gap-1 text-primary-container">
             <Activity size={14} className="animate-pulse" />
-            <span className="font-label-bold uppercase tracking-widest text-[10px] text-on-surface">Canlı Sistem</span>
+            <span className="font-label-bold uppercase tracking-widest text-[10px] text-on-surface">
+              {lang === 'tr' ? 'Canlı Sistem' : 'Live System'}
+            </span>
           </div>
           <button onClick={() => setIsOpen(false)} className="text-on-surface-variant hover:text-[#ff5f56] transition-colors">
             <X size={14} />
@@ -147,7 +152,9 @@ export default function SystemStatusWidget() {
             <div className="flex justify-between items-end mb-3">
               <div className="flex items-center gap-2 text-on-surface-variant">
                 <Cpu size={16} />
-                <span className="font-label-medium text-[10px] uppercase">İşlemci (CPU)</span>
+                <span className="font-label-medium text-[10px] uppercase">
+                  {lang === 'tr' ? 'İşlemci (CPU)' : 'Processor (CPU)'}
+                </span>
               </div>
               <span className="font-mono text-primary-container font-bold text-[10px]">%{stats.cpu}</span>
             </div>
@@ -170,7 +177,9 @@ export default function SystemStatusWidget() {
             <div className="flex justify-between items-center mb-3">
               <div className="flex items-center gap-2 text-on-surface-variant">
                 <HardDrive size={16} />
-                <span className="font-label-medium text-[10px] uppercase">Bellek (RAM)</span>
+                <span className="font-label-medium text-[10px] uppercase">
+                  {lang === 'tr' ? 'Bellek (RAM)' : 'Memory (RAM)'}
+                </span>
               </div>
               <span className="font-mono text-on-surface font-bold text-[10px]">{stats.usedMemMb} MB</span>
             </div>
@@ -181,7 +190,7 @@ export default function SystemStatusWidget() {
               ></div>
             </div>
             <div className="text-right mt-2 text-xs text-on-surface-variant/50 font-mono tracking-widest">
-              TOPLAM: {stats.totalMemMb} MB
+              {lang === 'tr' ? 'TOPLAM:' : 'TOTAL:'} {stats.totalMemMb} MB
             </div>
           </div>
 
@@ -191,7 +200,9 @@ export default function SystemStatusWidget() {
                 <Activity size={14} className="text-primary-container/70" />
                 <span className="font-label-medium text-[10px] uppercase tracking-wide">Ping</span>
               </div>
-              <span className="font-mono text-on-surface text-[10px]">{stats.ping > 0 ? `${stats.ping} ms` : 'Ölçülüyor...'}</span>
+              <span className="font-mono text-on-surface text-[10px]">
+                {stats.ping > 0 ? `${stats.ping} ms` : (lang === 'tr' ? 'Ölçülüyor...' : 'Measuring...')}
+              </span>
           </div>
 
           {/* Uptime (Çalışma Süresi) */}
@@ -221,7 +232,7 @@ export default function SystemStatusWidget() {
         {/* İpucu (Tooltip) */}
         {!isOpen && (
           <div className="absolute left-full ml-3 whitespace-nowrap bg-surface-container-high border border-outline-variant px-3 py-1.5 rounded text-[10px] font-label-bold tracking-widest uppercase text-on-surface opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none shadow-lg">
-            Canlı Sistem
+            {lang === 'tr' ? 'Canlı Sistem' : 'Live System'}
           </div>
         )}
       </button>

@@ -104,11 +104,12 @@ export default function VotePage() {
             </div>
           </div>
 
-          <div className="w-full py-1 text-center text-gray-400 border border-dashed border-gray-800 rounded-xl bg-[#0d0f17]">
-            <p className="text-[10px] font-medium text-gray-300">Veyronix Oy Doğrulama Alanı</p>
-            <p className="text-xs text-gray-500 mt-1">
-              Süre dolduğunda oy butonunuz otomatik olarak aktifleştirilecektir.
-            </p>
+          <div className="w-full text-center text-gray-400 border border-dashed border-gray-800 rounded-xl bg-[#0d0f17] overflow-hidden relative" style={{ aspectRatio: '16/9' }}>
+            <iframe
+              src="/vast-player.html"
+              className="absolute top-0 left-0 w-full h-full border-0"
+              allow="autoplay; fullscreen"
+            ></iframe>
           </div>
         </div>
 

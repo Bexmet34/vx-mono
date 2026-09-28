@@ -17,10 +17,19 @@ async function fetchWithTimeout(promise, timeoutMs = 15000) {
   }
 }
 
+let allPostsCache = null;
+let allPostsCacheTime = 0;
+const CACHE_TTL = 30000; // 30 seconds
+
 /**
  * Tüm yayınlanmış blog yazılarını Supabase 'blog_posts' tablosundan getirir.
  */
 export async function getAllBlogPosts() {
+  const now = Date.now();
+  if (allPostsCache && (now - allPostsCacheTime < CACHE_TTL)) {
+    return allPostsCache;
+  }
+
   try {
     const { data, error } = await fetchWithTimeout(
       supabase
@@ -32,7 +41,7 @@ export async function getAllBlogPosts() {
     );
 
     if (!error && data && data.length > 0) {
-      return data.map(post => ({
+      allPostsCache = data.map(post => ({
         id: post.id,
         slug: post.slug,
         title: post.title,
@@ -48,6 +57,8 @@ export async function getAllBlogPosts() {
         publishedAt: post.published_at || post.created_at,
         viewsCount: post.views_count || 0
       }));
+      allPostsCacheTime = Date.now();
+      return allPostsCache;
     }
   } catch (err) {
     console.warn('[SupabaseBlog] Fetch error:', err.message);
@@ -60,40 +71,8 @@ export async function getAllBlogPosts() {
  * Slug'a göre tek bir blog yazısını getirir
  */
 export async function getBlogPostBySlug(slug) {
-  try {
-    const { data, error } = await fetchWithTimeout(
-      supabase
-        .from('blog_posts')
-        .select('*')
-        .eq('slug', slug)
-        .eq('status', 'published')
-        .single(),
-      15000
-    );
-
-    if (!error && data) {
-      return {
-        id: data.id,
-        slug: data.slug,
-        title: data.title,
-        description: data.description || '',
-        content: data.content,
-        coverImage: data.cover_image || null,
-        category: data.category || 'Rehber',
-        tags: Array.isArray(data.tags) ? data.tags : (data.tags ? data.tags.split(',').map(t => t.trim()) : []),
-        authorName: data.author_name || 'Veyronix Ekibi',
-        authorAvatar: data.author_avatar || LINKS.LOGO_URL,
-        readTimeMinutes: data.read_time_minutes || calculateReadTime(data.content),
-        lang: data.lang || (data.slug.endsWith('-en') ? 'en' : 'tr'),
-        publishedAt: data.published_at || data.created_at,
-        viewsCount: data.views_count || 0
-      };
-    }
-  } catch (err) {
-    console.warn(`[SupabaseBlog] Fetch failed for slug ${slug}:`, err.message);
-  }
-
-  return null;
+  const allPosts = await getAllBlogPosts();
+  return allPosts.find(post => post.slug === slug) || null;
 }
 
 /**

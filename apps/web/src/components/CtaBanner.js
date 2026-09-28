@@ -1,8 +1,10 @@
 "use client";
 
 import Link from 'next/link';
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function CtaBanner() {
+  const { lang } = useLanguage();
   return (
     <div style={{
       background: 'linear-gradient(90deg, rgba(252, 163, 17, 0.1) 0%, rgba(231, 76, 60, 0.1) 100%)',
@@ -29,10 +31,12 @@ export default function CtaBanner() {
       
       <div style={{ position: 'relative', zIndex: 1 }}>
         <h3 style={{ fontSize: '1.8rem', color: '#fff', marginBottom: '0.5rem', fontWeight: '800' }}>
-          Loncanızın Savaşlarını Discord&apos;a Taşıyın!
+          {lang === 'tr' ? "Loncanızın Savaşlarını Discord'a Taşıyın!" : "Bring Your Guild Battles to Discord!"}
         </h3>
         <p style={{ color: '#aaa', fontSize: '1rem', marginBottom: '1.5rem', maxWidth: '600px', margin: '0 auto 1.5rem auto' }}>
-          Veyronix Bot ile Albion Online Killboard, otomatik roller ve etkinlik yönetimini doğrudan Discord sunucunuzda ücretsiz olarak kullanın.
+          {lang === 'tr' 
+            ? "Veyronix Bot ile Albion Online Killboard, otomatik roller ve etkinlik yönetimini doğrudan Discord sunucunuzda ücretsiz olarak kullanın." 
+            : "Use Veyronix Bot to bring Albion Online Killboards, automatic roles, and event management directly to your Discord server for free."}
         </p>
         
         <Link 
@@ -55,7 +59,7 @@ export default function CtaBanner() {
           onMouseOver={(e) => e.target.style.transform = 'scale(1.05)'}
           onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
         >
-          Discord Sunucuna Ekle
+          {lang === 'tr' ? "Discord Sunucuna Ekle" : "Add to Discord"}
         </Link>
       </div>
     </div>

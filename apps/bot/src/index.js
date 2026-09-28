@@ -151,15 +151,20 @@ client.once('clientReady', async (c) => {
     console.log(`🌍 Service active on ${c.guilds.cache.size} servers.`);
     console.log('-------------------------------------------');
 
-    // Sunucuları Supabase ile senkronize et
+    // Sunucuları Supabase ile senkronize et (Sıralı işlem, DB yorulmasın)
     const { getSubscription } = require('@veyronix/database');
-    c.guilds.cache.forEach(async (guild) => {
-        try {
-            await getSubscription(guild.id, guild.name, guild.ownerId);
-        } catch (err) {
-            console.error(`[GuildSync] Error syncing guild ${guild.id}:`, err?.message);
+    const guildsArray = Array.from(c.guilds.cache.values());
+    (async () => {
+        for (const guild of guildsArray) {
+            try {
+                await getSubscription(guild.id, guild.name, guild.ownerId);
+            } catch (err) {
+                console.error(`[GuildSync] Error syncing guild ${guild.id}:`, err?.message);
+            }
+            // Küçük bir bekleme (rate limit / db exhaustion önlemek için)
+            await new Promise(resolve => setTimeout(resolve, 50));
         }
-    });
+    })();
 
     // Set activity safely
     try {
@@ -398,7 +403,7 @@ client.on('interactionCreate', async interaction => {
         }
 
         // Fail-Safe: Eğer herhangi bir etkileşim cevapsız kalmışsa Discord'un zaman aşımına uğramasını engelle
-        if (!interaction.replied && !interaction.deferred) {
+        if (!interaction.isAutocomplete() && !interaction.replied && !interaction.deferred) {
             console.warn(`[Interaction] Unacknowledged interaction detected for "${interaction.customId || interaction.commandName}". Replying with fail-safe.`);
             await interaction.reply({
                 content: '⚠️ Bu buton veya etkileşim artık aktif değil veya süresi dolmuş.',
