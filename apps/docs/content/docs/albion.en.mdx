@@ -1,27 +1,68 @@
 ---
-title: Albion Online
-description: The world's best Albion Online ZvZ and Killboard integration.
+title: Albion Online Integration
+description: Advanced Guild synchronization and Killboard engine developed for MMORPG Albion Online communities.
 ---
 
-# Albion Online Systems
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-Veyronix offers the most comprehensive toolset specifically developed for Albion Online guilds and alliances. You can instantly track your members' in-game achievements and easily manage your operations.
+# Albion Online ZvZ and Killboard Engine
 
-## Killboard Integration
+Veyronix offers a unique, real-time in-game integration for Guilds playing the Albion Online game and organizing over Discord.
 
-Automatically pulls the kills and deaths from in-game battles to your Discord server and presents them with an elegant card design.
+Thanks to this module, you can automatically sync your in-game player roster with your Discord server and instantly reflect your guild's ZvZ (Zerg vs Zerg) performance (who killed whom, who died where) to your Discord channels in real time.
 
-- **Filtering:** You can filter out kills above a certain Fame or separate PVE/PVP deaths.
-- **Top Lists:** Automatically ranks the top killers or top fame earners on a weekly or monthly basis and shares them in a channel you specify.
+---
 
-## ZvZ Party Builder
+## 1. Guild Synchronization
 
-An excellent tool for gathering your team before large-scale (ZvZ) operations.
-- Create an announcement by specifying the planned time and meeting location (Hideout, City, etc.).
-- Participants can sign up for roles such as Tank, Healer, DPS, or Support.
-- The party leader (Caller) can view the participant list and missing roles instantly on a single panel.
+When you enter your Albion Online information via the Dashboard, Veyronix communicates with the game's official API servers to audit your players' status.
 
-## Character Matching (Synchronization)
+### Synchronization Settings (Dashboard)
+- **Game Server:** You choose which of Albion's global servers you play on (e.g., Europe, Americas, Asia). This ensures the bot connects to the correct database.
+- **Guild ID / Name:** You enter the exact ID of your in-game guild (you can get this from the Albion Killboard) or its exact name.
+- **How It Works:** Once this info is entered, Veyronix cross-references the names of the members registered on your server with the player names in the Albion database.
+- **Benefit:** If a person leaves the guild or is kicked out, their permissions on Discord can also be automatically restricted or their name can be edited (Auto-Weeding). This prevents spies from secretly reading the guild channels.
 
-Members can link their Discord accounts with their Albion Online characters.
-This makes permission and role assignments within the server fully automated. (e.g., Ensuring only guild members can view the Discord server).
+---
+
+## 2. Killboard (Kill/Death Notifications)
+
+The system that reflects the enemies your players kill or the situations they die in during battles (Gank, ZvZ, Hellgate) as rich visual reports (Embed) to the Discord channels you designate.
+
+### Web Dashboard Killboard Settings
+You can assign two different notification channels from the **Killboard** tab on the Dashboard:
+- **Kill Channel:** The victory channel where reports will be sent when your guild members defeat opponents (e.g., `[VX] John Killed [Enemy] Mike`). The reports include tactical data such as the weapon used, Item Power (IP), and Party info.
+- **Death Channel:** The report channel where it will drop when your members die to opponents. This way, you can analyze where, to whom, and with what gear composition your players died, allowing you to manage the re-gear process after ZvZ.
+
+<Callout type="info">
+  **Real-Time Latency:** Depending on the speed at which the Albion Online API publishes data, a death experienced in-game usually drops into your Discord channel within 2 to 5 minutes. Veyronix operates on an infrastructure that keeps this ping time to a minimum.
+</Callout>
+
+---
+
+## Setup Steps
+
+To integrate the Albion module into your server:
+
+<Steps>
+<Step>
+### Enter Settings from Dashboard
+Log in to the [Veyronix Dashboard](https://veyronix.com.tr) and click on the **Albion Online (Killboard)** tab.
+</Step>
+
+<Step>
+### Server and Guild Information
+Select the location you play in (Europe, etc.) and enter your exact in-game Guild name / ID.
+</Step>
+
+<Step>
+### Designate Report Channels
+Select the `#kills` and `#deaths` channels you prepared on Discord from the relevant menus (Kill Channel ID / Death Channel ID).
+</Step>
+
+<Step>
+### Save and Wait
+After saving the settings, the system is automatically triggered in the background. As soon as your players start fighting, your logs will begin to flow!
+</Step>
+</Steps>

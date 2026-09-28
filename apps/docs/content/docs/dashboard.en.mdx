@@ -1,26 +1,106 @@
 ---
 title: Web Dashboard
-description: Manage your server from the Veyronix web interface.
+description: Comprehensive user guide for all modules, tabs, and settings available on the Veyronix Web Dashboard.
 ---
 
-# Web Dashboard (Control Panel)
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-Instead of using complex and long commands in Discord to configure all of the bot's settings, you can do it via our modern and fast web interface.
+# Comprehensive Web Dashboard Guide
 
-## Logging into the Panel
+The Veyronix Web Dashboard allows you to manage your Discord server with a fully visual and interactive interface, freeing you from the command line. In this guide, you will find detailed explanations and usage scenarios for every tab and sub-setting you will encounter on the dashboard.
+
+<Callout type="info">
+  **Note:** Some advanced features (e.g., detailed logging exemptions, unlimited ticket options) may require a **Guild Premium** subscription. Features marked with a crown (👑) icon on the dashboard are premium.
+</Callout>
+
+---
+
+## Dashboard Login and Navigation
 
 1. Go to [veyronix.com.tr](https://veyronix.com.tr).
-2. Click the **Login** button in the top right corner and connect with your Discord account.
-3. Servers where you have Administrator permissions will automatically be listed on the panel.
+2. **Log in** with your Discord account from the top right corner.
+3. Only servers where you have *Administrator* privileges will be listed. Select the server you want to manage.
+4. On the left menu (or the hamburger menu on mobile), you will find all system modules organized in tabs.
 
-## Setting Modules
+---
 
-Main modules you can use on the Dashboard:
+## All Tabs and Setting Details
 
-- **General Settings:** Server prefix, language settings, and staff roles.
-- **Temporary Voice (VoiceForge):** The category where voice channels will be created and panel settings.
-- **Registration System:** Automatically assigned roles and the registration welcome channel.
-- **Welcome / Goodbye:** Custom embedded image or text messages to be sent to joining/leaving members.
-- **Auto Role:** Initial roles given unconditionally to those joining the server.
-- **Ticket Settings:** Support system managers and transcript channels.
-- **Premium:** If your server has Premium features, the area where extra features are activated.
+### 1. Overview
+This tab displays the current status of your server on Veyronix.
+- **Bot Status:** You can see if the bot is active on your server and view its ping values.
+- **Premium Status:** Track your server's subscription type, remaining time, and limit usage.
+- **Quick Shortcuts:** Cards that allow one-click access to the most used modules (e.g., Registration, Ticket).
+
+### 2. General Settings
+Settings that determine the basic configuration of your server are located here.
+- **Bot Language:** Choose the language (Turkish / English) for the messages (errors, notifications) the bot will send to your server.
+- **Welcome Channel:** Select the channel where basic welcome messages will be sent to new members.
+- **Auto Role:** If you don't use the registration system, you can assign an initial role (e.g., "Member") here, which will be given unconditionally to everyone who joins the server. 
+
+### 3. Registration
+The center of server security and professional member intake.
+- **Registration System Toggle:** Allows you to turn the system on or off.
+- **Registration Channel:** Select the Discord channel where registration buttons (e.g., Male, Female, Member) will appear.
+- **Unregistered Role:** The restricted default role given to a new member entering the server. The member stays in this role until registered, after which this role is automatically removed.
+- **Given Roles:** Roles to be given to the member upon successful registration. You can give up to **5 different roles** (e.g., Member role + Color role) simultaneously.
+- **Staff Role:** If you want registrations to be approved by authorized personnel rather than automatically via buttons, this role allows only specified staff to approve registrations.
+- **Name Format:** Automatically changes the registered user's Discord name or server nickname according to your rules. 
+  - *Example:* If you type `[VX] {name} | {age}`, a user registering as "John 22" will be renamed to `[VX] John | 22`.
+- **Application Forms:** For extra security, you can prompt users with custom questions (e.g., "How old are you?", "Did you read the rules?") during registration.
+
+### 4. VoiceForge (TempVoice)
+A dynamic voice channel engine that prevents unnecessary channel clutter.
+- **Target Category:** The category where the "➕ Create Room" channel will be located, allowing users to click and create their custom rooms.
+- **Room Name Format:** Determines the default name of the rooms when created (e.g., `{user}'s Room` or `🔥 {user}'s Lounge`).
+- **Room Capacity:** Sets the default maximum number of people that can enter the rooms (e.g., 5 people). Members can change this limit later from their own panels.
+- **Control Panel Channel:** The text channel where the control message (for locking, hiding, kicking members) will be sent for the room creators.
+
+### 5. Ticket System
+The system where your members can start private conversations with the staff.
+- **Ticket System Toggle:** On/Off switch.
+- **Category and Channel Selection:** Choose which channel the "Open Ticket" button will be sent to and under which category the opened ticket rooms will accumulate.
+- **Ticket Options:** Provide users with a menu to categorize their issues. 
+  - *Example Options:* Complaint, Partnership, Payment, Tech Support. You can assign a different emoji to each option.
+- **Staff Assignment:** Determine which staff roles can see the opened ticket rooms, preventing unauthorized people from viewing support channels.
+
+### 6. Ticket History
+When the ticket system is closed, all messages discussed inside are not deleted. Veyronix backs them up in HTML format.
+- In this tab, you can permanently read/download transcripts of all old and closed support requests, seeing who opened them, when they were closed, and everything discussed inside.
+
+### 7. Log Settings (Audit Logs)
+The x-ray of everything happening on your server. It's much more detailed than Discord's own audit log.
+- **Log Channel Selection:** Select the secret admin channel where all events will be reported.
+- **Event Filters:** Choose which logs you want to see:
+  - *Message Deletion:* Who deleted what and in which channel? (Shows the deleted message content).
+  - *Message Edit:* What was the old message, what is the new one?
+  - *Channel / Role Events:* Who created a new channel, whose role was changed?
+- **Log Exempts:** You can exempt certain people or bots (e.g., a Music bot deleting messages) to prevent them from cluttering the log channel.
+
+### 8. Events & Drops
+A random "Drop (Box)" system to liven up the chat and keep members active.
+- **Schedule Setting:** Set the box drop interval (e.g., At a random time between every 30 to 120 minutes, or on the hour).
+- **Reward Type:** Choose what will be given to the first person who clicks the box.
+  - *Coin (Points):* Grants server economy points (Drop Points). (You determine the amount).
+  - *Role Reward:* Directly gives a role (e.g., VIP) you specify to the person who clicks.
+- **Channel Restriction:** Ensure drops only fall in the general chat channel, not disturbing other channels.
+
+### 9. Role Menu
+Allows users to get roles by clicking on their own (e.g., Color roles, game roles).
+- You can set up role acquisition systems with buttons or dropdown menus (Select Menu) in any text channel you want.
+
+### 10. Albion Online ZvZ Integration (Killboard)
+A module specifically for MMORPG Albion Online communities.
+- **Guild Synchronization:** By entering your in-game guild name and ID, you ensure that Discord names perfectly match in-game names and non-players are automatically weeded out.
+- **Killboard Notifications:** Instantly drops in-game deaths and kills into your Discord channel as visual reports. Collects statistics for ZvZ analysis.
+
+### 11. Counters
+A system that instantly displays your server's member count and active voice user count in channel names (e.g., `👥 Members: 1250`).
+
+### 12. Embed Visual
+You can personalize the color (Hex Code) and the small image (Thumbnail) in the top right corner of all messages sent by the bot to match your server's logo or concept.
+
+---
+
+The Veyronix dashboard is free from complexity but has deep configuration options. All changes you make become active on your server within milliseconds after clicking the **Save** button.

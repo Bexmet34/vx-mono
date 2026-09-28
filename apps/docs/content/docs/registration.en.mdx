@@ -1,25 +1,67 @@
 ---
-title: Registration System
-description: Professionally welcome and register members joining your server.
+title: Registration & Application System
+description: Secure your server, welcome new members professionally, and conduct selective recruitments with detailed application forms.
 ---
 
-# Registration System
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-Unlike traditional registration bots, Veyronix offers a completely modern and loggable registration infrastructure.
+# Advanced Registration Infrastructure
 
-## Features
+The Veyronix Registration System goes beyond a simple role-click logic; it acts as the first security guard and welcoming committee at your server's doorstep. With its advanced features, you can accept only those who meet your criteria, organize incoming members' names, and log the registration process in detail.
 
-- **Button Registration:** Members can register quickly simply by clicking buttons (Male, Female, etc.) without entering complex commands.
-- **Name Formatting:** The registered person's name is automatically changed according to the format you specify (e.g., `[Tag] Name | Age`).
-- **Welcome and Log Messages:** You can send custom image welcome messages to newcomers and send a notification to the log channel when the registration is complete.
-- **Unregistered Role Automation:** The first person joining the server is automatically given the unregistered role, and this role is removed once registration is completed.
+## 1. Basic Operation and Security Barrier
 
-## Registration Setup
+When a user joins your server, the process works as follows:
+1. **Unregistered Role Assignment:** At the millisecond the user enters, the `Unregistered Role` you set from the Web Dashboard is assigned to them. This is usually a restricted role where the user cannot see any channels (chat, voice) except the "#register" channel.
+2. **Welcome Message:** Your custom-designed "Welcome" image and text are sent to the registration channel. You can provide information about server rules or registration steps in this message.
+3. **Registration Buttons:** Below the welcome message are interactive buttons that allow the user to enter the server by clicking or filling out a form.
+4. **Role Transition:** When registration is successfully completed, the system automatically removes the `Unregistered Role` from the user and gives the actual roles (Member, Player, etc.) you determined. The user's access to the server is opened.
 
-Go to the **Registration System** tab on the web dashboard:
-1. Select the initial role to be given to unregistered users.
-2. Select the registered roles to be assigned, such as Male/Female or Member.
-3. Determine the staff role that will perform the registration (Registration Officer).
-4. Select the channel where the registration panel will be sent (e.g., `#register-here`) and save.
+---
 
-As soon as you save the settings, an elegant registration menu will be sent to the channel you specified.
+## 2. Web Dashboard Registration Settings Guide
+
+Here are the detailed usage purposes of all the options you encounter on the dashboard when configuring the system:
+
+### Role Configurations
+- **Unregistered Role:** The role for those waiting to be registered. Must be selected.
+- **Given Roles (1-5):** Roles to be given to those who register. Veyronix allows you to grant up to **5 different roles** simultaneously in a single registration process. (e.g., 1st Role: "Member", 2nd Role: "Event Ping", 3rd Role: "Giveaway Participant").
+- **Staff Role:** If you want registrations to be approved only by authorized personnel (interview style) rather than automatically via buttons, you select this role. The system will switch from "Auto-Registration" to "Staff Approved" mode.
+- **Guest Role Duration:** If you want to give some people entering your server a temporary (e.g., 7 days) guest role instead of a permanent one, you can specify the duration in days here. When the time expires, the system takes the guest role back.
+
+### Automatic Name Formatting
+To keep your server looking organized, you can force registered members' names into a specific template.
+- Enter your template in the `Name Format` box on the dashboard.
+- **Supported Variables:**
+  - `{name}` : The default Discord name provided by the user.
+  - `{age}` : Age information, if requested from the user.
+  - `{tag}` : Your server's clantag/guild tag.
+- *Example Template:* `[VX] {name} | {age}`
+- *Result:* When a user registers, their name is directly updated on Discord as `[VX] John | 22`.
+
+### Welcome and Logging Modules
+- **Registration Channel:** The main channel where the buttons will be sent.
+- **Registration Log Channel:** The admin channel where detailed reports like "John was registered by staff Mike, old name was X, new name is Y" will be secretly stored.
+- **Welcome Message Customization:** You can separately configure the personal greeting messages to be sent to users in a private channel post-registration in both Turkish and English.
+
+---
+
+## 3. Application Forms
+
+<Callout type="info">
+  **Highlight Feature:** If you are a gaming Guild, Roleplay server, or a private community, you can use the **Application Form** system instead of standard registration buttons.
+</Callout>
+
+When you open the registration form, the user is directly presented with a pop-up **Modal (Form Window)** inside Discord when they click the button.
+
+- **Adding Custom Questions:** You can enter any questions you want in the `application_questions` section on the dashboard.
+  - *Question 1:* What is your real age and name?
+  - *Question 2:* Which games do you have experience in?
+  - *Question 3:* Do you read and accept the server rules?
+- **Approval Process:** When the user fills out and submits this form, the form content drops into your designated **Log / Staff channel**.
+- Your staff decides on the person's entry into the server using the **Approve** or **Reject** buttons under the form. Roles are given the moment they are approved; if rejected, a message can be sent to the person (optional) explaining why.
+
+## 4. Usage Recommendations
+- **For Security:** Always make sure to move the Veyronix role **above** the roles it will give and take (Unregistered, Member, etc.) in the Discord Server Settings -> Roles tab. Otherwise, Discord will give an "Insufficient Permissions" error.
+- After adding the bot to your server, creating an empty "Unregistered" role and a "Member" role on Discord before messing with the dashboard will speed up your setup.

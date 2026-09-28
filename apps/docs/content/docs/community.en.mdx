@@ -1,29 +1,75 @@
 ---
-title: Community & Engagement
-description: Revitalize your server with Ticket, Giveaway, and Drop (Point) systems.
+title: Community & Interactions
+description: Ticket management system, smart chat drops, and tools to take your server's activity to the peak.
 ---
 
-# Community Management and Engagement Tools
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-These are dedicated modules we provide to establish active communication with your users and boost server activity.
+# Community and Interaction Modules
 
-## 1. Advanced Ticket (Support) System
+Veyronix offers advanced gamification and communication tools not only for moderation but also to help your members spend more time on the server and build an organic bond.
 
-Creates button-based support rooms so your members can privately contact the staff.
-- **Categorized Structure:** You can categorize support requests as Complaints, Suggestions, Support, etc.
-- **HTML Transcript:** Every closed ticket conversation is automatically recorded and sent to your server log channel as a readable HTML (Web page) file.
-- **Task Assignment:** You can assign a specific staff member to a support request.
+In this section, we will examine two massive infrastructures managed via the Web Dashboard: the **Smart Drop System** and the **Advanced Ticket System**.
 
-## 2. Drop and Point System
+---
 
-An excellent tool to revitalize the chat.
-- At certain intervals, a random "Drop (Box)" falls into the chat.
-- The first member to click earns a specific amount of points/credits.
-- Earned points can be used to purchase special roles or items in the Market (Store) system.
+## 1. Smart Drop System (Events & Drops)
 
-## 3. Giveaway System
+This system, where surprise boxes drop in chat channels and the first person to grab the box wins a prize, goes far beyond simple randomness; it has a **Chat Burst/Silence Analyzer** intelligence.
 
-A simple and fair giveaway infrastructure.
-- You can ensure only members with specific roles (e.g., VIP members) join the giveaway.
-- You can set flexible durations based on Seconds, Minutes, or Days.
-- When the giveaway ends, the winner is automatically announced and backup winners can be drawn.
+The advanced drop settings you can configure from the Web Dashboard are:
+
+### Basic Settings and Rewards
+- **System Toggle:** Completely turns the feature on and off.
+- **Target Channels (Channel IDs):** You can ensure drops only fall in the channels you specify (e.g., #general-chat, #lfg).
+- **Reward Type:**
+  - *Coin (Points):* Gives server economy points to the winning person. (You determine the amount with `Reward Amount`).
+  - *Role:* Directly gives a role you select (e.g., "Lucky of the Week" or "VIP") to the lucky person who clicks the box.
+
+### Timing and Chance Model (Schedule Type)
+Veyronix wants you to decide how the drops will fall:
+1. **Random Interval:** For example, you can say "Drop randomly between a minimum of 30 minutes and a maximum of 120 minutes." The system picks a random time between these two durations.
+2. **Hourly Chance:** "A 25% chance of a box dropping every hour on the hour." This way, you can keep members in the chat right on the hour (e.g., 14:00, 15:00).
+3. **Exact Minutes:** "Drop only on the 15th and 45th minutes of the hours."
+
+### Drop Chance and Cooldown
+- **Chance Factor (Drop Chance):** You can set the difficulty of the box dropping as "Easy, Medium, Hard, Impossible" or directly as a custom percentage (e.g., 15%).
+- **Cooldown:** To prevent boxes from dropping back-to-back, you can enforce a minimum time that must pass (e.g., 15 minutes) after a box drops.
+
+### Smart Chat Analyzer (Only on Veyronix)
+The bot can drop boxes tactically by reading how fast the chat is flowing:
+- **Silence Threshold:** If no one has spoken in the chat for, say, "15 minutes," the bot can instantly throw a Drop into the middle to liven up the chat!
+- **Burst Threshold:** If "more than 30 messages were sent in the last 180 seconds" (meaning the chat is on fire), the bot throws a surprise box to double the excitement.
+
+---
+
+## 2. Advanced Ticket System
+
+The support system that allows players on your server to reach founders and moderators securely, neatly, and privately. It prevents dozens of people from harassing staff via DMs (Direct Messages).
+
+### Setup Parameters
+- **Ticket Category:** You choose under which folder/category all the private support rooms to be opened will be hosted.
+- **Button Channel:** The channel where members will see the "Open Support Ticket" menu.
+- **Maximum Ticket Limit:** You prevent spam/troll attacks by limiting how many tickets a member can open at the same time (e.g., Max 1).
+
+### Category (Topic) Options
+Instead of having the member open a direct ticket, you can present them with an elegant selection menu. You can add as many topic titles as you want via the dashboard.
+- *Label:* Complaint Report
+- *Description:* Click to report a member.
+- *Value & Emoji:* 🚨 (Icon to appear on the button).
+
+### Authorization and Naming
+- **Staff Roles:** Who will see the support requests? By selecting only the Founder and Moderator roles, you prevent ordinary members from reading support rooms.
+- **Ticket Name Format:** How should the name of the opened channel be?
+  - `ticket-{username}` (e.g., ticket-john)
+  - `{topic}-{username}` (e.g., complaint-john) you organize it with variables like these.
+
+### 3. Ticket History (HTML Transcript)
+Veyronix doesn't just delete and throw away the conversation inside when the ticket is closed.
+- It backs up every word spoken, pictures, and files sent in a modern web page layout (HTML Transcript).
+- By entering the **Ticket History** tab on the Web Dashboard, you can keep track of who received support on what topic in the past for months and download it to your computer at any time.
+
+<Callout type="info">
+  **Pro Tip:** Transcripts are a perfect tool for auditing your staff's attitude towards members (Quality Assurance).
+</Callout>

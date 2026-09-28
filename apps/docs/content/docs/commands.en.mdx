@@ -1,36 +1,77 @@
 ---
-title: Command List
-description: Full reference of all slash (/) commands for the Veyronix Discord bot.
+title: Command References (Slash)
+description: A complete list and parameters of all slash (/) commands that allow you to perform quick actions within Discord.
 ---
 
-# Command References
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-Veyronix uses modern Discord APIs and has built all its commands upon the Slash (`/`) structure. This way, when you start typing a command, the required information (parameters) is visually presented to you by Discord.
+# Slash (/) Command Guide
 
-## ⚙️ General and Settings Commands
+Due to Veyronix's design philosophy, all core settings and module configurations of your server are done via the **[Web Dashboard](/docs/dashboard)**. However, you might not want to switch to the browser when you are playing a game, chatting, or need to take an urgent action.
 
-- `/setup` - Starts the wizard allowing you to set up all core systems of Veyronix in your server.
-- `/ping` - Shows the bot's current latency and API status.
-- `/istatistik` - Displays the general system and hardware usage statistics of the Veyronix bot.
-- `/dil` - Sets the language the bot will use in your server (Turkish, English, etc.).
+This is where Veyronix's next-generation Discord Slash (`/`) commands come into play. When you start typing a command, Discord automatically lists the information (parameters) you need to enter visually.
 
-## 🔊 Temporary Voice (VoiceForge) Commands
+<Callout type="info">
+  **Permission Check:** Some commands (e.g., Starting a Giveaway, Setup) can only be seen and used by people with Administrator privileges on the server or the "Bot Staff" role determined from the dashboard.
+</Callout>
 
-*Note: Actions that can be performed via the voice panel can also be done with commands.*
-- `/ses-kilitle` - Locks the voice channel you are currently in.
-- `/ses-ac` - Opens your locked voice channel to everyone.
-- `/ses-limit <number>` - Sets the limit for how many people can join the room.
-- `/ses-isim <new_name>` - Changes the name of your room.
+---
 
-## 📝 Community & Engagement
+## ⚙️ Core System Commands
 
-- `/cekilis-baslat` - Allows you to quickly create a giveaway.
-- `/cekilis-bitir` - Immediately ends an ongoing giveaway.
-- `/drop-at` - Manually drops a point (Drop) box into the chat.
-- `/ticket-kur` - Sends the Support System menu to the selected channel.
+Used to test the bot's operability and trigger quick setups.
 
-## ⚔️ Albion Online Commands
+- **`/setup`**
+  - *What It Does:* When you first add the bot to the server or want to reset settings, it launches an automated wizard that creates the necessary channels and base roles for you in seconds. Only founders can use this.
+- **`/ping`**
+  - *What It Does:* Allows you to check the bot's current latency (ms), database response speed, and active server shard statistics.
+- **`/istatistik` (Statistics)**
+  - *What It Does:* Reports how many servers the bot is serving, active CPU/RAM usage, and uptime.
 
-- `/albion-eslestir <player_name>` - Links your Discord account with your in-game character.
-- `/zvz-parti-kur` - Creates a new ZvZ operation plan.
-- `/killboard-ayarla` - Configures the channel where Killboard notifications will be sent.
+---
+
+## 🔊 VoiceForge (Voice Management) Commands
+
+Members who open their own rooms may also choose to use the command line instead of clicking the buttons in the text channel. These commands only work when you are **inside** a VoiceForge temporary room and you are the **owner** of that room.
+
+- **`/ses-isim`** `[new_name]`
+  - Changes the name of your channel in seconds. Names caught in the profanity/insult filter are rejected by the bot.
+- **`/ses-limit`** `[number]`
+  - Sets the maximum number of people who can enter the room (between 0 and 99). When the limit is reached, others cannot enter the room.
+- **`/ses-kilitle`** & **`/ses-ac`** (Lock/Unlock)
+  - Completely closes the doors of the room to outside entries or opens them again.
+- **`/ses-gizle`** & **`/ses-goster`** (Hide/Unhide)
+  - Makes the room invisible on the server list or makes it visible again.
+- **`/ses-at`** `[user]` (Kick)
+  - Allows you to kick a disturbing person from your channel by tagging them.
+- **`/ses-devret`** `[user]` (Transfer)
+  - If you need to leave but don't want the room to disappear, you transfer the ownership of the room (the authority to use the buttons on the control panel) to someone else inside.
+
+---
+
+## 🎉 Interaction and Community Commands
+
+Tools used by administrators or event managers to liven up the server.
+
+- **`/cekilis-baslat`** `[duration] [prize] [winner_count]` (Start Giveaway)
+  - *How It Works:* Starts a giveaway that will last for the duration you specify (e.g., 10m, 1h, 1d). Participants join by clicking the button/reaction left on the message.
+- **`/cekilis-bitir`** `[message_id]` (End Giveaway)
+  - *How It Works:* Used to urgently conclude a giveaway that hasn't expired yet.
+- **`/cekilis-reroll`** `[message_id]` (Reroll)
+  - *How It Works:* If the person who won the giveaway doesn't meet the conditions, it allows a new winner (backup) to be selected.
+- **`/drop-at`** `[amount] [reward_type]` (Drop Box)
+  - *How It Works:* Instead of waiting for the bot's automatic drops, it allows you as an administrator to instantly throw a reward box into the chat. Perfect for instantly igniting the chat.
+
+---
+
+## ⚔️ Albion Online ZvZ Commands
+
+Tools that coordinate Guild battles and killboard records.
+
+- **`/albion-eslestir`** `[in_game_name]` (Link Account)
+  - Allows players to link their Discord accounts with their in-game Albion characters. If successful, the user's Discord name is edited according to the Albion tag.
+- **`/zvz-parti-kur`** `[target] [time]` (Create Party)
+  - Creates a CTA (Call to Arms) announcement. Launches a buttoned party interface where joining members can choose whether they will play Tank, Healer, or DPS roles.
+- **`/guild-guncelle`** (Update Guild)
+  - Bypasses the bot's cooldown (API Refresh) and forces it to instantly connect to the Albion API and update the roles and names on the server. Used to quickly weed out spies.
