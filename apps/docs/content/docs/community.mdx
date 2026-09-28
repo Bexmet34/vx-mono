@@ -1,29 +1,75 @@
 ---
-title: Topluluk & Etkileşim
-description: Ticket, Çekiliş ve Drop (Puan) sistemleri ile sunucunuzu canlandırın.
+title: Topluluk & Etkileşim (Community)
+description: Bilet (Ticket) yönetim sistemi, akıllı sohbet dropları (Drop) ve sunucunuzun aktivitesini zirveye taşıyacak araçlar.
 ---
 
-# Topluluk Yönetimi ve Etkileşim Araçları
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-Kullanıcılarınızla daha aktif bir iletişim kurmak ve sunucu aktivitesini artırmak için sağladığımız özel modüllerdir.
+# Topluluk ve Etkileşim Modülleri
 
-## 1. Gelişmiş Ticket (Destek) Sistemi
+Veyronix, sadece moderasyon değil aynı zamanda üyelerinizin sunucuda daha fazla vakit geçirmesi ve organik bir bağ kurması için gelişmiş oyunlaştırma (gamification) ve iletişim araçları sunar.
 
-Üyelerinizin yetkililerle özel olarak iletişime geçebilmesi için butonlu destek odaları oluşturur.
-- **Kategorili Yapı:** Destek taleplerini Şikayet, Öneri, Destek gibi kategorilere ayırabilirsiniz.
-- **HTML Transkript:** Kapatılan her ticket görüşmesi otomatik olarak kayıt altına alınır ve sunucu log kanalınıza okunaklı bir HTML (Web sayfası) dosyası olarak gönderilir.
-- **Görev Atama:** Bir destek talebini belirli bir yetkiliye atayabilirsiniz.
+Bu bölümde Web Panel üzerinden yönetilen iki devasa altyapıyı, **Akıllı Drop Sistemini** ve **Gelişmiş Ticket (Bilet) Sistemini** inceleyeceğiz.
 
-## 2. Drop ve Puan Sistemi
+---
 
-Sohbeti canlandırmak için mükemmel bir araçtır.
-- Belirli aralıklarla sohbete rastgele "Drop (Kutu)" düşer.
-- İlk tıklayan üye belli miktarda puan/kredi kazanır.
-- Kazanılan puanlar Market (Mağaza) sisteminde özel roller veya ürünler satın almak için kullanılabilir.
+## 1. Akıllı Drop Sistemi (Events & Drops)
 
-## 3. Çekiliş Sistemi
+Sohbet kanallarında sürpriz kutuların düştüğü, kutuyu kapan ilk kişinin ödül kazandığı bu sistem, basit bir rastgelelikten çok daha öte, **Sohbet Algılayıcı (Chat Burst/Silence Analyzer)** bir zekaya sahiptir.
 
-Basit ve adil bir çekiliş altyapısı.
-- Çekilişe sadece belirli rollere sahip olanların (Örn: Sadece VIP üyeler) katılmasını sağlayabilirsiniz.
-- Saniye, Dakika veya Gün bazlı esnek süreler ayarlayabilirsiniz.
-- Çekiliş bitiminde kazanan otomatik açıklanır ve yedek kazananlar belirlenebilir.
+Web Panelinden yapabileceğiniz gelişmiş drop ayarları şunlardır:
+
+### Temel Ayarlar ve Ödüller
+- **Sistem Aktifliği:** Özelliği tamamen açıp kapatır.
+- **Hedef Kanallar (Channel IDs):** Dropların sadece belirlediğiniz kanallarda (Örn: #genel-sohbet, #oyun-arama) düşmesini sağlayabilirsiniz.
+- **Ödül Tipi (Reward Type):**
+  - *Coin (Puan):* Kazanan kişiye sunucu içi ekonomi puanı verir. (Miktarını `Reward Amount` ile siz belirlersiniz).
+  - *Rol (Role):* Kutuya tıklayan şanslı kişiye seçtiğiniz bir rolü (Örn: "Haftanın Şanslısı" veya "VIP") verir.
+
+### Zamanlama ve Şans Modeli (Schedule Type)
+Veyronix dropları nasıl düşüreceğine sizin karar vermenizi ister:
+1. **Rastgele Zamanlı (Random Interval):** Örneğin "Minimum 30 dakika, Maksimum 120 dakikada bir düşsün" diyebilirsiniz. Sistem bu iki süre arasında rastgele bir zaman seçer.
+2. **Saatlik Şans (Hourly Chance):** "Her saat başı %25 ihtimalle kutu düşsün." Bu sayede tam saat başlarında (14:00, 15:00) üyeleri sohbette tutabilirsiniz.
+3. **Belirli Dakikalar (Exact Minutes):** "Sadece saatlerin 15. ve 45. dakikalarında düşsün."
+
+### Drop İhtimali ve Cooldown
+- **Şans Faktörü (Drop Chance):** Kutunun düşme zorluğunu "Kolay, Orta, Zor, İmkansız" veya doğrudan özel yüzde (Örn: %15) olarak ayarlayabilirsiniz.
+- **Bekleme Süresi (Cooldown):** Peş peşe kutu düşmesini engellemek için, bir kutu düştükten sonra geçmesi gereken minimum süreyi (Örn: 15 dakika) zorunlu tutabilirsiniz.
+
+### Akıllı Sohbet Algılayıcı (Sadece Veyronix'te)
+Bot, chat'in ne kadar hızlı aktığını okuyarak dropları taktiksel olarak düşürebilir:
+- **Durgunluk Eşiği (Silence Threshold):** Eğer sohbette örneğin "15 dakikadır" kimse konuşmuyorsa, sohbeti canlandırmak için bot ortaya anında bir Drop atabilir!
+- **Mesaj Yağmuru (Burst Threshold):** Eğer "Son 180 saniye içinde 30'dan fazla mesaj" atıldıysa (yani chat alev aldıysa), coşkuyu katlamak için bot sürpriz bir kutu fırlatır.
+
+---
+
+## 2. Gelişmiş Ticket (Bilet) Sistemi
+
+Sunucunuzdaki oyuncuların kuruculara ve moderatörlere güvenli, düzenli ve gizli bir şekilde ulaşmasını sağlayan destek sistemidir. Düzinelerce kişinin DM (Özel Mesaj) atarak yetkilileri darlamasını önler.
+
+### Kurulum Parametreleri
+- **Ticket Kategorisi:** Açılacak tüm özel destek odalarının hangi klasör/kategori altında barınacağını seçersiniz.
+- **Buton Kanalı:** Üyelerin "Destek Talebi Aç" menüsünü göreceği kanaldır.
+- **Maksimum Bilet Limiti:** Bir üyenin aynı anda kaç tane (Örn: En fazla 1) ticket açabileceğini sınırlayarak spam/troll saldırılarını önlersiniz.
+
+### Kategori (Konu) Seçenekleri (Ticket Options)
+Üyeye direkt bilet açtırmak yerine, ona şık bir seçim menüsü sunabilirsiniz. Panel üzerinden dilediğiniz kadar konu başlığı ekleyebilirsiniz.
+- *Etiket (Label):* Şikayet Bildirimi
+- *Açıklama (Description):* Bir üyeyi şikayet etmek için tıklayın.
+- *Değer (Value) & Emoji:* 🚨 (Butonda çıkacak ikon).
+
+### Yetkilendirme ve İsimlendirme
+- **Yetkili Roller (Staff Roles):** Destek taleplerini kimler görecek? Sadece Kurucu ve Moderatör rollerini seçerek, sıradan üyelerin biletleri okumasını engellersiniz.
+- **Bilet İsim Formatı:** Açılan kanalın adı nasıl olsun? 
+  - `ticket-{username}` (Örn: ticket-ahmet)
+  - `{topic}-{username}` (Örn: sikayet-ahmet) gibi değişkenlerle organizasyonu sağlarsınız.
+
+### 3. Ticket Geçmişi (HTML Transkript)
+Veyronix, bilet kapatıldığında içerideki konuşmayı silip atmaz.
+- Konuşulan her kelimeyi, atılan resimleri ve dosyaları modern bir web sayfası görünümünde (HTML Transkript) yedekler.
+- Web Panelindeki **Ticket History (Ticket Geçmişi)** sekmesine girerek, geçmişte kimin hangi konuda destek aldığını aylarca saklayabilir ve dilediğiniz zaman bilgisayarınıza indirebilirsiniz. 
+
+<Callout type="info">
+  **Profesyonel İpucu:** Transkriptler, yetkililerinizin üyelere karşı olan tutumlarını denetlemek (Quality Assurance) için mükemmel bir araçtır.
+</Callout>

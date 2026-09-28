@@ -1,62 +1,67 @@
 ---
-title: Kayıt Sistemi
-description: Sunucunuza katılan üyeleri profesyonelce karşılayın, güvenliği sağlayın ve isimlerini otomatik düzenleyin.
+title: Kayıt ve Başvuru Sistemi
+description: Sunucu güvenliğinizi sağlayın, yeni üyeleri profesyonelce karşılayın ve detaylı başvuru formlarıyla seçici alımlar yapın.
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-# Kayıt Sistemi Nedir?
+# Gelişmiş Kayıt Altyapısı
 
-Veyronix Kayıt Sistemi, sunucunuza yeni katılan üyeleri yetkililerinizin manuel olarak kayıt etmesi derdini ortadan kaldıran veya bu süreci çok daha profesyonel bir arayüzle sunan gelişmiş bir modüldür.
+Veyronix Kayıt Sistemi, basit bir role tıklama mantığının ötesine geçerek sunucunuzun kapısındaki ilk güvenlik görevlisi ve karşılama komitesidir. Gelişmiş özellikleri sayesinde sunucunuza sadece istediğiniz kriterlere uyan kişileri kabul edebilir, gelen kişilerin isimlerini düzenleyebilir ve kayıt sürecini detaylıca loglayabilirsiniz.
 
-Klasik kayıt botlarının aksine, kullanıcıların zorlu komutlar yazmasını beklemez. Tamamen **Discord Butonları** üzerinden çalışan, loglanabilir ve isim formatlama destekli modern bir altyapı sunar.
+## 1. Temel İşleyiş ve Güvenlik Bariyeri
 
-## Temel Özellikler
-
-- **Butonlu Etkileşim:** Üyeler karmaşık komutlar girmeden, doğrudan kanal içindeki şık bir mesaja yerleştirilmiş butonlara (Örn: Erkek, Kadın, Üye) tıklayarak kayıt olabilirler.
-- **Otomatik İsim Formatlama:** Kayıt olan kişinin adı, belirlediğiniz şablona göre otomatik değiştirilir (Örn: `[Tag] İsim | Yaş` veya `✨ İsim`).
-- **Görsel Hoş Geldin Mesajları:** Yeni gelen üyelere özel resimli ve tasarımlı hoş geldin mesajları gönderebilirsiniz.
-- **Kayıtsız Rolü Otomasyonu:** Sunucuya giren kişiye saniyesinde belirlediğiniz "Kayıtsız" rolü verilir. Kayıt başarıyla tamamlandığında bu rol geri alınır ve yerine kayıtlı rolleri verilir.
-- **Güvenlik Bariyeri:** Yeni açılmış veya şüpheli hesapların sunucuya doğrudan giriş yapmasını kayıt aşamasında filtreleyebilirsiniz.
+Bir kullanıcı sunucunuza katıldığında süreç şu şekilde işler:
+1. **Kayıtsız Rolü Ataması:** Kullanıcı girdiği milisaniyede, Web Panelinden belirlediğiniz `Kayıtsız Rolü (Unregistered Role)` kullanıcıya atanır. Bu rol genellikle sunucudaki tüm kanalları (sohbet, ses) görmesi engellenmiş, sadece "#kayıt-ol" kanalını görebilen kısıtlı bir roldür.
+2. **Hoş Geldin Mesajı:** Belirlediğiniz özel tasarımlı "Hoş Geldin" resmi ve metni, kayıt kanalına gönderilir. Bu mesajda sunucunun kurallarına veya kayıt aşamalarına dair bilgiler verebilirsiniz.
+3. **Kayıt Butonları:** Hoş geldin mesajının altında, kullanıcının tıklayarak veya form doldurarak sunucuya girmesini sağlayan etkileşimli butonlar yer alır.
+4. **Rol Geçişi:** Kayıt başarıyla tamamlandığında, sistem `Kayıtsız Rolünü` otomatik olarak kullanıcıdan çeker ve yerine sizin belirlediğiniz asıl rolleri (Üye, Oyuncu vb.) verir. Kullanıcının erişimi sunucuya açılır.
 
 ---
 
-## Adım Adım Kayıt Sistemi Kurulumu
+## 2. Web Paneli Kayıt Ayarları Rehberi
 
-Kayıt sistemini aktif etmek için herhangi bir komut kullanmanıza gerek yoktur, her şeyi **Web Panelinizden** birkaç tıklamayla halledebilirsiniz.
+Sistemi yapılandırırken panelde karşınıza çıkan tüm seçeneklerin detaylı kullanım amaçları şunlardır:
 
-<Steps>
-<Step>
-### Panelde Kayıt Modülüne Gidin
-[Veyronix Panel'e](https://veyronix.com.tr) giriş yaptıktan sonra sunucunuzu seçin ve sol menüden **Kayıt Sistemi** sekmesine tıklayın.
-</Step>
+### Rol Yapılandırmaları
+- **Kayıtsız Rolü (Unregistered Role):** Kayıt olmayanların beklediği rol. Kesinlikle seçilmelidir.
+- **Kayıtlı Rolleri (Given Roles 1-5):** Kayıt olanlara verilecek rollerdir. Veyronix, tek bir kayıt işleminde **5 farklı role kadar** aynı anda yetki verebilmenizi sağlar. (Örn: Verilecek 1. Rol: "Üye", 2. Rol: "Etkinlik Bildirimleri", 3. Rol: "Çekiliş Katılımcısı").
+- **Kayıt Yetkilisi (Staff Role):** Kayıtların herkes tarafından butona basılarak değil de, sadece yetkililer tarafından onaylanmasını (mülakat tarzı) istiyorsanız bu rolü seçersiniz. Bu rolü seçerseniz sistem "Oto-Kayıt" modundan "Yetkili Onaylı" moda geçer.
+- **Misafir Rolü Süresi (Guest Duration):** Sunucunuza giren bazı kişilere kalıcı değil, süreli (Örn: 7 gün) misafir rolü vermek isterseniz, bu alandan süreyi gün bazında belirtebilirsiniz. Süre dolduğunda sistem misafir rolünü geri alır.
 
-<Step>
-### Rolleri Tanımlayın
-Sistemin kimden hangi rolü alıp, kime ne vereceğini bilmesi gerekir. Açılan ekranda şunları seçin:
-- **Kayıtsız Rolü:** (Örn: "Unregistered" veya "Kayıtsız").
-- **Kayıtlı Rolleri:** (Örn: "Üye", "Erkek", "Kadın" gibi kayıt işlemi bitince verilecek roller).
-- **Kayıt Yetkilisi:** (Eğer sistemin yetkili onaylı olmasını istiyorsanız kayıt işlemlerini yapacak rolü seçin).
-</Step>
+### Otomatik İsim Formatlama
+Sunucunuzun düzenli görünmesi için kayıt olan üyelerin isimlerini belirli bir şablona zorlayabilirsiniz.
+- Paneldeki `İsim Formatı` kutusuna şablonunuzu yazın.
+- **Desteklenen Değişkenler:**
+  - `{isim}` : Kullanıcının belirttiği veya varsayılan Discord adı.
+  - `{yas}` : Eğer kullanıcıdan yaş istendi ise yaş bilgisi.
+  - `{tag}` : Sunucunuzun clantag/guild tag'i.
+- *Örnek Şablon:* `[VX] {isim} | {yas}`
+- *Sonuç:* Kullanıcı kayıt olduğunda ismi doğrudan `[VX] Ahmet | 22` olarak Discord üzerinde güncellenir.
 
-<Step>
-### İsim Formatını Belirleyin (Opsiyonel)
-Üyelerin isimlerinin belirli bir düzende olmasını istiyorsanız "İsim Formatı" kutucuğunu doldurun. 
-Kullanabileceğiniz değişkenler: `{isim}`, `{yas}`, `{tag}`.
-*Örnek:* `[VX] {isim} | {yas}` yazarsanız, sistem kullanıcının adını bu şablona göre otomatik düzenler.
-</Step>
+### Hoş Geldin ve Loglama Modülleri
+- **Kayıt Kanalı:** Butonların gönderileceği ana kanal.
+- **Kayıt Log Kanalı:** "Ahmet, yetkili Mehmet tarafından kayıt edildi, eski ismi X idi, yeni ismi Y oldu" şeklindeki detaylı raporların gizlice depolanacağı yönetici kanalıdır.
+- **Ticket / Karşılama Mesajı Özelleştirme:** Kullanıcılara kayıt sonrası özel bir kanalda atılacak kişisel selamlama mesajlarını Türkçe ve İngilizce olarak ayrı ayrı yapılandırabilirsiniz.
 
-<Step>
-### Kayıt Kanalını Seçin ve Başlatın
-Kayıt butonlarının gönderileceği kanalı (Örn: `#kayıt-ol`) seçin ve **"Kaydet ve Sistemi Başlat"** butonuna tıklayın.
-</Step>
-</Steps>
+---
+
+## 3. Başvuru Sistemi (Application Forms)
 
 <Callout type="info">
-  **İşlem Tamam!** Ayarları kaydettiğiniz anda belirlediğiniz Discord kanalına çok şık bir kayıt karşılama mesajı ve altında tıklanabilir kayıt butonları gönderilecektir. Üyeleriniz artık bu butonları kullanarak kolayca kayıt olabilir.
+  **Öne Çıkan Özellik:** Eğer bir oyun klanı (Guild), Roleplay sunucusu veya özel bir topluluksanız, standart kayıt butonları yerine **Başvuru Formu** sistemini kullanabilirsiniz.
 </Callout>
 
-## Loglama ve Takip
+Kayıt formunu açtığınızda, kullanıcı butona tıkladığında doğrudan Discord içinde açılır bir **Modal (Form Penceresi)** ile karşılaşır.
 
-Kayıt olan her üyenin bilgisi, kimin ne zaman kayıt olduğu, eski isminin ne olduğu ve yeni isminin ne yapıldığı gibi tüm detaylar, Kurulum Sihirbazı'nda belirlediğiniz **Log Kanalı'na** detaylı bir rapor (embed) olarak gönderilir. Böylece sunucunuzdaki tüm üye giriş akışını şeffaf bir şekilde takip edebilirsiniz.
+- **Özel Sorular Ekleme:** Panelden `application_questions` bölümüne istediğiniz soruları girebilirsiniz.
+  - *Soru 1:* Gerçek yaşınız ve isminiz nedir?
+  - *Soru 2:* Hangi oyunlarda tecrübeniz var?
+  - *Soru 3:* Sunucu kurallarını okuyup kabul ediyor musunuz?
+- **Onay Süreci:** Kullanıcı bu formu doldurup gönderdiğinde, form içeriği belirlediğiniz **Log / Yetkili kanalına** düşer.
+- Yetkilileriniz formun altında çıkan **Onayla (Approve)** veya **Reddet (Reject)** butonlarını kullanarak kişinin sunucuya girişine karar verir. Onaylandığı an roller verilir, reddedildiğinde ise neden reddedildiğine dair kişiye (isteğe bağlı) mesaj gönderilebilir.
+
+## 4. Kullanım Tavsiyeleri
+- **Güvenlik İçin:** Veyronix rolünü her zaman Discord Sunucu Ayarları -> Roller sekmesinde, vereceği ve alacağı rollerin (Kayıtsız, Üye vb.) **üzerine** taşıdığınızdan emin olun. Aksi halde Discord "Yetki Yetersiz" hatası verecektir.
+- Sunucunuza bot eklendikten sonra paneli kurcalamadan önce Discord üzerinden boş bir "Kayıtsız" rolü ve bir "Üye" rolü açıp, ardından panele geçiş yapmanız kurulumunuzu hızlandıracaktır.

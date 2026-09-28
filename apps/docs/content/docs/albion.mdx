@@ -1,27 +1,68 @@
 ---
-title: Albion Online
-description: Dünyanın en iyi Albion Online ZvZ ve Killboard entegrasyonu.
+title: Albion Online Entegrasyonu
+description: MMORPG Albion Online toplulukları için geliştirilmiş gelişmiş Guild senkronizasyonu ve Killboard motoru.
 ---
 
-# Albion Online Sistemleri
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-Veyronix, Albion Online loncaları (Guild) ve ittifakları (Alliance) için özel olarak geliştirilmiş en kapsamlı araç setini sunar. Üyelerinizin oyun içi başarılarını anlık olarak takip edebilir ve operasyonlarınızı kolayca yönetebilirsiniz.
+# Albion Online ZvZ ve Killboard Motoru
 
-## Killboard Entegrasyonu
+Veyronix, Albion Online oyununu oynayan ve Discord üzerinden organize olan loncalar (Guilds) için benzersiz, gerçek zamanlı bir oyun içi entegrasyon sunar. 
 
-Oyun içerisindeki savaşlarda yaşanan ölümleri ve öldürmeleri (Kill/Death) otomatik olarak Discord sunucunuza çeker ve şık bir kart tasarımı ile sunar.
+Bu modül sayesinde oyun içindeki oyuncu kadronuzu Discord sunucunuzla otomatik eşitleyebilir ve loncanızın ZvZ (Zerg vs Zerg) performansını (kim kimi öldürdü, kim nerede öldü) Discord kanallarınıza anlık olarak canlı bir şekilde aktarabilirsiniz.
 
-- **Filtreleme:** Sadece belirli bir Fame üzerindeki öldürmeleri veya PVE/PVP ölümlerini ayrıştırabilirsiniz.
-- **Top Listeler:** Haftalık veya aylık en çok kill alan veya en çok fame kasan oyuncuları otomatik olarak sıralar ve belirlediğiniz kanalda paylaşır.
+---
 
-## ZvZ Parti Kurucu
+## 1. Guild Senkronizasyonu
 
-Büyük savaş (ZvZ) operasyonları öncesinde ekibinizi toplamak için harika bir araç.
-- Planlanan saati ve toplanma yerini (Hideout, City vb.) belirleyerek bir ilan oluşturun.
-- İlana katılanlar Tank, Healer, DPS, Support gibi rollere göre kayıt olabilirler.
-- Parti lideri (Caller), katılanların listesini ve eksik rolleri anlık olarak tek bir panelde görebilir.
+Panel üzerinden Albion Online bilgilerinizi girdiğinizde Veyronix, oyunun resmi API sunucularıyla haberleşerek oyuncularınızın durumunu denetler.
 
-## Karakter Eşleştirme (Senkronizasyon)
+### Senkronizasyon Ayarları (Panel)
+- **Oyun Sunucusu (Server):** Albion'un global sunucularından hangisinde oynadığınızı (Örn: Europe, Americas, Asia) seçersiniz. Bu sayede bot doğru veritabanına bağlanır.
+- **Guild ID / İsim:** Oyun içi loncanızın tam ID'sini (Albion Killboard'dan alabilirsiniz) veya tam ismini girersiniz.
+- **Nasıl Çalışır?** Bu bilgiler girildiğinde Veyronix, sunucunuza kayıt olan üyelerin isimlerini, Albion veritabanındaki oyuncu isimleriyle çapraz sorgular.
+- **Yararı:** Eğer kişi guild'den çıkarsa veya atılırsa, Discord üzerinde de otomatik olarak yetkileri kısıtlanabilir veya ismi düzenlenebilir (Oto-Ayıklama). Böylece ajanların lonca kanallarını gizlice okuması engellenir.
 
-Üyeler Discord hesapları ile Albion Online karakterlerini eşleştirebilir.
-Bu sayede sunucu içinde yetki ve rol atamaları tamamen otomatik hale gelir. (Örn: Sadece loncaya üye olanların Discord sunucusunu görebilmesi).
+---
+
+## 2. Killboard (Ölüm/Öldürme Bildirimleri)
+
+Oyuncularınızın savaşlarda (Gank, ZvZ, Hellgate) kestiği adamları veya öldükleri durumları, Discord'un belirlediğiniz kanallarına zengin görsel raporlar (Embed) olarak yansıtan sistemdir. 
+
+### Web Panel Killboard Ayarları
+Dashboard üzerindeki **Killboard** sekmesinden iki farklı bildirim kanalı atayabilirsiniz:
+- **Kill (Öldürme) Kanalı:** Lonca üyelerinizin rakipleri alt ettiğinde (Örn: `[VX] Ahmet Killed [Enemy] Mehmet`) raporların gönderileceği zafer kanalı. Raporlarda; hangi silahın kullanıldığı, kaç IP (Item Power) olduğu ve Party bilgileri gibi taktiksel veriler yer alır.
+- **Death (Ölüm) Kanalı:** Üyelerinizin rakiplere öldüğünde düşeceği rapor kanalı. Böylece oyuncularınızın nerede, kime, nasıl bir eşya (gear) dizilimi ile öldüğünü analiz edebilir, ZvZ sonrası re-gear (yeniden eşya dizme) sürecini yönetebilirsiniz.
+
+<Callout type="info">
+  **Gerçek Zamanlı Gecikme:** Albion Online API'sinin verileri yayınlama hızına bağlı olarak, oyun içinde yaşanan bir ölüm genellikle 2 ile 5 dakika içerisinde Discord kanalınıza düşer. Veyronix bu ping süresini minimumda tutacak bir altyapıyla çalışır.
+</Callout>
+
+---
+
+## Kurulum Adımları
+
+Albion modülünü sunucunuza entegre etmek için:
+
+<Steps>
+<Step>
+### Panelden Ayarları Girin
+[Veyronix Dashboard](https://veyronix.com.tr)'a girin ve **Albion Online (Killboard)** sekmesine tıklayın.
+</Step>
+
+<Step>
+### Sunucu ve Guild Bilgisi
+Oynadığınız lokasyonu (Europe vb.) seçin ve oyun içi tam Guild adınızı / ID'nizi girin.
+</Step>
+
+<Step>
+### Rapor Kanallarını Belirleyin
+Discord'da hazırladığınız `#kills` ve `#deaths` kanallarını ilgili menülerden (Kill Channel ID / Death Channel ID) seçin.
+</Step>
+
+<Step>
+### Kaydedin ve Bekleyin
+Ayarları kaydettikten sonra sistem otomatik olarak arkaplanda tetiklenir. Oyuncularınız savaşmaya başladığı andan itibaren loglarınız akmaya başlayacaktır!
+</Step>
+</Steps>

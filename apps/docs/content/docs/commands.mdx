@@ -1,36 +1,77 @@
 ---
-title: Komut Listesi
-description: Veyronix Discord botunun tüm eğik çizgi (/slash) komutları referansı.
+title: Komut Referansları (Slash)
+description: Discord içerisinde hızlı işlemler yapmanızı sağlayan tüm eğik çizgi (/) komutlarının tam listesi ve parametreleri.
 ---
 
-# Komut Referansları
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-Veyronix modern Discord API'lerini kullanır ve tüm komutlarını Slash (`/`) yapısı üzerine kurmuştur. Bu sayede bir komutu yazmaya başladığınızda hangi bilgileri (parametreleri) girmeniz gerektiği Discord tarafından size görsel olarak sunulur.
+# Slash (/) Komut Kılavuzu
 
-## ⚙️ Genel ve Ayar Komutları
+Veyronix'in tasarım felsefesi gereği sunucunuzun tüm çekirdek ayarları ve modül yapılandırmaları **[Web Dashboard](/docs/dashboard)** üzerinden yapılır. Ancak, oyun oynarken, sohbetteyken veya acil bir aksiyon almanız gerektiğinde tarayıcıya geçmek istemeyebilirsiniz. 
 
-- `/setup` - Veyronix'in sunucunuzdaki tüm temel sistemlerini kurmanızı sağlayan sihribazı başlatır.
-- `/ping` - Botun anlık gecikme süresini ve API durumunu gösterir.
-- `/istatistik` - Veyronix botunun genel sistem ve donanım kullanım istatistiklerini gösterir.
-- `/dil` - Botun sunucunuzda konuşacağı dili (Türkçe, İngilizce vb.) ayarlar.
+İşte bu noktada Veyronix'in yeni nesil Discord Eğik Çizgi (`/`) komutları devreye girer. Bir komutu yazmaya başladığınızda hangi bilgileri (parametreleri) girmeniz gerektiği Discord tarafından size otomatik olarak listelenir.
 
-## 🔊 Geçici Ses (VoiceForge) Komutları
+<Callout type="info">
+  **Yetki Kontrolü:** Bazı komutları (Örn: Çekiliş Başlatma, Setup) sadece sunucuda Yönetici yetkisine veya panelden belirlenmiş "Bot Yetkilisi" rolüne sahip kişiler görebilir ve kullanabilir.
+</Callout>
 
-*Not: Ses paneli üzerinden yapılabilen işlemler komutla da yapılabilir.*
-- `/ses-kilitle` - İçinde bulunduğunuz ses kanalını kilitler.
-- `/ses-ac` - Kilitli olan ses kanalınızı herkesin girişine açar.
-- `/ses-limit <sayı>` - Odaya girebilecek kişi limitini ayarlar.
-- `/ses-isim <yeni_isim>` - Odanızın adını değiştirir.
+---
 
-## 📝 Topluluk & Etkileşim
+## ⚙️ Temel Sistem Komutları
 
-- `/cekilis-baslat` - Hızlıca bir çekiliş oluşturmanızı sağlar.
-- `/cekilis-bitir` - Süresi dolmamış bir çekilişi hemen sonlandırır.
-- `/drop-at` - Sohbete manuel olarak bir puan (Drop) kutusu bırakır.
-- `/ticket-kur` - Seçilen kanala Destek Sistemi menüsünü gönderir.
+Botun çalışabilirliğini test etmek ve hızlı kurulumları tetiklemek için kullanılır.
 
-## ⚔️ Albion Online Komutları
+- **`/setup`**
+  - *Ne İşe Yarar:* Botu sunucuya ilk eklediğinizde veya ayarları sıfırlamak istediğinizde, gerekli kanalları ve temel rolleri saniyeler içinde sizin için oluşturan otomatik sihirbazı başlatır. Sadece kurucular kullanabilir.
+- **`/ping`**
+  - *Ne İşe Yarar:* Botun o anki gecikme süresini (ms), veritabanı yanıt hızını ve aktif sunucu shard istatistiklerini kontrol etmenizi sağlar.
+- **`/istatistik`**
+  - *Ne İşe Yarar:* Botun kaç sunucuda hizmet verdiğini, aktif CPU/RAM kullanımını ve uptime (çalışma) süresini raporlar.
 
-- `/albion-eslestir <oyuncu_adı>` - Discord hesabınızı oyundaki karakterinizle eşleştirir.
-- `/zvz-parti-kur` - Yeni bir ZvZ operasyon planlaması oluşturur.
-- `/killboard-ayarla` - Killboard bildirimlerinin atılacağı kanalı yapılandırır.
+---
+
+## 🔊 VoiceForge (Ses Yönetimi) Komutları
+
+Kendi odasını açan üyeler, metin kanalındaki butonlara tıklamak yerine komut satırını kullanmayı da tercih edebilirler. Bu komutlar sadece bir VoiceForge geçici odasının **içindeyken** ve o odanın **sahibi** iseniz çalışır.
+
+- **`/ses-isim`** `[yeni_isim]`
+  - Kanalınızın adını saniyeler içinde değiştirir. Küfür/hakaret filtresine takılan isimler bot tarafından reddedilir.
+- **`/ses-limit`** `[sayı]`
+  - Odaya en fazla kaç kişinin girebileceğini ayarlar (0 ile 99 arası). Limit dolduğunda diğerleri odaya giriş yapamaz.
+- **`/ses-kilitle`** & **`/ses-ac`**
+  - Odanın kapılarını dışarıdan girişlere tamamen kapatır veya tekrar açar.
+- **`/ses-gizle`** & **`/ses-goster`**
+  - Odayı sunucu listesinde görünmez yapar veya tekrar görünür hale getirir.
+- **`/ses-at`** `[kullanıcı]`
+  - Sizi rahatsız eden kişiyi etiketleyerek kanalınızdan atmanızı sağlar.
+- **`/ses-devret`** `[kullanıcı]`
+  - Çıkmanız gerektiğinde odanın yok olmasını istemiyorsanız, içerideki başka birine oda sahipliğini devredersiniz.
+
+---
+
+## 🎉 Etkileşim ve Topluluk Komutları
+
+Yöneticilerin veya etkinlik sorumlularının sunucuyu canlandırmak için kullandığı araçlardır.
+
+- **`/cekilis-baslat`** `[süre] [ödül] [kazanan_sayisi]`
+  - *Nasıl Çalışır:* Belirttiğiniz süre (Örn: 10m, 1h, 1d) boyunca devam edecek bir çekiliş başlatır. Katılımcılar mesaja bırakılan butona/tepkiye tıklayarak katılırlar.
+- **`/cekilis-bitir`** `[mesaj_id]`
+  - *Nasıl Çalışır:* Süresi dolmamış bir çekilişi acil olarak hemen sonuçlandırmak için kullanılır.
+- **`/cekilis-reroll`** `[mesaj_id]`
+  - *Nasıl Çalışır:* Çekilişi kazanan kişi şartları sağlamıyorsa, yeni bir kazanan (yedek) seçilmesini sağlar.
+- **`/drop-at`** `[miktar] [ödül_tipi]`
+  - *Nasıl Çalışır:* Botun otomatik attığı dropları beklemek yerine, yönetici olarak anında sohbete bir ödül kutusu fırlatmanızı sağlar. Chat'i anında alevlendirmek için mükemmeldir.
+
+---
+
+## ⚔️ Albion Online ZvZ Komutları
+
+Guild (Lonca) savaşlarını ve killboard kayıtlarını koordine eden araçlardır.
+
+- **`/albion-eslestir`** `[oyun_ici_isim]`
+  - Oyuncuların Discord hesaplarını oyun içi Albion karakterleriyle eşleştirmesini (Link) sağlar. Başarılı olursa kullanıcının Discord ismi Albion tag'ine göre düzenlenir.
+- **`/zvz-parti-kur`** `[hedef] [zaman]`
+  - Bir CTA (Call to Arms) duyurusu oluşturur. Katılacak üyelerin Tank, Healer, DPS rollerinden hangisini oynayacaklarını seçebilecekleri butonlu bir parti arayüzü başlatır.
+- **`/guild-guncelle`**
+  - Botun bekleme süresini (API Refresh) es geçerek, anında Albion API'sine bağlanıp sunucudaki rollerin ve isimlerin güncellenmesini zorlar. Ajanları hızla temizlemek için kullanılır.
