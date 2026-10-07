@@ -40,6 +40,10 @@ const TIME_APIS = [
 /**
  * Syncs the system time with an external API to calculate offset.
  * Tries multiple APIs with a short timeout. Fails silently if all unavailable.
+ *
+ * Büyük sapmalar (≥60 dk) tespit edildiğinde sunucu saatini timedatectl
+ * ile düzeltmek için gereken komutu açıkça loglar.
+ * Küçük sapmalar (5s–60dk) için yazılımsal telafi (timeOffsetMs) devam eder.
  */
 async function syncTimeOffset() {
     for (const api of TIME_APIS) {
@@ -56,10 +60,23 @@ async function syncTimeOffset() {
                 timeOffsetMs = realTime - systemTime;
 
                 const offsetMins = (timeOffsetMs / 60000).toFixed(1);
-                if (Math.abs(timeOffsetMs) > 5000) {
-                    console.log(`[TimeSync] Sistem saati ${offsetMins} dakika hatalı. Otomatik düzeltme aktif.`);
+                const absOffsetMs = Math.abs(timeOffsetMs);
+
+                if (absOffsetMs >= 60 * 60 * 1000) {
+                    // ≥ 60 dakika: kritik sapma — sunucu saatini düzeltmek gerekiyor
+                    const realDateStr = new Date(realTime).toISOString().replace('T', ' ').slice(0, 19);
+                    console.error(
+                        `[TimeSync] ⚠️  KRİTİK: Sistem saati ${offsetMins} dakika hatalı!\n` +
+                        `[TimeSync]    Yazılımsal telafi aktif, ancak kalıcı çözüm için sunucuda şu komutu çalıştırın:\n` +
+                        `[TimeSync]    sudo timedatectl set-ntp true\n` +
+                        `[TimeSync]    sudo timedatectl set-time "${realDateStr}"\n` +
+                        `[TimeSync]    (veya NTP aktifse yalnızca: sudo timedatectl set-ntp true)`
+                    );
+                } else if (absOffsetMs > 5000) {
+                    // 5 saniye – 60 dakika: yazılımsal telafi yeterli
+                    console.warn(`[TimeSync] ⚡ Sistem saati ${offsetMins} dakika hatalı. Yazılımsal düzeltme aktif.`);
                 } else {
-                    console.log(`[TimeSync] Sistem saati senkronize (Sapma: ${timeOffsetMs}ms).`);
+                    console.log(`[TimeSync] ✅ Sistem saati senkronize (Sapma: ${timeOffsetMs}ms).`);
                 }
                 return; // success — stop trying
             }
@@ -69,6 +86,15 @@ async function syncTimeOffset() {
     }
     // All APIs failed — VPS has no outbound HTTP, use system clock as-is
     console.log('[TimeSync] Harici saat API\'lerine erişilemiyor, sistem saati kullanılıyor.');
+}
+
+/**
+ * Mevcut saat ofsetini milisaniye cinsinden döndürür.
+ * Tanılama ve izleme amaçlıdır.
+ * @returns {number}
+ */
+function getTimeOffsetMs() {
+    return timeOffsetMs;
 }
 
 /**
@@ -82,5 +108,6 @@ function getNow() {
 module.exports = {
     parseTimeToMs,
     syncTimeOffset,
+    getTimeOffsetMs,
     getNow
 };

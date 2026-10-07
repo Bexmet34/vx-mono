@@ -14,7 +14,6 @@ const { handleCreatePartyCommand, handleTempCommand, handleTempAutocomplete, han
 
 const { handlePartyButtons, handleObjectiveButtons, handleRegisterButtons } = require('./handlers/buttonHandler');
 const { handlePartiModal, handleObjectiveModal, handleRegisterModal, handleApplicationAnswerModal } = require('./handlers/modalHandler');
-const { AutoPoster } = require('topgg-autoposter');
 const { handleManageMenu, handleEditModal, handleKickMember, handleJoinRoleSelect, handleJoinMultiRoleSelect, handleAddMemberSelect, handleAddMemberUserSelect } = require('./handlers/menuHandler');
 const { handleSettingsLanguageSelect } = require('./handlers/settingsHandler');
 const { handleReactionAdd, handleReactionRemove } = require('./handlers/reactionHandler');
@@ -24,7 +23,7 @@ const { initDb } = require('./services/db');
 const { getGuildConfig } = require('./services/guildConfig');
 const { MessageFlags } = require('discord.js');
 const { t } = require('./services/i18n');
-const { syncTimeOffset } = require('./utils/timeUtils');
+const { syncTimeOffset, getTimeOffsetMs } = require('./utils/timeUtils');
 
 // Create Discord client
 const { Partials } = require('discord.js');
@@ -108,6 +107,21 @@ async function startBot() {
         setTimeout(startBot, 5000);
     }
 }
+
+// Saat offsetini her 30 dakikada bir yeniden kontrol et.
+// Uzun çalışma sürelerinde sistem saati kaymasını veya DST geçişlerini yakalar.
+const TIME_SYNC_INTERVAL = 30 * 60 * 1000; // 30 dakika
+const timeSyncTimer = setInterval(async () => {
+    const prevOffset = getTimeOffsetMs();
+    await syncTimeOffset();
+    const newOffset = getTimeOffsetMs();
+    const delta = Math.abs(newOffset - prevOffset);
+    if (delta > 5000) {
+        console.warn(`[TimeSync] Offset güncellendi: ${(prevOffset / 60000).toFixed(1)}dk → ${(newOffset / 60000).toFixed(1)}dk (Δ${(delta / 1000).toFixed(1)}s)`);
+    }
+}, TIME_SYNC_INTERVAL);
+
+if (timeSyncTimer.unref) timeSyncTimer.unref();
 
 // Client ready event
 client.once('clientReady', async (c) => {
