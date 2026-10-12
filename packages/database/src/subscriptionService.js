@@ -1,6 +1,6 @@
 const { supabase } = require('./client');
 const subCache = new Map();
-const SUB_CACHE_TTL_MS = 5 * 60 * 1000; // 5 dakika TTL
+const SUB_CACHE_TTL_MS = 15 * 60 * 1000; // 15 dakika TTL (Sorgu sayısını 3 kat azaltır)
 
 function invalidateSubCache(guildId) {
     if (guildId) subCache.delete(guildId);
@@ -157,6 +157,7 @@ async function addSubscriptionDays(guildId, days) {
         })
         .eq('guild_id', guildId);
 
+    invalidateSubCache(guildId);
     return !error;
 }
 
@@ -178,6 +179,7 @@ async function setUnlimitedSubscription(guildId, value = true) {
                 updated_at: new Date().toISOString() 
             })
             .eq('guild_id', guildId);
+        invalidateSubCache(guildId);
         return !error;
     } else {
         const { error } = await supabase
@@ -189,6 +191,7 @@ async function setUnlimitedSubscription(guildId, value = true) {
                 updated_at: new Date().toISOString() 
             })
             .eq('guild_id', guildId);
+        invalidateSubCache(guildId);
         return !error;
     }
 }
@@ -218,6 +221,7 @@ async function removeSubscriptionDays(guildId, days) {
         })
         .eq('guild_id', guildId);
 
+    invalidateSubCache(guildId);
     return !error;
 }
 
@@ -232,6 +236,7 @@ async function setSubscriptionActive(guildId, value = true) {
             updated_at: new Date().toISOString() 
         })
         .eq('guild_id', guildId);
+    invalidateSubCache(guildId);
     return !error;
 }
 

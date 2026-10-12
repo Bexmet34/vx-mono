@@ -26,22 +26,33 @@ function getAppEmoji(client, names, fallback = '') {
   return fallback;
 }
 
+// Killboard sunucu ayarları için 10 dakikalık bellek önbelleği
+let cachedKillboardConfigs = null;
+let lastKillboardConfigFetch = 0;
+const KILLBOARD_CONFIG_CACHE_TTL = 10 * 60 * 1000;
+
 /**
  * Run the killboard check for all configured guilds
  * @param {import('discord.js').Client} client 
  */
 async function runKillboardCheck(client) {
   try {
-    // 1. Fetch all guild settings that have an albion_guild_id and at least one channel configured
-    const { data: configs, error } = await supabase
-      .from('guild_settings')
-      .select('guild_id, albion_guild_id, albion_server, killboard_kill_channel_id, killboard_death_channel_id, killboard_last_event_id, language')
-      .not('albion_guild_id', 'is', null)
-      .or('killboard_kill_channel_id.not.is.null,killboard_death_channel_id.not.is.null');
+    let configs = cachedKillboardConfigs;
+    if (!configs || (Date.now() - lastKillboardConfigFetch > KILLBOARD_CONFIG_CACHE_TTL)) {
+      const { data, error } = await supabase
+        .from('guild_settings')
+        .select('guild_id, albion_guild_id, albion_server, killboard_kill_channel_id, killboard_death_channel_id, killboard_last_event_id, language')
+        .not('albion_guild_id', 'is', null)
+        .or('killboard_kill_channel_id.not.is.null,killboard_death_channel_id.not.is.null');
 
-    if (error) {
-      console.error('[Killboard] Error fetching guild settings:', error);
-      return;
+      if (error) {
+        console.error('[Killboard] Error fetching guild settings:', error);
+        return;
+      }
+
+      cachedKillboardConfigs = data || [];
+      lastKillboardConfigFetch = Date.now();
+      configs = cachedKillboardConfigs;
     }
 
     if (!configs || configs.length === 0) return;
@@ -279,6 +290,7 @@ async function processAlbionGuildEvents(client, trackingInfo, globalEvents = [])
 
       // Update last event ID if it changed
       if (newLastEventId > lastEventId) {
+        config.killboard_last_event_id = newLastEventId.toString();
         console.log(`[Killboard] Guild ${config.guild_id} processing complete. New LastEventID: ${newLastEventId}. Messages sent: ${eventsSent}`);
         await supabase
           .from('guild_settings')
@@ -289,7 +301,11 @@ async function processAlbionGuildEvents(client, trackingInfo, globalEvents = [])
       }
     }
   } catch (err) {
-    console.error(`[Killboard] Error processing Albion Guild ${trackingInfo.albion_guild_id}:`, err);
+    if (err.name === 'TimeoutError' || err.message?.includes('timeout') || err.message?.includes('aborted')) {
+      console.log(`[Killboard] Albion API zaman aşımı (${trackingInfo.albion_guild_id} / ${albion_server})`);
+    } else {
+      console.error(`[Killboard] Error processing Albion Guild ${trackingInfo.albion_guild_id}:`, err.message || err);
+    }
   }
 }
 

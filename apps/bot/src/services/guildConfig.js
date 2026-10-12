@@ -2,8 +2,8 @@ const db = require('./db');
 const { getSupabaseGuildSettings, updateGuildLanguage, updateSupabaseGuildSettings } = require('@veyronix/database');
 
 const configCache = new Map();
-const CACHE_TTL_MS = 10 * 60 * 1000; // 10 dakika (Realtime ile senkronize)
-const NEGATIVE_CACHE_TTL_MS = 60 * 1000; // 1 dakika (Yeni kurulan sunucuların gecikmesini önler)
+const CACHE_TTL_MS = 30 * 60 * 1000; // 30 dakika (Realtime ile senkronize)
+const NEGATIVE_CACHE_TTL_MS = 30 * 60 * 1000; // 30 dakika (Ayarı olmayan sunucuların Supabase'i spamlamasını önler)
 
 /**
  * Toplu olarak Realtime veya başlangıçta ayarları önbelleğe doldurur

@@ -1,5 +1,6 @@
 const { ChannelType, PermissionFlagsBits, OverwriteType } = require('discord.js');
 const { getGuildConfig } = require('./guildConfig');
+const db = require('./db');
 
 // Memory map to track active temp channels: Map<channelId, { ownerId: string, creatorId: string, count: number }>
 const activeTempChannels = new Map();
@@ -262,6 +263,8 @@ async function handleCreatorJoin(newState, creatorConfig) {
         }
 
         // 4. Guarantee Bot Full Permissions (always can manage/move/connect)
+        // NOT: ManageRoles kanal overwrite olarak ayarlanamaz; sunucu genelinde ManageRoles/Administrator
+        // izni olmayan botlarda 50013 hatasına neden olur. ManageChannels yeterlidir.
         setOverwrite(
             guild.client.user.id,
             OverwriteType.Member,
@@ -270,8 +273,7 @@ async function handleCreatorJoin(newState, creatorConfig) {
                 PermissionFlagsBits.Connect,
                 PermissionFlagsBits.Speak,
                 PermissionFlagsBits.ManageChannels,
-                PermissionFlagsBits.MoveMembers,
-                PermissionFlagsBits.ManageRoles
+                PermissionFlagsBits.MoveMembers
             ],
             []
         );
@@ -286,8 +288,9 @@ async function handleCreatorJoin(newState, creatorConfig) {
         ];
 
         if (Array.isArray(creatorConfig.ownerPermissions)) {
+            // NOT: manage_roles kanal overwrite olarak ayarlanamaz (Discord 50013 hatası),
+            // bu yüzden izin haritasından çıkarıldı.
             const permMap = {
-                'manage_roles': PermissionFlagsBits.ManageRoles,
                 'manage_channels': PermissionFlagsBits.ManageChannels,
                 'manage_messages': PermissionFlagsBits.ManageMessages,
                 'disconnect_members': PermissionFlagsBits.MoveMembers,
@@ -310,6 +313,33 @@ async function handleCreatorJoin(newState, creatorConfig) {
 
         setOverwrite(member.id, OverwriteType.Member, ownerAllow, []);
 
+        // 6. Güvenlik filtresi: Discord kuralına göre bot ManageRoles/Administrator iznine sahip
+        //    değilse, kanal oluştururken permission_overwrites parametresi gönderilemez (Discord 50013 hatası).
+        //    Ayrıca sahip olmadığı izinleri overwrite ile grant edemez.
+        const botMember = guild.members.me || await guild.members.fetchMe().catch(() => null);
+        let canManageRoles = false;
+        if (botMember) {
+            const botPerms = categoryId
+                ? botMember.permissionsIn(categoryId)
+                : botMember.permissions;
+
+            canManageRoles =
+                botPerms.has(PermissionFlagsBits.Administrator) ||
+                botPerms.has(PermissionFlagsBits.ManageRoles);
+
+            if (!canManageRoles) {
+                // Botun Rolleri Yönet izni yoksa Discord API 50013 hatası döndürür.
+                // Bu nedenle doğrudan boş bırakıyoruz.
+                filteredOverwrites = [];
+            } else {
+                for (const ow of filteredOverwrites) {
+                    if (Array.isArray(ow.allow) && ow.allow.length > 0) {
+                        ow.allow = ow.allow.filter(p => botPerms.has(p));
+                    }
+                }
+            }
+        }
+
         const creatorChannelRef = newState.channel;
         let positionValue;
 
@@ -323,7 +353,7 @@ async function handleCreatorJoin(newState, creatorConfig) {
             positionValue = creatorChannelRef ? creatorChannelRef.position + 1 : 999;
         }
 
-        // Create the channel
+        // Create the channel — çok katmanlı fallback ile 50013 hatası önlenir
         const channelOptions = {
             name: channelName,
             type: ChannelType.GuildVoice,
@@ -338,7 +368,40 @@ async function handleCreatorJoin(newState, creatorConfig) {
             channelOptions.rtcRegion = rtcRegion;
         }
 
-        const newChannel = await guild.channels.create(channelOptions);
+        let newChannel;
+        try {
+            // Deneme 1: Temel oluşturma
+            newChannel = await guild.channels.create(channelOptions);
+        } catch (createErr) {
+            if (createErr.code === 50013) {
+                // Deneme 2: Permission overwrites olmadan oluştur
+                const fallbackOptions = { ...channelOptions, permissionOverwrites: [] };
+                try {
+                    newChannel = await guild.channels.create(fallbackOptions);
+                    // Kanal oluştuktan sonra sadece owner'a temel izinler vermeyi dene
+                    await newChannel.permissionOverwrites.edit(member.id, {
+                        ViewChannel: true,
+                        Connect: true,
+                        Speak: true,
+                        Stream: true,
+                        UseVAD: true,
+                    }).catch(() => {});
+                } catch (fallbackErr) {
+                    // Deneme 3: Kategori olmadan root'ta oluştur
+                    if (fallbackErr.code === 50013) {
+                        const rootOptions = { ...channelOptions, permissionOverwrites: [], parent: null };
+                        newChannel = await guild.channels.create(rootOptions).catch(rootErr => {
+                            throw new Error(`VoiceForge kanal oluşturulamadı (tüm denemeler başarısız). Botun bu sunucuda "Kanalları Yönet" ve "Üyeleri Taşı" izni olduğundan emin olun. Orijinal hata: ${rootErr.message}`);
+                        });
+                    } else {
+                        throw fallbackErr;
+                    }
+                }
+            } else {
+                throw createErr;
+            }
+        }
+
 
         // Store in memory
         activeTempChannels.set(newChannel.id, {
@@ -452,7 +515,18 @@ async function cleanupEmptyTempChannels(client, isStartup = false) {
         let deletedCount = 0;
         let recoveredCount = 0;
 
-        for (const guild of client.guilds.cache.values()) {
+        // Supabase'e 74 istek atmak yerine sadece yerel SQLite'ta aktif geçici ses kanalı tanımlı olan sunucuları sorgula
+        const activeRows = await db.all("SELECT guild_id FROM guild_configs WHERE tempvoice_creators IS NOT NULL AND tempvoice_creators != '[]' AND tempvoice_creators != ''").catch(() => []);
+        const targetGuildIds = activeRows && activeRows.length > 0 
+            ? activeRows.map(r => r.guild_id).filter(id => client.guilds.cache.has(id))
+            : [];
+
+        if (targetGuildIds.length === 0) return;
+
+        for (const guildId of targetGuildIds) {
+            const guild = client.guilds.cache.get(guildId);
+            if (!guild) continue;
+
             const config = await getGuildConfig(guild.id).catch(() => null);
             if (!config || !Array.isArray(config.tempvoice_creators) || config.tempvoice_creators.length === 0) {
                 continue;
@@ -510,8 +584,8 @@ async function updateOwnerPermissions(vc, newOwnerId, creatorId, guildId) {
     
     const ownerAllowObj = {};
     if (creatorConfig && Array.isArray(creatorConfig.ownerPermissions)) {
+        // NOT: manage_roles kanal overwrite olarak ayarlanamaz (Discord 50013 hatası)
         const permStrMap = {
-            'manage_roles': 'ManageRoles',
             'manage_channels': 'ManageChannels',
             'manage_messages': 'ManageMessages',
             'disconnect_members': 'MoveMembers',
