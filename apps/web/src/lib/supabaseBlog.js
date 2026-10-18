@@ -174,13 +174,21 @@ export async function getBlogPostBySlug(slug) {
 }
 
 /**
- * İlgili diğer makaleleri getirir
+ * İlgili diğer makaleleri getirir (Aynı dil ve aynı kategori öncelikli)
  */
-export async function getRelatedPosts(currentSlug, category, limit = 3) {
+export async function getRelatedPosts(currentSlug, category, limit = 3, currentLang = 'tr') {
   const allPosts = await getAllBlogPosts();
+  const catLower = (category || '').toLowerCase();
   return allPosts
     .filter(p => p.slug !== currentSlug)
-    .filter(p => !category || p.category.toLowerCase() === category.toLowerCase() || true)
+    .sort((a, b) => {
+      const aLang = (a.lang || 'tr') === currentLang ? 1 : 0;
+      const bLang = (b.lang || 'tr') === currentLang ? 1 : 0;
+      if (aLang !== bLang) return bLang - aLang;
+      const aCat = catLower && (a.category || '').toLowerCase() === catLower ? 1 : 0;
+      const bCat = catLower && (b.category || '').toLowerCase() === catLower ? 1 : 0;
+      return bCat - aCat;
+    })
     .slice(0, limit);
 }
 

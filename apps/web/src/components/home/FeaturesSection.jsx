@@ -1,6 +1,7 @@
 "use client";
 
-import { Swords, Skull, Mic2, ClipboardList, ShieldCheck, LayoutDashboard } from "lucide-react";
+import Link from "next/link";
+import { Swords, Skull, Mic2, ClipboardList, ShieldCheck, LayoutDashboard, ArrowUpRight } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import FadeIn from "@/components/ui/FadeIn";
 
@@ -16,18 +17,19 @@ const featureColors = [
 
 export default function FeaturesSection() {
   const { t, lang } = useLanguage();
+  const isTr = lang === 'tr';
 
   const features = [
-    { titleKey: 'feat1Title', descKey: 'feat1Desc', large: true },
-    { titleKey: 'feat2Title', descKey: 'feat2Desc', large: false },
-    { titleKey: 'feat3Title', descKey: 'feat3Desc', large: false },
-    { titleKey: 'feat4Title', descKey: 'feat4Desc', large: false },
-    { titleKey: 'feat5Title', descKey: 'feat5Desc', large: false },
-    { titleKey: 'feat6Title', descKey: 'feat6Desc', large: true },
+    { titleKey: 'feat1Title', descKey: 'feat1Desc', href: '/ozellikler/parti-kurucu', large: true },
+    { titleKey: 'feat2Title', descKey: 'feat2Desc', href: '/killboard', large: false },
+    { titleKey: 'feat3Title', descKey: 'feat3Desc', href: '/ozellikler/gecici-ses-kanali', large: false },
+    { titleKey: 'feat4Title', descKey: 'feat4Desc', href: '/ozellikler/kayit-sistemi', large: false },
+    { titleKey: 'feat5Title', descKey: 'feat5Desc', href: '/ozellikler/ticket-destek', large: false },
+    { titleKey: 'feat6Title', descKey: 'feat6Desc', href: '/dashboard', large: true },
   ];
 
   return (
-    <section className="px-margin-mobile md:px-margin-desktop py-12 md:py-16 max-w-container-max mx-auto">
+    <section id="features" className="px-margin-mobile md:px-margin-desktop py-12 md:py-16 max-w-container-max mx-auto">
       <div className="text-center mb-10">
         <FadeIn delay={100} direction="up" distance={20}>
           <h2 className="font-headline-xl text-2xl sm:text-3xl md:text-4xl text-on-surface tracking-tight mb-3 font-bold">
@@ -49,11 +51,14 @@ export default function FeaturesSection() {
           
           return (
             <FadeIn key={idx} delay={100 + idx * 80} direction="up" distance={25} className={isLarge ? 'md:col-span-2' : ''}>
-              <div className={`group h-full rounded-2xl p-7 md:p-8 flex flex-col justify-end relative overflow-hidden transition-all duration-500 cursor-default
-                bg-surface-container/40 border border-outline-variant/20 backdrop-blur-sm
-                hover:bg-surface-container-high/60 hover:border-outline-variant/40 hover:-translate-y-1
-                ${color.glow}
-              `}>
+              <Link
+                href={feat.href}
+                className={`group h-full rounded-2xl p-7 md:p-8 flex flex-col justify-end relative overflow-hidden transition-all duration-500 cursor-pointer
+                  bg-surface-container/40 border border-outline-variant/20 backdrop-blur-sm
+                  hover:bg-surface-container-high/60 hover:border-outline-variant/40 hover:-translate-y-1
+                  ${color.glow}
+                `}
+              >
                 {/* Subtle gradient overlay on hover */}
                 <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl`}
                   style={{ background: `radial-gradient(ellipse at top left, ${color.bg.includes('blue') ? 'rgba(59,130,246,0.05)' : color.bg.includes('red') ? 'rgba(239,68,68,0.05)' : color.bg.includes('emerald') ? 'rgba(16,185,129,0.05)' : color.bg.includes('amber') ? 'rgba(245,158,11,0.05)' : color.bg.includes('violet') ? 'rgba(139,92,246,0.05)' : 'rgba(255,215,0,0.05)'}, transparent 70%)` }}
@@ -67,17 +72,23 @@ export default function FeaturesSection() {
                 )}
                 
                 <div className="relative z-10">
-                  <div className={`w-12 h-12 rounded-xl ${color.bg} ${color.border} border flex items-center justify-center mb-5 transition-all duration-500 group-hover:scale-110`}>
-                    <Icon size={22} className={color.text} />
+                  <div className="flex items-center justify-between mb-5">
+                    <div className={`w-12 h-12 rounded-xl ${color.bg} ${color.border} border flex items-center justify-center transition-all duration-500 group-hover:scale-110`}>
+                      <Icon size={22} className={color.text} />
+                    </div>
+                    <span className={`inline-flex items-center gap-1 text-xs font-medium ${color.text} opacity-70 group-hover:opacity-100 transition-opacity`}>
+                      <span>{isTr ? 'İncele' : 'Explore'}</span>
+                      <ArrowUpRight size={14} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                    </span>
                   </div>
-                  <h3 className="font-headline-md text-xl md:text-2xl text-on-surface mb-2.5 tracking-tight font-semibold">
+                  <h3 className="font-headline-md text-xl md:text-2xl text-on-surface mb-2.5 tracking-tight font-semibold group-hover:text-white transition-colors">
                     {t[feat.titleKey]}
                   </h3>
                   <p className={`font-body-md text-on-surface-variant font-light leading-relaxed ${isLarge ? 'max-w-lg' : ''}`}>
                     {t[feat.descKey]}
                   </p>
                 </div>
-              </div>
+              </Link>
             </FadeIn>
           );
         })}

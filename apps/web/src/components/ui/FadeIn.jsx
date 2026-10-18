@@ -9,10 +9,22 @@ export default function FadeIn({
   className = "",
   distance = 30, // px to translate
 }) {
-  const [isVisible, setIsVisible] = useState(false);
+  // SSR-safe: Default to true so Googlebot & initial HTML always render opacity: 1
+  const [isVisible, setIsVisible] = useState(true);
   const domRef = useRef();
 
   useEffect(() => {
+    const currentRef = domRef.current;
+    if (!currentRef || typeof IntersectionObserver === "undefined") return;
+
+    // Only animate elements that start below the initial viewport
+    const rect = currentRef.getBoundingClientRect();
+    if (rect.top > window.innerHeight) {
+      setIsVisible(false);
+    } else {
+      return;
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -23,16 +35,15 @@ export default function FadeIn({
         });
       },
       {
-        rootMargin: "0px 0px -50px 0px", // Trigger slightly before it comes fully into view
-        threshold: 0.1
+        rootMargin: "0px 0px -40px 0px",
+        threshold: 0.05
       }
     );
     
-    const currentRef = domRef.current;
-    if (currentRef) observer.observe(currentRef);
+    observer.observe(currentRef);
     
     return () => {
-      if (currentRef) observer.unobserve(currentRef);
+      observer.unobserve(currentRef);
     };
   }, []);
 
@@ -50,7 +61,7 @@ export default function FadeIn({
   return (
     <div
       ref={domRef}
-      className={`transition-all duration-[800ms] ease-out ${className}`}
+      className={`transition-all duration-[700ms] ease-out ${className}`}
       style={{
         opacity: isVisible ? 1 : 0,
         transform: getTransform(),

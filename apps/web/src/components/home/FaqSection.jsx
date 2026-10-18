@@ -45,8 +45,25 @@ export default function FaqSection() {
     { q: t.faqQ4, a: t.faqA4 },
   ];
 
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqs.map((faq) => ({
+      "@type": "Question",
+      "name": faq.q,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.a
+      }
+    }))
+  };
+
   return (
     <section id="faq" className="px-margin-mobile md:px-margin-desktop py-12 md:py-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <div className="max-w-3xl mx-auto">
         <FadeIn delay={100} direction="up" distance={20}>
           <div className="text-center mb-8">

@@ -35,20 +35,30 @@ export default function BlogListClient({ allPosts = [] }) {
     setSearchQuery('');
   }, [lang]);
 
-  // Normalize all posts into a single, unified English/Global feed
+  // Prioritize posts matching the active language (TR first for Turkish users & Googlebot on .com.tr, EN first when switched to English)
   const processedPosts = useMemo(() => {
-    return allPosts.map(p => {
+    const mapped = allPosts.map(p => {
       const normalizedCat = normalizeCategory(p.category);
+      const postLang = p.lang || (p.slug?.endsWith('-en') ? 'en' : 'tr');
       
       return {
         ...p,
+        lang: postLang,
         category: normalizedCat,
         readTimeMinutes: p.readTimeMinutes || 5,
-        authorName: p.authorName || 'Veyronix Team',
+        authorName: p.authorName || (postLang === 'tr' ? 'Veyronix Ekibi' : 'Veyronix Team'),
         authorAvatar: p.authorAvatar || 'https://veyronix.com.tr/icon.svg',
       };
     });
-  }, [allPosts]);
+
+    const targetLang = isTr ? 'tr' : 'en';
+    return mapped.sort((a, b) => {
+      const aMatch = a.lang === targetLang ? 1 : 0;
+      const bMatch = b.lang === targetLang ? 1 : 0;
+      if (aMatch !== bMatch) return bMatch - aMatch;
+      return new Date(b.publishedAt || 0) - new Date(a.publishedAt || 0);
+    });
+  }, [allPosts, isTr]);
 
   // Unified Categories with counts
   const categories = useMemo(() => {
