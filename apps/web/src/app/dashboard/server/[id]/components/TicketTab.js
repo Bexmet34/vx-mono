@@ -2,6 +2,8 @@ import { Save, Info, Hash, Shield, Search, X as XIcon, Users, Plus, Trash2, Send
 import InfoTooltip from "@/components/InfoTooltip";
 import { useState, useRef, useEffect } from "react";
 import TicketHistoryTab from "./TicketHistoryTab";
+import PermissionStatusCard from "./PermissionStatusCard";
+
 
 export default function TicketTab({ t, lang, settings, setSettings, discordChannels, discordRoles = [], discordMembers = [], handleSave, saving, guildId, showToast, isPremium }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -128,7 +130,22 @@ export default function TicketTab({ t, lang, settings, setSettings, discordChann
              <Send size={16} />
              {deploying ? (lang === 'tr' ? 'Gönderiliyor...' : 'Deploying...') : (lang === 'tr' ? 'Paneli Kanala Gönder' : 'Deploy Panel to Channel')}
           </button>
+
+          {/* ── Bot Yetki Kontrolü ─────────────────────────────────────── */}
+          <div className="mt-2 pt-2 border-t border-white/5">
+            <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+              <Shield size={11} className="text-primary-container" />
+              {lang === 'tr' ? 'Bot Yetki Durumu' : 'Bot Permission Status'}
+            </p>
+            <PermissionStatusCard
+              guildId={guildId}
+              mode="ticket"
+              channelId={settings?.ticket_channel_id || null}
+              lang={lang}
+            />
+          </div>
         </div>
+
 
         <div className="bg-surface-variant p-2 rounded-md border border-white/5 shadow-sm relative group">
           <div className="absolute -inset-0.5 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>

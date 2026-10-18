@@ -13,7 +13,7 @@ export const metadata = {
   },
 };
 
-export const revalidate = 60; // 60 saniyede bir yeni yazıları kontrol et (ISR)
+export const revalidate = 10800; // 3 saatte bir ISR yenilemesi (Egress tasarrufu)
 
 export default async function BlogIndex() {
   const posts = await getAllBlogPosts();

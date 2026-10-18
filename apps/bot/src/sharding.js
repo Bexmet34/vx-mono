@@ -29,18 +29,18 @@ manager.on('shardCreate', shard => {
     });
 });
 
-if (config.TOPGG_TOKEN) {
-    const ap = AutoPoster(config.TOPGG_TOKEN, manager);
-    ap.on('posted', () => {
-        console.log(`[Top.gg] Server count posted successfully from ShardingManager!`);
-    });
-    ap.on('error', (err) => {
-        console.error('[Top.gg] AutoPoster Error in ShardingManager:', err.message);
-    });
-} else {
-    console.warn('[ShardingManager] TOPGG_TOKEN is missing. Top.gg AutoPoster is disabled.');
-}
-
-manager.spawn().catch(error => {
+manager.spawn().then(() => {
+    if (config.TOPGG_TOKEN) {
+        const ap = AutoPoster(config.TOPGG_TOKEN, manager);
+        ap.on('posted', () => {
+            console.log(`[Top.gg] Server count posted successfully from ShardingManager!`);
+        });
+        ap.on('error', (err) => {
+            console.log(`[Top.gg] AutoPoster geçici API uyarısı: ${err.message}`);
+        });
+    } else {
+        console.warn('[ShardingManager] TOPGG_TOKEN is missing. Top.gg AutoPoster is disabled.');
+    }
+}).catch(error => {
     console.error('[ShardingManager] Failed to spawn shards:', error);
 });

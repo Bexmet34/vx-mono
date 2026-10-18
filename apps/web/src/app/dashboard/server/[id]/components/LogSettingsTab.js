@@ -1,6 +1,8 @@
 import { Save, Info, Hash, Shield, Search, X as XIcon, User, Bot, Users } from "lucide-react";
 import InfoTooltip from "@/components/InfoTooltip";
 import { useState, useRef, useEffect } from "react";
+import PermissionStatusCard from "./PermissionStatusCard";
+
 
 export default function LogSettingsTab({ t, lang, settings, setSettings, discordChannels, discordRoles = [], discordMembers = [], handleSave, saving }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -131,6 +133,22 @@ export default function LogSettingsTab({ t, lang, settings, setSettings, discord
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
               </div>
             </div>
+
+            {/* ── Bot Yetki Kontrolü ─────────────────────────────────────── */}
+            {settings?.log_channel_id && (
+              <div className="mt-3 pt-2.5 border-t border-white/5">
+                <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                  <Shield size={11} className="text-primary" />
+                  {lang === 'tr' ? 'Bot Yetki Durumu' : 'Bot Permission Status'}
+                </p>
+                <PermissionStatusCard
+                  guildId={settings?.id || ""}
+                  mode="log"
+                  channelId={settings?.log_channel_id || null}
+                  lang={lang}
+                />
+              </div>
+            )}
           </div>
 
           <div className="bg-surface-variant p-3 rounded-md border border-white/5 shadow-sm relative group">

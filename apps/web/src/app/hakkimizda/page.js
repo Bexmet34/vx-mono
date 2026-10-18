@@ -43,11 +43,6 @@ export default function AboutPage() {
           </p>
           <p>
             {isEn
-              ? "Founded in 2024, Veyronix was born out of a real gaming problem: managing large MMO parties, Discord roles, and guild events manually was chaotic, time-consuming, and prone to errors. We set out to build the fastest, most reliable, and beautifully designed Discord automation ecosystem specifically tailored for Albion Online guilds and competitive gaming communities."
-              : "2024 yılında kurulan Veyronix, bizzat oyuncuların yaşadığı büyük bir soruna çözüm üretmek amacıyla doğdu: Geniş çaplı MMO loncalarında parti kurma, ZvZ kompozisyonlarını yönetme, rol dağıtma ve Killboard takibini manuel yapmak hem yorucu hem de karmaşıktı. Veyronix, Albion Online loncaları ve oyun toplulukları için dünyanın en hızlı, en güvenilir ve en gelişmiş Discord otomasyon platformunu inşa etme vizyonuyla yola çıktı."}
-          </p>
-          <p>
-            {isEn
               ? "Today, Veyronix powers hundreds of active Discord servers, handling thousands of automated party setups, real-time killboard tracking, and guild registrations daily with a 99.9% uptime track record."
               : "Bugün Veyronix, yüzlerce aktif Discord sunucusunda on binlerce oyuncunun parti organizasyonunu, canlı killboard bildirimlerini ve otomatik kayıt sistemlerini %99.9 kesintisiz çalışma oranıyla yönetmektedir."}
           </p>
@@ -155,6 +150,19 @@ export default function AboutPage() {
               </div>
             </div>
           </div>
+        </section>
+
+        {/* Official Brand & Domain Ownership Notice */}
+        <section className="p-4 bg-primary-container/10 rounded-xl border border-primary-container/30 text-xs text-on-surface-variant space-y-1.5">
+          <p className="text-white font-bold flex items-center gap-1.5">
+            <Shield size={15} className="text-primary" />
+            {isEn ? "Official Brand & Domain Verification Notice" : "Resmi Marka, İsim Hakkı ve Alan Adı Doğrulama Beyanı"}
+          </p>
+          <p>
+            {isEn
+              ? "Veyronix™ (Veyronix Digital Services) operates exclusively through its official domain veyronix.com.tr and its authorized subdomains (*.veyronix.com.tr). Any third-party websites using similar names or extensions (such as .fun, .xyz, etc.) have no affiliation with the official Veyronix platform."
+              : "Veyronix™ (Veyronix Digital Services) markası, Discord bot ekosistemleri ve bulut otomasyon yazılımları yalnızca resmi alan adımız olan veyronix.com.tr ve yetkili alt alan adları (*.veyronix.com.tr) üzerinden hizmet vermektedir. Farklı uzantılarla (.fun, .xyz vb.) açılmış üçüncü taraf sitelerin resmi Veyronix markamızla hiçbir bağlantısı yoktur."}
+          </p>
         </section>
 
         {/* Legal Disclaimer */}

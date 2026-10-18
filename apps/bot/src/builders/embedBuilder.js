@@ -546,7 +546,16 @@ function createPlayerCardEmbed(player, lang = 'tr') {
                 name: '\u200b', value: '\u200b', inline: true // Alignment spacer
             }
         )
-        .setFooter({ text: `Veyronix Registration System • ID: ${player.Id}` })
+        
+    if (player.RecentGuilds && player.RecentGuilds.length > 0) {
+        embed.addFields({
+            name: lang === 'tr' ? '🏰 Geçmiş Loncaları' : '🏰 Past Guilds',
+            value: player.RecentGuilds.map(g => `\`${g}\``).join(', '),
+            inline: false
+        });
+    }
+
+    embed.setFooter({ text: `Veyronix Registration System • ID: ${player.Id}` })
         .setTimestamp();
 
     return embed;

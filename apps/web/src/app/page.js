@@ -9,12 +9,23 @@ import StatsBanner from "@/components/home/StatsBanner";
 import FaqSection from "@/components/home/FaqSection";
 import CtaBanner from "@/components/home/CtaBanner";
 
-export const revalidate = 300; // Revalidate home page every 5 minutes (ISR)
+// Günde maksimum 4-5 sorgu: 5 saatte bir ISR yenilemesi (5 * 3600 = 18000 saniye)
+export const revalidate = 18000;
+
+// Bellek içi önbellek (In-Memory Cache): Node süreci boyunca günde max 5 sorguyu garanti eder
+let cachedServers = null;
+let lastFetchTime = 0;
+const CACHE_TTL_MS = 5 * 60 * 60 * 1000; // 5 saat
 
 async function getPublicServers() {
+  const now = Date.now();
+  if (cachedServers && (now - lastFetchTime < CACHE_TTL_MS)) {
+    return cachedServers;
+  }
+
   try {
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-      return [];
+      return cachedServers || [];
     }
     const { data: guilds, error } = await supabase
       .from('subscriptions')
@@ -22,14 +33,14 @@ async function getPublicServers() {
       .neq('owner_id', '407234961582587916')
       .limit(50);
 
-    if (error || !guilds) return [];
+    if (error || !guilds) return cachedServers || [];
 
     // Bot API'sinden ikon bilgisini çek
     let botGuildMap = {};
     try {
       const botApiUrl = process.env.BOT_API_URL || 'http://127.0.0.1:3005';
       const botRes = await fetch(`${botApiUrl}/api/bot-guilds`, { 
-        next: { revalidate: 300 },
+        next: { revalidate: 18000 },
         signal: AbortSignal.timeout(3000)
       });
       if (botRes.ok) {
@@ -44,7 +55,7 @@ async function getPublicServers() {
       // Bot API erişilemez olsa bile devam et, ikonlar olmadan göster
     }
 
-    return guilds
+    const result = guilds
       .filter(g => g.guild_name && g.guild_name.trim() !== '' && g.guild_name.toLowerCase() !== 'unknown')
       .map(g => {
         const botGuild = botGuildMap[g.guild_id];
@@ -55,8 +66,12 @@ async function getPublicServers() {
             : null,
         };
       });
+
+    cachedServers = result;
+    lastFetchTime = now;
+    return result;
   } catch (error) {
-    return [];
+    return cachedServers || [];
   }
 }
 

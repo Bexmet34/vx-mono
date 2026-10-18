@@ -58,7 +58,7 @@ export default function HeroSection() {
         <FadeIn delay={400} direction="up" distance={15}>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5">
             <a 
-              href="https://discord.com/oauth2/authorize?client_id=1082239904169336902&permissions=510977&scope=bot+applications.commands"
+              href={LINKS.BOT_INVITE}
               target="_blank"
               rel="noopener noreferrer"
               className="group w-full sm:w-auto bg-primary-container text-on-primary px-7 py-3.5 rounded-xl font-label-bold uppercase tracking-wider transition-all hover:shadow-[0_0_35px_rgba(255,215,0,0.3)] hover:-translate-y-0.5 active:scale-95 flex items-center justify-center gap-2 text-xs sm:text-sm"

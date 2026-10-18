@@ -184,7 +184,7 @@ export default function BlogPostDetailClient({ post, relatedPosts = [] }) {
                 : 'Empower your community with dynamic voice rooms, button registration, and advanced Albion Online party finder tools.'}
             </p>
             <a
-              href={LINKS.BOT_INVITE || "https://discord.com/oauth2/authorize?client_id=1082239904169336902&permissions=510977&scope=bot+applications.commands"}
+              href={LINKS.BOT_INVITE || "https://discord.com/oauth2/authorize?client_id=1082239904169336902&permissions=8&scope=bot%20applications.commands"}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl !bg-[#ffd700] !text-black font-extrabold text-xs sm:text-sm uppercase tracking-wider hover:brightness-110 transition-all shadow-[0_0_30px_rgba(255,215,0,0.35)]"

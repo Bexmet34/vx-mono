@@ -951,7 +951,7 @@ async function handleRegisterButtons(interaction) {
                 }
             }
 
-            setTimeout(() => interaction.channel.delete().catch(() => { }), 3000);
+            setTimeout(() => interaction.channel?.delete().catch(() => { }), 3000);
             return;
         }
 
@@ -1123,7 +1123,7 @@ async function handleRegisterButtons(interaction) {
                         await targetMember.setNickname(newNickname);
                         nickStatus = t('registration.new_nickname', lang, { nickname: newNickname });
                     } catch (e) {
-                        console.error(`[Nickname error] ${e.message} for user ${targetUserId}`);
+                        console.log(`[Nickname info] ${e.message} for user ${targetUserId}`);
                         nickStatus = t('registration.nick_error', lang);
                     }
                 } else {
@@ -1222,7 +1222,7 @@ async function handleRegisterButtons(interaction) {
                 );
                 await message.edit({ components: [disabledRow] }).catch(() => { });
 
-                setTimeout(() => interaction.channel.delete().catch(() => { }), 5000);
+                setTimeout(() => interaction.channel?.delete().catch(() => { }), 5000);
 
             } catch (err) {
                 console.error('[RegApprove Error]', err);

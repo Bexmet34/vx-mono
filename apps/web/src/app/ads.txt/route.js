@@ -1,5 +1,6 @@
 export const dynamic = 'force-static';
 
+export async function GET() {
   const content = `google.com, pub-1315540294941790, DIRECT, f08c47fec0942fa0
 # admatic.com.tr ads.txt lines | Date: 2026-09-27
 admatic.com.tr, adm-pub-671f641ea1d751fbc78ba766, DIRECT
@@ -70,7 +71,7 @@ adform.com, 2083, RESELLER
 rtbhouse.com, 36401e736811e8034581, RESELLER, 4f3b94578e85950c
 rtbhouse.com, Bl90aHDHpnUdxORfqhhI, RESELLER, 4f3b94578e85950c
 rubiconproject.com, 25100, RESELLER, 0bfd66d529a55807
-\`;
+`;
   return new Response(content, {
     headers: {
       'Content-Type': 'text/plain; charset=utf-8',

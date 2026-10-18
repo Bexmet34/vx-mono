@@ -1,5 +1,12 @@
 const { supabase } = require('./client');
 
+const guildSettingsCache = new Map();
+const GS_CACHE_TTL_MS = 15 * 60 * 1000; // 15 dakika TTL (Tekrarlayan sorguları engeller)
+
+function invalidateGuildSettingsCache(guildId) {
+    if (guildId) guildSettingsCache.delete(guildId);
+}
+
 /**
  * Fetch the guild settings from supabase database
  * @param {string} guildId 
@@ -8,6 +15,12 @@ const { supabase } = require('./client');
 async function getSupabaseGuildSettings(guildId) {
     try {
         if (!guildId) return null;
+
+        const cached = guildSettingsCache.get(guildId);
+        if (cached && (Date.now() - cached.timestamp < GS_CACHE_TTL_MS)) {
+            return cached.data;
+        }
+
         const { data, error } = await supabase
             .from('guild_settings')
             .select('*')
@@ -19,6 +32,7 @@ async function getSupabaseGuildSettings(guildId) {
             return null;
         }
 
+        guildSettingsCache.set(guildId, { data, timestamp: Date.now() });
         return data; // Returns the full row or null if not found
     } catch (e) {
         console.error(`[Supabase] Exception fetching guild_settings for ${guildId}:`, e.message);
@@ -33,6 +47,7 @@ async function getSupabaseGuildSettings(guildId) {
  * @returns {Promise<boolean>}
  */
 async function updateGuildLanguage(guildId, language, ownerId = null) {
+    invalidateGuildSettingsCache(guildId);
     try {
         const { data: existing } = await supabase
             .from('guild_settings')
@@ -68,6 +83,7 @@ async function updateGuildLanguage(guildId, language, ownerId = null) {
  * Update general guild settings in supabase
  */
 async function updateSupabaseGuildSettings(guildId, settings) {
+    invalidateGuildSettingsCache(guildId);
     try {
         const { error } = await supabase
             .from('guild_settings')
@@ -87,5 +103,6 @@ async function updateSupabaseGuildSettings(guildId, settings) {
 module.exports = {
     getSupabaseGuildSettings,
     updateGuildLanguage,
-    updateSupabaseGuildSettings
+    updateSupabaseGuildSettings,
+    invalidateGuildSettingsCache
 };

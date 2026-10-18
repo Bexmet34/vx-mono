@@ -51,7 +51,7 @@ export async function generateStaticParams() {
   return posts.map((post) => ({ slug: post.slug }));
 }
 
-export const revalidate = 60; // 60 saniyede bir yeni veri kontrol et
+export const revalidate = 86400; // 24 saatte bir ISR yenilemesi (Tekil yazılar RAM'de kalıcı tutulur)
 
 export default async function BlogPostPage({ params }) {
   const { slug } = await params;

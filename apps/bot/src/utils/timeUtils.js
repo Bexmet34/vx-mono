@@ -29,7 +29,7 @@ let timeOffsetMs = 0;
 const TIME_APIS = [
     {
         url: 'https://timeapi.io/api/time/current/zone?timeZone=UTC',
-        parse: (data) => new Date(data.dateTime).getTime(),
+        parse: (data) => new Date(data.dateTime + 'Z').getTime(),
     },
     {
         url: 'http://worldtimeapi.org/api/timezone/Etc/UTC',

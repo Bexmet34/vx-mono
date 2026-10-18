@@ -165,20 +165,8 @@ client.once('clientReady', async (c) => {
     console.log(`🌍 Service active on ${c.guilds.cache.size} servers.`);
     console.log('-------------------------------------------');
 
-    // Sunucuları Supabase ile senkronize et (Sıralı işlem, DB yorulmasın)
-    const { getSubscription } = require('@veyronix/database');
-    const guildsArray = Array.from(c.guilds.cache.values());
-    (async () => {
-        for (const guild of guildsArray) {
-            try {
-                await getSubscription(guild.id, guild.name, guild.ownerId);
-            } catch (err) {
-                console.error(`[GuildSync] Error syncing guild ${guild.id}:`, err?.message);
-            }
-            // Küçük bir bekleme (rate limit / db exhaustion önlemek için)
-            await new Promise(resolve => setTimeout(resolve, 50));
-        }
-    })();
+    // Sunucu abonelikleri ve ayarları dbListenerService tarafından toplu önbelleğe alınır,
+    // yeni sunucu katılımları ise doğrudan 'guildCreate' eventi ile işlenir.
 
     // Set activity safely
     try {
@@ -507,9 +495,10 @@ client.on(Events.MessageCreate, async (message) => {
             await handleDropCodeMessage(message);
         }
 
-        // ── 2. percent_based mod tetikleme ────────────────────────────────────
-        const settings = await getDropSettings(message.guild.id);
-        if (!settings?.is_enabled) return;
+        // ── 2. percent_based mod tetikleme (Tamamen bellek içi önbellekten, 0 Supabase sorgusu) ───
+        const { getActiveDropSetting } = require('./services/dropScheduler');
+        const settings = getActiveDropSetting(message.guild.id);
+        if (!settings || !settings.is_enabled) return;
         if (settings.schedule_type !== 'percent_based') return;
 
         // Bu kanal izleme listesinde mi?

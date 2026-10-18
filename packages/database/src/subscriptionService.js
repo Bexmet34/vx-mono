@@ -6,6 +6,10 @@ function invalidateSubCache(guildId) {
     if (guildId) subCache.delete(guildId);
 }
 
+function setCachedSubscription(guildId, sub) {
+    if (guildId) subCache.set(guildId, { data: sub, timestamp: Date.now() });
+}
+
 /**
  * Gets subscription for a guild. If not exists, creates a 3-day trial.
  * @param {string} guildId 
@@ -280,5 +284,6 @@ module.exports = {
     setUnlimitedSubscription,
     setSubscriptionActive,
     isUserPremium,
-    invalidateSubCache
+    invalidateSubCache,
+    setCachedSubscription
 };

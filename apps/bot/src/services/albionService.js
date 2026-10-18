@@ -51,6 +51,38 @@ async function getPlayerInfo(playerName, server = 'Europe') {
         
         const detailedData = await detailResponse.json();
         
+        // 3. Get recent guilds from official API combat logs (to bypass Cloudflare and support all regions)
+        try {
+            const killsResponse = await fetch(`${baseUrl}/players/${player.Id}/kills`, { signal: AbortSignal.timeout(5000) });
+            const deathsResponse = await fetch(`${baseUrl}/players/${player.Id}/deaths`, { signal: AbortSignal.timeout(5000) });
+            
+            let events = [];
+            if (killsResponse.ok) {
+                const kills = await killsResponse.json();
+                events = events.concat(kills.map(k => ({ ...k, isKiller: true })));
+            }
+            if (deathsResponse.ok) {
+                const deaths = await deathsResponse.json();
+                events = events.concat(deaths.map(d => ({ ...d, isKiller: false })));
+            }
+            
+            // Sort by timestamp desc
+            events.sort((a, b) => new Date(b.TimeStamp) - new Date(a.TimeStamp));
+            
+            const recentGuilds = new Set();
+            for (const ev of events) {
+                const target = ev.isKiller ? ev.Killer : ev.Victim;
+                if (target && target.Id === player.Id && target.GuildName) {
+                    recentGuilds.add(target.GuildName);
+                }
+            }
+            
+            detailedData.RecentGuilds = Array.from(recentGuilds).slice(0, 5);
+        } catch (e) {
+            console.error(`[AlbionService] Error fetching combat history for ${player.Id}:`, e.message);
+            detailedData.RecentGuilds = [];
+        }
+        
         console.log(`[AlbionService] Successfully fetched data for: ${detailedData.Name} on ${server}`);
         return detailedData;
     } catch (error) {

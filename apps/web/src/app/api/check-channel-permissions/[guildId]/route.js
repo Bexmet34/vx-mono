@@ -14,14 +14,89 @@ function getBotToken() {
 
 // Discord permission bit flags (BigInt)
 const PERM = {
-    ADMINISTRATOR: 1n << 3n,
-    MANAGE_CHANNELS: 1n << 4n,
-    VIEW_CHANNEL:  1n << 10n,
-    SEND_MESSAGES: 1n << 11n,
-    EMBED_LINKS:   1n << 14n,
-    ATTACH_FILES:  1n << 15n,
-    MOVE_MEMBERS:  1n << 24n,
-    MANAGE_ROLES:  1n << 28n,
+    ADMINISTRATOR:        1n << 3n,
+    MANAGE_CHANNELS:      1n << 4n,
+    MANAGE_GUILD:         1n << 5n,
+    ADD_REACTIONS:        1n << 6n,
+    VIEW_AUDIT_LOG:       1n << 7n,
+    VIEW_CHANNEL:         1n << 10n,
+    SEND_MESSAGES:        1n << 11n,
+    MANAGE_MESSAGES:      1n << 13n,
+    EMBED_LINKS:          1n << 14n,
+    ATTACH_FILES:         1n << 15n,
+    READ_MESSAGE_HISTORY: 1n << 16n,
+    MENTION_EVERYONE:     1n << 17n,
+    CONNECT:              1n << 20n,
+    MOVE_MEMBERS:         1n << 24n,
+    MANAGE_ROLES:         1n << 28n,
+    MANAGE_WEBHOOKS:      1n << 29n,
+    MANAGE_THREADS:       1n << 34n,
+    MODERATE_MEMBERS:     1n << 40n,
+};
+
+// ─── Feature → Required Permissions Map ─────────────────────────────────────
+// Her özellik için botun sunucu genelinde (veya ilgili kanalda) sahip olması
+// gereken minimum Discord izinleri.
+const FEATURE_PERMS = {
+    // Geçici Ses Kanalı (VoiceForge)
+    voiceforge: [
+        { flag: PERM.MANAGE_CHANNELS, name_tr: 'Kanalları Yönet',   name_en: 'Manage Channels' },
+        { flag: PERM.MANAGE_ROLES,    name_tr: 'Rolleri Yönet',     name_en: 'Manage Roles'    },
+        { flag: PERM.MOVE_MEMBERS,    name_tr: 'Üyeleri Taşı',      name_en: 'Move Members'    },
+    ],
+    // Sayaç Kanalları
+    counters: [
+        { flag: PERM.MANAGE_CHANNELS, name_tr: 'Kanalları Yönet',       name_en: 'Manage Channels' },
+        { flag: PERM.VIEW_CHANNEL,    name_tr: 'Kanalı Görüntüle',      name_en: 'View Channel'    },
+        { flag: PERM.CONNECT,         name_tr: 'Bağlan (Ses Kanalı)',   name_en: 'Connect (Voice)' },
+    ],
+    // Ticket Sistemi
+    ticket: [
+        { flag: PERM.MANAGE_CHANNELS,      name_tr: 'Kanalları Yönet',       name_en: 'Manage Channels'       },
+        { flag: PERM.VIEW_CHANNEL,         name_tr: 'Kanalı Görüntüle',      name_en: 'View Channel'          },
+        { flag: PERM.SEND_MESSAGES,        name_tr: 'Mesaj Gönder',          name_en: 'Send Messages'         },
+        { flag: PERM.EMBED_LINKS,          name_tr: 'Bağlantı Yerleştir',   name_en: 'Embed Links'           },
+        { flag: PERM.READ_MESSAGE_HISTORY, name_tr: 'Mesaj Geçmişini Oku',  name_en: 'Read Message History'  },
+        { flag: PERM.MANAGE_MESSAGES,      name_tr: 'Mesajları Yönet',       name_en: 'Manage Messages'       },
+    ],
+    // Rol Menüsü
+    rolemenu: [
+        { flag: PERM.MANAGE_ROLES,  name_tr: 'Rolleri Yönet',   name_en: 'Manage Roles'   },
+        { flag: PERM.VIEW_CHANNEL,  name_tr: 'Kanalı Görüntüle', name_en: 'View Channel'  },
+        { flag: PERM.SEND_MESSAGES, name_tr: 'Mesaj Gönder',    name_en: 'Send Messages'  },
+        { flag: PERM.EMBED_LINKS,   name_tr: 'Bağlantı Yerleştir', name_en: 'Embed Links' },
+    ],
+    // Çekiliş (Giveaway)
+    giveaway: [
+        { flag: PERM.VIEW_CHANNEL,         name_tr: 'Kanalı Görüntüle',     name_en: 'View Channel'         },
+        { flag: PERM.SEND_MESSAGES,        name_tr: 'Mesaj Gönder',         name_en: 'Send Messages'        },
+        { flag: PERM.EMBED_LINKS,          name_tr: 'Bağlantı Yerleştir',  name_en: 'Embed Links'          },
+        { flag: PERM.ADD_REACTIONS,        name_tr: 'Reaksiyon Ekle',       name_en: 'Add Reactions'        },
+        { flag: PERM.READ_MESSAGE_HISTORY, name_tr: 'Mesaj Geçmişini Oku', name_en: 'Read Message History' },
+    ],
+    // Log Sistemi
+    log: [
+        { flag: PERM.VIEW_CHANNEL,         name_tr: 'Kanalı Görüntüle',    name_en: 'View Channel'         },
+        { flag: PERM.SEND_MESSAGES,        name_tr: 'Mesaj Gönder',        name_en: 'Send Messages'        },
+        { flag: PERM.EMBED_LINKS,          name_tr: 'Bağlantı Yerleştir', name_en: 'Embed Links'          },
+        { flag: PERM.READ_MESSAGE_HISTORY, name_tr: 'Mesaj Geçmişini Oku',name_en: 'Read Message History' },
+        { flag: PERM.MANAGE_WEBHOOKS,      name_tr: 'Webhook\'leri Yönet', name_en: 'Manage Webhooks'      },
+        { flag: PERM.VIEW_AUDIT_LOG,       name_tr: 'Denetim Günlüğünü Gör', name_en: 'View Audit Log'    },
+    ],
+    // Başvuru / Form Sistemi
+    application: [
+        { flag: PERM.MANAGE_CHANNELS, name_tr: 'Kanalları Yönet',     name_en: 'Manage Channels' },
+        { flag: PERM.VIEW_CHANNEL,    name_tr: 'Kanalı Görüntüle',    name_en: 'View Channel'    },
+        { flag: PERM.SEND_MESSAGES,   name_tr: 'Mesaj Gönder',        name_en: 'Send Messages'   },
+        { flag: PERM.EMBED_LINKS,     name_tr: 'Bağlantı Yerleştir', name_en: 'Embed Links'     },
+    ],
+    // Genel mesaj/embed gönderme (içerik kanalları vb.)
+    general: [
+        { flag: PERM.VIEW_CHANNEL,  name_tr: 'Kanalı Görüntüle',    name_en: 'View Channel'  },
+        { flag: PERM.SEND_MESSAGES, name_tr: 'Mesaj Gönder',        name_en: 'Send Messages' },
+        { flag: PERM.EMBED_LINKS,   name_tr: 'Bağlantı Yerleştir', name_en: 'Embed Links'   },
+        { flag: PERM.ATTACH_FILES,  name_tr: 'Dosya Ekle',          name_en: 'Attach Files'  },
+    ],
 };
 
 /**
@@ -189,26 +264,20 @@ export async function GET(req, context) {
         }
 
         // ── Step 7: Check required permissions ───────────────────────────────
-        let requiredPerms = [
-            { flag: PERM.VIEW_CHANNEL,  name_tr: 'Kanalı Görüntüle',   name_en: 'View Channel'  },
-            { flag: PERM.SEND_MESSAGES, name_tr: 'Mesaj Gönder',        name_en: 'Send Messages' },
-            { flag: PERM.EMBED_LINKS,   name_tr: 'Bağlantı Yerleştir',  name_en: 'Embed Links'   },
-            { flag: PERM.ATTACH_FILES,  name_tr: 'Dosya Ekle',          name_en: 'Attach Files'  },
-        ];
-
-        if (mode === 'voiceforge') {
-            requiredPerms = [
-                { flag: PERM.MANAGE_CHANNELS, name_tr: 'Kanalları Yönet',   name_en: 'Manage Channels' },
-                { flag: PERM.MANAGE_ROLES,    name_tr: 'Rolleri Yönet',     name_en: 'Manage Roles' },
-                { flag: PERM.MOVE_MEMBERS,    name_tr: 'Üyeleri Taşı',      name_en: 'Move Members' },
-            ];
-        }
+        // FEATURE_PERMS haritasından ilgili mode'un izinlerini al,
+        // bilinmeyen mod ise 'general' (genel mesaj gönderme) olarak varsay.
+        const requiredPerms = FEATURE_PERMS[mode] ?? FEATURE_PERMS['general'];
 
         let missingPermissions = requiredPerms.filter(p => (basePermissions & p.flag) !== p.flag);
 
         // ── Step 8: REAL API TESTING (Ultimate Source of Truth) ───────────────
-        if (mode !== 'voiceforge' && channelId) {
-            // KESİN BİLGİ 1: Step 2'de (channel fetch) 403 yemedik ve kanalı okuduk. 
+        // Sadece kanal bazlı kontrol yapan modlarda gerçek API testi yapalım.
+        // voiceforge ve counters sunucu geneli izinlerine bakıyor; kanal yoksa atla.
+        const GUILD_WIDE_MODES = new Set(['voiceforge', 'counters']);
+        const hasSendMessagePerm = requiredPerms.some(p => p.flag === PERM.SEND_MESSAGES);
+
+        if (!GUILD_WIDE_MODES.has(mode) && channelId && hasSendMessagePerm) {
+            // KESİN BİLGİ 1: Step 2'de (channel fetch) 403 yemedik ve kanalı okuduk.
             // Bu yüzden VIEW_CHANNEL kesinlikle var! (Local hesaplama ne derse desin)
             missingPermissions = missingPermissions.filter(p => p.flag !== PERM.VIEW_CHANNEL);
 
@@ -229,13 +298,15 @@ export async function GET(req, context) {
             // Eğer typing atamadıysak, SEND_MESSAGES kesinlikle yoktur. (Eksik listesine ekle)
             if (!hasRealSendAccess) {
                 if (!missingPermissions.find(p => p.flag === PERM.SEND_MESSAGES)) {
-                    missingPermissions.push(requiredPerms.find(p => p.flag === PERM.SEND_MESSAGES));
+                    const sendPerm = requiredPerms.find(p => p.flag === PERM.SEND_MESSAGES);
+                    if (sendPerm) missingPermissions.push(sendPerm);
                 }
             } else {
                 // Eğer typing atabildiysek, SEND_MESSAGES kesinlikle VARDIR. (Eksik listesinden çıkar)
                 missingPermissions = missingPermissions.filter(p => p.flag !== PERM.SEND_MESSAGES);
             }
         }
+
 
         const allGood = missingPermissions.length === 0;
 

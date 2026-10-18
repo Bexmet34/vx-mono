@@ -10,6 +10,11 @@ const ALBION_ENDPOINTS = {
   'europe': 'https://gameinfo-ams.albiononline.com/api/gameinfo'
 };
 
+const ALBION_FETCH_HEADERS = {
+  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+  'Accept': 'application/json'
+};
+
 function getAlbionBaseUrl(server) {
   if (!server) return ALBION_ENDPOINTS['europe'];
   const key = server.toString().trim().toLowerCase();
@@ -79,17 +84,42 @@ async function runKillboardCheck(client) {
     for (const server of activeServers) {
       const baseUrl = getAlbionBaseUrl(server);
       serverGlobalEvents[server] = [];
-      try {
-        // Fetch up to 102 recent events globally to catch deaths (offset 0, 51)
-        for (let offset = 0; offset <= 51; offset += 51) {
-          const res = await fetch(`${baseUrl}/events?limit=51&offset=${offset}`, { signal: AbortSignal.timeout(6000) });
-          if (res.ok) {
-            const data = await res.json();
-            if (data && data.length) serverGlobalEvents[server].push(...data);
+
+      const offsets = [0, 51];
+      const results = await Promise.allSettled(
+        offsets.map(async (offset) => {
+          let lastErr = null;
+          for (let attempt = 0; attempt < 2; attempt++) {
+            try {
+              const res = await fetch(`${baseUrl}/events?limit=51&offset=${offset}`, {
+                headers: ALBION_FETCH_HEADERS,
+                signal: AbortSignal.timeout(12000)
+              });
+              if (res.ok) {
+                const data = await res.json();
+                return Array.isArray(data) ? data : [];
+              }
+              throw new Error(`HTTP ${res.status}`);
+            } catch (err) {
+              lastErr = err;
+              if (attempt === 0) await new Promise(r => setTimeout(r, 800));
+            }
+          }
+          throw lastErr;
+        })
+      );
+
+      for (const result of results) {
+        if (result.status === 'fulfilled' && result.value?.length) {
+          serverGlobalEvents[server].push(...result.value);
+        } else if (result.status === 'rejected') {
+          const err = result.reason;
+          if (err?.name === 'TimeoutError' || err?.message?.includes('timeout') || err?.message?.includes('aborted')) {
+            console.log(`[Killboard] Albion global events zaman aşımı (${server}): ${err.message}`);
+          } else {
+            console.warn(`[Killboard] Error fetching global events for ${server}:`, err?.message || err);
           }
         }
-      } catch (e) {
-        console.error(`[Killboard] Error fetching global events for ${server}:`, e.message);
       }
     }
 
@@ -121,7 +151,10 @@ async function processAlbionGuildEvents(client, trackingInfo, globalEvents = [])
   const baseUrl = getAlbionBaseUrl(albion_server);
   
   try {
-    const res = await fetch(`${baseUrl}/events?guildId=${albion_guild_id}&limit=50`, { signal: AbortSignal.timeout(10000) });
+    const res = await fetch(`${baseUrl}/events?guildId=${albion_guild_id}&limit=50`, {
+      headers: ALBION_FETCH_HEADERS,
+      signal: AbortSignal.timeout(12000)
+    });
     if (!res.ok) {
       console.warn(`[Killboard] Failed to fetch events for ${albion_guild_id} on ${albion_server} (Status: ${res.status})`);
       return;

@@ -2,7 +2,7 @@ const { supabase } = require('./client');
 
 // Bellek içi cache (performans için)
 const dropSettingsCache = new Map();
-const CACHE_TTL_MS = 60 * 1000; // 1 dakika
+const CACHE_TTL_MS = 15 * 60 * 1000; // 15 dakika (Supabase istek sayısını 15 kat azaltır)
 
 // ─── drop_settings ────────────────────────────────────────────────────────────
 

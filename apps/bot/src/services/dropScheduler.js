@@ -42,20 +42,19 @@ function resolveTargetChannels(channelIds, mode) {
   return [picked];
 }
 
-// Aktif zamanlı drop ayarlarını bellekte tutarak her dakika Supabase'e boş GET sorguları atılmasını engeller
+// Aktif zamanlı ve yüzde tabanlı drop ayarlarını bellekte tutarak her dakika Supabase'e boş GET sorguları atılmasını engeller
 const activeDropSettingsCache = new Map();
 let isDropCacheInitialized = false;
 
 /**
- * Aktif drop ayarlarını Supabase'den ilk kez belleğe çeker
+ * Aktif drop ayarlarını Supabase'den ilk kez belleğe çeker (tüm modlar)
  */
 async function initDropSettingsCache() {
   try {
     const { data, error } = await supabase
       .from('drop_settings')
       .select('*')
-      .eq('is_enabled', true)
-      .in('schedule_type', ['exact_minutes', 'random_interval', 'hourly_chance']);
+      .eq('is_enabled', true);
     
     if (!error && data) {
       activeDropSettingsCache.clear();
@@ -75,12 +74,18 @@ async function initDropSettingsCache() {
  */
 function syncDropSettingsCache(setting, isDeleted = false) {
   if (!setting || !setting.guild_id) return;
-  const isTimeBased = ['exact_minutes', 'random_interval', 'hourly_chance'].includes(setting.schedule_type);
-  if (isDeleted || !setting.is_enabled || !isTimeBased) {
+  if (isDeleted || !setting.is_enabled) {
     activeDropSettingsCache.delete(setting.guild_id);
   } else {
     activeDropSettingsCache.set(setting.guild_id, setting);
   }
+}
+
+/**
+ * Bellek önbelleğinden belirli bir sunucunun aktif drop ayarını döner (0 Supabase sorgusu)
+ */
+function getActiveDropSetting(guildId) {
+  return activeDropSettingsCache.get(guildId) || null;
 }
 
 /**
@@ -96,7 +101,12 @@ async function processTimeBasedDrops(client) {
       return; // Aktif zamanlı drop yoksa Supabase'e ASLA istek atma
     }
 
-    const allSettings = Array.from(activeDropSettingsCache.values());
+    // Sadece zaman tabanlı olanları filtrele (percent_based mod index.js messageCreate içinde işlenir)
+    const allSettings = Array.from(activeDropSettingsCache.values()).filter(s =>
+      ['exact_minutes', 'random_interval', 'hourly_chance'].includes(s.schedule_type)
+    );
+    if (allSettings.length === 0) return;
+
     const now           = new Date();
     const currentMinute = now.getMinutes();
 
@@ -183,5 +193,6 @@ async function processTimeBasedDrops(client) {
 module.exports = {
   processTimeBasedDrops,
   initDropSettingsCache,
-  syncDropSettingsCache
+  syncDropSettingsCache,
+  getActiveDropSetting
 };

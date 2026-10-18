@@ -2,6 +2,7 @@
 
 import { useLanguage } from "@/context/LanguageContext";
 import FadeIn from "@/components/ui/FadeIn";
+import { LINKS } from "@veyronix/config";
 import { 
   XCircle, 
   CheckCircle2, 
@@ -146,7 +147,7 @@ export default function ComparisonSection() {
                 {lang === 'tr' ? '✨ Hepsi tek botta, sıfır kargaşa!' : '✨ All in one verified bot, zero bloat!'}
               </div>
               <a
-                href="https://discord.com/oauth2/authorize?client_id=1082239904169336902&permissions=510977&scope=bot+applications.commands"
+                href={LINKS.BOT_INVITE}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-primary-container text-on-primary px-5 py-2.5 rounded-xl font-label-bold text-xs uppercase tracking-wider transition-all hover:shadow-[0_0_30px_rgba(255,215,0,0.35)] hover:-translate-y-0.5 active:scale-95"

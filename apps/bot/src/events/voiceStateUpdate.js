@@ -4,13 +4,17 @@ const { handleCreatorJoin, handleTempChannelLeave } = require('../services/tempV
 module.exports = async (client) => {
     client.on('voiceStateUpdate', async (oldState, newState) => {
         try {
+            // Kullanıcı kanal değiştirmediyse (mute, deafen, stream, konuşma vb.) işlem yapma
+            if (oldState.channelId === newState.channelId) {
+                return;
+            }
+
             const member = newState.member || oldState.member;
-            console.log(`[voiceStateUpdate] ${member?.user?.tag || 'User'} moved in ${newState.guild?.name || oldState.guild?.name} (old: ${oldState.channelId}, new: ${newState.channelId})`);
 
             // Check if user left a temp channel (non-blocking so join is instant)
             if (oldState.channelId && oldState.channelId !== newState.channelId) {
                 handleTempChannelLeave(oldState).catch(err => {
-                    console.error('[VoiceForge] Error in handleTempChannelLeave:', err);
+                    console.error('[VoiceForge] Error in handleTempChannelLeave:', err.message || err);
                 });
             }
 
@@ -26,14 +30,13 @@ module.exports = async (client) => {
                     if (Array.isArray(creators)) {
                         const creatorConfig = creators.find(c => c.channelId === newState.channelId);
                         if (creatorConfig) {
-                            console.log(`[voiceStateUpdate] Triggering handleCreatorJoin for channel ${newState.channelId}`);
                             await handleCreatorJoin(newState, creatorConfig);
                         }
                     }
                 }
             }
         } catch (err) {
-            console.error('[voiceStateUpdate] Error handling VoiceForge logic:', err);
+            console.error('[voiceStateUpdate] Error handling VoiceForge logic:', err.message || err);
         }
     });
 };

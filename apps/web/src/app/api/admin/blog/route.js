@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { supabase } from '@veyronix/database';
+import { invalidateBlogCache } from '@/lib/supabaseBlog';
 
 // GET: Tüm Blog Yazılarını Getir
 export async function GET() {
@@ -19,7 +21,7 @@ export async function GET() {
   }
 }
 
-// POST: Manuel Manuel Yeni Blog Yazısı Ekle
+// POST: Manuel Yeni Blog Yazısı Ekle
 export async function POST(req) {
   try {
     const body = await req.json();
@@ -85,6 +87,12 @@ export async function POST(req) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    invalidateBlogCache(finalSlug);
+    try {
+      revalidatePath('/blog');
+      revalidatePath(`/blog/${finalSlug}`);
+    } catch (_) {}
+
     return NextResponse.json({ success: true, post: data[0] });
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -134,6 +142,13 @@ export async function PUT(req) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    const updatedSlug = data?.[0]?.slug || null;
+    invalidateBlogCache(updatedSlug);
+    try {
+      revalidatePath('/blog');
+      if (updatedSlug) revalidatePath(`/blog/${updatedSlug}`);
+    } catch (_) {}
+
     return NextResponse.json({ success: true, post: data[0] });
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -158,6 +173,11 @@ export async function DELETE(req) {
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
+
+    invalidateBlogCache();
+    try {
+      revalidatePath('/blog');
+    } catch (_) {}
 
     return NextResponse.json({ success: true });
   } catch (error) {

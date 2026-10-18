@@ -83,9 +83,7 @@ export async function POST(req, context) {
     };
 
 
-    if (embedFooter) {
-      embed.footer = { text: embedFooter };
-    }
+    embed.footer = { text: embedFooter || 'Powered by Veyronix VoiceForge • veyronix.com.tr' };
 
     const messagePayload = {
       embeds: [embed],

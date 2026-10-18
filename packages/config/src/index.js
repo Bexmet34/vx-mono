@@ -6,7 +6,7 @@ const LINKS = {
   DASHBOARD: "https://veyronix.com.tr/dashboard",
 
   // Bot Invite URL
-  BOT_INVITE: "https://discord.com/oauth2/authorize?client_id=1082239904169336902&permissions=510977&scope=bot+applications.commands",
+  BOT_INVITE: "https://discord.com/oauth2/authorize?client_id=1082239904169336902&permissions=8&scope=bot%20applications.commands",
 
   // Global Discord Support Server URL
   SUPPORT_SERVER: "https://veyronix.com.tr/support",

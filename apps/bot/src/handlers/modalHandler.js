@@ -138,7 +138,18 @@ async function handlePartiModal(interaction) {
             }
         }
 
-        const msg = await targetChannel.send({ content: '@everyone', embeds: [embed], components: components });
+        let msg;
+        try {
+            msg = await targetChannel.send({ content: '@everyone', embeds: [embed], components: components });
+        } catch (sendErr) {
+            console.error('[ModalHandler] Error sending party message to target channel:', sendErr.message);
+            await interaction.editReply({
+                content: `❌ Parti mesajı kanala (${targetChannel?.name ? '#' + targetChannel.name : 'hedef kanal'}) gönderilemedi. Lütfen botun o kanalda **Kanalı Görüntüle**, **Mesaj Gönder**, **Bağlantı Yerleştir** ve **@everyone Etiketleme** izinlerine sahip olduğundan emin olun.`,
+                embeds: [],
+                components: []
+            }).catch(() => {});
+            return;
+        }
         
         const msgId = msg?.id;
         const chanId = msg?.channelId || targetChannel.id;

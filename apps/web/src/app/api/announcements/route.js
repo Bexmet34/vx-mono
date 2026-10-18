@@ -5,7 +5,16 @@ import { supabase } from '@veyronix/database';
 
 export const dynamic = 'force-dynamic';
 
+let cachedAnnouncements = null;
+let lastFetchTime = 0;
+const CACHE_TTL_MS = 60 * 60 * 1000; // 1 saat
+
 export async function GET(req) {
+  const now = Date.now();
+  if (cachedAnnouncements && (now - lastFetchTime < CACHE_TTL_MS)) {
+    return NextResponse.json(cachedAnnouncements);
+  }
+
   try {
     const { data, error } = await supabase
       .from('system_announcements')
@@ -14,13 +23,16 @@ export async function GET(req) {
 
     if (error) {
       console.error('Error fetching announcements:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json(cachedAnnouncements || { error: error.message }, { status: cachedAnnouncements ? 200 : 500 });
     }
+
+    cachedAnnouncements = data;
+    lastFetchTime = now;
 
     return NextResponse.json(data);
   } catch (err) {
     console.error('Server error fetching announcements:', err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json(cachedAnnouncements || { error: err.message }, { status: cachedAnnouncements ? 200 : 500 });
   }
 }
 
@@ -50,6 +62,7 @@ export async function POST(req) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    cachedAnnouncements = null;
     return NextResponse.json(data);
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 });
@@ -79,6 +92,7 @@ export async function PUT(req) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    cachedAnnouncements = null;
     return NextResponse.json(data);
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 });
@@ -106,6 +120,7 @@ export async function DELETE(req) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    cachedAnnouncements = null;
     return NextResponse.json({ success: true });
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 });

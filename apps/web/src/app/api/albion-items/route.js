@@ -1,7 +1,20 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@veyronix/database';
 
+export const revalidate = 86400; // 24 saat
+
+let cachedAlbionItems = null;
+let lastFetchTime = 0;
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 saat
+
 export async function GET() {
+  const now = Date.now();
+  if (cachedAlbionItems && (now - lastFetchTime < CACHE_TTL_MS)) {
+    return NextResponse.json(cachedAlbionItems, {
+      headers: { 'Cache-Control': 'public, max-age=86400, s-maxage=86400' }
+    });
+  }
+
   try {
     const { data, error } = await supabase
       .from('albion_items')
@@ -132,9 +145,14 @@ export async function GET() {
     // Swaps will just use weapons
     grouped.swaps = [...grouped.weapons].sort();
 
-    return NextResponse.json(grouped);
+    cachedAlbionItems = grouped;
+    lastFetchTime = now;
+
+    return NextResponse.json(grouped, {
+      headers: { 'Cache-Control': 'public, max-age=86400, s-maxage=86400' }
+    });
   } catch (err) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json(cachedAlbionItems || { error: err.message }, { status: cachedAlbionItems ? 200 : 500 });
   }
 }
 

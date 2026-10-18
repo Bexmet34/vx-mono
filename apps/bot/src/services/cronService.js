@@ -80,7 +80,11 @@ function startCronService(client) {
                             }
                         }
                     } catch (e) {
-                        console.error(`[CronService] Guild fetch error for ${guildName} on ${match.server}:`, e);
+                        if (e.name === 'TimeoutError' || e.message?.includes('timeout') || e.message?.includes('aborted')) {
+                            console.log(`[CronService] Albion API zaman aşımı: ${guildName} (${match.server})`);
+                        } else {
+                            console.error(`[CronService] Guild fetch error for ${guildName} on ${match.server}:`, e.message || e);
+                        }
                     }
                 }
             }

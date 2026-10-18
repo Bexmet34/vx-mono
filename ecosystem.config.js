@@ -43,6 +43,7 @@ module.exports = {
       script: 'index.js',
       cwd: './apps/monitor',
       watch: false,
+      env_file: './apps/monitor/.env',
       env: {
         NODE_ENV: 'production'
       }

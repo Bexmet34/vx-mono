@@ -51,7 +51,7 @@ module.exports = (client) => {
             .setTitle('🗑️ Mesaj Silindi')
             .setColor('#EF4444')
             .setDescription(`<@${message.author.id}> adlı kullanıcının mesajı <#${message.channel.id}> kanalında silindi.`)
-            .addFields({ name: 'Mesaj İçeriği', value: message.content || '*İçerik yok veya resim*', inline: false })
+            .addFields({ name: 'Mesaj İçeriği', value: message.content ? message.content.substring(0, 1024) : '*İçerik yok veya resim*', inline: false })
             .setFooter({ text: `Kullanıcı ID: ${message.author.id}` })
             .setTimestamp();
 

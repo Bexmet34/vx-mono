@@ -10,6 +10,8 @@ import {
 import { useState } from "react";
 import React from 'react';
 import Link from 'next/link';
+import PermissionStatusCard from "./PermissionStatusCard";
+
 
 export const COUNTER_CATEGORIES = [
   { id: 'member', nameTr: '👥 Üye Sayaçları', nameEn: '👥 Member Counters' },
@@ -314,6 +316,19 @@ export default function CountersTab({ t, lang, settings, setSettings, discordCha
                   {lang === 'tr' ? 'Bilet sayaçlarının doğru sayması için biletlerin açıldığı kategoriyi belirleyebilirsiniz.' : 'Select the category where tickets are created for precise counting.'}
                 </p>
               </div>
+            </div>
+
+            {/* ── Bot Yetki Kontrolü ─────────────────────────────────────── */}
+            <div className="mt-4 pt-3 border-t border-outline-variant/20">
+              <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <Shield size={11} className="text-primary-container" />
+                {lang === 'tr' ? 'Bot Yetki Durumu' : 'Bot Permission Status'}
+              </p>
+              <PermissionStatusCard
+                guildId={guildId}
+                mode="counters"
+                lang={lang}
+              />
             </div>
           </div>
 

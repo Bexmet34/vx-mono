@@ -563,15 +563,25 @@ async function handleSetupRegistrationCommand(interaction) {
 
     const row = new ActionRowBuilder().addComponents(components);
 
-    await interaction.reply({
-        content: lang === 'tr' ? '✅ Kayıt sistemi bu kanalda başlatıldı!' : '✅ Registration system started in this channel!',
-        flags: [MessageFlags.Ephemeral]
-    });
+    try {
+        await channel.send({
+            embeds: [embed],
+            components: [row]
+        });
 
-    await channel.send({
-        embeds: [embed],
-        components: [row]
-    });
+        await safeReply(interaction, {
+            content: lang === 'tr' ? '✅ Kayıt sistemi bu kanalda başlatıldı!' : '✅ Registration system started in this channel!',
+            flags: [MessageFlags.Ephemeral]
+        });
+    } catch (err) {
+        console.error('[CommandHandler] Error sending registration panel:', err.message);
+        await safeReply(interaction, {
+            content: lang === 'tr'
+                ? `❌ Kayıt paneli seçilen kanala (<#${channel.id}>) gönderilemedi. Lütfen botun o kanalda **Kanalı Görüntüle**, **Mesaj Gönder** ve **Bağlantı Yerleştir** izinlerine sahip olduğundan emin olun.`
+                : `❌ Could not send registration panel to <#${channel.id}>. Please ensure the bot has **View Channel**, **Send Messages**, and **Embed Links** permissions in that channel.`,
+            flags: [MessageFlags.Ephemeral]
+        });
+    }
 }
 
 /**
@@ -810,7 +820,7 @@ async function handleFixRegistrationCommand(interaction) {
                 await targetMember.setNickname(newNickname);
                 nickStatus = `\n✅ **Yeni İsim:** \`${newNickname}\``;
             } catch (e) {
-                console.error(`[Nickname error] ${e.message} for user ${targetMember.id}`);
+                console.log(`[Nickname info] ${e.message} for user ${targetMember.id}`);
                 nickStatus = `\n❌ **İsim değiştirilemedi (Yetki sınırı olabilir). Olması gereken:** \`${newNickname}\``;
             }
         } else {

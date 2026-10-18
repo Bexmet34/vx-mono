@@ -12,12 +12,14 @@ let lastKnownPending = new Set();
 async function initDbListeners(client) {
     console.log('[DbListenerService] Initializing Realtime listeners...');
 
-    // 1. Fetch initial subscriptions state to track changes locally
+    // 1. Fetch initial subscriptions state to track changes locally & populate memory cache
     try {
         const { data: subs, error } = await supabase.from('subscriptions').select('*');
         if (!error && subs) {
+            const { setCachedSubscription } = require('@veyronix/database');
             for (const sub of subs) {
                 lastKnownSubs.set(sub.guild_id, sub);
+                setCachedSubscription(sub.guild_id, sub);
             }
         }
     } catch (err) {
@@ -46,10 +48,19 @@ async function initDbListeners(client) {
         const { data: allGuildSettings, error: gsErr } = await supabase.from('guild_settings').select('*');
         if (!gsErr && allGuildSettings) {
             const { setCachedGuildSettings } = require('./guildConfig');
+            const foundGuildIds = new Set();
             for (const gs of allGuildSettings) {
                 setCachedGuildSettings(gs.guild_id, gs);
+                foundGuildIds.add(gs.guild_id);
             }
-            console.log(`[DbListenerService] Pre-loaded ${allGuildSettings.length} guild settings into memory.`);
+            if (client?.guilds?.cache) {
+                for (const gId of client.guilds.cache.keys()) {
+                    if (!foundGuildIds.has(gId)) {
+                        setCachedGuildSettings(gId, null);
+                    }
+                }
+            }
+            console.log(`[DbListenerService] Pre-loaded ${allGuildSettings.length} guild settings and negative-cached unconfigured servers into memory.`);
         }
     } catch (err) {
         console.error('[DbListenerService] Pre-load guild settings error:', err.message);

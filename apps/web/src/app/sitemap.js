@@ -1,7 +1,7 @@
 import { getAllBlogPosts } from '@/lib/supabaseBlog';
 import { LINKS } from '@veyronix/config';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 43200; // 12 saatte bir ISR yenilemesi
 
 export default async function sitemap() {
   let blogUrls = [];
@@ -61,6 +61,24 @@ export default async function sitemap() {
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.90,
+    },
+    {
+      url: LINKS.PAGE_PREMIUM,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.95,
+    },
+    {
+      url: LINKS.PAGE_KILLBOARD,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.90,
+    },
+    {
+      url: LINKS.PAGE_VOTE,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.85,
     },
     {
       url: LINKS.PAGE_BLOG,

@@ -2,10 +2,25 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@veyronix/database';
 import { LINKS } from '@veyronix/config';
 
-// Bu endpoint kimlik doğrulama gerektirmez - public config değerleri sunar
-export const dynamic = 'force-dynamic';
+// 1 saatlik ISR önbelleği
+export const revalidate = 3600;
+
+let cachedSupportServer = null;
+let lastFetchTime = 0;
+const CACHE_TTL_MS = 60 * 60 * 1000; // 1 saat
 
 export async function GET() {
+    const now = Date.now();
+    if (cachedSupportServer && (now - lastFetchTime < CACHE_TTL_MS)) {
+        return NextResponse.json({
+            supportServer: cachedSupportServer,
+        }, {
+            headers: {
+                'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400'
+            }
+        });
+    }
+
     try {
         const { data, error } = await supabase
             .from('system_settings')
@@ -17,19 +32,20 @@ export async function GET() {
             data.forEach(s => { settings[s.key] = s.value; });
         }
 
+        const supportUrl = settings['discord_invite_url'] || LINKS.SUPPORT_SERVER;
+        cachedSupportServer = supportUrl;
+        lastFetchTime = now;
+
         return NextResponse.json({
-            supportServer: settings['discord_invite_url'] || LINKS.SUPPORT_SERVER,
+            supportServer: supportUrl,
         }, {
             headers: {
-                // 60 saniye tarayıcı cache'i — çok fazla istek gelmez ama hâlâ "canlı"
-                'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30'
+                'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400'
             }
         });
     } catch (err) {
-        // Hata olursa config dosyasındaki varsayılan değeri döndür
         return NextResponse.json({
-            supportServer: LINKS.SUPPORT_SERVER,
+            supportServer: cachedSupportServer || LINKS.SUPPORT_SERVER,
         });
     }
 }
-

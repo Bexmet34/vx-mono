@@ -1,3 +1,4 @@
+require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 const pm2 = require('pm2');
 const axios = require('axios');
 

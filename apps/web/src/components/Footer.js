@@ -186,7 +186,7 @@ export default function Footer() {
             </div>
           </div>
           <p className="text-[10px] text-on-surface-variant/40 font-mono text-center">
-            &copy; {new Date().getFullYear()} Veyronix. {lang === 'tr' ? 'Tüm hakları saklıdır.' : 'All rights reserved.'}
+            &copy; 2024 - {new Date().getFullYear()} Veyronix&trade; (veyronix.com.tr). {lang === 'tr' ? 'Tüm isim, marka ve yazılım hakları saklıdır.' : 'All brand, trademark, and software rights reserved.'}
           </p>
         </div>
 

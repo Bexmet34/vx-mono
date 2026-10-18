@@ -91,8 +91,8 @@ export const metadata = {
     title: "Veyronix",
   },
   openGraph: {
-    title: "Veyronix – Discord Automation, VoiceForge & Community Platform",
-    description: "Empower your Discord server with all-in-one automation: 15-button temporary voice channels (VoiceForge), modal registration & auto-roles, Albion Online ZvZ party finder, live Killboard & web dashboard!",
+    title: "Veyronix™ – Resmi Discord Kayıt, Geçici Ses Kanalı & Albion Online Botu",
+    description: "Discord sunucunuzu tek bir güçlü botla yönetin: 15 butonlu geçici ses kanalları (VoiceForge), butonlu kayıt & otomatik rol, Albion Online ZvZ parti kurucu, canlı Killboard ve web kontrol paneli!",
     url: LINKS.WEBSITE,
     siteName: "Veyronix",
     images: [
@@ -100,22 +100,26 @@ export const metadata = {
         url: LINKS.OG_IMAGE_URL,
         width: 1200,
         height: 630,
-        alt: "Veyronix - Discord Automation & Community Management Platform",
+        alt: "Veyronix™ - Resmi Discord Otomasyon & Topluluk Yönetim Platformu",
       },
     ],
-    locale: "en_US",
-    alternateLocale: ["tr_TR"],
+    locale: "tr_TR",
+    alternateLocale: ["en_US"],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Veyronix – Discord Automation, VoiceForge & Community Platform",
-    description: "Empower your Discord server with all-in-one automation: 15-button temporary voice channels (VoiceForge), modal registration & auto-roles, ZvZ party finder, live Killboard & web dashboard!",
+    title: "Veyronix™ – Resmi Discord Kayıt, Geçici Ses Kanalı & Albion Online Botu",
+    description: "Discord sunucunuzu tek bir güçlü botla yönetin: 15 butonlu geçici ses kanalları (VoiceForge), butonlu kayıt & otomatik rol, ZvZ parti kurucu, canlı Killboard ve web kontrol paneli!",
     images: [LINKS.OG_IMAGE_URL],
   },
+  applicationName: "Veyronix",
+  category: "technology",
   other: {
     cryptomus: "7e16ba27",
     "google-adsense-account": "ca-pub-1315540294941790",
+    "copyright": "Veyronix Digital Services (veyronix.com.tr)",
+    "brand": "Veyronix",
   },
   verification: {
     google: "Sb34R-Xts1_g6mT_DiZvpXlRVD75T_uc-G2qp505mMQ",
@@ -126,16 +130,23 @@ export default async function RootLayout({ children }) {
   const jsonLdSoftware = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'Veyronix - All-In-One Discord Bot & Albion Online Platform',
+    '@id': `${LINKS.WEBSITE}/#software`,
+    name: 'Veyronix',
+    alternateName: ['Veyronix Discord Bot', 'Veyronix Bot', 'Veyronix Albion Bot'],
     operatingSystem: 'Discord, Web, iOS, Android',
     applicationCategory: 'UtilitiesApplication',
-    applicationSubCategory: 'Discord Bot',
+    applicationSubCategory: 'Discord Bot & Gaming Community Platform',
     url: LINKS.WEBSITE,
-    description: 'Discord sunucuları için hepsi bir arada otomasyon: Dinamik geçici ses kanalları (VoiceForge), butonlu kayıt ve otomatik rol, Albion Online ZvZ parti kurucu, Killboard takibi ve web paneli.',
+    author: { '@id': `${LINKS.WEBSITE}/#organization` },
+    publisher: { '@id': `${LINKS.WEBSITE}/#organization` },
+    brand: { '@id': `${LINKS.WEBSITE}/#brand` },
+    copyrightHolder: { '@id': `${LINKS.WEBSITE}/#organization` },
+    copyrightYear: 2024,
+    description: 'Discord sunucuları için resmi Veyronix hepsi bir arada otomasyon platformu: Dinamik geçici ses kanalları (VoiceForge), butonlu kayıt ve otomatik rol, Albion Online ZvZ parti kurucu, Killboard takibi ve web paneli.',
     offers: {
       '@type': 'Offer',
       price: '0.00',
-      priceCurrency: 'USD',
+      priceCurrency: 'TRY',
     },
     aggregateRating: {
       '@type': 'AggregateRating',
@@ -155,13 +166,69 @@ export default async function RootLayout({ children }) {
 
   const jsonLdOrg = {
     '@context': 'https://schema.org',
-    '@type': 'Organization',
-    name: 'Veyronix',
-    url: LINKS.WEBSITE,
-    logo: LINKS.OG_IMAGE_URL,
-    sameAs: [
-      LINKS.SUPPORT_SERVER,
-      'https://top.gg/bot/1082239904169336902'
+    '@graph': [
+      {
+        '@type': 'Organization',
+        '@id': `${LINKS.WEBSITE}/#organization`,
+        name: 'Veyronix',
+        legalName: 'Veyronix Digital Services',
+        alternateName: [
+          'Veyronix Bot',
+          'Veyronix Discord Bot',
+          'Veyronix Albion Bot',
+          'Veyronix Türkiye'
+        ],
+        url: LINKS.WEBSITE,
+        logo: {
+          '@type': 'ImageObject',
+          url: `${LINKS.WEBSITE}/icon.png`,
+          width: 512,
+          height: 512
+        },
+        image: LINKS.OG_IMAGE_URL,
+        foundingDate: '2024-04-05',
+        description: 'Veyronix (veyronix.com.tr), Discord sunucu otomasyonu, VoiceForge geçici ses kanalları, butonlu kayıt sistemleri ve Albion Online topluluk yönetim araçlarının resmi geliştiricisi ve marka sahibidir.',
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: 'İzmir',
+          addressCountry: 'TR'
+        },
+        contactPoint: {
+          '@type': 'ContactPoint',
+          telephone: '+90-551-078-8261',
+          email: 'info@veyronix.com.tr',
+          contactType: 'customer support',
+          areaServed: ['TR', 'GLOBAL'],
+          availableLanguage: ['Turkish', 'English']
+        },
+        brand: { '@id': `${LINKS.WEBSITE}/#brand` },
+        sameAs: [
+          LINKS.WEBSITE,
+          'https://docs.veyronix.com.tr',
+          LINKS.SUPPORT_SERVER,
+          'https://top.gg/bot/1082239904169336902'
+        ]
+      },
+      {
+        '@type': 'Brand',
+        '@id': `${LINKS.WEBSITE}/#brand`,
+        name: 'Veyronix',
+        alternateName: 'Veyronix™',
+        url: LINKS.WEBSITE,
+        logo: `${LINKS.WEBSITE}/icon.png`,
+        image: LINKS.OG_IMAGE_URL,
+        slogan: 'Discord Kayıt, Geçici Ses Kanalı & Albion Online Botu',
+        description: 'Veyronix™ resmi Discord otomasyon ve oyun topluluk platformu markasıdır. Yalnızca veyronix.com.tr alan adı üzerinden hizmet vermektedir.'
+      },
+      {
+        '@type': 'WebSite',
+        '@id': `${LINKS.WEBSITE}/#website`,
+        url: LINKS.WEBSITE,
+        name: 'Veyronix',
+        alternateName: ['Veyronix Discord Bot', 'Veyronix Resmi Web Sitesi'],
+        publisher: { '@id': `${LINKS.WEBSITE}/#organization` },
+        inLanguage: ['tr-TR', 'en-US']
+      }
     ]
   };
 

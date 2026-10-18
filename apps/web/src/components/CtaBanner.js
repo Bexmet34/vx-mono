@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useLanguage } from "@/context/LanguageContext";
+import { LINKS } from '@veyronix/config';
 
 export default function CtaBanner() {
   const { lang } = useLanguage();
@@ -40,7 +41,7 @@ export default function CtaBanner() {
         </p>
         
         <Link 
-          href="https://discord.com/oauth2/authorize?client_id=1082239904169336902&permissions=510977&scope=bot+applications.commands"
+          href={LINKS.BOT_INVITE}
           target="_blank"
           style={{
             display: 'inline-flex',

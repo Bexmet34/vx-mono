@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Gift, Plus, Trash2, CheckCircle2, Clock, Users, ShieldAlert, Image, ChevronDown, ChevronUp, RefreshCw, X } from "lucide-react";
+import { Gift, Plus, Trash2, CheckCircle2, Clock, Users, ShieldAlert, Image, ChevronDown, ChevronUp, RefreshCw, X, Shield } from "lucide-react";
+import PermissionStatusCard from "./PermissionStatusCard";
+
 
 export default function GiveawayTab({ t, lang, guildId, discordChannels, discordRoles }) {
   const [activeGiveaways, setActiveGiveaways] = useState([]);
@@ -172,6 +174,15 @@ export default function GiveawayTab({ t, lang, guildId, discordChannels, discord
           </div>
         </div>
       </div>
+
+      {/* ── Bot Yetki Kontrolü ─────────────────────────────────────── */}
+      <PermissionStatusCard
+        guildId={guildId}
+        mode="giveaway"
+        channelId={channelId || null}
+        lang={lang}
+        className="max-w-5xl"
+      />
 
       {/* Main Form (Screenshot 1 Layout) */}
       <form onSubmit={handleCreate} className="space-y-6">
