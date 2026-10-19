@@ -6,7 +6,6 @@ import PublicServersSection from "@/components/home/PublicServersSection";
 import FeaturesSection from "@/components/home/FeaturesSection";
 import ComparisonSection from "@/components/home/ComparisonSection";
 import StatsBanner from "@/components/home/StatsBanner";
-import GuidesSection from "@/components/home/GuidesSection";
 import FaqSection from "@/components/home/FaqSection";
 import CtaBanner from "@/components/home/CtaBanner";
 
@@ -95,9 +94,6 @@ export default async function Home() {
 
       {/* STATS — Animated counter banner */}
       <StatsBanner />
-
-      {/* GUIDES — Internal SEO Links to Pillar Turkish & English Guides */}
-      <GuidesSection />
 
       {/* FAQ — Accordion style */}
       <FaqSection />

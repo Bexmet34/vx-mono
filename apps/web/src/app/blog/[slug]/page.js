@@ -61,7 +61,7 @@ export default async function BlogPostPage({ params }) {
     notFound();
   }
 
-  const related = await getRelatedPosts(post.slug, post.category, 3, post.lang || 'tr');
+  const related = await getRelatedPosts(post.slug, post.category, 3);
   const postUrl = `${LINKS.PAGE_BLOG}/${post.slug}`;
 
   const jsonLd = {
@@ -71,7 +71,6 @@ export default async function BlogPostPage({ params }) {
         '@type': 'BlogPosting',
         headline: post.title,
         description: post.description,
-        inLanguage: post.lang === 'en' ? 'en-US' : 'tr-TR',
         image: post.coverImage || LINKS.OG_IMAGE_URL,
         datePublished: post.publishedAt,
         dateModified: post.publishedAt,
