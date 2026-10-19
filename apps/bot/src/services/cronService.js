@@ -269,6 +269,15 @@ function startCronService(client) {
             console.error('[CronService] Killboard Check Error:', err);
         });
     });
+
+    // --- Auto Blog Turkish SEO Optimizer (Every 15 minutes) ---
+    // Google Apps Script (otoblog) tarafından İngilizce eklenen makaleleri yakalayıp %100 Türkçe SEO'ya dönüştürür
+    cron.schedule('*/15 * * * *', async () => {
+        const { convertRecentEnglishBlogPosts } = require('./blogSeoService');
+        await convertRecentEnglishBlogPosts(1).catch(err => {
+            console.error('[CronService] Blog SEO Optimizer Error:', err.message);
+        });
+    });
 }
 
 /**
